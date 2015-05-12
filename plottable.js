@@ -89,23 +89,6 @@ var Plottable;
             }
             Methods.intersection = intersection;
             /**
-             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-             * and "activate" it by turning it into a function in (datum, index,  dataset)
-             */
-            function accessorize(accessor) {
-                if (typeof (accessor) === "function") {
-                    return accessor;
-                }
-                else if (typeof (accessor) === "string" && accessor[0] !== "#") {
-                    return function (datum, index, dataset) { return datum[accessor]; };
-                }
-                else {
-                    return function (datum, index, dataset) { return accessor; };
-                }
-                ;
-            }
-            Methods.accessorize = accessorize;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -6288,39 +6271,11 @@ var Plottable;
             this._dataChanged = true;
             this.render();
         };
-        /**
-         * Sets an attribute of every data point.
-         *
-         * Here's a common use case:
-         * ```typescript
-         * plot.attr("x", function(d) { return d.foo; }, xScale);
-         * ```
-         * This will set the x accessor of each datum `d` to be `d.foo`,
-         * scaled in accordance with `xScale`
-         *
-         * @param {string} attrToSet The attribute to set across each data
-         * point. Popular examples include "x", "y".
-         *
-         * @param {Function|string|any} accessor Function to apply to each element
-         * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
-         * `d[accessor]` is used. If anything else, use `accessor` as a constant
-         * across all data points.
-         *
-         * @param {Scale.Scale} scale If provided, the result of the accessor
-         * is passed through the scale, such as `scale.scale(accessor(d, i))`.
-         *
-         * @returns {Plot} The calling Plot.
-         */
-        Plot.prototype.attr = function (attrToSet, accessor, scale) {
-            return this.project(attrToSet, accessor, scale);
-        };
-        /**
-         * Identical to plot.attr
-         */
-        Plot.prototype.project = function (attrToSet, accessor, scale) {
-            attrToSet = attrToSet.toLowerCase();
-            accessor = Plottable.Utils.Methods.accessorize(accessor);
-            this._bindAttr(attrToSet, accessor, scale);
+        Plot.prototype.attr = function (attr, attrValue, scale) {
+            if (attrValue == null) {
+                return this._attrBindings.get(attr);
+            }
+            this._bindAttr(attr, attrValue, scale);
             this.render(); // queue a re-render upon changing projector
             return this;
         };
@@ -7239,7 +7194,7 @@ var Plottable;
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            function Grid(xScale, yScale, colorScale) {
+            function Grid(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("grid-plot", true);
                 // The x and y scales should render in bands with no padding for category scales
@@ -7249,7 +7204,6 @@ var Plottable;
                 if (yScale instanceof Plottable.Scales.Category) {
                     yScale.innerPadding(0).outerPadding(0);
                 }
-                this._colorScale = colorScale;
                 this.animator("cells", new Plottable.Animators.Null());
             }
             Grid.prototype.addDataset = function (dataset) {
@@ -7262,17 +7216,6 @@ var Plottable;
             };
             Grid.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, true);
-            };
-            /**
-             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
-             * the data should return a valid CSS color.
-             */
-            Grid.prototype.project = function (attrToSet, accessor, scale) {
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
-                if (attrToSet === "fill") {
-                    this._colorScale = this._attrBindings.get("fill").scale;
-                }
-                return this;
             };
             Grid.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];

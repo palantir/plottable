@@ -44,11 +44,6 @@ declare module Plottable {
              */
             function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
             /**
-             * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-             * and "activate" it by turning it into a function in (datum, index,  dataset)
-             */
-            function accessorize(accessor: any): _Accessor;
-            /**
              * Takes two sets and returns the union
              *
              * Due to the fact that D3.Sets store strings internally, return type is always a string set
@@ -2545,34 +2540,9 @@ declare module Plottable {
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
-        /**
-         * Sets an attribute of every data point.
-         *
-         * Here's a common use case:
-         * ```typescript
-         * plot.attr("x", function(d) { return d.foo; }, xScale);
-         * ```
-         * This will set the x accessor of each datum `d` to be `d.foo`,
-         * scaled in accordance with `xScale`
-         *
-         * @param {string} attrToSet The attribute to set across each data
-         * point. Popular examples include "x", "y".
-         *
-         * @param {Function|string|any} accessor Function to apply to each element
-         * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
-         * `d[accessor]` is used. If anything else, use `accessor` as a constant
-         * across all data points.
-         *
-         * @param {Scale.Scale} scale If provided, the result of the accessor
-         * is passed through the scale, such as `scale.scale(accessor(d, i))`.
-         *
-         * @returns {Plot} The calling Plot.
-         */
-        attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-        /**
-         * Identical to plot.attr
-         */
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
+        attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
+        attr(attr: string, attrValue: number | string | _Accessor): Plot;
+        attr<D>(attr: string, attrValue: D | _Accessor, scale: Scale<D, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
@@ -2839,14 +2809,9 @@ declare module Plottable {
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>, colorScale: Scale<any, string>);
+            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>);
             addDataset(dataset: Dataset): Grid;
             protected _getDrawer(key: string): Drawers.Rect;
-            /**
-             * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
-             * the data should return a valid CSS color.
-             */
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x(): Plots.AccessorScaleBinding<any, number>;
             x(x: number | _Accessor): Grid;

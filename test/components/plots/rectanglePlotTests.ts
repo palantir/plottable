@@ -58,9 +58,8 @@ describe("Plots", () => {
 
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
-      var cScale = new Plottable.Scales.Color();
 
-      var plot = new Plottable.Plots.Grid(xScale, yScale, cScale);
+      var plot = new Plottable.Plots.Grid(xScale, yScale);
       plot
         .x((d: any) => d.x, xScale)
         .y((d: any) => d.y1, yScale)

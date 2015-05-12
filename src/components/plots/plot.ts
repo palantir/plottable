@@ -141,40 +141,14 @@ module Plottable {
       this.render();
     }
 
-    /**
-     * Sets an attribute of every data point.
-     *
-     * Here's a common use case:
-     * ```typescript
-     * plot.attr("x", function(d) { return d.foo; }, xScale);
-     * ```
-     * This will set the x accessor of each datum `d` to be `d.foo`,
-     * scaled in accordance with `xScale`
-     *
-     * @param {string} attrToSet The attribute to set across each data
-     * point. Popular examples include "x", "y".
-     *
-     * @param {Function|string|any} accessor Function to apply to each element
-     * of the dataSource. If a Function, use `accessor(d, i)`. If a string,
-     * `d[accessor]` is used. If anything else, use `accessor` as a constant
-     * across all data points.
-     *
-     * @param {Scale.Scale} scale If provided, the result of the accessor
-     * is passed through the scale, such as `scale.scale(accessor(d, i))`.
-     *
-     * @returns {Plot} The calling Plot.
-     */
-    public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      return this.project(attrToSet, accessor, scale);
-    }
-
-    /**
-     * Identical to plot.attr
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      attrToSet = attrToSet.toLowerCase();
-      accessor = Utils.Methods.accessorize(accessor);
-      this._bindAttr(attrToSet, accessor, scale);
+    public attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
+    public attr(attr: string, attrValue: number | string | _Accessor): Plot;
+    public attr<D>(attr: string, attrValue: D | _Accessor, scale: Scale<D, number | string>): Plot;
+    public attr<D>(attr: string, attrValue?: number | string | _Accessor | D, scale?: Scale<D, number | string>): any {
+      if (attrValue == null) {
+        return this._attrBindings.get(attr);
+      }
+      this._bindAttr(attr, attrValue, scale);
       this.render(); // queue a re-render upon changing projector
       return this;
     }

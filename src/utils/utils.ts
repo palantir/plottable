@@ -81,20 +81,6 @@ export module Utils {
     }
 
     /**
-     * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-     * and "activate" it by turning it into a function in (datum, index,  dataset)
-     */
-    export function accessorize(accessor: any): _Accessor {
-      if (typeof(accessor) === "function") {
-        return (<_Accessor> accessor);
-      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
-        return (datum: any, index: number, dataset: Dataset) => datum[accessor];
-      } else {
-        return (datum: any, index: number, dataset: Dataset) => accessor;
-      };
-    }
-
-    /**
      * Takes two sets and returns the union
      *
      * Due to the fact that D3.Sets store strings internally, return type is always a string set

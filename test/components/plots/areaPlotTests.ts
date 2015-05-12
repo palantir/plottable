@@ -51,8 +51,8 @@ describe("Plots", () => {
       areaPlot.x(xAccessor, xScale)
               .y(yAccessor, yScale);
       areaPlot.y0(y0Accessor, yScale)
-              .project("fill", fillAccessor)
-              .project("stroke", colorAccessor)
+              .attr("fill", fillAccessor)
+              .attr("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
     });
@@ -167,7 +167,7 @@ describe("Plots", () => {
 
     it("retains original classes when class is projected", () => {
       var newClassProjector = () => "pink";
-      areaPlot.project("class", newClassProjector);
+      areaPlot.attr("class", newClassProjector);
       areaPlot.renderTo(svg);
       var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
       assert.isTrue(areaPath.classed("pink"));

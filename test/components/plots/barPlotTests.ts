@@ -501,7 +501,7 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;
         var bar1y = bar1.data()[0].y;
-        barPlot.project("width", 10);
+        barPlot.attr("width", 10);
         assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
         assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
         assert.closeTo(TestMethods.numAttr(bar0, "width"), 100, 0.01, "bar0 width");

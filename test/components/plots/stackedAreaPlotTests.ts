@@ -35,7 +35,7 @@ describe("Plots", () => {
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
-      renderer.project("fill", "type", colorScale);
+      renderer.attr("fill", "type", colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
@@ -82,7 +82,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.project("fill", "type", colorScale);
+      renderer.attr("fill", "type", colorScale);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       new Plottable.Components.Table([[renderer]]).renderTo(svg);
@@ -128,7 +128,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.StackedArea(xScale, yScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.project("fill", "type", colorScale);
+      renderer.attr("fill", "type", colorScale);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       renderer.renderTo(svg);
@@ -342,7 +342,7 @@ describe("Plots", () => {
       renderer.x((d) => d.x, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.project("fill", "type", colorScale);
+      renderer.attr("fill", (d) => d.type, colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
@@ -366,7 +366,7 @@ describe("Plots", () => {
     });
 
     it("project works correctly", () => {
-      renderer.project("check", "type");
+      renderer.attr("check", (d) => d.type);
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
@@ -405,7 +405,7 @@ describe("Plots", () => {
       plot.addDataset(dataset1);
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
-      plot.project("fill", "fill");
+      plot.attr("fill", "fill");
       plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
@@ -446,7 +446,7 @@ describe("Plots", () => {
       plot.addDataset(dataset1);
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
-      plot.project("fill", "fill");
+      plot.attr("fill", "fill");
       plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);

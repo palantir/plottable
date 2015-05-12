@@ -83,9 +83,9 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var metadataProjector = (d: any, i: number, m: any) => m.cssClass;
-      r.project("x", "x", xScale);
-      r.project("y", "y", yScale);
-      r.project("meta", metadataProjector);
+      r.attr("x", (d) => d.x, xScale);
+      r.attr("y", (d) => d.y, yScale);
+      r.attr("meta", metadataProjector);
       xScale.onUpdate((listenable: Plottable.Scales.Linear) => {
         assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
@@ -121,7 +121,7 @@ describe("Plots", () => {
     it("Plot.project works as intended", () => {
       var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
-      r.project("attr", "a", s);
+      r.attr("attr", (d) => d.a, s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
@@ -135,11 +135,11 @@ describe("Plots", () => {
       var svg2 = TestMethods.generateSVG(100, 100);
       new Plottable.Plot()
         .addDataset(ds1)
-        .project("x", (x: number) => x, s)
+        .attr("x", (x: number) => x, s)
         .renderTo(svg1);
       new Plottable.Plot()
         .addDataset(ds2)
-        .project("x", (x: number) => x, s)
+        .attr("x", (x: number) => x, s)
         .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
@@ -386,7 +386,7 @@ describe("Plots", () => {
     it("destroy() disconnects plots from its scales", () => {
       var plot2 = new Plottable.Plot();
       var scale = new Plottable.Scales.Linear();
-      plot2.project("attr", "a", scale);
+      plot2.attr("attr", (d) => d.a, scale);
       plot2.destroy();
       var scaleCallbacks = (<any> scale)._callbacks.values();
       assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
@@ -460,7 +460,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plot();
       plot.addDataset(dataset2);
       plot.addDataset(dataset1);
-      plot.project("key", "key", categoryScale);
+      plot.attr("key", (d) => d.key, categoryScale);
 
       var svg = TestMethods.generateSVG();
       plot.renderTo(svg);

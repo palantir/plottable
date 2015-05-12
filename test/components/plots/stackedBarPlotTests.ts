@@ -420,7 +420,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
-      plot.project("fill", "fill");
+      plot.attr("fill", "fill");
       plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
@@ -459,7 +459,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data3));
       plot.addDataset(new Plottable.Dataset(data4));
       plot.addDataset(new Plottable.Dataset(data5));
-      plot.project("fill", "fill");
+      plot.attr("fill", "fill");
       plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var keys = (<any> plot)._key2PlotDatasetKey.keys();
