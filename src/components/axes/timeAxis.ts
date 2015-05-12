@@ -550,6 +550,10 @@ export module Axes {
           return d3.time.day;
         case TimeInterval.month:
           return d3.time.month;
+        case TimeInterval.year:
+          return d3.time.year;
+        default:
+          throw Error("TimeInterval specified does not exist");
       }
     }
   }

@@ -2245,6 +2245,10 @@ var Plottable;
                         return d3.time.day;
                     case 4 /* month */:
                         return d3.time.month;
+                    case 5 /* year */:
+                        return d3.time.year;
+                    default:
+                        throw Error("TimeInterval specified does not exist");
                 }
             };
             return Time;
@@ -4408,6 +4412,10 @@ var Plottable;
                         return d3.time.day;
                     case 4 /* month */:
                         return d3.time.month;
+                    case 5 /* year */:
+                        return d3.time.year;
+                    default:
+                        throw Error("TimeInterval specified does not exist");
                 }
             };
             /**
