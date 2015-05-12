@@ -7440,21 +7440,6 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeScale tests", function () {
-    it("parses reasonable formats for dates", function () {
-        var scale = new Plottable.Scales.Time();
-        var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
-        var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
-        function checkDomain(domain) {
-            scale.domain(domain);
-            var time1 = scale.domain()[0].valueOf();
-            assert.strictEqual(time1, firstDate, "first value of domain set correctly");
-            var time2 = scale.domain()[1].valueOf();
-            assert.strictEqual(time2, secondDate, "first value of domain set correctly");
-        }
-        checkDomain([new Date("10/1/2014"), new Date("11/1/2014")]);
-        checkDomain([new Date("October 1, 2014"), new Date("November 1, 2014")]);
-        checkDomain([new Date("Oct 1, 2014"), new Date("Nov 1, 2014")]);
-    });
     it("can't set reversed domain", function () {
         var scale = new Plottable.Scales.Time();
         assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");

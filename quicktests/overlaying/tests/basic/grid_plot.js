@@ -2,7 +2,7 @@
 function makeData() {
   "use strict";
 
-    var data = [{name: "jon", y: 10, type: "q1"}, {name: "dan", y: 2, type: "q1"}, {name: "zoo", y: 1, type: "q1"}];
+    var data = [{name: "jon", y: "10", type: "q1"}, {name: "dan", y: "2", type: "q1"}, {name: "zoo", y: "1", type: "q1"}];
 
   return data;
 }
