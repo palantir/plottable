@@ -382,10 +382,10 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
-         * Transforms the Plottable TimeInterval into a d3 time interval equivalent.
+         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
          * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
-        function timeIntervalToD3Time(timeInterval: TimeInterval): D3.Time.Interval;
+        function timeIntervalToD3Time(timeInterval: string): D3.Time.Interval;
         /**
          * Creates a formatter for relative dates.
          *
@@ -1174,7 +1174,15 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: TimeInterval, step?: number): Date[];
+            /**
+             * Specifies the interval between ticks
+             *
+             * @param {string} interval TimeInterval string specifying the interval unit measure
+             * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
+             *
+             * @return {Date[]}
+             */
+            tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
             copy(): Time;
             _defaultExtent(): Date[];
@@ -1925,14 +1933,14 @@ declare module Plottable {
 
 
 declare module Plottable {
-    enum TimeInterval {
-        second = 0,
-        minute = 1,
-        hour = 2,
-        day = 3,
-        week = 4,
-        month = 5,
-        year = 6,
+    module TimeInterval {
+        var second: string;
+        var minute: string;
+        var hour: string;
+        var day: string;
+        var week: string;
+        var month: string;
+        var year: string;
     }
     module Axes {
         /**
@@ -1943,7 +1951,7 @@ declare module Plottable {
          * formatter - formatter used to format tick labels.
          */
         type TimeAxisTierConfiguration = {
-            interval: TimeInterval;
+            interval: string;
             step: number;
             formatter: Formatter;
         };

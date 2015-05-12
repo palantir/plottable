@@ -2,8 +2,14 @@
 
 module Plottable {
 
-export enum TimeInterval {
-  second, minute, hour, day, week, month, year
+export module TimeInterval {
+  export var second = "second";
+  export var minute = "minute";
+  export var hour = "hour";
+  export var day = "day";
+  export var week = "week";
+  export var month = "month";
+  export var year = "year";
 };
 
 export module Axes {
@@ -15,7 +21,7 @@ export module Axes {
    * formatter - formatter used to format tick labels.
    */
   export type TimeAxisTierConfiguration = {
-    interval: TimeInterval;
+    interval: string;
     step: number;
     formatter: Formatter;
   };
