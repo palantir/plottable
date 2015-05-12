@@ -26,12 +26,16 @@ module Plottable {
 
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | _Accessor): XYPlot<X, Y>;
-    public x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
     public x(x?: number | _Accessor | X, scale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
-      super.x(<any> x, scale);
+      if (scale == null) {
+        super.x(<number | _Accessor> x);
+      } else {
+        super.x(<X | _Accessor> x, scale);
+      }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
       }
@@ -40,12 +44,16 @@ module Plottable {
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
     public y(y: number | _Accessor): XYPlot<X, Y>;
-    public y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
     public y(y?: number | _Accessor | Y, scale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
-      super.y(<any> y, scale);
+      if (scale == null) {
+        super.y(<number | _Accessor> y);
+      } else {
+        super.y(<Y | _Accessor> y, scale);
+      }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
       }

@@ -7259,19 +7259,24 @@ var Plottable;
                 if (x == null) {
                     return _super.prototype.x.call(this);
                 }
-                _super.prototype.x.call(this, x, scale);
-                if (scale instanceof Plottable.Scales.Category) {
-                    this.project("x1", function (d, i, dataset, m) {
-                        return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                    });
-                    this.project("x2", function (d, i, dataset, m) {
-                        return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                    });
+                if (scale == null) {
+                    _super.prototype.x.call(this, x);
                 }
-                if (scale instanceof Plottable.QuantitativeScale) {
-                    this.project("x1", function (d, i, dataset, m) {
-                        return scale.scale(_this.x().accessor(d, i, dataset, m));
-                    });
+                else {
+                    _super.prototype.x.call(this, x, scale);
+                    if (scale instanceof Plottable.Scales.Category) {
+                        this.project("x1", function (d, i, dataset, m) {
+                            return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("x2", function (d, i, dataset, m) {
+                            return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    else if (scale instanceof Plottable.QuantitativeScale) {
+                        this.project("x1", function (d, i, dataset, m) {
+                            return scale.scale(_this.x().accessor(d, i, dataset, m));
+                        });
+                    }
                 }
                 return this;
             };
@@ -7280,19 +7285,24 @@ var Plottable;
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                _super.prototype.y.call(this, y, scale);
-                if (scale instanceof Plottable.Scales.Category) {
-                    this.project("y1", function (d, i, dataset, m) {
-                        return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
-                    });
-                    this.project("y2", function (d, i, dataset, m) {
-                        return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
-                    });
+                if (scale == null) {
+                    _super.prototype.y.call(this, y);
                 }
-                if (scale instanceof Plottable.QuantitativeScale) {
-                    this.project("y1", function (d, i, dataset, m) {
-                        return scale.scale(_this.y().accessor(d, i, dataset, m));
-                    });
+                else {
+                    _super.prototype.y.call(this, y, scale);
+                    if (scale instanceof Plottable.Scales.Category) {
+                        this.project("y1", function (d, i, dataset, m) {
+                            return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2;
+                        });
+                        this.project("y2", function (d, i, dataset, m) {
+                            return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2;
+                        });
+                    }
+                    else if (scale instanceof Plottable.QuantitativeScale) {
+                        this.project("y1", function (d, i, dataset, m) {
+                            return scale.scale(_this.y().accessor(d, i, dataset, m));
+                        });
+                    }
                 }
                 return this;
             };
@@ -8045,7 +8055,12 @@ var Plottable;
             if (x == null) {
                 return _super.prototype.x.call(this);
             }
-            _super.prototype.x.call(this, x, scale);
+            if (scale == null) {
+                _super.prototype.x.call(this, x);
+            }
+            else {
+                _super.prototype.x.call(this, x, scale);
+            }
             if (this.x().accessor != null && this.y().accessor != null) {
                 this._updateStackOffsets();
             }
@@ -8055,7 +8070,12 @@ var Plottable;
             if (y == null) {
                 return _super.prototype.y.call(this);
             }
-            _super.prototype.y.call(this, y, scale);
+            if (scale == null) {
+                _super.prototype.y.call(this, y);
+            }
+            else {
+                _super.prototype.y.call(this, y, scale);
+            }
             if (this.x().accessor != null && this.y().accessor != null) {
                 this._updateStackOffsets();
             }

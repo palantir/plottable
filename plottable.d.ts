@@ -3072,10 +3072,10 @@ declare module Plottable {
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
         x(): Plots.AccessorScaleBinding<X, number>;
         x(x: number | _Accessor): XYPlot<X, Y>;
-        x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+        x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | _Accessor): XYPlot<X, Y>;
-        y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
