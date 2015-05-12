@@ -745,7 +745,7 @@ describe("TimeAxis", function () {
         var configurations = axis.axisConfigurations();
         var newPossibleConfigurations = configurations.slice(0, 3);
         newPossibleConfigurations.forEach(function (axisConfig) { return axisConfig.forEach(function (tierConfig) {
-            tierConfig.interval = d3.time.minute;
+            tierConfig.interval = 1 /* minute */;
             tierConfig.step += 3;
         }); });
         axis.axisConfigurations(newPossibleConfigurations);
@@ -756,7 +756,7 @@ describe("TimeAxis", function () {
         scale.range([0, 800]);
         axis.renderTo(svg);
         var configs = newPossibleConfigurations[axis._mostPreciseConfigIndex];
-        assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+        assert.deepEqual(configs[0].interval, 1 /* minute */, "axis used new time unit");
         assert.deepEqual(configs[0].step, 4, "axis used new step");
         svg.remove();
     });
@@ -809,22 +809,22 @@ describe("TimeAxis", function () {
         xAxis.gutter(0);
         xAxis.axisConfigurations([
             [
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") }
             ],
         ]);
         xAxis.renderTo(svg);
         var oneTierSize = xAxis.height();
         xAxis.axisConfigurations([
             [
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") }
             ],
         ]);
         var twoTierSize = xAxis.height();
         assert.strictEqual(twoTierSize, oneTierSize * 2, "two-tier axis is twice as tall as one-tier axis");
         xAxis.axisConfigurations([
             [
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") }
             ],
         ]);
         var initialTierSize = xAxis.height();
@@ -840,16 +840,16 @@ describe("TimeAxis", function () {
         xAxis.renderTo(svg);
         xAxis.axisConfigurations([
             [
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
             ],
         ]);
         var twoTierAxisHeight = xAxis.height();
         xAxis.axisConfigurations([
             [
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
-                { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
+                { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") },
             ],
         ]);
         var threeTierAxisHeight = xAxis.height();
@@ -863,7 +863,7 @@ describe("TimeAxis", function () {
         var xAxis = new Plottable.Axes.Time(xScale, "bottom");
         var tiersToCreate = 15;
         var configuration = Array.apply(null, Array(tiersToCreate)).map(function () {
-            return { interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
+            return { interval: 3 /* day */, step: 2, formatter: Plottable.Formatters.time("%a %e") };
         });
         xAxis.axisConfigurations([configuration]);
         xAxis.renderTo(svg);
@@ -7450,31 +7450,31 @@ describe("TimeScale tests", function () {
         var scale = new Plottable.Scales.Time();
         // 100 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
-        var ticks = scale.tickInterval(d3.time.year);
+        var ticks = scale.tickInterval(5 /* year */);
         assert.strictEqual(ticks.length, 101, "generated correct number of ticks");
         // 1 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
-        ticks = scale.tickInterval(d3.time.month);
+        ticks = scale.tickInterval(4 /* month */);
         assert.strictEqual(ticks.length, 12, "generated correct number of ticks");
-        ticks = scale.tickInterval(d3.time.month, 3);
+        ticks = scale.tickInterval(4 /* month */, 3);
         assert.strictEqual(ticks.length, 4, "generated correct number of ticks");
         // 1 month span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
-        ticks = scale.tickInterval(d3.time.day);
+        ticks = scale.tickInterval(3 /* day */);
         assert.strictEqual(ticks.length, 32, "generated correct number of ticks");
         // 1 day span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
-        ticks = scale.tickInterval(d3.time.hour);
+        ticks = scale.tickInterval(2 /* hour */);
         assert.strictEqual(ticks.length, 24, "generated correct number of ticks");
         // 1 hour span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
-        ticks = scale.tickInterval(d3.time.minute);
+        ticks = scale.tickInterval(1 /* minute */);
         assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
-        ticks = scale.tickInterval(d3.time.minute, 10);
+        ticks = scale.tickInterval(1 /* minute */, 10);
         assert.strictEqual(ticks.length, 7, "generated correct number of ticks");
         // 1 minute span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
-        ticks = scale.tickInterval(d3.time.second);
+        ticks = scale.tickInterval(0 /* second */);
         assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
     });
 });
