@@ -2512,7 +2512,6 @@ declare module Plottable {
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;
         protected _attrExtents: D3.Map<any[]>;
-        protected _attrFilters: D3.Map<_Accessor>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         /**
@@ -2589,12 +2588,11 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
-        protected _updateExtentsForAttr(attr: string): void;
+        protected _updateExtentsForAttr(attr: string, filter?: _Accessor): void;
         /**
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForAttr(attr: string): any[];
-        protected _makeFilterByAttr(attr: string): _Accessor;
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2703,6 +2701,9 @@ declare module Plottable {
          * x and y position in the Plot.
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
+        protected _updateExtentsForAttr(attr: string): void;
+        protected _xFilter(): _Accessor;
+        protected _yFilter(): _Accessor;
         destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.

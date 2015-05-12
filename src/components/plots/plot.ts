@@ -33,7 +33,6 @@ module Plottable {
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
     protected _attrExtents: D3.Map<any[]>;
-    protected _attrFilters: D3.Map<_Accessor>;
     private _extentProvider: Scales.ExtentProvider<any>;
 
     protected _animate: boolean = false;
@@ -61,7 +60,6 @@ module Plottable {
       this._key2PlotDatasetKey = d3.map();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
-      this._attrFilters = d3.map();
       this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
@@ -272,10 +270,9 @@ module Plottable {
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    protected _updateExtentsForAttr(attr: string) {
+    protected _updateExtentsForAttr(attr: string, filter?: _Accessor) {
       var binding = this._attrBindings.get(attr);
       var accessor = binding.accessor;
-      var filter = this._attrFilters.get(attr);
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
@@ -327,21 +324,6 @@ module Plottable {
         }
       });
       return d3.merge(allSetsOfExtents);
-    }
-
-    protected _makeFilterByAttr(attr: string): _Accessor {
-      return (datum: any, index: number, dataset: Dataset, metadata: Plots.PlotMetadata) => {
-        var attrBinding = this._attrBindings.get(attr);
-        if (attrBinding != null) {
-          var accessor = attrBinding.accessor;
-          var scale = attrBinding.scale;
-          if (scale != null) {
-            var range = scale.range();
-            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, metadata)), range[0], range[1]);
-          }
-        }
-        return true;
-      };
     }
 
     /**

@@ -71,6 +71,49 @@ module Plottable {
       return this;
     }
 
+    protected _updateExtentsForAttr(attr: string) {
+      if (attr === "x") {
+        return super._updateExtentsForAttr(attr, this._xFilter());
+      } else if (attr === "y") {
+        return super._updateExtentsForAttr(attr, this._yFilter());
+      }
+      return super._updateExtentsForAttr(attr);
+    }
+
+    protected _xFilter(): _Accessor {
+      if (this._autoAdjustXScaleDomain) {
+        var yBinding = this._attrBindings.get("y");
+        if (yBinding != null) {
+          var yAccessor = yBinding.accessor;
+          var yScale = yBinding.scale;
+          if (yScale != null) {
+            return (d, i, dataset, metadata) => {
+              var range = yScale.range();
+              return Utils.Methods.inRange(yScale.scale(yAccessor(d, i, dataset, metadata)), range[0], range[1]);
+            };
+          }
+        }
+      }
+      return null;
+    }
+
+    protected _yFilter(): _Accessor {
+      if (this._autoAdjustYScaleDomain) {
+        var xBinding = this._attrBindings.get("x");
+        if (xBinding != null) {
+          var xAccessor = xBinding.accessor;
+          var xScale = xBinding.scale;
+          if (xScale != null) {
+            return (d, i, dataset, metadata) => {
+              var range = xScale.range();
+              return Utils.Methods.inRange(xScale.scale(xAccessor(d, i, dataset, metadata)), range[0], range[1]);
+            };
+          }
+        }
+      }
+      return null;
+    }
+
     public destroy() {
       super.destroy();
       if (this._xScale) {
@@ -92,13 +135,6 @@ module Plottable {
      */
     public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
-
-      if (this._autoAdjustYScaleDomain) {
-        this._attrFilters.set("y", this._makeFilterByAttr("x"));
-      } else {
-        this._attrFilters.set("y", null);
-      }
-
       this._adjustYDomainOnChangeFromX();
       return this;
     }
@@ -113,13 +149,6 @@ module Plottable {
      */
     public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
-
-      if (this._autoAdjustXScaleDomain) {
-        this._attrFilters.set("x", this._makeFilterByAttr("y"));
-      } else {
-        this._attrFilters.set("x", null);
-      }
-
       this._adjustXDomainOnChangeFromY();
       return this;
     }

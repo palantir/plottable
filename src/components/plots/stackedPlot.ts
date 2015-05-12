@@ -62,7 +62,7 @@ module Plottable {
     public _updateStackExtents() {
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
-      var filter = this._attrFilters.get(this._isVertical ? "y" : "x");
+      var filter = this._isVertical ? this._yFilter() : this._xFilter();
 
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
