@@ -270,9 +270,10 @@ module Plottable {
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    protected _updateExtentsForAttr(attr: string, filter?: _Accessor) {
+    protected _updateExtentsForAttr(attr: string) {
       var binding = this._attrBindings.get(attr);
       var accessor = binding.accessor;
+      var filter = this._filterForAttr(attr);
       var extents = this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
@@ -280,6 +281,10 @@ module Plottable {
         return this._computeExtent(dataset, accessor, plotMetadata, filter);
       });
       this._attrExtents.set(attr, extents);
+    }
+
+    protected _filterForAttr(attr: string): _Accessor {
+      return null;
     }
 
     private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter?: _Accessor): any[] {

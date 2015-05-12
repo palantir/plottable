@@ -2588,7 +2588,8 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
-        protected _updateExtentsForAttr(attr: string, filter?: _Accessor): void;
+        protected _updateExtentsForAttr(attr: string): void;
+        protected _filterForAttr(attr: string): _Accessor;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2701,9 +2702,7 @@ declare module Plottable {
          * x and y position in the Plot.
          */
         project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
-        protected _updateExtentsForAttr(attr: string): void;
-        protected _xFilter(): _Accessor;
-        protected _yFilter(): _Accessor;
+        protected _filterForAttr(attr: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.

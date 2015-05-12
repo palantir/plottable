@@ -71,45 +71,25 @@ module Plottable {
       return this;
     }
 
-    protected _updateExtentsForAttr(attr: string) {
-      if (attr === "x") {
-        return super._updateExtentsForAttr(attr, this._xFilter());
-      } else if (attr === "y") {
-        return super._updateExtentsForAttr(attr, this._yFilter());
-      }
-      return super._updateExtentsForAttr(attr);
-    }
-
-    protected _xFilter(): _Accessor {
-      if (this._autoAdjustXScaleDomain) {
-        var yBinding = this._attrBindings.get("y");
-        if (yBinding != null) {
-          var yAccessor = yBinding.accessor;
-          var yScale = yBinding.scale;
-          if (yScale != null) {
-            return (d, i, dataset, metadata) => {
-              var range = yScale.range();
-              return Utils.Methods.inRange(yScale.scale(yAccessor(d, i, dataset, metadata)), range[0], range[1]);
-            };
-          }
+    private _makeFilterByAttr(attr: string) {
+      var binding = this._attrBindings.get(attr);
+      if (binding != null) {
+        var accessor = binding.accessor;
+        var scale = binding.scale;
+        if (scale != null) {
+          return (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => {
+            var range = scale.range();
+            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, plotMetadata)), range[0], range[1]);
+          };
         }
       }
-      return null;
     }
 
-    protected _yFilter(): _Accessor {
-      if (this._autoAdjustYScaleDomain) {
-        var xBinding = this._attrBindings.get("x");
-        if (xBinding != null) {
-          var xAccessor = xBinding.accessor;
-          var xScale = xBinding.scale;
-          if (xScale != null) {
-            return (d, i, dataset, metadata) => {
-              var range = xScale.range();
-              return Utils.Methods.inRange(xScale.scale(xAccessor(d, i, dataset, metadata)), range[0], range[1]);
-            };
-          }
-        }
+    protected _filterForAttr(attr: string) {
+      if (attr === "x" && this._autoAdjustXScaleDomain) {
+        return this._makeFilterByAttr("y");
+      } else if (attr === "y" && this._autoAdjustYScaleDomain) {
+        return this._makeFilterByAttr("x");
       }
       return null;
     }
