@@ -1921,6 +1921,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
+        enum TimeInterval {
+            second = 0,
+            minute = 1,
+            hour = 2,
+            day = 3,
+            month = 4,
+            year = 5,
+        }
         /**
          * Defines a configuration for a time axis tier.
          * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks

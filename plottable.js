@@ -4074,6 +4074,16 @@ var Plottable;
 (function (Plottable) {
     var Axes;
     (function (Axes) {
+        (function (TimeInterval) {
+            TimeInterval[TimeInterval["second"] = 0] = "second";
+            TimeInterval[TimeInterval["minute"] = 1] = "minute";
+            TimeInterval[TimeInterval["hour"] = 2] = "hour";
+            TimeInterval[TimeInterval["day"] = 3] = "day";
+            TimeInterval[TimeInterval["month"] = 4] = "month";
+            TimeInterval[TimeInterval["year"] = 5] = "year";
+        })(Axes.TimeInterval || (Axes.TimeInterval = {}));
+        var TimeInterval = Axes.TimeInterval;
+        ;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4369,6 +4379,20 @@ var Plottable;
                         tickLabel.style("visibility", "inherit");
                     }
                 });
+            };
+            Time.prototype._getD3TimeInterval = function (timeInterval) {
+                switch (timeInterval) {
+                    case 0 /* second */:
+                        return d3.time.second;
+                    case 1 /* minute */:
+                        return d3.time.minute;
+                    case 2 /* hour */:
+                        return d3.time.hour;
+                    case 3 /* day */:
+                        return d3.time.day;
+                    case 4 /* month */:
+                        return d3.time.month;
+                }
             };
             /**
              * The css class applied to each time axis tier

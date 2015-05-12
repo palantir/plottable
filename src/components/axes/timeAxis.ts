@@ -2,6 +2,11 @@
 
 module Plottable {
 export module Axes {
+
+  export enum TimeInterval {
+    second, minute, hour, day, month, year
+  };
+
   /**
    * Defines a configuration for a time axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -531,6 +536,22 @@ export module Axes {
         }
       });
     }
+
+    private _getD3TimeInterval(timeInterval: TimeInterval) {
+      switch(timeInterval) {
+        case TimeInterval.second:
+          return d3.time.second;
+        case TimeInterval.minute:
+          return d3.time.minute;
+        case TimeInterval.hour:
+          return d3.time.hour;
+        case TimeInterval.day:
+          return d3.time.day;
+        case TimeInterval.month:
+          return d3.time.month;
+      }
+    }
+
   }
 }
 }
