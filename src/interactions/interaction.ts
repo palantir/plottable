@@ -44,7 +44,9 @@ module Plottable {
      * @return {Interaction}
      */
     public detachFrom(component: Component) {
-      this._unanchor();
+      if (this._isAnchored) {
+        this._unanchor();
+      }
       this._componentAttachedTo = null;
       component.offAnchor(this._anchorCallback);
 
