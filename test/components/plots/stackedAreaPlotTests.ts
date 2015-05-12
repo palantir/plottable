@@ -342,7 +342,7 @@ describe("Plots", () => {
       renderer.x((d) => d.x, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.attr("fill", "type", colorScale);
+      renderer.attr("fill", (d) => d.type, colorScale);
       var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
     });
@@ -366,7 +366,7 @@ describe("Plots", () => {
     });
 
     it("project works correctly", () => {
-      renderer.attr("check", "type");
+      renderer.attr("check", (d) => d.type);
       var areas = (<any> renderer)._renderArea.selectAll(".area");
       var area0 = d3.select(areas[0][0]);
       assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");

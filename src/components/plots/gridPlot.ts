@@ -3,7 +3,6 @@
 module Plottable {
 export module Plots {
   export class Grid extends Rectangle<any, any> {
-    private _colorScale: Scale<any, string>;
 
     /**
      * Constructs a GridPlot.
@@ -17,8 +16,7 @@ export module Plots {
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale<any, any>, yScale: Scale<any, any>,
-      colorScale: Scale<any, string>) {
+    constructor(xScale: Scale<any, any>, yScale: Scale<any, any>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
@@ -30,7 +28,6 @@ export module Plots {
         yScale.innerPadding(0).outerPadding(0);
       }
 
-      this._colorScale = colorScale;
       this.animator("cells", new Animators.Null());
     }
 
@@ -45,20 +42,6 @@ export module Plots {
 
     protected _getDrawer(key: string) {
       return new Drawers.Rect(key, true);
-    }
-
-    /**
-     * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
-     * the data should return a valid CSS color.
-     */
-    public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.attr(attrToSet, accessor, scale);
-
-      if (attrToSet === "fill") {
-        this._colorScale = this._attrBindings.get("fill").scale;
-      }
-
-      return this;
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {

@@ -73,7 +73,7 @@ describe("Scales", () => {
       var svg = TestMethods.generateSVG(100, 100);
       new Plottable.Plot()
         .addDataset(dataset)
-        .attr("x", "foo", scale)
+        .attr("x", (d) => d.foo, scale)
         .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
@@ -87,17 +87,17 @@ describe("Scales", () => {
       var svg2 = TestMethods.generateSVG(100, 100);
       var renderer1 = new Plottable.Plot()
                           .addDataset(dataset)
-                          .attr("x", "foo", scale);
+                          .attr("x", (d) => d.foo, scale);
       renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Plot()
                           .addDataset(dataset)
-                          .attr("x", "foo", scale);
+                          .attr("x", (d) => d.foo, scale);
       renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scales.Linear();
-      renderer1.attr("x", "foo", otherScale);
+      renderer1.attr("x", (d) => d.foo, otherScale);
       dataset.data([{foo: 10}, {foo: 11}]);
       assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
-      renderer2.attr("x", "foo", otherScale);
+      renderer2.attr("x", (d) => d.foo, otherScale);
       // "scale not listening to the dataset after all perspectives removed"
       dataset.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");

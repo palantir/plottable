@@ -192,7 +192,7 @@ describe("Plots", () => {
         var arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
 
-        piePlot.attr("fill", "type", new Plottable.Scales.Color("20"));
+        piePlot.attr("fill", (d) => d.type, new Plottable.Scales.Color("20"));
 
         arcPaths = renderArea.selectAll(".arc");
 

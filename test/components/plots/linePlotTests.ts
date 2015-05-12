@@ -109,7 +109,7 @@ describe("Plots", () => {
       var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
-      linePlot.attr("stroke", "stroke");
+      linePlot.attr("stroke", (d) => d.stroke);
       var areaPath = renderArea.select(".line");
       assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
