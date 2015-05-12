@@ -7915,7 +7915,6 @@ var Plottable;
                     else {
                         yScale.domainer().removePaddingException(this);
                     }
-                    // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
                     yScale._autoDomainIfAutomaticMode();
                 }
             };
