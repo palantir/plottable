@@ -8205,7 +8205,7 @@ describe("Interactions", function () {
             assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
             svg.remove();
         });
-        it("calling detachFrom on a detached Interaction has no effect", function () {
+        it("calling detachFrom() on a detached Interaction has no effect", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var component = new Plottable.Component();
             var clickInteraction = new Plottable.Interactions.Click();

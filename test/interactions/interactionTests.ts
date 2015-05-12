@@ -71,7 +71,7 @@ describe("Interactions", () => {
       svg.remove();
     });
 
-    it("calling detachFrom on a detached Interaction has no effect", () => {
+    it("calling detachFrom() on a detached Interaction has no effect", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var component = new Plottable.Component();
 
