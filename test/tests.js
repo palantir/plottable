@@ -763,7 +763,7 @@ describe("TimeAxis", function () {
     it("renders end ticks on either side", function () {
         var width = 500;
         var svg = TestMethods.generateSVG(width, 100);
-        scale.domain(["2010", "2014"]);
+        scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
         axis.renderTo(svg);
         var firstTick = d3.select(".tick-mark");
         assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
@@ -776,7 +776,7 @@ describe("TimeAxis", function () {
     it("adds a class corresponding to the end-tick for the first and last ticks", function () {
         var width = 500;
         var svg = TestMethods.generateSVG(width, 100);
-        scale.domain(["2010", "2014"]);
+        scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
         axis.renderTo(svg);
         var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
         assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
@@ -7200,21 +7200,6 @@ describe("Scales", function () {
             scale.domain([-1, 5]);
             assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
         });
-        it("autoranges appropriately even if stringy numbers are projected", function () {
-            var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Scatter(xScale, yScale);
-            plot.addDataset(new Plottable.Dataset(sadTimesData));
-            var id = function (d) { return d; };
-            xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
-            plot.x(id, xScale);
-            plot.y(id, yScale);
-            var svg = TestMethods.generateSVG();
-            plot.renderTo(svg);
-            assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
-            svg.remove();
-        });
         it("custom tick generator", function () {
             var scale = new Plottable.Scales.Linear();
             scale.domain([0, 10]);
@@ -7490,33 +7475,9 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeScale tests", function () {
-    it("parses reasonable formats for dates", function () {
-        var scale = new Plottable.Scales.Time();
-        var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
-        var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
-        function checkDomain(domain) {
-            scale.domain(domain);
-            var time1 = scale.domain()[0].valueOf();
-            assert.strictEqual(time1, firstDate, "first value of domain set correctly");
-            var time2 = scale.domain()[1].valueOf();
-            assert.strictEqual(time2, secondDate, "first value of domain set correctly");
-        }
-        checkDomain(["10/1/2014", "11/1/2014"]);
-        checkDomain(["October 1, 2014", "November 1, 2014"]);
-        checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
-    });
     it("can't set reversed domain", function () {
         var scale = new Plottable.Scales.Time();
-        assert.throws(function () { return scale.domain(["1985-10-26", "1955-11-05"]); }, "chronological");
-    });
-    it("time coercer works as intended", function () {
-        var tc = new Plottable.Scales.Time()._typeCoercer;
-        assert.strictEqual(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
-        // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
-        assert.strictEqual(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
-        assert.strictEqual(tc(0).getMilliseconds(), 0, "number parsed to date");
-        var d = new Date(0);
-        assert.strictEqual(tc(d), d, "date passed thru unchanged");
+        assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");
     });
     it("tickInterval produces correct number of ticks", function () {
         var scale = new Plottable.Scales.Time();
@@ -8261,6 +8222,26 @@ describe("Interactions", function () {
             TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
             assert.isFalse(callbackCalled, "callback was removed from component and should not be called");
+            svg.remove();
+        });
+        it("calling detachFrom() on a detached Interaction has no effect", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var component = new Plottable.Component();
+            var clickInteraction = new Plottable.Interactions.Click();
+            assert.doesNotThrow(function () {
+                clickInteraction.detachFrom(component);
+            }, "detaching an Interaction which was not attached should not throw an error");
+            clickInteraction.attachTo(component);
+            clickInteraction.detachFrom(component);
+            assert.doesNotThrow(function () {
+                clickInteraction.detachFrom(component);
+            }, "calling detachFrom() twice should not throw an error");
+            component.renderTo(svg);
+            clickInteraction.attachTo(component);
+            clickInteraction.detachFrom(component);
+            assert.doesNotThrow(function () {
+                clickInteraction.detachFrom(component);
+            }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
             svg.remove();
         });
         it("can move interaction from one component to another", function () {

@@ -71,6 +71,34 @@ describe("Interactions", () => {
       svg.remove();
     });
 
+    it("calling detachFrom() on a detached Interaction has no effect", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var component = new Plottable.Component();
+
+      var clickInteraction = new Plottable.Interactions.Click();
+
+      assert.doesNotThrow(() => {
+        clickInteraction.detachFrom(component);
+      }, "detaching an Interaction which was not attached should not throw an error");
+
+      clickInteraction.attachTo(component);
+      clickInteraction.detachFrom(component);
+      assert.doesNotThrow(() => {
+        clickInteraction.detachFrom(component);
+      }, "calling detachFrom() twice should not throw an error");
+
+      component.renderTo(svg);
+
+      clickInteraction.attachTo(component);
+      clickInteraction.detachFrom(component);
+      assert.doesNotThrow(() => {
+        clickInteraction.detachFrom(component);
+      }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
+
+      svg.remove();
+
+    });
+
     it("can move interaction from one component to another", () => {
       var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);

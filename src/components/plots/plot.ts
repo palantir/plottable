@@ -276,19 +276,18 @@ module Plottable {
     private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
-      var coercer = (accScaleBinding.scale != null) ? accScaleBinding.scale._typeCoercer : (d: any) => d;
       extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accScaleBinding.accessor, coercer, plotMetadata);
+        return this._computeExtent(dataset, accScaleBinding.accessor, plotMetadata);
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any): any[] {
       var data = dataset.data();
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
-      var mappedData = data.map(appliedAccessor).map(typeCoercer);
+      var mappedData = data.map(appliedAccessor);
       if (mappedData.length === 0) {
         return [];
       } else if (typeof(mappedData[0]) === "string") {

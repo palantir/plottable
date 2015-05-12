@@ -394,7 +394,7 @@ describe("Plots", () => {
 
     describe("Vertical Bar Plot time scale", () => {
       var svg: D3.Selection;
-      var barPlot: Plottable.Plots.Bar<number, number>;
+      var barPlot: Plottable.Plots.Bar<Date, number>;
       var xScale: Plottable.Scales.Time;
 
       beforeEach(() => {

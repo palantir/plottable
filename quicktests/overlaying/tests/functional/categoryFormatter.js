@@ -7,7 +7,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: 0.5}];
+  data = [{x: "0", y: 1}, {x: "1", y: 2}, {x: "2", y: 4}, {x: "3", y: 6}, {x: "4", y: 5}, {x: "5", y: 3}, {x: "6", y: 0.5}];
   var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
 

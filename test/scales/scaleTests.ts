@@ -182,22 +182,6 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
     });
 
-    it("autoranges appropriately even if stringy numbers are projected", () => {
-      var sadTimesData = ["999", "10", "100", "1000", "2", "999"];
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Scatter(xScale, yScale);
-      plot.addDataset(new Plottable.Dataset(sadTimesData));
-      var id = (d: any) => d;
-      xScale.domainer(new Plottable.Domainer()); // to disable padding, etc
-      plot.x(id, xScale);
-      plot.y(id, yScale);
-      var svg = TestMethods.generateSVG();
-      plot.renderTo(svg);
-      assert.deepEqual(xScale.domain(), [2, 1000], "the domain was calculated appropriately");
-      svg.remove();
-    });
-
     it("custom tick generator", () => {
       var scale = new Plottable.Scales.Linear();
       scale.domain([0, 10]);
@@ -207,7 +191,6 @@ describe("Scales", () => {
       ticks = scale.ticks();
       assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
     });
-
   });
 
   describe("Category Scales", () => {
