@@ -209,7 +209,8 @@ module Plottable {
       case TimeInterval.year:
         return d3.time.year;
       default:
-        throw Error("TimeInterval specified does not exist");
+        Utils.Methods.warn("TimeInterval specified does not exist");
+        return d3.time.year;
       }
     }
 
