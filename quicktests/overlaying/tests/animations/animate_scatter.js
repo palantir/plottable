@@ -18,9 +18,9 @@ function run(svg, data, Plottable) {
 
   var circleRenderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(d1)
                                                                  .addDataset(d2)
-                                                                 .attr("size", 16)
-                                                                 .project("x", "x", xScale)
-                                                                 .project("y", "y", yScale)
+                                                                 .size(16)
+                                                                 .x(function(d) { return d.x; }, xScale)
+                                                                 .y(function(d) { return d.y; }, yScale)
                                                                  .attr("opacity", 0.75)
                                                                  .animate(true);
 

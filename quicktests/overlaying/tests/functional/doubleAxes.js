@@ -16,11 +16,11 @@ function run(svg, data, Plottable) {
 
   var plot1 = new Plottable.Plots.Area(xScale1, yScale);
   plot1.addDataset(ds1);
-  plot1.project("x", "x", xScale1).project("y", "y", yScale);
+  plot1.x(function(d) { return d.x; }, xScale1).y(function(d) { return d.y; }, yScale);
 
   var plot2 = new Plottable.Plots.Line(xScale2, yScale);
   plot2.addDataset(ds2);
-  plot2.project("x", "x", xScale2).project("y", "y", yScale);
+  plot2.x(function(d) { return d.x; }, xScale2).y(function(d) { return d.y; }, yScale);
 
   var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");
   var xAxis2 = new Plottable.Axes.Category(xScale2, "bottom");
