@@ -202,6 +202,8 @@ module Plottable {
         return d3.time.hour;
       case TimeInterval.day:
         return d3.time.day;
+      case TimeInterval.week:
+        return d3.time.week;
       case TimeInterval.month:
         return d3.time.month;
       case TimeInterval.year:

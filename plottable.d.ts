@@ -1929,8 +1929,9 @@ declare module Plottable {
         minute = 1,
         hour = 2,
         day = 3,
-        month = 4,
-        year = 5,
+        week = 4,
+        month = 5,
+        year = 6,
     }
     module Axes {
         /**

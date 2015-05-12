@@ -3,7 +3,7 @@
 module Plottable {
 
 export enum TimeInterval {
-  second, minute, hour, day, month, year
+  second, minute, hour, day, week, month, year
 };
 
 export module Axes {

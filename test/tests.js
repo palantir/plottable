@@ -7450,13 +7450,13 @@ describe("TimeScale tests", function () {
         var scale = new Plottable.Scales.Time();
         // 100 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
-        var ticks = scale.tickInterval(5 /* year */);
+        var ticks = scale.tickInterval(6 /* year */);
         assert.strictEqual(ticks.length, 101, "generated correct number of ticks");
         // 1 year span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
-        ticks = scale.tickInterval(4 /* month */);
+        ticks = scale.tickInterval(5 /* month */);
         assert.strictEqual(ticks.length, 12, "generated correct number of ticks");
-        ticks = scale.tickInterval(4 /* month */, 3);
+        ticks = scale.tickInterval(5 /* month */, 3);
         assert.strictEqual(ticks.length, 4, "generated correct number of ticks");
         // 1 month span
         scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
