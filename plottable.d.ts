@@ -767,7 +767,6 @@ declare module Plottable {
         }
     }
     class Scale<D, R> {
-        _typeCoercer: (d: any) => any;
         protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
@@ -867,7 +866,6 @@ declare module Plottable {
         protected static _DEFAULT_NUM_TICKS: number;
         protected _d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
-        _typeCoercer: (d: any) => number;
         /**
          * Constructs a new QuantitativeScaleScale.
          *
@@ -903,14 +901,14 @@ declare module Plottable {
         /**
          * Gets a set of tick values spanning the domain.
          *
-         * @returns {any[]} The generated ticks.
+         * @returns {D[]} The generated ticks.
          */
-        ticks(): any[];
+        ticks(): D[];
         /**
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        _niceDomain(domain: any[], count?: number): any[];
+        _niceDomain(domain: D[], count?: number): D[];
         /**
          * Gets a Domainer of a scale. A Domainer is responsible for combining
          * multiple extents into a single domain.
@@ -930,7 +928,7 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScaleScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): any[];
+        _defaultExtent(): D[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -969,6 +967,7 @@ declare module Plottable {
              * @returns {Linear} A copy of the calling LinearScale.
              */
             copy(): Linear;
+            _defaultExtent(): number[];
         }
     }
 }
@@ -1038,7 +1037,7 @@ declare module Plottable {
             protected _setDomain(values: number[]): void;
             ticks(): number[];
             copy(): ModifiedLog;
-            _niceDomain(domain: any[], count?: number): any[];
+            _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
              *
@@ -1055,6 +1054,7 @@ declare module Plottable {
              * @returns {ModifiedLog} The calling ModifiedLog.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
+            _defaultExtent(): number[];
         }
     }
 }
@@ -1064,7 +1064,6 @@ declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
             protected _d3Scale: D3.Scale.OrdinalScale;
-            _typeCoercer: (d: any) => any;
             /**
              * Creates a CategoryScale.
              *
@@ -1159,8 +1158,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        class Time extends QuantitativeScale<any> {
-            _typeCoercer: (d: any) => any;
+        class Time extends QuantitativeScale<Date> {
             /**
              * Constructs a TimeScale.
              *
@@ -1171,10 +1169,10 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): any[];
-            protected _setDomain(values: any[]): void;
+            tickInterval(interval: D3.Time.Interval, step?: number): Date[];
+            protected _setDomain(values: Date[]): void;
             copy(): Time;
-            _defaultExtent(): any[];
+            _defaultExtent(): Date[];
         }
     }
 }
@@ -1196,14 +1194,14 @@ declare module Plottable {
              * An InterpolatedColorScale maps numbers evenly to color strings.
              *
              * @constructor
-             * @param {string|string[]} colorRange the type of color scale to
+             * @param {string | string[]} colorRange the type of color scale to
              *     create. Default is "reds". @see {@link colorRange} for further
              *     options.
              * @param {string} scaleType the type of underlying scale to use
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            constructor(colorRange?: any, scaleType?: string);
+            constructor(colorRange?: string | string[], scaleType?: string);
             /**
              * Gets the color range.
              *

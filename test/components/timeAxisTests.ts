@@ -109,7 +109,7 @@ describe("TimeAxis", () => {
   it("renders end ticks on either side", () => {
     var width = 500;
     var svg = TestMethods.generateSVG(width, 100);
-    scale.domain(["2010", "2014"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
     var firstTick = d3.select(".tick-mark");
     assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
@@ -123,7 +123,7 @@ describe("TimeAxis", () => {
   it("adds a class corresponding to the end-tick for the first and last ticks", () => {
     var width = 500;
     var svg = TestMethods.generateSVG(width, 100);
-    scale.domain(["2010", "2014"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
     var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
     assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");

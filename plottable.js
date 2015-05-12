@@ -1520,7 +1520,6 @@ var Plottable;
          * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
         function Scale(scale) {
-            this._typeCoercer = function (d) { return d; };
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
@@ -1653,7 +1652,6 @@ var Plottable;
             _super.call(this, scale);
             this._userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
-            this._typeCoercer = function (d) { return +d; };
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
         QuantitativeScale.prototype._getExtent = function () {
@@ -1696,7 +1694,7 @@ var Plottable;
         /**
          * Gets a set of tick values spanning the domain.
          *
-         * @returns {any[]} The generated ticks.
+         * @returns {D[]} The generated ticks.
          */
         QuantitativeScale.prototype.ticks = function () {
             return this._tickGenerator(this);
@@ -1720,7 +1718,7 @@ var Plottable;
             }
         };
         QuantitativeScale.prototype._defaultExtent = function () {
-            return [0, 1];
+            throw Error("The quantitative scale itself does not have a default extent");
         };
         QuantitativeScale.prototype.tickGenerator = function (generator) {
             if (generator == null) {
@@ -1761,6 +1759,9 @@ var Plottable;
              */
             Linear.prototype.copy = function () {
                 return new Linear(this._d3Scale.copy());
+            };
+            Linear.prototype._defaultExtent = function () {
+                return [0, 1];
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1911,7 +1912,7 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
-                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this.howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -1934,7 +1935,7 @@ var Plottable;
              */
             ModifiedLog.prototype.logTicks = function (lower, upper) {
                 var _this = this;
-                var nTicks = this.howManyTicks(lower, upper);
+                var nTicks = this._howManyTicks(lower, upper);
                 if (nTicks === 0) {
                     return [];
                 }
@@ -1953,11 +1954,11 @@ var Plottable;
             /**
              * How many ticks does the range [lower, upper] deserve?
              *
-             * e.g. if your domain was [10, 1000] and I asked howManyTicks(10, 100),
+             * e.g. if your domain was [10, 1000] and I asked _howManyTicks(10, 100),
              * I would get 1/2 of the ticks. The range 10, 100 takes up 1/2 of the
              * distance when plotted.
              */
-            ModifiedLog.prototype.howManyTicks = function (lower, upper) {
+            ModifiedLog.prototype._howManyTicks = function (lower, upper) {
                 var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this.untransformedDomain, 0));
                 var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this.untransformedDomain, 0));
                 var adjustedLower = this.adjustedLog(lower);
@@ -1979,6 +1980,9 @@ var Plottable;
                 else {
                     this._showIntermediateTicks = show;
                 }
+            };
+            ModifiedLog.prototype._defaultExtent = function () {
+                return [0, 1];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2011,7 +2015,6 @@ var Plottable;
                 if (scale === void 0) { scale = d3.scale.ordinal(); }
                 _super.call(this, scale);
                 this._range = [0, 1];
-                this._typeCoercer = function (d) { return d != null && d.toString ? d.toString() : d; };
                 var d3InnerPadding = 0.3;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -2207,7 +2210,6 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                this._typeCoercer = function (d) { return d && d._isAMomentObject || d instanceof Date ? d : new Date(d); };
             }
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
@@ -2217,8 +2219,6 @@ var Plottable;
                 return tempScale.ticks(interval.range, step);
             };
             Time.prototype._setDomain = function (values) {
-                // attempt to parse dates
-                values = values.map(this._typeCoercer);
                 if (values[1] < values[0]) {
                     throw new Error("Scale.Time domain values must be in chronological order");
                 }
@@ -2228,9 +2228,9 @@ var Plottable;
                 return new Time(this._d3Scale.copy());
             };
             Time.prototype._defaultExtent = function () {
-                var endTime = new Date().valueOf();
-                var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
-                return [startTime, endTime];
+                var endTimeValue = new Date().valueOf();
+                var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+                return [new Date(startTimeValue), new Date(endTimeValue)];
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -2264,7 +2264,7 @@ var Plottable;
              * An InterpolatedColorScale maps numbers evenly to color strings.
              *
              * @constructor
-             * @param {string|string[]} colorRange the type of color scale to
+             * @param {string | string[]} colorRange the type of color scale to
              *     create. Default is "reds". @see {@link colorRange} for further
              *     options.
              * @param {string} scaleType the type of underlying scale to use
@@ -6418,20 +6418,18 @@ var Plottable;
             var _this = this;
             var binding = this._attrBindings.get(attr);
             var accessor = binding.accessor;
-            var scale = binding.scale;
-            var coercer = (scale != null) ? scale._typeCoercer : function (d) { return d; };
             var extents = this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
                 var plotMetadata = plotDatasetKey.plotMetadata;
-                return _this._computeExtent(dataset, accessor, coercer, plotMetadata);
+                return _this._computeExtent(dataset, accessor, plotMetadata);
             });
             this._attrExtents.set(attr, extents);
         };
-        Plot.prototype._computeExtent = function (dataset, accessor, typeCoercer, plotMetadata) {
+        Plot.prototype._computeExtent = function (dataset, accessor, plotMetadata) {
             var data = dataset.data();
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset, plotMetadata); };
-            var mappedData = data.map(appliedAccessor).map(typeCoercer);
+            var mappedData = data.map(appliedAccessor);
             if (mappedData.length === 0) {
                 return [];
             }

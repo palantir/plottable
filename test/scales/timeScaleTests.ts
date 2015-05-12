@@ -3,36 +3,9 @@
 var assert = chai.assert;
 
 describe("TimeScale tests", () => {
-  it("parses reasonable formats for dates", () => {
-    var scale = new Plottable.Scales.Time();
-    var firstDate = new Date(2014, 9, 1, 0, 0, 0, 0).valueOf();
-    var secondDate = new Date(2014, 10, 1, 0, 0, 0).valueOf();
-
-    function checkDomain(domain: any[]) {
-      scale.domain(domain);
-      var time1 = scale.domain()[0].valueOf();
-      assert.strictEqual(time1, firstDate, "first value of domain set correctly");
-      var time2 = scale.domain()[1].valueOf();
-      assert.strictEqual(time2, secondDate, "first value of domain set correctly");
-    }
-    checkDomain(["10/1/2014", "11/1/2014"]);
-    checkDomain(["October 1, 2014", "November 1, 2014"]);
-    checkDomain(["Oct 1, 2014", "Nov 1, 2014"]);
-  });
-
   it("can't set reversed domain", () => {
     var scale = new Plottable.Scales.Time();
-    assert.throws(() => scale.domain(["1985-10-26", "1955-11-05"]), "chronological");
-  });
-
-  it("time coercer works as intended", () => {
-    var tc = new Plottable.Scales.Time()._typeCoercer;
-    assert.strictEqual(tc(null).getMilliseconds(), 0, "null converted to Date(0)");
-    // converting null to Date(0) is the correct behavior as it mirror's d3's semantics
-    assert.strictEqual(tc("Wed Dec 31 1969 16:00:00 GMT-0800 (PST)").getMilliseconds(), 0, "string parsed to date");
-    assert.strictEqual(tc(0).getMilliseconds(), 0, "number parsed to date");
-    var d = new Date(0);
-    assert.strictEqual(tc(d), d, "date passed thru unchanged");
+    assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
   });
 
   it("tickInterval produces correct number of ticks", () => {
