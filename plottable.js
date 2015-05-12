@@ -8275,16 +8275,28 @@ var Plottable;
                 if (x == null) {
                     return _super.prototype.x.call(this);
                 }
-                _super.prototype.x.call(this, x, xScale);
-                Plottable.Stacked.prototype.x.apply(this, [x, xScale]);
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                    Plottable.Stacked.prototype.x.apply(this, [x]);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                    Plottable.Stacked.prototype.x.apply(this, [x, xScale]);
+                }
                 return this;
             };
             StackedArea.prototype.y = function (y, yScale) {
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                _super.prototype.y.call(this, y, yScale);
-                Plottable.Stacked.prototype.y.apply(this, [y, yScale]);
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                    Plottable.Stacked.prototype.y.apply(this, [y]);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    Plottable.Stacked.prototype.y.apply(this, [y, yScale]);
+                }
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {
