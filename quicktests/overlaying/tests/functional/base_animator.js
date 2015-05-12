@@ -24,9 +24,9 @@ function run(svg, data, Plottable) {
 
 
     var vbar = new Plottable.Plots.Bar(xScale, yScale)
-      .project("x", "x", xScale)
-      .project("y", "y", yScale)
-      .project("fill", "type", colorScale)
+      .x(function(d) { return d.x; }, xScale)
+      .y(function(d) { return d.y; }, yScale)
+      .attr("fill", function(d) { return d.type; }, colorScale)
       .labelsEnabled(true)
       .labelFormatter(function(text){return text + "!";})
       .addDataset(new Plottable.Dataset(data))

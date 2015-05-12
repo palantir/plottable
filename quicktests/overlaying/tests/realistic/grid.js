@@ -43,11 +43,11 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Category(yScale, "left");
   var plot = new Plottable.Plots.Grid(xScale, yScale);
   plot.addDataset(new Plottable.Dataset(data));
-  plot.project("x", timeFormatStart, xScale)
-  .project("y", "team", yScale)
-  .project("x2", timeFormatEnd, xScale)
-  .project("fill", "fill")
-  .project("stroke", "stroke");
+  plot.x(timeFormatStart, xScale)
+  .y(function(d) { return d.team; }, yScale)
+  .x2(timeFormatEnd, xScale)
+  .attr("fill", function(d) { return d.fill; })
+  .attr("stroke", function(d) { return d.stroke; });
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);

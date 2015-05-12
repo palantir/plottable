@@ -36,7 +36,7 @@ function run(svg, data, Plottable) {
   var yAxisTable2 = new Plottable.Components.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
   var renderAreaD1 = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
-  renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
+  renderAreaD1.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
 
   var basicTable = new Plottable.Components.Table([[null, xAxisTable2, null],
