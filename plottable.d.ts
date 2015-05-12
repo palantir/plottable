@@ -1169,7 +1169,7 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): Date[];
+            tickInterval(interval: TimeInterval, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
             copy(): Time;
             _defaultExtent(): Date[];
@@ -1920,15 +1920,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    enum TimeInterval {
+        second = 0,
+        minute = 1,
+        hour = 2,
+        day = 3,
+        month = 4,
+        year = 5,
+    }
     module Axes {
-        enum TimeInterval {
-            second = 0,
-            minute = 1,
-            hour = 2,
-            day = 3,
-            month = 4,
-            year = 5,
-        }
         /**
          * Defines a configuration for a time axis tier.
          * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
@@ -1937,7 +1937,7 @@ declare module Plottable {
          * formatter - formatter used to format tick labels.
          */
         type TimeAxisTierConfiguration = {
-            interval: D3.Time.Interval;
+            interval: TimeInterval;
             step: number;
             formatter: Formatter;
         };

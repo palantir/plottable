@@ -18,12 +18,13 @@ export module Scales {
       super(scale == null ? (<any>d3.time.scale()) : scale);
     }
 
-    public tickInterval(interval: D3.Time.Interval, step?: number): Date[] {
+    public tickInterval(interval: TimeInterval, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
+      var d3Interval = this._getD3TimeInterval(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
-      return tempScale.ticks(interval.range, step);
+      return tempScale.ticks(d3Interval.range, step);
     }
 
     protected _setDomain(values: Date[]) {
@@ -42,6 +43,22 @@ export module Scales {
       var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
     }
+
+    private _getD3TimeInterval(timeInterval: TimeInterval) {
+      switch (timeInterval) {
+        case TimeInterval.second:
+          return d3.time.second;
+        case TimeInterval.minute:
+          return d3.time.minute;
+        case TimeInterval.hour:
+          return d3.time.hour;
+        case TimeInterval.day:
+          return d3.time.day;
+        case TimeInterval.month:
+          return d3.time.month;
+      }
+    }
+
   }
 }
 }

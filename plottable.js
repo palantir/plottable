@@ -2214,9 +2214,10 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
+                var d3Interval = this._getD3TimeInterval(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
-                return tempScale.ticks(interval.range, step);
+                return tempScale.ticks(d3Interval.range, step);
             };
             Time.prototype._setDomain = function (values) {
                 if (values[1] < values[0]) {
@@ -2231,6 +2232,20 @@ var Plottable;
                 var endTimeValue = new Date().valueOf();
                 var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
                 return [new Date(startTimeValue), new Date(endTimeValue)];
+            };
+            Time.prototype._getD3TimeInterval = function (timeInterval) {
+                switch (timeInterval) {
+                    case 0 /* second */:
+                        return d3.time.second;
+                    case 1 /* minute */:
+                        return d3.time.minute;
+                    case 2 /* hour */:
+                        return d3.time.hour;
+                    case 3 /* day */:
+                        return d3.time.day;
+                    case 4 /* month */:
+                        return d3.time.month;
+                }
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -4072,18 +4087,18 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    (function (TimeInterval) {
+        TimeInterval[TimeInterval["second"] = 0] = "second";
+        TimeInterval[TimeInterval["minute"] = 1] = "minute";
+        TimeInterval[TimeInterval["hour"] = 2] = "hour";
+        TimeInterval[TimeInterval["day"] = 3] = "day";
+        TimeInterval[TimeInterval["month"] = 4] = "month";
+        TimeInterval[TimeInterval["year"] = 5] = "year";
+    })(Plottable.TimeInterval || (Plottable.TimeInterval = {}));
+    var TimeInterval = Plottable.TimeInterval;
+    ;
     var Axes;
     (function (Axes) {
-        (function (TimeInterval) {
-            TimeInterval[TimeInterval["second"] = 0] = "second";
-            TimeInterval[TimeInterval["minute"] = 1] = "minute";
-            TimeInterval[TimeInterval["hour"] = 2] = "hour";
-            TimeInterval[TimeInterval["day"] = 3] = "day";
-            TimeInterval[TimeInterval["month"] = 4] = "month";
-            TimeInterval[TimeInterval["year"] = 5] = "year";
-        })(Axes.TimeInterval || (Axes.TimeInterval = {}));
-        var TimeInterval = Axes.TimeInterval;
-        ;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4167,7 +4182,8 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var endDate = config.interval.offset(startDate, config.step);
+                var d3Interval = this._getD3TimeInterval(config.interval);
+                var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
                     return this.width();
@@ -4403,111 +4419,111 @@ var Plottable;
              */
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
-                    { interval: d3.time.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 0 /* second */, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.second, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 0 /* second */, step: 5, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.second, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 0 /* second */, step: 10, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.second, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 0 /* second */, step: 15, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.second, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 0 /* second */, step: 30, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.minute, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 1 /* minute */, step: 1, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.minute, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 1 /* minute */, step: 5, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.minute, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 1 /* minute */, step: 10, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.minute, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 1 /* minute */, step: 15, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.minute, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 1 /* minute */, step: 30, formatter: Plottable.Formatters.time("%I:%M %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.hour, step: 1, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 2 /* hour */, step: 1, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.hour, step: 3, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 2 /* hour */, step: 3, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.hour, step: 6, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 2 /* hour */, step: 6, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.hour, step: 12, formatter: Plottable.Formatters.time("%I %p") },
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
+                    { interval: 2 /* hour */, step: 12, formatter: Plottable.Formatters.time("%I %p") },
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%B %e, %Y") }
                 ],
                 [
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%a %e") },
-                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%a %e") },
+                    { interval: 4 /* month */, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: d3.time.day, step: 1, formatter: Plottable.Formatters.time("%e") },
-                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
+                    { interval: 3 /* day */, step: 1, formatter: Plottable.Formatters.time("%e") },
+                    { interval: 4 /* month */, step: 1, formatter: Plottable.Formatters.time("%B %Y") }
                 ],
                 [
-                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%B") },
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 4 /* month */, step: 1, formatter: Plottable.Formatters.time("%B") },
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.month, step: 1, formatter: Plottable.Formatters.time("%b") },
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 4 /* month */, step: 1, formatter: Plottable.Formatters.time("%b") },
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.month, step: 3, formatter: Plottable.Formatters.time("%b") },
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 4 /* month */, step: 3, formatter: Plottable.Formatters.time("%b") },
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.month, step: 6, formatter: Plottable.Formatters.time("%b") },
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 4 /* month */, step: 6, formatter: Plottable.Formatters.time("%b") },
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 1, formatter: Plottable.Formatters.time("%y") }
+                    { interval: 5 /* year */, step: 1, formatter: Plottable.Formatters.time("%y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 5, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 5, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 25, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 25, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 50, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 50, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 100, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 100, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 200, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 200, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 500, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 500, formatter: Plottable.Formatters.time("%Y") }
                 ],
                 [
-                    { interval: d3.time.year, step: 1000, formatter: Plottable.Formatters.time("%Y") }
+                    { interval: 5 /* year */, step: 1000, formatter: Plottable.Formatters.time("%Y") }
                 ]
             ];
             Time._LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
