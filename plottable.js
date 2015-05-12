@@ -949,7 +949,7 @@ var Plottable;
                 case Plottable.TimeInterval.year:
                     return d3.time.year;
                 default:
-                    Plottable.Utils.Methods.warn("TimeInterval specified does not exist");
+                    Plottable.Utils.Methods.warn("TimeInterval specified does not exist: " + timeInterval);
                     return d3.time.year;
             }
         }
