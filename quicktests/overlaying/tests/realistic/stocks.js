@@ -64,13 +64,13 @@ function run(svg, data, Plottable) {
           var line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d.Adj Close; }, yScale_aapl)
+                                  .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d.Adj Close; }, yScale_goog)
+                                  .y(function(d) { return d["Adj Close"]; }, yScale_goog)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
                                   .automaticallyAdjustYScaleOverVisiblePoints(true);
 
@@ -88,7 +88,7 @@ function run(svg, data, Plottable) {
           var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, true).animate(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d.net change; }, yScale_diff)
+                                  .y(function(d) { return d["net change"]; }, yScale_diff)
                                   .attr("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
                                   .attr("fill", function(d) {
                                     return d["net change"] > 0 ? Plottable.Core.Colors.FERN : Plottable.Core.Colors.CERISE_RED;
