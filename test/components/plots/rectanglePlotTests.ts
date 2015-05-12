@@ -64,7 +64,7 @@ describe("Plots", () => {
       plot
         .x((d: any) => d.x, xScale)
         .y((d: any) => d.y1, yScale)
-        .y2((d) => d.y2, yScale);
+        .y2((d: any) => d.y2, yScale);
       plot.addDataset(new Plottable.Dataset(data1));
 
       plot.renderTo(svg);

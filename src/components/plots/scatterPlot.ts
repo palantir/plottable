@@ -4,6 +4,8 @@ module Plottable {
 export module Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> {
     private _defaultFillColor: string;
+    private static _SIZE_KEY = "size";
+    private static _SYMBOL_KEY = "symbol";
 
     /**
      * Constructs a ScatterPlot.
@@ -35,6 +37,29 @@ export module Plots {
       attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
 
       return attrToProjector;
+    }
+
+    public size(): AccessorScaleBinding<X, number>;
+    public size(size: number | _Accessor): Plots.Scatter<X, Y>;
+    public size(size: any | _Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+    public size(size?: number | _Accessor | any, scale?: Scale<any, number>): any {
+      if (size == null) {
+        return this._propertyBindings.get(Scatter._SIZE_KEY);
+      }
+      this._bindProperty(Scatter._SIZE_KEY, size, scale);
+      this._render();
+      return this;
+    }
+
+    public symbol(): AccessorScaleBinding<any, any>;
+    public symbol(symbol: _Accessor): Plots.Scatter<X, Y>;
+    public symbol(symbol?: _Accessor): any {
+      if (symbol == null) {
+        return this._propertyBindings.get(Scatter._SYMBOL_KEY);
+      }
+      this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
+      this._render();
+      return this;
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {

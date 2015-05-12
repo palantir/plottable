@@ -2812,6 +2812,11 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
+            size(): AccessorScaleBinding<X, number>;
+            size(size: number | _Accessor): Plots.Scatter<X, Y>;
+            size(size: any | _Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+            symbol(): AccessorScaleBinding<any, any>;
+            symbol(symbol: _Accessor): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }

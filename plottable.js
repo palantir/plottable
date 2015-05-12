@@ -7167,6 +7167,22 @@ var Plottable;
                 attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
                 return attrToProjector;
             };
+            Scatter.prototype.size = function (size, scale) {
+                if (size == null) {
+                    return this._propertyBindings.get(Scatter._SIZE_KEY);
+                }
+                this._bindProperty(Scatter._SIZE_KEY, size, scale);
+                this._render();
+                return this;
+            };
+            Scatter.prototype.symbol = function (symbol) {
+                if (symbol == null) {
+                    return this._propertyBindings.get(Scatter._SYMBOL_KEY);
+                }
+                this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
+                this._render();
+                return this;
+            };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
@@ -7190,6 +7206,8 @@ var Plottable;
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
+            Scatter._SIZE_KEY = "size";
+            Scatter._SYMBOL_KEY = "symbol";
             return Scatter;
         })(Plottable.XYPlot);
         Plots.Scatter = Scatter;
