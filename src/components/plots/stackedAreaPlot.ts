@@ -69,6 +69,13 @@ export module Plots {
       return this;
     }
 
+    protected _updateExtentsForAttr(attr: string) {
+      super._updateExtentsForAttr(attr);
+      if ((attr === "x" || attr === "y") && this._projectorsReady()) {
+        this._updateStackExtents();
+      }
+    }
+
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
@@ -141,10 +148,6 @@ export module Plots {
 
     public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
       return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
-    }
-
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
     }
     // ===== /Stack logic =====
   }

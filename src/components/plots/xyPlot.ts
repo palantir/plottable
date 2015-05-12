@@ -71,6 +71,29 @@ module Plottable {
       return this;
     }
 
+    private _makeFilterByAttr(attr: string) {
+      var binding = this._attrBindings.get(attr);
+      if (binding != null) {
+        var accessor = binding.accessor;
+        var scale = binding.scale;
+        if (scale != null) {
+          return (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => {
+            var range = scale.range();
+            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, plotMetadata)), range[0], range[1]);
+          };
+        }
+      }
+    }
+
+    protected _filterForAttr(attr: string) {
+      if (attr === "x" && this._autoAdjustXScaleDomain) {
+        return this._makeFilterByAttr("y");
+      } else if (attr === "y" && this._autoAdjustYScaleDomain) {
+        return this._makeFilterByAttr("x");
+      }
+      return null;
+    }
+
     public destroy() {
       super.destroy();
       if (this._xScale) {
@@ -158,69 +181,26 @@ module Plottable {
      * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
+      this._updateExtentsForAttr("x");
       this._xScale.autoDomain();
-      if (!this._autoAdjustYScaleDomain) {
-        this._yScale.autoDomain();
-      }
+      this._updateExtentsForAttr("y");
+      this._yScale.autoDomain();
+      return this;
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
+        this._updateExtentsForAttr("y");
+        this._yScale.autoDomain();
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
+        this._updateExtentsForAttr("x");
+        this._xScale.autoDomain();
       }
-    }
-
-    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
-                                             toScale: Scale<B, number>,
-                                             fromX: boolean) {
-      if (toScale instanceof QuantitativeScale) {
-        var toScaleQ = <QuantitativeScale<B>> toScale;
-        var normalizedData = this._normalizeDatasets<A, B>(fromX);
-
-        var filterFn: (v: A) => boolean;
-        if (fromScale instanceof QuantitativeScale) {
-          var fromDomain = fromScale.domain();
-          filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
-        } else {
-          var fromDomainSet = d3.set(fromScale.domain());
-          filterFn = (a: A) => fromDomainSet.has(a);
-        }
-
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
-        if (adjustedDomain.length === 0) {
-          return;
-        }
-        adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
-        toScaleQ.domain(adjustedDomain);
-      }
-    }
-
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => A = this._attrBindings.get(fromX ? "x" : "y").accessor;
-      var bAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => B = this._attrBindings.get(fromX ? "y" : "x").accessor;
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        return dataset.data().map((d, i) => {
-          return { a: aAccessor(d, i, dataset, plotMetadata), b: bAccessor(d, i, dataset, plotMetadata) };
-        });
-      }));
-    }
-
-    private _adjustDomainOverVisiblePoints<A, B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
-      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
-      var retVal: B[] = [];
-      if (bVals.length !== 0) {
-        retVal = [Utils.Methods.min<B>(bVals, null), Utils.Methods.max<B>(bVals, null)];
-      }
-      return retVal;
     }
 
     protected _projectorsReady() {
