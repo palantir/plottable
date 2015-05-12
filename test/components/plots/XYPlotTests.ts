@@ -6,23 +6,18 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
-    var xAccessor: any;
-    var yAccessor: any;
-    var simpleDataset: Plottable.Dataset;
     var plot: Plottable.XYPlot<number, number>;
-
-    before(() => {
-      xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a + dataset.metadata().foo;
-      yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
-    });
+    var simpleDataset = new Plottable.Dataset([
+      { a: -6, b: 6 },
+      { a: -2, b: 2 },
+      { a: 2, b: -2 },
+      { a: 6, b: -6 }
+    ]);
+    var xAccessor = (d: any) => d.a;
+    var yAccessor = (d: any) => d.b;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([
-        { a: -5, b: 6 },
-        { a: -2, b: 2 },
-        { a: 2, b: -2 },
-        { a: 5, b: -6 } ], {foo: 0});
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
       plot = new Plottable.XYPlot(xScale, yScale);
@@ -32,40 +27,44 @@ describe("Plots", () => {
           .renderTo(svg);
     });
 
-    it("plot auto domain scale to visible points", () => {
+    it("automatically adjusting Y domain over visible points", () => {
       xScale.domain([-3, 3]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       plot.automaticallyAdjustYScaleOverVisiblePoints(false);
-      plot.automaticallyAdjustXScaleOverVisiblePoints(true);
-      yScale.domain([-6, 6]);
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
       svg.remove();
     });
 
-    it("no visible points", () => {
+    it("automatically adjusting Y domain when no points are visible", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
       assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
       svg.remove();
     });
 
-    it("points not visible in X aren't included in y scale's autodomain()", () => {
-      xScale.domain([-2, 2]);
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      plot.renderTo(svg);
-      yScale.autoDomain();
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
+    it("automatically adjusting X domain over visible points", () => {
+      yScale.domain([-3, 3]);
+      assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+      plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+      assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+      plot.automaticallyAdjustXScaleOverVisiblePoints(false);
       svg.remove();
     });
 
-    it("show all data", () => {
+    it("automatically adjusting X domain when no points are visible", () => {
+      plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+      yScale.domain([-0.5, 0.5]);
+      assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+      svg.remove();
+    });
+
+    it("showAllData()", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       xScale.domain([-0.5, 0.5]);
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+      assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
       svg.remove();
     });
 
@@ -75,7 +74,7 @@ describe("Plots", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(false);
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+      assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
       svg.remove();
     });
 
