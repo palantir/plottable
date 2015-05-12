@@ -6333,7 +6333,12 @@ var Plottable;
         Plot.prototype._bind = function (key, value, scale, bindings, extents) {
             var binding = bindings.get(key);
             var oldScale = binding != null ? binding.scale : null;
-            this._replaceScaleForKey(oldScale, scale, key);
+            if (oldScale != null) {
+                this._uninstallScaleForKey(oldScale, key);
+            }
+            if (scale != null) {
+                this._installScaleForKey(scale, key);
+            }
             bindings.set(key, { accessor: d3.functor(value), scale: scale });
             this._updateExtentsForKey(key, bindings, extents);
         };
@@ -6670,14 +6675,6 @@ var Plottable;
         };
         Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
-        };
-        Plot.prototype._replaceScaleForKey = function (oldScale, newScale, key) {
-            if (oldScale != null) {
-                this._uninstallScaleForKey(oldScale, key);
-            }
-            if (newScale != null) {
-                this._installScaleForKey(newScale, key);
-            }
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);

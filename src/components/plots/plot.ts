@@ -191,7 +191,14 @@ module Plottable {
                       bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
-      this._replaceScaleForKey(oldScale, scale, key);
+
+      if (oldScale != null) {
+        this._uninstallScaleForKey(oldScale, key);
+      }
+      if (scale != null) {
+        this._installScaleForKey(scale, key);
+      }
+
       bindings.set(key, { accessor: d3.functor(value), scale: scale });
       this._updateExtentsForKey(key, bindings, extents);
     }
@@ -569,16 +576,6 @@ module Plottable {
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
-    }
-
-    private _replaceScaleForKey(oldScale: Scale<any, any>, newScale: Scale<any, any>, key: string) {
-      if (oldScale != null) {
-        this._uninstallScaleForKey(oldScale, key);
-      }
-
-      if (newScale != null) {
-        this._installScaleForKey(newScale, key);
-      }
     }
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
