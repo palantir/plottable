@@ -38,8 +38,13 @@ export module Plots {
       if (x == null) {
         return super.x();
       }
-      super.x(<any> x, xScale);
-      Stacked.prototype.x.apply(this, [x, xScale]);
+      if (xScale == null) {
+        super.x(<number | _Accessor> x);
+        Stacked.prototype.x.apply(this, [x]);
+      } else {
+        super.x(<X | _Accessor> x, xScale);
+        Stacked.prototype.x.apply(this, [x, xScale]);
+      }
       return this;
     }
 
@@ -50,8 +55,13 @@ export module Plots {
       if (y == null) {
         return super.y();
       }
-      super.y(<any> y, yScale);
-      Stacked.prototype.y.apply(this, [y, yScale]);
+      if (yScale == null) {
+        super.y(<number | _Accessor> y);
+        Stacked.prototype.y.apply(this, [y]);
+      } else {
+        super.y(<Y | _Accessor> y, yScale);
+        Stacked.prototype.y.apply(this, [y, yScale]);
+      }
       return this;
     }
 
