@@ -13,7 +13,7 @@ export module Plot {
   }
 
   export interface PlotMetadata {
-    datasetKey: string
+    datasetKey: string;
   }
 
   export type PlotData = {

@@ -3,7 +3,7 @@
 module Plottable {
 export module _Util {
   export class ClientToSVGTranslator {
-    private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator"
+    private static _TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
     private _svg: SVGElement;
     private _measureRect: SVGElement;
 
