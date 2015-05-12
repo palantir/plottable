@@ -949,8 +949,7 @@ var Plottable;
                 case Plottable.TimeInterval.year:
                     return d3.time.year;
                 default:
-                    Plottable.Utils.Methods.warn("TimeInterval specified does not exist: " + timeInterval);
-                    return d3.time.year;
+                    throw Error("TimeInterval specified does not exist: " + timeInterval);
             }
         }
         Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
@@ -1324,9 +1323,7 @@ var Plottable;
                 // Layout
                 _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
                 _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                var toRender = _componentsNeedingRender;
-                _componentsNeedingRender = new Plottable.Utils.Set();
-                toRender.values().forEach(function (component) {
+                _componentsNeedingRender.values().forEach(function (component) {
                     try {
                         component.render(true);
                     }
@@ -1335,9 +1332,9 @@ var Plottable;
                         window.setTimeout(function () {
                             throw err;
                         }, 0);
-                        registerToRender(component); // try again later
                     }
                 });
+                _componentsNeedingRender = new Plottable.Utils.Set();
                 _animationRequested = false;
             }
             if (_componentsNeedingRender.values().length !== 0) {
