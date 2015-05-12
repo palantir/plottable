@@ -51,8 +51,8 @@ export module Plots {
      * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
      * the data should return a valid CSS color.
      */
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
+    public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
+      super.attr(attrToSet, accessor, scale);
 
       if (attrToSet === "fill") {
         this._colorScale = this._attrBindings.get("fill").scale;

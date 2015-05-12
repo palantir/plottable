@@ -2152,9 +2152,9 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
             var metadataProjector = function (d, i, m) { return m.cssClass; };
-            r.project("x", "x", xScale);
-            r.project("y", "y", yScale);
-            r.project("meta", metadataProjector);
+            r.attr("x", "x", xScale);
+            r.attr("y", "y", yScale);
+            r.attr("meta", metadataProjector);
             xScale.onUpdate(function (listenable) {
                 assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
                 ++xScaleCalls;
@@ -2183,7 +2183,7 @@ describe("Plots", function () {
         it("Plot.project works as intended", function () {
             var r = new Plottable.Plot();
             var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
-            r.project("attr", "a", s);
+            r.attr("attr", "a", s);
             var attrToProjector = r._generateAttrToProjector();
             var projector = attrToProjector["attr"];
             assert.strictEqual(projector({ "a": 0.5 }, 0, null, null), 5, "projector works as intended");
@@ -2194,8 +2194,8 @@ describe("Plots", function () {
             var s = new Plottable.Scales.Linear();
             var svg1 = TestMethods.generateSVG(100, 100);
             var svg2 = TestMethods.generateSVG(100, 100);
-            new Plottable.Plot().addDataset(ds1).project("x", function (x) { return x; }, s).renderTo(svg1);
-            new Plottable.Plot().addDataset(ds2).project("x", function (x) { return x; }, s).renderTo(svg2);
+            new Plottable.Plot().addDataset(ds1).attr("x", function (x) { return x; }, s).renderTo(svg1);
+            new Plottable.Plot().addDataset(ds2).attr("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -2410,7 +2410,7 @@ describe("Plots", function () {
         it("destroy() disconnects plots from its scales", function () {
             var plot2 = new Plottable.Plot();
             var scale = new Plottable.Scales.Linear();
-            plot2.project("attr", "a", scale);
+            plot2.attr("attr", "a", scale);
             plot2.destroy();
             var scaleCallbacks = scale._callbacks.values();
             assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
@@ -2472,7 +2472,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plot();
             plot.addDataset(dataset2);
             plot.addDataset(dataset1);
-            plot.project("key", "key", categoryScale);
+            plot.attr("key", "key", categoryScale);
             var svg = TestMethods.generateSVG();
             plot.renderTo(svg);
             assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
@@ -2716,13 +2716,13 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("project fill", function () {
-                piePlot.project("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color("10"));
+                piePlot.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color("10"));
                 var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
                 assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
                 assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
-                piePlot.project("fill", "type", new Plottable.Scales.Color("20"));
+                piePlot.attr("fill", "type", new Plottable.Scales.Color("20"));
                 arcPaths = renderArea.selectAll(".arc");
                 arcPath0 = d3.select(arcPaths[0][0]);
                 assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
@@ -2850,7 +2850,7 @@ describe("Plots", function () {
             simpleDataset = new Plottable.Dataset(twoPointData);
             linePlot = new Plottable.Plots.Line(xScale, yScale);
             linePlot.addDataset(simpleDataset);
-            linePlot.x(xAccessor, xScale).y(yAccessor, yScale).project("stroke", colorAccessor).renderTo(svg);
+            linePlot.x(xAccessor, xScale).y(yAccessor, yScale).attr("stroke", colorAccessor).renderTo(svg);
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
@@ -2867,7 +2867,7 @@ describe("Plots", function () {
         });
         it("attributes can be changed by projecting new accessor and re-render appropriately", function () {
             var newColorAccessor = function () { return "pink"; };
-            linePlot.project("stroke", newColorAccessor);
+            linePlot.attr("stroke", newColorAccessor);
             linePlot.renderTo(svg);
             var linePath = renderArea.select(".line");
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
@@ -2879,7 +2879,7 @@ describe("Plots", function () {
                 d.stroke = "pink";
             });
             simpleDataset.data(data);
-            linePlot.project("stroke", "stroke");
+            linePlot.attr("stroke", "stroke");
             var areaPath = renderArea.select(".line");
             assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
@@ -3047,7 +3047,7 @@ describe("Plots", function () {
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
-            linePlot.project("class", newClassProjector);
+            linePlot.attr("class", newClassProjector);
             linePlot.renderTo(svg);
             var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
             assert.isTrue(linePath.classed("pink"));
@@ -3103,7 +3103,7 @@ describe("Plots", function () {
             areaPlot = new Plottable.Plots.Area(xScale, yScale);
             areaPlot.addDataset(simpleDataset);
             areaPlot.x(xAccessor, xScale).y(yAccessor, yScale);
-            areaPlot.y0(y0Accessor, yScale).project("fill", fillAccessor).project("stroke", colorAccessor).renderTo(svg);
+            areaPlot.y0(y0Accessor, yScale).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
@@ -3195,7 +3195,7 @@ describe("Plots", function () {
         });
         it("retains original classes when class is projected", function () {
             var newClassProjector = function () { return "pink"; };
-            areaPlot.project("class", newClassProjector);
+            areaPlot.attr("class", newClassProjector);
             areaPlot.renderTo(svg);
             var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
             assert.isTrue(areaPath.classed("pink"));
@@ -3629,7 +3629,7 @@ describe("Plots", function () {
                 var bar1 = d3.select(bars[0][1]);
                 var bar0y = bar0.data()[0].y;
                 var bar1y = bar1.data()[0].y;
-                barPlot.project("width", 10);
+                barPlot.attr("width", 10);
                 assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
                 assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
                 assert.closeTo(TestMethods.numAttr(bar0, "width"), 100, 0.01, "bar0 width");
@@ -3921,7 +3921,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(new Plottable.Dataset(DATA)).project("fill", "magnitude", colorScale);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", "magnitude", colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             gridPlot.renderTo(svg);
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
@@ -3934,7 +3934,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale);
+            gridPlot.addDataset(dataset).attr("fill", "magnitude", colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             dataset.data(DATA);
             VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
@@ -3949,7 +3949,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale);
+            gridPlot.addDataset(dataset).attr("fill", "magnitude", colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             var data = [
                 { x: "A", y: "W", magnitude: 0 },
@@ -3975,7 +3975,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
-            gridPlot.addDataset(new Plottable.Dataset(DATA)).project("fill", "magnitude").x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", "magnitude").x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             yScale.domain(["U", "V"]);
             var cells = gridPlot._renderArea.selectAll("rect")[0];
             var cellAU = d3.select(cells[0]);
@@ -4006,7 +4006,7 @@ describe("Plots", function () {
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
                 var dataset = new Plottable.Dataset(DATA);
-                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale).x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
+                gridPlot.addDataset(dataset).attr("fill", "magnitude", colorScale).x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
                 var allCells = gridPlot.getAllSelections();
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
@@ -4019,7 +4019,7 @@ describe("Plots", function () {
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
                 var dataset = new Plottable.Dataset(DATA);
-                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale);
+                gridPlot.addDataset(dataset).attr("fill", "magnitude", colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
                 var allCells = gridPlot.getAllSelections([dataset]);
@@ -4035,7 +4035,7 @@ describe("Plots", function () {
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Grid(xScale, yScale, colorScale);
                 var dataset = new Plottable.Dataset(DATA);
-                gridPlot.addDataset(dataset).project("fill", "magnitude", colorScale);
+                gridPlot.addDataset(dataset).attr("fill", "magnitude", colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
                 var dummyDataset = new Plottable.Dataset([]);
@@ -4302,7 +4302,7 @@ describe("Plots", function () {
                 yScale = new Plottable.Scales.Linear().domain([0, 81]);
                 circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
                 circlePlot.addDataset(quadraticDataset);
-                circlePlot.project("fill", colorAccessor);
+                circlePlot.attr("fill", colorAccessor);
                 circlePlot.x(function (d) { return d.x; }, xScale);
                 circlePlot.y(function (d) { return d.y; }, yScale);
                 circlePlot.renderTo(svg);
@@ -4639,7 +4639,7 @@ describe("Plots", function () {
             renderer.addDataset(dataset2);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
-            renderer.project("fill", "type", colorScale);
+            renderer.attr("fill", "type", colorScale);
             var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
             new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
@@ -4678,7 +4678,7 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
-            renderer.project("fill", "type", colorScale);
+            renderer.attr("fill", "type", colorScale);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
             new Plottable.Components.Table([[renderer]]).renderTo(svg);
@@ -4716,7 +4716,7 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.StackedArea(xScale, yScale);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
-            renderer.project("fill", "type", colorScale);
+            renderer.attr("fill", "type", colorScale);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
             renderer.renderTo(svg);
@@ -4894,7 +4894,7 @@ describe("Plots", function () {
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
-            renderer.project("fill", "type", colorScale);
+            renderer.attr("fill", "type", colorScale);
             var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
             new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
         });
@@ -4914,7 +4914,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("project works correctly", function () {
-            renderer.project("check", "type");
+            renderer.attr("check", "type");
             var areas = renderer._renderArea.selectAll(".area");
             var area0 = d3.select(areas[0][0]);
             assert.strictEqual(area0.attr("check"), "a", "projector has been applied to first area");
@@ -4949,7 +4949,7 @@ describe("Plots", function () {
             plot.addDataset(dataset1);
             var dataset2 = new Plottable.Dataset(data2);
             plot.addDataset(dataset2);
-            plot.project("fill", "fill");
+            plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
             var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
@@ -4983,7 +4983,7 @@ describe("Plots", function () {
             plot.addDataset(dataset1);
             var dataset2 = new Plottable.Dataset(data2);
             plot.addDataset(dataset2);
-            plot.project("fill", "fill");
+            plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
             var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
@@ -5355,7 +5355,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
-            plot.project("fill", "fill");
+            plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
             var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
@@ -5388,7 +5388,7 @@ describe("Plots", function () {
             plot.addDataset(new Plottable.Dataset(data3));
             plot.addDataset(new Plottable.Dataset(data4));
             plot.addDataset(new Plottable.Dataset(data5));
-            plot.project("fill", "fill");
+            plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             var keys = plot._key2PlotDatasetKey.keys();
             var offset0 = plot._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
@@ -7105,7 +7105,7 @@ describe("Scales", function () {
         });
         it("scale autorange works as expected with single dataset", function () {
             var svg = TestMethods.generateSVG(100, 100);
-            new Plottable.Plot().addDataset(dataset).project("x", "foo", scale).renderTo(svg);
+            new Plottable.Plot().addDataset(dataset).attr("x", "foo", scale).renderTo(svg);
             assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
             data.push({ foo: 100, bar: 200 });
             dataset.data(data);
@@ -7115,15 +7115,15 @@ describe("Scales", function () {
         it("scale reference counting works as expected", function () {
             var svg1 = TestMethods.generateSVG(100, 100);
             var svg2 = TestMethods.generateSVG(100, 100);
-            var renderer1 = new Plottable.Plot().addDataset(dataset).project("x", "foo", scale);
+            var renderer1 = new Plottable.Plot().addDataset(dataset).attr("x", "foo", scale);
             renderer1.renderTo(svg1);
-            var renderer2 = new Plottable.Plot().addDataset(dataset).project("x", "foo", scale);
+            var renderer2 = new Plottable.Plot().addDataset(dataset).attr("x", "foo", scale);
             renderer2.renderTo(svg2);
             var otherScale = new Plottable.Scales.Linear();
-            renderer1.project("x", "foo", otherScale);
+            renderer1.attr("x", "foo", otherScale);
             dataset.data([{ foo: 10 }, { foo: 11 }]);
             assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
-            renderer2.project("x", "foo", otherScale);
+            renderer2.attr("x", "foo", otherScale);
             // "scale not listening to the dataset after all perspectives removed"
             dataset.data([{ foo: 99 }, { foo: 100 }]);
             assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");

@@ -2569,10 +2569,6 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
-        /**
-         * Identical to plot.attr
-         */
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
@@ -2846,7 +2842,7 @@ declare module Plottable {
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
+            attr(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x(): Plots.AccessorScaleBinding<any, number>;
             x(x: number | _Accessor): Grid;

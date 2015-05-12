@@ -6312,12 +6312,6 @@ var Plottable;
          * @returns {Plot} The calling Plot.
          */
         Plot.prototype.attr = function (attrToSet, accessor, scale) {
-            return this.project(attrToSet, accessor, scale);
-        };
-        /**
-         * Identical to plot.attr
-         */
-        Plot.prototype.project = function (attrToSet, accessor, scale) {
             attrToSet = attrToSet.toLowerCase();
             accessor = Plottable.Utils.Methods.accessorize(accessor);
             this._bindAttr(attrToSet, accessor, scale);
@@ -7267,8 +7261,8 @@ var Plottable;
              * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
              * the data should return a valid CSS color.
              */
-            Grid.prototype.project = function (attrToSet, accessor, scale) {
-                _super.prototype.project.call(this, attrToSet, accessor, scale);
+            Grid.prototype.attr = function (attrToSet, accessor, scale) {
+                _super.prototype.attr.call(this, attrToSet, accessor, scale);
                 if (attrToSet === "fill") {
                     this._colorScale = this._attrBindings.get("fill").scale;
                 }

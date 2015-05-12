@@ -77,7 +77,7 @@ describe("Plots", () => {
       linePlot.addDataset(simpleDataset);
       linePlot.x(xAccessor, xScale)
               .y(yAccessor, yScale)
-              .project("stroke", colorAccessor)
+              .attr("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = (<any> linePlot)._renderArea;
     });
@@ -98,7 +98,7 @@ describe("Plots", () => {
 
     it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
       var newColorAccessor = () => "pink";
-      linePlot.project("stroke", newColorAccessor);
+      linePlot.attr("stroke", newColorAccessor);
       linePlot.renderTo(svg);
       var linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
@@ -109,7 +109,7 @@ describe("Plots", () => {
       var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
-      linePlot.project("stroke", "stroke");
+      linePlot.attr("stroke", "stroke");
       var areaPath = renderArea.select(".line");
       assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
@@ -317,7 +317,7 @@ describe("Plots", () => {
 
     it("retains original classes when class is projected", () => {
       var newClassProjector = () => "pink";
-      linePlot.project("class", newClassProjector);
+      linePlot.attr("class", newClassProjector);
       linePlot.renderTo(svg);
       var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
       assert.isTrue(linePath.classed("pink"));

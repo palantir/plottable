@@ -165,13 +165,6 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public attr(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      return this.project(attrToSet, accessor, scale);
-    }
-
-    /**
-     * Identical to plot.attr
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
       attrToSet = attrToSet.toLowerCase();
       accessor = Utils.Methods.accessorize(accessor);
       this._bindAttr(attrToSet, accessor, scale);
