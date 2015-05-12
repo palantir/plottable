@@ -90,7 +90,7 @@ describe("TimeAxis", () => {
     var configurations = axis.axisConfigurations();
     var newPossibleConfigurations = configurations.slice(0, 3);
     newPossibleConfigurations.forEach(axisConfig => axisConfig.forEach(tierConfig => {
-      tierConfig.interval = d3.time.minute;
+      tierConfig.interval = Plottable.TimeInterval.minute;
       tierConfig.step += 3;
     }));
     axis.axisConfigurations(newPossibleConfigurations);
@@ -101,7 +101,7 @@ describe("TimeAxis", () => {
     scale.range([0, 800]);
     axis.renderTo(svg);
     var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex];
-    assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+    assert.deepEqual(configs[0].interval, Plottable.TimeInterval.minute, "axis used new time unit");
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
@@ -160,7 +160,7 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -170,8 +170,8 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -181,7 +181,7 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -204,8 +204,8 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
         ],
     ]);
 
@@ -213,9 +213,9 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
         ],
     ]);
 
@@ -236,7 +236,7 @@ describe("TimeAxis", () => {
 
     var tiersToCreate = 15;
     var configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
-      return {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
+      return {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
     });
     xAxis.axisConfigurations([configuration]);
 

@@ -382,6 +382,11 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
+         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
+         */
+        function timeIntervalToD3Time(timeInterval: string): D3.Time.Interval;
+        /**
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -1169,7 +1174,15 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            tickInterval(interval: D3.Time.Interval, step?: number): Date[];
+            /**
+             * Specifies the interval between ticks
+             *
+             * @param {string} interval TimeInterval string specifying the interval unit measure
+             * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
+             *
+             * @return {Date[]}
+             */
+            tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
             copy(): Time;
             _defaultExtent(): Date[];
@@ -1920,6 +1933,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module TimeInterval {
+        var second: string;
+        var minute: string;
+        var hour: string;
+        var day: string;
+        var week: string;
+        var month: string;
+        var year: string;
+    }
     module Axes {
         /**
          * Defines a configuration for a time axis tier.
@@ -1929,7 +1951,7 @@ declare module Plottable {
          * formatter - formatter used to format tick labels.
          */
         type TimeAxisTierConfiguration = {
-            interval: D3.Time.Interval;
+            interval: string;
             step: number;
             formatter: Formatter;
         };
