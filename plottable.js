@@ -929,7 +929,8 @@ var Plottable;
         }
         Formatters.time = time;
         /**
-         * Transforms the Plottable TimeInterval into a d3 time interval equivalent
+         * Transforms the Plottable TimeInterval into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
         function timeIntervalToD3Time(timeInterval) {
             switch (timeInterval) {

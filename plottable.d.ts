@@ -382,7 +382,8 @@ declare module Plottable {
          */
         function time(specifier: string): Formatter;
         /**
-         * Transforms the Plottable TimeInterval into a d3 time interval equivalent
+         * Transforms the Plottable TimeInterval into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
         function timeIntervalToD3Time(timeInterval: TimeInterval): D3.Time.Interval;
         /**
