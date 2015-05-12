@@ -3081,6 +3081,7 @@ var Plottable;
             this._cssClasses = ["component"];
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
+            this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3090,7 +3091,7 @@ var Plottable;
          */
         Component.prototype.anchor = function (selection) {
             if (this._destroyed) {
-                throw new Error("Can't reuse remove()-ed components!");
+                throw new Error("Can't reuse destroy()-ed components!");
             }
             if (selection.node().nodeName.toLowerCase() === "svg") {
                 // svg node gets the "plottable" CSS class
@@ -3116,7 +3117,7 @@ var Plottable;
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback The callback to be added.
          *
          * @return {Component}
          */
@@ -3131,7 +3132,7 @@ var Plottable;
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
@@ -3141,7 +3142,7 @@ var Plottable;
         };
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         Component.prototype._setup = function () {
@@ -3463,6 +3464,28 @@ var Plottable;
             }
             this._isAnchored = false;
             this._parentElement = null;
+            this._onDetachCallbacks.callCallbacks(this);
+            return this;
+        };
+        /**
+         * Adds a callback to be called when th Component is detach()-ed.
+         *
+         * @param {ComponentCallback} callback The callback to be added.
+         * @return {Component} The calling Component.
+         */
+        Component.prototype.onDetach = function (callback) {
+            this._onDetachCallbacks.add(callback);
+            return this;
+        };
+        /**
+         * Removes a callback to be called when th Component is detach()-ed.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback The callback to be removed.
+         * @return {Component} The calling Component.
+         */
+        Component.prototype.offDetach = function (callback) {
+            this._onDetachCallbacks.delete(callback);
             return this;
         };
         Component.prototype._parent = function (parentElement) {

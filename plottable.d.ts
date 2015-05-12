@@ -1438,7 +1438,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type AnchorCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => any;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1468,23 +1468,23 @@ declare module Plottable {
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback The callback to be added.
          *
          * @return {Component}
          */
-        onAnchor(callback: AnchorCallback): Component;
+        onAnchor(callback: ComponentCallback): Component;
         /**
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
-        offAnchor(callback: AnchorCallback): Component;
+        offAnchor(callback: ComponentCallback): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
@@ -1621,6 +1621,21 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
+        /**
+         * Adds a callback to be called when th Component is detach()-ed.
+         *
+         * @param {ComponentCallback} callback The callback to be added.
+         * @return {Component} The calling Component.
+         */
+        onDetach(callback: ComponentCallback): Component;
+        /**
+         * Removes a callback to be called when th Component is detach()-ed.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback The callback to be removed.
+         * @return {Component} The calling Component.
+         */
+        offDetach(callback: ComponentCallback): Component;
         _parent(): ComponentContainer;
         _parent(parentElement: ComponentContainer): any;
         /**

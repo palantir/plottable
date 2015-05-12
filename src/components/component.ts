@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type AnchorCallback = (component: Component) => any;
+  export type ComponentCallback = (component: Component) => any;
 
   export module Components {
     export class Alignment {
@@ -48,7 +48,8 @@ module Plottable {
     private _height: number;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
-    private _onAnchorCallbacks = new Utils.CallbackSet<AnchorCallback>();
+    private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
+    private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -58,7 +59,7 @@ module Plottable {
      */
     public anchor(selection: D3.Selection) {
       if (this._destroyed) {
-        throw new Error("Can't reuse remove()-ed components!");
+        throw new Error("Can't reuse destroy()-ed components!");
       }
 
       if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -86,11 +87,11 @@ module Plottable {
      * Adds a callback to be called on anchoring the Component to the DOM.
      * If the component is already anchored, the callback is called immediately.
      *
-     * @param {AnchorCallback} callback The callback to be added.
+     * @param {ComponentCallback} callback The callback to be added.
      *
      * @return {Component}
      */
-    public onAnchor(callback: AnchorCallback) {
+    public onAnchor(callback: ComponentCallback) {
       if (this._isAnchored) {
         callback(this);
       }
@@ -102,18 +103,18 @@ module Plottable {
      * Removes a callback to be called on anchoring the Component to the DOM.
      * The callback is identified by reference equality.
      *
-     * @param {AnchorCallback} callback The callback to be removed.
+     * @param {ComponentCallback} callback The callback to be removed.
      *
      * @return {Component}
      */
-    public offAnchor(callback: AnchorCallback) {
+    public offAnchor(callback: ComponentCallback) {
       this._onAnchorCallbacks.delete(callback);
       return this;
     }
 
     /**
      * Creates additional elements as necessary for the Component to function.
-     * Called during _anchor() if the Component's element has not been created yet.
+     * Called during anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
     protected _setup() {
@@ -490,6 +491,30 @@ module Plottable {
       }
       this._isAnchored = false;
       this._parentElement = null;
+      this._onDetachCallbacks.callCallbacks(this);
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called when th Component is detach()-ed.
+     *
+     * @param {ComponentCallback} callback The callback to be added.
+     * @return {Component} The calling Component.
+     */
+    public onDetach(callback: ComponentCallback) {
+      this._onDetachCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback to be called when th Component is detach()-ed.
+     * The callback is identified by reference equality.
+     *
+     * @param {ComponentCallback} callback The callback to be removed.
+     * @return {Component} The calling Component.
+     */
+    public offDetach(callback: ComponentCallback) {
+      this._onDetachCallbacks.delete(callback);
       return this;
     }
 
