@@ -34,8 +34,42 @@ export module Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | _Accessor): StackedArea<X>;
+    public x(x: X | _Accessor, xScale: Scale<X, number>): Area<X>;
+    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      if (xScale == null) {
+        super.x(<number | _Accessor> x);
+        Stacked.prototype.x.apply(this, [x]);
+      } else {
+        super.x(<X | _Accessor> x, xScale);
+        Stacked.prototype.x.apply(this, [x, xScale]);
+      }
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | _Accessor): StackedArea<X>;
+    public y(y: number | _Accessor, yScale: Scale<number, number>): Area<X>;
+    public y(y?: number | _Accessor | number, yScale?: Scale<number, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      if (yScale == null) {
+        super.y(<number | _Accessor> y);
+        Stacked.prototype.y.apply(this, [y]);
+      } else {
+        super.y(<number | _Accessor> y, yScale);
+        Stacked.prototype.y.apply(this, [y, yScale]);
+      }
+      return this;
+    }
+
     protected _additionalPaint() {
-      var scaledBaseline = this._yScale.scale(this._baselineValue);
+      var scaledBaseline = this.y().scale.scale(this._baselineValue);
       var baselineAttr: any = {
         "x1": 0,
         "y1": scaledBaseline,
@@ -48,19 +82,13 @@ export module Plots {
 
     protected _updateYDomainer() {
       super._updateYDomainer();
-      var scale = <QuantitativeScale<any>> this._yScale;
+      var scale = <QuantitativeScale<any>> this.y().scale;
       if (!scale._userSetDomainer) {
         scale.domainer().addPaddingException(this, 0)
                         .addIncludedValue(this, 0);
         // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
         scale._autoDomainIfAutomaticMode();
       }
-    }
-
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
-      return this;
     }
 
     protected _onDatasetUpdate() {
@@ -76,12 +104,12 @@ export module Plots {
         attrToProjector["fill-opacity"] = d3.functor(1);
       }
 
-      var yAccessor = this._attrBindings.get("y").accessor;
-      var xAccessor = this._attrBindings.get("x").accessor;
+      var yAccessor = this.y().accessor;
+      var xAccessor = this.x().accessor;
       attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        this._yScale.scale(+yAccessor(d, i, dataset, m) + m.offsets.get(xAccessor(d, i, dataset, m)));
+        this.y().scale.scale(+yAccessor(d, i, dataset, m) + m.offsets.get(xAccessor(d, i, dataset, m)));
       attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        this._yScale.scale(m.offsets.get(xAccessor(d, i, dataset, m)));
+        this.y().scale.scale(m.offsets.get(xAccessor(d, i, dataset, m)));
 
       return attrToProjector;
     }
@@ -94,7 +122,7 @@ export module Plots {
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
       var domainKeys = this._getDomainKeys();
-      var keyAccessor = this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
+      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -127,8 +155,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    protected _extentsForAttr(attr: string) {
-      return (<any> Stacked.prototype)._extentsForAttr.call(this, attr);
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
     public _keyAccessor(): _Accessor {

@@ -45,8 +45,8 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.StackedBar(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       renderer.baseline(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
@@ -172,8 +172,8 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
       plot.addDataset(new Plottable.Dataset(data4));
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       plot.baseline(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
@@ -236,8 +236,8 @@ describe("Plots", () => {
       dataset2 = new Plottable.Dataset(data2);
 
       renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
-      renderer.project("y", "name", yScale);
-      renderer.project("x", "y", xScale);
+      renderer.y((d) => d.name, yScale);
+      renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
@@ -313,8 +313,8 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
     });
@@ -374,8 +374,8 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       plot.renderTo(svg);
     });
 
@@ -421,7 +421,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.project("fill", "fill");
-      plot.project("x", "x", xScale).project("y", "y", yScale);
+      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
       var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
@@ -460,7 +460,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data4));
       plot.addDataset(new Plottable.Dataset(data5));
       plot.project("fill", "fill");
-      plot.project("x", "x", xScale).project("y", "y", yScale);
+      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
 
       var keys = (<any> plot)._key2PlotDatasetKey.keys();
       var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");

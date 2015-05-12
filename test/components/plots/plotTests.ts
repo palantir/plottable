@@ -437,7 +437,8 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y).addDataset(new Plottable.Dataset([])).animate(true);
+      var plot = new Plottable.Plots.Bar(x, y);
+      plot.addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
@@ -445,8 +446,8 @@ describe("Plots", () => {
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = TestMethods.generateSVG();
-      plot.project("x", "x", x);
-      plot.project("y", "y", y);
+      plot.x((d) => d.x, x);
+      plot.y((d) => d.y, y);
       plot.renderTo(svg);
       assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
       svg.remove();
@@ -489,9 +490,9 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
       plot = new Plottable.XYPlot(xScale, yScale);
-      plot.addDataset(simpleDataset)
-          .project("x", xAccessor, xScale)
-          .project("y", yAccessor, yScale)
+      plot.addDataset(simpleDataset);
+      plot.x(xAccessor, xScale)
+          .y(yAccessor, yScale)
           .renderTo(svg);
     });
 
@@ -546,13 +547,13 @@ describe("Plots", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       var plot2 = new Plottable.XYPlot(zScale, yScale)
                                     .automaticallyAdjustXScaleOverVisiblePoints(true)
-                                    .project("x", xAccessor, zScale)
-                                    .project("y", yAccessor, yScale)
+                                    .x(xAccessor, zScale)
+                                    .y(yAccessor, yScale)
                                     .addDataset(simpleDataset);
       var plot3 = new Plottable.XYPlot(zScale, xScale)
                                     .automaticallyAdjustYScaleOverVisiblePoints(true)
-                                    .project("x", xAccessor, zScale)
-                                    .project("y", yAccessor, xScale)
+                                    .x(xAccessor, zScale)
+                                    .y(yAccessor, xScale)
                                     .addDataset(simpleDataset);
       plot2.renderTo(svg);
       plot3.renderTo(svg);
@@ -581,7 +582,7 @@ describe("Plots", () => {
     it("listeners are deregistered for changed scale", () => {
       plot.automaticallyAdjustYScaleOverVisiblePoints(true);
       var newScale = new Plottable.Scales.Linear().domain([-10, 10]);
-      plot.project("x", xAccessor, newScale);
+      plot.x(xAccessor, newScale);
       xScale.domain([-2, 2]);
       assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
       svg.remove();

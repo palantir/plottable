@@ -24,9 +24,37 @@ module Plottable {
       return metadata;
     }
 
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      if (this._attrBindings.get("x") && this._attrBindings.get("y") && (attrToSet === "x" || attrToSet === "y")) {
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | _Accessor): XYPlot<X, Y>;
+    public x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | _Accessor | X, scale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      if (scale == null) {
+        super.x(<number | _Accessor> x);
+      } else {
+        super.x(<X | _Accessor> x, scale);
+      }
+      if (this.x().accessor != null && this.y().accessor != null) {
+        this._updateStackOffsets();
+      }
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | _Accessor): XYPlot<X, Y>;
+    public y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | _Accessor | Y, scale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      if (scale == null) {
+        super.y(<number | _Accessor> y);
+      } else {
+        super.y(<Y | _Accessor> y, scale);
+      }
+      if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
       }
       return this;
@@ -172,8 +200,8 @@ module Plottable {
       return dataMapArray;
     }
 
-    protected _extentsForAttr(attr: string) {
-      var extents = super._extentsForAttr(attr);
+    protected _extentsForProperty(attr: string) {
+      var extents = super._extentsForProperty(attr);
       var primaryAttr = this._isVertical ? "y" : "x";
       if (attr === primaryAttr && this._stackedExtent) {
         var clonedExtents = extents.slice();
@@ -185,8 +213,8 @@ module Plottable {
     }
 
     public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor = this._attrBindings.get(fromX ? "x" : "y").accessor;
-      var bAccessor = this._attrBindings.get(fromX ? "y" : "x").accessor;
+      var aAccessor = fromX ? this.x().accessor : this.y().accessor;
+      var bAccessor = fromX ? this.y().accessor : this.x().accessor;
       var aStackedAccessor = (d: any, i: number, dataset: Dataset, m: Plots.StackedPlotMetadata) => {
         var value = aAccessor(d, i, dataset, m);
         if (this._isVertical ? !fromX : fromX) {
@@ -216,11 +244,11 @@ module Plottable {
     }
 
     public _keyAccessor(): _Accessor {
-       return this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
+       return this._isVertical ? this.x().accessor : this.y().accessor;
     }
 
     public _valueAccessor(): _Accessor {
-       return this._isVertical ? this._attrBindings.get("y").accessor : this._attrBindings.get("x").accessor;
+       return this._isVertical ? this.y().accessor : this.x().accessor;
     }
   }
 }

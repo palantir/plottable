@@ -2520,6 +2520,7 @@ declare module Plottable {
         protected _attrExtents: D3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
+        protected _propertyExtents: D3.Map<any[]>;
         protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
          * Constructs a Plot.
@@ -2599,7 +2600,7 @@ declare module Plottable {
         /**
          * Override in subclass to add special extents, such as included values
          */
-        protected _extentsForAttr(attr: string): any[];
+        protected _extentsForProperty(property: string): any[];
         /**
          * Get the animator associated with the specified Animator key.
          *
@@ -2664,6 +2665,9 @@ declare module Plottable {
          */
         getClosestPlotData(queryPoint: Point): Plots.PlotData;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
+        protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
+        protected _generatePropertyToProjectors(): AttributeToProjector;
     }
 }
 
@@ -2698,8 +2702,6 @@ declare module Plottable {
 
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
-        protected _xScale: Scale<X, number>;
-        protected _yScale: Scale<Y, number>;
         /**
          * Constructs an XYPlot.
          *
@@ -2712,11 +2714,14 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
-        /**
-         * @param {string} attrToSet One of ["x", "y"] which determines the point's
-         * x and y position in the Plot.
-         */
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): XYPlot<X, Y>;
+        x(): Plots.AccessorScaleBinding<X, number>;
+        x(x: number | _Accessor): XYPlot<X, Y>;
+        x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(y: number | _Accessor): XYPlot<X, Y>;
+        y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
+        protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
          * Sets the automatic domain adjustment over visible points for y scale.
@@ -2736,7 +2741,7 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected _generateAttrToProjector(): AttributeToProjector;
+        protected _generatePropertyToProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
@@ -2750,11 +2755,7 @@ declare module Plottable {
             a: A;
             b: B;
         }[];
-        protected _projectorsReady(): {
-            accessor: (datum: any, index?: number, dataset?: Dataset, plotMetadata?: Plots.PlotMetadata) => any;
-            scale?: Scale<any, any>;
-            attribute: string;
-        };
+        protected _projectorsReady(): boolean;
     }
 }
 
@@ -2830,6 +2831,12 @@ declare module Plottable {
              */
             project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Grid;
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            x(): Plots.AccessorScaleBinding<any, number>;
+            x(x: number | _Accessor): Grid;
+            x(x: any | _Accessor, scale: Scale<any, number>): Grid;
+            y(): Plots.AccessorScaleBinding<any, number>;
+            y(y: number | _Accessor): Grid;
+            y(y: any | _Accessor, scale: Scale<any, number>): Grid;
         }
     }
 }
@@ -2957,7 +2964,6 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
-            protected _yScale: QuantitativeScale<number>;
             /**
              * Constructs a LinePlot.
              *
@@ -3005,10 +3011,12 @@ declare module Plottable {
              * @param {QuantitativeScaleScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            y0(): Plots.AccessorScaleBinding<number, number>;
+            y0(y0: number | _Accessor): Area<X>;
+            y0(y0: number | _Accessor, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Area<X>;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             protected _wholeDatumAttributes(): string[];
             protected _generateAttrToProjector(): {
@@ -3062,7 +3070,12 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        project(attrToSet: string, accessor: any, scale?: Scale<any, any>): Stacked<X, Y>;
+        x(): Plots.AccessorScaleBinding<X, number>;
+        x(x: number | _Accessor): XYPlot<X, Y>;
+        x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
+        y(): Plots.AccessorScaleBinding<Y, number>;
+        y(y: number | _Accessor): XYPlot<X, Y>;
+        y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
@@ -3078,7 +3091,7 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        protected _extentsForAttr(attr: string): any[];
+        protected _extentsForProperty(attr: string): any[];
         _normalizeDatasets<A, B>(fromX: boolean): {
             a: A;
             b: B;
@@ -3103,9 +3116,14 @@ declare module Plottable {
             protected _getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | _Accessor): StackedArea<X>;
+            x(x: X | _Accessor, xScale: Scale<X, number>): Area<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | _Accessor): StackedArea<X>;
+            y(y: number | _Accessor, yScale: Scale<number, number>): Area<X>;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedArea<X>;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
@@ -3117,7 +3135,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForAttr(attr: string): any;
+            protected _extentsForProperty(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
@@ -3144,11 +3162,16 @@ declare module Plottable {
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animators.PlotAnimator;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | _Accessor): StackedBar<X, Y>;
+            x(x: X | _Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
+            y(): Plots.AccessorScaleBinding<Y, number>;
+            y(y: number | _Accessor): StackedBar<X, Y>;
+            y(y: Y | _Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            project(attrToSet: string, accessor: any, scale?: Scale<any, any>): StackedBar<X, Y>;
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _normalizeDatasets<A, B>(fromX: boolean): {
@@ -3161,7 +3184,7 @@ declare module Plottable {
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForAttr(attr: string): any;
+            protected _extentsForProperty(attr: string): any;
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
         }
