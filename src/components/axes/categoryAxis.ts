@@ -120,8 +120,8 @@ export module Axes {
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),
-          xAlign: xAlign[self.orient()],
-          yAlign: yAlign[self.orient()],
+          xAlign: xAlign[self.orientation()],
+          yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle()
         };
         self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -208,8 +208,8 @@ export module Axes {
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }

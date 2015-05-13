@@ -1897,7 +1897,7 @@ declare module Plottable {
          *
          * @returns {number} the current orientation.
          */
-        orient(): string;
+        orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
@@ -1905,7 +1905,7 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orient(newOrientation: string): Axis;
+        orientation(orientation: string): Axis;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -1988,8 +1988,8 @@ declare module Plottable {
              * @returns {Axis.Time} The calling Axis.Time.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
-            orient(): string;
-            orient(orientation: string): Time;
+            orientation(): string;
+            orientation(orientation: string): Time;
             protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -2144,7 +2144,7 @@ declare module Plottable {
              *
              * @returns {string} the current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the Label.
              *
@@ -2152,7 +2152,7 @@ declare module Plottable {
              * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
-            orient(newOrientation: string): Label;
+            orientation(orientation: string): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2319,7 +2319,7 @@ declare module Plottable {
              *
              * @returns {string} The current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the InterpolatedColorLegend.
              *
@@ -2327,7 +2327,7 @@ declare module Plottable {
              *
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            orient(newOrientation: string): InterpolatedColorLegend;
+            orientation(orientation: string): InterpolatedColorLegend;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _render(): void;

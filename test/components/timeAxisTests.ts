@@ -16,9 +16,9 @@ describe("TimeAxis", () => {
   });
 
   it("cannot change time axis orientation to vertical", () => {
-      assert.throws(() => axis.orient("left"), "horizontal");
-      assert.throws(() => axis.orient("right"), "horizontal");
-      assert.strictEqual(axis.orient(), "bottom", "orientation unchanged");
+      assert.throws(() => axis.orientation("left"), "horizontal");
+      assert.throws(() => axis.orientation("right"), "horizontal");
+      assert.strictEqual(axis.orientation(), "bottom", "orientation unchanged");
   });
 
   it("Computing the default ticks doesn't error out for edge cases", () => {

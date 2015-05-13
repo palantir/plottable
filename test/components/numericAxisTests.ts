@@ -200,7 +200,7 @@ describe("NumericAxis", () => {
       }
     }
 
-    numericAxis.orient("bottom");
+    numericAxis.orientation("bottom");
     visibleTickLabels = (<any> numericAxis)._element
                           .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
                           .filter(function(d: any, i: number) {
