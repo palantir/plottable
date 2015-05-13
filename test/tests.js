@@ -2488,53 +2488,75 @@ describe("Plots", function () {
         var svg;
         var xScale;
         var yScale;
-        var xAccessor;
-        var yAccessor;
-        var simpleDataset;
         var plot;
-        before(function () {
-            xAccessor = function (d, i, dataset) { return d.a + dataset.metadata().foo; };
-            yAccessor = function (d, i, dataset) { return d.b + dataset.metadata().foo; };
-        });
+        var simpleDataset = new Plottable.Dataset([
+            { a: -6, b: 6 },
+            { a: -2, b: 2 },
+            { a: 2, b: -2 },
+            { a: 6, b: -6 }
+        ]);
+        var xAccessor = function (d) { return d.a; };
+        var yAccessor = function (d) { return d.b; };
         beforeEach(function () {
             svg = TestMethods.generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }], { foo: 0 });
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
             plot = new Plottable.XYPlot(xScale, yScale);
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
-        it("plot auto domain scale to visible points", function () {
+        it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
-            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
-            yScale.domain([-6, 6]);
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
             svg.remove();
         });
-        it("no visible points", function () {
+        it("automatically adjusting Y domain when no points are visible", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
+            assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
             svg.remove();
         });
-        it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", function () {
-            xScale.domain([-2, 2]);
+        it("automatically adjusting Y domain when X scale is replaced", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            plot.renderTo(svg);
-            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
+            var newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
+            plot.x(xAccessor, newXScale);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "changing domain of original X scale doesn't affect Y scale's domain");
             svg.remove();
         });
-        it("show all data", function () {
+        it("automatically adjusting X domain over visible points", function () {
+            yScale.domain([-3, 3]);
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            plot.automaticallyAdjustXScaleOverVisiblePoints(false);
+            svg.remove();
+        });
+        it("automatically adjusting X domain when no points are visible", function () {
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            yScale.domain([-0.5, 0.5]);
+            assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+            svg.remove();
+        });
+        it("automatically adjusting X domain when Y scale is replaced", function () {
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            var newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
+            plot.y(yAccessor, newYScale);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
+            yScale.domain([-2, 2]);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "changing domain of original Y scale doesn't affect X scale's domain");
+            svg.remove();
+        });
+        it("showAllData()", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("show all data without auto adjust domain", function () {
@@ -2543,20 +2565,7 @@ describe("Plots", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
-            svg.remove();
-        });
-        it("no cycle in auto domain on plot", function () {
-            var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            var plot2 = new Plottable.XYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).x(xAccessor, zScale).y(yAccessor, yScale).addDataset(simpleDataset);
-            var plot3 = new Plottable.XYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).x(xAccessor, zScale).y(yAccessor, xScale).addDataset(simpleDataset);
-            plot2.renderTo(svg);
-            plot3.renderTo(svg);
-            xScale.domain([-2, 2]);
-            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
-            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
-            assert.deepEqual(xScale.domain(), [-2, 2], "x domain is not adjusted using custom algorithm and domainer");
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("listeners are deregistered after removal", function () {
@@ -2566,14 +2575,6 @@ describe("Plots", function () {
             assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
             var yScaleCallbacks = yScale._callbacks.values();
             assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
-            svg.remove();
-        });
-        it("listeners are deregistered for changed scale", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            var newScale = new Plottable.Scales.Linear().domain([-10, 10]);
-            plot.x(xAccessor, newScale);
-            xScale.domain([-2, 2]);
-            assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
             svg.remove();
         });
     });

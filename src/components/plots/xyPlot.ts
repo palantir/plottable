@@ -49,6 +49,10 @@ module Plottable {
       }
 
       this._bindProperty(XYPlot._X_KEY, x, xScale);
+      if (this._autoAdjustYScaleDomain) {
+        this._updateExtentsForProperty("y");
+        this.y().scale.autoDomain();
+      }
       this._updateXDomainer();
       this._render();
       return this;
@@ -63,9 +67,37 @@ module Plottable {
       }
 
       this._bindProperty(XYPlot._Y_KEY, y, yScale);
+      if (this._autoAdjustXScaleDomain) {
+        this._updateExtentsForProperty("x");
+        this.x().scale.autoDomain();
+      }
       this._updateYDomainer();
       this._render();
       return this;
+    }
+
+    protected _filterForProperty(property: string) {
+      if (property === "x" && this._autoAdjustXScaleDomain) {
+        return this._makeFilterByProperty("y");
+      } else if (property === "y" && this._autoAdjustYScaleDomain) {
+        return this._makeFilterByProperty("x");
+      }
+      return null;
+    }
+
+    private _makeFilterByProperty(property: string) {
+      var binding = this._propertyBindings.get(property);
+      if (binding != null) {
+        var accessor = binding.accessor;
+        var scale = binding.scale;
+        if (scale != null) {
+          return (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => {
+            var range = scale.range();
+            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, plotMetadata)), range[0], range[1]);
+          };
+        }
+      }
+      return null;
     }
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
@@ -175,69 +207,26 @@ module Plottable {
      * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
+      this._updateExtentsForProperty("x");
       this.x().scale.autoDomain();
-      if (!this._autoAdjustYScaleDomain) {
-        this.y().scale.autoDomain();
-      }
+      this._updateExtentsForProperty("y");
+      this.y().scale.autoDomain();
+      return this;
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X, Y>(this.x().scale, this.y().scale, true);
+        this._updateExtentsForProperty("y");
+        this.y().scale.autoDomain();
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y, X>(this.y().scale, this.x().scale, false);
+        this._updateExtentsForProperty("x");
+        this.x().scale.autoDomain();
       }
-    }
-
-    private _adjustDomainToVisiblePoints<A, B>(fromScale: Scale<A, number>,
-                                             toScale: Scale<B, number>,
-                                             fromX: boolean) {
-      if (toScale instanceof QuantitativeScale) {
-        var toScaleQ = <QuantitativeScale<B>> toScale;
-        var normalizedData = this._normalizeDatasets<A, B>(fromX);
-
-        var filterFn: (v: A) => boolean;
-        if (fromScale instanceof QuantitativeScale) {
-          var fromDomain = fromScale.domain();
-          filterFn = (a: A) => fromDomain[0] <= a && fromDomain[1] >= a;
-        } else {
-          var fromDomainSet = d3.set(fromScale.domain());
-          filterFn = (a: A) => fromDomainSet.has(a);
-        }
-
-        var adjustedDomain = this._adjustDomainOverVisiblePoints<A, B>(normalizedData, filterFn);
-        if (adjustedDomain.length === 0) {
-          return;
-        }
-        adjustedDomain = toScaleQ.domainer().computeDomain([adjustedDomain], toScaleQ);
-        toScaleQ.domain(adjustedDomain);
-      }
-    }
-
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => A = fromX ? this.x().accessor : this.y().accessor;
-      var bAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => B = fromX ? this.y().accessor : this.x().accessor;
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
-        return dataset.data().map((d, i) => {
-          return { a: aAccessor(d, i, dataset, plotMetadata), b: bAccessor(d, i, dataset, plotMetadata) };
-        });
-      }));
-    }
-
-    private _adjustDomainOverVisiblePoints<A, B>(values: {a: A; b: B}[], filterFn: (v: any) => boolean): B[] {
-      var bVals = values.filter(v => filterFn(v.a)).map(v => v.b);
-      var retVal: B[] = [];
-      if (bVals.length !== 0) {
-        retVal = [Utils.Methods.min<B>(bVals, null), Utils.Methods.max<B>(bVals, null)];
-      }
-      return retVal;
     }
 
     protected _projectorsReady() {

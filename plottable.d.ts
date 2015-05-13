@@ -2587,6 +2587,8 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        protected _updateExtentsForProperty(property: string): void;
+        protected _filterForProperty(property: string): _Accessor;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2710,6 +2712,7 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | _Accessor): XYPlot<X, Y>;
         y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2740,11 +2743,7 @@ declare module Plottable {
          *
          * This call does not override auto domain adjustment behavior over visible points.
          */
-        showAllData(): void;
-        protected _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
+        showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
     }
 }
@@ -3093,11 +3092,8 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
+        protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
         _keyAccessor(): _Accessor;
         _valueAccessor(): _Accessor;
     }
@@ -3141,10 +3137,7 @@ declare module Plottable {
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
         }
     }
 }
@@ -3176,10 +3169,7 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
