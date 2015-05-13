@@ -140,7 +140,7 @@ module Plottable {
       this._isSetup = true;
     }
 
-    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {
         minWidth: 0,
         minHeight: 0

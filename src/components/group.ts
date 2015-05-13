@@ -23,11 +23,11 @@ export module Components {
       components.forEach((c: Component) => this.add(c));
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
-        minWidth: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minWidth, 0),
-        minHeight: Utils.Methods.max<_SpaceRequest, number>(requests, (request: _SpaceRequest) => request.minHeight, 0)
+        minWidth: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
+        minHeight: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
       };
     }
 
