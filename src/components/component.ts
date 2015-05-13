@@ -284,24 +284,24 @@ module Plottable {
      *
      * @returns {string} The current x alignment.
      */
-    public xAlign(): string;
+    public xAlignment(): string;
     /**
      * Sets the x alignment of the Component.
      *
      * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
      * @returns {Component} The calling Component.
      */
-    public xAlign(alignment: string): Component;
-    public xAlign(alignment?: string): any {
-      if (alignment == null) {
+    public xAlignment(xAlignment: string): Component;
+    public xAlignment(xAlignment?: string): any {
+      if (xAlignment == null) {
         return this._xAlignment;
       }
 
-      alignment = alignment.toLowerCase();
-      if (Component._xAlignToProportion[alignment] == null) {
-        throw new Error("Unsupported alignment: " + alignment);
+      xAlignment = xAlignment.toLowerCase();
+      if (Component._xAlignToProportion[xAlignment] == null) {
+        throw new Error("Unsupported alignment: " + xAlignment);
       }
-      this._xAlignment = alignment;
+      this._xAlignment = xAlignment;
       this.redraw();
       return this;
     }
@@ -311,24 +311,24 @@ module Plottable {
      *
      * @returns {string} The current y alignment.
      */
-    public yAlign(): string;
+    public yAlignment(): string;
     /**
      * Sets the y alignment of the Component.
      *
      * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
      * @returns {Component} The calling Component.
      */
-    public yAlign(alignment: string): Component;
-    public yAlign(alignment?: string): any {
-      if (alignment == null) {
+    public yAlignment(yAlignment: string): Component;
+    public yAlignment(yAlignment?: string): any {
+      if (yAlignment == null) {
         return this._yAlignment;
       }
 
-      alignment = alignment.toLowerCase();
-      if (Component._yAlignToProportion[alignment] == null) {
-        throw new Error("Unsupported alignment: " + alignment);
+      yAlignment = yAlignment.toLowerCase();
+      if (Component._yAlignToProportion[yAlignment] == null) {
+        throw new Error("Unsupported alignment: " + yAlignment);
       }
-      this._yAlignment = alignment;
+      this._yAlignment = yAlignment;
       this.redraw();
       return this;
     }

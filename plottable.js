@@ -3316,27 +3316,27 @@ var Plottable;
             Plottable.RenderController.flush();
             return this;
         };
-        Component.prototype.xAlign = function (alignment) {
-            if (alignment == null) {
+        Component.prototype.xAlignment = function (xAlignment) {
+            if (xAlignment == null) {
                 return this._xAlignment;
             }
-            alignment = alignment.toLowerCase();
-            if (Component._xAlignToProportion[alignment] == null) {
-                throw new Error("Unsupported alignment: " + alignment);
+            xAlignment = xAlignment.toLowerCase();
+            if (Component._xAlignToProportion[xAlignment] == null) {
+                throw new Error("Unsupported alignment: " + xAlignment);
             }
-            this._xAlignment = alignment;
+            this._xAlignment = xAlignment;
             this.redraw();
             return this;
         };
-        Component.prototype.yAlign = function (alignment) {
-            if (alignment == null) {
+        Component.prototype.yAlignment = function (yAlignment) {
+            if (yAlignment == null) {
                 return this._yAlignment;
             }
-            alignment = alignment.toLowerCase();
-            if (Component._yAlignToProportion[alignment] == null) {
-                throw new Error("Unsupported alignment: " + alignment);
+            yAlignment = yAlignment.toLowerCase();
+            if (Component._yAlignToProportion[yAlignment] == null) {
+                throw new Error("Unsupported alignment: " + yAlignment);
             }
-            this._yAlignment = alignment;
+            this._yAlignment = yAlignment;
             this.redraw();
             return this;
         };
@@ -3958,16 +3958,16 @@ var Plottable;
         Axis.prototype._setDefaultAlignment = function () {
             switch (this._orientation) {
                 case "bottom":
-                    this.yAlign("top");
+                    this.yAlignment("top");
                     break;
                 case "top":
-                    this.yAlign("bottom");
+                    this.yAlignment("bottom");
                     break;
                 case "left":
-                    this.xAlign("right");
+                    this.xAlignment("right");
                     break;
                 case "right":
-                    this.xAlign("left");
+                    this.xAlignment("left");
                     break;
             }
         };
@@ -5087,7 +5087,7 @@ var Plottable;
                 this.classed("label", true);
                 this.text(displayText);
                 this.orient(orientation);
-                this.xAlign("center").yAlign("center");
+                this.xAlignment("center").yAlignment("center");
                 this._fixedHeightFlag = true;
                 this._fixedWidthFlag = true;
                 this._padding = 0;
@@ -5162,8 +5162,8 @@ var Plottable;
                 var textRotation = { horizontal: 0, right: 90, left: -90 };
                 var writeOptions = {
                     selection: this._textContainer,
-                    xAlign: this.xAlign(),
-                    yAlign: this.yAlign(),
+                    xAlign: this.xAlignment(),
+                    yAlign: this.yAlignment(),
                     textRotation: textRotation[this.orient()]
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
@@ -5236,7 +5236,7 @@ var Plottable;
                 this._scale = colorScale;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
-                this.xAlign("right").yAlign("top");
+                this.xAlignment("right").yAlignment("top");
                 this._fixedWidthFlag = true;
                 this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
