@@ -7187,36 +7187,6 @@ describe("Scales", function () {
             svg.remove();
         });
     });
-    describe("Quantitative Scales", function () {
-        it("autorange defaults to [0, 1] if no perspectives set", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.autoDomain();
-            var d = scale.domain();
-            assert.strictEqual(d[0], 0);
-            assert.strictEqual(d[1], 1);
-        });
-        it("domain can't include NaN or Infinity", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.domain([0, 1]);
-            scale.domain([5, Infinity]);
-            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
-            scale.domain([5, -Infinity]);
-            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
-            scale.domain([NaN, 7]);
-            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
-            scale.domain([-1, 5]);
-            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-        });
-        it("custom tick generator", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.domain([0, 10]);
-            var ticks = scale.ticks();
-            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
-            ticks = scale.ticks();
-            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
-        });
-    });
     describe("Category Scales", function () {
         it("rangeBand is updated when domain changes", function () {
             var scale = new Plottable.Scales.Category();
@@ -7475,6 +7445,41 @@ describe("Scales", function () {
                 var ticks = scale.ticks();
                 assert.operator(ticks.length, ">", 0);
             });
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
+    describe("Quantitative Scales", function () {
+        it("autorange defaults to [0, 1] if no perspectives set", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.autoDomain();
+            var d = scale.domain();
+            assert.strictEqual(d[0], 0);
+            assert.strictEqual(d[1], 1);
+        });
+        it("domain can't include NaN or Infinity", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([0, 1]);
+            scale.domain([5, Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+            scale.domain([5, -Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+            scale.domain([NaN, 7]);
+            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+            scale.domain([-1, 5]);
+            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        });
+        it("custom tick generator", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([0, 10]);
+            var ticks = scale.ticks();
+            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
+            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
+            ticks = scale.ticks();
+            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
     });
 });
