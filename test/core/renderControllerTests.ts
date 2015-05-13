@@ -16,7 +16,7 @@ describe("RenderController", () => {
     (<any> link2)._render = () => link2Rendered = true;
 
     link1.render();
-    assert.isTrue(link2Rendered, "dependent Component was eventually drawn");
+    assert.isTrue(link2Rendered, "dependent Component was render()-ed");
 
     svg1.remove();
     svg2.remove();
