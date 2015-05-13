@@ -11,6 +11,47 @@ export module Scales {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends Scale<number, string> {
+    public static REDS = [
+      "#FFFFFF", // white
+      "#FFF6E1",
+      "#FEF4C0",
+      "#FED976",
+      "#FEB24C",
+      "#FD8D3C",
+      "#FC4E2A",
+      "#E31A1C",
+      "#B10026"  // red
+    ];
+    public static BLUES = [
+      "#FFFFFF", // white
+      "#CCFFFF",
+      "#A5FFFD",
+      "#85F7FB",
+      "#6ED3EF",
+      "#55A7E0",
+      "#417FD0",
+      "#2545D3",
+      "#0B02E1"  // blue
+    ];
+    public static POSNEG = [
+      "#0B02E1", // blue
+      "#2545D3",
+      "#417FD0",
+      "#55A7E0",
+      "#6ED3EF",
+      "#85F7FB",
+      "#A5FFFD",
+      "#CCFFFF",
+      "#FFFFFF", // white
+      "#FFF6E1",
+      "#FEF4C0",
+      "#FED976",
+      "#FEB24C",
+      "#FD8D3C",
+      "#FC4E2A",
+      "#E31A1C",
+      "#B10026"  // red
+    ];
     private _colorRange: string[];
     private _colorScale: D3.Scale.QuantitativeScale;
 
@@ -18,12 +59,12 @@ export module Scales {
      * An InterpolatedColorScale maps numbers to color strings.
      * 
      * @param {string[]} colors an array of strings representing color values in hex 
-     *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.ColorRange.REDS
+     *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
-    constructor(colorRange = InterpolatedColor.ColorRange.REDS, scaleType = "linear") {
+    constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
       this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
@@ -120,51 +161,6 @@ export module Scales {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
-    }
-  }
-  export module InterpolatedColor {
-    export class ColorRange {
-      public static REDS = [
-        "#FFFFFF", // white
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026"  // red
-      ];
-      public static BLUES = [
-        "#FFFFFF", // white
-        "#CCFFFF",
-        "#A5FFFD",
-        "#85F7FB",
-        "#6ED3EF",
-        "#55A7E0",
-        "#417FD0",
-        "#2545D3",
-        "#0B02E1"  // blue
-      ];
-      public static POSNEG = [
-        "#0B02E1", // blue
-        "#2545D3",
-        "#417FD0",
-        "#55A7E0",
-        "#6ED3EF",
-        "#85F7FB",
-        "#A5FFFD",
-        "#CCFFFF",
-        "#FFFFFF", // white
-        "#FFF6E1",
-        "#FEF4C0",
-        "#FED976",
-        "#FEB24C",
-        "#FD8D3C",
-        "#FC4E2A",
-        "#E31A1C",
-        "#B10026"  // red
-      ];
     }
   }
 }

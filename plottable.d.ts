@@ -1167,11 +1167,14 @@ declare module Plottable {
          * By default it generates a linear scale internally.
          */
         class InterpolatedColor extends Scale<number, string> {
+            static REDS: string[];
+            static BLUES: string[];
+            static POSNEG: string[];
             /**
              * An InterpolatedColorScale maps numbers to color strings.
              *
              * @param {string[]} colors an array of strings representing color values in hex
-             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.ColorRange.REDS
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
              * @param {string} scaleType a string representing the underlying scale
              *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
@@ -1195,13 +1198,6 @@ declare module Plottable {
              */
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
-        }
-        module InterpolatedColor {
-            class ColorRange {
-                static REDS: string[];
-                static BLUES: string[];
-                static POSNEG: string[];
-            }
         }
     }
 }

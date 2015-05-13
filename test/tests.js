@@ -7370,7 +7370,7 @@ describe("Scales", function () {
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange(Plottable.Scales.InterpolatedColor.ColorRange.REDS);
+            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
         });
     });

@@ -2244,13 +2244,13 @@ var Plottable;
              * An InterpolatedColorScale maps numbers to color strings.
              *
              * @param {string[]} colors an array of strings representing color values in hex
-             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.ColorRange.REDS
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
              * @param {string} scaleType a string representing the underlying scale
              *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = InterpolatedColor.ColorRange.REDS; }
+                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
                 if (scaleType === void 0) { scaleType = "linear"; }
                 this._colorRange = colorRange;
                 switch (scaleType) {
@@ -2326,59 +2326,50 @@ var Plottable;
                 }
                 return this;
             };
+            InterpolatedColor.REDS = [
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
+            InterpolatedColor.BLUES = [
+                "#FFFFFF",
+                "#CCFFFF",
+                "#A5FFFD",
+                "#85F7FB",
+                "#6ED3EF",
+                "#55A7E0",
+                "#417FD0",
+                "#2545D3",
+                "#0B02E1"
+            ];
+            InterpolatedColor.POSNEG = [
+                "#0B02E1",
+                "#2545D3",
+                "#417FD0",
+                "#55A7E0",
+                "#6ED3EF",
+                "#85F7FB",
+                "#A5FFFD",
+                "#CCFFFF",
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
             return InterpolatedColor;
         })(Plottable.Scale);
         Scales.InterpolatedColor = InterpolatedColor;
-        var InterpolatedColor;
-        (function (InterpolatedColor) {
-            var ColorRange = (function () {
-                function ColorRange() {
-                }
-                ColorRange.REDS = [
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ];
-                ColorRange.BLUES = [
-                    "#FFFFFF",
-                    "#CCFFFF",
-                    "#A5FFFD",
-                    "#85F7FB",
-                    "#6ED3EF",
-                    "#55A7E0",
-                    "#417FD0",
-                    "#2545D3",
-                    "#0B02E1"
-                ];
-                ColorRange.POSNEG = [
-                    "#0B02E1",
-                    "#2545D3",
-                    "#417FD0",
-                    "#55A7E0",
-                    "#6ED3EF",
-                    "#85F7FB",
-                    "#A5FFFD",
-                    "#CCFFFF",
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ];
-                return ColorRange;
-            })();
-            InterpolatedColor.ColorRange = ColorRange;
-        })(InterpolatedColor = Scales.InterpolatedColor || (Scales.InterpolatedColor = {}));
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
