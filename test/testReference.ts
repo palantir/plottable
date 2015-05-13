@@ -26,7 +26,7 @@
 ///<reference path="components/selectionBoxLayerTests.ts" />
 
 ///<reference path="components/plots/plotTests.ts" />
-///<reference path="components/plots/XYPlotTests.ts" />
+///<reference path="components/plots/xyPlotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
