@@ -1733,7 +1733,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Axis extends Component {
+    class Axis<D> extends Component {
         /**
          * The css class applied to each end tick mark (the line on the end tick).
          */
@@ -1749,7 +1749,7 @@ declare module Plottable {
         protected _tickMarkContainer: D3.Selection;
         protected _tickLabelContainer: D3.Selection;
         protected _baseline: D3.Selection;
-        protected _scale: Scale<any, number>;
+        protected _scale: Scale<D, number>;
         protected _computedWidth: number;
         protected _computedHeight: number;
         /**
@@ -1763,7 +1763,7 @@ declare module Plottable {
          * @param {Formatter} Data is passed through this formatter before being
          * displayed.
          */
-        constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
+        constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
@@ -1772,9 +1772,9 @@ declare module Plottable {
         fixedHeight(): boolean;
         fixedWidth(): boolean;
         protected _rescale(): void;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<D>;
         protected _setup(): void;
-        protected _getTickValues(): any[];
+        protected _getTickValues(): D[];
         protected _render(): void;
         protected _generateBaselineAttrHash(): {
             x1: number;
@@ -1805,7 +1805,7 @@ declare module Plottable {
          * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
          * @returns {Axis} The calling Axis.
          */
-        formatter(formatter: Formatter): Axis;
+        formatter(formatter: Formatter): Axis<D>;
         /**
          * Gets the current tick mark length.
          *
@@ -1818,7 +1818,7 @@ declare module Plottable {
          * @param {number} length If provided, length of each tick.
          * @returns {Axis} The calling Axis.
          */
-        tickLength(length: number): Axis;
+        tickLength(length: number): Axis<D>;
         /**
          * Gets the current end tick mark length.
          *
@@ -1831,7 +1831,7 @@ declare module Plottable {
          * @param {number} length If provided, the length of the end ticks.
          * @returns {BaseAxis} The calling Axis.
          */
-        endTickLength(length: number): Axis;
+        endTickLength(length: number): Axis<D>;
         protected _maxLabelTickLength(): number;
         /**
          * Gets the padding between each tick mark and its associated label.
@@ -1846,7 +1846,7 @@ declare module Plottable {
          * @param {number} padding If provided, the desired padding.
          * @returns {Axis} The calling Axis.
          */
-        tickLabelPadding(padding: number): Axis;
+        tickLabelPadding(padding: number): Axis<D>;
         /**
          * Gets the size of the gutter (the extra space between the tick
          * labels and the outer edge of the axis).
@@ -1862,7 +1862,7 @@ declare module Plottable {
          * @param {number} size If provided, the desired gutter.
          * @returns {Axis} The calling Axis.
          */
-        gutter(size: number): Axis;
+        gutter(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
          *
@@ -1876,7 +1876,7 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orientation(orientation: string): Axis;
+        orientation(orientation: string): Axis<D>;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -1893,7 +1893,7 @@ declare module Plottable {
          * labels.
          * @returns {Axis} The calling Axis.
          */
-        showEndTickLabels(show: boolean): Axis;
+        showEndTickLabels(show: boolean): Axis<D>;
     }
 }
 
@@ -1927,7 +1927,7 @@ declare module Plottable {
          * Currently, up to two tiers are supported.
          */
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
-        class Time extends Axis {
+        class Time extends Axis<Date> {
             /**
              * The css class applied to each time axis tier
              */
@@ -1976,7 +1976,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Numeric extends Axis {
+        class Numeric extends Axis<number> {
             /**
              * Constructs a NumericAxis.
              *
@@ -1992,7 +1992,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _computeWidth(): number;
             protected _computeHeight(): number;
-            protected _getTickValues(): any[];
+            protected _getTickValues(): number[];
             protected _rescale(): void;
             protected _render(): void;
             /**
@@ -2042,7 +2042,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Category extends Axis {
+        class Category extends Axis<string> {
             /**
              * Constructs a CategoryAxis.
              *
@@ -2075,7 +2075,7 @@ declare module Plottable {
              */
             tickLabelAngle(angle: number): Category;
             protected _render(): Category;
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
         }
     }
 }

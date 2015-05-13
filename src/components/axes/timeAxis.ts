@@ -33,7 +33,7 @@ export module Axes {
    */
   export type TimeAxisConfiguration = TimeAxisTierConfiguration[];
 
-  export class Time extends Axis {
+  export class Time extends Axis<Date> {
     /**
      * The css class applied to each time axis tier
      */
@@ -340,7 +340,7 @@ export module Axes {
       return (<Scales.Time> this._scale).tickInterval(config.interval, config.step);
     }
 
-    protected _getTickValues(): any[] {
+    protected _getTickValues() {
       return this._possibleTimeAxisConfigurations[this._mostPreciseConfigIndex].reduce(
           (ticks: any[], config: TimeAxisTierConfiguration) => ticks.concat(this._getTickIntervalValues(config)),
           []
