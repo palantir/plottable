@@ -1306,7 +1306,9 @@ var Plottable;
                 // Layout
                 _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
                 _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                _componentsNeedingRender.values().forEach(function (component) {
+                var toRender = _componentsNeedingRender;
+                _componentsNeedingRender = new Plottable.Utils.Set(); // new Components might queue while we're looping
+                toRender.values().forEach(function (component) {
                     try {
                         component.render(true);
                     }
@@ -1317,7 +1319,6 @@ var Plottable;
                         }, 0);
                     }
                 });
-                _componentsNeedingRender = new Plottable.Utils.Set();
                 _animationRequested = false;
             }
             if (_componentsNeedingRender.values().length !== 0) {

@@ -87,7 +87,9 @@ module Plottable {
         _componentsNeedingComputeLayout.values().forEach((component) => component.computeLayout());
         _componentsNeedingComputeLayout = new Utils.Set<Component>();
 
-        _componentsNeedingRender.values().forEach((component) => {
+        var toRender = _componentsNeedingRender;
+        _componentsNeedingRender = new Utils.Set<Component>(); // new Components might queue while we're looping
+        toRender.values().forEach((component) => {
           try {
             component.render(true);
           } catch (err) {
@@ -95,7 +97,6 @@ module Plottable {
             window.setTimeout(() => { throw err; }, 0);
           }
         });
-        _componentsNeedingRender = new Utils.Set<Component>();
         _animationRequested = false;
       }
       if (_componentsNeedingRender.values().length !== 0) {
