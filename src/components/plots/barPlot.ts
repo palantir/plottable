@@ -289,7 +289,7 @@ export module Plots {
 
     protected _updateYDomainer() {
       if (this._isVertical) {
-        this._updateDomainer(this._yScale);
+        this._updateDomainer(this.y().scale);
       } else {
         super._updateYDomainer();
       }
@@ -297,14 +297,14 @@ export module Plots {
 
     protected _updateXDomainer() {
       if (!this._isVertical) {
-        this._updateDomainer(this._xScale);
+        this._updateDomainer(this.x().scale);
       } else {
         super._updateXDomainer();
       }
     }
 
     protected _additionalPaint(time: number) {
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var baselineAttr: any = {
@@ -341,7 +341,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
-        var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+        var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
         var scaledBaseline = primaryScale.scale(this._baselineValue);
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
@@ -357,8 +357,8 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale<any, number>    = this._isVertical ? this._yScale : this._xScale;
-      var secondaryScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var primaryScale: Scale<any, number>    = this._isVertical ? this.y().scale : this.x().scale;
+      var secondaryScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
       var primaryAttr     = this._isVertical ? "y" : "x";
       var secondaryAttr   = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -390,7 +390,7 @@ export module Plots {
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
 
-      var primaryAccessor = this._attrBindings.get(primaryAttr).accessor;
+      var primaryAccessor = this._propertyBindings.get(primaryAttr).accessor;
       if (this._labelsEnabled && this._labelFormatter) {
         attrToProjector["label"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
           return this._labelFormatter(primaryAccessor(d, i, dataset, m));
@@ -410,15 +410,15 @@ export module Plots {
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
      * If the position scale of the plot is a CategoryScale and in points mode, then
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-     * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+     * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;
-      var barScale: Scale<any, number>  = this._isVertical ? this._xScale : this._yScale;
+      var barScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
-        var barAccessor = this._isVertical ? this._attrBindings.get("x").accessor : this._attrBindings.get("y").accessor;
+        var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -454,7 +454,7 @@ export module Plots {
     public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
       var plotData = super.getAllPlotData(datasets);
 
-      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this._yScale : this._xScale)).scale(this.baseline());
+      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
       var isVertical = this._isVertical;
       var barAlignmentFactor = this._barAlignmentFactor;
 

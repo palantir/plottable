@@ -22,14 +22,14 @@ function run(svg, data, Plottable){
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))
-    .project("x", "month", xScale)
-    .project("y", "avg", yScale)
-    .project("label", "avg")
-    .project("fill", "city", colorScale);
+    .x(function(d) { return d.month; }, xScale)
+    .y(function(d) { return d.avg; }, yScale)
+    .attr("label", function(d) { return d.avg; })
+    .attr("fill", function(d) { return d.city; }, colorScale);
 
   var legend = new Plottable.Components.Legend(colorScale);
-  var title = new Plottable.Components.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yUnitLabel = new Plottable.Components.AxisLabel("Inches", "left" );
+  var title = new Plottable.Components.Label("Average Rainfall in Different Cities between 2013-2014", "horizontal" ).classed("title-label", true);
+  var yUnitLabel = new Plottable.Components.Label("Inches", "left" ).classed("axis-label", true);
 
   var chart = new Plottable.Components.Table([
                                             [null         ,   null    ,   title        ],

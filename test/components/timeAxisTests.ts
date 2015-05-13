@@ -16,9 +16,9 @@ describe("TimeAxis", () => {
   });
 
   it("cannot change time axis orientation to vertical", () => {
-      assert.throws(() => axis.orient("left"), "horizontal");
-      assert.throws(() => axis.orient("right"), "horizontal");
-      assert.strictEqual(axis.orient(), "bottom", "orientation unchanged");
+      assert.throws(() => axis.orientation("left"), "horizontal");
+      assert.throws(() => axis.orientation("right"), "horizontal");
+      assert.strictEqual(axis.orientation(), "bottom", "orientation unchanged");
   });
 
   it("Computing the default ticks doesn't error out for edge cases", () => {
@@ -90,7 +90,7 @@ describe("TimeAxis", () => {
     var configurations = axis.axisConfigurations();
     var newPossibleConfigurations = configurations.slice(0, 3);
     newPossibleConfigurations.forEach(axisConfig => axisConfig.forEach(tierConfig => {
-      tierConfig.interval = d3.time.minute;
+      tierConfig.interval = Plottable.TimeInterval.minute;
       tierConfig.step += 3;
     }));
     axis.axisConfigurations(newPossibleConfigurations);
@@ -101,7 +101,7 @@ describe("TimeAxis", () => {
     scale.range([0, 800]);
     axis.renderTo(svg);
     var configs = newPossibleConfigurations[(<any> axis)._mostPreciseConfigIndex];
-    assert.deepEqual(configs[0].interval, d3.time.minute, "axis used new time unit");
+    assert.deepEqual(configs[0].interval, Plottable.TimeInterval.minute, "axis used new time unit");
     assert.deepEqual(configs[0].step, 4, "axis used new step");
     svg.remove();
   });
@@ -109,7 +109,7 @@ describe("TimeAxis", () => {
   it("renders end ticks on either side", () => {
     var width = 500;
     var svg = TestMethods.generateSVG(width, 100);
-    scale.domain(["2010", "2014"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
     var firstTick = d3.select(".tick-mark");
     assert.strictEqual(firstTick.attr("x1"), "0", "xPos (x1) of first end tick is at the beginning of the axis container");
@@ -123,7 +123,7 @@ describe("TimeAxis", () => {
   it("adds a class corresponding to the end-tick for the first and last ticks", () => {
     var width = 500;
     var svg = TestMethods.generateSVG(width, 100);
-    scale.domain(["2010", "2014"]);
+    scale.domain([new Date("2010-01-01"), new Date("2014-01-01")]);
     axis.renderTo(svg);
     var firstTick = d3.select("." + Plottable.Axis.TICK_MARK_CLASS);
     assert.isTrue(firstTick.classed(Plottable.Axis.END_TICK_MARK_CLASS), "first end tick has the end-tick-mark class");
@@ -160,7 +160,7 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -170,8 +170,8 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -181,7 +181,7 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")}
         ],
     ]);
 
@@ -204,8 +204,8 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
         ],
     ]);
 
@@ -213,9 +213,9 @@ describe("TimeAxis", () => {
 
     xAxis.axisConfigurations([
         [
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
-           {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
+           {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e")},
         ],
     ]);
 
@@ -236,7 +236,7 @@ describe("TimeAxis", () => {
 
     var tiersToCreate = 15;
     var configuration = Array.apply(null, Array(tiersToCreate)).map(() => {
-      return {interval: d3.time.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
+      return {interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e") };
     });
     xAxis.axisConfigurations([configuration]);
 

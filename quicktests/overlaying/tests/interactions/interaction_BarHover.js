@@ -10,16 +10,16 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-  var title = new Plottable.Components.TitleLabel("Hover over bars");
+  var title = new Plottable.Components.Label("Hover over bars").classed("title-label", true);
   var colorScale = new Plottable.Scales.Color();
 
   var ds = new Plottable.Dataset(data, { foo: "!" });
 
   var plot = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(ds)
-    .project("x", function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
-    .project("y", "y", yScale)
-    .project("fill", "name", colorScale);
+    .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
+    .y(function(d) { return d.y; }, yScale)
+    .attr("fill", function(d) { return d.name; }, colorScale);
 
   var chart = new Plottable.Components.Table([
       [null, title],

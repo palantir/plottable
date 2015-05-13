@@ -6,7 +6,8 @@ describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
     var svg = TestMethods.generateSVG(400, 80);
-    var label = new Plottable.Components.TitleLabel("A CHART TITLE");
+    var label = new Plottable.Components.Label("A CHART TITLE");
+    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
     label.renderTo(svg);
 
     var content = (<any> label)._content;
@@ -25,7 +26,8 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
+    var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
+    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -38,7 +40,8 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
+    var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
+    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -50,7 +53,8 @@ describe("Labels", () => {
 
   it("Label text can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 80);
-    var label = new Plottable.Components.TitleLabel("a");
+    var label = new Plottable.Components.Label("a");
+    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
     label.renderTo(svg);
     assert.strictEqual((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -65,7 +69,8 @@ describe("Labels", () => {
   it.skip("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = TestMethods.generateSVG(svgWidth, 80);
-    var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
+    var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
+    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -77,7 +82,8 @@ describe("Labels", () => {
 
   it("text in a tiny box is truncated to empty string", () => {
     var svg = TestMethods.generateSVG(10, 10);
-    var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
+    var label = new Plottable.Components.Label("Yeah, not gonna fit...");
+    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");
     assert.strictEqual(text.text(), "", "text was truncated to empty string");
@@ -86,7 +92,7 @@ describe("Labels", () => {
 
   it("centered text in a table is positioned properly", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var label = new Plottable.Components.TitleLabel("X");
+    var label = new Plottable.Components.Label("X");
     var t = new Plottable.Components.Table().add(label, 0, 0)
                                  .add(new Plottable.Component(), 1, 0);
     t.renderTo(svg);
@@ -99,7 +105,7 @@ describe("Labels", () => {
 
   it("if a label text is changed to empty string, width updates to 0", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var label = new Plottable.Components.TitleLabel("foo");
+    var label = new Plottable.Components.Label("foo");
     label.renderTo(svg);
     label.text("");
     assert.strictEqual(label.width(), 0, "width updated to 0");
@@ -113,7 +119,8 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Label orientation can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
+    var label = new Plottable.Components.Label("CHANGING ORIENTATION");
+    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
 
     var content = (<any> label)._content;
@@ -121,7 +128,7 @@ describe("Labels", () => {
     var bbox = Plottable.Utils.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
-    label.orient("right");
+    label.orientation("right");
     text = content.select("text");
     bbox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
@@ -132,9 +139,9 @@ describe("Labels", () => {
 
   it("padding reacts well under align", () => {
     var svg = TestMethods.generateSVG(400, 200);
-    var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
-    var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-    var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+    var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlignment("left");
+    var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlignment("left");
+    var topLabel = new Plottable.Components.Label("label").yAlignment("bottom");
     new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
 
     var testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
@@ -142,21 +149,21 @@ describe("Labels", () => {
 
     assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
 
-    testLabel.xAlign("right");
+    testLabel.xAlignment("right");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     longTextRect = (<any> longLabel)._element.select("text").node().getBoundingClientRect();
 
     assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
 
-    testLabel.yAlign("bottom");
+    testLabel.yAlignment("bottom");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     longTextRect = (<any> longLabel)._element.select("text").node().getBoundingClientRect();
 
     assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
 
-    testLabel.yAlign("top");
+    testLabel.yAlignment("top");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     var topTextRect = (<any> topLabel)._element.select("text").node().getBoundingClientRect();

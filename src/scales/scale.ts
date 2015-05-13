@@ -13,13 +13,11 @@ module Plottable {
   }
 
   export class Scale<D, R> {
-    public _typeCoercer: (d: any) => any = (d: any) => d;
-
     protected _d3Scale: D3.Scale.Scale;
 
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
-    private _domainModificationInProgress: boolean = false;
+    private _domainModificationInProgress = false;
     private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
 
     /**
@@ -48,10 +46,12 @@ module Plottable {
 
     public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.add(callback);
+      return this;
     }
 
     public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.delete(callback);
+      return this;
     }
 
     protected _dispatchUpdate() {
@@ -106,7 +106,7 @@ module Plottable {
      * Sets the domain.
      *
      * @param {D[]} values If provided, the new value for the domain. On
-     * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
+     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returns {Scale} The calling Scale.
@@ -177,10 +177,12 @@ module Plottable {
 
     public addExtentProvider(provider: Scales.ExtentProvider<D>) {
       this._extentProviders.add(provider);
+      return this;
     }
 
     public removeExtentProvider(provider: Scales.ExtentProvider<D>) {
       this._extentProviders.delete(provider);
+      return this;
     }
   }
 }

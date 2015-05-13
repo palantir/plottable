@@ -25,35 +25,35 @@ function run(svg, data, Plottable) {
   "use strict";
 
   var colorScale = new Plottable.Scales.Color();
-  var legend = new Plottable.Components.Legend(colorScale).xAlign("left");
+  var legend = new Plottable.Components.Legend(colorScale).xAlignment("left");
   legend.maxEntriesPerRow(1);
-  var title = new Plottable.Components.TitleLabel("Sales by Region");
+  var title = new Plottable.Components.Label("Sales by Region").classed("title-label", true);
   var Alabel = new Plottable.Components.Label("Product A");
   var Blabel = new Plottable.Components.Label("Product B");
   var ABlabel = new Plottable.Components.Label("Combined");
 
   var Aplot = new Plottable.Plots.Pie();
     Aplot.addDataset(new Plottable.Dataset(data[0]));
-    Aplot.project("value", "percent");
-    Aplot.project("fill", "region", colorScale);
-    Aplot.project("inner-radius", 40);
-    Aplot.project("outer-radius", 80);
+    Aplot.sectorValue(function(d) { return d.percent; });
+    Aplot.attr("fill", function(d) { return d.region; }, colorScale);
+    Aplot.innerRadius(40);
+    Aplot.outerRadius(80);
     Aplot = Alabel.above(Aplot);
 
   var Bplot = new Plottable.Plots.Pie();
     Bplot.addDataset(new Plottable.Dataset(data[1]));
-    Bplot.project("value", "percent");
-    Bplot.project("fill", "region", colorScale);
-    Bplot.project("inner-radius", 40);
-    Bplot.project("outer-radius", 80);
+    Bplot.sectorValue(function(d) { return d.percent; });
+    Bplot.attr("fill", function(d) { return d.region; }, colorScale);
+    Bplot.innerRadius(40);
+    Bplot.outerRadius(80);
     Bplot = Blabel.above(Bplot);
 
   var ABplot = new Plottable.Plots.Pie();
     ABplot.addDataset(new Plottable.Dataset(data[2]));
-    ABplot.project("value", "percent");
-    ABplot.project("fill", "region", colorScale);
-    ABplot.project("inner-radius", 50);
-    ABplot.project("outer-radius", 100);
+    ABplot.sectorValue(function(d) { return d.percent; });
+    ABplot.attr("fill", function(d) { return d.region; }, colorScale);
+    ABplot.innerRadius(50);
+    ABplot.outerRadius(100);
     ABplot = ABlabel.above(ABplot);
 
   var productPlots = new Plottable.Components.Table([

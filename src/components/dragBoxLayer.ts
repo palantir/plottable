@@ -39,7 +39,7 @@ export module Components {
        * user's cursor from changing outside the DragBoxLayer, where they
        * wouldn't be able to grab the edges or corners for resizing.
        */
-      this.clipPathEnabled = true;
+      this._clipPathEnabled = true;
       this.classed("drag-box-layer", true);
 
       this._dragInteraction = new Interactions.Drag();

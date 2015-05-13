@@ -9,7 +9,7 @@ export module Components {
     wantsHeightArr: boolean[];
   }
 
-  export type _IterateLayoutResult = {
+  type _IterateLayoutResult = {
     colProportionalSpace: number[];
     rowProportionalSpace: number[];
     guaranteedWidths: number[];

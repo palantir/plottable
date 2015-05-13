@@ -247,7 +247,7 @@ describe("Tables", () => {
 
   describe("table._iterateLayout works properly", () => {
     // This test battery would have caught #405
-    function verifyLayoutResult(result: Plottable.Components._IterateLayoutResult,
+    function verifyLayoutResult(result: any,
                                 cPS: number[], rPS: number[], gW: number[], gH: number[],
                                 wW: boolean, wH: boolean, id: string) {
       assert.deepEqual(result.colProportionalSpace, cPS, "colProportionalSpace:" + id);

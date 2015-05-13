@@ -44,7 +44,7 @@ module Plottable {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
-      this.orient(orientation);
+      this.orientation(orientation);
       this._setDefaultAlignment();
       this.classed("axis", true);
       if (this._isHorizontal()) {
@@ -239,19 +239,19 @@ module Plottable {
     protected _setDefaultAlignment() {
       switch (this._orientation) {
         case "bottom":
-          this.yAlign("top");
+          this.yAlignment("top");
           break;
 
         case "top":
-          this.yAlign("bottom");
+          this.yAlignment("bottom");
           break;
 
         case "left":
-          this.xAlign("right");
+          this.xAlignment("right");
           break;
 
         case "right":
-          this.xAlign("left");
+          this.xAlignment("left");
           break;
       }
     }
@@ -402,7 +402,7 @@ module Plottable {
      *
      * @returns {number} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Axis.
      *
@@ -410,12 +410,12 @@ module Plottable {
      * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orient(newOrientation: string): Axis;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): Axis;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        var newOrientationLC = newOrientation.toLowerCase();
+        var newOrientationLC = orientation.toLowerCase();
         if (newOrientationLC !== "top" &&
             newOrientationLC !== "bottom" &&
             newOrientationLC !== "left" &&

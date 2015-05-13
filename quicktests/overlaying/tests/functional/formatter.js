@@ -35,11 +35,11 @@ function run(svg, data, Plottable) {
   var custFormatter = function(d) { return "= ' w ' ="; };
 
   var plot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries1);
-  plot.project("x", "x", xScale).project("y", "y", yScale);
+  plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
   var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
-  formatChoices.xAlign("center");
+  formatChoices.xAlignment("center");
 
   bigTable.renderTo(svg);
 

@@ -13,8 +13,11 @@ class CountingPlot extends Plottable.Plot {
 describe("Plots", () => {
   describe("Plot", () => {
     it("Plots default correctly", () => {
+      var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot();
-      assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+      r.renderTo(svg);
+      TestMethods.verifyClipPath(r);
+      svg.remove();
     });
 
     it("Base Plot functionality works", () => {
@@ -83,9 +86,9 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var metadataProjector = (d: any, i: number, m: any) => m.cssClass;
-      r.project("x", "x", xScale);
-      r.project("y", "y", yScale);
-      r.project("meta", metadataProjector);
+      r.attr("x", (d) => d.x, xScale);
+      r.attr("y", (d) => d.y, yScale);
+      r.attr("meta", metadataProjector);
       xScale.onUpdate((listenable: Plottable.Scales.Linear) => {
         assert.strictEqual(listenable, xScale, "Callback received the calling scale as the first argument");
         ++xScaleCalls;
@@ -121,7 +124,7 @@ describe("Plots", () => {
     it("Plot.project works as intended", () => {
       var r = new Plottable.Plot();
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
-      r.project("attr", "a", s);
+      r.attr("attr", (d) => d.a, s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
       var projector = attrToProjector["attr"];
       assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
@@ -135,11 +138,11 @@ describe("Plots", () => {
       var svg2 = TestMethods.generateSVG(100, 100);
       new Plottable.Plot()
         .addDataset(ds1)
-        .project("x", (x: number) => x, s)
+        .attr("x", (x: number) => x, s)
         .renderTo(svg1);
       new Plottable.Plot()
         .addDataset(ds2)
-        .project("x", (x: number) => x, s)
+        .attr("x", (x: number) => x, s)
         .renderTo(svg2);
       assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
       ds1.data([]);
@@ -386,7 +389,7 @@ describe("Plots", () => {
     it("destroy() disconnects plots from its scales", () => {
       var plot2 = new Plottable.Plot();
       var scale = new Plottable.Scales.Linear();
-      plot2.project("attr", "a", scale);
+      plot2.attr("attr", (d) => d.a, scale);
       plot2.destroy();
       var scaleCallbacks = (<any> scale)._callbacks.values();
       assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
@@ -437,7 +440,8 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y).addDataset(new Plottable.Dataset([])).animate(true);
+      var plot = new Plottable.Plots.Bar(x, y);
+      plot.addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
@@ -445,8 +449,8 @@ describe("Plots", () => {
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = TestMethods.generateSVG();
-      plot.project("x", "x", x);
-      plot.project("y", "y", y);
+      plot.x((d) => d.x, x);
+      plot.y((d) => d.y, y);
       plot.renderTo(svg);
       assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
       svg.remove();
@@ -459,7 +463,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plot();
       plot.addDataset(dataset2);
       plot.addDataset(dataset1);
-      plot.project("key", "key", categoryScale);
+      plot.attr("key", (d) => d.key, categoryScale);
 
       var svg = TestMethods.generateSVG();
       plot.renderTo(svg);
@@ -467,125 +471,5 @@ describe("Plots", () => {
       assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
       svg.remove();
     });
-  });
-
-  describe("XY Plot", () => {
-    var svg: D3.Selection;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var xAccessor: any;
-    var yAccessor: any;
-    var simpleDataset: Plottable.Dataset;
-    var plot: Plottable.XYPlot<number, number>;
-
-    before(() => {
-      xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a + dataset.metadata().foo;
-      yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
-    });
-
-    beforeEach(() => {
-      svg = TestMethods.generateSVG(500, 500);
-      simpleDataset = new Plottable.Dataset([{a: -5, b: 6}, {a: -2, b: 2}, {a: 2, b: -2}, {a: 5, b: -6}], {foo: 0});
-      xScale = new Plottable.Scales.Linear();
-      yScale = new Plottable.Scales.Linear();
-      plot = new Plottable.XYPlot(xScale, yScale);
-      plot.addDataset(simpleDataset)
-          .project("x", xAccessor, xScale)
-          .project("y", yAccessor, yScale)
-          .renderTo(svg);
-    });
-
-    it("plot auto domain scale to visible points", () => {
-      xScale.domain([-3, 3]);
-      assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-      plot.automaticallyAdjustYScaleOverVisiblePoints(false);
-      plot.automaticallyAdjustXScaleOverVisiblePoints(true);
-      yScale.domain([-6, 6]);
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
-      svg.remove();
-    });
-
-    it("no visible points", () => {
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      xScale.domain([-0.5, 0.5]);
-      assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
-      svg.remove();
-    });
-
-    it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", () => {
-      xScale.domain([-2, 2]);
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
-      svg.remove();
-    });
-
-    it("show all data", () => {
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      xScale.domain([-0.5, 0.5]);
-      plot.showAllData();
-      assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
-      svg.remove();
-    });
-
-    it("show all data without auto adjust domain", () => {
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      xScale.domain([-0.5, 0.5]);
-      plot.automaticallyAdjustYScaleOverVisiblePoints(false);
-      plot.showAllData();
-      assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-      assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
-      svg.remove();
-    });
-
-    it("no cycle in auto domain on plot", () => {
-      var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      var plot2 = new Plottable.XYPlot(zScale, yScale)
-                                    .automaticallyAdjustXScaleOverVisiblePoints(true)
-                                    .project("x", xAccessor, zScale)
-                                    .project("y", yAccessor, yScale)
-                                    .addDataset(simpleDataset);
-      var plot3 = new Plottable.XYPlot(zScale, xScale)
-                                    .automaticallyAdjustYScaleOverVisiblePoints(true)
-                                    .project("x", xAccessor, zScale)
-                                    .project("y", yAccessor, xScale)
-                                    .addDataset(simpleDataset);
-      plot2.renderTo(svg);
-      plot3.renderTo(svg);
-
-      xScale.domain([-2, 2]);
-      assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
-      assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
-      assert.deepEqual(xScale.domain(), [-2, 2],     "x domain is not adjusted using custom algorithm and domainer");
-
-      svg.remove();
-    });
-
-    it("listeners are deregistered after removal", () => {
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      plot.destroy();
-
-      var xScaleCallbacks = (<any> xScale)._callbacks.values();
-      assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
-
-      var yScaleCallbacks = (<any> yScale)._callbacks.values();
-      assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
-
-      svg.remove();
-    });
-
-    it("listeners are deregistered for changed scale", () => {
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-      var newScale = new Plottable.Scales.Linear().domain([-10, 10]);
-      plot.project("x", xAccessor, newScale);
-      xScale.domain([-2, 2]);
-      assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
-      svg.remove();
-    });
-
   });
 });

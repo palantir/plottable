@@ -7,8 +7,8 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = TestMethods.generateSVG(400, 400);
-      var plot = new Plottable.Plots.Pie();
-      plot.project("value", (d: any) => d.value);
+      var plot = new Plottable.Plots.Pie<number>();
+      plot.sectorValue((d) => d.value);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -20,16 +20,16 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
-    var piePlot: Plottable.Plots.Pie;
+    var piePlot: Plottable.Plots.Pie<number>;
     var renderArea: D3.Selection;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
-      piePlot = new Plottable.Plots.Pie();
+      piePlot = new Plottable.Plots.Pie<number>();
       piePlot.addDataset(simpleDataset);
-      piePlot.project("value", "value");
+      piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
       renderArea = (<any> piePlot)._renderArea;
     });
@@ -70,7 +70,7 @@ describe("Plots", () => {
     });
 
     it("project value onto different attribute", () => {
-      piePlot.project("value", "value2");
+      piePlot.sectorValue((d) => d.value2);
 
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -96,12 +96,12 @@ describe("Plots", () => {
       assert.closeTo(parseFloat(arcDestPoint1[0]), 0, 1, "ends on a line vertically from beginning");
       assert.operator(parseFloat(arcDestPoint1[1]), "<", 0, "ends above the center");
 
-      piePlot.project("value", "value");
+      piePlot.sectorValue((d) => d.value);
       svg.remove();
     });
 
     it("innerRadius project", () => {
-      piePlot.project("inner-radius", () => 5);
+      piePlot.innerRadius(5);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -117,12 +117,12 @@ describe("Plots", () => {
       assert.closeTo(innerArcPath0[5], 0, 1, "make inner arc to center");
       assert.closeTo(innerArcPath0[6], -5, 1, "makes inner arc to top of inner circle");
 
-      piePlot.project("inner-radius", () => 0);
+      piePlot.innerRadius(0);
       svg.remove();
     });
 
     it("outerRadius project", () => {
-      piePlot.project("outer-radius", () => 150);
+      piePlot.outerRadius(() => 150);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
@@ -138,7 +138,7 @@ describe("Plots", () => {
       assert.closeTo(outerArcPath0[5], 150, 1, "makes outer arc to right edge");
       assert.closeTo(outerArcPath0[6], 0, 1, "makes outer arc to right edge");
 
-      piePlot.project("outer-radius", () => 250);
+      piePlot.outerRadius(() => 250);
       svg.remove();
     });
 
@@ -182,7 +182,7 @@ describe("Plots", () => {
       });
 
       it("project fill", () => {
-        piePlot.project("fill", (d: any, i: number) => String(i), new Plottable.Scales.Color("10"));
+        piePlot.attr("fill", (d: any, i: number) => String(i), new Plottable.Scales.Color("10"));
 
         var arcPaths = renderArea.selectAll(".arc");
 
@@ -192,7 +192,7 @@ describe("Plots", () => {
         var arcPath1 = d3.select(arcPaths[0][1]);
         assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
 
-        piePlot.project("fill", "type", new Plottable.Scales.Color("20"));
+        piePlot.attr("fill", (d) => d.type, new Plottable.Scales.Color("20"));
 
         arcPaths = renderArea.selectAll(".arc");
 
@@ -233,9 +233,9 @@ describe("Plots", () => {
         { v: 1 },
       ];
 
-      var plot = new Plottable.Plots.Pie();
+      var plot = new Plottable.Plots.Pie<number>();
       plot.addDataset(new Plottable.Dataset(data1));
-      plot.project("value", "v");
+      plot.sectorValue((d) => d.v);
 
       plot.renderTo(svg);
 
@@ -258,9 +258,9 @@ describe("Plots", () => {
         { v: 1 },
       ];
 
-      var plot = new Plottable.Plots.Pie();
+      var plot = new Plottable.Plots.Pie<number>();
       plot.addDataset(new Plottable.Dataset(data1));
-      plot.project("value", "v");
+      plot.sectorValue((d) => d.v);
 
       plot.renderTo(svg);
 

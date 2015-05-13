@@ -35,7 +35,7 @@ module Plottable {
     /**
      * @param {any[][]} extents The list of extents to be reduced to a single
      *        extent.
-     * @param {QuantitativeScaleScale} scale
+     * @param {QuantitativeScale} scale
      *        Since nice() must do different things depending on Linear, Log,
      *        or Time scale, the scale must be passed in for nice() to work.
      * @returns {any[]} The domain, as a merging of all exents, as a [min, max]

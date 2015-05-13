@@ -14,8 +14,8 @@ export module Components {
      * Creates a set of Gridlines.
      * @constructor
      *
-     * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-     * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+     * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
     constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>) {
       if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {

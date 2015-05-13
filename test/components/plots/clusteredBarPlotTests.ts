@@ -47,8 +47,8 @@ describe("Plots", () => {
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -129,8 +129,8 @@ describe("Plots", () => {
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
       new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
@@ -197,8 +197,8 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
       plot.baseline(0);
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
     });
@@ -257,8 +257,8 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       plot.renderTo(svg);
     });
 

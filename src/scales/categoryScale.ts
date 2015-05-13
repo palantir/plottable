@@ -8,7 +8,6 @@ export module Scales {
 
     private _innerPadding: number;
     private _outerPadding: number;
-    public _typeCoercer: (d: any) => any = (d: any) => d != null && d.toString ? d.toString() : d;
 
     /**
      * Creates a CategoryScale.
