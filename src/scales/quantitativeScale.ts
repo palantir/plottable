@@ -4,6 +4,8 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
+    private _autoMin: D;
+    private _autoMax: D;
     public _userSetDomainer = false;
     private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
@@ -23,7 +25,26 @@ module Plottable {
     }
 
     protected _getExtent(): D[] {
-      return this._domainer.computeDomain(this._getAllExtents(), this);
+      var computedExtent = this._domainer.computeDomain(this._getAllExtents(), this);
+      var e0 = computedExtent[0];
+      var e1 = computedExtent[1];
+      if (this._autoMin != null) {
+        if (e0 < this._autoMin) {
+          e0 = this._autoMin;
+        }
+        if (e1 < this._autoMin) {
+          e1 = this._autoMin;
+        }
+      }
+      if (this._autoMax != null) {
+        if (e0 > this._autoMax) {
+          e0 = this._autoMax;
+        }
+        if (e1 > this._autoMax) {
+          e1 = this._autoMax;
+        }
+      }
+      return [e0, e1];
     }
 
     /**
@@ -49,6 +70,40 @@ module Plottable {
     public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining:/
+    }
+
+    /**
+     * Gets the minimum domain value when autoDomain()-ing. 
+     */
+    public autoMin(): D;
+    /**
+     * Sets the minimum domain value when autoDomain()-ing.
+     */
+    public autoMin(value: D): QuantitativeScale<D>;
+    public autoMin(value?: D): any {
+      if (value === undefined) {
+        return this._autoMin;
+      }
+      this._autoMin = value;
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    /**
+     * Gets the maximum domain value when autoDomain()-ing.
+     */
+    public autoMax(): D;
+    /**
+     * Sets the maximum domain value when autoDomain()-ing.
+     */
+    public autoMax(value: D): QuantitativeScale<D>;
+    public autoMax(value?: D): any {
+      if (value === undefined) {
+        return this._autoMax;
+      }
+      this._autoMax = value;
+      this._autoDomainIfAutomaticMode();
+      return this;
     }
 
     protected _setDomain(values: D[]) {
