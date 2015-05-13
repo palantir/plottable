@@ -2328,14 +2328,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        type _IterateLayoutResult = {
-            colProportionalSpace: number[];
-            rowProportionalSpace: number[];
-            guaranteedWidths: number[];
-            guaranteedHeights: number[];
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
         class Table extends ComponentContainer {
             /**
              * Constructs a Table.
