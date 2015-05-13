@@ -42,10 +42,6 @@ export module Scales {
       return super._setDomain(values);
     }
 
-    public copy(): Time {
-      return new Time(this._d3Scale.copy());
-    }
-
     public _defaultExtent(): Date[] {
       var endTimeValue = new Date().valueOf();
       var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
