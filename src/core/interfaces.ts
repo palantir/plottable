@@ -45,7 +45,7 @@ module Plottable {
     yMax: number;
   }
 
-  export type _SpaceRequest = {
+  export type SpaceRequest = {
     minWidth: number;
     minHeight: number;
   }

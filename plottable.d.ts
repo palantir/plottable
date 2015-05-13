@@ -636,7 +636,7 @@ declare module Plottable {
         yMin: number;
         yMax: number;
     };
-    type _SpaceRequest = {
+    type SpaceRequest = {
         minWidth: number;
         minHeight: number;
     };
@@ -1465,7 +1465,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
-        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1718,7 +1718,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1768,7 +1768,7 @@ declare module Plottable {
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         fixedHeight(): boolean;
         fixedWidth(): boolean;
         protected _rescale(): void;
@@ -2058,7 +2058,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle
@@ -2097,7 +2097,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2209,7 +2209,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             destroy(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2286,7 +2286,7 @@ declare module Plottable {
              */
             orientation(orientation: string): InterpolatedColorLegend;
             protected _setup(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _render(): void;
         }
     }
@@ -2354,7 +2354,7 @@ declare module Plottable {
              * @param {Component} component The Component to be removed.
              */
             removeComponent(component: Component): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
