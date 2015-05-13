@@ -30,8 +30,8 @@ export module Interactions {
      * does so by changing the xScale and yScales' domains repeatedly.
      *
      * @constructor
-     * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
-     * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
+     * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+     * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();

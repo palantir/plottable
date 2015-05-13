@@ -16,11 +16,11 @@ export module Axes {
      * Constructs a NumericAxis.
      *
      * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-     * is for rendering a QuantitativeScaleScale.
+     * is for rendering a QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
-     * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
+     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
+     * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
      * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
      */
     constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
