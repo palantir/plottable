@@ -781,8 +781,8 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
@@ -855,8 +855,8 @@ declare module Plottable {
          * @returns {Scale} A copy of the calling Scale.
          */
         copy(): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): void;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): void;
+        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
     }
 }
 
@@ -1412,7 +1412,7 @@ declare module Plottable {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
-        clipPathEnabled: boolean;
+        protected _clipPathEnabled: boolean;
         protected _fixedHeightFlag: boolean;
         protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
@@ -1851,7 +1851,7 @@ declare module Plottable {
          *
          * @returns {number} the current orientation.
          */
-        orient(): string;
+        orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
@@ -1859,7 +1859,7 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orient(newOrientation: string): Axis;
+        orientation(orientation: string): Axis;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -1942,8 +1942,8 @@ declare module Plottable {
              * @returns {Axis.Time} The calling Axis.Time.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
-            orient(): string;
-            orient(orientation: string): Time;
+            orientation(): string;
+            orientation(orientation: string): Time;
             protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -2044,6 +2044,11 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
+             * Gets the tick label angle
+             * @returns {number} the tick label angle
+             */
+            tickLabelAngle(): number;
+            /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
              * @param {number} angle The angle for the ticks
              * @returns {Category} The calling Category Axis.
@@ -2052,11 +2057,6 @@ declare module Plottable {
              * See tracking at https://github.com/palantir/plottable/issues/504
              */
             tickLabelAngle(angle: number): Category;
-            /**
-             * Gets the tick label angle
-             * @returns {number} the tick label angle
-             */
-            tickLabelAngle(): number;
             protected _render(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         }
@@ -2100,7 +2100,7 @@ declare module Plottable {
              *
              * @returns {string} the current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the Label.
              *
@@ -2108,7 +2108,7 @@ declare module Plottable {
              * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
-            orient(newOrientation: string): Label;
+            orientation(orientation: string): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2259,7 +2259,7 @@ declare module Plottable {
              *
              * @returns {string} The current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the InterpolatedColorLegend.
              *
@@ -2267,7 +2267,7 @@ declare module Plottable {
              *
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            orient(newOrientation: string): InterpolatedColorLegend;
+            orientation(orientation: string): InterpolatedColorLegend;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _render(): void;
@@ -2519,6 +2519,8 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        protected _updateExtentsForProperty(property: string): void;
+        protected _filterForProperty(property: string): _Accessor;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2642,6 +2644,7 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | _Accessor): XYPlot<X, Y>;
         y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2672,11 +2675,7 @@ declare module Plottable {
          *
          * This call does not override auto domain adjustment behavior over visible points.
          */
-        showAllData(): void;
-        protected _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
+        showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
     }
 }
@@ -3025,11 +3024,8 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
+        protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
         _keyAccessor(): _Accessor;
         _valueAccessor(): _Accessor;
     }
@@ -3073,10 +3069,7 @@ declare module Plottable {
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
         }
     }
 }
@@ -3108,10 +3101,7 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];

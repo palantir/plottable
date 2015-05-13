@@ -145,7 +145,7 @@ export module Axes {
       }
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch (this.orient()) {
+      switch (this.orientation()) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";

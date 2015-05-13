@@ -129,7 +129,7 @@ describe("Labels", () => {
     var bbox = Plottable.Utils.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
-    label.orient("right");
+    label.orientation("right");
     text = content.select("text");
     bbox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);

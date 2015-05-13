@@ -63,7 +63,7 @@ module Plottable {
      */
     constructor() {
       super();
-      this.clipPathEnabled = true;
+      this._clipPathEnabled = true;
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
       this._attrBindings = d3.map();
@@ -155,10 +155,12 @@ module Plottable {
 
     protected _bindProperty(property: string, value: any, scale: Scale<any, any>) {
       this._bind(property, value, scale, this._propertyBindings, this._propertyExtents);
+      this._updateExtentsForProperty(property);
     }
 
     private _bindAttr(attr: string, value: any, scale: Scale<any, any>) {
       this._bind(attr, value, scale, this._attrBindings, this._attrExtents);
+      this._updateExtentsForAttr(attr);
     }
 
     private _bind(key: string, value: any, scale: Scale<any, any>,
@@ -174,7 +176,6 @@ module Plottable {
       }
 
       bindings.set(key, { accessor: d3.functor(value), scale: scale });
-      this._updateExtentsForKey(key, bindings, extents);
     }
 
     protected _generateAttrToProjector(): AttributeToProjector {
@@ -268,24 +269,41 @@ module Plottable {
      * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
      */
     protected _updateExtents() {
-      this._attrBindings.forEach((attr) => this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents));
-      this._propertyExtents.forEach((property) => this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents));
+      this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
+      this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
       this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
     }
 
-    private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
+    private _updateExtentsForAttr(attr: string) {
+      // Filters should never be applied to attributes
+      this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
+    }
+
+    protected _updateExtentsForProperty(property: string) {
+      this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
+    }
+
+    protected _filterForProperty(property: string): _Accessor {
+      return null;
+    }
+
+    private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>,
+        extents: D3.Map<any[]>, filter: _Accessor) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
         var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accScaleBinding.accessor, plotMetadata);
+        return this._computeExtent(dataset, accScaleBinding.accessor, plotMetadata, filter);
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter: _Accessor): any[] {
       var data = dataset.data();
+      if (filter != null) {
+        data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+      }
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
       var mappedData = data.map(appliedAccessor);
       if (mappedData.length === 0) {
