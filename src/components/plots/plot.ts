@@ -275,7 +275,8 @@ module Plottable {
     }
 
     private _updateExtentsForAttr(attr: string) {
-      this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents);
+      // Filters should never be applied to attributes
+      this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
     }
 
     protected _updateExtentsForProperty(property: string) {
@@ -287,7 +288,7 @@ module Plottable {
     }
 
     private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>,
-        extents: D3.Map<any[]>, filter?: _Accessor) {
+        extents: D3.Map<any[]>, filter: _Accessor) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       extents.set(key, this._datasetKeysInOrder.map((key) => {
@@ -298,7 +299,7 @@ module Plottable {
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter?: _Accessor): any[] {
+    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter: _Accessor): any[] {
       var data = dataset.data();
       if (filter != null) {
         data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));

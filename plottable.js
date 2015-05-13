@@ -6433,7 +6433,8 @@ var Plottable;
             this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
-            this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents);
+            // Filters should never be applied to attributes
+            this._updateExtentsForKey(attr, this._attrBindings, this._attrExtents, null);
         };
         Plot.prototype._updateExtentsForProperty = function (property) {
             this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
