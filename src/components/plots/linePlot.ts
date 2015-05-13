@@ -9,8 +9,8 @@ export module Plots {
      * Constructs a LinePlot.
      *
      * @constructor
-     * @param {QuantitativeScaleScale} xScale The x scale to use.
-     * @param {QuantitativeScaleScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale The x scale to use.
+     * @param {QuantitativeScale} yScale The y scale to use.
      */
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
