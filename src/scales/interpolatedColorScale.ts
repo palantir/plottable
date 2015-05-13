@@ -69,7 +69,7 @@ export module Scales {
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
     constructor(colorRange: string | string[] = "reds", scaleType = "linear") {
-      this._colorRange = this._resolveColorValues(colorRange);   
+      this._colorRange = this._resolveColorValues(colorRange);
       switch (scaleType) {
         case "linear":
           this._colorScale = d3.scale.linear();
