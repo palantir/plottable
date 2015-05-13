@@ -50,8 +50,7 @@ module Plottable {
 
       this._bindProperty(XYPlot._X_KEY, x, xScale);
       if (this._autoAdjustYScaleDomain) {
-        this._updateExtentsForProperty("y");
-        this.y().scale.autoDomain();
+        this._updateYExtentsAndAutodomain();
       }
       this._updateXDomainer();
       this._render();
@@ -68,8 +67,7 @@ module Plottable {
 
       this._bindProperty(XYPlot._Y_KEY, y, yScale);
       if (this._autoAdjustXScaleDomain) {
-        this._updateExtentsForProperty("x");
-        this.x().scale.autoDomain();
+        this._updateXExtentsAndAutodomain();
       }
       this._updateYDomainer();
       this._render();
@@ -201,31 +199,43 @@ module Plottable {
       }
     }
 
+    private _updateXExtentsAndAutodomain() {
+      this._updateExtentsForProperty("x");
+      var xScale = this.x().scale;
+      if (xScale != null) {
+        xScale.autoDomain();
+      }
+    }
+
+    private _updateYExtentsAndAutodomain() {
+      this._updateExtentsForProperty("y");
+      var yScale = this.y().scale;
+      if (yScale != null) {
+        yScale.autoDomain();
+      }
+    }
+
     /**
      * Adjusts both domains' extents to show all datasets.
      *
      * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
-      this._updateExtentsForProperty("x");
-      this.x().scale.autoDomain();
-      this._updateExtentsForProperty("y");
-      this.y().scale.autoDomain();
+      this._updateXExtentsAndAutodomain();
+      this._updateYExtentsAndAutodomain();
       return this;
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
-        this._updateExtentsForProperty("y");
-        this.y().scale.autoDomain();
+        this._updateYExtentsAndAutodomain();
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
-        this._updateExtentsForProperty("x");
-        this.x().scale.autoDomain();
+        this._updateXExtentsAndAutodomain();
       }
     }
 
