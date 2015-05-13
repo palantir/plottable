@@ -32,8 +32,8 @@ var TestMethods;
                 minHeight: fixedHeight == null ? 0 : fixedHeight
             };
         };
-        c._fixedWidthFlag = fixedWidth == null ? false : true;
-        c._fixedHeightFlag = fixedHeight == null ? false : true;
+        c.fixedWidth = function () { return fixedWidth == null ? false : true; };
+        c.fixedHeight = function () { return fixedHeight == null ? false : true; };
         return c;
     }
     TestMethods.fixComponentSize = fixComponentSize;
@@ -232,14 +232,18 @@ var Mocks;
             _super.call(this);
             this.fsWidth = width;
             this.fsHeight = height;
-            this._fixedWidthFlag = true;
-            this._fixedHeightFlag = true;
         }
         FixedSizeComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: this.fsWidth,
                 minHeight: this.fsHeight
             };
+        };
+        FixedSizeComponent.prototype.fixedWidth = function () {
+            return true;
+        };
+        FixedSizeComponent.prototype.fixedHeight = function () {
+            return true;
         };
         return FixedSizeComponent;
     })(Plottable.Component);

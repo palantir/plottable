@@ -1430,8 +1430,6 @@ declare module Plottable {
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
         protected _clipPathEnabled: boolean;
-        protected _fixedHeightFlag: boolean;
-        protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
@@ -2139,6 +2137,8 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _render(): void;
         }
     }
@@ -2232,6 +2232,8 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
@@ -2285,6 +2287,8 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _render(): void;
@@ -2446,6 +2450,8 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             boxVisible(show: boolean): SelectionBoxLayer;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
