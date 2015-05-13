@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
   var yAxis2 = new Plottable.Axes.Category(yScale2, "left");
 
   var legend = new Plottable.Components.Legend(colorScale);
-  legend.xAlign("center");
+  legend.xAlignment("center");
 
   var title = new Plottable.Components.TitleLabel("Sample Net Earnings by Teams");
 
