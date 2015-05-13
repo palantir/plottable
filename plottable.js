@@ -2250,7 +2250,7 @@ var Plottable;
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = InterpolatedColor.COLOR_SCALES["reds"]; }
+                if (colorRange === void 0) { colorRange = InterpolatedColor.ColorRange.REDS; }
                 if (scaleType === void 0) { scaleType = "linear"; }
                 this._colorRange = colorRange;
                 switch (scaleType) {
@@ -2326,8 +2326,15 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor.COLOR_SCALES = {
-                reds: [
+            return InterpolatedColor;
+        })(Plottable.Scale);
+        Scales.InterpolatedColor = InterpolatedColor;
+        var InterpolatedColor;
+        (function (InterpolatedColor) {
+            var ColorRange = (function () {
+                function ColorRange() {
+                }
+                ColorRange.REDS = [
                     "#FFFFFF",
                     "#FFF6E1",
                     "#FEF4C0",
@@ -2337,8 +2344,8 @@ var Plottable;
                     "#FC4E2A",
                     "#E31A1C",
                     "#B10026"
-                ],
-                blues: [
+                ];
+                ColorRange.BLUES = [
                     "#FFFFFF",
                     "#CCFFFF",
                     "#A5FFFD",
@@ -2348,8 +2355,8 @@ var Plottable;
                     "#417FD0",
                     "#2545D3",
                     "#0B02E1"
-                ],
-                posneg: [
+                ];
+                ColorRange.POSNEG = [
                     "#0B02E1",
                     "#2545D3",
                     "#417FD0",
@@ -2367,11 +2374,11 @@ var Plottable;
                     "#FC4E2A",
                     "#E31A1C",
                     "#B10026"
-                ]
-            };
-            return InterpolatedColor;
-        })(Plottable.Scale);
-        Scales.InterpolatedColor = InterpolatedColor;
+                ];
+                return ColorRange;
+            })();
+            InterpolatedColor.ColorRange = ColorRange;
+        })(InterpolatedColor = Scales.InterpolatedColor || (Scales.InterpolatedColor = {}));
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
