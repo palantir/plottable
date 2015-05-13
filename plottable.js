@@ -1822,9 +1822,9 @@ var Plottable;
                 if (base === void 0) { base = 10; }
                 _super.call(this, d3.scale.linear());
                 this._showIntermediateTicks = false;
-                this.base = base;
-                this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
+                this._base = base;
+                this._pivot = this._base;
+                this._setDomain(this._defaultExtent());
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -1840,19 +1840,19 @@ var Plottable;
             ModifiedLog.prototype.adjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
-                if (x < this.pivot) {
-                    x += (this.pivot - x) / this.pivot;
+                if (x < this._pivot) {
+                    x += (this._pivot - x) / this._pivot;
                 }
-                x = Math.log(x) / Math.log(this.base);
+                x = Math.log(x) / Math.log(this._base);
                 x *= negationFactor;
                 return x;
             };
             ModifiedLog.prototype.invertedAdjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
-                x = Math.pow(this.base, x);
-                if (x < this.pivot) {
-                    x = (this.pivot * (x - 1)) / (this.pivot - 1);
+                x = Math.pow(this._base, x);
+                if (x < this._pivot) {
+                    x = (this._pivot * (x - 1)) / (this._pivot - 1);
                 }
                 x *= negationFactor;
                 return x;
@@ -1864,10 +1864,10 @@ var Plottable;
                 return this.invertedAdjustedLog(this._d3Scale.invert(x));
             };
             ModifiedLog.prototype._getDomain = function () {
-                return this.untransformedDomain;
+                return this._untransformedDomain;
             };
             ModifiedLog.prototype._setDomain = function (values) {
-                this.untransformedDomain = values;
+                this._untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 this._d3Scale.domain(transformedDomain);
                 this._dispatchUpdate();
@@ -1877,15 +1877,15 @@ var Plottable;
                 // then we're going to draw negative log ticks from -100 to -10,
                 // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
-                var min = Plottable.Utils.Methods.min(this.untransformedDomain, 0);
-                var max = Plottable.Utils.Methods.max(this.untransformedDomain, 0);
+                var min = Plottable.Utils.Methods.min(this._untransformedDomain, 0);
+                var max = Plottable.Utils.Methods.max(this._untransformedDomain, 0);
                 var negativeLower = min;
-                var negativeUpper = middle(min, max, -this.pivot);
-                var positiveLower = middle(min, max, this.pivot);
+                var negativeUpper = middle(min, max, -this._pivot);
+                var positiveLower = middle(min, max, this._pivot);
                 var positiveUpper = max;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
-                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -1912,13 +1912,13 @@ var Plottable;
                 if (nTicks === 0) {
                     return [];
                 }
-                var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
-                var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+                var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
+                var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-                var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+                var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
                 var uniqMultiples = Plottable.Utils.Methods.uniq(multiples);
-                var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this.base, b - 1) * x; }); });
+                var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this._base, b - 1) * x; }); });
                 var flattened = Plottable.Utils.Methods.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
                 var sorted = filtered.sort(function (x, y) { return x - y; });
@@ -1932,8 +1932,8 @@ var Plottable;
              * distance when plotted.
              */
             ModifiedLog.prototype._howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this.untransformedDomain, 0));
-                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this.untransformedDomain, 0));
+                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
+                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -1941,7 +1941,7 @@ var Plottable;
                 return ticks;
             };
             ModifiedLog.prototype.copy = function () {
-                return new ModifiedLog(this.base);
+                return new ModifiedLog(this._base);
             };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
                 return domain;
@@ -1955,7 +1955,7 @@ var Plottable;
                 }
             };
             ModifiedLog.prototype._defaultExtent = function () {
-                return [0, 1];
+                return [0, this._base];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);

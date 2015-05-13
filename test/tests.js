@@ -7385,6 +7385,11 @@ describe("Scales", function () {
             assert.strictEqual("#e3e3e3", scale.scale(8));
         });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
     describe("Modified Log Scale", function () {
         var scale;
         var base = 10;
@@ -7403,7 +7408,7 @@ describe("Scales", function () {
             });
             assert.closeTo(scale.scale(0), 0, epsilon);
         });
-        it("is close to log() for large values", function () {
+        it("Has log() behavior at values > base", function () {
             [10, 100, 23103.4, 5].forEach(function (x) {
                 assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
             });
@@ -7414,9 +7419,9 @@ describe("Scales", function () {
                 assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
             });
         });
-        it("domain defaults to [0, 1]", function () {
+        it("domain defaults to [0, base]", function () {
             scale = new Plottable.Scales.ModifiedLog(base);
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("works with a Domainer", function () {
             scale.addExtentProvider(function (scale) { return [[0, base * 2]]; });
@@ -7429,7 +7434,7 @@ describe("Scales", function () {
             assert.operator(domain[1], "<=", scale.domain()[1]);
             scale = new Plottable.Scales.ModifiedLog(base);
             scale.domainer(new Plottable.Domainer());
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];

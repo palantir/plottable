@@ -49,6 +49,7 @@
 ///<reference path="core/domainerTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/modifiedLogScaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />
 
