@@ -2319,7 +2319,7 @@ var Plottable;
                 this._dispatchUpdate();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (colorRange.length == 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
+                if (colorRange.length === 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
                     return InterpolatedColor._COLOR_SCALES[colorRange[0]];
                 }
                 else {
