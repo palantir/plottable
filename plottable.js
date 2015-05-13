@@ -2248,11 +2248,27 @@ var Plottable;
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            function InterpolatedColor(colorRange, colorScale) {
+            function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = "reds"; }
-                if (colorScale === void 0) { colorScale = d3.scale.linear(); }
+                if (scaleType === void 0) { scaleType = "linear"; }
                 this._colorRange = this._resolveColorValues(colorRange);
-                this._colorScale = colorScale;
+                switch (scaleType) {
+                    case "linear":
+                        this._colorScale = d3.scale.linear();
+                        break;
+                    case "log":
+                        this._colorScale = d3.scale.log();
+                        break;
+                    case "sqrt":
+                        this._colorScale = d3.scale.sqrt();
+                        break;
+                    case "pow":
+                        this._colorScale = d3.scale.pow();
+                        break;
+                }
+                if (this._colorScale == null) {
+                    throw new Error("unknown QuantitativeScale scale type " + scaleType);
+                }
                 _super.call(this, this._D3InterpolatedScale());
             }
             /**

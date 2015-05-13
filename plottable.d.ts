@@ -1180,7 +1180,7 @@ declare module Plottable {
              *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
              *     for further options.
              */
-            constructor(colorRange?: string | string[], colorScale?: D3.Scale.QuantitativeScale);
+            constructor(colorRange?: string | string[], scaleType?: string);
             /**
              * Gets the color range.
              *

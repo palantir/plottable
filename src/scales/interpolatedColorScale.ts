@@ -72,9 +72,25 @@ export module Scales {
      *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
      *     for further options.
      */
-    constructor(colorRange: string | string[] = "reds", colorScale: D3.Scale.QuantitativeScale = d3.scale.linear()) {
-      this._colorRange = this._resolveColorValues(colorRange);
-      this._colorScale = colorScale;
+    constructor(colorRange: string | string[] = "reds", scaleType = "linear") {
+      this._colorRange = this._resolveColorValues(colorRange);   
+      switch (scaleType) {
+        case "linear":
+          this._colorScale = d3.scale.linear();
+          break;
+        case "log":
+          this._colorScale = d3.scale.log();
+          break;
+        case "sqrt":
+          this._colorScale = d3.scale.sqrt();
+          break;
+        case "pow":
+          this._colorScale = d3.scale.pow();
+          break;
+      }
+      if (this._colorScale == null) {
+        throw new Error("unknown QuantitativeScale scale type " + scaleType);
+      }
       super(this._D3InterpolatedScale());
     }
 
