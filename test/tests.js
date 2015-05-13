@@ -6895,23 +6895,6 @@ describe("Domainer", function () {
         assert.strictEqual(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
         assert.strictEqual(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
     });
-    it("pad() works on log scales", function () {
-        var logScale = new Plottable.Scales.Log();
-        logScale.addExtentProvider(function (scale) { return [[10, 100]]; });
-        logScale.autoDomain();
-        logScale.range([0, 1]);
-        logScale.domainer(domainer.pad(2.0));
-        assert.closeTo(logScale.domain()[0], 1, 0.001);
-        assert.closeTo(logScale.domain()[1], 1000, 0.001);
-        logScale.range([50, 60]);
-        logScale.autoDomain();
-        assert.closeTo(logScale.domain()[0], 1, 0.001);
-        assert.closeTo(logScale.domain()[1], 1000, 0.001);
-        logScale.range([-1, -2]);
-        logScale.autoDomain();
-        assert.closeTo(logScale.domain()[0], 1, 0.001);
-        assert.closeTo(logScale.domain()[1], 1000, 0.001);
-    });
     it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
         domainer.pad();
         var domain = domainer.computeDomain([[5, 5]], scale);
@@ -7182,11 +7165,6 @@ describe("Scales", function () {
             var d = scale.domain();
             assert.strictEqual(d[0], 0);
             assert.strictEqual(d[1], 1);
-        });
-        it("autorange defaults to [1, 10] on log scale", function () {
-            var scale = new Plottable.Scales.Log();
-            scale.autoDomain();
-            assert.deepEqual(scale.domain(), [1, 10]);
         });
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scales.Linear();

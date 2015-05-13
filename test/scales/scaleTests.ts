@@ -163,12 +163,6 @@ describe("Scales", () => {
       assert.strictEqual(d[1], 1);
     });
 
-    it("autorange defaults to [1, 10] on log scale", () => {
-      var scale = new Plottable.Scales.Log();
-      scale.autoDomain();
-      assert.deepEqual(scale.domain(), [1, 10]);
-    });
-
     it("domain can't include NaN or Infinity", () => {
       var scale = new Plottable.Scales.Linear();
       scale.domain([0, 1]);
