@@ -17,8 +17,8 @@ export module Scales {
     /**
      * An InterpolatedColorScale maps numbers to color strings.
      * 
-     * @param {string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white"). Default is ["reds"]
+     * @param {string[]} colors an array of strings representing color values in hex 
+     *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.ColorRange.REDS
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
