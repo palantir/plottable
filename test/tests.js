@@ -2479,6 +2479,11 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
     describe("XY Plot", function () {
         var svg;
         var xScale;
