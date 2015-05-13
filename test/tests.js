@@ -5849,6 +5849,26 @@ describe("Metadata", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("RenderController", function () {
+    it("Components whose render() is triggered by another Component's render() will be drawn", function () {
+        var link1 = new Plottable.Component();
+        var svg1 = TestMethods.generateSVG();
+        link1.anchor(svg1).computeLayout();
+        var link2 = new Plottable.Component();
+        var svg2 = TestMethods.generateSVG();
+        link2.anchor(svg2).computeLayout();
+        link1._render = function () { return link2.render(); };
+        var link2Rendered = false;
+        link2._render = function () { return link2Rendered = true; };
+        link1.render();
+        assert.isTrue(link2Rendered, "dependent Component was render()-ed");
+        svg1.remove();
+        svg2.remove();
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("ComponentContainer", function () {
     it("add()", function () {
         var container = new Plottable.ComponentContainer();
