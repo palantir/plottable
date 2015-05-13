@@ -1869,8 +1869,7 @@ var Plottable;
             ModifiedLog.prototype._setDomain = function (values) {
                 this._untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-                this._d3Scale.domain(transformedDomain);
-                this._dispatchUpdate();
+                _super.prototype._setDomain.call(this, transformedDomain);
             };
             ModifiedLog.prototype.ticks = function () {
                 // Say your domain is [-100, 100] and your pivot is 10.

@@ -94,8 +94,7 @@ export module Scales {
     protected _setDomain(values: number[]) {
       this._untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-      this._d3Scale.domain(transformedDomain);
-      this._dispatchUpdate();
+      super._setDomain(transformedDomain);
     }
 
     public ticks(): number[] {
