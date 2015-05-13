@@ -4904,7 +4904,9 @@ var Plottable;
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
                 var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
-                var expectedRangeBand = axisSpace / (2 * scale.outerPadding() + (ticks.length - 1) * scale.innerPadding() + ticks.length);
+                var totalOuterPadding = 2 * scale.outerPadding();
+                var totalInnerPadding = (ticks.length - 1) * scale.innerPadding();
+                var expectedRangeBand = axisSpace / (totalOuterPadding + totalInnerPadding + ticks.length);
                 var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
                 var wrappingResults = ticks.map(function (s) {
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
