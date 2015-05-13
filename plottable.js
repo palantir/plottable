@@ -1786,44 +1786,6 @@ var Plottable;
 (function (Plottable) {
     var Scales;
     (function (Scales) {
-        var Log = (function (_super) {
-            __extends(Log, _super);
-            function Log(scale) {
-                _super.call(this, scale == null ? d3.scale.log() : scale);
-                if (!Log.warned) {
-                    Log.warned = true;
-                    Plottable.Utils.Methods.warn("Plottable.Scale.Log is deprecated. If possible, use Plottable.Scale.ModifiedLog instead.");
-                }
-            }
-            /**
-             * Creates a copy of the Scale.Log with the same domain and range but without any registered listeners.
-             *
-             * @returns {Log} A copy of the calling Log.
-             */
-            Log.prototype.copy = function () {
-                return new Log(this._d3Scale.copy());
-            };
-            Log.prototype._defaultExtent = function () {
-                return [1, 10];
-            };
-            Log.warned = false;
-            return Log;
-        })(Plottable.QuantitativeScale);
-        Scales.Log = Log;
-    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Scales;
-    (function (Scales) {
         var ModifiedLog = (function (_super) {
             __extends(ModifiedLog, _super);
             /**
