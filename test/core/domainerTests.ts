@@ -11,7 +11,7 @@ describe("Domainer", () => {
   });
 
   it("pad() works in general case", () => {
-    scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[100, 200]]);
+    scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[100, 200]]);
     scale.autoDomain();
     scale.domainer(new Plottable.Domainer().pad(0.2));
     assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
@@ -23,7 +23,7 @@ describe("Domainer", () => {
     var f = d3.time.format("%x");
     var d1 = f.parse("06/02/2014");
     var d2 = f.parse("06/03/2014");
-    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[d1, d2]]);
+    timeScale.addExtentsProvider((scale: Plottable.Scale<Date, number>) => [[d1, d2]]);
     timeScale.autoDomain();
     timeScale.domainer(new Plottable.Domainer().pad());
     var dd1 = timeScale.domain()[0];
@@ -94,7 +94,7 @@ describe("Domainer", () => {
     var startDate = new Date(2000, 5, 5);
     var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
+    timeScale.addExtentsProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
     domainer.pad().addPaddingException("key", startDate);
     timeScale.domainer(domainer);
@@ -137,7 +137,7 @@ describe("Domainer", () => {
     var startDate = new Date(2000, 5, 6);
     var endDate = new Date(2003, 0, 1);
     var timeScale = new Plottable.Scales.Time();
-    timeScale.addExtentProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
+    timeScale.addExtentsProvider((scale: Plottable.Scale<Date, number>) => [[startDate, endDate]]);
     timeScale.autoDomain();
     domainer.addIncludedValue("key", includedDate);
     timeScale.domainer(domainer);
