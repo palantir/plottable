@@ -62,13 +62,13 @@ export module Scales {
     /**
      * An InterpolatedColorScale maps numbers to color strings.
      * 
-     * @param {string | string[]} colors an array of strings representing color
-     *     values in hex ("#FFFFFF") or keywords ("white"). Default is "reds"
+     * @param {string[]} colors an array of strings representing color
+     *     values in hex ("#FFFFFF") or keywords ("white"). Default is ["reds"]
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
-    constructor(colorRange: string | string[] = "reds", scaleType = "linear") {
+    constructor(colorRange = ["reds"], scaleType = "linear") {
       this._colorRange = this._resolveColorValues(colorRange);
       switch (scaleType) {
         case "linear":
@@ -135,15 +135,15 @@ export module Scales {
     /**
      * Sets the color range.
      *
-     * @param {string|string[]} [colorRange]. If provided and if colorRange is one of
+     * @param {string[]} [colorRange]. If provided and if colorRange is one of
      * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
      * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
      * "dodgerblue"], the resulting scale will interpolate between the color
      * values across the domain.
      * @returns {InterpolatedColor} The calling InterpolatedColor.
      */
-    public colorRange(colorRange: string | string[]): InterpolatedColor;
-    public colorRange(colorRange?: string | string[]): any {
+    public colorRange(colorRange: string[]): InterpolatedColor;
+    public colorRange(colorRange?: string[]): any {
       if (colorRange == null) {
         return this._colorRange;
       }
@@ -158,13 +158,11 @@ export module Scales {
       this._dispatchUpdate();
     }
 
-    private _resolveColorValues(colorRange: string | string[]): string[] {
-      if (typeof(colorRange) === "object") {
-        return <string[]> colorRange;
-      } else if (InterpolatedColor._COLOR_SCALES[<string> colorRange] != null) {
-        return InterpolatedColor._COLOR_SCALES[<string> colorRange];
+    private _resolveColorValues(colorRange: string[]): string[] {
+      if (colorRange.length == 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
+        return InterpolatedColor._COLOR_SCALES[colorRange[0]];
       } else {
-        return InterpolatedColor._COLOR_SCALES["reds"];
+        return colorRange;
       }
     }
 

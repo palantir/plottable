@@ -2243,14 +2243,14 @@ var Plottable;
             /**
              * An InterpolatedColorScale maps numbers to color strings.
              *
-             * @param {string | string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white"). Default is "reds"
+             * @param {string[]} colors an array of strings representing color
+             *     values in hex ("#FFFFFF") or keywords ("white"). Default is ["reds"]
              * @param {string} scaleType a string representing the underlying scale
              *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = "reds"; }
+                if (colorRange === void 0) { colorRange = ["reds"]; }
                 if (scaleType === void 0) { scaleType = "linear"; }
                 this._colorRange = this._resolveColorValues(colorRange);
                 switch (scaleType) {
@@ -2319,14 +2319,11 @@ var Plottable;
                 this._dispatchUpdate();
             };
             InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (typeof (colorRange) === "object") {
-                    return colorRange;
-                }
-                else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
-                    return InterpolatedColor._COLOR_SCALES[colorRange];
+                if (colorRange.length == 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
+                    return InterpolatedColor._COLOR_SCALES[colorRange[0]];
                 }
                 else {
-                    return InterpolatedColor._COLOR_SCALES["reds"];
+                    return colorRange;
                 }
             };
             InterpolatedColor.prototype.autoDomain = function () {
