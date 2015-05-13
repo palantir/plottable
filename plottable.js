@@ -1542,9 +1542,11 @@ var Plottable;
         };
         Scale.prototype.onUpdate = function (callback) {
             this._callbacks.add(callback);
+            return this;
         };
         Scale.prototype.offUpdate = function (callback) {
             this._callbacks.delete(callback);
+            return this;
         };
         Scale.prototype._dispatchUpdate = function () {
             this._callbacks.callCallbacks(this);
@@ -1625,9 +1627,11 @@ var Plottable;
         };
         Scale.prototype.addExtentProvider = function (provider) {
             this._extentProviders.add(provider);
+            return this;
         };
         Scale.prototype.removeExtentProvider = function (provider) {
             this._extentProviders.delete(provider);
+            return this;
         };
         return Scale;
     })();

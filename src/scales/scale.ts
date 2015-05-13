@@ -46,10 +46,12 @@ module Plottable {
 
     public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.add(callback);
+      return this;
     }
 
     public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.delete(callback);
+      return this;
     }
 
     protected _dispatchUpdate() {
@@ -175,10 +177,12 @@ module Plottable {
 
     public addExtentProvider(provider: Scales.ExtentProvider<D>) {
       this._extentProviders.add(provider);
+      return this;
     }
 
     public removeExtentProvider(provider: Scales.ExtentProvider<D>) {
       this._extentProviders.delete(provider);
+      return this;
     }
   }
 }
