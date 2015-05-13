@@ -32,7 +32,7 @@ export module Components {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orient(orientation);
+      this.orientation(orientation);
       this.xAlign("center").yAlign("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
@@ -41,8 +41,8 @@ export module Components {
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         minWidth: desiredWidth,
@@ -87,7 +87,7 @@ export module Components {
      *
      * @returns {string} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Label.
      *
@@ -95,16 +95,16 @@ export module Components {
      * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
-    public orient(newOrientation: string): Label;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): Label;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this._orientation = newOrientation;
+        orientation = orientation.toLowerCase();
+        if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+          this._orientation = orientation;
         } else {
-          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+          throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
         this.redraw();
         return this;
@@ -153,7 +153,7 @@ export module Components {
                         selection: this._textContainer,
                         xAlign: this.xAlign(),
                         yAlign: this.yAlign(),
-                        textRotation: textRotation[this.orient()]
+                        textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
     }

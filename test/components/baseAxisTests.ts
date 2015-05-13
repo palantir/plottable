@@ -79,7 +79,7 @@ describe("BaseAxis", () => {
     assert.strictEqual(baseline.attr("y1"), "0");
     assert.strictEqual(baseline.attr("y2"), "0");
 
-    baseAxis.orient("top");
+    baseAxis.orientation("top");
     assert.isNotNull(baseline.node(), "baseline was drawn");
     assert.strictEqual(baseline.attr("x1"), "0");
     assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
@@ -111,7 +111,7 @@ describe("BaseAxis", () => {
     assert.strictEqual(baseline.attr("y1"), "0");
     assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
 
-    baseAxis.orient("right");
+    baseAxis.orientation("right");
     assert.isNotNull(baseline.node(), "baseline was drawn");
     assert.strictEqual(baseline.attr("x1"), "0");
     assert.strictEqual(baseline.attr("x2"), "0");

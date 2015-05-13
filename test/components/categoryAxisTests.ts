@@ -132,7 +132,7 @@ describe("Category Axes", () => {
     var smallDimension = 10;
     var spaceRequest = axis.requestedSpace(300, smallDimension);
     assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
-    axis.orient("left");
+    axis.orientation("left");
     spaceRequest = axis.requestedSpace(smallDimension, 300);
     assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
     svg.remove();
@@ -157,7 +157,7 @@ describe("Category Axes", () => {
     var tickLabels = (<any> axis)._content.selectAll(".tick-label");
     var tickMarks = (<any> axis)._content.selectAll(".tick-mark");
     verifyTickLabelOverlaps(tickLabels, tickMarks);
-    axis.orient("right");
+    axis.orientation("right");
     verifyTickLabelOverlaps(tickLabels, tickMarks);
     svg.remove();
   });
