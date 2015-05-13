@@ -20,8 +20,8 @@ describe("Plots", () => {
 
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
-      linePlot.project("x", (d: any) => d.foo, xScale);
-      linePlot.project("y", (d: any) => d.bar, yScale);
+      linePlot.x((d: any) => d.foo, xScale);
+      linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
       var apd = linePlot.getAllPlotData();
@@ -41,8 +41,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Line(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -74,10 +74,10 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
       linePlot = new Plottable.Plots.Line(xScale, yScale);
-      linePlot.addDataset(simpleDataset)
-              .project("x", xAccessor, xScale)
-              .project("y", yAccessor, yScale)
-              .project("stroke", colorAccessor)
+      linePlot.addDataset(simpleDataset);
+      linePlot.x(xAccessor, xScale)
+              .y(yAccessor, yScale)
+              .attr("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = (<any> linePlot)._renderArea;
     });
@@ -98,7 +98,7 @@ describe("Plots", () => {
 
     it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
       var newColorAccessor = () => "pink";
-      linePlot.project("stroke", newColorAccessor);
+      linePlot.attr("stroke", newColorAccessor);
       linePlot.renderTo(svg);
       var linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
@@ -109,7 +109,7 @@ describe("Plots", () => {
       var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
-      linePlot.project("stroke", "stroke");
+      linePlot.attr("stroke", (d) => d.stroke);
       var areaPath = renderArea.select(".line");
       assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
@@ -317,7 +317,7 @@ describe("Plots", () => {
 
     it("retains original classes when class is projected", () => {
       var newClassProjector = () => "pink";
-      linePlot.project("class", newClassProjector);
+      linePlot.attr("class", newClassProjector);
       linePlot.renderTo(svg);
       var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
       assert.isTrue(linePath.classed("pink"));

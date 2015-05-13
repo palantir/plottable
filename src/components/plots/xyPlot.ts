@@ -2,8 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    protected _xScale: Scale<X, number>;
-    protected _yScale: Scale<Y, number>;
+    private static _X_KEY = "x";
+    private static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
     private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
@@ -27,8 +27,8 @@ module Plottable {
       }
       this.classed("xy-plot", true);
 
-      this._xScale = xScale;
-      this._yScale = yScale;
+      this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
+      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale});
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
@@ -40,44 +40,55 @@ module Plottable {
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
-    /**
-     * @param {string} attrToSet One of ["x", "y"] which determines the point's
-     * x and y position in the Plot.
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      // We only want padding and nice-ing on scales that will correspond to axes / pixel layout.
-      // So when we get an "x" or "y" scale, enable autoNiceing and autoPadding.
-      if (attrToSet === "x" && scale) {
-        if (this._xScale) {
-          this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-        }
-        this._xScale = scale;
-        this._updateXDomainer();
-
-        scale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | _Accessor): XYPlot<X, Y>;
+    public x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return this._propertyBindings.get(XYPlot._X_KEY);
       }
 
-      if (attrToSet === "y" && scale) {
-        if (this._yScale) {
-          this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-        }
-        this._yScale = scale;
-        this._updateYDomainer();
-        scale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
-      }
-
-      super.project(attrToSet, accessor, scale);
-
+      this._bindProperty(XYPlot._X_KEY, x, xScale);
+      this._updateXDomainer();
+      this._render();
       return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | _Accessor): XYPlot<X, Y>;
+    public y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | _Accessor | Y, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return this._propertyBindings.get(XYPlot._Y_KEY);
+      }
+
+      this._bindProperty(XYPlot._Y_KEY, y, yScale);
+      this._updateYDomainer();
+      this._render();
+      return this;
+    }
+
+    protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
+      super._uninstallScaleForKey(scale, key);
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+                                                 : this._adjustXDomainOnChangeFromYCallback;
+      scale.offUpdate(adjustCallback);
+    }
+
+    protected _installScaleForKey(scale: Scale<any, any>, key: string) {
+      super._installScaleForKey(scale, key);
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+                                                 : this._adjustXDomainOnChangeFromYCallback;
+      scale.onUpdate(adjustCallback);
     }
 
     public destroy() {
       super.destroy();
-      if (this._xScale) {
-        this._xScale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+      if (this.x().scale) {
+        this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
-      if (this._yScale) {
-        this._yScale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+      if (this.y().scale) {
+        this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
       return this;
     }
@@ -110,8 +121,8 @@ module Plottable {
       return this;
     }
 
-    protected _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector: AttributeToProjector = super._generateAttrToProjector();
+    protected _generatePropertyToProjectors(): AttributeToProjector {
+      var attrToProjector = super._generatePropertyToProjectors();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
       attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
@@ -125,18 +136,24 @@ module Plottable {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this._xScale.range([0, this.width()]);
-      if (this._yScale instanceof Scales.Category) {
-        this._yScale.range([0, this.height()]);
-      } else {
-        this._yScale.range([this.height(), 0]);
+      var xScale = this.x().scale;
+      if (xScale != null) {
+        xScale.range([0, this.width()]);
+      }
+      var yScale = this.y().scale;
+      if (yScale != null) {
+        if (this.y().scale instanceof Scales.Category) {
+          this.y().scale.range([0, this.height()]);
+        } else {
+          this.y().scale.range([this.height(), 0]);
+        }
       }
       return this;
     }
 
     protected _updateXDomainer() {
-      if (this._xScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this._xScale;
+      if (this.x().scale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.x().scale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -144,8 +161,8 @@ module Plottable {
     }
 
     protected _updateYDomainer() {
-      if (this._yScale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this._yScale;
+      if (this.y().scale instanceof QuantitativeScale) {
+        var scale = <QuantitativeScale<any>> this.y().scale;
         if (!scale._userSetDomainer) {
           scale.domainer().pad().nice();
         }
@@ -158,22 +175,22 @@ module Plottable {
      * This call does not override auto domain adjustment behavior over visible points.
      */
     public showAllData() {
-      this._xScale.autoDomain();
+      this.x().scale.autoDomain();
       if (!this._autoAdjustYScaleDomain) {
-        this._yScale.autoDomain();
+        this.y().scale.autoDomain();
       }
     }
 
     private _adjustYDomainOnChangeFromX() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
-        this._adjustDomainToVisiblePoints<X, Y>(this._xScale, this._yScale, true);
+        this._adjustDomainToVisiblePoints<X, Y>(this.x().scale, this.y().scale, true);
       }
     }
     private _adjustXDomainOnChangeFromY() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
-        this._adjustDomainToVisiblePoints<Y, X>(this._yScale, this._xScale, false);
+        this._adjustDomainToVisiblePoints<Y, X>(this.y().scale, this.x().scale, false);
       }
     }
 
@@ -203,8 +220,8 @@ module Plottable {
     }
 
     protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => A = this._attrBindings.get(fromX ? "x" : "y").accessor;
-      var bAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => B = this._attrBindings.get(fromX ? "y" : "x").accessor;
+      var aAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => A = fromX ? this.x().accessor : this.y().accessor;
+      var bAccessor: (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => B = fromX ? this.y().accessor : this.x().accessor;
       return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
         var dataset = this._key2PlotDatasetKey.get(key).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(key).plotMetadata;
@@ -224,7 +241,7 @@ module Plottable {
     }
 
     protected _projectorsReady() {
-      return this._attrBindings.get("x") && this._attrBindings.get("y");
+      return this.x().accessor != null && this.y().accessor != null;
     }
   }
 }

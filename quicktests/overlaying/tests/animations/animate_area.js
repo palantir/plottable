@@ -22,8 +22,8 @@ function run(svg, data, Plottable) {
   var areaRenderer = new Plottable.Plots.Area(xScale, yScale)
             .addDataset(dataset)
             .attr("opacity", 0.75)
-            .project("x", "x", xScale)
-            .project("y", "y", yScale)
+            .x(function(d) { return d.x; }, xScale)
+            .y(function(d) { return d.y; }, yScale)
             .animate(doAnimate);
 
   var areaChart = new Plottable.Components.Table([[yAxis, areaRenderer],

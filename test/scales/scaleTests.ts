@@ -73,7 +73,7 @@ describe("Scales", () => {
       var svg = TestMethods.generateSVG(100, 100);
       new Plottable.Plot()
         .addDataset(dataset)
-        .project("x", "foo", scale)
+        .attr("x", (d) => d.foo, scale)
         .renderTo(svg);
       assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
       data.push({foo: 100, bar: 200});
@@ -87,17 +87,17 @@ describe("Scales", () => {
       var svg2 = TestMethods.generateSVG(100, 100);
       var renderer1 = new Plottable.Plot()
                           .addDataset(dataset)
-                          .project("x", "foo", scale);
+                          .attr("x", (d) => d.foo, scale);
       renderer1.renderTo(svg1);
       var renderer2 = new Plottable.Plot()
                           .addDataset(dataset)
-                          .project("x", "foo", scale);
+                          .attr("x", (d) => d.foo, scale);
       renderer2.renderTo(svg2);
       var otherScale = new Plottable.Scales.Linear();
-      renderer1.project("x", "foo", otherScale);
+      renderer1.attr("x", (d) => d.foo, otherScale);
       dataset.data([{foo: 10}, {foo: 11}]);
       assert.deepEqual(scale.domain(), [10, 11], "scale was still listening to dataset after one perspective deregistered");
-      renderer2.project("x", "foo", otherScale);
+      renderer2.attr("x", (d) => d.foo, otherScale);
       // "scale not listening to the dataset after all perspectives removed"
       dataset.data([{foo: 99}, {foo: 100}]);
       assert.deepEqual(scale.domain(), [0, 1], "scale shows default values when all perspectives removed");
@@ -137,12 +137,12 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
-      renderAreaD1.project("x", "x", xScale);
-      renderAreaD1.project("y", "y", yScale);
+      renderAreaD1.x((d) => d.x, xScale);
+      renderAreaD1.y((d) => d.y, yScale);
       var renderAreaD2 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD2.addDataset(ds2);
-      renderAreaD2.project("x", "x", xScale);
-      renderAreaD2.project("y", "y", yScale);
+      renderAreaD2.x((d) => d.x, xScale);
+      renderAreaD2.y((d) => d.y, yScale);
       var renderAreas = renderAreaD1.below(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -224,9 +224,10 @@ describe("Scales", () => {
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
-    var barPlot = new Plottable.Plots.Bar(xScale, yScale).addDataset(dataset);
-    barPlot.project("x", "x", xScale);
-    barPlot.project("y", "y", yScale);
+    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
+    barPlot.addDataset(dataset);
+    barPlot.x((d) => d.x, xScale);
+    barPlot.y((d) => d.y, yScale);
     var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);

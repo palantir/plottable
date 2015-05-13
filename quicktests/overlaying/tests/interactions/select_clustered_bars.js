@@ -21,8 +21,8 @@ function run(svg, data, Plottable) {
                                   .addDataset(new Plottable.Dataset(data[0]))
                                   .addDataset(new Plottable.Dataset(data[1]))
                                   .addDataset(new Plottable.Dataset(data[2]))
-                                  .project("x", "name", xScale)
-                                  .project("y", "y", yScale);
+                                  .x(function(d) { return d.name; }, xScale)
+                                  .y(function(d) { return d.y; }, yScale);
 
   var chart = new Plottable.Components.Table([
                                             [yAxis, barPlot],

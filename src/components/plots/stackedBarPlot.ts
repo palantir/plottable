@@ -22,7 +22,7 @@ export module Plots {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
           var scaledBaseline = primaryScale.scale(this.baseline());
           return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
@@ -31,14 +31,48 @@ export module Plots {
       return new Animators.Null();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | _Accessor): StackedBar<X, Y>;
+    public x(x: X | _Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
+    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      if (xScale == null) {
+        super.x(<number | _Accessor> x);
+        Stacked.prototype.x.apply(this, [x]);
+      } else {
+        super.x(<X | _Accessor> x, xScale);
+        Stacked.prototype.x.apply(this, [x, xScale]);
+      }
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | _Accessor): StackedBar<X, Y>;
+    public y(y: Y | _Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
+    public y(y?: number | _Accessor | Y, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      if (yScale == null) {
+        super.y(<number | _Accessor> y);
+        Stacked.prototype.y.apply(this, [y]);
+      } else {
+        super.y(<Y | _Accessor> y, yScale);
+        Stacked.prototype.y.apply(this, [y, yScale]);
+      }
+      return this;
+    }
+
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._attrBindings.get(valueAttr).accessor;
-      var keyAccessor = this._attrBindings.get(keyAttr).accessor;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
+      var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
       var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
         primaryScale.scale(m.offsets.get(keyAccessor(d, i, dataset, m)));
       var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
@@ -49,7 +83,6 @@ export module Plots {
       };
 
       var attrFunction = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-
         +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
       attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
         this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
@@ -59,12 +92,6 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
-    }
-
-    public project(attrToSet: string, accessor: any, scale?: Scale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      Stacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
-      return this;
     }
 
     protected _onDatasetUpdate() {
@@ -106,8 +133,8 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    protected _extentsForAttr(attr: string) {
-      return (<any> Stacked.prototype)._extentsForAttr.call(this, attr);
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
     public _keyAccessor(): _Accessor {

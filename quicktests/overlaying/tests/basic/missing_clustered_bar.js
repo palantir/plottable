@@ -20,11 +20,11 @@ function run(svg, data, Plottable) {
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))
-    .attr("x", "name", xScale)
-    .attr("y", "y", yScale)
-    .attr("fill", "type", colorScale)
-    .attr("type", "type")
-    .attr("yval", "y")
+    .x(function(d) { return d.name; }, xScale)
+    .y(function(d) { return d.y; }, yScale)
+    .attr("fill", function(d) { return d.type; }, colorScale)
+    .attr("type", function(d) { return d.type; })
+    .attr("yval", function(d) { return d.y; })
     .labelsEnabled(true);
 
   var center = clusteredBarRenderer.below(new Plottable.Components.Legend(colorScale));
