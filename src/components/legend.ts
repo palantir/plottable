@@ -48,7 +48,7 @@ export module Components {
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
 
-      this.xAlign("right").yAlign("top");
+      this.xAlignment("right").yAlignment("top");
       this._fixedWidthFlag = true;
       this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);

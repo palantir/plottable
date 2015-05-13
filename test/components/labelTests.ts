@@ -140,9 +140,9 @@ describe("Labels", () => {
 
   it("padding reacts well under align", () => {
     var svg = TestMethods.generateSVG(400, 200);
-    var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
-    var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-    var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+    var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlignment("left");
+    var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlignment("left");
+    var topLabel = new Plottable.Components.Label("label").yAlignment("bottom");
     new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
 
     var testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
@@ -150,21 +150,21 @@ describe("Labels", () => {
 
     assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
 
-    testLabel.xAlign("right");
+    testLabel.xAlignment("right");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     longTextRect = (<any> longLabel)._element.select("text").node().getBoundingClientRect();
 
     assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
 
-    testLabel.yAlign("bottom");
+    testLabel.yAlignment("bottom");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     longTextRect = (<any> longLabel)._element.select("text").node().getBoundingClientRect();
 
     assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
 
-    testLabel.yAlign("top");
+    testLabel.yAlignment("top");
 
     testTextRect = (<any> testLabel)._element.select("text").node().getBoundingClientRect();
     var topTextRect = (<any> topLabel)._element.select("text").node().getBoundingClientRect();

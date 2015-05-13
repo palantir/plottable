@@ -239,19 +239,19 @@ module Plottable {
     protected _setDefaultAlignment() {
       switch (this._orientation) {
         case "bottom":
-          this.yAlign("top");
+          this.yAlignment("top");
           break;
 
         case "top":
-          this.yAlign("bottom");
+          this.yAlignment("bottom");
           break;
 
         case "left":
-          this.xAlign("right");
+          this.xAlignment("right");
           break;
 
         case "right":
-          this.xAlign("left");
+          this.xAlignment("left");
           break;
       }
     }

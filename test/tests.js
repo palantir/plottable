@@ -670,13 +670,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scales.Linear();
         var baseAxis = new Plottable.Axis(scale, "bottom");
-        assert.strictEqual(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
+        assert.strictEqual(baseAxis.yAlignment(), "top", "y alignment defaults to \"top\" for bottom axis");
         baseAxis = new Plottable.Axis(scale, "top");
-        assert.strictEqual(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
+        assert.strictEqual(baseAxis.yAlignment(), "bottom", "y alignment defaults to \"bottom\" for top axis");
         baseAxis = new Plottable.Axis(scale, "left");
-        assert.strictEqual(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
+        assert.strictEqual(baseAxis.xAlignment(), "right", "x alignment defaults to \"right\" for left axis");
         baseAxis = new Plottable.Axis(scale, "right");
-        assert.strictEqual(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
+        assert.strictEqual(baseAxis.xAlignment(), "left", "x alignment defaults to \"left\" for right axis");
     });
 });
 
@@ -1603,22 +1603,22 @@ describe("Labels", function () {
     });
     it("padding reacts well under align", function () {
         var svg = TestMethods.generateSVG(400, 200);
-        var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
-        var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-        var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+        var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlignment("left");
+        var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlignment("left");
+        var topLabel = new Plottable.Components.Label("label").yAlignment("bottom");
         new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
         var testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
-        testLabel.xAlign("right");
+        testLabel.xAlignment("right");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
-        testLabel.yAlign("bottom");
+        testLabel.yAlignment("bottom");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
-        testLabel.yAlign("top");
+        testLabel.yAlignment("top");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var topTextRect = topLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.top, topTextRect.bottom + 30, 2, "vertical difference by padding amount");
@@ -6302,8 +6302,8 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("component defaults are as expected", function () {
-        assert.strictEqual(c.xAlign(), "left", "x alignment defaults to \"left\"");
-        assert.strictEqual(c.yAlign(), "top", "y alignment defaults to \"top\"");
+        assert.strictEqual(c.xAlignment(), "left", "x alignment defaults to \"left\"");
+        assert.strictEqual(c.yAlignment(), "top", "y alignment defaults to \"top\"");
         var layout = c.requestedSpace(1, 1);
         assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
         assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
@@ -6312,13 +6312,13 @@ describe("Component behavior", function () {
     it("fixed-width component will align to the right spot", function () {
         TestMethods.fixComponentSize(c, 100, 100);
         c.anchor(svg);
-        c.xAlign("left").yAlign("top");
+        c.xAlignment("left").yAlignment("top");
         c.computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
-        c.xAlign("center").yAlign("center");
+        c.xAlignment("center").yAlignment("center");
         c.computeLayout();
         assertComponentXY(c, 150, 100, "center component aligns correctly");
-        c.xAlign("right").yAlign("bottom");
+        c.xAlignment("right").yAlignment("bottom");
         c.computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
         svg.remove();
@@ -6340,8 +6340,8 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("errors are thrown on bad alignments", function () {
-        assert.throws(function () { return c.xAlign("foo"); }, Error, "Unsupported alignment");
-        assert.throws(function () { return c.yAlign("foo"); }, Error, "Unsupported alignment");
+        assert.throws(function () { return c.xAlignment("foo"); }, Error, "Unsupported alignment");
+        assert.throws(function () { return c.yAlignment("foo"); }, Error, "Unsupported alignment");
         svg.remove();
     });
     it("css classing works as expected", function () {
@@ -6403,8 +6403,8 @@ describe("Component behavior", function () {
         var placeHolder = new Plottable.Component();
         var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0).addComponent(new Plottable.Component(), 0, 1).addComponent(placeHolder, 1, 0).addComponent(horizontalComponent, 1, 1);
         t.renderTo(svg);
-        horizontalComponent.xAlign("center");
-        verticalComponent.yAlign("bottom");
+        horizontalComponent.xAlignment("center");
+        verticalComponent.yAlignment("bottom");
         TestMethods.assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
         TestMethods.assertBBoxInclusion(t._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
@@ -6417,7 +6417,7 @@ describe("Component behavior", function () {
         };
         c._fixedWidthFlag = true;
         c._fixedHeightFlag = true;
-        c.xAlign("left");
+        c.xAlignment("left");
         var t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
         var transform = d3.transform(c._element.attr("transform"));
@@ -6477,15 +6477,15 @@ describe("Component behavior", function () {
         it("origin() (top-level component)", function () {
             TestMethods.fixComponentSize(c, cWidth, cHeight);
             c.renderTo(svg);
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.origin();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.origin();
             assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.origin();
             assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
@@ -6497,15 +6497,15 @@ describe("Component behavior", function () {
             group.renderTo(svg);
             var groupWidth = group.width();
             var groupHeight = group.height();
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.origin();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.origin();
             assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.origin();
             assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
@@ -6514,15 +6514,15 @@ describe("Component behavior", function () {
         it("originToSVG() (top-level component)", function () {
             TestMethods.fixComponentSize(c, cWidth, cHeight);
             c.renderTo(svg);
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.originToSVG();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
@@ -6534,15 +6534,15 @@ describe("Component behavior", function () {
             group.renderTo(svg);
             var groupWidth = group.width();
             var groupHeight = group.height();
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.originToSVG();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");

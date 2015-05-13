@@ -1510,27 +1510,27 @@ declare module Plottable {
          *
          * @returns {string} The current x alignment.
          */
-        xAlign(): string;
+        xAlignment(): string;
         /**
          * Sets the x alignment of the Component.
          *
          * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
          * @returns {Component} The calling Component.
          */
-        xAlign(alignment: string): Component;
+        xAlignment(xAlignment: string): Component;
         /**
          * Gets the y alignment of the Component.
          *
          * @returns {string} The current y alignment.
          */
-        yAlign(): string;
+        yAlignment(): string;
         /**
          * Sets the y alignment of the Component.
          *
          * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
          * @returns {Component} The calling Component.
          */
-        yAlign(alignment: string): Component;
+        yAlignment(yAlignment: string): Component;
         /**
          * Checks if the Component has a given CSS class.
          *

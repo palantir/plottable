@@ -33,7 +33,7 @@ export module Components {
       this.classed("label", true);
       this.text(displayText);
       this.orientation(orientation);
-      this.xAlign("center").yAlign("center");
+      this.xAlignment("center").yAlignment("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
       this._padding = 0;
@@ -151,8 +151,8 @@ export module Components {
       var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
                         selection: this._textContainer,
-                        xAlign: this.xAlign(),
-                        yAlign: this.yAlign(),
+                        xAlign: this.xAlignment(),
+                        yAlign: this.yAlignment(),
                         textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
