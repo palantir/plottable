@@ -688,7 +688,7 @@ declare module Plottable {
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
          *        extent.
-         * @param {QuantitativeScaleScale} scale
+         * @param {QuantitativeScale} scale
          *        Since nice() must do different things depending on Linear, Log,
          *        or Time scale, the scale must be passed in for nice() to work.
          * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
@@ -781,8 +781,8 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
@@ -819,7 +819,7 @@ declare module Plottable {
          * Sets the domain.
          *
          * @param {D[]} values If provided, the new value for the domain. On
-         * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
+         * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
          * make the function decreasing. On Scale.Ordinal, this is an array of all
          * input values.
          * @returns {Scale} The calling Scale.
@@ -848,8 +848,8 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): void;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): void;
+        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
     }
 }
 
@@ -860,14 +860,14 @@ declare module Plottable {
         protected _d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
         /**
-         * Constructs a new QuantitativeScaleScale.
+         * Constructs a new QuantitativeScale.
          *
-         * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
          * is invertible and continuous.
          *
          * @constructor
-         * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
-         * backing the QuantitativeScaleScale.
+         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+         * backing the QuantitativeScale.
          */
         constructor(scale: D3.Scale.QuantitativeScale);
         protected _getExtent(): D[];
@@ -912,7 +912,7 @@ declare module Plottable {
          * includes 0, etc., will be the responsability of the new domainer.
          *
          * @param {Domainer} domainer If provided, the new domainer.
-         * @return {QuantitativeScale} The calling QuantitativeScaleScale.
+         * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
         _defaultExtent(): D[];
@@ -947,29 +947,6 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            _defaultExtent(): number[];
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Scales {
-        class Log extends QuantitativeScale<number> {
-            /**
-             * Constructs a new Scale.Log.
-             *
-             * Warning: Log is deprecated; if possible, use ModifiedLog. Log scales are
-             * very unstable due to the fact that they can't handle 0 or negative
-             * numbers. The only time when you would want to use a Log scale over a
-             * ModifiedLog scale is if you're plotting very small data, such as all
-             * data < 1.
-             *
-             * @constructor
-             * @param {D3.Scale.LogScale} [scale] The D3 Scale.Log backing the Scale.Log. If not supplied, uses a default scale.
-             */
-            constructor();
-            constructor(scale: D3.Scale.LogScale);
             _defaultExtent(): number[];
         }
     }
@@ -1429,7 +1406,7 @@ declare module Plottable {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
-        clipPathEnabled: boolean;
+        protected _clipPathEnabled: boolean;
         protected _fixedHeightFlag: boolean;
         protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
@@ -1510,27 +1487,27 @@ declare module Plottable {
          *
          * @returns {string} The current x alignment.
          */
-        xAlign(): string;
+        xAlignment(): string;
         /**
          * Sets the x alignment of the Component.
          *
          * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
          * @returns {Component} The calling Component.
          */
-        xAlign(alignment: string): Component;
+        xAlignment(xAlignment: string): Component;
         /**
          * Gets the y alignment of the Component.
          *
          * @returns {string} The current y alignment.
          */
-        yAlign(): string;
+        yAlignment(): string;
         /**
          * Sets the y alignment of the Component.
          *
          * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
          * @returns {Component} The calling Component.
          */
-        yAlign(alignment: string): Component;
+        yAlignment(yAlignment: string): Component;
         /**
          * Checks if the Component has a given CSS class.
          *
@@ -1868,7 +1845,7 @@ declare module Plottable {
          *
          * @returns {number} the current orientation.
          */
-        orient(): string;
+        orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
@@ -1876,7 +1853,7 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orient(newOrientation: string): Axis;
+        orientation(orientation: string): Axis;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -1959,8 +1936,8 @@ declare module Plottable {
              * @returns {Axis.Time} The calling Axis.Time.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
-            orient(): string;
-            orient(orientation: string): Time;
+            orientation(): string;
+            orientation(orientation: string): Time;
             protected _computeHeight(): number;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1981,11 +1958,11 @@ declare module Plottable {
              * Constructs a NumericAxis.
              *
              * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScaleScale.
+             * is for rendering a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
+             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
+             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
@@ -2061,6 +2038,11 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _getTickValues(): string[];
             /**
+             * Gets the tick label angle
+             * @returns {number} the tick label angle
+             */
+            tickLabelAngle(): number;
+            /**
              * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
              * @param {number} angle The angle for the ticks
              * @returns {Category} The calling Category Axis.
@@ -2069,11 +2051,6 @@ declare module Plottable {
              * See tracking at https://github.com/palantir/plottable/issues/504
              */
             tickLabelAngle(angle: number): Category;
-            /**
-             * Gets the tick label angle
-             * @returns {number} the tick label angle
-             */
-            tickLabelAngle(): number;
             protected _render(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
         }
@@ -2084,6 +2061,8 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class Label extends Component {
+            static TITLE_LABEL_CLASS: string;
+            static AXIS_LABEL_CLASS: string;
             /**
              * Creates a Label.
              *
@@ -2115,7 +2094,7 @@ declare module Plottable {
              *
              * @returns {string} the current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the Label.
              *
@@ -2123,7 +2102,7 @@ declare module Plottable {
              * (horizontal/left/right).
              * @returns {Label} The calling Label.
              */
-            orient(newOrientation: string): Label;
+            orientation(orientation: string): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2138,22 +2117,6 @@ declare module Plottable {
              */
             padding(padAmount: number): Label;
             protected _render(): void;
-        }
-        class TitleLabel extends Label {
-            /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
-             *
-             * @constructor
-             */
-            constructor(text?: string, orientation?: string);
-        }
-        class AxisLabel extends Label {
-            /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
-             *
-             * @constructor
-             */
-            constructor(text?: string, orientation?: string);
         }
     }
 }
@@ -2290,7 +2253,7 @@ declare module Plottable {
              *
              * @returns {string} The current orientation.
              */
-            orient(): string;
+            orientation(): string;
             /**
              * Sets the orientation of the InterpolatedColorLegend.
              *
@@ -2298,7 +2261,7 @@ declare module Plottable {
              *
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            orient(newOrientation: string): InterpolatedColorLegend;
+            orientation(orientation: string): InterpolatedColorLegend;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
             protected _render(): void;
@@ -2314,8 +2277,8 @@ declare module Plottable {
              * Creates a set of Gridlines.
              * @constructor
              *
-             * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             destroy(): Gridlines;
@@ -2328,14 +2291,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        type _IterateLayoutResult = {
-            colProportionalSpace: number[];
-            rowProportionalSpace: number[];
-            guaranteedWidths: number[];
-            guaranteedHeights: number[];
-            wantsWidth: boolean;
-            wantsHeight: boolean;
-        };
         class Table extends ComponentContainer {
             /**
              * Constructs a Table.
@@ -2558,6 +2513,8 @@ declare module Plottable {
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
          */
         protected _updateExtents(): void;
+        protected _updateExtentsForProperty(property: string): void;
+        protected _filterForProperty(property: string): _Accessor;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2681,6 +2638,7 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | _Accessor): XYPlot<X, Y>;
         y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2711,11 +2669,7 @@ declare module Plottable {
          *
          * This call does not override auto domain adjustment behavior over visible points.
          */
-        showAllData(): void;
-        protected _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
+        showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
     }
 }
@@ -2925,7 +2879,7 @@ declare module Plottable {
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
              * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
@@ -2941,8 +2895,8 @@ declare module Plottable {
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor): boolean;
@@ -2980,8 +2934,8 @@ declare module Plottable {
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             y0(): Plots.AccessorScaleBinding<number, number>;
@@ -3064,11 +3018,8 @@ declare module Plottable {
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
+        protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _normalizeDatasets<A, B>(fromX: boolean): {
-            a: A;
-            b: B;
-        }[];
         _keyAccessor(): _Accessor;
         _valueAccessor(): _Accessor;
     }
@@ -3082,8 +3033,8 @@ declare module Plottable {
              * Constructs a StackedArea plot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
@@ -3112,10 +3063,7 @@ declare module Plottable {
             _keyAccessor(): _Accessor;
             _valueAccessor(): _Accessor;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
         }
     }
 }
@@ -3147,10 +3095,7 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
-            protected _normalizeDatasets<A, B>(fromX: boolean): {
-                a: A;
-                b: B;
-            }[];
+            protected _updateExtentsForProperty(property: string): void;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
@@ -3819,8 +3764,8 @@ declare module Plottable {
              * does so by changing the xScale and yScales' domains repeatedly.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;

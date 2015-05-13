@@ -107,7 +107,7 @@ function run(svg, data, Plottable) {
   twoPlots();
 
   //title + legend
-  var title1 = new Plottable.Components.TitleLabel( "Two Data Series", "horizontal");
+  var title1 = new Plottable.Components.Label( "Two Data Series", "horizontal").classed("title-label", true);
   var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
   var titleTable = new Plottable.Components.Table([[title1, legend1]]);

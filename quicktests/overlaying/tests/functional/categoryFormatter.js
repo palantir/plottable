@@ -32,7 +32,7 @@ function run(svg, data, Plottable) {
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Components.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);
   var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
-  formatChoices.xAlign("center");
+  formatChoices.xAlignment("center");
 
   bigTable.renderTo(svg);
 

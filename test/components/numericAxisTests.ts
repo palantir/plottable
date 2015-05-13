@@ -200,7 +200,7 @@ describe("NumericAxis", () => {
       }
     }
 
-    numericAxis.orient("bottom");
+    numericAxis.orientation("bottom");
     visibleTickLabels = (<any> numericAxis)._element
                           .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
                           .filter(function(d: any, i: number) {
@@ -304,7 +304,8 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scales.Category();
     var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
+    var yLabel = new Plottable.Components.Label("LABEL", "left");
+    yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.x((d) => d.x, xScale);
     barPlot.y((d) => d.y, yScale);

@@ -26,7 +26,6 @@
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitativeScale.ts" />
 /// <reference path="scales/linearScale.ts" />
-/// <reference path="scales/logScale.ts" />
 /// <reference path="scales/modifiedLogScale.ts" />
 /// <reference path="scales/categoryScale.ts" />
 /// <reference path="scales/colorScale.ts" />

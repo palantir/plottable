@@ -3,6 +3,13 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
+
+    // Css class for labels that are made for rendering titles.
+    public static TITLE_LABEL_CLASS = "title-label";
+
+    // Css class for labels that are made for rendering axis titles.
+    public static AXIS_LABEL_CLASS = "axis-label";
+
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
@@ -25,8 +32,8 @@ export module Components {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orient(orientation);
-      this.xAlign("center").yAlign("center");
+      this.orientation(orientation);
+      this.xAlignment("center").yAlignment("center");
       this._fixedHeightFlag = true;
       this._fixedWidthFlag = true;
       this._padding = 0;
@@ -34,8 +41,8 @@ export module Components {
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         minWidth: desiredWidth,
@@ -80,7 +87,7 @@ export module Components {
      *
      * @returns {string} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Label.
      *
@@ -88,16 +95,16 @@ export module Components {
      * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
-    public orient(newOrientation: string): Label;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): Label;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this._orientation = newOrientation;
+        orientation = orientation.toLowerCase();
+        if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+          this._orientation = orientation;
         } else {
-          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+          throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
         this.redraw();
         return this;
@@ -144,35 +151,11 @@ export module Components {
       var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
                         selection: this._textContainer,
-                        xAlign: this.xAlign(),
-                        yAlign: this.yAlign(),
-                        textRotation: textRotation[this.orient()]
+                        xAlign: this.xAlignment(),
+                        yAlign: this.yAlignment(),
+                        textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
-    }
-  }
-
-  export class TitleLabel extends Label {
-    /**
-     * Creates a TitleLabel, a type of label made for rendering titles.
-     *
-     * @constructor
-     */
-    constructor(text?: string, orientation?: string) {
-      super(text, orientation);
-      this.classed("title-label", true);
-    }
-  }
-
-  export class AxisLabel extends Label {
-    /**
-     * Creates a AxisLabel, a type of label made for rendering axis labels.
-     *
-     * @constructor
-     */
-    constructor(text?: string, orientation?: string) {
-      super(text, orientation);
-      this.classed("axis-label", true);
     }
   }
 }

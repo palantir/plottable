@@ -26,6 +26,7 @@
 ///<reference path="components/selectionBoxLayerTests.ts" />
 
 ///<reference path="components/plots/plotTests.ts" />
+///<reference path="components/plots/xyPlotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
@@ -39,6 +40,7 @@
 ///<reference path="components/plots/clusteredBarPlotTests.ts" />
 
 ///<reference path="core/metadataTests.ts" />
+///<reference path="core/renderControllerTests.ts" />
 ///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
 ///<reference path="core/componentTests.ts" />

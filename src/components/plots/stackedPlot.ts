@@ -90,10 +90,15 @@ module Plottable {
     public _updateStackExtents() {
       var valueAccessor = this._valueAccessor();
       var keyAccessor = this._keyAccessor();
+      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
-        return Utils.Methods.max<any, number>(dataset.data(), (datum: any, i: number) => {
+        var data = dataset.data();
+        if (filter != null) {
+          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        }
+        return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
         }, 0);
@@ -102,7 +107,11 @@ module Plottable {
       var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
-        return Utils.Methods.min<any, number>(dataset.data(), (datum: any, i: number) => {
+        var data = dataset.data();
+        if (filter != null) {
+          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        }
+        return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
             plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
         }, 0);
@@ -200,6 +209,13 @@ module Plottable {
       return dataMapArray;
     }
 
+    protected _updateExtentsForProperty(property: string) {
+      super._updateExtentsForProperty(property);
+      if ((property === "x" || property === "y") && this._projectorsReady()) {
+        this._updateStackExtents();
+      }
+    }
+
     protected _extentsForProperty(attr: string) {
       var extents = super._extentsForProperty(attr);
       var primaryAttr = this._isVertical ? "y" : "x";
@@ -210,37 +226,6 @@ module Plottable {
       } else {
         return extents;
       }
-    }
-
-    public _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      var aAccessor = fromX ? this.x().accessor : this.y().accessor;
-      var bAccessor = fromX ? this.y().accessor : this.x().accessor;
-      var aStackedAccessor = (d: any, i: number, dataset: Dataset, m: Plots.StackedPlotMetadata) => {
-        var value = aAccessor(d, i, dataset, m);
-        if (this._isVertical ? !fromX : fromX) {
-          value += m.offsets.get(bAccessor(d, i, dataset, m));
-        }
-        return value;
-      };
-
-      var bStackedAccessor = (d: any, i: number, dataset: Dataset, m: Plots.StackedPlotMetadata) => {
-        var value = bAccessor(d, i, dataset, m);
-        if (this._isVertical ? fromX : !fromX) {
-          value += m.offsets.get(aAccessor(d, i, dataset, m));
-        }
-        return value;
-      };
-
-      return Utils.Methods.flatten(this._datasetKeysInOrder.map((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
-        return dataset.data().map((d, i) => {
-          return {
-            a: aStackedAccessor(d, i, dataset, plotMetadata),
-            b: bStackedAccessor(d, i, dataset, plotMetadata)
-          };
-        });
-      }));
     }
 
     public _keyAccessor(): _Accessor {

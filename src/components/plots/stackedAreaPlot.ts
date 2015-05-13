@@ -12,8 +12,8 @@ export module Plots {
      * Constructs a StackedArea plot.
      *
      * @constructor
-     * @param {QuantitativeScaleScale} xScale The x scale to use.
-     * @param {QuantitativeScaleScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale The x scale to use.
+     * @param {QuantitativeScale} yScale The y scale to use.
      */
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
@@ -171,8 +171,8 @@ export module Plots {
       return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
+    protected _updateExtentsForProperty(property: string) {
+      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
     }
     // ===== /Stack logic =====
   }

@@ -254,13 +254,13 @@ export module Axes {
       return mostPreciseIndex;
     }
 
-    public orient(): string;
-    public orient(orientation: string): Time;
-    public orient(orientation?: string): any {
+    public orientation(): string;
+    public orientation(orientation: string): Time;
+    public orientation(orientation?: string): any {
       if (orientation && (orientation.toLowerCase() === "right" || orientation.toLowerCase() === "left")) {
         throw new Error(orientation + " is not a supported orientation for TimeAxis - only horizontal orientations are supported");
       }
-      return super.orient(orientation); // maintains getter-setter functionality
+      return super.orientation(orientation); // maintains getter-setter functionality
     }
 
     protected _computeHeight() {
@@ -386,7 +386,7 @@ export module Axes {
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
-      var yTranslate = this.orient() === "bottom" ?
+      var yTranslate = this.orientation() === "bottom" ?
           d3.sum(this._tierHeights.slice(0, index + 1)) - this.tickLabelPadding() :
           this.height() - d3.sum(this._tierHeights.slice(0, index)) - this.tickLabelPadding();
 
@@ -405,7 +405,7 @@ export module Axes {
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
       var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
-      if (this.orient() === "bottom") {
+      if (this.orientation() === "bottom") {
         attr["y1"] = offset;
         attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
       } else {
@@ -414,7 +414,7 @@ export module Axes {
                                                   this.tickLength() : this._tierHeights[index]));
       }
       tickMarks.attr(attr);
-      if (this.orient() === "bottom") {
+      if (this.orientation() === "bottom") {
         attr["y1"] = offset;
         attr["y2"] = offset + this._tierHeights[index];
       } else {
@@ -434,7 +434,7 @@ export module Axes {
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       var attr = this._generateTickMarkAttrHash();
-      attr["y2"] = (this.orient() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
+      attr["y2"] = (this.orientation() === "bottom") ? this.tickLabelPadding() : this.height() - this.tickLabelPadding();
       tickMarks.attr(attr);
       tickMarks.exit().remove();
     }
@@ -463,7 +463,7 @@ export module Axes {
       var baselineOffset = 0;
       for (var i = 0; i < Math.max(tierConfigs.length, 1); ++i) {
         var attr = this._generateBaselineAttrHash();
-        attr["y1"] += (this.orient() === "bottom") ? baselineOffset : -baselineOffset;
+        attr["y1"] += (this.orientation() === "bottom") ? baselineOffset : -baselineOffset;
         attr["y2"] = attr["y1"];
         this._tierBaselines[i].attr(attr).style("visibility", "inherit");
         baselineOffset += this._tierHeights[i];
