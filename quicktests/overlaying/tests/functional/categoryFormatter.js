@@ -7,7 +7,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  data = [{x: 0, y: 1}, {x: 1, y: 2}, {x: 2, y: 4}, {x: 3, y: 6}, {x: 4, y: 5}, {x: 5, y: 3}, {x: 6, y: 0.5}];
+  data = [{x: "0", y: 1}, {x: "1", y: 2}, {x: "2", y: 4}, {x: "3", y: 6}, {x: "4", y: 5}, {x: "5", y: 3}, {x: "6", y: 0.5}];
   var DOW = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
   var Emp = ["Justin", "Cassie", "Brandon", "Roger", "Dan", "Lewin", "Brian"];
 
@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
   };
 
   var plot = new Plottable.Plots.Bar(xScale, yScale).addDataset(new Plottable.Dataset(data));
-  plot.project("x", "x", xScale).project("y", "y", yScale);
+  plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Components.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);
   var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);

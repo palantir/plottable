@@ -33,23 +33,23 @@ function run(svg, data, Plottable) {
 
 
   // metadata is broken
-  var colorProjector = function(d, i, m) {
-    return colorScale1.scale(m.name);
+  var colorProjector = function(d, i, dataset) {
+    return colorScale1.scale(dataset.metadata().name);
   };
 
   //rendering
   var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
-  scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
+  scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
-  linePlot.project("x", "x", xScale).project("y", "y", yScale);
+  linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
-  renderApple.project("x", "x", xScale).project("y", "y", yScale);
+  renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
-  renderBanana.project("x", "x", xScale).project("y", "y", yScale);
+  renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
-  renderOrange.project("x", "x", xScale).project("y", "y", yScale);
+  renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
-  renderGrape.project("x", "x", xScale).project("y", "y", yScale);
+  renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
   scatterPlot.attr("fill", colorProjector);
   linePlot.attr("stroke", colorProjector);
@@ -121,12 +121,14 @@ function run(svg, data, Plottable) {
 
   var labelTable = new Plottable.Components.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],
-    [longTitleLabel, tallLegendLabel]]);
+    [longTitleLabel, tallLegendLabel]
+  ]);
 
   var basicTable = new Plottable.Components.Table([[null, titleTable],
-   [yAxis, renderArea],
-   [null, xAxis],
-   [null, labelTable]]);
+    [yAxis, renderArea],
+    [null, xAxis],
+    [null, labelTable]
+  ]);
 
   basicTable.renderTo(svg);
 

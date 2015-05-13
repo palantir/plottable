@@ -17,8 +17,8 @@ function run(svg, data, Plottable) {
 
   var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, false)
     .addDataset(new Plottable.Dataset(data))
-    .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
-    .project("y", "y", yScale);
+    .x(function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
+    .y(function(d) { return d.y; }, yScale);
 
   var xAxis = new Plottable.Axes.Time(xScale, "bottom", Plottable.Formatters.multiTime());
   var yAxis = new Plottable.Axes.Category(yScale, "left");

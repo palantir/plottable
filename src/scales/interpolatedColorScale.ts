@@ -97,8 +97,8 @@ export module Scales {
       if (colors.length < 2) {
         throw new Error("Color scale arrays must have at least two elements.");
       };
-      return (ignored: any): any => {
-        return (t: any): any => {
+      return (ignored: any) => {
+        return (t: number) => {
           // Clamp t parameter to [0,1]
           t = Math.max(0, Math.min(1, t));
 

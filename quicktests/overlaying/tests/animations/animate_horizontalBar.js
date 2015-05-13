@@ -19,8 +19,8 @@ function run(svg, data, Plottable) {
 
   var hBarRenderer = new Plottable.Plots.Bar(xScale, yScale, false).addDataset(dataset);
   hBarRenderer.attr("opacity", 0.75);
-  hBarRenderer.project("x", "x", xScale);
-  hBarRenderer.project("y", "y", yScale);
+  hBarRenderer.x(function(d) { return d.x; }, xScale);
+  hBarRenderer.y(function(d) { return d.y; }, yScale);
   hBarRenderer.animate(doAnimate);
 
   var hBarChart = new Plottable.Components.Table([[yAxis, hBarRenderer],

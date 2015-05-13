@@ -4,9 +4,8 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
-    public _userSetDomainer: boolean = false;
+    public _userSetDomainer = false;
     private _domainer: Domainer = new Domainer();
-    public _typeCoercer = (d: any) => +d;
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
     /**
@@ -71,9 +70,9 @@ module Plottable {
     /**
      * Gets a set of tick values spanning the domain.
      *
-     * @returns {any[]} The generated ticks.
+     * @returns {D[]} The generated ticks.
      */
-    public ticks(): any[] {
+    public ticks(): D[] {
       return this._tickGenerator(this);
     }
 
@@ -81,7 +80,7 @@ module Plottable {
      * Given a domain, expands its domain onto "nice" values, e.g. whole
      * numbers.
      */
-    public _niceDomain(domain: any[], count?: number): any[] {
+    public _niceDomain(domain: D[], count?: number): D[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
@@ -115,8 +114,8 @@ module Plottable {
       }
     }
 
-    public _defaultExtent(): any[] {
-      return [0, 1];
+    public _defaultExtent(): D[] {
+      throw Error("The quantitative scale itself does not have a default extent");
     }
 
     /**

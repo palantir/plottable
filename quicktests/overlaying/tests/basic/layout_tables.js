@@ -24,15 +24,15 @@ function run(svg, data, Plottable) {
     //test Component constructor (default, should be no issues)
 
     var renderAreaD0 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset1);
-    renderAreaD0.project("x", "x", xScale).project("y", "y", yScale);
+    renderAreaD0.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset2)
                                       .attr( "stroke", d3.functor("red"));
-    renderAreaD1.project("x", "x", xScale).project("y", "y", yScale);
+    renderAreaD1.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD2 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset1);
-    renderAreaD2.project("x", "x", xScale).project("y", "y", yScale);
+    renderAreaD2.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
     var renderAreaD3 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset2)
                                       .attr( "fill", d3.functor("red"));
-    renderAreaD3.project("x", "x", xScale).project("y", "y", yScale);
+    renderAreaD3.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
 
     //test merge:

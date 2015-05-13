@@ -17,9 +17,9 @@ function run(svg, data, Plottable) {
 
   var plot = new Plottable.Plots.Bar(xScale, yScale, true)
     .addDataset(ds)
-    .project("x", function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
-    .project("y", "y", yScale)
-    .project("fill", "name", colorScale);
+    .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
+    .y(function(d) { return d.y; }, yScale)
+    .attr("fill", function(d) { return d.name; }, colorScale);
 
   var chart = new Plottable.Components.Table([
       [null, title],

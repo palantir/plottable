@@ -32,11 +32,11 @@ function run(svg, data, Plottable){
     }
   };
   var symbolSize = 15;
-  plot.project("x", "x", xScale)
-  .project("y", "y", yScale)
-  .project("size", symbolSize)
-  .project("symbol", fourSymbolAccessor)
-  .project("fill", function(datum){return datum.y>0?(datum.x>0?"#00bb00":"#bbbbbb"):(datum.x>0?"#bbbbbb":"#bb0000");});
+  plot.x(function(d) { return d.x; }, xScale)
+  .y(function(d) { return d.y; }, yScale)
+  .size(symbolSize)
+  .symbol(fourSymbolAccessor)
+  .attr("fill", function(datum){return datum.y>0?(datum.x>0?"#00bb00":"#bbbbbb"):(datum.x>0?"#bbbbbb":"#bb0000");});
 
   var title = new Plottable.Components.Label("n = new point, d = delete point");
   var cs = new Plottable.Scales.Color();
