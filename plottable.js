@@ -5168,37 +5168,13 @@ var Plottable;
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
             };
+            // Css class for labels that are made for rendering titles.
+            Label.TITLE_LABEL_CLASS = "title-label";
+            // Css class for labels that are made for rendering axis titles.
+            Label.AXIS_LABEL_CLASS = "axis-label";
             return Label;
         })(Plottable.Component);
         Components.Label = Label;
-        var TitleLabel = (function (_super) {
-            __extends(TitleLabel, _super);
-            /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
-             *
-             * @constructor
-             */
-            function TitleLabel(text, orientation) {
-                _super.call(this, text, orientation);
-                this.classed("title-label", true);
-            }
-            return TitleLabel;
-        })(Label);
-        Components.TitleLabel = TitleLabel;
-        var AxisLabel = (function (_super) {
-            __extends(AxisLabel, _super);
-            /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
-             *
-             * @constructor
-             */
-            function AxisLabel(text, orientation) {
-                _super.call(this, text, orientation);
-                this.classed("axis-label", true);
-            }
-            return AxisLabel;
-        })(Label);
-        Components.AxisLabel = AxisLabel;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
