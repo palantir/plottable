@@ -781,8 +781,8 @@ declare module Plottable {
         constructor(scale: D3.Scale.Scale);
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): void;
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): void;
+        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
          * Modifies the domain on the scale so that it includes the extent of all
@@ -855,8 +855,8 @@ declare module Plottable {
          * @returns {Scale} A copy of the calling Scale.
          */
         copy(): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): void;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): void;
+        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
     }
 }
 
