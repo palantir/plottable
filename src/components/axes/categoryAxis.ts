@@ -130,9 +130,9 @@ export module Axes {
      */
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
       var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
-      var totalOuterPadding = 2 * scale.outerPadding();
-      var totalInnerPadding = (ticks.length - 1) * scale.innerPadding();
-      var expectedRangeBand = axisSpace / (totalOuterPadding + totalInnerPadding + ticks.length);
+      var totalOuterPaddingRatio = 2 * scale.outerPadding();
+      var totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
+      var expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
       var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
 
       var wrappingResults = ticks.map((s: string) => {
