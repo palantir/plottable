@@ -1361,7 +1361,7 @@ var Plottable;
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
          *        extent.
-         * @param {QuantitativeScaleScale} scale
+         * @param {QuantitativeScale} scale
          *        Since nice() must do different things depending on Linear, Log,
          *        or Time scale, the scale must be passed in for nice() to work.
          * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
@@ -1646,14 +1646,14 @@ var Plottable;
     var QuantitativeScale = (function (_super) {
         __extends(QuantitativeScale, _super);
         /**
-         * Constructs a new QuantitativeScaleScale.
+         * Constructs a new QuantitativeScale.
          *
-         * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
          * is invertible and continuous.
          *
          * @constructor
-         * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
-         * backing the QuantitativeScaleScale.
+         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+         * backing the QuantitativeScale.
          */
         function QuantitativeScale(scale) {
             _super.call(this, scale);
@@ -1674,9 +1674,9 @@ var Plottable;
             return this._d3Scale.invert(value);
         };
         /**
-         * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
+         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
          *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
+         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
          */
         QuantitativeScale.prototype.copy = function () {
             return new QuantitativeScale(this._d3Scale.copy());
@@ -1687,7 +1687,7 @@ var Plottable;
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                Plottable.Utils.Methods.warn("Warning: QuantitativeScaleScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                Plottable.Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
             }
             _super.prototype._setDomain.call(this, values);
@@ -2263,7 +2263,7 @@ var Plottable;
              *     values in hex ("#FFFFFF") or keywords ("white").
              * @param {string} scaleType a string representing the underlying scale
              *     type ("linear"/"log"/"sqrt"/"pow")
-             * @returns {D3.Scale.QuantitativeScaleScale} The converted QuantitativeScale d3 scale.
+             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
                 var scale;
@@ -2347,7 +2347,7 @@ var Plottable;
                 }
             };
             InterpolatedColor.prototype.autoDomain = function () {
-                // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
+                // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
                     this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
@@ -3046,7 +3046,7 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
     var Component = (function () {
         function Component() {
-            this.clipPathEnabled = false;
+            this._clipPathEnabled = false;
             this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
             this._xAlignment = "left";
             this._yAlignment = "top";
@@ -3136,7 +3136,7 @@ var Plottable;
             this._content = this._element.append("g").classed("content", true);
             this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
             this._boxContainer = this._element.append("g").classed("box-container", true);
-            if (this.clipPathEnabled) {
+            if (this._clipPathEnabled) {
                 this._generateClipPath();
             }
             ;
@@ -4500,11 +4500,11 @@ var Plottable;
              * Constructs a NumericAxis.
              *
              * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScaleScale.
+             * is for rendering a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
+             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
+             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             function Numeric(scale, orientation, formatter) {
@@ -5623,8 +5623,8 @@ var Plottable;
              * Creates a set of Gridlines.
              * @constructor
              *
-             * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
@@ -6182,7 +6182,7 @@ var Plottable;
             this._animate = false;
             this._animators = {};
             this._animateOnNextRender = true;
-            this.clipPathEnabled = true;
+            this._clipPathEnabled = true;
             this.classed("plot", true);
             this._key2PlotDatasetKey = d3.map();
             this._attrBindings = d3.map();
@@ -7571,7 +7571,7 @@ var Plottable;
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
              * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             Bar.prototype._getBarPixelWidth = function () {
                 var _this = this;
@@ -7658,8 +7658,8 @@ var Plottable;
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -7815,8 +7815,8 @@ var Plottable;
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -8204,8 +8204,8 @@ var Plottable;
              * Constructs a StackedArea plot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -9695,8 +9695,8 @@ var Plottable;
              * does so by changing the xScale and yScales' domains repeatedly.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
                 var _this = this;
@@ -10024,7 +10024,7 @@ var Plottable;
                  * user's cursor from changing outside the DragBoxLayer, where they
                  * wouldn't be able to grab the edges or corners for resizing.
                  */
-                this.clipPathEnabled = true;
+                this._clipPathEnabled = true;
                 this.classed("drag-box-layer", true);
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();

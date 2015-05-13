@@ -203,6 +203,16 @@ var TestMethods;
         });
     }
     TestMethods.assertAreaPathCloseTo = assertAreaPathCloseTo;
+    function verifyClipPath(c) {
+        var clipPathId = c._boxContainer[0][0].firstChild.id;
+        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+        var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
+        assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
+    }
+    TestMethods.verifyClipPath = verifyClipPath;
 })(TestMethods || (TestMethods = {}));
 
 ///<reference path="testReference.ts" />
@@ -2106,8 +2116,11 @@ var CountingPlot = (function (_super) {
 describe("Plots", function () {
     describe("Plot", function () {
         it("Plots default correctly", function () {
+            var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
-            assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+            r.renderTo(svg);
+            TestMethods.verifyClipPath(r);
+            svg.remove();
         });
         it("Base Plot functionality works", function () {
             var svg = TestMethods.generateSVG(400, 300);
@@ -6304,24 +6317,6 @@ describe("Component behavior", function () {
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
         svg.remove();
     });
-    it("clipPath works as expected", function () {
-        assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
-        c.clipPathEnabled = true;
-        c.anchor(svg);
-        c.computeLayout({ x: 0, y: 0 }, 100, 100);
-        c.render();
-        var clipPathId = c._boxContainer[0][0].firstChild.id;
-        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
-        var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
-        assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
-        var clipRect = c._boxContainer.select(".clip-rect");
-        assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
-        assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
-        svg.remove();
-    });
     it("boxes work as expected", function () {
         assert.throws(function () { return c._addBox("pre-anchor"); }, Error, "Adding boxes before anchoring is currently disallowed");
         c.renderTo(svg);
@@ -9692,8 +9687,14 @@ describe("Interactive Components", function () {
             svg.remove();
         });
         it("clipPath enabled", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dbl = new Plottable.Components.DragBoxLayer();
-            assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
+            dbl.renderTo(svg);
+            TestMethods.verifyClipPath(dbl);
+            var clipRect = dbl._boxContainer.select(".clip-rect");
+            assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+            assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+            svg.remove();
         });
         it("detectionRadius()", function () {
             var dbl = new Plottable.Components.DragBoxLayer();

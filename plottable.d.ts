@@ -688,7 +688,7 @@ declare module Plottable {
         /**
          * @param {any[][]} extents The list of extents to be reduced to a single
          *        extent.
-         * @param {QuantitativeScaleScale} scale
+         * @param {QuantitativeScale} scale
          *        Since nice() must do different things depending on Linear, Log,
          *        or Time scale, the scale must be passed in for nice() to work.
          * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
@@ -819,7 +819,7 @@ declare module Plottable {
          * Sets the domain.
          *
          * @param {D[]} values If provided, the new value for the domain. On
-         * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
+         * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
          * make the function decreasing. On Scale.Ordinal, this is an array of all
          * input values.
          * @returns {Scale} The calling Scale.
@@ -867,14 +867,14 @@ declare module Plottable {
         protected _d3Scale: D3.Scale.QuantitativeScale;
         _userSetDomainer: boolean;
         /**
-         * Constructs a new QuantitativeScaleScale.
+         * Constructs a new QuantitativeScale.
          *
-         * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
          * is invertible and continuous.
          *
          * @constructor
-         * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
-         * backing the QuantitativeScaleScale.
+         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+         * backing the QuantitativeScale.
          */
         constructor(scale: D3.Scale.QuantitativeScale);
         protected _getExtent(): D[];
@@ -886,9 +886,9 @@ declare module Plottable {
          */
         invert(value: number): D;
         /**
-         * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
+         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
          *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
+         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
          */
         copy(): QuantitativeScale<D>;
         domain(): D[];
@@ -925,7 +925,7 @@ declare module Plottable {
          * includes 0, etc., will be the responsability of the new domainer.
          *
          * @param {Domainer} domainer If provided, the new domainer.
-         * @return {QuantitativeScale} The calling QuantitativeScaleScale.
+         * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         domainer(domainer: Domainer): QuantitativeScale<D>;
         _defaultExtent(): D[];
@@ -1429,7 +1429,7 @@ declare module Plottable {
         protected _element: D3.Selection;
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
-        clipPathEnabled: boolean;
+        protected _clipPathEnabled: boolean;
         protected _fixedHeightFlag: boolean;
         protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
@@ -1981,11 +1981,11 @@ declare module Plottable {
              * Constructs a NumericAxis.
              *
              * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScaleScale.
+             * is for rendering a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} scale The QuantitativeScaleScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScaleScale (top/bottom/left/right)
+             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
+             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
              * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
@@ -2300,8 +2300,8 @@ declare module Plottable {
              * Creates a set of Gridlines.
              * @constructor
              *
-             * @param {QuantitativeScaleScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScaleScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             destroy(): Gridlines;
@@ -2903,7 +2903,7 @@ declare module Plottable {
              * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
              * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-             * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
@@ -2919,8 +2919,8 @@ declare module Plottable {
              * Constructs a LinePlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor): boolean;
@@ -2958,8 +2958,8 @@ declare module Plottable {
              * Constructs an AreaPlot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             y0(): Plots.AccessorScaleBinding<number, number>;
@@ -3060,8 +3060,8 @@ declare module Plottable {
              * Constructs a StackedArea plot.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} xScale The x scale to use.
-             * @param {QuantitativeScaleScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale The x scale to use.
+             * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
@@ -3797,8 +3797,8 @@ declare module Plottable {
              * does so by changing the xScale and yScales' domains repeatedly.
              *
              * @constructor
-             * @param {QuantitativeScaleScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScaleScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;

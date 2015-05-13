@@ -13,8 +13,11 @@ class CountingPlot extends Plottable.Plot {
 describe("Plots", () => {
   describe("Plot", () => {
     it("Plots default correctly", () => {
+      var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot();
-      assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+      r.renderTo(svg);
+      TestMethods.verifyClipPath(r);
+      svg.remove();
     });
 
     it("Base Plot functionality works", () => {
