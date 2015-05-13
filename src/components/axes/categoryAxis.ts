@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axes {
-  export class Category extends Axis {
+  export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
@@ -62,7 +62,7 @@ export module Axes {
       };
     }
 
-    protected _getTickValues(): string[] {
+    protected _getTickValues() {
       return this._scale.domain();
     }
 

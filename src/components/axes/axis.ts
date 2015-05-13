@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class Axis extends Component {
+  export class Axis<D> extends Component {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -17,7 +17,7 @@ module Plottable {
     protected _tickMarkContainer: D3.Selection;
     protected _tickLabelContainer: D3.Selection;
     protected _baseline: D3.Selection;
-    protected _scale: Scale<any, number>;
+    protected _scale: Scale<D, number>;
     private _formatter: Formatter;
     private _orientation: string;
     protected _computedWidth: number;
@@ -27,7 +27,7 @@ module Plottable {
     private _tickLabelPadding = 10;
     private _gutter = 15;
     private _showEndTickLabels = false;
-    private _rescaleCallback: ScaleCallback<Scale<any, number>>;
+    private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -40,7 +40,7 @@ module Plottable {
      * @param {Formatter} Data is passed through this formatter before being
      * displayed.
      */
-    constructor(scale: Scale<any, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
@@ -138,7 +138,7 @@ module Plottable {
      * Function for generating tick values in data-space (as opposed to pixel values).
      * To be implemented by subclasses.
      */
-    protected _getTickValues(): any[] {
+    protected _getTickValues(): D[] {
       return [];
     }
 
@@ -271,7 +271,7 @@ module Plottable {
      * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
      * @returns {Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): Axis;
+    public formatter(formatter: Formatter): Axis<D>;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -293,7 +293,7 @@ module Plottable {
      * @param {number} length If provided, length of each tick.
      * @returns {Axis} The calling Axis.
      */
-    public tickLength(length: number): Axis;
+    public tickLength(length: number): Axis<D>;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -319,7 +319,7 @@ module Plottable {
      * @param {number} length If provided, the length of the end ticks.
      * @returns {BaseAxis} The calling Axis.
      */
-    public endTickLength(length: number): Axis;
+    public endTickLength(length: number): Axis<D>;
     public endTickLength(length?: number): any {
       if (length == null) {
         return this._endTickLength;
@@ -354,7 +354,7 @@ module Plottable {
      * @param {number} padding If provided, the desired padding.
      * @returns {Axis} The calling Axis.
      */
-    public tickLabelPadding(padding: number): Axis;
+    public tickLabelPadding(padding: number): Axis<D>;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -383,7 +383,7 @@ module Plottable {
      * @param {number} size If provided, the desired gutter.
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): Axis;
+    public gutter(size: number): Axis<D>;
     public gutter(size?: number): any {
       if (size == null) {
         return this._gutter;
@@ -410,7 +410,7 @@ module Plottable {
      * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orientation(orientation: string): Axis;
+    public orientation(orientation: string): Axis<D>;
     public orientation(orientation?: string): any {
       if (orientation == null) {
         return this._orientation;
@@ -444,7 +444,7 @@ module Plottable {
      * labels.
      * @returns {Axis} The calling Axis.
      */
-    public showEndTickLabels(show: boolean): Axis;
+    public showEndTickLabels(show: boolean): Axis<D>;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {
         return this._showEndTickLabels;
