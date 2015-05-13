@@ -2,7 +2,6 @@
 
 module Plottable {
 export module Scales {
-  type ColorGroups = { [key: string]: string[]; };
 
   /**
    * This class implements a color scale that takes quantitive input and
@@ -12,7 +11,7 @@ export module Scales {
    * By default it generates a linear scale internally.
    */
   export class InterpolatedColor extends Scale<number, string> {
-    private static _COLOR_SCALES: ColorGroups = {
+    public static COLOR_SCALES = {
       reds: [
         "#FFFFFF", // white
         "#FFF6E1",
@@ -68,8 +67,8 @@ export module Scales {
      *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
-    constructor(colorRange = ["reds"], scaleType = "linear") {
-      this._colorRange = this._resolveColorValues(colorRange);
+    constructor(colorRange = InterpolatedColor.COLOR_SCALES["reds"], scaleType = "linear") {
+      this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
           this._colorScale = d3.scale.linear();
@@ -147,7 +146,7 @@ export module Scales {
       if (colorRange == null) {
         return this._colorRange;
       }
-      this._colorRange = this._resolveColorValues(colorRange);
+      this._colorRange = colorRange;
       this._resetScale();
       return this;
     }
@@ -156,14 +155,6 @@ export module Scales {
       this._d3Scale = this._D3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
       this._dispatchUpdate();
-    }
-
-    private _resolveColorValues(colorRange: string[]): string[] {
-      if (colorRange.length === 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
-        return InterpolatedColor._COLOR_SCALES[colorRange[0]];
-      } else {
-        return colorRange;
-      }
     }
 
     public autoDomain() {

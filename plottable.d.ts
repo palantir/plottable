@@ -1167,6 +1167,11 @@ declare module Plottable {
          * By default it generates a linear scale internally.
          */
         class InterpolatedColor extends Scale<number, string> {
+            static COLOR_SCALES: {
+                reds: string[];
+                blues: string[];
+                posneg: string[];
+            };
             /**
              * An InterpolatedColorScale maps numbers to color strings.
              *

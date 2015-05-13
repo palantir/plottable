@@ -2250,9 +2250,9 @@ var Plottable;
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = ["reds"]; }
+                if (colorRange === void 0) { colorRange = InterpolatedColor.COLOR_SCALES["reds"]; }
                 if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
                         this._colorScale = d3.scale.linear();
@@ -2309,7 +2309,7 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
+                this._colorRange = colorRange;
                 this._resetScale();
                 return this;
             };
@@ -2317,14 +2317,6 @@ var Plottable;
                 this._d3Scale = this._D3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
-            };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (colorRange.length === 1 && InterpolatedColor._COLOR_SCALES[colorRange[0]] != null) {
-                    return InterpolatedColor._COLOR_SCALES[colorRange[0]];
-                }
-                else {
-                    return colorRange;
-                }
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
@@ -2334,7 +2326,7 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor._COLOR_SCALES = {
+            InterpolatedColor.COLOR_SCALES = {
                 reds: [
                     "#FFFFFF",
                     "#FFF6E1",
