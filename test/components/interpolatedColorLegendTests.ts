@@ -109,14 +109,14 @@ describe("InterpolatedColorLegend", () => {
     svg.remove();
   });
 
-  it("orient() input-checking", () => {
+  it("orientation() input-checking", () => {
     var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
 
-    legend.orient("horizontal"); // should work
-    legend.orient("right"); // should work
-    legend.orient("left"); // should work
+    legend.orientation("horizontal"); // should work
+    legend.orientation("right"); // should work
+    legend.orientation("left"); // should work
 
-    assert.throws(() => legend.orient("blargh"), "not a valid orientation");
+    assert.throws(() => legend.orientation("blargh"), "not a valid orientation");
     svg.remove();
   });
 
@@ -127,7 +127,7 @@ describe("InterpolatedColorLegend", () => {
     var widthBefore = legend.width();
     var heightBefore = legend.height();
 
-    legend.orient("right");
+    legend.orientation("right");
     assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
     assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
     svg.remove();

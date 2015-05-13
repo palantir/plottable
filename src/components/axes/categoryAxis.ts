@@ -67,6 +67,11 @@ export module Axes {
     }
 
     /**
+     * Gets the tick label angle
+     * @returns {number} the tick label angle
+     */
+    public tickLabelAngle(): number;
+    /**
      * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
      * @param {number} angle The angle for the ticks
      * @returns {Category} The calling Category Axis.
@@ -75,11 +80,6 @@ export module Axes {
      * See tracking at https://github.com/palantir/plottable/issues/504
      */
     public tickLabelAngle(angle: number): Category;
-    /**
-     * Gets the tick label angle
-     * @returns {number} the tick label angle
-     */
-    public tickLabelAngle(): number;
     public tickLabelAngle(angle?: number): any {
       if (angle == null) {
         return this._tickLabelAngle;
@@ -120,8 +120,8 @@ export module Axes {
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),
-          xAlign: xAlign[self.orient()],
-          yAlign: yAlign[self.orient()],
+          xAlign: xAlign[self.orientation()],
+          yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle()
         };
         self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -208,8 +208,8 @@ export module Axes {
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }

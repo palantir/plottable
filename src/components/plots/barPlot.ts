@@ -410,7 +410,7 @@ export module Plots {
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
      * If the position scale of the plot is a CategoryScale and in points mode, then
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
-     * If the position scale of the plot is a QuantitativeScaleScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+     * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
       var barPixelWidth: number;

@@ -92,7 +92,7 @@ export module Components {
      *
      * @returns {string} The current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the InterpolatedColorLegend.
      *
@@ -100,12 +100,12 @@ export module Components {
      *
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orient(newOrientation: string): InterpolatedColorLegend;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): InterpolatedColorLegend;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
+        this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
         this.redraw();
         return this;
       }

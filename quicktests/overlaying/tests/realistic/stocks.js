@@ -50,11 +50,11 @@ function run(svg, data, Plottable) {
 
           var yScale_aapl = new Plottable.Scales.Linear();
           var yAxis_aapl = new Plottable.Axes.Numeric(yScale_aapl, "right").showEndTickLabels(true);
-          var label_aapl = new Plottable.Components.AxisLabel("AAPL", "right");
+          var label_aapl = new Plottable.Components.Label("AAPL", "right").classed("axis-label", true);
 
           var yScale_goog = new Plottable.Scales.Linear();
           var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlignment("right").showEndTickLabels(true);
-          var label_goog = new Plottable.Components.AxisLabel("GOOG", "left");
+          var label_goog = new Plottable.Components.Label("GOOG", "left").classed("axis-label", true);
 
           var colorScale = new Plottable.Scales.Color();
 
