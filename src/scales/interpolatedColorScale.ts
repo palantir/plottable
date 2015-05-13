@@ -60,17 +60,13 @@ export module Scales {
     private _colorScale: D3.Scale.QuantitativeScale;
 
     /**
-     * Constructs an InterpolatedColorScale.
-     *
-     * An InterpolatedColorScale maps numbers evenly to color strings.
-     *
-     * @constructor
-     * @param {string|string[]} colorRange the type of color scale to
-     *     create. Default is "reds". @see {@link colorRange} for further
-     *     options.
-     * @param {string} scaleType the type of underlying scale to use
-     *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-     *     for further options.
+     * An InterpolatedColorScale maps numbers to color strings.
+     * 
+     * @param {string | string[]} colors an array of strings representing color
+     *     values in hex ("#FFFFFF") or keywords ("white"). Default is "reds"
+     * @param {string} scaleType a string representing the underlying scale
+     *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
+     * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
     constructor(colorRange: string | string[] = "reds", scaleType = "linear") {
       this._colorRange = this._resolveColorValues(colorRange);   
@@ -173,7 +169,7 @@ export module Scales {
     }
 
     public autoDomain() {
-      // unlike other QuantitativeScaleScales, interpolatedColorScale ignores its domainer
+      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
       var extents = this._getAllExtents();
       if (extents.length > 0) {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);

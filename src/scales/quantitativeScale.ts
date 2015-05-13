@@ -9,14 +9,14 @@ module Plottable {
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
     /**
-     * Constructs a new QuantitativeScaleScale.
+     * Constructs a new QuantitativeScale.
      *
-     * A QuantitativeScaleScale is a Scale that maps anys to numbers. It
+     * A QuantitativeScale is a Scale that maps anys to numbers. It
      * is invertible and continuous.
      *
      * @constructor
-     * @param {D3.Scale.QuantitativeScaleScale} scale The D3 QuantitativeScaleScale
-     * backing the QuantitativeScaleScale.
+     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
+     * backing the QuantitativeScale.
      */
     constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
@@ -37,9 +37,9 @@ module Plottable {
     }
 
     /**
-     * Creates a copy of the QuantitativeScaleScale with the same domain and range but without any registered list.
+     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
      *
-     * @returns {QuantitativeScale} A copy of the calling QuantitativeScaleScale.
+     * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
      */
     public copy(): QuantitativeScale<D> {
       return new QuantitativeScale<D>(this._d3Scale.copy());
@@ -54,7 +54,7 @@ module Plottable {
     protected _setDomain(values: D[]) {
         var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
         if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-            Utils.Methods.warn("Warning: QuantitativeScaleScales cannot take NaN or Infinity as a domain value. Ignoring.");
+            Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
             return;
         }
         super._setDomain(values);
@@ -100,7 +100,7 @@ module Plottable {
      * includes 0, etc., will be the responsability of the new domainer.
      *
      * @param {Domainer} domainer If provided, the new domainer.
-     * @return {QuantitativeScale} The calling QuantitativeScaleScale.
+     * @return {QuantitativeScale} The calling QuantitativeScale.
      */
     public domainer(domainer: Domainer): QuantitativeScale<D>;
     public domainer(domainer?: Domainer): any {

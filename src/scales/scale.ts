@@ -104,7 +104,7 @@ module Plottable {
      * Sets the domain.
      *
      * @param {D[]} values If provided, the new value for the domain. On
-     * a QuantitativeScaleScale, this is a [min, max] pair, or a [max, min] pair to
+     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
      * make the function decreasing. On Scale.Ordinal, this is an array of all
      * input values.
      * @returns {Scale} The calling Scale.
