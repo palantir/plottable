@@ -67,6 +67,11 @@ export module Axes {
     }
 
     /**
+     * Gets the tick label angle
+     * @returns {number} the tick label angle
+     */
+    public tickLabelAngle(): number;
+    /**
      * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
      * @param {number} angle The angle for the ticks
      * @returns {Category} The calling Category Axis.
@@ -75,11 +80,6 @@ export module Axes {
      * See tracking at https://github.com/palantir/plottable/issues/504
      */
     public tickLabelAngle(angle: number): Category;
-    /**
-     * Gets the tick label angle
-     * @returns {number} the tick label angle
-     */
-    public tickLabelAngle(): number;
     public tickLabelAngle(angle?: number): any {
       if (angle == null) {
         return this._tickLabelAngle;
