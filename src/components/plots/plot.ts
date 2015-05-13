@@ -63,7 +63,7 @@ module Plottable {
      */
     constructor() {
       super();
-      this.clipPathEnabled = true;
+      this._clipPathEnabled = true;
       this.classed("plot", true);
       this._key2PlotDatasetKey = d3.map();
       this._attrBindings = d3.map();

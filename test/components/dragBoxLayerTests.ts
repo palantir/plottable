@@ -51,8 +51,14 @@ describe("Interactive Components", () => {
     });
 
     it("clipPath enabled", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Components.DragBoxLayer();
-      assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
+      dbl.renderTo(svg);
+      TestMethods.verifyClipPath(dbl);
+      var clipRect = (<any> dbl)._boxContainer.select(".clip-rect");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+      svg.remove();
     });
 
     it("detectionRadius()", () => {

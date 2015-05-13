@@ -19,7 +19,7 @@ module Plottable {
     protected _boundingBox: D3.Selection;
     private _backgroundContainer: D3.Selection;
     private _foregroundContainer: D3.Selection;
-    public clipPathEnabled = false;
+    protected _clipPathEnabled = false;
     private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
     private _parentElement: ComponentContainer;
@@ -131,7 +131,7 @@ module Plottable {
       this._foregroundContainer = this._element.append("g").classed("foreground-container", true);
       this._boxContainer = this._element.append("g").classed("box-container", true);
 
-      if (this.clipPathEnabled) {
+      if (this._clipPathEnabled) {
         this._generateClipPath();
       };
 
