@@ -17,7 +17,7 @@ export module Components {
     constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
-      components.forEach((c: Component) => this.add(c));
+      components.forEach((c: Component) => this.append(c));
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
@@ -62,21 +62,10 @@ export module Components {
       return this._componentList;
     }
 
-    /**
-     * Adds a Component to the Group.
-     * 
-     * @param {Component} component
-     * @param {boolean} prepend If true, prepends the Component. If false, appends it.
-     */
-    public add(component: Component, prepend = false) {
+    public append(component: Component) {
       if (component != null && !this.has(component)) {
         component.detach();
-        if (prepend) {
-          this._componentList.unshift(component);
-        } else {
-          this._componentList.push(component);
-        }
-
+        this._componentList.push(component);
         this._adoptAndAnchor(component);
         this.redraw();
       }

@@ -331,7 +331,7 @@ describe("Component behavior", () => {
   it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = TestMethods.makeFixedSizeComponent(10, 10);
-    cg.add(c);
+    cg.append(c);
     cg.renderTo(svg);
     assert.strictEqual(cg.height(), 300, "height() is the entire available height");
     assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -410,7 +410,7 @@ describe("Component behavior", () => {
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);
 
-    group.add(plot);
+    group.append(plot);
 
     assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");

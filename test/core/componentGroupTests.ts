@@ -3,29 +3,25 @@
 var assert = chai.assert;
 
 describe("ComponentGroups", () => {
-  it("add()", () => {
+  it("append()", () => {
     var componentGroup = new Plottable.Components.Group();
 
     var c1 = new Plottable.Component();
-    componentGroup.add(c1);
+    componentGroup.append(c1);
     assert.deepEqual(componentGroup.components(), [c1], "Component 1 was added to the Group");
 
     var c2 = new Plottable.Component();
-    componentGroup.add(c2);
+    componentGroup.append(c2);
     assert.deepEqual(componentGroup.components(), [c1, c2], "appended Component 2 to the Group");
 
-    var c0 = new Plottable.Component();
-    componentGroup.add(c0, true);
-    assert.deepEqual(componentGroup.components(), [c0, c1, c2], "prepended Component 0 when called with \"true\"");
-
-    componentGroup.add(c1);
-    assert.deepEqual(componentGroup.components(), [c0, c1, c2], "adding an already-added Component does nothing");
+    componentGroup.append(c1);
+    assert.deepEqual(componentGroup.components(), [c1, c2], "adding an already-added Component does nothing");
 
     var svg = TestMethods.generateSVG();
     componentGroup.renderTo(svg);
     var c3 = new Plottable.Component();
-    componentGroup.add(c3);
-    assert.deepEqual(componentGroup.components(), [c0, c1, c2, c3], "Components can be add()-ed after rendering");
+    componentGroup.append(c3);
+    assert.deepEqual(componentGroup.components(), [c1, c2, c3], "Components can be append()-ed after rendering");
 
     svg.remove();
   });
@@ -34,23 +30,23 @@ describe("ComponentGroups", () => {
     var cg1 = new Plottable.Components.Group();
     var c = new Plottable.Component;
 
-    cg1.add(c);
+    cg1.append(c);
 
     assert.strictEqual(cg1.components().length, 1,
       "there should first be 1 element in the group");
 
-    assert.doesNotThrow(() => cg1.add(null));
+    assert.doesNotThrow(() => cg1.append(null));
 
     assert.strictEqual(cg1.components().length, 1,
       "adding null to a group should have no effect on the group");
   });
 
-  it("add()-ing a Component to the Group should detach() it from its current location", () => {
+  it("append()-ing a Component to the Group should detach() it from its current location", () => {
     var c1 = new Plottable.Component;
     var svg = TestMethods.generateSVG();
     c1.renderTo(svg);
     var group = new Plottable.Components.Group();
-    group.add(c1);
+    group.append(c1);
     assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
     svg.remove();
   });
@@ -92,7 +88,7 @@ describe("ComponentGroups", () => {
     var cg2 = new Plottable.Components.Group();
     var c = new Plottable.Component();
 
-    cg1.add(c);
+    cg1.append(c);
 
     cg1.renderTo(svg);
     cg2.renderTo(svg);
@@ -107,7 +103,7 @@ describe("ComponentGroups", () => {
       "component's parent before moving should be the group 1"
     );
 
-    assert.doesNotThrow(() => cg2.add(c), Error,
+    assert.doesNotThrow(() => cg2.append(c), Error,
       "should be able to move components between groups after anchoring"
     );
 
@@ -130,7 +126,7 @@ describe("ComponentGroups", () => {
     assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group");
     componentGroup.remove(c0);
     assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Group");
-    componentGroup.add(c0);
+    componentGroup.append(c0);
     assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group again");
   });
 

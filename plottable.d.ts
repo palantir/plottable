@@ -1646,15 +1646,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-<<<<<<< Updated upstream
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
-||||||| merged common ancestors
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
-=======
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
->>>>>>> Stashed changes
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1667,13 +1659,7 @@ declare module Plottable {
              */
             components(): Component[];
             protected _components(): Component[];
-            /**
-             * Adds a Component to the Group.
-             *
-             * @param {Component} component
-             * @param {boolean} prepend If true, prepends the Component. If false, appends it.
-             */
-            add(component: Component, prepend?: boolean): Group;
+            append(component: Component): Group;
             protected _remove(component: Component): boolean;
         }
     }

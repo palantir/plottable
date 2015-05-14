@@ -3570,7 +3570,7 @@ var Plottable;
                 _super.call(this);
                 this._componentList = [];
                 this.classed("component-group", true);
-                components.forEach(function (c) { return _this.add(c); });
+                components.forEach(function (c) { return _this.append(c); });
             }
             Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this._components().map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
@@ -3608,22 +3608,10 @@ var Plottable;
             Group.prototype._components = function () {
                 return this._componentList;
             };
-            /**
-             * Adds a Component to the Group.
-             *
-             * @param {Component} component
-             * @param {boolean} prepend If true, prepends the Component. If false, appends it.
-             */
-            Group.prototype.add = function (component, prepend) {
-                if (prepend === void 0) { prepend = false; }
+            Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();
-                    if (prepend) {
-                        this._componentList.unshift(component);
-                    }
-                    else {
-                        this._componentList.push(component);
-                    }
+                    this._componentList.push(component);
                     this._adoptAndAnchor(component);
                     this.redraw();
                 }

@@ -132,7 +132,7 @@ describe("Scales", () => {
       assert.deepEqual(xScale.domain(), [0, 2]);
       renderAreaD1.detach();
       assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
-      renderAreas.add(renderAreaD1);
+      renderAreas.append(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
     });
