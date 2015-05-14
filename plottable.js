@@ -3054,8 +3054,6 @@ var Plottable;
             this._origin = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
             this._xAlignment = "left";
             this._yAlignment = "top";
-            this._fixedHeightFlag = false;
-            this._fixedWidthFlag = false;
             this._isSetup = false;
             this._isAnchored = false;
             this._boxes = [];
@@ -3371,7 +3369,7 @@ var Plottable;
          * @returns {boolean} Whether the component has a fixed width.
          */
         Component.prototype.fixedWidth = function () {
-            return this._fixedWidthFlag;
+            return false;
         };
         /**
          * Checks if the Component has a fixed height or false if it grows to fill available space.
@@ -3380,7 +3378,7 @@ var Plottable;
          * @returns {boolean} Whether the component has a fixed height.
          */
         Component.prototype.fixedHeight = function () {
-            return this._fixedHeightFlag;
+            return false;
         };
         Component.prototype._merge = function (c, below) {
             var cg;
@@ -5055,8 +5053,6 @@ var Plottable;
                 this.text(displayText);
                 this.orientation(orientation);
                 this.xAlignment("center").yAlignment("center");
-                this._fixedHeightFlag = true;
-                this._fixedWidthFlag = true;
                 this._padding = 0;
             }
             Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
@@ -5115,6 +5111,12 @@ var Plottable;
                     this.redraw();
                     return this;
                 }
+            };
+            Label.prototype.fixedWidth = function () {
+                return true;
+            };
+            Label.prototype.fixedHeight = function () {
+                return true;
             };
             Label.prototype._render = function () {
                 _super.prototype._render.call(this);
@@ -5180,8 +5182,6 @@ var Plottable;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
                 this.xAlignment("right").yAlignment("top");
-                this._fixedWidthFlag = true;
-                this._fixedHeightFlag = true;
                 this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
@@ -5368,6 +5368,12 @@ var Plottable;
                     return this;
                 }
             };
+            Legend.prototype.fixedWidth = function () {
+                return true;
+            };
+            Legend.prototype.fixedHeight = function () {
+                return true;
+            };
             /**
              * The css class applied to each legend row
              */
@@ -5426,8 +5432,6 @@ var Plottable;
                 this._scale.onUpdate(this._redrawCallback);
                 this._formatter = formatter;
                 this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
-                this._fixedWidthFlag = true;
-                this._fixedHeightFlag = true;
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
             InterpolatedColorLegend.prototype.destroy = function () {
@@ -5460,6 +5464,12 @@ var Plottable;
                     this.redraw();
                     return this;
                 }
+            };
+            InterpolatedColorLegend.prototype.fixedWidth = function () {
+                return true;
+            };
+            InterpolatedColorLegend.prototype.fixedHeight = function () {
+                return true;
             };
             InterpolatedColorLegend.prototype._generateTicks = function () {
                 var domain = this._scale.domain();
@@ -6086,8 +6096,6 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this.classed("selection-box-layer", true);
-                this._fixedWidthFlag = true;
-                this._fixedHeightFlag = true;
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6147,6 +6155,12 @@ var Plottable;
                 this._boxVisible = show;
                 this.render();
                 return this;
+            };
+            SelectionBoxLayer.prototype.fixedWidth = function () {
+                return true;
+            };
+            SelectionBoxLayer.prototype.fixedHeight = function () {
+                return true;
             };
             return SelectionBoxLayer;
         })(Plottable.Component);

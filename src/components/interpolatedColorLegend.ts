@@ -46,8 +46,6 @@ export module Components {
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
@@ -109,6 +107,14 @@ export module Components {
         this.redraw();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
 
     private _generateTicks() {
