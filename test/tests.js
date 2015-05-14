@@ -32,8 +32,8 @@ var TestMethods;
                 minHeight: fixedHeight == null ? 0 : fixedHeight
             };
         };
-        c._fixedWidthFlag = fixedWidth == null ? false : true;
-        c._fixedHeightFlag = fixedHeight == null ? false : true;
+        c.fixedWidth = function () { return fixedWidth == null ? false : true; };
+        c.fixedHeight = function () { return fixedHeight == null ? false : true; };
         return c;
     }
     TestMethods.fixComponentSize = fixComponentSize;
@@ -203,6 +203,16 @@ var TestMethods;
         });
     }
     TestMethods.assertAreaPathCloseTo = assertAreaPathCloseTo;
+    function verifyClipPath(c) {
+        var clipPathId = c._boxContainer[0][0].firstChild.id;
+        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+        var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
+        assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
+    }
+    TestMethods.verifyClipPath = verifyClipPath;
 })(TestMethods || (TestMethods = {}));
 
 ///<reference path="testReference.ts" />
@@ -222,14 +232,18 @@ var Mocks;
             _super.call(this);
             this.fsWidth = width;
             this.fsHeight = height;
-            this._fixedWidthFlag = true;
-            this._fixedHeightFlag = true;
         }
         FixedSizeComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: this.fsWidth,
                 minHeight: this.fsHeight
             };
+        };
+        FixedSizeComponent.prototype.fixedWidth = function () {
+            return true;
+        };
+        FixedSizeComponent.prototype.fixedHeight = function () {
+            return true;
         };
         return FixedSizeComponent;
     })(Plottable.Component);
@@ -558,7 +572,7 @@ describe("BaseAxis", function () {
         assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
         assert.strictEqual(baseline.attr("y1"), "0");
         assert.strictEqual(baseline.attr("y2"), "0");
-        baseAxis.orient("top");
+        baseAxis.orientation("top");
         assert.isNotNull(baseline.node(), "baseline was drawn");
         assert.strictEqual(baseline.attr("x1"), "0");
         assert.strictEqual(baseline.attr("x2"), String(SVG_WIDTH));
@@ -587,7 +601,7 @@ describe("BaseAxis", function () {
         assert.strictEqual(baseline.attr("x2"), String(baseAxis.width()));
         assert.strictEqual(baseline.attr("y1"), "0");
         assert.strictEqual(baseline.attr("y2"), String(SVG_HEIGHT));
-        baseAxis.orient("right");
+        baseAxis.orientation("right");
         assert.isNotNull(baseline.node(), "baseline was drawn");
         assert.strictEqual(baseline.attr("x1"), "0");
         assert.strictEqual(baseline.attr("x2"), "0");
@@ -660,13 +674,13 @@ describe("BaseAxis", function () {
     it("default alignment based on orientation", function () {
         var scale = new Plottable.Scales.Linear();
         var baseAxis = new Plottable.Axis(scale, "bottom");
-        assert.strictEqual(baseAxis.yAlign(), "top", "y alignment defaults to \"top\" for bottom axis");
+        assert.strictEqual(baseAxis.yAlignment(), "top", "y alignment defaults to \"top\" for bottom axis");
         baseAxis = new Plottable.Axis(scale, "top");
-        assert.strictEqual(baseAxis.yAlign(), "bottom", "y alignment defaults to \"bottom\" for top axis");
+        assert.strictEqual(baseAxis.yAlignment(), "bottom", "y alignment defaults to \"bottom\" for top axis");
         baseAxis = new Plottable.Axis(scale, "left");
-        assert.strictEqual(baseAxis.xAlign(), "right", "x alignment defaults to \"right\" for left axis");
+        assert.strictEqual(baseAxis.xAlignment(), "right", "x alignment defaults to \"right\" for left axis");
         baseAxis = new Plottable.Axis(scale, "right");
-        assert.strictEqual(baseAxis.xAlign(), "left", "x alignment defaults to \"left\" for right axis");
+        assert.strictEqual(baseAxis.xAlignment(), "left", "x alignment defaults to \"left\" for right axis");
     });
 });
 
@@ -684,9 +698,9 @@ describe("TimeAxis", function () {
         assert.throws(function () { return new Plottable.Axes.Time(scale, "right"); }, "horizontal");
     });
     it("cannot change time axis orientation to vertical", function () {
-        assert.throws(function () { return axis.orient("left"); }, "horizontal");
-        assert.throws(function () { return axis.orient("right"); }, "horizontal");
-        assert.strictEqual(axis.orient(), "bottom", "orientation unchanged");
+        assert.throws(function () { return axis.orientation("left"); }, "horizontal");
+        assert.throws(function () { return axis.orientation("right"); }, "horizontal");
+        assert.strictEqual(axis.orientation(), "bottom", "orientation unchanged");
     });
     it("Computing the default ticks doesn't error out for edge cases", function () {
         var svg = TestMethods.generateSVG(400, 100);
@@ -1079,7 +1093,7 @@ describe("NumericAxis", function () {
                 assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
             }
         }
-        numericAxis.orient("bottom");
+        numericAxis.orientation("bottom");
         visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
         });
@@ -1392,7 +1406,7 @@ describe("Category Axes", function () {
         var smallDimension = 10;
         var spaceRequest = axis.requestedSpace(300, smallDimension);
         assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
-        axis.orient("left");
+        axis.orientation("left");
         spaceRequest = axis.requestedSpace(smallDimension, 300);
         assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
         svg.remove();
@@ -1413,7 +1427,7 @@ describe("Category Axes", function () {
         var tickLabels = axis._content.selectAll(".tick-label");
         var tickMarks = axis._content.selectAll(".tick-mark");
         verifyTickLabelOverlaps(tickLabels, tickMarks);
-        axis.orient("right");
+        axis.orientation("right");
         verifyTickLabelOverlaps(tickLabels, tickMarks);
         svg.remove();
     });
@@ -1584,7 +1598,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var bbox = Plottable.Utils.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
-        label.orient("right");
+        label.orientation("right");
         text = content.select("text");
         bbox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
@@ -1593,22 +1607,22 @@ describe("Labels", function () {
     });
     it("padding reacts well under align", function () {
         var svg = TestMethods.generateSVG(400, 200);
-        var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlign("left");
-        var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlign("left");
-        var topLabel = new Plottable.Components.Label("label").yAlign("bottom");
+        var testLabel = new Plottable.Components.Label("testing label").padding(30).xAlignment("left");
+        var longLabel = new Plottable.Components.Label("LONG LABELLLLLLLLLLLLLLLLL").xAlignment("left");
+        var topLabel = new Plottable.Components.Label("label").yAlignment("bottom");
         new Plottable.Components.Table([[topLabel], [testLabel], [longLabel]]).renderTo(svg);
         var testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.left, longTextRect.left + 30, 2, "left difference by padding amount");
-        testLabel.xAlign("right");
+        testLabel.xAlignment("right");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.right, longTextRect.right - 30, 2, "right difference by padding amount");
-        testLabel.yAlign("bottom");
+        testLabel.yAlignment("bottom");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         longTextRect = longLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.bottom, longTextRect.top - 30, 2, "vertical difference by padding amount");
-        testLabel.yAlign("top");
+        testLabel.yAlignment("top");
         testTextRect = testLabel._element.select("text").node().getBoundingClientRect();
         var topTextRect = topLabel._element.select("text").node().getBoundingClientRect();
         assert.closeTo(testTextRect.top, topTextRect.bottom + 30, 2, "vertical difference by padding amount");
@@ -1956,12 +1970,12 @@ describe("InterpolatedColorLegend", function () {
         assertBasicRendering(legend);
         svg.remove();
     });
-    it("orient() input-checking", function () {
+    it("orientation() input-checking", function () {
         var legend = new Plottable.Components.InterpolatedColorLegend(colorScale, "horizontal");
-        legend.orient("horizontal"); // should work
-        legend.orient("right"); // should work
-        legend.orient("left"); // should work
-        assert.throws(function () { return legend.orient("blargh"); }, "not a valid orientation");
+        legend.orientation("horizontal"); // should work
+        legend.orientation("right"); // should work
+        legend.orientation("left"); // should work
+        assert.throws(function () { return legend.orientation("blargh"); }, "not a valid orientation");
         svg.remove();
     });
     it("orient() triggers layout computation", function () {
@@ -1969,7 +1983,7 @@ describe("InterpolatedColorLegend", function () {
         legend.renderTo(svg);
         var widthBefore = legend.width();
         var heightBefore = legend.height();
-        legend.orient("right");
+        legend.orientation("right");
         assert.notEqual(legend.width(), widthBefore, "proportions changed (width)");
         assert.notEqual(legend.height(), heightBefore, "proportions changed (height)");
         svg.remove();
@@ -2106,8 +2120,11 @@ var CountingPlot = (function (_super) {
 describe("Plots", function () {
     describe("Plot", function () {
         it("Plots default correctly", function () {
+            var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
-            assert.isTrue(r.clipPathEnabled, "clipPathEnabled defaults to true");
+            r.renderTo(svg);
+            TestMethods.verifyClipPath(r);
+            svg.remove();
         });
         it("Base Plot functionality works", function () {
             var svg = TestMethods.generateSVG(400, 300);
@@ -2488,57 +2505,84 @@ describe("Plots", function () {
             svg.remove();
         });
     });
+});
+
+///<reference path="../../testReference.ts" />
+var assert = chai.assert;
+describe("Plots", function () {
     describe("XY Plot", function () {
         var svg;
         var xScale;
         var yScale;
-        var xAccessor;
-        var yAccessor;
-        var simpleDataset;
         var plot;
-        before(function () {
-            xAccessor = function (d, i, dataset) { return d.a + dataset.metadata().foo; };
-            yAccessor = function (d, i, dataset) { return d.b + dataset.metadata().foo; };
-        });
+        var simpleDataset = new Plottable.Dataset([
+            { a: -6, b: 6 },
+            { a: -2, b: 2 },
+            { a: 2, b: -2 },
+            { a: 6, b: -6 }
+        ]);
+        var xAccessor = function (d) { return d.a; };
+        var yAccessor = function (d) { return d.b; };
         beforeEach(function () {
             svg = TestMethods.generateSVG(500, 500);
-            simpleDataset = new Plottable.Dataset([{ a: -5, b: 6 }, { a: -2, b: 2 }, { a: 2, b: -2 }, { a: 5, b: -6 }], { foo: 0 });
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
             plot = new Plottable.XYPlot(xScale, yScale);
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
-        it("plot auto domain scale to visible points", function () {
+        it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
-            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
-            yScale.domain([-6, 6]);
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to visible points");
             svg.remove();
         });
-        it("no visible points", function () {
+        it("automatically adjusting Y domain when no points are visible", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            assert.deepEqual(yScale.domain(), [-7, 7], "domain has been not been adjusted");
+            assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
             svg.remove();
         });
-        it("automaticallyAdjustYScaleOverVisiblePoints disables autoDomain", function () {
-            xScale.domain([-2, 2]);
+        it("automatically adjusting Y domain when X scale is replaced", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            plot.renderTo(svg);
-            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been been adjusted");
+            var newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
+            plot.x(xAccessor, newXScale);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
+            xScale.domain([-2, 2]);
+            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "changing domain of original X scale doesn't affect Y scale's domain");
             svg.remove();
         });
-        it("show all data", function () {
+        it("automatically adjusting X domain over visible points", function () {
+            yScale.domain([-3, 3]);
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
+            plot.automaticallyAdjustXScaleOverVisiblePoints(false);
+            svg.remove();
+        });
+        it("automatically adjusting X domain when no points are visible", function () {
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            yScale.domain([-0.5, 0.5]);
+            assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+            svg.remove();
+        });
+        it("automatically adjusting X domain when Y scale is replaced", function () {
+            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            var newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
+            plot.y(yAccessor, newYScale);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
+            yScale.domain([-2, 2]);
+            assert.deepEqual(xScale.domain(), [-2.5, 2.5], "changing domain of original Y scale doesn't affect X scale's domain");
+            svg.remove();
+        });
+        it("showAllData()", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("show all data without auto adjust domain", function () {
@@ -2547,20 +2591,7 @@ describe("Plots", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(false);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
-            assert.deepEqual(xScale.domain(), [-6, 6], "domain has been adjusted to show all data");
-            svg.remove();
-        });
-        it("no cycle in auto domain on plot", function () {
-            var zScale = new Plottable.Scales.Linear().domain([-10, 10]);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            var plot2 = new Plottable.XYPlot(zScale, yScale).automaticallyAdjustXScaleOverVisiblePoints(true).x(xAccessor, zScale).y(yAccessor, yScale).addDataset(simpleDataset);
-            var plot3 = new Plottable.XYPlot(zScale, xScale).automaticallyAdjustYScaleOverVisiblePoints(true).x(xAccessor, zScale).y(yAccessor, xScale).addDataset(simpleDataset);
-            plot2.renderTo(svg);
-            plot3.renderTo(svg);
-            xScale.domain([-2, 2]);
-            assert.deepEqual(yScale.domain(), [-2.5, 2.5], "y domain is adjusted by x domain using custom algorithm and domainer");
-            assert.deepEqual(zScale.domain(), [-2.5, 2.5], "z domain is adjusted by y domain using custom algorithm and domainer");
-            assert.deepEqual(xScale.domain(), [-2, 2], "x domain is not adjusted using custom algorithm and domainer");
+            assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("listeners are deregistered after removal", function () {
@@ -2570,14 +2601,6 @@ describe("Plots", function () {
             assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
             var yScaleCallbacks = yScale._callbacks.values();
             assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
-            svg.remove();
-        });
-        it("listeners are deregistered for changed scale", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
-            var newScale = new Plottable.Scales.Linear().domain([-10, 10]);
-            plot.x(xAccessor, newScale);
-            xScale.domain([-2, 2]);
-            assert.deepEqual(yScale.domain(), [-7, 7], "replaced xScale didn't adjust yScale");
             svg.remove();
         });
     });
@@ -6283,8 +6306,8 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("component defaults are as expected", function () {
-        assert.strictEqual(c.xAlign(), "left", "x alignment defaults to \"left\"");
-        assert.strictEqual(c.yAlign(), "top", "y alignment defaults to \"top\"");
+        assert.strictEqual(c.xAlignment(), "left", "x alignment defaults to \"left\"");
+        assert.strictEqual(c.yAlignment(), "top", "y alignment defaults to \"top\"");
         var layout = c.requestedSpace(1, 1);
         assert.strictEqual(layout.minWidth, 0, "requested minWidth defaults to 0");
         assert.strictEqual(layout.minHeight, 0, "requested minHeight defaults to 0");
@@ -6293,33 +6316,15 @@ describe("Component behavior", function () {
     it("fixed-width component will align to the right spot", function () {
         TestMethods.fixComponentSize(c, 100, 100);
         c.anchor(svg);
-        c.xAlign("left").yAlign("top");
+        c.xAlignment("left").yAlignment("top");
         c.computeLayout();
         assertComponentXY(c, 0, 0, "top-left component aligns correctly");
-        c.xAlign("center").yAlign("center");
+        c.xAlignment("center").yAlignment("center");
         c.computeLayout();
         assertComponentXY(c, 150, 100, "center component aligns correctly");
-        c.xAlign("right").yAlign("bottom");
+        c.xAlignment("right").yAlignment("bottom");
         c.computeLayout();
         assertComponentXY(c, 300, 200, "bottom-right component aligns correctly");
-        svg.remove();
-    });
-    it("clipPath works as expected", function () {
-        assert.isFalse(c.clipPathEnabled, "clipPathEnabled defaults to false");
-        c.clipPathEnabled = true;
-        c.anchor(svg);
-        c.computeLayout({ x: 0, y: 0 }, 100, 100);
-        c.render();
-        var clipPathId = c._boxContainer[0][0].firstChild.id;
-        var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
-        expectedPrefix = expectedPrefix.replace(/#.*/g, "");
-        var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
-        // IE 9 has clipPath like 'url("#clipPath")', must accomodate
-        var normalizeClipPath = function (s) { return s.replace(/"/g, ""); };
-        assert.isTrue(normalizeClipPath(c._element.attr("clip-path")) === expectedClipPathURL, "the element has clip-path url attached");
-        var clipRect = c._boxContainer.select(".clip-rect");
-        assert.strictEqual(clipRect.attr("width"), "100", "the clipRect has an appropriate width");
-        assert.strictEqual(clipRect.attr("height"), "100", "the clipRect has an appropriate height");
         svg.remove();
     });
     it("boxes work as expected", function () {
@@ -6339,8 +6344,8 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("errors are thrown on bad alignments", function () {
-        assert.throws(function () { return c.xAlign("foo"); }, Error, "Unsupported alignment");
-        assert.throws(function () { return c.yAlign("foo"); }, Error, "Unsupported alignment");
+        assert.throws(function () { return c.xAlignment("foo"); }, Error, "Unsupported alignment");
+        assert.throws(function () { return c.yAlignment("foo"); }, Error, "Unsupported alignment");
         svg.remove();
     });
     it("css classing works as expected", function () {
@@ -6402,8 +6407,8 @@ describe("Component behavior", function () {
         var placeHolder = new Plottable.Component();
         var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0).addComponent(new Plottable.Component(), 0, 1).addComponent(placeHolder, 1, 0).addComponent(horizontalComponent, 1, 1);
         t.renderTo(svg);
-        horizontalComponent.xAlign("center");
-        verticalComponent.yAlign("bottom");
+        horizontalComponent.xAlignment("center");
+        verticalComponent.yAlignment("bottom");
         TestMethods.assertBBoxNonIntersection(verticalComponent._element.select(".bounding-box"), placeHolder._element.select(".bounding-box"));
         TestMethods.assertBBoxInclusion(t._boxContainer.select(".bounding-box"), horizontalComponent._element.select(".bounding-box"));
         svg.remove();
@@ -6416,7 +6421,7 @@ describe("Component behavior", function () {
         };
         c._fixedWidthFlag = true;
         c._fixedHeightFlag = true;
-        c.xAlign("left");
+        c.xAlignment("left");
         var t = new Plottable.Components.Table([[c]]);
         t.renderTo(svg);
         var transform = d3.transform(c._element.attr("transform"));
@@ -6476,15 +6481,15 @@ describe("Component behavior", function () {
         it("origin() (top-level component)", function () {
             TestMethods.fixComponentSize(c, cWidth, cHeight);
             c.renderTo(svg);
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.origin();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.origin();
             assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.origin();
             assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
@@ -6496,15 +6501,15 @@ describe("Component behavior", function () {
             group.renderTo(svg);
             var groupWidth = group.width();
             var groupHeight = group.height();
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.origin();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.origin();
             assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.origin();
             assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
@@ -6513,15 +6518,15 @@ describe("Component behavior", function () {
         it("originToSVG() (top-level component)", function () {
             TestMethods.fixComponentSize(c, cWidth, cHeight);
             c.renderTo(svg);
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.originToSVG();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, (SVG_WIDTH - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (SVG_HEIGHT - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, SVG_WIDTH - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, SVG_HEIGHT - cHeight, "returns correct value (yAlign bottom)");
@@ -6533,15 +6538,15 @@ describe("Component behavior", function () {
             group.renderTo(svg);
             var groupWidth = group.width();
             var groupHeight = group.height();
-            c.xAlign("left").yAlign("top");
+            c.xAlignment("left").yAlignment("top");
             var origin = c.originToSVG();
             assert.strictEqual(origin.x, 0, "returns correct value (xAlign left)");
             assert.strictEqual(origin.y, 0, "returns correct value (yAlign top)");
-            c.xAlign("center").yAlign("center");
+            c.xAlignment("center").yAlignment("center");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, (groupWidth - cWidth) / 2, "returns correct value (xAlign center)");
             assert.strictEqual(origin.y, (groupHeight - cHeight) / 2, "returns correct value (yAlign center)");
-            c.xAlign("right").yAlign("bottom");
+            c.xAlignment("right").yAlignment("bottom");
             origin = c.originToSVG();
             assert.strictEqual(origin.x, groupWidth - cWidth, "returns correct value (xAlign right)");
             assert.strictEqual(origin.y, groupHeight - cHeight, "returns correct value (yAlign bottom)");
@@ -6725,7 +6730,7 @@ describe("Tables", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-        table.padding(5, 5);
+        table.rowPadding(5).columnPadding(5);
         var svg = TestMethods.generateSVG(415, 415);
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
@@ -6901,7 +6906,7 @@ describe("Domainer", function () {
         domainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
-        scale.addExtentProvider(function (scale) { return [[100, 200]]; });
+        scale.addExtentsProvider(function (scale) { return [[100, 200]]; });
         scale.autoDomain();
         scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
@@ -6912,7 +6917,7 @@ describe("Domainer", function () {
         var f = d3.time.format("%x");
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
-        timeScale.addExtentProvider(function (scale) { return [[d1, d2]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[d1, d2]]; });
         timeScale.autoDomain();
         timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
@@ -6976,7 +6981,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 5);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.pad().addPaddingException("key", startDate);
         timeScale.domainer(domainer);
@@ -7014,7 +7019,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 6);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.addIncludedValue("key", includedDate);
         timeScale.domainer(domainer);
@@ -7062,18 +7067,6 @@ describe("Domainer", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Scales", function () {
-    it("Scale's copy() works correctly", function () {
-        var testCallback = function (listenable) {
-            return true;
-        };
-        var scale = new Plottable.Scales.Linear();
-        scale.onUpdate(testCallback);
-        var scaleCopy = scale.copy();
-        assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
-        assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.strictEqual(scale._callbacks.values().length, 1, "The initial scale should have a callback attached");
-        assert.strictEqual(scaleCopy._callbacks.values().length, 0, "The copied scale should not have any callback from the original scale attached");
-    });
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale(d3.scale.identity());
         var callbackWasCalled = false;
@@ -7110,7 +7103,7 @@ describe("Scales", function () {
             scale = new Plottable.Scales.Linear();
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-            scale.addExtentProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
+            scale.addExtentsProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
             scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
@@ -7143,22 +7136,22 @@ describe("Scales", function () {
             svg1.remove();
             svg2.remove();
         });
-        it("addExtentProvider()", function () {
-            scale.addExtentProvider(function (scale) { return [[0, 10]]; });
+        it("addExtentsProvider()", function () {
+            scale.addExtentsProvider(function (scale) { return [[0, 10]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
-            scale.addExtentProvider(function (scale) { return [[-10, 0]]; });
+            scale.addExtentsProvider(function (scale) { return [[-10, 0]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
         });
-        it("removeExtentProvider()", function () {
+        it("removeExtentsProvider()", function () {
             var posProvider = function (scale) { return [[0, 10]]; };
-            scale.addExtentProvider(posProvider);
+            scale.addExtentsProvider(posProvider);
             var negProvider = function (scale) { return [[-10, 0]]; };
-            scale.addExtentProvider(negProvider);
+            scale.addExtentsProvider(negProvider);
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
-            scale.removeExtentProvider(negProvider);
+            scale.removeExtentsProvider(negProvider);
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
         });
@@ -7307,7 +7300,7 @@ describe("Scales", function () {
             assert.strictEqual("#b10026", scale.scale(16));
         });
         it("linearly interpolates colors in L*a*b color space", function () {
-            var scale = new Plottable.Scales.InterpolatedColor("reds");
+            var scale = new Plottable.Scales.InterpolatedColor();
             scale.domain([0, 1]);
             assert.strictEqual("#b10026", scale.scale(1));
             assert.strictEqual("#d9151f", scale.scale(0.9));
@@ -7339,112 +7332,8 @@ describe("Scales", function () {
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange("reds");
+            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
-        });
-        it("can be converted to a different scale type", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-            scale.domain([0, 16]);
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#777777", scale.scale(8));
-            scale.scaleType("log");
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#e3e3e3", scale.scale(8));
-        });
-    });
-    describe("Modified Log Scale", function () {
-        var scale;
-        var base = 10;
-        var epsilon = 0.00001;
-        beforeEach(function () {
-            scale = new Plottable.Scales.ModifiedLog(base);
-        });
-        it("is an increasing, continuous function that can go negative", function () {
-            d3.range(-base * 2, base * 2, base / 20).forEach(function (x) {
-                // increasing
-                assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
-                assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
-                // continuous
-                assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
-                assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
-            });
-            assert.closeTo(scale.scale(0), 0, epsilon);
-        });
-        it("is close to log() for large values", function () {
-            [10, 100, 23103.4, 5].forEach(function (x) {
-                assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
-            });
-        });
-        it("x = invert(scale(x))", function () {
-            [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach(function (x) {
-                assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
-                assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
-            });
-        });
-        it("domain defaults to [0, 1]", function () {
-            scale = new Plottable.Scales.ModifiedLog(base);
-            assert.deepEqual(scale.domain(), [0, 1]);
-        });
-        it("works with a Domainer", function () {
-            scale.addExtentProvider(function (scale) { return [[0, base * 2]]; });
-            var domain = scale.domain();
-            scale.domainer(new Plottable.Domainer().pad(0.1));
-            assert.operator(scale.domain()[0], "<", domain[0]);
-            assert.operator(domain[1], "<", scale.domain()[1]);
-            scale.domainer(new Plottable.Domainer().nice());
-            assert.operator(scale.domain()[0], "<=", domain[0]);
-            assert.operator(domain[1], "<=", scale.domain()[1]);
-            scale = new Plottable.Scales.ModifiedLog(base);
-            scale.domainer(new Plottable.Domainer());
-            assert.deepEqual(scale.domain(), [0, 1]);
-        });
-        it("gives reasonable values for ticks()", function () {
-            var providedExtents = [[0, base / 2]];
-            scale.addExtentProvider(function (scale) { return providedExtents; });
-            scale.autoDomain();
-            var ticks = scale.ticks();
-            assert.operator(ticks.length, ">", 0);
-            providedExtents = [[-base * 2, base * 2]];
-            scale.autoDomain();
-            ticks = scale.ticks();
-            var beforePivot = ticks.filter(function (x) { return x <= -base; });
-            var afterPivot = ticks.filter(function (x) { return base <= x; });
-            var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
-            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
-            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
-            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
-        });
-        it("works on inverted domain", function () {
-            scale.addExtentProvider(function (scale) { return [[200, -100]]; });
-            scale.autoDomain();
-            var range = scale.range();
-            assert.closeTo(scale.scale(-100), range[1], epsilon);
-            assert.closeTo(scale.scale(200), range[0], epsilon);
-            var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
-            var b = a.map(function (x) { return scale.scale(x); });
-            // should be decreasing function; reverse is sorted
-            assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
-            var ticks = scale.ticks();
-            assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Utils.Methods.uniq(ticks), "ticks should not be repeated");
-            var beforePivot = ticks.filter(function (x) { return x <= -base; });
-            var afterPivot = ticks.filter(function (x) { return base <= x; });
-            var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
-            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
-            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
-            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
-        });
-        it("ticks() is always non-empty", function () {
-            var desiredExtents = [];
-            scale.addExtentProvider(function (scale) { return desiredExtents; });
-            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (extent) {
-                desiredExtents = [extent];
-                scale.autoDomain();
-                var ticks = scale.ticks();
-                assert.operator(ticks.length, ">", 0);
-            });
         });
     });
 });
@@ -7480,6 +7369,104 @@ describe("Scales", function () {
             scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
+    describe("Modified Log Scale", function () {
+        var scale;
+        var base = 10;
+        var epsilon = 0.00001;
+        beforeEach(function () {
+            scale = new Plottable.Scales.ModifiedLog(base);
+        });
+        it("is an increasing, continuous function that can go negative", function () {
+            d3.range(-base * 2, base * 2, base / 20).forEach(function (x) {
+                // increasing
+                assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
+                assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
+                // continuous
+                assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
+                assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
+            });
+            assert.closeTo(scale.scale(0), 0, epsilon);
+        });
+        it("Has log() behavior at values > base", function () {
+            [10, 100, 23103.4, 5].forEach(function (x) {
+                assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
+            });
+        });
+        it("x = invert(scale(x))", function () {
+            [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach(function (x) {
+                assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
+                assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
+            });
+        });
+        it("domain defaults to [0, base]", function () {
+            scale = new Plottable.Scales.ModifiedLog(base);
+            assert.deepEqual(scale.domain(), [0, base]);
+        });
+        it("works with a Domainer", function () {
+            scale.addExtentsProvider(function (scale) { return [[0, base * 2]]; });
+            var domain = scale.domain();
+            scale.domainer(new Plottable.Domainer().pad(0.1));
+            assert.operator(scale.domain()[0], "<", domain[0]);
+            assert.operator(domain[1], "<", scale.domain()[1]);
+            scale.domainer(new Plottable.Domainer().nice());
+            assert.operator(scale.domain()[0], "<=", domain[0]);
+            assert.operator(domain[1], "<=", scale.domain()[1]);
+            scale = new Plottable.Scales.ModifiedLog(base);
+            scale.domainer(new Plottable.Domainer());
+            assert.deepEqual(scale.domain(), [0, base]);
+        });
+        it("gives reasonable values for ticks()", function () {
+            var providedExtents = [[0, base / 2]];
+            scale.addExtentsProvider(function (scale) { return providedExtents; });
+            scale.autoDomain();
+            var ticks = scale.ticks();
+            assert.operator(ticks.length, ">", 0);
+            providedExtents = [[-base * 2, base * 2]];
+            scale.autoDomain();
+            ticks = scale.ticks();
+            var beforePivot = ticks.filter(function (x) { return x <= -base; });
+            var afterPivot = ticks.filter(function (x) { return base <= x; });
+            var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+        it("works on inverted domain", function () {
+            scale.addExtentsProvider(function (scale) { return [[200, -100]]; });
+            scale.autoDomain();
+            var range = scale.range();
+            assert.closeTo(scale.scale(-100), range[1], epsilon);
+            assert.closeTo(scale.scale(200), range[0], epsilon);
+            var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
+            var b = a.map(function (x) { return scale.scale(x); });
+            // should be decreasing function; reverse is sorted
+            assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
+            var ticks = scale.ticks();
+            assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
+            assert.deepEqual(ticks, Plottable.Utils.Methods.uniq(ticks), "ticks should not be repeated");
+            var beforePivot = ticks.filter(function (x) { return x <= -base; });
+            var afterPivot = ticks.filter(function (x) { return base <= x; });
+            var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
+            assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
+            assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
+            assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
+        });
+        it("ticks() is always non-empty", function () {
+            var desiredExtents = [];
+            scale.addExtentsProvider(function (scale) { return desiredExtents; });
+            [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (extent) {
+                desiredExtents = [extent];
+                scale.autoDomain();
+                var ticks = scale.ticks();
+                assert.operator(ticks.length, ">", 0);
+            });
         });
     });
 });
@@ -9697,8 +9684,14 @@ describe("Interactive Components", function () {
             svg.remove();
         });
         it("clipPath enabled", function () {
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dbl = new Plottable.Components.DragBoxLayer();
-            assert.isTrue(dbl.clipPathEnabled, "uses clipPath (to hide detection edges)");
+            dbl.renderTo(svg);
+            TestMethods.verifyClipPath(dbl);
+            var clipRect = dbl._boxContainer.select(".clip-rect");
+            assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+            assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+            svg.remove();
         });
         it("detectionRadius()", function () {
             var dbl = new Plottable.Components.DragBoxLayer();

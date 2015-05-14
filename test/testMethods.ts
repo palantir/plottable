@@ -18,7 +18,7 @@ module TestMethods {
     }
   }
 
-  export function verifySpaceRequest(sr: Plottable._SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
+  export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
     assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
     assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
   }
@@ -30,8 +30,8 @@ module TestMethods {
         minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
-    (<any> c)._fixedWidthFlag = fixedWidth == null ? false : true;
-    (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
+    (<any> c).fixedWidth = () => fixedWidth == null ? false : true;
+    (<any> c).fixedHeight = () => fixedHeight == null ? false : true;
     return c;
   }
 
@@ -212,5 +212,16 @@ module TestMethods {
         assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
       });
     });
+  }
+
+  export function verifyClipPath(c: Plottable.Component) {
+    var clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
+    var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+    var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+    // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+    var normalizeClipPath = (s: string) => s.replace(/"/g, "");
+    assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
+                  "the element has clip-path url attached");
   }
 }

@@ -140,10 +140,6 @@ export module Scales {
       return this;
     }
 
-    public copy(): Category {
-      return new Category(this._d3Scale.copy());
-    }
-
     public scale(value: string): number {
       // scale it to the middle
       return super.scale(value) + this.rangeBand() / 2;

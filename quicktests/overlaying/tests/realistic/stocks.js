@@ -53,7 +53,7 @@ function run(svg, data, Plottable) {
           var label_aapl = new Plottable.Components.Label("AAPL", "right").classed("axis-label", true);
 
           var yScale_goog = new Plottable.Scales.Linear();
-          var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlign("right").showEndTickLabels(true);
+          var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlignment("right").showEndTickLabels(true);
           var label_goog = new Plottable.Components.Label("GOOG", "left").classed("axis-label", true);
 
           var colorScale = new Plottable.Scales.Color();
@@ -78,7 +78,7 @@ function run(svg, data, Plottable) {
 
           var legend = new Plottable.Components.Legend(colorScale);
           legend.maxEntriesPerRow(1);
-          legend.yAlign("top");
+          legend.yAlignment("top");
           var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
 
           var yScale_diff = new Plottable.Scales.Linear();

@@ -171,8 +171,8 @@ export module Plots {
       return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return Stacked.prototype._normalizeDatasets.call(this, fromX);
+    protected _updateExtentsForProperty(property: string) {
+      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
     }
     // ===== /Stack logic =====
   }

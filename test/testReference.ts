@@ -26,6 +26,7 @@
 ///<reference path="components/selectionBoxLayerTests.ts" />
 
 ///<reference path="components/plots/plotTests.ts" />
+///<reference path="components/plots/xyPlotTests.ts" />
 ///<reference path="components/plots/piePlotTests.ts" />
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
@@ -49,6 +50,7 @@
 
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/quantitativeScaleTests.ts" />
+///<reference path="scales/modifiedLogScaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />
 

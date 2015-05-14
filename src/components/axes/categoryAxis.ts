@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axes {
-  export class Category extends Axis {
+  export class Category extends Axis<string> {
     private _tickLabelAngle = 0;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _wrapper: SVGTypewriter.Wrappers.SingleLineWrapper;
@@ -36,7 +36,7 @@ export module Axes {
       return this.redraw();
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
       var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
 
@@ -47,14 +47,8 @@ export module Axes {
         };
       }
 
-      var categoryScale: Scales.Category = <Scales.Category> this._scale;
-      var fakeScale = categoryScale.copy();
-      if (this._isHorizontal()) {
-        fakeScale.range([0, offeredWidth]);
-      } else {
-        fakeScale.range([offeredHeight, 0]);
-      }
-      var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
+      var categoryScale = <Scales.Category> this._scale;
+      var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
 
       return {
         minWidth: measureResult.usedWidth + widthRequiredByTicks,
@@ -62,10 +56,15 @@ export module Axes {
       };
     }
 
-    protected _getTickValues(): string[] {
+    protected _getTickValues() {
       return this._scale.domain();
     }
 
+    /**
+     * Gets the tick label angle
+     * @returns {number} the tick label angle
+     */
+    public tickLabelAngle(): number;
     /**
      * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
      * @param {number} angle The angle for the ticks
@@ -75,11 +74,6 @@ export module Axes {
      * See tracking at https://github.com/palantir/plottable/issues/504
      */
     public tickLabelAngle(angle: number): Category;
-    /**
-     * Gets the tick label angle
-     * @returns {number} the tick label angle
-     */
-    public tickLabelAngle(): number;
     public tickLabelAngle(angle?: number): any {
       if (angle == null) {
         return this._tickLabelAngle;
@@ -120,8 +114,8 @@ export module Axes {
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),
-          xAlign: xAlign[self.orient()],
-          yAlign: yAlign[self.orient()],
+          xAlign: xAlign[self.orientation()],
+          yAlign: yAlign[self.orientation()],
           textRotation: self.tickLabelAngle()
         };
         self._writer.write(self.formatter()(d), width, height, writeOptions);
@@ -135,13 +129,18 @@ export module Axes {
      * @param {string[]} ticks The strings that will be printed on the ticks.
      */
     private _measureTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: string[]) {
+      var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
+      var totalOuterPaddingRatio = 2 * scale.outerPadding();
+      var totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
+      var expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
+      var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
+
       var wrappingResults = ticks.map((s: string) => {
-        var bandWidth = scale.stepWidth();
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
         var width = axisWidth - this._maxLabelTickLength() - this.tickLabelPadding(); // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
-          width = bandWidth; // defaults to the band width
+          width = stepWidth; // defaults to the band width
           if (this._tickLabelAngle !== 0) { // rotated label
             width = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding(); // use the axis height
           }
@@ -150,7 +149,7 @@ export module Axes {
         }
 
         // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-        var height = bandWidth; // default for left/right
+        var height = stepWidth; // default for left/right
         if (this._isHorizontal()) { // case for top/bottom
           height = axisHeight - this._maxLabelTickLength() - this.tickLabelPadding();
           if (this._tickLabelAngle !== 0) { // rotated label
@@ -208,8 +207,8 @@ export module Axes {
       tickLabels.text("");
       this._drawTicks(this.width(), this.height(), catScale, tickLabels);
 
-      var xTranslate = this.orient() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
-      var yTranslate = this.orient() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var xTranslate = this.orientation() === "right" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
+      var yTranslate = this.orientation() === "bottom" ? this._maxLabelTickLength() + this.tickLabelPadding() : 0;
       Utils.DOM.translate(this._tickLabelContainer, xTranslate, yTranslate);
       return this;
     }

@@ -3,22 +3,6 @@
 var assert = chai.assert;
 
 describe("Scales", () => {
-  it("Scale's copy() works correctly", () => {
-    var testCallback = (listenable: any) => {
-      return true;
-    };
-    var scale = new Plottable.Scales.Linear();
-    scale.onUpdate(testCallback);
-    var scaleCopy = scale.copy();
-    assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
-    assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-
-    assert.strictEqual((<any>scale)._callbacks.values().length, 1,
-      "The initial scale should have a callback attached");
-    assert.strictEqual((<any>scaleCopy)._callbacks.values().length, 0,
-      "The copied scale should not have any callback from the original scale attached");
-  });
-
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale(d3.scale.identity());
 
@@ -61,7 +45,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
       scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
@@ -105,25 +89,25 @@ describe("Scales", () => {
       svg2.remove();
     });
 
-    it("addExtentProvider()", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+    it("addExtentsProvider()", () => {
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
-    it("removeExtentProvider()", () => {
-      var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
-      scale.addExtentProvider(posProvider);
-      var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
-      scale.addExtentProvider(negProvider);
+    it("removeExtentsProvider()", () => {
+      var posProvider = (scale: Plottable.Scale<number, number>) => [[0, 10]];
+      scale.addExtentsProvider(posProvider);
+      var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
+      scale.addExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
-      scale.removeExtentProvider(negProvider);
+      scale.removeExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
     });
@@ -304,7 +288,7 @@ describe("Scales", () => {
     });
 
     it("linearly interpolates colors in L*a*b color space", () => {
-      var scale = new Plottable.Scales.InterpolatedColor("reds");
+      var scale = new Plottable.Scales.InterpolatedColor();
       scale.domain([0, 1]);
       assert.strictEqual("#b10026", scale.scale(1));
       assert.strictEqual("#d9151f", scale.scale(0.9));
@@ -340,128 +324,8 @@ describe("Scales", () => {
       scale.domain([0, 16]);
       assert.strictEqual("#000000", scale.scale(0));
       assert.strictEqual("#ffffff", scale.scale(16));
-      scale.colorRange("reds");
+      scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
       assert.strictEqual("#b10026", scale.scale(16));
     });
-
-    it("can be converted to a different scale type", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-      scale.domain([0, 16]);
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#777777", scale.scale(8));
-
-      scale.scaleType("log");
-      assert.strictEqual("#000000", scale.scale(0));
-      assert.strictEqual("#ffffff", scale.scale(16));
-      assert.strictEqual("#e3e3e3", scale.scale(8));
-    });
   });
-
-  describe("Modified Log Scale", () => {
-    var scale: Plottable.Scales.ModifiedLog;
-    var base = 10;
-    var epsilon = 0.00001;
-    beforeEach(() => {
-      scale = new Plottable.Scales.ModifiedLog(base);
-    });
-
-    it("is an increasing, continuous function that can go negative", () => {
-      d3.range(-base * 2, base * 2, base / 20).forEach((x: number) => {
-        // increasing
-        assert.operator(scale.scale(x - epsilon), "<", scale.scale(x));
-        assert.operator(scale.scale(x), "<", scale.scale(x + epsilon));
-        // continuous
-        assert.closeTo(scale.scale(x - epsilon), scale.scale(x), epsilon);
-        assert.closeTo(scale.scale(x), scale.scale(x + epsilon), epsilon);
-      });
-      assert.closeTo(scale.scale(0), 0, epsilon);
-    });
-
-    it("is close to log() for large values", () => {
-      [10, 100, 23103.4, 5].forEach((x) => {
-        assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
-      });
-    });
-
-    it("x = invert(scale(x))", () => {
-      [0, 1, base, 100, 0.001, -1, -0.3, -base, base - 0.001].forEach((x) => {
-        assert.closeTo(x, scale.invert(scale.scale(x)), epsilon);
-        assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
-      });
-    });
-
-    it("domain defaults to [0, 1]", () => {
-      scale = new Plottable.Scales.ModifiedLog(base);
-      assert.deepEqual(scale.domain(), [0, 1]);
-    });
-
-    it("works with a Domainer", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
-      var domain = scale.domain();
-      scale.domainer(new Plottable.Domainer().pad(0.1));
-      assert.operator(scale.domain()[0], "<", domain[0]);
-      assert.operator(domain[1], "<", scale.domain()[1]);
-
-      scale.domainer(new Plottable.Domainer().nice());
-      assert.operator(scale.domain()[0], "<=", domain[0]);
-      assert.operator(domain[1], "<=", scale.domain()[1]);
-
-      scale = new Plottable.Scales.ModifiedLog(base);
-      scale.domainer(new Plottable.Domainer());
-      assert.deepEqual(scale.domain(), [0, 1]);
-    });
-
-    it("gives reasonable values for ticks()", () => {
-      var providedExtents = [[0, base / 2]];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => providedExtents);
-      scale.autoDomain();
-      var ticks = scale.ticks();
-      assert.operator(ticks.length, ">", 0);
-
-      providedExtents = [[-base * 2, base * 2]];
-      scale.autoDomain();
-      ticks = scale.ticks();
-      var beforePivot = ticks.filter((x) => x <= -base);
-      var afterPivot = ticks.filter((x) => base <= x);
-      var betweenPivots = ticks.filter((x) => -base < x && x < base);
-      assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
-      assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
-      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
-    });
-
-    it("works on inverted domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
-      scale.autoDomain();
-      var range = scale.range();
-      assert.closeTo(scale.scale(-100), range[1], epsilon);
-      assert.closeTo(scale.scale(200), range[0], epsilon);
-      var a = [-100, -10, -3, 0, 1, 3.64, 50, 60, 200];
-      var b = a.map((x) => scale.scale(x));
-      // should be decreasing function; reverse is sorted
-      assert.deepEqual(b.slice().reverse(), b.slice().sort((x, y) => x - y));
-
-      var ticks = scale.ticks();
-      assert.deepEqual(ticks, ticks.slice().sort((x, y) => x - y), "ticks should be sorted");
-      assert.deepEqual(ticks, Plottable.Utils.Methods.uniq(ticks), "ticks should not be repeated");
-      var beforePivot = ticks.filter((x) => x <= -base);
-      var afterPivot = ticks.filter((x) => base <= x);
-      var betweenPivots = ticks.filter((x) => -base < x && x < base);
-      assert.operator(beforePivot.length, ">", 0, "should be ticks before -base");
-      assert.operator(afterPivot.length, ">", 0, "should be ticks after base");
-      assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
-    });
-
-    it("ticks() is always non-empty", () => {
-      var desiredExtents: number[][] = [];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
-      [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
-        desiredExtents = [extent];
-        scale.autoDomain();
-        var ticks = scale.ticks();
-        assert.operator(ticks.length, ">", 0);
-      });
-    });
-  });
-
 });

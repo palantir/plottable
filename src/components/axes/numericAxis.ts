@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Axes {
-  export class Numeric extends Axis {
+  export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
     // Whether or not first/last tick label will still be displayed even if
@@ -63,7 +63,7 @@ export module Axes {
       return this._computedHeight;
     }
 
-    protected _getTickValues(): any[] {
+    protected _getTickValues() {
       var scale = (<QuantitativeScale<number>> this._scale);
       var domain = scale.domain();
       var min = domain[0] <= domain[1] ? domain[0] : domain[1];
@@ -145,7 +145,7 @@ export module Axes {
       }
 
       var tickMarkAttrHash = this._generateTickMarkAttrHash();
-      switch (this.orient()) {
+      switch (this.orientation()) {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";

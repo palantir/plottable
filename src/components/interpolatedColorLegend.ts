@@ -46,8 +46,6 @@ export module Components {
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
@@ -92,7 +90,7 @@ export module Components {
      *
      * @returns {string} The current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the InterpolatedColorLegend.
      *
@@ -100,15 +98,23 @@ export module Components {
      *
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orient(newOrientation: string): InterpolatedColorLegend;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): InterpolatedColorLegend;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
+        this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
         this.redraw();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
 
     private _generateTicks() {
@@ -134,7 +140,7 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();
