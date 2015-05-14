@@ -2706,18 +2706,18 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            x1(): AccessorScaleBinding<X, number>;
+            x1<X1>(): AccessorScaleBinding<X1, number>;
             x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x1(x1: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-            x2(): AccessorScaleBinding<X, number>;
+            x1<X1>(x1: X | Accessor<X>, scale: Scale<X1, number>): Plots.Rectangle<X, Y>;
+            x2<X2>(): AccessorScaleBinding<X2, number>;
             x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-            y1(): AccessorScaleBinding<Y, number>;
+            x2<X2>(x2: X2 | Accessor<X2>, scale: Scale<X2, number>): Plots.Rectangle<X, Y>;
+            y1<Y1>(): AccessorScaleBinding<Y1, number>;
             y1(y1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y1(y1: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-            y2(): AccessorScaleBinding<Y, number>;
+            y1<Y1>(y1: Y1 | Accessor<Y1>, scale: Scale<Y1, number>): Plots.Rectangle<X, Y>;
+            y2<Y2>(): AccessorScaleBinding<Y2, number>;
             y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y2<Y2>(y2: Y2 | Accessor<Y>, scale: Scale<Y2, number>): Plots.Rectangle<X, Y>;
         }
     }
 }
