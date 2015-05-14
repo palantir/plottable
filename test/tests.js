@@ -7068,7 +7068,8 @@ describe("Domainer", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     it("Scale alerts listeners when its domain is updated", function () {
-        var scale = new Plottable.Scale(d3.scale.identity());
+        var scale = new Plottable.Scale();
+        scale._d3Scale = d3.scale.identity();
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
@@ -7079,7 +7080,8 @@ describe("Scales", function () {
         assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
     it("Scale update listeners can be turned off", function () {
-        var scale = new Plottable.Scale(d3.scale.identity());
+        var scale = new Plottable.Scale();
+        scale._d3Scale = d3.scale.identity();
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");

@@ -18,7 +18,7 @@ export module Scales {
      */
     constructor() {
       super();
-      this._d3Scale = d3.scale.ordinal();    
+      this._d3Scale = d3.scale.ordinal();
       var d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);

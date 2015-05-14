@@ -4,7 +4,8 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -17,7 +18,8 @@ describe("Scales", () => {
   });
 
   it("Scale update listeners can be turned off", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {

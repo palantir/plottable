@@ -85,7 +85,7 @@ export module Scales {
     }
 
     public invert(x: number): number {
-      return this.invertedAdjustedLog(this._d3Scale.invert(x));
+      return this.invertedAdjustedLog((<D3.Scale.LinearScale> this._d3Scale).invert(x));
     }
 
     protected _getDomain() {
