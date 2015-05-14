@@ -20,7 +20,7 @@ export module Components {
 
   export class Table extends ComponentContainer {
     private _rowPadding = 0;
-    private _colPadding = 0;
+    private _columnPadding = 0;
 
     private _rows: Component[][] = [];
 
@@ -138,7 +138,7 @@ export module Components {
      */
       var rows = this._rows;
       var cols = d3.transpose(this._rows);
-      var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
+      var availableWidthAfterPadding  = availableWidth  - this._columnPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
       var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
@@ -285,7 +285,7 @@ export module Components {
           if (component != null) {
             component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
           }
-          childXOrigin += colWidths[colIndex] + this._colPadding;
+          childXOrigin += colWidths[colIndex] + this._columnPadding;
         });
         childYOrigin += rowHeights[rowIndex] + this._rowPadding;
       });
@@ -293,15 +293,45 @@ export module Components {
     }
 
     /**
-     * Sets the row and column padding on the Table.
+     * Gets the row padding on the Table.
+     *
+     * @returns {number} the row padding.
+     */
+    public rowPadding(): number;
+    /**
+     * Sets the row padding on the Table.
      *
      * @param {number} rowPadding The padding above and below each row, in pixels.
-     * @param {number} colPadding the padding to the left and right of each column, in pixels.
      * @returns {Table} The calling Table.
      */
-    public padding(rowPadding: number, colPadding: number) {
+    public rowPadding(rowPadding: number): Table;
+    public rowPadding(rowPadding?: number): any {
+      if (rowPadding == null) {
+        return this._rowPadding;
+      }
       this._rowPadding = rowPadding;
-      this._colPadding = colPadding;
+      this.redraw();
+      return this;
+    }
+
+    /**
+     * Gets the column padding on the Table.
+     *
+     * @returns {number} the column padding.
+     */
+    public columnPadding(): number;
+    /**
+     * Sets the column padding on the Table.
+     *
+     * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+     * @returns {Table} The calling Table.
+     */
+    public columnPadding(columnPadding: number): Table;
+    public columnPadding(columnPadding?: number): any {
+      if (columnPadding == null) {
+        return this._columnPadding;
+      }
+      this._columnPadding = columnPadding;
       this.redraw();
       return this;
     }

@@ -5730,7 +5730,7 @@ var Plottable;
                 if (rows === void 0) { rows = []; }
                 _super.call(this);
                 this._rowPadding = 0;
-                this._colPadding = 0;
+                this._columnPadding = 0;
                 this._rows = [];
                 this._rowWeights = [];
                 this._colWeights = [];
@@ -5820,7 +5820,7 @@ var Plottable;
                  */
                 var rows = this._rows;
                 var cols = d3.transpose(this._rows);
-                var availableWidthAfterPadding = availableWidth - this._colPadding * (this._nCols - 1);
+                var availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
                 var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
                 var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.fixedHeight(); });
                 var colWeights = Table._calcComponentWeights(this._colWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
@@ -5943,22 +5943,25 @@ var Plottable;
                         if (component != null) {
                             component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
                         }
-                        childXOrigin += colWidths[colIndex] + _this._colPadding;
+                        childXOrigin += colWidths[colIndex] + _this._columnPadding;
                     });
                     childYOrigin += rowHeights[rowIndex] + _this._rowPadding;
                 });
                 return this;
             };
-            /**
-             * Sets the row and column padding on the Table.
-             *
-             * @param {number} rowPadding The padding above and below each row, in pixels.
-             * @param {number} colPadding the padding to the left and right of each column, in pixels.
-             * @returns {Table} The calling Table.
-             */
-            Table.prototype.padding = function (rowPadding, colPadding) {
+            Table.prototype.rowPadding = function (rowPadding) {
+                if (rowPadding == null) {
+                    return this._rowPadding;
+                }
                 this._rowPadding = rowPadding;
-                this._colPadding = colPadding;
+                this.redraw();
+                return this;
+            };
+            Table.prototype.columnPadding = function (columnPadding) {
+                if (columnPadding == null) {
+                    return this._columnPadding;
+                }
+                this._columnPadding = columnPadding;
                 this.redraw();
                 return this;
             };
