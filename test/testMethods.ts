@@ -18,7 +18,7 @@ module TestMethods {
     }
   }
 
-  export function verifySpaceRequest(sr: Plottable._SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
+  export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
     assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
     assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
   }
@@ -30,8 +30,8 @@ module TestMethods {
         minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
-    (<any> c)._fixedWidthFlag = fixedWidth == null ? false : true;
-    (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
+    (<any> c).fixedWidth = () => fixedWidth == null ? false : true;
+    (<any> c).fixedHeight = () => fixedHeight == null ? false : true;
     return c;
   }
 

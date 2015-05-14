@@ -627,16 +627,7 @@ declare module Plottable {
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
     };
-    /**
-     * A simple bounding box.
-     */
-    type SelectionArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
-    type _SpaceRequest = {
+    type SpaceRequest = {
         minWidth: number;
         minHeight: number;
     };
@@ -762,7 +753,7 @@ declare module Plottable {
         (scale: S): any;
     }
     module Scales {
-        interface ExtentProvider<D> {
+        interface ExtentsProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
     }
@@ -848,15 +839,8 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        /**
-         * Constructs a copy of the Scale with the same domain and range but without
-         * any registered listeners.
-         *
-         * @returns {Scale} A copy of the calling Scale.
-         */
-        copy(): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
 
@@ -885,12 +869,6 @@ declare module Plottable {
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         invert(value: number): D;
-        /**
-         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-         *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-         */
-        copy(): QuantitativeScale<D>;
         domain(): D[];
         domain(values: D[]): QuantitativeScale<D>;
         protected _setDomain(values: D[]): void;
@@ -960,13 +938,6 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            /**
-             * Constructs a copy of the LinearScale with the same domain and range but
-             * without any registered listeners.
-             *
-             * @returns {Linear} A copy of the calling LinearScale.
-             */
-            copy(): Linear;
             _defaultExtent(): number[];
         }
     }
@@ -1007,7 +978,6 @@ declare module Plottable {
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
             ticks(): number[];
-            copy(): ModifiedLog;
             _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
@@ -1101,7 +1071,6 @@ declare module Plottable {
              * @returns {Ordinal} The calling Scale.Ordinal
              */
             outerPadding(outerPadding: number): Category;
-            copy(): Category;
             scale(value: string): number;
         }
     }
@@ -1150,7 +1119,6 @@ declare module Plottable {
              */
             tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
-            copy(): Time;
             _defaultExtent(): Date[];
         }
     }
@@ -1167,20 +1135,19 @@ declare module Plottable {
          * By default it generates a linear scale internally.
          */
         class InterpolatedColor extends Scale<number, string> {
+            static REDS: string[];
+            static BLUES: string[];
+            static POSNEG: string[];
             /**
-             * Constructs an InterpolatedColorScale.
+             * An InterpolatedColorScale maps numbers to color strings.
              *
-             * An InterpolatedColorScale maps numbers evenly to color strings.
-             *
-             * @constructor
-             * @param {string | string[]} colorRange the type of color scale to
-             *     create. Default is "reds". @see {@link colorRange} for further
-             *     options.
-             * @param {string} scaleType the type of underlying scale to use
-             *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-             *     for further options.
+             * @param {string[]} colors an array of strings representing color values in hex
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
+             * @param {string} scaleType a string representing the underlying scale
+             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
+             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
-            constructor(colorRange?: string | string[], scaleType?: string);
+            constructor(colorRange?: string[], scaleType?: string);
             /**
              * Gets the color range.
              *
@@ -1190,27 +1157,14 @@ declare module Plottable {
             /**
              * Sets the color range.
              *
-             * @param {string|string[]} [colorRange]. If provided and if colorRange is one of
+             * @param {string[]} [colorRange]. If provided and if colorRange is one of
              * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
              * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
              * "dodgerblue"], the resulting scale will interpolate between the color
              * values across the domain.
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
-            colorRange(colorRange: string | string[]): InterpolatedColor;
-            /**
-             * Gets the internal scale type.
-             *
-             * @returns {string} The current scale type.
-             */
-            scaleType(): string;
-            /**
-             * Sets the internal scale type.
-             *
-             * @param {string} scaleType If provided, the type of d3 scale to use internally.  (linear/log/sqrt/pow).
-             * @returns {InterpolatedColor} The calling InterpolatedColor.
-             */
-            scaleType(scaleType: string): InterpolatedColor;
+            colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
         }
     }
@@ -1430,8 +1384,6 @@ declare module Plottable {
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
         protected _clipPathEnabled: boolean;
-        protected _fixedHeightFlag: boolean;
-        protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
@@ -1465,7 +1417,7 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
-        requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest;
+        requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes the size, position, and alignment from the specified values.
          * If no parameters are supplied and the Component is a root node,
@@ -1727,7 +1679,7 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1755,7 +1707,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Axis extends Component {
+    class Axis<D> extends Component {
         /**
          * The css class applied to each end tick mark (the line on the end tick).
          */
@@ -1771,7 +1723,7 @@ declare module Plottable {
         protected _tickMarkContainer: D3.Selection;
         protected _tickLabelContainer: D3.Selection;
         protected _baseline: D3.Selection;
-        protected _scale: Scale<any, number>;
+        protected _scale: Scale<D, number>;
         protected _computedWidth: number;
         protected _computedHeight: number;
         /**
@@ -1785,18 +1737,18 @@ declare module Plottable {
          * @param {Formatter} Data is passed through this formatter before being
          * displayed.
          */
-        constructor(scale: Scale<any, number>, orientation: string, formatter?: (d: any) => string);
+        constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
         protected _computeHeight(): number;
-        requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+        requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
         fixedHeight(): boolean;
         fixedWidth(): boolean;
         protected _rescale(): void;
-        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
+        computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<D>;
         protected _setup(): void;
-        protected _getTickValues(): any[];
+        protected _getTickValues(): D[];
         protected _render(): void;
         protected _generateBaselineAttrHash(): {
             x1: number;
@@ -1827,7 +1779,7 @@ declare module Plottable {
          * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
          * @returns {Axis} The calling Axis.
          */
-        formatter(formatter: Formatter): Axis;
+        formatter(formatter: Formatter): Axis<D>;
         /**
          * Gets the current tick mark length.
          *
@@ -1840,7 +1792,7 @@ declare module Plottable {
          * @param {number} length If provided, length of each tick.
          * @returns {Axis} The calling Axis.
          */
-        tickLength(length: number): Axis;
+        tickLength(length: number): Axis<D>;
         /**
          * Gets the current end tick mark length.
          *
@@ -1853,7 +1805,7 @@ declare module Plottable {
          * @param {number} length If provided, the length of the end ticks.
          * @returns {BaseAxis} The calling Axis.
          */
-        endTickLength(length: number): Axis;
+        endTickLength(length: number): Axis<D>;
         protected _maxLabelTickLength(): number;
         /**
          * Gets the padding between each tick mark and its associated label.
@@ -1868,7 +1820,7 @@ declare module Plottable {
          * @param {number} padding If provided, the desired padding.
          * @returns {Axis} The calling Axis.
          */
-        tickLabelPadding(padding: number): Axis;
+        tickLabelPadding(padding: number): Axis<D>;
         /**
          * Gets the size of the gutter (the extra space between the tick
          * labels and the outer edge of the axis).
@@ -1884,7 +1836,7 @@ declare module Plottable {
          * @param {number} size If provided, the desired gutter.
          * @returns {Axis} The calling Axis.
          */
-        gutter(size: number): Axis;
+        gutter(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
          *
@@ -1898,7 +1850,7 @@ declare module Plottable {
          * (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
-        orientation(orientation: string): Axis;
+        orientation(orientation: string): Axis<D>;
         /**
          * Gets whether the Axis is currently set to show the first and last
          * tick labels.
@@ -1915,7 +1867,7 @@ declare module Plottable {
          * labels.
          * @returns {Axis} The calling Axis.
          */
-        showEndTickLabels(show: boolean): Axis;
+        showEndTickLabels(show: boolean): Axis<D>;
     }
 }
 
@@ -1949,7 +1901,7 @@ declare module Plottable {
          * Currently, up to two tiers are supported.
          */
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
-        class Time extends Axis {
+        class Time extends Axis<Date> {
             /**
              * The css class applied to each time axis tier
              */
@@ -1998,7 +1950,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Numeric extends Axis {
+        class Numeric extends Axis<number> {
             /**
              * Constructs a NumericAxis.
              *
@@ -2014,7 +1966,7 @@ declare module Plottable {
             protected _setup(): void;
             protected _computeWidth(): number;
             protected _computeHeight(): number;
-            protected _getTickValues(): any[];
+            protected _getTickValues(): number[];
             protected _rescale(): void;
             protected _render(): void;
             /**
@@ -2064,7 +2016,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Axes {
-        class Category extends Axis {
+        class Category extends Axis<string> {
             /**
              * Constructs a CategoryAxis.
              *
@@ -2080,7 +2032,7 @@ declare module Plottable {
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
              * Gets the tick label angle
@@ -2097,7 +2049,7 @@ declare module Plottable {
              */
             tickLabelAngle(angle: number): Category;
             protected _render(): Category;
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
         }
     }
 }
@@ -2119,7 +2071,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
             constructor(displayText?: string, orientation?: string);
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
@@ -2161,6 +2113,8 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _render(): void;
         }
     }
@@ -2231,7 +2185,7 @@ declare module Plottable {
              */
             scale(scale: Scales.Color): Legend;
             destroy(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
              * Gets the legend entry under the given pixel position.
              *
@@ -2254,6 +2208,8 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
@@ -2307,8 +2263,10 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _setup(): void;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _render(): void;
         }
     }
@@ -2372,7 +2330,7 @@ declare module Plottable {
              */
             add(component: Component, row: number, col: number): Table;
             protected _remove(component: Component): boolean;
-            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
              * Sets the row and column padding on the Table.
@@ -2464,6 +2422,8 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             boxVisible(show: boolean): SelectionBoxLayer;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }

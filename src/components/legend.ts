@@ -49,8 +49,6 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
 
       this.xAlignment("right").yAlignment("top");
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
@@ -172,7 +170,7 @@ export module Components {
       };
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
 
       var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
@@ -315,6 +313,14 @@ export module Components {
         this.render();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
   }
 }

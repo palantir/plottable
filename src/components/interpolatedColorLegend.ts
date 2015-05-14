@@ -46,8 +46,6 @@ export module Components {
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
@@ -111,6 +109,14 @@ export module Components {
       }
     }
 
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
+    }
+
     private _generateTicks() {
       var domain = this._scale.domain();
       var slope = (domain[1] - domain[0]) / this._numSwatches;
@@ -134,7 +140,7 @@ export module Components {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();

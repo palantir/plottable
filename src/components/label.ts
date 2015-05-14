@@ -34,12 +34,10 @@ export module Components {
       this.text(displayText);
       this.orientation(orientation);
       this.xAlignment("center").yAlignment("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
       this._padding = 0;
     }
 
-    public requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
       var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
@@ -136,6 +134,14 @@ export module Components {
         this.redraw();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
 
     protected _render() {

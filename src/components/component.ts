@@ -35,8 +35,6 @@ module Plottable {
       "center": 0.5,
       "bottom": 1
     };
-    protected _fixedHeightFlag = false;
-    protected _fixedWidthFlag = false;
     protected _isSetup = false;
     protected _isAnchored = false;
 
@@ -141,7 +139,7 @@ module Plottable {
       this._isSetup = true;
     }
 
-    public requestedSpace(availableWidth: number, availableHeight: number): _SpaceRequest {
+    public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {
         minWidth: 0,
         minHeight: 0
@@ -410,8 +408,8 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed width.
      */
-    public fixedWidth(): boolean {
-      return this._fixedWidthFlag;
+    public fixedWidth() {
+      return false;
     }
 
     /**
@@ -420,8 +418,8 @@ module Plottable {
      *
      * @returns {boolean} Whether the component has a fixed height.
      */
-    public fixedHeight(): boolean {
-      return this._fixedHeightFlag;
+    public fixedHeight() {
+      return false;
     }
 
     public _merge(c: Component, below: boolean): Components.Group {

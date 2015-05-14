@@ -14,8 +14,6 @@ export module Components {
     constructor() {
       super();
       this.classed("selection-box-layer", true);
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
     }
 
     protected _setup() {
@@ -107,6 +105,14 @@ export module Components {
       this._boxVisible = show;
       this.render();
       return this;
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
   }
 }

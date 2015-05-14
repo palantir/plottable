@@ -35,17 +35,7 @@ module Plottable {
 
   export type AttributeToAppliedProjector = { [attrToSet: string]: AppliedProjector; };
 
-  /**
-   * A simple bounding box.
-   */
-  export type SelectionArea = {
-    xMin: number;
-    xMax: number;
-    yMin: number;
-    yMax: number;
-  }
-
-  export type _SpaceRequest = {
+  export type SpaceRequest = {
     minWidth: number;
     minHeight: number;
   }

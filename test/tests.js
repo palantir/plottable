@@ -32,8 +32,8 @@ var TestMethods;
                 minHeight: fixedHeight == null ? 0 : fixedHeight
             };
         };
-        c._fixedWidthFlag = fixedWidth == null ? false : true;
-        c._fixedHeightFlag = fixedHeight == null ? false : true;
+        c.fixedWidth = function () { return fixedWidth == null ? false : true; };
+        c.fixedHeight = function () { return fixedHeight == null ? false : true; };
         return c;
     }
     TestMethods.fixComponentSize = fixComponentSize;
@@ -232,14 +232,18 @@ var Mocks;
             _super.call(this);
             this.fsWidth = width;
             this.fsHeight = height;
-            this._fixedWidthFlag = true;
-            this._fixedHeightFlag = true;
         }
         FixedSizeComponent.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: this.fsWidth,
                 minHeight: this.fsHeight
             };
+        };
+        FixedSizeComponent.prototype.fixedWidth = function () {
+            return true;
+        };
+        FixedSizeComponent.prototype.fixedHeight = function () {
+            return true;
         };
         return FixedSizeComponent;
     })(Plottable.Component);
@@ -6977,7 +6981,7 @@ describe("Domainer", function () {
         domainer = new Plottable.Domainer();
     });
     it("pad() works in general case", function () {
-        scale.addExtentProvider(function (scale) { return [[100, 200]]; });
+        scale.addExtentsProvider(function (scale) { return [[100, 200]]; });
         scale.autoDomain();
         scale.domainer(new Plottable.Domainer().pad(0.2));
         assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
@@ -6988,7 +6992,7 @@ describe("Domainer", function () {
         var f = d3.time.format("%x");
         var d1 = f.parse("06/02/2014");
         var d2 = f.parse("06/03/2014");
-        timeScale.addExtentProvider(function (scale) { return [[d1, d2]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[d1, d2]]; });
         timeScale.autoDomain();
         timeScale.domainer(new Plottable.Domainer().pad());
         var dd1 = timeScale.domain()[0];
@@ -7052,7 +7056,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 5);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.pad().addPaddingException("key", startDate);
         timeScale.domainer(domainer);
@@ -7090,7 +7094,7 @@ describe("Domainer", function () {
         var startDate = new Date(2000, 5, 6);
         var endDate = new Date(2003, 0, 1);
         var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentProvider(function (scale) { return [[startDate, endDate]]; });
+        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
         timeScale.autoDomain();
         domainer.addIncludedValue("key", includedDate);
         timeScale.domainer(domainer);
@@ -7138,18 +7142,6 @@ describe("Domainer", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Scales", function () {
-    it("Scale's copy() works correctly", function () {
-        var testCallback = function (listenable) {
-            return true;
-        };
-        var scale = new Plottable.Scales.Linear();
-        scale.onUpdate(testCallback);
-        var scaleCopy = scale.copy();
-        assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
-        assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.strictEqual(scale._callbacks.values().length, 1, "The initial scale should have a callback attached");
-        assert.strictEqual(scaleCopy._callbacks.values().length, 0, "The copied scale should not have any callback from the original scale attached");
-    });
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale(d3.scale.identity());
         var callbackWasCalled = false;
@@ -7186,7 +7178,7 @@ describe("Scales", function () {
             scale = new Plottable.Scales.Linear();
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-            scale.addExtentProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
+            scale.addExtentsProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
             scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
@@ -7219,22 +7211,22 @@ describe("Scales", function () {
             svg1.remove();
             svg2.remove();
         });
-        it("addExtentProvider()", function () {
-            scale.addExtentProvider(function (scale) { return [[0, 10]]; });
+        it("addExtentsProvider()", function () {
+            scale.addExtentsProvider(function (scale) { return [[0, 10]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
-            scale.addExtentProvider(function (scale) { return [[-10, 0]]; });
+            scale.addExtentsProvider(function (scale) { return [[-10, 0]]; });
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
         });
-        it("removeExtentProvider()", function () {
+        it("removeExtentsProvider()", function () {
             var posProvider = function (scale) { return [[0, 10]]; };
-            scale.addExtentProvider(posProvider);
+            scale.addExtentsProvider(posProvider);
             var negProvider = function (scale) { return [[-10, 0]]; };
-            scale.addExtentProvider(negProvider);
+            scale.addExtentsProvider(negProvider);
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
-            scale.removeExtentProvider(negProvider);
+            scale.removeExtentsProvider(negProvider);
             scale.autoDomain();
             assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
         });
@@ -7413,7 +7405,7 @@ describe("Scales", function () {
             assert.strictEqual("#b10026", scale.scale(16));
         });
         it("linearly interpolates colors in L*a*b color space", function () {
-            var scale = new Plottable.Scales.InterpolatedColor("reds");
+            var scale = new Plottable.Scales.InterpolatedColor();
             scale.domain([0, 1]);
             assert.strictEqual("#b10026", scale.scale(1));
             assert.strictEqual("#d9151f", scale.scale(0.9));
@@ -7445,21 +7437,15 @@ describe("Scales", function () {
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange("reds");
+            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
         });
-        it("can be converted to a different scale type", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-            scale.domain([0, 16]);
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#777777", scale.scale(8));
-            scale.scaleType("log");
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#e3e3e3", scale.scale(8));
-        });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
     describe("Modified Log Scale", function () {
         var scale;
         var base = 10;
@@ -7478,7 +7464,7 @@ describe("Scales", function () {
             });
             assert.closeTo(scale.scale(0), 0, epsilon);
         });
-        it("is close to log() for large values", function () {
+        it("Has log() behavior at values > base", function () {
             [10, 100, 23103.4, 5].forEach(function (x) {
                 assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
             });
@@ -7489,12 +7475,12 @@ describe("Scales", function () {
                 assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
             });
         });
-        it("domain defaults to [0, 1]", function () {
+        it("domain defaults to [0, base]", function () {
             scale = new Plottable.Scales.ModifiedLog(base);
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("works with a Domainer", function () {
-            scale.addExtentProvider(function (scale) { return [[0, base * 2]]; });
+            scale.addExtentsProvider(function (scale) { return [[0, base * 2]]; });
             var domain = scale.domain();
             scale.domainer(new Plottable.Domainer().pad(0.1));
             assert.operator(scale.domain()[0], "<", domain[0]);
@@ -7504,11 +7490,11 @@ describe("Scales", function () {
             assert.operator(domain[1], "<=", scale.domain()[1]);
             scale = new Plottable.Scales.ModifiedLog(base);
             scale.domainer(new Plottable.Domainer());
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];
-            scale.addExtentProvider(function (scale) { return providedExtents; });
+            scale.addExtentsProvider(function (scale) { return providedExtents; });
             scale.autoDomain();
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
@@ -7523,7 +7509,7 @@ describe("Scales", function () {
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
         it("works on inverted domain", function () {
-            scale.addExtentProvider(function (scale) { return [[200, -100]]; });
+            scale.addExtentsProvider(function (scale) { return [[200, -100]]; });
             scale.autoDomain();
             var range = scale.range();
             assert.closeTo(scale.scale(-100), range[1], epsilon);
@@ -7544,7 +7530,7 @@ describe("Scales", function () {
         });
         it("ticks() is always non-empty", function () {
             var desiredExtents = [];
-            scale.addExtentProvider(function (scale) { return desiredExtents; });
+            scale.addExtentsProvider(function (scale) { return desiredExtents; });
             [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (extent) {
                 desiredExtents = [extent];
                 scale.autoDomain();
