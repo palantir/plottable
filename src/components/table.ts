@@ -84,8 +84,8 @@ export module Components {
         throw Error("Cannot add null to a table cell");
       }
 
-      if (this._components().indexOf(component) === -1) {
-        component._parent(this);
+      if (!this.has(component)) {
+        component.detach();
 
         var currentComponent = this._rows[row] && this._rows[row][col];
         if (currentComponent) {
@@ -97,9 +97,7 @@ export module Components {
         this._padTableToSize(this._nRows, this._nCols);
         this._rows[row][col] = component;
 
-        if (this._isAnchored) {
-          component.anchor(this._content);
-        }
+        this._adoptAndAnchor(component);
         this.redraw();
       }
       return this;

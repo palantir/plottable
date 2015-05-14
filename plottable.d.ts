@@ -1613,8 +1613,8 @@ declare module Plottable {
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
-        _parent(): ComponentContainer;
-        _parent(parentElement: ComponentContainer): any;
+        parent(): ComponentContainer;
+        parent(parentElement: ComponentContainer): any;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1677,8 +1677,14 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
+        constructor();
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
+        /**
+         * Checks whether the specified Component is in the ComponentContainer.
+         */
+        has(component: Component): boolean;
+        protected _adoptAndAnchor(component: Component): void;
         /**
          * Removes the specified Component from the ComponentContainer.
          */

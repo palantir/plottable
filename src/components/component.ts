@@ -22,7 +22,7 @@ module Plottable {
     protected _clipPathEnabled = false;
     private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
-    private _parentElement: ComponentContainer;
+    private _parent: ComponentContainer;
     private _xAlignment: string = "left";
     private static _xAlignToProportion: { [alignment: string]: number } = {
       "left": 0,
@@ -243,7 +243,7 @@ module Plottable {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent().redraw();
+          this.parent().redraw();
         }
       }
       return this;
@@ -480,17 +480,13 @@ module Plottable {
      * @returns The calling Component.
      */
     public detach() {
+      this.parent(null);
+
       if (this._isAnchored) {
         this._element.remove();
       }
-
-      var parent: ComponentContainer = this._parent();
-
-      if (parent != null) {
-        parent.remove(this);
-      }
       this._isAnchored = false;
-      this._parentElement = null;
+
       this._onDetachCallbacks.callCallbacks(this);
       return this;
     }
@@ -518,15 +514,17 @@ module Plottable {
       return this;
     }
 
-    public _parent(): ComponentContainer;
-    public _parent(parentElement: ComponentContainer): any;
-    public _parent(parentElement?: ComponentContainer): any {
-      if (parentElement === undefined) {
-        return this._parentElement;
+    public parent(): ComponentContainer;
+    public parent(parentElement: ComponentContainer): any;
+    public parent(parent?: ComponentContainer): any {
+      if (parent === undefined) {
+       return this._parent;
       }
-
-      this.detach();
-      this._parentElement = parentElement;
+      if (parent !== null && !parent.has(this)) {
+        throw new Error("Passed invalid parent");
+      }
+      this._parent = parent;
+      return this;
     }
 
     /**
@@ -575,12 +573,12 @@ module Plottable {
      */
     public originToSVG(): Point {
       var origin = this.origin();
-      var ancestor = this._parent();
+      var ancestor = this.parent();
       while (ancestor != null) {
         var ancestorOrigin = ancestor.origin();
         origin.x += ancestorOrigin.x;
         origin.y += ancestorOrigin.y;
-        ancestor = ancestor._parent();
+        ancestor = ancestor.parent();
       }
       return origin;
     }

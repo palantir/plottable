@@ -5908,6 +5908,23 @@ describe("ComponentGroups", function () {
         assert.deepEqual(componentGroup.components(), [c0, c1, c2, c3], "Components can be add()-ed after rendering");
         svg.remove();
     });
+    it("can add null to a Group without failing", function () {
+        var cg1 = new Plottable.Components.Group();
+        var c = new Plottable.Component;
+        cg1.add(c);
+        assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
+        assert.doesNotThrow(function () { return cg1.add(null); });
+        assert.strictEqual(cg1.components().length, 1, "adding null to a group should have no effect on the group");
+    });
+    it("add()-ing a Component to the Group should detach() it from its current location", function () {
+        var c1 = new Plottable.Component;
+        var svg = TestMethods.generateSVG();
+        c1.renderTo(svg);
+        var group = new Plottable.Components.Group();
+        group.add(c1);
+        assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
+        svg.remove();
+    });
     it("remove()", function () {
         var c0 = new Plottable.Component();
         var c1 = new Plottable.Component();
@@ -5921,6 +5938,42 @@ describe("ComponentGroups", function () {
         assert.deepEqual(componentGroup.components(), [c0, c2], "removing a Component not in the Group does not remove Components from the Group");
         assert.strictEqual(svg.node().childNodes[0], c1._element.node(), "The Component not in the Group stayed put");
         svg.remove();
+    });
+    it("detach()-ing a Component that is in the Group removes it from the Group", function () {
+        var c0 = new Plottable.Component();
+        var componentGroup = new Plottable.Components.Group([c0]);
+        var svg = TestMethods.generateSVG();
+        componentGroup.renderTo(svg);
+        c0.detach();
+        assert.lengthOf(componentGroup.components(), 0, "Component is no longer in the Group");
+        assert.isNull(c0.parent(), "Component disconnected from Group");
+        svg.remove();
+    });
+    it("can move components to other groups after anchoring", function () {
+        var svg = TestMethods.generateSVG();
+        var cg1 = new Plottable.Components.Group();
+        var cg2 = new Plottable.Components.Group();
+        var c = new Plottable.Component();
+        cg1.add(c);
+        cg1.renderTo(svg);
+        cg2.renderTo(svg);
+        assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
+        assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
+        assert.strictEqual(c.parent(), cg1, "component's parent before moving should be the group 1");
+        assert.doesNotThrow(function () { return cg2.add(c); }, Error, "should be able to move components between groups after anchoring");
+        assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
+        assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
+        assert.strictEqual(c.parent(), cg2, "component's parent after movement should be the group 2");
+        svg.remove();
+    });
+    it("has()", function () {
+        var c0 = new Plottable.Component();
+        var componentGroup = new Plottable.Components.Group([c0]);
+        assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group");
+        componentGroup.remove(c0);
+        assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Group");
+        componentGroup.add(c0);
+        assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group again");
     });
     it("components in componentGroups overlap", function () {
         var c1 = TestMethods.makeFixedSizeComponent(10, 10);
@@ -6011,31 +6064,6 @@ describe("ComponentGroups", function () {
             assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
             assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
             svg.remove();
-        });
-        it("can move components to other groups after anchoring", function () {
-            var svg = TestMethods.generateSVG();
-            var cg1 = new Plottable.Components.Group();
-            var cg2 = new Plottable.Components.Group();
-            var c = new Plottable.Component();
-            cg1.add(c);
-            cg1.renderTo(svg);
-            cg2.renderTo(svg);
-            assert.strictEqual(cg2.components().length, 0, "second group should have no component before movement");
-            assert.strictEqual(cg1.components().length, 1, "first group should have 1 component before movement");
-            assert.strictEqual(c._parent(), cg1, "component's parent before moving should be the group 1");
-            assert.doesNotThrow(function () { return cg2.add(c); }, Error, "should be able to move components between groups after anchoring");
-            assert.strictEqual(cg2.components().length, 1, "second group should have 1 component after movement");
-            assert.strictEqual(cg1.components().length, 0, "first group should have no components after movement");
-            assert.strictEqual(c._parent(), cg2, "component's parent after movement should be the group 2");
-            svg.remove();
-        });
-        it("can add null to a Group without failing", function () {
-            var cg1 = new Plottable.Components.Group();
-            var c = new Plottable.Component;
-            cg1.add(c);
-            assert.strictEqual(cg1.components().length, 1, "there should first be 1 element in the group");
-            assert.doesNotThrow(function () { return cg1.add(null); });
-            assert.strictEqual(cg1.components().length, 1, "adding null to a group should have no effect on the group");
         });
     });
     describe("Merging components works as expected", function () {
@@ -6234,6 +6262,19 @@ describe("Component behavior", function () {
             assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
             svg.remove();
         });
+    });
+    it("parent()", function () {
+        var c = new Plottable.Component();
+        var acceptingContainer = {
+            has: function (component) { return true; }
+        };
+        c.parent(acceptingContainer);
+        assert.strictEqual(c.parent(), acceptingContainer, "Component's parent was set if the Component is contained in the parent");
+        var rejectingContainer = {
+            has: function (component) { return false; }
+        };
+        assert.throws(function () { return c.parent(rejectingContainer); }, Error, "invalid parent");
+        svg.remove();
     });
     describe("computeLayout", function () {
         it("computeLayout defaults and updates intelligently", function () {
@@ -6463,10 +6504,10 @@ describe("Component behavior", function () {
         var group = new Plottable.Components.Group;
         group.renderTo(svg1);
         group.add(plot);
-        assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+        assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
         plot.renderTo(svg2);
-        assert.strictEqual(plot._parent(), null, "the plot should be outside the group");
+        assert.strictEqual(plot.parent(), null, "the plot should be outside the group");
         assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
         svg1.remove();
         svg2.remove();
@@ -6706,6 +6747,15 @@ describe("Tables", function () {
             var t = new Plottable.Components.Table([[c1]]);
             assert.throw(function () { return t.add(null, 0, 0); }, "Cannot add null to a table cell");
         });
+        it("add()-ing a Component to the Group should detach() it from its current location", function () {
+            var c1 = new Plottable.Component;
+            var svg = TestMethods.generateSVG();
+            c1.renderTo(svg);
+            var table = new Plottable.Components.Table();
+            table.add(c1, 0, 0);
+            assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
+            svg.remove();
+        });
         it("add() works even if a component is added with a high column and low row index", function () {
             // Solves #180, a weird bug
             var t = new Plottable.Components.Table();
@@ -6897,6 +6947,23 @@ describe("Tables", function () {
             table.remove(c1);
             assert.deepEqual(table._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
         });
+        it("detach()-ing a Component removes it from the Table", function () {
+            table = new Plottable.Components.Table([[c1]]);
+            var svg = TestMethods.generateSVG();
+            table.renderTo(svg);
+            c1.detach();
+            assert.deepEqual(table._rows, [[null]], "calling detach() on the Component removed it from the Table");
+            svg.remove();
+        });
+    });
+    it("has()", function () {
+        var c0 = new Plottable.Component();
+        var componentGroup = new Plottable.Components.Table([[c0]]);
+        assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table");
+        componentGroup.remove(c0);
+        assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Table");
+        componentGroup.add(c0, 1, 1);
+        assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table again");
     });
 });
 

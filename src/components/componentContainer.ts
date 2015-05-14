@@ -6,6 +6,13 @@ module Plottable {
    * It will not do anything if instantiated directly.
    */
   export class ComponentContainer extends Component {
+    private _detachCallback: ComponentCallback;
+
+    constructor() {
+      super();
+      this._detachCallback = (component: Component) => this.remove(component);
+    }
+
     public anchor(selection: D3.Selection) {
       super.anchor(selection);
       this._components().forEach((c) => c.anchor(this._content));
@@ -18,10 +25,27 @@ module Plottable {
     }
 
     /**
+     * Checks whether the specified Component is in the ComponentContainer.
+     */
+    public has(component: Component) {
+      return this._components().indexOf(component) >= 0;
+    }
+
+    protected _adoptAndAnchor(component: Component) {
+      component.parent(this);
+      component.onDetach(this._detachCallback);
+      if (this._isAnchored) {
+        component.anchor(this._content);
+      }
+    }
+
+    /**
      * Removes the specified Component from the ComponentContainer.
      */
     public remove(component: Component) {
-      if (this._remove(component)) {
+      if (this.has(component)) {
+        component.offDetach(this._detachCallback);
+        this._remove(component);
         component.detach();
         this.redraw();
       }

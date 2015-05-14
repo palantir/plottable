@@ -128,6 +128,20 @@ describe("Component behavior", () => {
     });
   });
 
+  it("parent()", () => {
+    var c = new Plottable.Component();
+    var acceptingContainer = {
+      has: (component: Plottable.Component) => true
+    };
+    c.parent(<any> acceptingContainer);
+    assert.strictEqual(c.parent(), acceptingContainer, "Component's parent was set if the Component is contained in the parent");
+    var rejectingContainer = {
+      has: (component: Plottable.Component) => false
+    };
+    assert.throws(() => c.parent(<any> rejectingContainer), Error, "invalid parent");
+    svg.remove();
+  });
+
   describe("computeLayout", () => {
     it("computeLayout defaults and updates intelligently", () => {
       c.anchor(svg);
@@ -398,12 +412,12 @@ describe("Component behavior", () => {
 
     group.add(plot);
 
-    assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+    assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
 
     plot.renderTo(svg2);
 
-    assert.strictEqual(plot._parent(), null, "the plot should be outside the group");
+    assert.strictEqual(plot.parent(), null, "the plot should be outside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
 
     svg1.remove();

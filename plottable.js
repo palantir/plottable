@@ -3248,7 +3248,7 @@ var Plottable;
                     this._scheduleComputeLayout();
                 }
                 else {
-                    this._parent().redraw();
+                    this.parent().redraw();
                 }
             }
             return this;
@@ -3437,15 +3437,11 @@ var Plottable;
          * @returns The calling Component.
          */
         Component.prototype.detach = function () {
+            this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
             }
-            var parent = this._parent();
-            if (parent != null) {
-                parent.remove(this);
-            }
             this._isAnchored = false;
-            this._parentElement = null;
             this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
@@ -3470,12 +3466,15 @@ var Plottable;
             this._onDetachCallbacks.delete(callback);
             return this;
         };
-        Component.prototype._parent = function (parentElement) {
-            if (parentElement === undefined) {
-                return this._parentElement;
+        Component.prototype.parent = function (parent) {
+            if (parent === undefined) {
+                return this._parent;
             }
-            this.detach();
-            this._parentElement = parentElement;
+            if (parent !== null && !parent.has(this)) {
+                throw new Error("Passed invalid parent");
+            }
+            this._parent = parent;
+            return this;
         };
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
@@ -3519,12 +3518,12 @@ var Plottable;
          */
         Component.prototype.originToSVG = function () {
             var origin = this.origin();
-            var ancestor = this._parent();
+            var ancestor = this.parent();
             while (ancestor != null) {
                 var ancestorOrigin = ancestor.origin();
                 origin.x += ancestorOrigin.x;
                 origin.y += ancestorOrigin.y;
-                ancestor = ancestor._parent();
+                ancestor = ancestor.parent();
             }
             return origin;
         };
@@ -3592,7 +3591,9 @@ var Plottable;
     var ComponentContainer = (function (_super) {
         __extends(ComponentContainer, _super);
         function ComponentContainer() {
-            _super.apply(this, arguments);
+            var _this = this;
+            _super.call(this);
+            this._detachCallback = function (component) { return _this.remove(component); };
         }
         ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
@@ -3605,10 +3606,25 @@ var Plottable;
             return this;
         };
         /**
+         * Checks whether the specified Component is in the ComponentContainer.
+         */
+        ComponentContainer.prototype.has = function (component) {
+            return this._components().indexOf(component) >= 0;
+        };
+        ComponentContainer.prototype._adoptAndAnchor = function (component) {
+            component.parent(this);
+            component.onDetach(this._detachCallback);
+            if (this._isAnchored) {
+                component.anchor(this._content);
+            }
+        };
+        /**
          * Removes the specified Component from the ComponentContainer.
          */
         ComponentContainer.prototype.remove = function (component) {
-            if (this._remove(component)) {
+            if (this.has(component)) {
+                component.offDetach(this._detachCallback);
+                this._remove(component);
                 component.detach();
                 this.redraw();
             }
@@ -3725,17 +3741,15 @@ var Plottable;
              */
             Group.prototype.add = function (component, prepend) {
                 if (prepend === void 0) { prepend = false; }
-                if (component != null && this._componentList.indexOf(component) === -1) {
+                if (component != null && !this.has(component)) {
+                    component.detach();
                     if (prepend) {
                         this._componentList.unshift(component);
                     }
                     else {
                         this._componentList.push(component);
                     }
-                    component._parent(this);
-                    if (this._isAnchored) {
-                        component.anchor(this._content);
-                    }
+                    this._adoptAndAnchor(component);
                     this.redraw();
                 }
                 return this;
@@ -5799,8 +5813,8 @@ var Plottable;
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
-                if (this._components().indexOf(component) === -1) {
-                    component._parent(this);
+                if (!this.has(component)) {
+                    component.detach();
                     var currentComponent = this._rows[row] && this._rows[row][col];
                     if (currentComponent) {
                         component = component.above(currentComponent);
@@ -5809,9 +5823,7 @@ var Plottable;
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
                     this._rows[row][col] = component;
-                    if (this._isAnchored) {
-                        component.anchor(this._content);
-                    }
+                    this._adoptAndAnchor(component);
                     this.redraw();
                 }
                 return this;

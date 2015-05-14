@@ -30,6 +30,31 @@ describe("ComponentGroups", () => {
     svg.remove();
   });
 
+  it("can add null to a Group without failing", () => {
+    var cg1 = new Plottable.Components.Group();
+    var c = new Plottable.Component;
+
+    cg1.add(c);
+
+    assert.strictEqual(cg1.components().length, 1,
+      "there should first be 1 element in the group");
+
+    assert.doesNotThrow(() => cg1.add(null));
+
+    assert.strictEqual(cg1.components().length, 1,
+      "adding null to a group should have no effect on the group");
+  });
+
+  it("add()-ing a Component to the Group should detach() it from its current location", () => {
+    var c1 = new Plottable.Component;
+    var svg = TestMethods.generateSVG();
+    c1.renderTo(svg);
+    var group = new Plottable.Components.Group();
+    group.add(c1);
+    assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
+    svg.remove();
+  });
+
   it("remove()", () => {
     var c0 = new Plottable.Component();
     var c1 = new Plottable.Component();
@@ -47,6 +72,66 @@ describe("ComponentGroups", () => {
     assert.strictEqual(svg.node().childNodes[0], (<D3.Selection> (<any> c1)._element).node(), "The Component not in the Group stayed put");
 
     svg.remove();
+  });
+
+  it("detach()-ing a Component that is in the Group removes it from the Group", () => {
+    var c0 = new Plottable.Component();
+    var componentGroup = new Plottable.Components.Group([c0]);
+    var svg = TestMethods.generateSVG();
+    componentGroup.renderTo(svg);
+    c0.detach();
+    assert.lengthOf(componentGroup.components(), 0, "Component is no longer in the Group");
+    assert.isNull(c0.parent(), "Component disconnected from Group");
+    svg.remove();
+  });
+
+  it("can move components to other groups after anchoring", () => {
+    var svg = TestMethods.generateSVG();
+
+    var cg1 = new Plottable.Components.Group();
+    var cg2 = new Plottable.Components.Group();
+    var c = new Plottable.Component();
+
+    cg1.add(c);
+
+    cg1.renderTo(svg);
+    cg2.renderTo(svg);
+
+    assert.strictEqual(cg2.components().length, 0,
+      "second group should have no component before movement");
+
+    assert.strictEqual(cg1.components().length, 1,
+      "first group should have 1 component before movement");
+
+    assert.strictEqual(c.parent(), cg1,
+      "component's parent before moving should be the group 1"
+    );
+
+    assert.doesNotThrow(() => cg2.add(c), Error,
+      "should be able to move components between groups after anchoring"
+    );
+
+    assert.strictEqual(cg2.components().length, 1,
+      "second group should have 1 component after movement");
+
+    assert.strictEqual(cg1.components().length, 0,
+      "first group should have no components after movement");
+
+    assert.strictEqual(c.parent(), cg2,
+      "component's parent after movement should be the group 2"
+    );
+
+    svg.remove();
+  });
+
+  it("has()", () => {
+    var c0 = new Plottable.Component();
+    var componentGroup = new Plottable.Components.Group([c0]);
+    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group");
+    componentGroup.remove(c0);
+    assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Group");
+    componentGroup.add(c0);
+    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Group again");
   });
 
   it("components in componentGroups overlap", () => {
@@ -163,60 +248,6 @@ describe("ComponentGroups", () => {
       assert.strictEqual(cg.width(), SVG_WIDTH, "occupies all offered width");
       assert.strictEqual(cg.height(), SVG_HEIGHT, "occupies all offered height");
       svg.remove();
-    });
-
-    it("can move components to other groups after anchoring", () => {
-      var svg = TestMethods.generateSVG();
-
-      var cg1 = new Plottable.Components.Group();
-      var cg2 = new Plottable.Components.Group();
-      var c = new Plottable.Component();
-
-      cg1.add(c);
-
-      cg1.renderTo(svg);
-      cg2.renderTo(svg);
-
-      assert.strictEqual(cg2.components().length, 0,
-        "second group should have no component before movement");
-
-      assert.strictEqual(cg1.components().length, 1,
-        "first group should have 1 component before movement");
-
-      assert.strictEqual(c._parent(), cg1,
-        "component's parent before moving should be the group 1"
-      );
-
-      assert.doesNotThrow(() => cg2.add(c), Error,
-        "should be able to move components between groups after anchoring"
-      );
-
-      assert.strictEqual(cg2.components().length, 1,
-        "second group should have 1 component after movement");
-
-      assert.strictEqual(cg1.components().length, 0,
-        "first group should have no components after movement");
-
-      assert.strictEqual(c._parent(), cg2,
-        "component's parent after movement should be the group 2"
-      );
-
-      svg.remove();
-    });
-
-    it("can add null to a Group without failing", () => {
-      var cg1 = new Plottable.Components.Group();
-      var c = new Plottable.Component;
-
-      cg1.add(c);
-
-      assert.strictEqual(cg1.components().length, 1,
-        "there should first be 1 element in the group");
-
-      assert.doesNotThrow(() => cg1.add(null));
-
-      assert.strictEqual(cg1.components().length, 1,
-        "adding null to a group should have no effect on the group");
     });
   });
 

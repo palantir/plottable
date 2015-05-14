@@ -113,6 +113,16 @@ describe("Tables", () => {
       assert.throw(() => t.add(null, 0, 0), "Cannot add null to a table cell");
     });
 
+    it("add()-ing a Component to the Group should detach() it from its current location", () => {
+      var c1 = new Plottable.Component;
+      var svg = TestMethods.generateSVG();
+      c1.renderTo(svg);
+      var table = new Plottable.Components.Table();
+      table.add(c1, 0, 0);
+      assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
+      svg.remove();
+    });
+
     it("add() works even if a component is added with a high column and low row index", () => {
       // Solves #180, a weird bug
       var t = new Plottable.Components.Table();
@@ -337,5 +347,24 @@ describe("Tables", () => {
       table.remove(c1);
       assert.deepEqual((<any> table)._rows, [[null, c2, c3], [c4, c5, c6]], "item twice");
     });
+
+    it("detach()-ing a Component removes it from the Table", () => {
+      table = new Plottable.Components.Table([[c1]]);
+      var svg = TestMethods.generateSVG();
+      table.renderTo(svg);
+      c1.detach();
+      assert.deepEqual((<any> table)._rows, [[null]], "calling detach() on the Component removed it from the Table");
+      svg.remove();
+    });
+  });
+
+  it("has()", () => {
+    var c0 = new Plottable.Component();
+    var componentGroup = new Plottable.Components.Table([[c0]]);
+    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table");
+    componentGroup.remove(c0);
+    assert.isFalse(componentGroup.has(c0), "correctly checks that Component is no longer in the Table");
+    componentGroup.add(c0, 1, 1);
+    assert.isTrue(componentGroup.has(c0), "correctly checks that Component is in the Table again");
   });
 });

@@ -78,16 +78,15 @@ export module Components {
      * @param {boolean} prepend If true, prepends the Component. If false, appends it.
      */
     public add(component: Component, prepend = false) {
-      if (component != null && this._componentList.indexOf(component) === -1) {
+      if (component != null && !this.has(component)) {
+        component.detach();
         if (prepend) {
           this._componentList.unshift(component);
         } else {
           this._componentList.push(component);
         }
-        component._parent(this);
-        if (this._isAnchored) {
-          component.anchor(this._content);
-        }
+
+        this._adoptAndAnchor(component);
         this.redraw();
       }
       return this;
