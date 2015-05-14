@@ -7338,7 +7338,7 @@ describe("Scales", function () {
             assert.strictEqual("#b10026", scale.scale(16));
         });
         it("linearly interpolates colors in L*a*b color space", function () {
-            var scale = new Plottable.Scales.InterpolatedColor("reds");
+            var scale = new Plottable.Scales.InterpolatedColor();
             scale.domain([0, 1]);
             assert.strictEqual("#b10026", scale.scale(1));
             assert.strictEqual("#d9151f", scale.scale(0.9));
@@ -7370,19 +7370,8 @@ describe("Scales", function () {
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange("reds");
+            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
-        });
-        it("can be converted to a different scale type", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-            scale.domain([0, 16]);
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#777777", scale.scale(8));
-            scale.scaleType("log");
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#e3e3e3", scale.scale(8));
         });
     });
     describe("Modified Log Scale", function () {

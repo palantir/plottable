@@ -1167,20 +1167,19 @@ declare module Plottable {
          * By default it generates a linear scale internally.
          */
         class InterpolatedColor extends Scale<number, string> {
+            static REDS: string[];
+            static BLUES: string[];
+            static POSNEG: string[];
             /**
-             * Constructs an InterpolatedColorScale.
+             * An InterpolatedColorScale maps numbers to color strings.
              *
-             * An InterpolatedColorScale maps numbers evenly to color strings.
-             *
-             * @constructor
-             * @param {string | string[]} colorRange the type of color scale to
-             *     create. Default is "reds". @see {@link colorRange} for further
-             *     options.
-             * @param {string} scaleType the type of underlying scale to use
-             *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-             *     for further options.
+             * @param {string[]} colors an array of strings representing color values in hex
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
+             * @param {string} scaleType a string representing the underlying scale
+             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
+             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
-            constructor(colorRange?: string | string[], scaleType?: string);
+            constructor(colorRange?: string[], scaleType?: string);
             /**
              * Gets the color range.
              *
@@ -1190,27 +1189,14 @@ declare module Plottable {
             /**
              * Sets the color range.
              *
-             * @param {string|string[]} [colorRange]. If provided and if colorRange is one of
+             * @param {string[]} [colorRange]. If provided and if colorRange is one of
              * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
              * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
              * "dodgerblue"], the resulting scale will interpolate between the color
              * values across the domain.
              * @returns {InterpolatedColor} The calling InterpolatedColor.
              */
-            colorRange(colorRange: string | string[]): InterpolatedColor;
-            /**
-             * Gets the internal scale type.
-             *
-             * @returns {string} The current scale type.
-             */
-            scaleType(): string;
-            /**
-             * Sets the internal scale type.
-             *
-             * @param {string} scaleType If provided, the type of d3 scale to use internally.  (linear/log/sqrt/pow).
-             * @returns {InterpolatedColor} The calling InterpolatedColor.
-             */
-            scaleType(scaleType: string): InterpolatedColor;
+            colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
         }
     }

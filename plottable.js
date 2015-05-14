@@ -2241,65 +2241,52 @@ var Plottable;
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
-             * Constructs an InterpolatedColorScale.
+             * An InterpolatedColorScale maps numbers to color strings.
              *
-             * An InterpolatedColorScale maps numbers evenly to color strings.
-             *
-             * @constructor
-             * @param {string | string[]} colorRange the type of color scale to
-             *     create. Default is "reds". @see {@link colorRange} for further
-             *     options.
-             * @param {string} scaleType the type of underlying scale to use
-             *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-             *     for further options.
-             */
-            function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = "reds"; }
-                if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
-                this._scaleType = scaleType;
-                _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
-            }
-            /**
-             * Converts the string array into a d3 scale.
-             *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
+             * @param {string[]} colors an array of strings representing color values in hex
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
              * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow")
+             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
-            InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
-                var scale;
+            function InterpolatedColor(colorRange, scaleType) {
+                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
+                if (scaleType === void 0) { scaleType = "linear"; }
+                this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
-                        scale = d3.scale.linear();
+                        this._colorScale = d3.scale.linear();
                         break;
                     case "log":
-                        scale = d3.scale.log();
+                        this._colorScale = d3.scale.log();
                         break;
                     case "sqrt":
-                        scale = d3.scale.sqrt();
+                        this._colorScale = d3.scale.sqrt();
                         break;
                     case "pow":
-                        scale = d3.scale.pow();
+                        this._colorScale = d3.scale.pow();
                         break;
                 }
-                if (scale == null) {
+                if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
+                _super.call(this, this._D3InterpolatedScale());
+            }
+            /**
+             * Generates the converted QuantitativeScale.
+             *
+             * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
+             */
+            InterpolatedColor.prototype._D3InterpolatedScale = function () {
+                return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
             };
             /**
-             * Creates a d3 interpolator given the color array.
+             * Generates the d3 interpolator for colors.
              *
-             * This class implements a scale that maps numbers to strings.
-             *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
-             * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
+             * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
-            InterpolatedColor._interpolateColors = function (colors) {
+            InterpolatedColor.prototype._interpolateColors = function () {
+                var colors = this._colorRange;
                 if (colors.length < 2) {
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
@@ -2322,33 +2309,14 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
-                this._resetScale();
-                return this;
-            };
-            InterpolatedColor.prototype.scaleType = function (scaleType) {
-                if (scaleType == null) {
-                    return this._scaleType;
-                }
-                this._scaleType = scaleType;
+                this._colorRange = colorRange;
                 this._resetScale();
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+                this._d3Scale = this._D3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
-            };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (typeof (colorRange) === "object") {
-                    return colorRange;
-                }
-                else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
-                    return InterpolatedColor._COLOR_SCALES[colorRange];
-                }
-                else {
-                    return InterpolatedColor._COLOR_SCALES["reds"];
-                }
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
@@ -2358,49 +2326,47 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor._COLOR_SCALES = {
-                reds: [
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ],
-                blues: [
-                    "#FFFFFF",
-                    "#CCFFFF",
-                    "#A5FFFD",
-                    "#85F7FB",
-                    "#6ED3EF",
-                    "#55A7E0",
-                    "#417FD0",
-                    "#2545D3",
-                    "#0B02E1"
-                ],
-                posneg: [
-                    "#0B02E1",
-                    "#2545D3",
-                    "#417FD0",
-                    "#55A7E0",
-                    "#6ED3EF",
-                    "#85F7FB",
-                    "#A5FFFD",
-                    "#CCFFFF",
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ]
-            };
+            InterpolatedColor.REDS = [
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
+            InterpolatedColor.BLUES = [
+                "#FFFFFF",
+                "#CCFFFF",
+                "#A5FFFD",
+                "#85F7FB",
+                "#6ED3EF",
+                "#55A7E0",
+                "#417FD0",
+                "#2545D3",
+                "#0B02E1"
+            ];
+            InterpolatedColor.POSNEG = [
+                "#0B02E1",
+                "#2545D3",
+                "#417FD0",
+                "#55A7E0",
+                "#6ED3EF",
+                "#85F7FB",
+                "#A5FFFD",
+                "#CCFFFF",
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
             return InterpolatedColor;
         })(Plottable.Scale);
         Scales.InterpolatedColor = InterpolatedColor;
