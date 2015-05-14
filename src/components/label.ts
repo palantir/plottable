@@ -34,8 +34,6 @@ export module Components {
       this.text(displayText);
       this.orientation(orientation);
       this.xAlignment("center").yAlignment("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
       this._padding = 0;
     }
 
@@ -136,6 +134,14 @@ export module Components {
         this.redraw();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
 
     protected _render() {

@@ -42,7 +42,7 @@ describe("Scales", () => {
     });
 
     it("works with a Domainer", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
       var domain = scale.domain();
       scale.domainer(new Plottable.Domainer().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
@@ -59,7 +59,7 @@ describe("Scales", () => {
 
     it("gives reasonable values for ticks()", () => {
       var providedExtents = [[0, base / 2]];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => providedExtents);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => providedExtents);
       scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
@@ -76,7 +76,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
       scale.autoDomain();
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
@@ -99,7 +99,7 @@ describe("Scales", () => {
 
     it("ticks() is always non-empty", () => {
       var desiredExtents: number[][] = [];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
         desiredExtents = [extent];
         scale.autoDomain();

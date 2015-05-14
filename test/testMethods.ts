@@ -30,8 +30,8 @@ module TestMethods {
         minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
-    (<any> c)._fixedWidthFlag = fixedWidth == null ? false : true;
-    (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
+    (<any> c).fixedWidth = () => fixedWidth == null ? false : true;
+    (<any> c).fixedHeight = () => fixedHeight == null ? false : true;
     return c;
   }
 

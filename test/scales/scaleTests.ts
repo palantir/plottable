@@ -3,22 +3,6 @@
 var assert = chai.assert;
 
 describe("Scales", () => {
-  it("Scale's copy() works correctly", () => {
-    var testCallback = (listenable: any) => {
-      return true;
-    };
-    var scale = new Plottable.Scales.Linear();
-    scale.onUpdate(testCallback);
-    var scaleCopy = scale.copy();
-    assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
-    assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-
-    assert.strictEqual((<any>scale)._callbacks.values().length, 1,
-      "The initial scale should have a callback attached");
-    assert.strictEqual((<any>scaleCopy)._callbacks.values().length, 0,
-      "The copied scale should not have any callback from the original scale attached");
-  });
-
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale(d3.scale.identity());
 
@@ -61,7 +45,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
       scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
@@ -105,25 +89,25 @@ describe("Scales", () => {
       svg2.remove();
     });
 
-    it("addExtentProvider()", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+    it("addExtentsProvider()", () => {
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
-    it("removeExtentProvider()", () => {
-      var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
-      scale.addExtentProvider(posProvider);
-      var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
-      scale.addExtentProvider(negProvider);
+    it("removeExtentsProvider()", () => {
+      var posProvider = (scale: Plottable.Scale<number, number>) => [[0, 10]];
+      scale.addExtentsProvider(posProvider);
+      var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
+      scale.addExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
-      scale.removeExtentProvider(negProvider);
+      scale.removeExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
     });

@@ -7,7 +7,7 @@ module Plottable {
   }
 
   export module Scales {
-    export interface ExtentProvider<D> {
+    export interface ExtentsProvider<D> {
       (scale: Scale<D, any>): D[][];
     }
   }
@@ -18,7 +18,7 @@ module Plottable {
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
-    private _extentProviders: Utils.Set<Scales.ExtentProvider<D>>;
+    private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
 
     /**
      * Constructs a new Scale.
@@ -33,11 +33,11 @@ module Plottable {
     constructor(scale: D3.Scale.Scale) {
       this._d3Scale = scale;
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
-      this._extentProviders = new Utils.Set<Scales.ExtentProvider<D>>();
+      this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.merge(this._extentProviders.values().map((provider) => provider(this)));
+      return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
     }
 
     protected _getExtent(): D[] {
@@ -165,23 +165,13 @@ module Plottable {
       }
     }
 
-    /**
-     * Constructs a copy of the Scale with the same domain and range but without
-     * any registered listeners.
-     *
-     * @returns {Scale} A copy of the calling Scale.
-     */
-    public copy(): Scale<D, R> {
-      return new Scale<D, R>(this._d3Scale.copy());
-    }
-
-    public addExtentProvider(provider: Scales.ExtentProvider<D>) {
-      this._extentProviders.add(provider);
+    public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
+      this._extentsProviders.add(provider);
       return this;
     }
 
-    public removeExtentProvider(provider: Scales.ExtentProvider<D>) {
-      this._extentProviders.delete(provider);
+    public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
+      this._extentsProviders.delete(provider);
       return this;
     }
   }

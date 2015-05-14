@@ -172,10 +172,6 @@ export module Scales {
       return ticks;
     }
 
-    public copy(): ModifiedLog {
-      return new ModifiedLog(this._base);
-    }
-
     public _niceDomain(domain: number[], count?: number): number[] {
       return domain;
     }

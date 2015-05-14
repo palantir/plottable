@@ -627,15 +627,6 @@ declare module Plottable {
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
     };
-    /**
-     * A simple bounding box.
-     */
-    type SelectionArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     type SpaceRequest = {
         minWidth: number;
         minHeight: number;
@@ -762,7 +753,7 @@ declare module Plottable {
         (scale: S): any;
     }
     module Scales {
-        interface ExtentProvider<D> {
+        interface ExtentsProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
     }
@@ -848,15 +839,8 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        /**
-         * Constructs a copy of the Scale with the same domain and range but without
-         * any registered listeners.
-         *
-         * @returns {Scale} A copy of the calling Scale.
-         */
-        copy(): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
 
@@ -885,12 +869,6 @@ declare module Plottable {
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         invert(value: number): D;
-        /**
-         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-         *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-         */
-        copy(): QuantitativeScale<D>;
         domain(): D[];
         domain(values: D[]): QuantitativeScale<D>;
         protected _setDomain(values: D[]): void;
@@ -960,13 +938,6 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            /**
-             * Constructs a copy of the LinearScale with the same domain and range but
-             * without any registered listeners.
-             *
-             * @returns {Linear} A copy of the calling LinearScale.
-             */
-            copy(): Linear;
             _defaultExtent(): number[];
         }
     }
@@ -1007,7 +978,6 @@ declare module Plottable {
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
             ticks(): number[];
-            copy(): ModifiedLog;
             _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
@@ -1101,7 +1071,6 @@ declare module Plottable {
              * @returns {Ordinal} The calling Scale.Ordinal
              */
             outerPadding(outerPadding: number): Category;
-            copy(): Category;
             scale(value: string): number;
         }
     }
@@ -1150,7 +1119,6 @@ declare module Plottable {
              */
             tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
-            copy(): Time;
             _defaultExtent(): Date[];
         }
     }
@@ -1416,8 +1384,6 @@ declare module Plottable {
         protected _content: D3.Selection;
         protected _boundingBox: D3.Selection;
         protected _clipPathEnabled: boolean;
-        protected _fixedHeightFlag: boolean;
-        protected _fixedWidthFlag: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
@@ -2125,6 +2091,8 @@ declare module Plottable {
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _render(): void;
         }
     }
@@ -2218,6 +2186,8 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
@@ -2271,6 +2241,8 @@ declare module Plottable {
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _render(): void;
@@ -2432,6 +2404,8 @@ declare module Plottable {
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             boxVisible(show: boolean): SelectionBoxLayer;
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
         }
     }
 }
