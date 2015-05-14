@@ -2525,7 +2525,7 @@ declare module Plottable {
          */
         protected _updateExtents(): void;
         protected _updateExtentsForProperty(property: string): void;
-        protected _filterForProperty(property: string): Accessor<any>;
+        protected _filterForProperty(property: string): Accessor<boolean>;
         /**
          * Override in subclass to add special extents, such as included values
          */

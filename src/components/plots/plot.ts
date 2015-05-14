@@ -284,12 +284,12 @@ module Plottable {
       this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
     }
 
-    protected _filterForProperty(property: string): Accessor<any> {
+    protected _filterForProperty(property: string): Accessor<boolean> {
       return null;
     }
 
     private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>,
-        extents: D3.Map<any[]>, filter: Accessor<any>) {
+        extents: D3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       extents.set(key, this._datasetKeysInOrder.map((key) => {
@@ -300,7 +300,7 @@ module Plottable {
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, plotMetadata: any, filter: Accessor<any>): any[] {
+    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, plotMetadata: any, filter: Accessor<boolean>): any[] {
       var data = dataset.data();
       if (filter != null) {
         data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
