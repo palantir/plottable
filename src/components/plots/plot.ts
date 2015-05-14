@@ -38,7 +38,7 @@ module Plottable {
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
     protected _attrExtents: D3.Map<any[]>;
-    private _extentProvider: Scales.ExtentProvider<any>;
+    private _extentsProvider: Scales.ExtentsProvider<any>;
 
     protected _animate: boolean = false;
     private _animators: Animators.PlotAnimatorMap = {};
@@ -68,7 +68,7 @@ module Plottable {
       this._key2PlotDatasetKey = d3.map();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
-      this._extentProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
+      this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
@@ -571,13 +571,13 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
-      scale.removeExtentProvider(this._extentProvider);
+      scale.removeExtentsProvider(this._extentsProvider);
       scale._autoDomainIfAutomaticMode();
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
-      scale.addExtentProvider(this._extentProvider);
+      scale.addExtentsProvider(this._extentsProvider);
       scale._autoDomainIfAutomaticMode();
     }
 

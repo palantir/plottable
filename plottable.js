@@ -1531,11 +1531,11 @@ var Plottable;
             this._domainModificationInProgress = false;
             this._d3Scale = scale;
             this._callbacks = new Plottable.Utils.CallbackSet();
-            this._extentProviders = new Plottable.Utils.Set();
+            this._extentsProviders = new Plottable.Utils.Set();
         }
         Scale.prototype._getAllExtents = function () {
             var _this = this;
-            return d3.merge(this._extentProviders.values().map(function (provider) { return provider(_this); }));
+            return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
@@ -1625,12 +1625,12 @@ var Plottable;
         Scale.prototype.copy = function () {
             return new Scale(this._d3Scale.copy());
         };
-        Scale.prototype.addExtentProvider = function (provider) {
-            this._extentProviders.add(provider);
+        Scale.prototype.addExtentsProvider = function (provider) {
+            this._extentsProviders.add(provider);
             return this;
         };
-        Scale.prototype.removeExtentProvider = function (provider) {
-            this._extentProviders.delete(provider);
+        Scale.prototype.removeExtentsProvider = function (provider) {
+            this._extentsProviders.delete(provider);
             return this;
         };
         return Scale;
@@ -6191,7 +6191,7 @@ var Plottable;
             this._key2PlotDatasetKey = d3.map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
-            this._extentProvider = function (scale) { return _this._extentsForScale(scale); };
+            this._extentsProvider = function (scale) { return _this._extentsForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
             this._renderCallback = function (scale) { return _this.render(); };
@@ -6633,12 +6633,12 @@ var Plottable;
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
-            scale.removeExtentProvider(this._extentProvider);
+            scale.removeExtentsProvider(this._extentsProvider);
             scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
-            scale.addExtentProvider(this._extentProvider);
+            scale.addExtentsProvider(this._extentsProvider);
             scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._generatePropertyToProjectors = function () {
