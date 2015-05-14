@@ -2752,7 +2752,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Grid extends Rectangle<any, any> {
+        class Grid<X, Y> extends Rectangle<any, any> {
             /**
              * Constructs a GridPlot.
              *
@@ -2765,12 +2765,12 @@ declare module Plottable {
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>);
-            addDataset(dataset: Dataset): Grid;
+            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
+            addDataset(dataset: Dataset): Grid<X, Y>;
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            x(x?: number | Accessor<number> | any | Accessor<any>, scale?: Scale<any, number>): any;
-            y(y?: number | Accessor<number> | any, scale?: Scale<any, number>): any;
+            x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
         }
     }
 }
