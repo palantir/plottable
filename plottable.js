@@ -1796,9 +1796,9 @@ var Plottable;
                 if (base === void 0) { base = 10; }
                 _super.call(this, d3.scale.linear());
                 this._showIntermediateTicks = false;
-                this.base = base;
-                this.pivot = this.base;
-                this.untransformedDomain = this._defaultExtent();
+                this._base = base;
+                this._pivot = this._base;
+                this._setDomain(this._defaultExtent());
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
@@ -1814,19 +1814,19 @@ var Plottable;
             ModifiedLog.prototype.adjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
-                if (x < this.pivot) {
-                    x += (this.pivot - x) / this.pivot;
+                if (x < this._pivot) {
+                    x += (this._pivot - x) / this._pivot;
                 }
-                x = Math.log(x) / Math.log(this.base);
+                x = Math.log(x) / Math.log(this._base);
                 x *= negationFactor;
                 return x;
             };
             ModifiedLog.prototype.invertedAdjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
-                x = Math.pow(this.base, x);
-                if (x < this.pivot) {
-                    x = (this.pivot * (x - 1)) / (this.pivot - 1);
+                x = Math.pow(this._base, x);
+                if (x < this._pivot) {
+                    x = (this._pivot * (x - 1)) / (this._pivot - 1);
                 }
                 x *= negationFactor;
                 return x;
@@ -1838,28 +1838,27 @@ var Plottable;
                 return this.invertedAdjustedLog(this._d3Scale.invert(x));
             };
             ModifiedLog.prototype._getDomain = function () {
-                return this.untransformedDomain;
+                return this._untransformedDomain;
             };
             ModifiedLog.prototype._setDomain = function (values) {
-                this.untransformedDomain = values;
+                this._untransformedDomain = values;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-                this._d3Scale.domain(transformedDomain);
-                this._dispatchUpdate();
+                _super.prototype._setDomain.call(this, transformedDomain);
             };
             ModifiedLog.prototype.ticks = function () {
                 // Say your domain is [-100, 100] and your pivot is 10.
                 // then we're going to draw negative log ticks from -100 to -10,
                 // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
-                var min = Plottable.Utils.Methods.min(this.untransformedDomain, 0);
-                var max = Plottable.Utils.Methods.max(this.untransformedDomain, 0);
+                var min = Plottable.Utils.Methods.min(this._untransformedDomain, 0);
+                var max = Plottable.Utils.Methods.max(this._untransformedDomain, 0);
                 var negativeLower = min;
-                var negativeUpper = middle(min, max, -this.pivot);
-                var positiveLower = middle(min, max, this.pivot);
+                var negativeUpper = middle(min, max, -this._pivot);
+                var positiveLower = middle(min, max, this._pivot);
                 var positiveUpper = max;
                 var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
-                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this.pivot, 0, this.pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -1886,13 +1885,13 @@ var Plottable;
                 if (nTicks === 0) {
                     return [];
                 }
-                var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
-                var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+                var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
+                var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-                var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+                var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
                 var uniqMultiples = Plottable.Utils.Methods.uniq(multiples);
-                var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this.base, b - 1) * x; }); });
+                var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this._base, b - 1) * x; }); });
                 var flattened = Plottable.Utils.Methods.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
                 var sorted = filtered.sort(function (x, y) { return x - y; });
@@ -1906,8 +1905,8 @@ var Plottable;
              * distance when plotted.
              */
             ModifiedLog.prototype._howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this.untransformedDomain, 0));
-                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this.untransformedDomain, 0));
+                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
+                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
                 var adjustedLower = this.adjustedLog(lower);
                 var adjustedUpper = this.adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -1926,7 +1925,7 @@ var Plottable;
                 }
             };
             ModifiedLog.prototype._defaultExtent = function () {
-                return [0, 1];
+                return [0, this._base];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2206,65 +2205,52 @@ var Plottable;
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
-             * Constructs an InterpolatedColorScale.
+             * An InterpolatedColorScale maps numbers to color strings.
              *
-             * An InterpolatedColorScale maps numbers evenly to color strings.
-             *
-             * @constructor
-             * @param {string | string[]} colorRange the type of color scale to
-             *     create. Default is "reds". @see {@link colorRange} for further
-             *     options.
-             * @param {string} scaleType the type of underlying scale to use
-             *     (linear/pow/log/sqrt). Default is "linear". @see {@link scaleType}
-             *     for further options.
-             */
-            function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = "reds"; }
-                if (scaleType === void 0) { scaleType = "linear"; }
-                this._colorRange = this._resolveColorValues(colorRange);
-                this._scaleType = scaleType;
-                _super.call(this, InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType));
-            }
-            /**
-             * Converts the string array into a d3 scale.
-             *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
+             * @param {string[]} colors an array of strings representing color values in hex
+             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
              * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow")
+             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
-            InterpolatedColor._getD3InterpolatedScale = function (colors, scaleType) {
-                var scale;
+            function InterpolatedColor(colorRange, scaleType) {
+                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
+                if (scaleType === void 0) { scaleType = "linear"; }
+                this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
-                        scale = d3.scale.linear();
+                        this._colorScale = d3.scale.linear();
                         break;
                     case "log":
-                        scale = d3.scale.log();
+                        this._colorScale = d3.scale.log();
                         break;
                     case "sqrt":
-                        scale = d3.scale.sqrt();
+                        this._colorScale = d3.scale.sqrt();
                         break;
                     case "pow":
-                        scale = d3.scale.pow();
+                        this._colorScale = d3.scale.pow();
                         break;
                 }
-                if (scale == null) {
+                if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                return scale.range([0, 1]).interpolate(InterpolatedColor._interpolateColors(colors));
+                _super.call(this, this._D3InterpolatedScale());
+            }
+            /**
+             * Generates the converted QuantitativeScale.
+             *
+             * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
+             */
+            InterpolatedColor.prototype._D3InterpolatedScale = function () {
+                return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
             };
             /**
-             * Creates a d3 interpolator given the color array.
+             * Generates the d3 interpolator for colors.
              *
-             * This class implements a scale that maps numbers to strings.
-             *
-             * @param {string[]} colors an array of strings representing color
-             *     values in hex ("#FFFFFF") or keywords ("white").
-             * @returns {D3.Transition.Interpolate} The d3 interpolator for colors.
+             * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
-            InterpolatedColor._interpolateColors = function (colors) {
+            InterpolatedColor.prototype._interpolateColors = function () {
+                var colors = this._colorRange;
                 if (colors.length < 2) {
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
@@ -2287,33 +2273,14 @@ var Plottable;
                 if (colorRange == null) {
                     return this._colorRange;
                 }
-                this._colorRange = this._resolveColorValues(colorRange);
-                this._resetScale();
-                return this;
-            };
-            InterpolatedColor.prototype.scaleType = function (scaleType) {
-                if (scaleType == null) {
-                    return this._scaleType;
-                }
-                this._scaleType = scaleType;
+                this._colorRange = colorRange;
                 this._resetScale();
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = InterpolatedColor._getD3InterpolatedScale(this._colorRange, this._scaleType);
+                this._d3Scale = this._D3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
-            };
-            InterpolatedColor.prototype._resolveColorValues = function (colorRange) {
-                if (typeof (colorRange) === "object") {
-                    return colorRange;
-                }
-                else if (InterpolatedColor._COLOR_SCALES[colorRange] != null) {
-                    return InterpolatedColor._COLOR_SCALES[colorRange];
-                }
-                else {
-                    return InterpolatedColor._COLOR_SCALES["reds"];
-                }
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
@@ -2323,49 +2290,47 @@ var Plottable;
                 }
                 return this;
             };
-            InterpolatedColor._COLOR_SCALES = {
-                reds: [
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ],
-                blues: [
-                    "#FFFFFF",
-                    "#CCFFFF",
-                    "#A5FFFD",
-                    "#85F7FB",
-                    "#6ED3EF",
-                    "#55A7E0",
-                    "#417FD0",
-                    "#2545D3",
-                    "#0B02E1"
-                ],
-                posneg: [
-                    "#0B02E1",
-                    "#2545D3",
-                    "#417FD0",
-                    "#55A7E0",
-                    "#6ED3EF",
-                    "#85F7FB",
-                    "#A5FFFD",
-                    "#CCFFFF",
-                    "#FFFFFF",
-                    "#FFF6E1",
-                    "#FEF4C0",
-                    "#FED976",
-                    "#FEB24C",
-                    "#FD8D3C",
-                    "#FC4E2A",
-                    "#E31A1C",
-                    "#B10026"
-                ]
-            };
+            InterpolatedColor.REDS = [
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
+            InterpolatedColor.BLUES = [
+                "#FFFFFF",
+                "#CCFFFF",
+                "#A5FFFD",
+                "#85F7FB",
+                "#6ED3EF",
+                "#55A7E0",
+                "#417FD0",
+                "#2545D3",
+                "#0B02E1"
+            ];
+            InterpolatedColor.POSNEG = [
+                "#0B02E1",
+                "#2545D3",
+                "#417FD0",
+                "#55A7E0",
+                "#6ED3EF",
+                "#85F7FB",
+                "#A5FFFD",
+                "#CCFFFF",
+                "#FFFFFF",
+                "#FFF6E1",
+                "#FEF4C0",
+                "#FED976",
+                "#FEB24C",
+                "#FD8D3C",
+                "#FC4E2A",
+                "#E31A1C",
+                "#B10026"
+            ];
             return InterpolatedColor;
         })(Plottable.Scale);
         Scales.InterpolatedColor = InterpolatedColor;

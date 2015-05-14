@@ -3,9 +3,9 @@
 module Plottable {
 export module Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
-    private base: number;
-    private pivot: number;
-    private untransformedDomain: number[];
+    private _base: number;
+    private _pivot: number;
+    private _untransformedDomain: number[];
     private _showIntermediateTicks = false;
 
     /**
@@ -35,9 +35,9 @@ export module Scales {
      */
     constructor(base = 10) {
       super(d3.scale.linear());
-      this.base = base;
-      this.pivot = this.base;
-      this.untransformedDomain = this._defaultExtent();
+      this._base = base;
+      this._pivot = this._base;
+      this._setDomain(this._defaultExtent());
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
@@ -55,11 +55,11 @@ export module Scales {
       var negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
-      if (x < this.pivot) {
-        x += (this.pivot - x) / this.pivot;
+      if (x < this._pivot) {
+        x += (this._pivot - x) / this._pivot;
       }
 
-      x = Math.log(x) / Math.log(this.base);
+      x = Math.log(x) / Math.log(this._base);
 
       x *= negationFactor;
       return x;
@@ -69,10 +69,10 @@ export module Scales {
       var negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
-      x = Math.pow(this.base, x);
+      x = Math.pow(this._base, x);
 
-      if (x < this.pivot) {
-        x = (this.pivot * (x - 1)) / (this.pivot - 1);
+      if (x < this._pivot) {
+        x = (this._pivot * (x - 1)) / (this._pivot - 1);
       }
 
       x *= negationFactor;
@@ -88,14 +88,13 @@ export module Scales {
     }
 
     protected _getDomain() {
-      return this.untransformedDomain;
+      return this._untransformedDomain;
     }
 
     protected _setDomain(values: number[]) {
-      this.untransformedDomain = values;
+      this._untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
-      this._d3Scale.domain(transformedDomain);
-      this._dispatchUpdate();
+      super._setDomain(transformedDomain);
     }
 
     public ticks(): number[] {
@@ -103,11 +102,11 @@ export module Scales {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = Utils.Methods.min(this.untransformedDomain, 0);
-      var max = Utils.Methods.max(this.untransformedDomain, 0);
+      var min = Utils.Methods.min(this._untransformedDomain, 0);
+      var max = Utils.Methods.max(this._untransformedDomain, 0);
       var negativeLower = min;
-      var negativeUpper = middle(min, max, -this.pivot);
-      var positiveLower = middle(min, max, this.pivot);
+      var negativeUpper = middle(min, max, -this._pivot);
+      var positiveLower = middle(min, max, this._pivot);
       var positiveUpper = max;
 
       var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
@@ -115,7 +114,7 @@ export module Scales {
       var linearTicks = this._showIntermediateTicks ?
                                 d3.scale.linear().domain([negativeUpper, positiveLower])
                                         .ticks(this._howManyTicks(negativeUpper, positiveLower)) :
-                                [-this.pivot, 0, this.pivot].filter((x) => min <= x && x <= max);
+                                [-this._pivot, 0, this._pivot].filter((x) => min <= x && x <= max);
 
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
@@ -143,13 +142,13 @@ export module Scales {
       if (nTicks === 0) {
         return [];
       }
-      var startLogged = Math.floor(Math.log(lower) / Math.log(this.base));
-      var endLogged = Math.ceil(Math.log(upper) / Math.log(this.base));
+      var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
+      var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-      var multiples = d3.range(this.base, 1, -(this.base - 1) / nMultiples).map(Math.floor);
+      var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
       var uniqMultiples = Utils.Methods.uniq(multiples);
-      var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this.base, b - 1) * x));
+      var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
       var flattened = Utils.Methods.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
@@ -164,8 +163,8 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(Utils.Methods.min(this.untransformedDomain, 0));
-      var adjustedMax = this.adjustedLog(Utils.Methods.max(this.untransformedDomain, 0));
+      var adjustedMin = this.adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
+      var adjustedMax = this.adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
       var adjustedLower = this.adjustedLog(lower);
       var adjustedUpper = this.adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -202,7 +201,7 @@ export module Scales {
     }
 
     public _defaultExtent(): number[] {
-      return [0, 1];
+      return [0, this._base];
     }
 
   }

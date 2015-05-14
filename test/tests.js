@@ -7330,7 +7330,7 @@ describe("Scales", function () {
             assert.strictEqual("#b10026", scale.scale(16));
         });
         it("linearly interpolates colors in L*a*b color space", function () {
-            var scale = new Plottable.Scales.InterpolatedColor("reds");
+            var scale = new Plottable.Scales.InterpolatedColor();
             scale.domain([0, 1]);
             assert.strictEqual("#b10026", scale.scale(1));
             assert.strictEqual("#d9151f", scale.scale(0.9));
@@ -7362,21 +7362,15 @@ describe("Scales", function () {
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange("reds");
+            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
         });
-        it("can be converted to a different scale type", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
-            scale.domain([0, 16]);
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#777777", scale.scale(8));
-            scale.scaleType("log");
-            assert.strictEqual("#000000", scale.scale(0));
-            assert.strictEqual("#ffffff", scale.scale(16));
-            assert.strictEqual("#e3e3e3", scale.scale(8));
-        });
     });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
     describe("Modified Log Scale", function () {
         var scale;
         var base = 10;
@@ -7395,7 +7389,7 @@ describe("Scales", function () {
             });
             assert.closeTo(scale.scale(0), 0, epsilon);
         });
-        it("is close to log() for large values", function () {
+        it("Has log() behavior at values > base", function () {
             [10, 100, 23103.4, 5].forEach(function (x) {
                 assert.closeTo(scale.scale(x), Math.log(x) / Math.log(10), 0.1);
             });
@@ -7406,9 +7400,9 @@ describe("Scales", function () {
                 assert.closeTo(x, scale.scale(scale.invert(x)), epsilon);
             });
         });
-        it("domain defaults to [0, 1]", function () {
+        it("domain defaults to [0, base]", function () {
             scale = new Plottable.Scales.ModifiedLog(base);
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("works with a Domainer", function () {
             scale.addExtentsProvider(function (scale) { return [[0, base * 2]]; });
@@ -7421,7 +7415,7 @@ describe("Scales", function () {
             assert.operator(domain[1], "<=", scale.domain()[1]);
             scale = new Plottable.Scales.ModifiedLog(base);
             scale.domainer(new Plottable.Domainer());
-            assert.deepEqual(scale.domain(), [0, 1]);
+            assert.deepEqual(scale.domain(), [0, base]);
         });
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];
