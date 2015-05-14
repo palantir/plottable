@@ -1616,15 +1616,6 @@ var Plottable;
                 return this;
             }
         };
-        /**
-         * Constructs a copy of the Scale with the same domain and range but without
-         * any registered listeners.
-         *
-         * @returns {Scale} A copy of the calling Scale.
-         */
-        Scale.prototype.copy = function () {
-            return new Scale(this._d3Scale.copy());
-        };
         Scale.prototype.addExtentsProvider = function (provider) {
             this._extentsProviders.add(provider);
             return this;
@@ -1676,14 +1667,6 @@ var Plottable;
          */
         QuantitativeScale.prototype.invert = function (value) {
             return this._d3Scale.invert(value);
-        };
-        /**
-         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-         *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-         */
-        QuantitativeScale.prototype.copy = function () {
-            return new QuantitativeScale(this._d3Scale.copy());
         };
         QuantitativeScale.prototype.domain = function (values) {
             return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
@@ -1762,15 +1745,6 @@ var Plottable;
             function Linear(scale) {
                 _super.call(this, scale == null ? d3.scale.linear() : scale);
             }
-            /**
-             * Constructs a copy of the LinearScale with the same domain and range but
-             * without any registered listeners.
-             *
-             * @returns {Linear} A copy of the calling LinearScale.
-             */
-            Linear.prototype.copy = function () {
-                return new Linear(this._d3Scale.copy());
-            };
             Linear.prototype._defaultExtent = function () {
                 return [0, 1];
             };
@@ -1940,9 +1914,6 @@ var Plottable;
                 var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
             };
-            ModifiedLog.prototype.copy = function () {
-                return new ModifiedLog(this.base);
-            };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
                 return domain;
             };
@@ -2057,9 +2028,6 @@ var Plottable;
                 this.range(this.range());
                 this._dispatchUpdate();
                 return this;
-            };
-            Category.prototype.copy = function () {
-                return new Category(this._d3Scale.copy());
             };
             Category.prototype.scale = function (value) {
                 // scale it to the middle
@@ -2205,9 +2173,6 @@ var Plottable;
                     throw new Error("Scale.Time domain values must be in chronological order");
                 }
                 return _super.prototype._setDomain.call(this, values);
-            };
-            Time.prototype.copy = function () {
-                return new Time(this._d3Scale.copy());
             };
             Time.prototype._defaultExtent = function () {
                 var endTimeValue = new Date().valueOf();
@@ -4873,14 +4838,7 @@ var Plottable;
                     };
                 }
                 var categoryScale = this._scale;
-                var fakeScale = categoryScale.copy();
-                if (this._isHorizontal()) {
-                    fakeScale.range([0, offeredWidth]);
-                }
-                else {
-                    fakeScale.range([offeredHeight, 0]);
-                }
-                var measureResult = this._measureTicks(offeredWidth, offeredHeight, fakeScale, categoryScale.domain());
+                var measureResult = this._measureTicks(offeredWidth, offeredHeight, categoryScale, categoryScale.domain());
                 return {
                     minWidth: measureResult.usedWidth + widthRequiredByTicks,
                     minHeight: measureResult.usedHeight + heightRequiredByTicks
@@ -4943,12 +4901,16 @@ var Plottable;
              */
             Category.prototype._measureTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var _this = this;
+                var axisSpace = this._isHorizontal() ? axisWidth : axisHeight;
+                var totalOuterPaddingRatio = 2 * scale.outerPadding();
+                var totalInnerPaddingRatio = (ticks.length - 1) * scale.innerPadding();
+                var expectedRangeBand = axisSpace / (totalOuterPaddingRatio + totalInnerPaddingRatio + ticks.length);
+                var stepWidth = expectedRangeBand * (1 + scale.innerPadding());
                 var wrappingResults = ticks.map(function (s) {
-                    var bandWidth = scale.stepWidth();
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
                     var width = axisWidth - _this._maxLabelTickLength() - _this.tickLabelPadding(); // default for left/right
                     if (_this._isHorizontal()) {
-                        width = bandWidth; // defaults to the band width
+                        width = stepWidth; // defaults to the band width
                         if (_this._tickLabelAngle !== 0) {
                             width = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding(); // use the axis height
                         }
@@ -4956,7 +4918,7 @@ var Plottable;
                         width = Math.max(width, 0);
                     }
                     // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-                    var height = bandWidth; // default for left/right
+                    var height = stepWidth; // default for left/right
                     if (_this._isHorizontal()) {
                         height = axisHeight - _this._maxLabelTickLength() - _this.tickLabelPadding();
                         if (_this._tickLabelAngle !== 0) {

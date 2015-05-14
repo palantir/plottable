@@ -7067,18 +7067,6 @@ describe("Domainer", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Scales", function () {
-    it("Scale's copy() works correctly", function () {
-        var testCallback = function (listenable) {
-            return true;
-        };
-        var scale = new Plottable.Scales.Linear();
-        scale.onUpdate(testCallback);
-        var scaleCopy = scale.copy();
-        assert.deepEqual(scale.domain(), scaleCopy.domain(), "Copied scale has the same domain as the original.");
-        assert.deepEqual(scale.range(), scaleCopy.range(), "Copied scale has the same range as the original.");
-        assert.strictEqual(scale._callbacks.values().length, 1, "The initial scale should have a callback attached");
-        assert.strictEqual(scaleCopy._callbacks.values().length, 0, "The copied scale should not have any callback from the original scale attached");
-    });
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale(d3.scale.identity());
         var callbackWasCalled = false;
