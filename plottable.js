@@ -5733,7 +5733,7 @@ var Plottable;
                 this._columnPadding = 0;
                 this._rows = [];
                 this._rowWeights = [];
-                this._colWeights = [];
+                this._columnWeights = [];
                 this._nRows = 0;
                 this._nCols = 0;
                 this._calculatedLayout = null;
@@ -5823,7 +5823,7 @@ var Plottable;
                 var availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
                 var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
                 var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, function (c) { return (c == null) || c.fixedHeight(); });
-                var colWeights = Table._calcComponentWeights(this._colWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
+                var colWeights = Table._calcComponentWeights(this._columnWeights, cols, function (c) { return (c == null) || c.fixedWidth(); });
                 // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
                 // so that they will get some initial space allocated to work with
                 var heuristicColWeights = colWeights.map(function (c) { return c === 0 ? 0.5 : c; });
@@ -5965,48 +5965,19 @@ var Plottable;
                 this.redraw();
                 return this;
             };
-            /**
-             * Sets the layout weight of a particular row.
-             * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
-             *
-             * A common case would be to have one row take up 2/3rds of the space,
-             * and the other row take up 1/3rd.
-             *
-             * Example:
-             *
-             * ```JavaScript
-             * plot = new Plottable.Component.Table([
-             *  [row1],
-             *  [row2]
-             * ]);
-             *
-             * // assign twice as much space to the first row
-             * plot
-             *  .rowWeight(0, 2)
-             *  .rowWeight(1, 1)
-             * ```
-             *
-             * @param {number} index The index of the row.
-             * @param {number} weight The weight to be set on the row.
-             * @returns {Table} The calling Table.
-             */
             Table.prototype.rowWeight = function (index, weight) {
+                if (weight == null) {
+                    return this._rowWeights[index];
+                }
                 this._rowWeights[index] = weight;
                 this.redraw();
                 return this;
             };
-            /**
-             * Sets the layout weight of a particular column.
-             * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
-             *
-             * Please see `rowWeight` docs for an example.
-             *
-             * @param {number} index The index of the column.
-             * @param {number} weight The weight to be set on the column.
-             * @returns {Table} The calling Table.
-             */
-            Table.prototype.colWeight = function (index, weight) {
-                this._colWeights[index] = weight;
+            Table.prototype.columnWeight = function (index, weight) {
+                if (weight == null) {
+                    return this._columnWeights[index];
+                }
+                this._columnWeights[index] = weight;
                 this.redraw();
                 return this;
             };
@@ -6030,8 +6001,8 @@ var Plottable;
                     }
                 }
                 for (j = 0; j < nCols; j++) {
-                    if (this._colWeights[j] === undefined) {
-                        this._colWeights[j] = null;
+                    if (this._columnWeights[j] === undefined) {
+                        this._columnWeights[j] = null;
                     }
                 }
             };

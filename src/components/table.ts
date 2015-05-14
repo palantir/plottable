@@ -25,7 +25,7 @@ export module Components {
     private _rows: Component[][] = [];
 
     private _rowWeights: number[] = [];
-    private _colWeights: number[] = [];
+    private _columnWeights: number[] = [];
 
     private _nRows = 0;
     private _nCols = 0;
@@ -142,7 +142,7 @@ export module Components {
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
       var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
+      var colWeights = Table._calcComponentWeights(this._columnWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -336,6 +336,7 @@ export module Components {
       return this;
     }
 
+    public rowWeight(index: number): number;
     /**
      * Sets the layout weight of a particular row.
      * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
@@ -361,12 +362,17 @@ export module Components {
      * @param {number} weight The weight to be set on the row.
      * @returns {Table} The calling Table.
      */
-    public rowWeight(index: number, weight: number) {
+    public rowWeight(index: number, weight: number): Table;
+    public rowWeight(index: number, weight?: number): any {
+      if (weight == null) {
+        return this._rowWeights[index];
+      }
       this._rowWeights[index] = weight;
       this.redraw();
       return this;
     }
 
+    public columnWeight(index: number): number;
     /**
      * Sets the layout weight of a particular column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
@@ -377,8 +383,12 @@ export module Components {
      * @param {number} weight The weight to be set on the column.
      * @returns {Table} The calling Table.
      */
-    public colWeight(index: number, weight: number) {
-      this._colWeights[index] = weight;
+    public columnWeight(index: number, weight: number): Table;
+    public columnWeight(index: number, weight?: number): any {
+      if (weight == null) {
+        return this._columnWeights[index];
+      }
+      this._columnWeights[index] = weight;
       this.redraw();
       return this;
     }
@@ -405,8 +415,8 @@ export module Components {
         }
       }
       for (j = 0; j < nCols; j++) {
-        if (this._colWeights[j] === undefined) {
-          this._colWeights[j] = null;
+        if (this._columnWeights[j] === undefined) {
+          this._columnWeights[j] = null;
         }
       }
     }
