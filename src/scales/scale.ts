@@ -165,16 +165,6 @@ module Plottable {
       }
     }
 
-    /**
-     * Constructs a copy of the Scale with the same domain and range but without
-     * any registered listeners.
-     *
-     * @returns {Scale} A copy of the calling Scale.
-     */
-    public copy(): Scale<D, R> {
-      return new Scale<D, R>(this._d3Scale.copy());
-    }
-
     public addExtentProvider(provider: Scales.ExtentProvider<D>) {
       this._extentProviders.add(provider);
       return this;

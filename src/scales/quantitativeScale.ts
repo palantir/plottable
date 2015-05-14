@@ -36,15 +36,6 @@ module Plottable {
       return <any> this._d3Scale.invert(value);
     }
 
-    /**
-     * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-     *
-     * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-     */
-    public copy(): QuantitativeScale<D> {
-      return new QuantitativeScale<D>(this._d3Scale.copy());
-    }
-
     public domain(): D[];
     public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {

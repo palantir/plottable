@@ -848,13 +848,6 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        /**
-         * Constructs a copy of the Scale with the same domain and range but without
-         * any registered listeners.
-         *
-         * @returns {Scale} A copy of the calling Scale.
-         */
-        copy(): Scale<D, R>;
         addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
         removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
     }
@@ -885,12 +878,6 @@ declare module Plottable {
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         invert(value: number): D;
-        /**
-         * Creates a copy of the QuantitativeScale with the same domain and range but without any registered list.
-         *
-         * @returns {QuantitativeScale} A copy of the calling QuantitativeScale.
-         */
-        copy(): QuantitativeScale<D>;
         domain(): D[];
         domain(values: D[]): QuantitativeScale<D>;
         protected _setDomain(values: D[]): void;
@@ -960,13 +947,6 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            /**
-             * Constructs a copy of the LinearScale with the same domain and range but
-             * without any registered listeners.
-             *
-             * @returns {Linear} A copy of the calling LinearScale.
-             */
-            copy(): Linear;
             _defaultExtent(): number[];
         }
     }
@@ -1007,7 +987,6 @@ declare module Plottable {
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
             ticks(): number[];
-            copy(): ModifiedLog;
             _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
@@ -1101,7 +1080,6 @@ declare module Plottable {
              * @returns {Ordinal} The calling Scale.Ordinal
              */
             outerPadding(outerPadding: number): Category;
-            copy(): Category;
             scale(value: string): number;
         }
     }
@@ -1150,7 +1128,6 @@ declare module Plottable {
              */
             tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
-            copy(): Time;
             _defaultExtent(): Date[];
         }
     }
