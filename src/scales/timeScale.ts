@@ -11,11 +11,9 @@ export module Scales {
      * @constructor
      * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
      */
-    constructor();
-    constructor(scale: D3.Scale.LinearScale);
-    constructor(scale?: D3.Scale.LinearScale) {
-      // need to cast since d3 time scales do not descend from QuantitativeScale scales
-      super(scale == null ? (<any>d3.time.scale()) : scale);
+    constructor() {
+      super();
+      this._d3Scale = d3.time.scale();
     }
 
     /**

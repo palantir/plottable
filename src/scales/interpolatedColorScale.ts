@@ -65,6 +65,7 @@ export module Scales {
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
     constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
+      super();
       this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
@@ -83,7 +84,7 @@ export module Scales {
       if (this._colorScale == null) {
         throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
-      super(this._D3InterpolatedScale());
+      this._d3Scale = this._D3InterpolatedScale();
     }
 
     /**

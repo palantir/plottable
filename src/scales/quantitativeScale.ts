@@ -8,20 +8,6 @@ module Plottable {
     private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
 
-    /**
-     * Constructs a new QuantitativeScale.
-     *
-     * A QuantitativeScale is a Scale that maps anys to numbers. It
-     * is invertible and continuous.
-     *
-     * @constructor
-     * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-     * backing the QuantitativeScale.
-     */
-    constructor(scale: D3.Scale.QuantitativeScale) {
-      super(scale);
-    }
-
     protected _getExtent(): D[] {
       return this._domainer.computeDomain(this._getAllExtents(), this);
     }

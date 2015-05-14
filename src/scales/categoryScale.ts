@@ -3,7 +3,6 @@
 module Plottable {
 export module Scales {
   export class Category extends Scale<string, number> {
-    protected _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 
     private _innerPadding: number;
@@ -17,9 +16,9 @@ export module Scales {
      *
      * @constructor
      */
-    constructor(scale: D3.Scale.OrdinalScale = d3.scale.ordinal()) {
-      super(scale);
-
+    constructor() {
+      super();
+      this._d3Scale = d3.scale.ordinal();    
       var d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -50,7 +49,7 @@ export module Scales {
         this._range = values;
         var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
         var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-        this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
+        (<D3.Scale.OrdinalScale> this._d3Scale).rangeBands(values, d3InnerPadding, d3OuterPadding);
         return this;
       }
     }
@@ -69,7 +68,7 @@ export module Scales {
      * @returns {number} The range band width
      */
     public rangeBand(): number {
-      return this._d3Scale.rangeBand();
+      return (<D3.Scale.OrdinalScale> this._d3Scale).rangeBand();
     }
 
     /**

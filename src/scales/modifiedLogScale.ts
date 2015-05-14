@@ -34,7 +34,8 @@ export module Scales {
      *        For negative values, scale(-x) = -scale(x).
      */
     constructor(base = 10) {
-      super(d3.scale.linear());
+      super();
+      this._d3Scale = d3.scale.linear();
       this._base = base;
       this._pivot = this._base;
       this._setDomain(this._defaultExtent());

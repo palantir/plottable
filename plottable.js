@@ -1524,12 +1524,10 @@ var Plottable;
          * from domain to range.
          *
          * @constructor
-         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
-        function Scale(scale) {
+        function Scale() {
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
-            this._d3Scale = scale;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
@@ -1640,18 +1638,8 @@ var Plottable;
 (function (Plottable) {
     var QuantitativeScale = (function (_super) {
         __extends(QuantitativeScale, _super);
-        /**
-         * Constructs a new QuantitativeScale.
-         *
-         * A QuantitativeScale is a Scale that maps anys to numbers. It
-         * is invertible and continuous.
-         *
-         * @constructor
-         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-         * backing the QuantitativeScale.
-         */
-        function QuantitativeScale(scale) {
-            _super.call(this, scale);
+        function QuantitativeScale() {
+            _super.apply(this, arguments);
             this._userSetDomainer = false;
             this._domainer = new Plottable.Domainer();
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
@@ -1742,8 +1730,18 @@ var Plottable;
     (function (Scales) {
         var Linear = (function (_super) {
             __extends(Linear, _super);
-            function Linear(scale) {
-                _super.call(this, scale == null ? d3.scale.linear() : scale);
+            /**
+             * Constructs a new LinearScale.
+             *
+             * This scale maps from domain to range with a simple `mx + b` formula.
+             *
+             * @constructor
+             * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
+             * LinearScale. If not supplied, uses a default scale.
+             */
+            function Linear() {
+                _super.call(this);
+                this._d3Scale = d3.scale.linear();
             }
             Linear.prototype._defaultExtent = function () {
                 return [0, 1];
@@ -1794,8 +1792,9 @@ var Plottable;
              */
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
-                _super.call(this, d3.scale.linear());
+                _super.call(this);
                 this._showIntermediateTicks = false;
+                this._d3Scale = d3.scale.linear();
                 this._base = base;
                 this._pivot = this._base;
                 this._setDomain(this._defaultExtent());
@@ -1954,10 +1953,10 @@ var Plottable;
              *
              * @constructor
              */
-            function Category(scale) {
-                if (scale === void 0) { scale = d3.scale.ordinal(); }
-                _super.call(this, scale);
+            function Category() {
+                _super.call(this);
                 this._range = [0, 1];
+                this._d3Scale = d3.scale.ordinal();
                 var d3InnerPadding = 0.3;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -2060,6 +2059,7 @@ var Plottable;
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             function Color(scaleType) {
+                _super.call(this);
                 var scale;
                 switch (scaleType) {
                     case null:
@@ -2089,7 +2089,7 @@ var Plottable;
                     default:
                         throw new Error("Unsupported ColorScale type");
                 }
-                _super.call(this, scale);
+                this._d3Scale = scale;
             }
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2147,9 +2147,17 @@ var Plottable;
     (function (Scales) {
         var Time = (function (_super) {
             __extends(Time, _super);
-            function Time(scale) {
-                // need to cast since d3 time scales do not descend from QuantitativeScale scales
-                _super.call(this, scale == null ? d3.time.scale() : scale);
+            /**
+             * Constructs a TimeScale.
+             *
+             * A TimeScale maps Date objects to numbers.
+             *
+             * @constructor
+             * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
+             */
+            function Time() {
+                _super.call(this);
+                this._d3Scale = d3.time.scale();
             }
             /**
              * Specifies the interval between ticks
@@ -2216,6 +2224,7 @@ var Plottable;
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
                 if (scaleType === void 0) { scaleType = "linear"; }
+                _super.call(this);
                 this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
@@ -2234,7 +2243,7 @@ var Plottable;
                 if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                _super.call(this, this._D3InterpolatedScale());
+                this._d3Scale = this._D3InterpolatedScale();
             }
             /**
              * Generates the converted QuantitativeScale.

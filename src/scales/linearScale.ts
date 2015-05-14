@@ -13,10 +13,9 @@ export module Scales {
      * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
      * LinearScale. If not supplied, uses a default scale.
      */
-    constructor();
-    constructor(scale: D3.Scale.LinearScale);
-    constructor(scale?: any) {
-      super(scale == null ? d3.scale.linear() : scale);
+    constructor() {
+      super();
+      this._d3Scale = d3.scale.linear();
     }
 
     public _defaultExtent(): number[] {

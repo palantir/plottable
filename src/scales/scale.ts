@@ -28,10 +28,8 @@ module Plottable {
      * from domain to range.
      *
      * @constructor
-     * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
-    constructor(scale: D3.Scale.Scale) {
-      this._d3Scale = scale;
+    constructor() {
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }

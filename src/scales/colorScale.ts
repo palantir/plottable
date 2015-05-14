@@ -17,6 +17,7 @@ export module Scales {
      * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
      */
     constructor(scaleType?: string) {
+      super();
       var scale: D3.Scale.OrdinalScale;
       switch (scaleType) {
         case null:
@@ -46,7 +47,7 @@ export module Scales {
         default:
           throw new Error("Unsupported ColorScale type");
       }
-      super(scale);
+      this._d3Scale = scale;
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
