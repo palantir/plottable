@@ -3097,7 +3097,7 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<any>;
+            _keyAccessor(): Accessor<X> | Accessor<Y>;
             _valueAccessor(): Accessor<number>;
         }
     }

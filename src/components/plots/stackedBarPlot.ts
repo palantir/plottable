@@ -131,7 +131,7 @@ export module Plots {
       return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
-    public _keyAccessor(): Accessor<any> {
+    public _keyAccessor(): Accessor<X> | Accessor<Y> {
       return Stacked.prototype._keyAccessor.call(this);
     }
 

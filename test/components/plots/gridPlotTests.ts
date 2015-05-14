@@ -67,7 +67,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
-      var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Grid(xScale, yScale);
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -86,7 +86,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
-      var gridPlot: Plottable.Plots.Grid = new Plottable.Plots.Grid(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Grid(xScale, yScale);
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
