@@ -627,15 +627,6 @@ declare module Plottable {
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
     };
-    /**
-     * A simple bounding box.
-     */
-    type SelectionArea = {
-        xMin: number;
-        xMax: number;
-        yMin: number;
-        yMax: number;
-    };
     type SpaceRequest = {
         minWidth: number;
         minHeight: number;
