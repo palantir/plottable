@@ -3023,7 +3023,7 @@ declare module Plottable {
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor<any>;
+        _keyAccessor(): Accessor<X> | Accessor<Y>;
         _valueAccessor(): Accessor<number>;
     }
 }

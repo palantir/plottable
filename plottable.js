@@ -8037,7 +8037,7 @@ var Plottable;
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
                 }
                 return Plottable.Utils.Methods.max(data, function (datum, i) {
-                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
                 }, 0);
             }, 0);
             var minStackExtent = Plottable.Utils.Methods.min(this._datasetKeysInOrder, function (k) {
@@ -8048,7 +8048,7 @@ var Plottable;
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
                 }
                 return Plottable.Utils.Methods.min(data, function (datum, i) {
-                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
@@ -8080,7 +8080,7 @@ var Plottable;
                 var negativeDataMap = negativeDataMapArray[index];
                 var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset, plotMetadata) <= 0; });
                 dataset.data().forEach(function (datum, datumIndex) {
-                    var key = keyAccessor(datum, datumIndex, dataset, plotMetadata);
+                    var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
                     var positiveOffset = positiveDataMap.get(key).offset;
                     var negativeOffset = negativeDataMap.get(key).offset;
                     var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
@@ -8122,7 +8122,7 @@ var Plottable;
                 var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                 var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                 dataset.data().forEach(function (datum, index) {
-                    var key = keyAccessor(datum, index, dataset, plotMetadata);
+                    var key = String(keyAccessor(datum, index, dataset, plotMetadata));
                     var value = valueAccessor(datum, index, dataset, plotMetadata);
                     dataMapArray[datasetIndex].set(key, { key: key, value: value });
                 });

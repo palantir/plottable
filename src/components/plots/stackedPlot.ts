@@ -94,7 +94,7 @@ module Plottable {
         }
         return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
         }, 0);
       }, 0);
 
@@ -107,7 +107,7 @@ module Plottable {
         }
         return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
         }, 0);
       }, 0);
 
@@ -148,7 +148,7 @@ module Plottable {
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var key = keyAccessor(datum, datumIndex, dataset, plotMetadata);
+          var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
           var positiveOffset = positiveDataMap.get(key).offset;
           var negativeOffset = negativeDataMap.get(key).offset;
 
@@ -194,7 +194,7 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          var key = keyAccessor(datum, index, dataset, plotMetadata);
+          var key = String(keyAccessor(datum, index, dataset, plotMetadata));
           var value = valueAccessor(datum, index, dataset, plotMetadata);
           dataMapArray[datasetIndex].set(key, {key: key, value: value});
         });
@@ -222,7 +222,7 @@ module Plottable {
       }
     }
 
-    public _keyAccessor(): Accessor<any> {
+    public _keyAccessor(): Accessor<X> | Accessor<Y> {
        return this._isVertical ? this.x().accessor : this.y().accessor;
     }
 
