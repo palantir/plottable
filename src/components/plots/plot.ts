@@ -141,11 +141,11 @@ module Plottable {
       this.render();
     }
 
-    public attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
+    public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
     public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
-    public attr<D>(attr: string, attrValue: D | Accessor<D>, scale: Scale<D, number | string>): Plot;
-    public attr<D>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | D | Accessor<D>,
-                   scale?: Scale<D, number | string>): any {
+    public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
+    public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
+                   scale?: Scale<A, number | string>): any {
       if (attrValue == null) {
         return this._attrBindings.get(attr);
       }

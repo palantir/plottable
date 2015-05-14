@@ -2497,9 +2497,9 @@ declare module Plottable {
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
-        attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
+        attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
-        attr<D>(attr: string, attrValue: D | Accessor<D>, scale: Scale<D, number | string>): Plot;
+        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
