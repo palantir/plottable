@@ -49,16 +49,16 @@ export module Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<any, number>;
-    public x(x: number | _Accessor): Grid;
-    public x(x: any | _Accessor, scale: Scale<any, number>): Grid;
-    public x(x?: number | _Accessor | any, scale?: Scale<any, number>): any {
+    public x(x: number | Accessor): Grid;
+    public x(x: any | Accessor, scale: Scale<any, number>): Grid;
+    public x(x?: number | Accessor | any, scale?: Scale<any, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor> x);
       } else {
-        super.x(<any | _Accessor> x, scale);
+        super.x(<any | Accessor> x, scale);
         if (scale instanceof Scales.Category) {
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
           this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
@@ -70,16 +70,16 @@ export module Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<any, number>;
-    public y(y: number | _Accessor): Grid;
-    public y(y: any | _Accessor, scale: Scale<any, number>): Grid;
-    public y(y?: number | _Accessor | any, scale?: Scale<any, number>): any {
+    public y(y: number | Accessor): Grid;
+    public y(y: any | Accessor, scale: Scale<any, number>): Grid;
+    public y(y?: number | Accessor | any, scale?: Scale<any, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor> y);
       } else {
-        super.y(<any | _Accessor> y, scale);
+        super.y(<any | Accessor> y, scale);
         if (scale instanceof Scales.Category) {
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
           this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);

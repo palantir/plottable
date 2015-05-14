@@ -40,9 +40,9 @@ export module Plots {
     }
 
     public size(): AccessorScaleBinding<X, number>;
-    public size(size: number | _Accessor): Plots.Scatter<X, Y>;
-    public size(size: any | _Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
-    public size(size?: number | _Accessor | any, scale?: Scale<any, number>): any {
+    public size(size: number | Accessor): Plots.Scatter<X, Y>;
+    public size(size: any | Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+    public size(size?: number | Accessor | any, scale?: Scale<any, number>): any {
       if (size == null) {
         return this._propertyBindings.get(Scatter._SIZE_KEY);
       }
@@ -52,8 +52,8 @@ export module Plots {
     }
 
     public symbol(): AccessorScaleBinding<any, any>;
-    public symbol(symbol: _Accessor): Plots.Scatter<X, Y>;
-    public symbol(symbol?: _Accessor): any {
+    public symbol(symbol: Accessor): Plots.Scatter<X, Y>;
+    public symbol(symbol?: Accessor): any {
       if (symbol == null) {
         return this._propertyBindings.get(Scatter._SYMBOL_KEY);
       }

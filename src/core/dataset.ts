@@ -5,7 +5,7 @@ module Plottable {
   export type DatasetCallback = (dataset: Dataset) => any;
 
   type CachedExtent = {
-    accessor: _Accessor;
+    accessor: Accessor;
     extent: any[];
   }
   export class Dataset {

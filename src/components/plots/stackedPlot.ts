@@ -25,16 +25,16 @@ module Plottable {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | _Accessor): XYPlot<X, Y>;
-    public x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
-    public x(x?: number | _Accessor | X, scale?: Scale<X, number>): any {
+    public x(x: number | Accessor): XYPlot<X, Y>;
+    public x(x: X | Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | Accessor | X, scale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor> x);
       } else {
-        super.x(<X | _Accessor> x, scale);
+        super.x(<X | Accessor> x, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -43,16 +43,16 @@ module Plottable {
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | _Accessor): XYPlot<X, Y>;
-    public y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
-    public y(y?: number | _Accessor | Y, scale?: Scale<Y, number>): any {
+    public y(y: number | Accessor): XYPlot<X, Y>;
+    public y(y: Y | Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | Accessor | Y, scale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor> y);
       } else {
-        super.y(<Y | _Accessor> y, scale);
+        super.y(<Y | Accessor> y, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -228,11 +228,11 @@ module Plottable {
       }
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor {
        return this._isVertical ? this.x().accessor : this.y().accessor;
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor {
        return this._isVertical ? this.y().accessor : this.x().accessor;
     }
   }

@@ -35,34 +35,34 @@ export module Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | _Accessor): StackedArea<X>;
-    public x(x: X | _Accessor, xScale: Scale<X, number>): Area<X>;
-    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+    public x(x: number | Accessor): StackedArea<X>;
+    public x(x: X | Accessor, xScale: Scale<X, number>): Area<X>;
+    public x(x?: number | Accessor | X, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (xScale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor> x);
         Stacked.prototype.x.apply(this, [x]);
       } else {
-        super.x(<X | _Accessor> x, xScale);
+        super.x(<X | Accessor> x, xScale);
         Stacked.prototype.x.apply(this, [x, xScale]);
       }
       return this;
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | _Accessor): StackedArea<X>;
-    public y(y: number | _Accessor, yScale: Scale<number, number>): Area<X>;
-    public y(y?: number | _Accessor | number, yScale?: Scale<number, number>): any {
+    public y(y: number | Accessor): StackedArea<X>;
+    public y(y: number | Accessor, yScale: Scale<number, number>): Area<X>;
+    public y(y?: number | Accessor | number, yScale?: Scale<number, number>): any {
       if (y == null) {
         return super.y();
       }
       if (yScale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor> y);
         Stacked.prototype.y.apply(this, [y]);
       } else {
-        super.y(<number | _Accessor> y, yScale);
+        super.y(<number | Accessor> y, yScale);
         Stacked.prototype.y.apply(this, [y, yScale]);
       }
       return this;
@@ -159,11 +159,11 @@ export module Plots {
       return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor {
       return Stacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor {
       return Stacked.prototype._valueAccessor.call(this);
     }
 

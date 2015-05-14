@@ -75,9 +75,9 @@ export module Plots {
     }
 
     public sectorValue(): AccessorScaleBinding<D, number>;
-    public sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-    public sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public sectorValue(sectorValue?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public sectorValue(sectorValue: number | Accessor): Plots.Pie<D>;
+    public sectorValue(sectorValue: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public sectorValue(sectorValue?: number | Accessor | D, scale?: Scale<D, number>): any {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
@@ -87,9 +87,9 @@ export module Plots {
     }
 
     public innerRadius(): AccessorScaleBinding<D, number>;
-    public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-    public innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public innerRadius(innerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public innerRadius(innerRadius: number | Accessor): Plots.Pie<D>;
+    public innerRadius(innerRadius: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public innerRadius(innerRadius?: number | Accessor | D, scale?: Scale<D, number>): any {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
@@ -99,9 +99,9 @@ export module Plots {
     }
 
     public outerRadius(): AccessorScaleBinding<D, number>;
-    public outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-    public outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public outerRadius(outerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public outerRadius(outerRadius: number | Accessor): Plots.Pie<D>;
+    public outerRadius(outerRadius: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+    public outerRadius(outerRadius?: number | Accessor | D, scale?: Scale<D, number>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }

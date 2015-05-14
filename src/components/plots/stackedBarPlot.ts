@@ -32,34 +32,34 @@ export module Plots {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | _Accessor): StackedBar<X, Y>;
-    public x(x: X | _Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
-    public x(x?: number | _Accessor | X, xScale?: Scale<X, number>): any {
+    public x(x: number | Accessor): StackedBar<X, Y>;
+    public x(x: X | Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
+    public x(x?: number | Accessor | X, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (xScale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor> x);
         Stacked.prototype.x.apply(this, [x]);
       } else {
-        super.x(<X | _Accessor> x, xScale);
+        super.x(<X | Accessor> x, xScale);
         Stacked.prototype.x.apply(this, [x, xScale]);
       }
       return this;
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | _Accessor): StackedBar<X, Y>;
-    public y(y: Y | _Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
-    public y(y?: number | _Accessor | Y, yScale?: Scale<Y, number>): any {
+    public y(y: number | Accessor): StackedBar<X, Y>;
+    public y(y: Y | Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
+    public y(y?: number | Accessor | Y, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
       if (yScale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor> y);
         Stacked.prototype.y.apply(this, [y]);
       } else {
-        super.y(<Y | _Accessor> y, yScale);
+        super.y(<Y | Accessor> y, yScale);
         Stacked.prototype.y.apply(this, [y, yScale]);
       }
       return this;
@@ -137,11 +137,11 @@ export module Plots {
       return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor {
       return Stacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor {
       return Stacked.prototype._valueAccessor.call(this);
     }
     // ===== /Stack logic =====
