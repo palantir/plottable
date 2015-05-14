@@ -1779,6 +1779,8 @@ var Plottable;
             __extends(Linear, _super);
             function Linear(scale) {
                 _super.call(this, scale == null ? d3.scale.linear() : scale);
+                this.autoMin(-Infinity);
+                this.autoMax(Infinity);
             }
             Linear.prototype._defaultExtent = function () {
                 return [0, 1];
@@ -1837,6 +1839,8 @@ var Plottable;
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
+                this.autoMin(-Infinity);
+                this.autoMax(Infinity);
             }
             /**
              * Returns an adjusted log10 value for graphing purposes.  The first
@@ -2185,6 +2189,9 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
+                // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+                this.autoMin(new Date(-8640000000000000));
+                this.autoMax(new Date(8640000000000000));
             }
             /**
              * Specifies the interval between ticks

@@ -8,7 +8,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Time();
       assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
     });
-  
+
     it("tickInterval produces correct number of ticks", () => {
       var scale = new Plottable.Scales.Time();
       // 100 year span
@@ -39,6 +39,30 @@ describe("Scales", () => {
       scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
       ticks = scale.tickInterval(Plottable.TimeInterval.second);
       assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
+    });
+
+    it("autoMin()", () => {
+      var scale = new Plottable.Scales.Time();
+      // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+      assert.strictEqual(scale.autoMin().getTime(), -8640000000000000, "default autoMin() is smallest possible date");
+      var desiredDomain = [new Date(-1000), new Date(1000)];
+      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [desiredDomain]);
+      scale.autoMin(new Date(0));
+      var domain = scale.domain();
+      assert.strictEqual(domain[0].getTime(), 0, "lower end of domain was set to autoMin() value");
+      assert.strictEqual(domain[1].getTime(), desiredDomain[1].getTime(), "upper end of domain was set to desired value");
+    });
+
+    it("autoMax()", () => {
+      var scale = new Plottable.Scales.Time();
+      // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+      assert.strictEqual(scale.autoMax().getTime(), 8640000000000000, "default autoMax() is largest possible date");
+      var desiredDomain = [new Date(-1000), new Date(1000)];
+      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [desiredDomain]);
+      scale.autoMax(new Date(0));
+      var domain = scale.domain();
+      assert.strictEqual(domain[0].getTime(), desiredDomain[0].getTime(), "upper end of domain was set to desired value");
+      assert.strictEqual(domain[1].getTime(), 0, "upper end of domain was set to autoMin() value");
     });
   });
 });

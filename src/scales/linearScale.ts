@@ -3,7 +3,6 @@
 module Plottable {
 export module Scales {
   export class Linear extends QuantitativeScale<number> {
-
     /**
      * Constructs a new LinearScale.
      *
@@ -17,6 +16,8 @@ export module Scales {
     constructor(scale: D3.Scale.LinearScale);
     constructor(scale?: any) {
       super(scale == null ? d3.scale.linear() : scale);
+      this.autoMin(-Infinity);
+      this.autoMax(Infinity);
     }
 
     public _defaultExtent(): number[] {

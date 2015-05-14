@@ -16,6 +16,9 @@ export module Scales {
     constructor(scale?: D3.Scale.LinearScale) {
       // need to cast since d3 time scales do not descend from QuantitativeScale scales
       super(scale == null ? (<any>d3.time.scale()) : scale);
+      // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+      this.autoMin(new Date(-8640000000000000));
+      this.autoMax(new Date(8640000000000000));
     }
 
     /**

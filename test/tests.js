@@ -7342,13 +7342,6 @@ describe("Scales", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     describe("Quantitative Scales", function () {
-        it("autorange defaults to [0, 1] if no perspectives set", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.autoDomain();
-            var d = scale.domain();
-            assert.strictEqual(d[0], 0);
-            assert.strictEqual(d[1], 1);
-        });
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scales.Linear();
             scale.domain([0, 1]);
@@ -7369,6 +7362,31 @@ describe("Scales", function () {
             scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+        });
+    });
+    describe("Linear", function () {
+        it("autorange defaults to [0, 1]", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+        it("autoMin()", function () {
+            var scale = new Plottable.Scales.Linear();
+            assert.strictEqual(scale.autoMin(), -Infinity, "autoMin() defaults to -Infinity");
+            var desiredDomain = [-10, 10];
+            scale.addExtentsProvider(function (scale) { return [desiredDomain]; });
+            scale.autoMin(0);
+            assert.strictEqual(scale.domain()[0], 0, "lower end of domain was set to autoMin() value");
+            assert.strictEqual(scale.domain()[1], desiredDomain[1], "upper end of domain was set to desired value");
+        });
+        it("autoMax()", function () {
+            var scale = new Plottable.Scales.Linear();
+            assert.strictEqual(scale.autoMax(), Infinity, "autoMax() defaults to +Infinity");
+            var desiredDomain = [-10, 10];
+            scale.addExtentsProvider(function (scale) { return [desiredDomain]; });
+            scale.autoMax(0);
+            assert.strictEqual(scale.domain()[0], desiredDomain[0], "lower end of domain was set to desired value");
+            assert.strictEqual(scale.domain()[1], 0, "upper end of domain was set to autoMax() value");
         });
     });
 });
@@ -7509,6 +7527,28 @@ describe("Scales", function () {
             scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
             ticks = scale.tickInterval(Plottable.TimeInterval.second);
             assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
+        });
+        it("autoMin()", function () {
+            var scale = new Plottable.Scales.Time();
+            // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+            assert.strictEqual(scale.autoMin().getTime(), -8640000000000000, "default autoMin() is smallest possible date");
+            var desiredDomain = [new Date(-1000), new Date(1000)];
+            scale.addExtentsProvider(function (scale) { return [desiredDomain]; });
+            scale.autoMin(new Date(0));
+            var domain = scale.domain();
+            assert.strictEqual(domain[0].getTime(), 0, "lower end of domain was set to autoMin() value");
+            assert.strictEqual(domain[1].getTime(), desiredDomain[1].getTime(), "upper end of domain was set to desired value");
+        });
+        it("autoMax()", function () {
+            var scale = new Plottable.Scales.Time();
+            // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
+            assert.strictEqual(scale.autoMax().getTime(), 8640000000000000, "default autoMax() is largest possible date");
+            var desiredDomain = [new Date(-1000), new Date(1000)];
+            scale.addExtentsProvider(function (scale) { return [desiredDomain]; });
+            scale.autoMax(new Date(0));
+            var domain = scale.domain();
+            assert.strictEqual(domain[0].getTime(), desiredDomain[0].getTime(), "upper end of domain was set to desired value");
+            assert.strictEqual(domain[1].getTime(), 0, "upper end of domain was set to autoMin() value");
         });
     });
 });
