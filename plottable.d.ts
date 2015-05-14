@@ -2708,7 +2708,7 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x1<X1>(): AccessorScaleBinding<X1, number>;
             x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x1<X1>(x1: X | Accessor<X>, scale: Scale<X1, number>): Plots.Rectangle<X, Y>;
+            x1<X1>(x1: X1 | Accessor<X1>, scale: Scale<X1, number>): Plots.Rectangle<X, Y>;
             x2<X2>(): AccessorScaleBinding<X2, number>;
             x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
             x2<X2>(x2: X2 | Accessor<X2>, scale: Scale<X2, number>): Plots.Rectangle<X, Y>;

@@ -65,7 +65,7 @@ export module Plots {
 
     public x1<X1>(): AccessorScaleBinding<X1, number>;
     public x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public x1<X1>(x1: X | Accessor<X>, scale: Scale<X1, number>): Plots.Rectangle<X, Y>;
+    public x1<X1>(x1: X1 | Accessor<X1>, scale: Scale<X1, number>): Plots.Rectangle<X, Y>;
     public x1<X1>(x1?: number | Accessor<number> | X1 | Accessor<X1>, scale?: Scale<X1, number>): any {
       if (x1 == null) {
         return this._propertyBindings.get(Rectangle._X1_KEY);
