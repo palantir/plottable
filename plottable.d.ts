@@ -762,7 +762,7 @@ declare module Plottable {
         (scale: S): any;
     }
     module Scales {
-        interface ExtentProvider<D> {
+        interface ExtentsProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
     }
@@ -855,8 +855,8 @@ declare module Plottable {
          * @returns {Scale} A copy of the calling Scale.
          */
         copy(): Scale<D, R>;
-        addExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
-        removeExtentProvider(provider: Scales.ExtentProvider<D>): Scale<D, R>;
+        addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
 

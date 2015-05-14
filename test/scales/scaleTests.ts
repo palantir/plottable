@@ -61,7 +61,7 @@ describe("Scales", () => {
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
       scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
@@ -105,25 +105,25 @@ describe("Scales", () => {
       svg2.remove();
     });
 
-    it("addExtentProvider()", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+    it("addExtentsProvider()", () => {
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
-    it("removeExtentProvider()", () => {
-      var posProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[0, 10]];
-      scale.addExtentProvider(posProvider);
-      var negProvider: Plottable.Scales.ExtentProvider<number> = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
-      scale.addExtentProvider(negProvider);
+    it("removeExtentsProvider()", () => {
+      var posProvider = (scale: Plottable.Scale<number, number>) => [[0, 10]];
+      scale.addExtentsProvider(posProvider);
+      var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
+      scale.addExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
-      scale.removeExtentProvider(negProvider);
+      scale.removeExtentsProvider(negProvider);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
     });
@@ -418,7 +418,7 @@ describe("Scales", () => {
     });
 
     it("works with a Domainer", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
       var domain = scale.domain();
       scale.domainer(new Plottable.Domainer().pad(0.1));
       assert.operator(scale.domain()[0], "<", domain[0]);
@@ -435,7 +435,7 @@ describe("Scales", () => {
 
     it("gives reasonable values for ticks()", () => {
       var providedExtents = [[0, base / 2]];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => providedExtents);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => providedExtents);
       scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
@@ -452,7 +452,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
       scale.autoDomain();
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
@@ -475,7 +475,7 @@ describe("Scales", () => {
 
     it("ticks() is always non-empty", () => {
       var desiredExtents: number[][] = [];
-      scale.addExtentProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
+      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
         desiredExtents = [extent];
         scale.autoDomain();
