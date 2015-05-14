@@ -68,42 +68,11 @@ describe("Tables", () => {
       assert.isNull(rows[1][0], "component at (1, 0) is null");
     });
 
-    it("adding a Component where one already exists creates a new Group", () => {
+    it("adding a Component where one already exists throws an Error", () => {
       var c1 = new Plottable.Component();
+      var t = new Plottable.Components.Table([[c1]]);
       var c2 = new Plottable.Component();
-      var c3 = new Plottable.Component();
-      var t = new Plottable.Components.Table();
-
-      t.add(c1, 0, 2);
-      t.add(c2, 0, 0);
-      t.add(c3, 0, 2);
-
-      assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "A group was created");
-
-      var components: Plottable.Component[] = (<any> t)._rows[0][2].components();
-      assert.lengthOf(components, 2, "The group created should have 2 components");
-      assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should be c1");
-      assert.strictEqual(components[1], c3, "Second element in the group at (0, 2) should be c3");
-    });
-
-    it("adding a Component where a Group already exists adds the component to the Group", () => {
-      var c1 = new Plottable.Component();
-      var c2 = new Plottable.Component();
-      var grp = new Plottable.Components.Group([c1, c2]);
-
-      var c3 = new Plottable.Component();
-
-      var t = new Plottable.Components.Table();
-
-      t.add(grp, 0, 2);
-      t.add(c3, 0, 2);
-      assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf((<any> t)._rows[0][2]), "The cell still contains a group");
-
-      var components: Plottable.Component[] = (<any> t)._rows[0][2].components();
-      assert.lengthOf(components, 3, "The group created should have 3 components");
-      assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should still be c1");
-      assert.strictEqual(components[1], c2, "Second element in the group at (0, 2) should still be c2");
-      assert.strictEqual(components[2], c3, "The Component was added to the existing Group");
+      assert.throws(() => t.add(c2, 0, 0), Error, "occupied");
     });
 
     it("adding null to a table cell should throw an error", () => {

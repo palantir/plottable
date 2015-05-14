@@ -3311,51 +3311,6 @@ var Plottable;
         Component.prototype.fixedHeight = function () {
             return false;
         };
-        Component.prototype._merge = function (c, below) {
-            var cg;
-            if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
-                cg = c;
-                cg.add(this, below);
-                return cg;
-            }
-            else {
-                var mergedComponents = below ? [this, c] : [c, this];
-                cg = new Plottable.Components.Group(mergedComponents);
-                return cg;
-            }
-        };
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        Component.prototype.above = function (c) {
-            return this._merge(c, false);
-        };
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        Component.prototype.below = function (c) {
-            return this._merge(c, true);
-        };
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -3604,11 +3559,7 @@ var Plottable;
              * Constructs a Component.Group.
              *
              * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * each other. Components added later will be rendered on top of existing Components.
              *
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
@@ -3627,10 +3578,6 @@ var Plottable;
                     minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
                     minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
                 };
-            };
-            Group.prototype._merge = function (c, below) {
-                this.add(c, !below);
-                return this;
             };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
@@ -5751,11 +5698,11 @@ var Plottable;
                     throw Error("Cannot add null to a table cell");
                 }
                 if (!this.has(component)) {
-                    component.detach();
                     var currentComponent = this._rows[row] && this._rows[row][col];
                     if (currentComponent) {
-                        component = component.above(currentComponent);
+                        throw new Error("cell is occupied");
                     }
+                    component.detach();
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);

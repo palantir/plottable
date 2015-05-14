@@ -6070,90 +6070,6 @@ describe("ComponentGroups", function () {
             svg.remove();
         });
     });
-    describe("Merging components works as expected", function () {
-        var c1 = new Plottable.Component();
-        var c2 = new Plottable.Component();
-        var c3 = new Plottable.Component();
-        var c4 = new Plottable.Component();
-        describe("above()", function () {
-            it("Component.above works as expected (Component.above Component)", function () {
-                var cg = c2.above(c1);
-                var innerComponents = cg.components();
-                assert.lengthOf(innerComponents, 2, "There are two components");
-                assert.strictEqual(innerComponents[0], c1, "first component correct");
-                assert.strictEqual(innerComponents[1], c2, "second component correct");
-            });
-            it("Component.above works as expected (Component.above ComponentGroup)", function () {
-                var cg = new Plottable.Components.Group([c1, c2, c3]);
-                var cg2 = c4.above(cg);
-                assert.strictEqual(cg, cg2, "c4.above(cg) returns cg");
-                var components = cg.components();
-                assert.lengthOf(components, 4, "four components");
-                assert.strictEqual(components[2], c3, "third component in third");
-                assert.strictEqual(components[3], c4, "fourth component is last");
-            });
-            it("Component.above works as expected (ComponentGroup.above Component)", function () {
-                var cg = new Plottable.Components.Group([c2, c3, c4]);
-                var cg2 = cg.above(c1);
-                assert.strictEqual(cg, cg2, "cg.merge(c1) returns cg");
-                var components = cg.components();
-                assert.lengthOf(components, 4, "there are four components");
-                assert.strictEqual(components[0], c1, "first is first");
-                assert.strictEqual(components[3], c4, "fourth is fourth");
-            });
-            it("Component.above works as expected (ComponentGroup.above ComponentGroup)", function () {
-                var cg1 = new Plottable.Components.Group([c1, c2]);
-                var cg2 = new Plottable.Components.Group([c3, c4]);
-                var cg = cg1.above(cg2);
-                assert.strictEqual(cg, cg1, "merged == cg1");
-                assert.notEqual(cg, cg2, "merged != cg2");
-                var components = cg.components();
-                assert.lengthOf(components, 3, "there are three inner components");
-                assert.strictEqual(components[0], cg2, "componentGroup2 inside componentGroup1");
-                assert.strictEqual(components[1], c1, "components are inside");
-                assert.strictEqual(components[2], c2, "components are inside");
-            });
-        });
-        describe("below()", function () {
-            it("Component.below works as expected (Component.below Component)", function () {
-                var cg = c1.below(c2);
-                var innerComponents = cg.components();
-                assert.lengthOf(innerComponents, 2, "There are two components");
-                assert.strictEqual(innerComponents[0], c1, "first component correct");
-                assert.strictEqual(innerComponents[1], c2, "second component correct");
-            });
-            it("Component.below works as expected (Component.below ComponentGroup)", function () {
-                var cg = new Plottable.Components.Group([c2, c3, c4]);
-                var cg2 = c1.below(cg);
-                assert.strictEqual(cg, cg2, "c1.below(cg) returns cg");
-                var components = cg.components();
-                assert.lengthOf(components, 4, "four components");
-                assert.strictEqual(components[0], c1, "first component in front");
-                assert.strictEqual(components[1], c2, "second component is second");
-            });
-            it("Component.below works as expected (ComponentGroup.below Component)", function () {
-                var cg = new Plottable.Components.Group([c1, c2, c3]);
-                var cg2 = cg.below(c4);
-                assert.strictEqual(cg, cg2, "cg.merge(c4) returns cg");
-                var components = cg.components();
-                assert.lengthOf(components, 4, "there are four components");
-                assert.strictEqual(components[0], c1, "first is first");
-                assert.strictEqual(components[3], c4, "fourth is fourth");
-            });
-            it("Component.below works as expected (ComponentGroup.below ComponentGroup)", function () {
-                var cg1 = new Plottable.Components.Group([c1, c2]);
-                var cg2 = new Plottable.Components.Group([c3, c4]);
-                var cg = cg1.below(cg2);
-                assert.strictEqual(cg, cg1, "merged group == cg1");
-                assert.notEqual(cg, cg2, "merged group != cg2");
-                var components = cg.components();
-                assert.lengthOf(components, 3, "there are three inner components");
-                assert.strictEqual(components[0], c1, "components are inside");
-                assert.strictEqual(components[1], c2, "components are inside");
-                assert.strictEqual(components[2], cg2, "componentGroup2 inside componentGroup1");
-            });
-        });
-    });
 });
 
 ///<reference path="../testReference.ts" />
@@ -6717,34 +6633,11 @@ describe("Tables", function () {
             assert.isNull(rows[0][1], "component at (0, 1) is null");
             assert.isNull(rows[1][0], "component at (1, 0) is null");
         });
-        it("adding a Component where one already exists creates a new Group", function () {
+        it("adding a Component where one already exists throws an Error", function () {
             var c1 = new Plottable.Component();
+            var t = new Plottable.Components.Table([[c1]]);
             var c2 = new Plottable.Component();
-            var c3 = new Plottable.Component();
-            var t = new Plottable.Components.Table();
-            t.add(c1, 0, 2);
-            t.add(c2, 0, 0);
-            t.add(c3, 0, 2);
-            assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "A group was created");
-            var components = t._rows[0][2].components();
-            assert.lengthOf(components, 2, "The group created should have 2 components");
-            assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should be c1");
-            assert.strictEqual(components[1], c3, "Second element in the group at (0, 2) should be c3");
-        });
-        it("adding a Component where a Group already exists adds the component to the Group", function () {
-            var c1 = new Plottable.Component();
-            var c2 = new Plottable.Component();
-            var grp = new Plottable.Components.Group([c1, c2]);
-            var c3 = new Plottable.Component();
-            var t = new Plottable.Components.Table();
-            t.add(grp, 0, 2);
-            t.add(c3, 0, 2);
-            assert.isTrue(Plottable.Components.Group.prototype.isPrototypeOf(t._rows[0][2]), "The cell still contains a group");
-            var components = t._rows[0][2].components();
-            assert.lengthOf(components, 3, "The group created should have 3 components");
-            assert.strictEqual(components[0], c1, "First element in the group at (0, 2) should still be c1");
-            assert.strictEqual(components[1], c2, "Second element in the group at (0, 2) should still be c2");
-            assert.strictEqual(components[2], c3, "The Component was added to the existing Group");
+            assert.throws(function () { return t.add(c2, 0, 0); }, Error, "occupied");
         });
         it("adding null to a table cell should throw an error", function () {
             var c1 = new Plottable.Component();
@@ -7245,12 +7138,12 @@ describe("Scales", function () {
             renderAreaD2.addDataset(ds2);
             renderAreaD2.x(function (d) { return d.x; }, xScale);
             renderAreaD2.y(function (d) { return d.y; }, yScale);
-            var renderAreas = renderAreaD1.below(renderAreaD2);
+            var renderAreas = new Plottable.Components.Group([renderAreaD1, renderAreaD2]);
             renderAreas.renderTo(svg);
             assert.deepEqual(xScale.domain(), [0, 2]);
             renderAreaD1.detach();
             assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
-            renderAreas.below(renderAreaD1);
+            renderAreas.add(renderAreaD1);
             assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
             svg.remove();
         });

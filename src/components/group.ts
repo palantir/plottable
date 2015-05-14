@@ -9,11 +9,7 @@ export module Components {
      * Constructs a Component.Group.
      *
      * A Component.Group is a set of Components that will be rendered on top of
-     * each other. When you call Component.above(Component) or Component.below(Component),
-     * it creates and returns a Component.Group.
-     *
-     * Note that the order of the components will determine placement on the z-axis,
-     * with the previous items rendered below the later items.
+     * each other. Components added later will be rendered on top of existing Components.
      *
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
@@ -30,11 +26,6 @@ export module Components {
         minWidth: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
         minHeight: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
       };
-    }
-
-    public _merge(c: Component, below: boolean): Group {
-      this.add(c, !below);
-      return this;
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {

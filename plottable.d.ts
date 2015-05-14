@@ -1512,35 +1512,6 @@ declare module Plottable {
          * @returns {boolean} Whether the component has a fixed height.
          */
         fixedHeight(): boolean;
-        _merge(c: Component, below: boolean): Components.Group;
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        above(c: Component): Components.Group;
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        below(c: Component): Components.Group;
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -1669,18 +1640,21 @@ declare module Plottable {
              * Constructs a Component.Group.
              *
              * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * each other. Components added later will be rendered on top of existing Components.
              *
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
+<<<<<<< Updated upstream
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             _merge(c: Component, below: boolean): Group;
+||||||| merged common ancestors
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+            _merge(c: Component, below: boolean): Group;
+=======
+            requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest;
+>>>>>>> Stashed changes
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;

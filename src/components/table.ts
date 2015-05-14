@@ -85,13 +85,11 @@ export module Components {
       }
 
       if (!this.has(component)) {
-        component.detach();
-
         var currentComponent = this._rows[row] && this._rows[row][col];
         if (currentComponent) {
-          component = component.above(currentComponent);
+          throw new Error("cell is occupied");
         }
-
+        component.detach();
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);

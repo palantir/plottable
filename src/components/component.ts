@@ -422,53 +422,6 @@ module Plottable {
       return false;
     }
 
-    public _merge(c: Component, below: boolean): Components.Group {
-      var cg: Components.Group;
-      if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
-        cg = (<Plottable.Components.Group> c);
-        cg.add(this, below);
-        return cg;
-      } else {
-        var mergedComponents = below ? [this, c] : [c, this];
-        cg = new Plottable.Components.Group(mergedComponents);
-        return cg;
-      }
-    }
-
-    /**
-     * Merges this Component above another Component, returning a
-     * ComponentGroup. This is used to layer Components on top of each other.
-     *
-     * There are four cases:
-     * Component + Component: Returns a ComponentGroup with the first component after the second component.
-     * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-     * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-     *
-     * @param {Component} c The component to merge in.
-     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-     */
-    public above(c: Component): Components.Group {
-      return this._merge(c, false);
-    }
-
-    /**
-     * Merges this Component below another Component, returning a
-     * ComponentGroup. This is used to layer Components on top of each other.
-     *
-     * There are four cases:
-     * Component + Component: Returns a ComponentGroup with the first component before the second component.
-     * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-     * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-     *
-     * @param {Component} c The component to merge in.
-     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-     */
-    public below(c: Component): Components.Group {
-      return this._merge(c, true);
-    }
-
     /**
      * Detaches a Component from the DOM. The component can be reused.
      *
