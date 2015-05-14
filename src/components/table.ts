@@ -20,12 +20,12 @@ export module Components {
 
   export class Table extends ComponentContainer {
     private _rowPadding = 0;
-    private _colPadding = 0;
+    private _columnPadding = 0;
 
     private _rows: Component[][] = [];
 
     private _rowWeights: number[] = [];
-    private _colWeights: number[] = [];
+    private _columnWeights: number[] = [];
 
     private _nRows = 0;
     private _nCols = 0;
@@ -138,11 +138,11 @@ export module Components {
      */
       var rows = this._rows;
       var cols = d3.transpose(this._rows);
-      var availableWidthAfterPadding  = availableWidth  - this._colPadding * (this._nCols - 1);
+      var availableWidthAfterPadding  = availableWidth  - this._columnPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
       var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
-      var colWeights = Table._calcComponentWeights(this._colWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
+      var colWeights = Table._calcComponentWeights(this._columnWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -285,7 +285,7 @@ export module Components {
           if (component != null) {
             component.computeLayout({ x: childXOrigin, y: childYOrigin }, colWidths[colIndex], rowHeights[rowIndex]);
           }
-          childXOrigin += colWidths[colIndex] + this._colPadding;
+          childXOrigin += colWidths[colIndex] + this._columnPadding;
         });
         childYOrigin += rowHeights[rowIndex] + this._rowPadding;
       });
@@ -293,19 +293,50 @@ export module Components {
     }
 
     /**
-     * Sets the row and column padding on the Table.
+     * Gets the row padding on the Table.
+     *
+     * @returns {number} the row padding.
+     */
+    public rowPadding(): number;
+    /**
+     * Sets the row padding on the Table.
      *
      * @param {number} rowPadding The padding above and below each row, in pixels.
-     * @param {number} colPadding the padding to the left and right of each column, in pixels.
      * @returns {Table} The calling Table.
      */
-    public padding(rowPadding: number, colPadding: number) {
+    public rowPadding(rowPadding: number): Table;
+    public rowPadding(rowPadding?: number): any {
+      if (rowPadding == null) {
+        return this._rowPadding;
+      }
       this._rowPadding = rowPadding;
-      this._colPadding = colPadding;
       this.redraw();
       return this;
     }
 
+    /**
+     * Gets the column padding on the Table.
+     *
+     * @returns {number} the column padding.
+     */
+    public columnPadding(): number;
+    /**
+     * Sets the column padding on the Table.
+     *
+     * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+     * @returns {Table} The calling Table.
+     */
+    public columnPadding(columnPadding: number): Table;
+    public columnPadding(columnPadding?: number): any {
+      if (columnPadding == null) {
+        return this._columnPadding;
+      }
+      this._columnPadding = columnPadding;
+      this.redraw();
+      return this;
+    }
+
+    public rowWeight(index: number): number;
     /**
      * Sets the layout weight of a particular row.
      * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
@@ -331,12 +362,17 @@ export module Components {
      * @param {number} weight The weight to be set on the row.
      * @returns {Table} The calling Table.
      */
-    public rowWeight(index: number, weight: number) {
+    public rowWeight(index: number, weight: number): Table;
+    public rowWeight(index: number, weight?: number): any {
+      if (weight == null) {
+        return this._rowWeights[index];
+      }
       this._rowWeights[index] = weight;
       this.redraw();
       return this;
     }
 
+    public columnWeight(index: number): number;
     /**
      * Sets the layout weight of a particular column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
@@ -347,8 +383,12 @@ export module Components {
      * @param {number} weight The weight to be set on the column.
      * @returns {Table} The calling Table.
      */
-    public colWeight(index: number, weight: number) {
-      this._colWeights[index] = weight;
+    public columnWeight(index: number, weight: number): Table;
+    public columnWeight(index: number, weight?: number): any {
+      if (weight == null) {
+        return this._columnWeights[index];
+      }
+      this._columnWeights[index] = weight;
       this.redraw();
       return this;
     }
@@ -375,8 +415,8 @@ export module Components {
         }
       }
       for (j = 0; j < nCols; j++) {
-        if (this._colWeights[j] === undefined) {
-          this._colWeights[j] = null;
+        if (this._columnWeights[j] === undefined) {
+          this._columnWeights[j] = null;
         }
       }
     }

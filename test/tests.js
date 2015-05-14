@@ -6730,7 +6730,7 @@ describe("Tables", function () {
         var tableAndcomponents = generateBasicTable(2, 2);
         var table = tableAndcomponents.table;
         var components = tableAndcomponents.components;
-        table.padding(5, 5);
+        table.rowPadding(5).columnPadding(5);
         var svg = TestMethods.generateSVG(415, 415);
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });

@@ -2315,13 +2315,32 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
-             * Sets the row and column padding on the Table.
+             * Gets the row padding on the Table.
+             *
+             * @returns {number} the row padding.
+             */
+            rowPadding(): number;
+            /**
+             * Sets the row padding on the Table.
              *
              * @param {number} rowPadding The padding above and below each row, in pixels.
-             * @param {number} colPadding the padding to the left and right of each column, in pixels.
              * @returns {Table} The calling Table.
              */
-            padding(rowPadding: number, colPadding: number): Table;
+            rowPadding(rowPadding: number): Table;
+            /**
+             * Gets the column padding on the Table.
+             *
+             * @returns {number} the column padding.
+             */
+            columnPadding(): number;
+            /**
+             * Sets the column padding on the Table.
+             *
+             * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+             * @returns {Table} The calling Table.
+             */
+            columnPadding(columnPadding: number): Table;
+            rowWeight(index: number): number;
             /**
              * Sets the layout weight of a particular row.
              * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
@@ -2348,6 +2367,7 @@ declare module Plottable {
              * @returns {Table} The calling Table.
              */
             rowWeight(index: number, weight: number): Table;
+            columnWeight(index: number): number;
             /**
              * Sets the layout weight of a particular column.
              * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
@@ -2358,7 +2378,7 @@ declare module Plottable {
              * @param {number} weight The weight to be set on the column.
              * @returns {Table} The calling Table.
              */
-            colWeight(index: number, weight: number): Table;
+            columnWeight(index: number, weight: number): Table;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
