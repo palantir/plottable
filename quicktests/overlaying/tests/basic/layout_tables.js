@@ -49,7 +49,7 @@ function run(svg, data, Plottable) {
                                           .add(renderAreaD1, 0, 1)
                                           .add(xAxis2, 1, 1);
     //XYRenderer + XYRenderer
-    var renderGroup3 = renderAreaD3.below(renderAreaD2);
+    var renderGroup3 = new Plottable.Components.Group([renderAreaD3, renderAreaD2]);
     var basicTable3 = new Plottable.Components.Table().add(renderGroup3, 0, 1)
                                           .add(xAxis3, 1, 1);
 
