@@ -86,10 +86,10 @@ export module Plots {
       return this;
     }
 
-    public innerRadius<I>(): AccessorScaleBinding<I, number>;
+    public innerRadius<R>(): AccessorScaleBinding<R, number>;
     public innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
-    public innerRadius<I>(innerRadius: I | Accessor<I>, scale: Scale<I, number>): Plots.Pie;
-    public innerRadius<I>(innerRadius?: number | Accessor<number> | I | Accessor<I>, scale?: Scale<I, number>): any {
+    public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public innerRadius<R>(innerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
@@ -98,10 +98,10 @@ export module Plots {
       return this;
     }
 
-    public outerRadius<O>(): AccessorScaleBinding<O, number>;
+    public outerRadius<R>(): AccessorScaleBinding<R, number>;
     public outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
-    public outerRadius<O>(outerRadius: O | Accessor<O>, scale: Scale<O, number>): Plots.Pie;
-    public outerRadius<O>(outerRadius?: number | Accessor<number> | O | Accessor<O>, scale?: Scale<O, number>): any {
+    public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }

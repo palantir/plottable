@@ -2618,12 +2618,12 @@ declare module Plottable {
             sectorValue<S>(): AccessorScaleBinding<S, number>;
             sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
             sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
-            innerRadius<I>(): AccessorScaleBinding<I, number>;
+            innerRadius<R>(): AccessorScaleBinding<R, number>;
             innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
-            innerRadius<I>(innerRadius: I | Accessor<I>, scale: Scale<I, number>): Plots.Pie;
-            outerRadius<O>(): AccessorScaleBinding<O, number>;
+            innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            outerRadius<R>(): AccessorScaleBinding<R, number>;
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
-            outerRadius<O>(outerRadius: O | Accessor<O>, scale: Scale<O, number>): Plots.Pie;
+            outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
         }
     }
 }
