@@ -2,7 +2,9 @@ module Plottable {
   /**
    * Access specific datum property.
    */
-  export type Accessor = (datum: any, index?: number, dataset?: Dataset, plotMetadata?: Plots.PlotMetadata) => any;
+  export interface Accessor<T> {
+    (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+  }
 
   /**
    * Retrieves scaled datum property.
@@ -18,7 +20,7 @@ module Plottable {
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
   export type _Projection = {
-    accessor: Accessor;
+    accessor: Accessor<any>;
     scale?: Scale<any, any>;
     attribute: string;
   }

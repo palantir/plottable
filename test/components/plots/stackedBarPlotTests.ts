@@ -421,7 +421,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
       var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
@@ -460,7 +460,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data4));
       plot.addDataset(new Plottable.Dataset(data5));
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var keys = (<any> plot)._key2PlotDatasetKey.keys();
       var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");

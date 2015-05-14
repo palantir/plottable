@@ -4,10 +4,6 @@ module Plottable {
 
   export type DatasetCallback = (dataset: Dataset) => any;
 
-  type CachedExtent = {
-    accessor: Accessor;
-    extent: any[];
-  }
   export class Dataset {
     private _data: any[];
     private _metadata: any;

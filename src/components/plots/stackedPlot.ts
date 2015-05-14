@@ -24,17 +24,14 @@ module Plottable {
       return metadata;
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor): XYPlot<X, Y>;
-    public x(x: X | Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
-    public x(x?: number | Accessor | X, scale?: Scale<X, number>): any {
+    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | Accessor> x);
+        super.x(<number | Accessor<number>> x);
       } else {
-        super.x(<X | Accessor> x, scale);
+        super.x(<X | Accessor<X>> x, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -42,17 +39,14 @@ module Plottable {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | Accessor): XYPlot<X, Y>;
-    public y(y: Y | Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
-    public y(y?: number | Accessor | Y, scale?: Scale<Y, number>): any {
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | Accessor> y);
+        super.y(<number | Accessor<number>> y);
       } else {
-        super.y(<Y | Accessor> y, scale);
+        super.y(<Y | Accessor<Y>> y, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -228,11 +222,11 @@ module Plottable {
       }
     }
 
-    public _keyAccessor(): Accessor {
+    public _keyAccessor(): Accessor<any> {
        return this._isVertical ? this.x().accessor : this.y().accessor;
     }
 
-    public _valueAccessor(): Accessor {
+    public _valueAccessor(): Accessor<number> {
        return this._isVertical ? this.y().accessor : this.x().accessor;
     }
   }

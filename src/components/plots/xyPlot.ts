@@ -41,9 +41,9 @@ module Plottable {
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor): XYPlot<X, Y>;
-    public x(x: X | Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
-    public x(x?: number | Accessor | X, xScale?: Scale<X, number>): any {
+    public x(x: number | Accessor<number>): XYPlot<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
@@ -58,9 +58,9 @@ module Plottable {
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | Accessor): XYPlot<X, Y>;
-    public y(y: Y | Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
-    public y(y?: number | Accessor | Y, yScale?: Scale<Y, number>): any {
+    public y(y: number | Accessor<number>): XYPlot<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return this._propertyBindings.get(XYPlot._Y_KEY);
       }

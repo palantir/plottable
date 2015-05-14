@@ -23,7 +23,7 @@ export module Plots {
       this._defaultStrokeColor = new Scales.Color().range()[0];
     }
 
-    protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor) {
+    protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor<any>) {
       var value = accessor(d, i, dataset, plotMetadata);
       return value != null && value === value;
     }

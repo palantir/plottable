@@ -34,35 +34,29 @@ export module Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor): StackedArea<X>;
-    public x(x: X | Accessor, xScale: Scale<X, number>): Area<X>;
-    public x(x?: number | Accessor | X, xScale?: Scale<X, number>): any {
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (xScale == null) {
-        super.x(<number | Accessor> x);
+        super.x(<number | Accessor<number>> x);
         Stacked.prototype.x.apply(this, [x]);
       } else {
-        super.x(<X | Accessor> x, xScale);
+        super.x(<X | Accessor<X>> x, xScale);
         Stacked.prototype.x.apply(this, [x, xScale]);
       }
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<number, number>;
-    public y(y: number | Accessor): StackedArea<X>;
-    public y(y: number | Accessor, yScale: Scale<number, number>): Area<X>;
-    public y(y?: number | Accessor | number, yScale?: Scale<number, number>): any {
+    public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
       if (y == null) {
         return super.y();
       }
       if (yScale == null) {
-        super.y(<number | Accessor> y);
+        super.y(<number | Accessor<number>> y);
         Stacked.prototype.y.apply(this, [y]);
       } else {
-        super.y(<number | Accessor> y, yScale);
+        super.y(<number | Accessor<number>> y, yScale);
         Stacked.prototype.y.apply(this, [y, yScale]);
       }
       return this;
@@ -159,11 +153,11 @@ export module Plots {
       return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
-    public _keyAccessor(): Accessor {
+    public _keyAccessor(): Accessor<X> {
       return Stacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): Accessor {
+    public _valueAccessor(): Accessor<number> {
       return Stacked.prototype._valueAccessor.call(this);
     }
 

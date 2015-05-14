@@ -596,7 +596,9 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    type Accessor = (datum: any, index?: number, dataset?: Dataset, plotMetadata?: Plots.PlotMetadata) => any;
+    interface Accessor<T> {
+        (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+    }
     /**
      * Retrieves scaled datum property.
      */
@@ -609,7 +611,7 @@ declare module Plottable {
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
     type _Projection = {
-        accessor: Accessor;
+        accessor: Accessor<any>;
         scale?: Scale<any, any>;
         attribute: string;
     };
@@ -2457,7 +2459,7 @@ declare module Plottable {
             selection: D3.Selection;
         };
         interface AccessorScaleBinding<D, R> {
-            accessor: Accessor;
+            accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
     }
@@ -2496,8 +2498,8 @@ declare module Plottable {
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
         attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
-        attr(attr: string, attrValue: number | string | Accessor): Plot;
-        attr<D>(attr: string, attrValue: D | Accessor, scale: Scale<D, number | string>): Plot;
+        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        attr<D>(attr: string, attrValue: D | Accessor<D>, scale: Scale<D, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
@@ -2523,7 +2525,7 @@ declare module Plottable {
          */
         protected _updateExtents(): void;
         protected _updateExtentsForProperty(property: string): void;
-        protected _filterForProperty(property: string): Accessor;
+        protected _filterForProperty(property: string): Accessor<any>;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2601,27 +2603,27 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Pie<D> extends Plot {
+        class Pie extends Plot {
             /**
              * Constructs a PiePlot.
              *
              * @constructor
              */
             constructor();
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
-            addDataset(dataset: Dataset): Pie<D>;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
+            addDataset(dataset: Dataset): Pie;
             protected _generateAttrToProjector(): AttributeToProjector;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
-            sectorValue(): AccessorScaleBinding<D, number>;
-            sectorValue(sectorValue: number | Accessor): Plots.Pie<D>;
-            sectorValue(sectorValue: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-            innerRadius(): AccessorScaleBinding<D, number>;
-            innerRadius(innerRadius: number | Accessor): Plots.Pie<D>;
-            innerRadius(innerRadius: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-            outerRadius(): AccessorScaleBinding<D, number>;
-            outerRadius(outerRadius: number | Accessor): Plots.Pie<D>;
-            outerRadius(outerRadius: D | Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+            sectorValue<S>(): AccessorScaleBinding<S, number>;
+            sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+            sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+            innerRadius<I>(): AccessorScaleBinding<I, number>;
+            innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+            innerRadius<I>(innerRadius: I | Accessor<I>, scale: Scale<I, number>): Plots.Pie;
+            outerRadius<O>(): AccessorScaleBinding<O, number>;
+            outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+            outerRadius<O>(outerRadius: O | Accessor<O>, scale: Scale<O, number>): Plots.Pie;
         }
     }
 }
@@ -2642,11 +2644,11 @@ declare module Plottable {
          */
         constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor): XYPlot<X, Y>;
-        x(x: X | Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+        x(x: number | Accessor<number>): XYPlot<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor): XYPlot<X, Y>;
-        y(y: Y | Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        y(y: number | Accessor<number>): XYPlot<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2705,17 +2707,17 @@ declare module Plottable {
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x1(): AccessorScaleBinding<X, number>;
-            x1(x1: number | Accessor): Plots.Rectangle<X, Y>;
-            x1(x1: X | Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            x1(x1: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
             x2(): AccessorScaleBinding<X, number>;
-            x2(x2: number | Accessor): Plots.Rectangle<X, Y>;
-            x2(x2: X | Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-            y1(): AccessorScaleBinding<X, number>;
-            y1(y1: number | Accessor): Plots.Rectangle<X, Y>;
-            y1(y1: Y | Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-            y2(): AccessorScaleBinding<X, number>;
-            y2(y2: number | Accessor): Plots.Rectangle<X, Y>;
-            y2(y2: Y | Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            y1(): AccessorScaleBinding<Y, number>;
+            y1(y1: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            y1(y1: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y2(): AccessorScaleBinding<Y, number>;
+            y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
         }
     }
 }
@@ -2736,11 +2738,11 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
-            size(): AccessorScaleBinding<X, number>;
-            size(size: number | Accessor): Plots.Scatter<X, Y>;
-            size(size: any | Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+            size<S>(): AccessorScaleBinding<S, number>;
+            size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+            size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
             symbol(): AccessorScaleBinding<any, any>;
-            symbol(symbol: Accessor): Plots.Scatter<X, Y>;
+            symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }
@@ -2767,12 +2769,8 @@ declare module Plottable {
             addDataset(dataset: Dataset): Grid;
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            x(): Plots.AccessorScaleBinding<any, number>;
-            x(x: number | Accessor): Grid;
-            x(x: any | Accessor, scale: Scale<any, number>): Grid;
-            y(): Plots.AccessorScaleBinding<any, number>;
-            y(y: number | Accessor): Grid;
-            y(y: any | Accessor, scale: Scale<any, number>): Grid;
+            x(x?: number | Accessor<number> | any | Accessor<any>, scale?: Scale<any, number>): any;
+            y(y?: number | Accessor<number> | any, scale?: Scale<any, number>): any;
         }
     }
 }
@@ -2908,7 +2906,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor): boolean;
+            protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor<any>): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2948,8 +2946,8 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             y0(): Plots.AccessorScaleBinding<number, number>;
-            y0(y0: number | Accessor): Area<X>;
-            y0(y0: number | Accessor, y0Scale: Scale<number, number>): Area<X>;
+            y0(y0: number | Accessor<number>): Area<X>;
+            y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
@@ -3006,12 +3004,8 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | Accessor): XYPlot<X, Y>;
-        x(x: X | Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
-        y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | Accessor): XYPlot<X, Y>;
-        y(y: Y | Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
+        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
+        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
@@ -3029,8 +3023,8 @@ declare module Plottable {
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor;
-        _valueAccessor(): Accessor;
+        _keyAccessor(): Accessor<any>;
+        _valueAccessor(): Accessor<number>;
     }
 }
 
@@ -3049,12 +3043,8 @@ declare module Plottable {
             protected _getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
-            x(): Plots.AccessorScaleBinding<X, number>;
-            x(x: number | Accessor): StackedArea<X>;
-            x(x: X | Accessor, xScale: Scale<X, number>): Area<X>;
-            y(): Plots.AccessorScaleBinding<number, number>;
-            y(y: number | Accessor): StackedArea<X>;
-            y(y: number | Accessor, yScale: Scale<number, number>): Area<X>;
+            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
@@ -3069,8 +3059,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor;
-            _valueAccessor(): Accessor;
+            _keyAccessor(): Accessor<X>;
+            _valueAccessor(): Accessor<number>;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
         }
@@ -3092,12 +3082,8 @@ declare module Plottable {
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animators.PlotAnimator;
-            x(): Plots.AccessorScaleBinding<X, number>;
-            x(x: number | Accessor): StackedBar<X, Y>;
-            x(x: X | Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
-            y(): Plots.AccessorScaleBinding<Y, number>;
-            y(y: number | Accessor): StackedBar<X, Y>;
-            y(y: Y | Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
+            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
@@ -3112,8 +3098,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor;
-            _valueAccessor(): Accessor;
+            _keyAccessor(): Accessor<any>;
+            _valueAccessor(): Accessor<number>;
         }
     }
 }

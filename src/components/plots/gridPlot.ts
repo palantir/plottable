@@ -48,17 +48,14 @@ export module Plots {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
 
-    public x(): Plots.AccessorScaleBinding<any, number>;
-    public x(x: number | Accessor): Grid;
-    public x(x: any | Accessor, scale: Scale<any, number>): Grid;
-    public x(x?: number | Accessor | any, scale?: Scale<any, number>): any {
+    public x(x?: number | Accessor<number> | any | Accessor<any>, scale?: Scale<any, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | Accessor> x);
+        super.x(<number | Accessor<number>> x);
       } else {
-        super.x(<any | Accessor> x, scale);
+        super.x(<any | Accessor<any>> x, scale);
         if (scale instanceof Scales.Category) {
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
           this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
@@ -69,17 +66,14 @@ export module Plots {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<any, number>;
-    public y(y: number | Accessor): Grid;
-    public y(y: any | Accessor, scale: Scale<any, number>): Grid;
-    public y(y?: number | Accessor | any, scale?: Scale<any, number>): any {
+    public y(y?: number | Accessor<number> | any, scale?: Scale<any, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | Accessor> y);
+        super.y(<number | Accessor<number>> y);
       } else {
-        super.y(<any | Accessor> y, scale);
+        super.y(<any | Accessor<any>> y, scale);
         if (scale instanceof Scales.Category) {
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
           this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
