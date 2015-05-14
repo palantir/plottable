@@ -7653,10 +7653,6 @@ var Plottable;
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
             }
-            Line.prototype._rejectNullsAndNaNs = function (d, i, dataset, plotMetadata, accessor) {
-                var value = accessor(d, i, dataset, plotMetadata);
-                return value != null && value === value;
-            };
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
             };
@@ -7682,7 +7678,6 @@ var Plottable;
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
@@ -7693,7 +7688,11 @@ var Plottable;
                 });
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i, dataset, m) { return _this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && _this._rejectNullsAndNaNs(d, i, dataset, m, yFunction); };
+                attrToProjector["defined"] = function (d, i, dataset, m) {
+                    var xValue = xFunction(d, i, dataset, m);
+                    var yValue = yFunction(d, i, dataset, m);
+                    return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
+                };
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;

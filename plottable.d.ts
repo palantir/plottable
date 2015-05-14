@@ -2906,7 +2906,6 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor<X> | Accessor<number>): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];

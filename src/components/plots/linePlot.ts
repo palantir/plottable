@@ -23,11 +23,6 @@ export module Plots {
       this._defaultStrokeColor = new Scales.Color().range()[0];
     }
 
-    protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: Accessor<X> | Accessor<number>) {
-      var value = accessor(d, i, dataset, plotMetadata);
-      return value != null && value === value;
-    }
-
     protected _getDrawer(key: string) {
       return new Plottable.Drawers.Line(key);
     }
@@ -71,8 +66,11 @@ export module Plots {
       var xFunction = attrToProjector["x"];
       var yFunction = attrToProjector["y"];
 
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) =>
-          this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && this._rejectNullsAndNaNs(d, i, dataset, m, yFunction);
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) => {
+        var xValue = xFunction(d, i, dataset, m);
+        var yValue = yFunction(d, i, dataset, m);
+        return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
+      };
 
       attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
       attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
