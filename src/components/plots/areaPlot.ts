@@ -7,7 +7,6 @@ export module Plots {
    */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
-    private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,7 +24,10 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      var defaultColor = new Scales.Color().range()[0];
+      this.attr("fill-opacity", 0.25);
+      this.attr("fill", defaultColor);
+      this.attr("stroke", defaultColor);
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
@@ -79,14 +81,6 @@ export module Plots {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
-      return attrToProjector;
     }
   }
 }

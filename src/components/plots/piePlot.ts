@@ -8,7 +8,6 @@ export module Plots {
    */
   export class Pie extends Plot {
 
-    private _colorScale: Scales.Color;
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
@@ -20,12 +19,10 @@ export module Plots {
      */
     constructor() {
       super();
-      this._colorScale = new Scales.Color();
-
-      this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: () => 0 });
-      this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: () => Math.min(this.width(), this.height()) / 2 });
-      this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: () => null });
+      this.innerRadius(0);
+      this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.classed("pie-plot", true);
+      this.attr("fill", (d, i) => String(i), new Scales.Color());
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -48,15 +45,6 @@ export module Plots {
       }
       super.addDataset(dataset);
       return this;
-    }
-
-    protected _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = super._generateAttrToProjector();
-
-      var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
-      attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-
-      return attrToProjector;
     }
 
     protected _getDrawer(key: string) {

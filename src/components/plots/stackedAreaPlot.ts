@@ -19,6 +19,7 @@ export module Plots {
       super(xScale, yScale);
       this.classed("area-plot", true);
       this._isVertical = true;
+      this.attr("fill-opacity", 1);
     }
 
     protected _getDrawer(key: string) {
@@ -93,10 +94,6 @@ export module Plots {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-
-      if (this._attrBindings.get("fill-opacity") == null) {
-        attrToProjector["fill-opacity"] = d3.functor(1);
-      }
 
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
