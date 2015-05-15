@@ -6595,9 +6595,8 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._colorScale = new Plottable.Scales.Color();
-                this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: function () { return 0; } });
-                this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: function () { return Math.min(_this.width(), _this.height()) / 2; } });
-                this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: function () { return null; } });
+                this.innerRadius(0);
+                this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.classed("pie-plot", true);
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {

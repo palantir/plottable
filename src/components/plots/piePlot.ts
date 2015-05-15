@@ -21,10 +21,8 @@ export module Plots {
     constructor() {
       super();
       this._colorScale = new Scales.Color();
-
-      this._propertyBindings.set(Pie._INNER_RADIUS_KEY, { accessor: () => 0 });
-      this._propertyBindings.set(Pie._OUTER_RADIUS_KEY, { accessor: () => Math.min(this.width(), this.height()) / 2 });
-      this._propertyBindings.set(Pie._SECTOR_VALUE_KEY, { accessor: () => null });
+      this.innerRadius(0);
+      this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.classed("pie-plot", true);
     }
 
