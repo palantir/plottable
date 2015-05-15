@@ -3,6 +3,7 @@
 module Plottable {
 export module Scales {
   export class Category extends Scale<string, number> {
+    private _d3Scale: D3.Scale.OrdinalScale;
     private _range = [0, 1];
 
     private _innerPadding: number;
@@ -49,7 +50,7 @@ export module Scales {
         this._range = values;
         var d3InnerPadding = 1 - 1 / (1 + this.innerPadding());
         var d3OuterPadding = this.outerPadding() / (1 + this.innerPadding());
-        (<D3.Scale.OrdinalScale> this._d3Scale).rangeBands(values, d3InnerPadding, d3OuterPadding);
+        this._d3Scale.rangeBands(values, d3InnerPadding, d3OuterPadding);
         return this;
       }
     }
@@ -68,7 +69,7 @@ export module Scales {
      * @returns {number} The range band width
      */
     public rangeBand(): number {
-      return (<D3.Scale.OrdinalScale> this._d3Scale).rangeBand();
+      return this._d3Scale.rangeBand();
     }
 
     /**
@@ -141,7 +142,23 @@ export module Scales {
 
     public scale(value: string): number {
       // scale it to the middle
-      return super.scale(value) + this.rangeBand() / 2;
+      return this._d3Scale(value) + this.rangeBand() / 2;
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setActualDomain(values: string[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
     }
   }
 }

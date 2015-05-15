@@ -123,12 +123,12 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
-      renderAreaD1.x((d) => d.x, xScale);
-      renderAreaD1.y((d) => d.y, yScale);
+      renderAreaD1.x((d: any) => d.x, xScale);
+      renderAreaD1.y((d: any) => d.y, yScale);
       var renderAreaD2 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD2.addDataset(ds2);
-      renderAreaD2.x((d) => d.x, xScale);
-      renderAreaD2.y((d) => d.y, yScale);
+      renderAreaD2.x((d: any) => d.x, xScale);
+      renderAreaD2.y((d: any) => d.y, yScale);
       var renderAreas = renderAreaD1.below(renderAreaD2);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -206,8 +206,8 @@ describe("Scales", () => {
     var dataset = new Plottable.Dataset([dA, dB]);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.addDataset(dataset);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);

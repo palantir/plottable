@@ -22,10 +22,10 @@ export module Plots {
 
       // The x and y scales should render in bands with no padding for category scales
       if (xScale instanceof Scales.Category) {
-        xScale.innerPadding(0).outerPadding(0);
+        <Scales.Category> xScale.innerPadding(0).outerPadding(0);
       }
       if (yScale instanceof Scales.Category) {
-        yScale.innerPadding(0).outerPadding(0);
+        <Scales.Category> yScale.innerPadding(0).outerPadding(0);
       }
 
       this.animator("cells", new Animators.Null());
@@ -59,9 +59,10 @@ export module Plots {
         super.x(<number | _Accessor> x);
       } else {
         super.x(<any | _Accessor> x, scale);
+        var catScale = (<Scales.Category> <any> scale);
         if (scale instanceof Scales.Category) {
-          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
-          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
+          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
+          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)));
         }
@@ -80,9 +81,10 @@ export module Plots {
         super.y(<number | _Accessor> y);
       } else {
         super.y(<any | _Accessor> y, scale);
+        var catScale = (<Scales.Category> <any> scale);
         if (scale instanceof Scales.Category) {
-          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
-          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
+          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
+          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)));
         }

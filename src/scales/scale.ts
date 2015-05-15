@@ -13,8 +13,6 @@ module Plottable {
   }
 
   export class Scale<D, R> {
-    protected _d3Scale: D3.Scale.Scale;
-
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
@@ -91,7 +89,7 @@ module Plottable {
      * @returns {R} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
-      return this._d3Scale(value);
+      return null;
     }
 
     /**
@@ -120,17 +118,21 @@ module Plottable {
       }
     }
 
-    protected _getDomain() {
-      return this._d3Scale.domain();
+    protected _getDomain(): D[] {
+      return [];
     }
 
     protected _setDomain(values: D[]) {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
-        this._d3Scale.domain(values);
+        this._setActualDomain(values);
         this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
+    }
+
+    protected _setActualDomain(values: D[]) {
+      // Subclasses should override
     }
 
     /**
@@ -156,11 +158,19 @@ module Plottable {
     public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
-        return this._d3Scale.range();
+        return this._getRange();
       } else {
-        this._d3Scale.range(values);
+        this._setRange(values);
         return this;
       }
+    }
+
+    protected _getRange(): R[] {
+      return [];
+    }
+
+    protected _setRange(values: R[]) {
+      // Subclasses should override
     }
 
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {

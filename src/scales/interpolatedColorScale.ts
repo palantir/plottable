@@ -10,7 +10,7 @@ export module Scales {
    *
    * By default it generates a linear scale internally.
    */
-  export class InterpolatedColor extends Scale<number, string> {
+  export class InterpolatedColor extends Scale<number, number> {
     public static REDS = [
       "#FFFFFF", // white
       "#FFF6E1",
@@ -54,6 +54,7 @@ export module Scales {
     ];
     private _colorRange: string[];
     private _colorScale: D3.Scale.QuantitativeScale;
+    private _d3Scale: D3.Scale.QuantitativeScale;
 
     /**
      * An InterpolatedColorScale maps numbers to color strings.
@@ -162,6 +163,26 @@ export module Scales {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
+    }
+
+    public scale(value: number) {
+      return this._d3Scale(value);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setActualDomain(values: number[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
     }
   }
 }

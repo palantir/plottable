@@ -20,7 +20,8 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category();
-      yScale = new Plottable.Scales.Linear().domain([0, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 3]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -221,7 +222,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([0, 6]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 6]);
       yScale = new Plottable.Scales.Category();
 
       var data1 = [
@@ -421,7 +423,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
       var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
@@ -460,7 +462,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data4));
       plot.addDataset(new Plottable.Dataset(data5));
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var keys = (<any> plot)._key2PlotDatasetKey.keys();
       var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");

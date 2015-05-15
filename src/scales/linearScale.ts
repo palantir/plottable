@@ -3,6 +3,7 @@
 module Plottable {
 export module Scales {
   export class Linear extends QuantitativeScale<number> {
+    private _d3Scale: D3.Scale.LinearScale;
 
     /**
      * Constructs a new LinearScale.
@@ -20,6 +21,38 @@ export module Scales {
 
     public _defaultExtent(): number[] {
         return [0, 1];
+    }
+
+    public scale(value: number) {
+      return this._d3Scale(value);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setActualDomain(values: number[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
+    }
+
+    public invert(value: number) {
+      return this._d3Scale.invert(value);
+    }
+
+    public getDefaultTicks(): number[] {
+      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    }
+
+    public _niceDomain(domain: number[], count?: number): number[] {
+      return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
     }
   }
 }

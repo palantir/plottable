@@ -4,6 +4,7 @@ module Plottable {
 export module Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
+    private _d3Scale: D3.Scale.LinearScale;
     private _pivot: number;
     private _untransformedDomain: number[];
     private _showIntermediateTicks = false;
@@ -85,7 +86,7 @@ export module Scales {
     }
 
     public invert(x: number): number {
-      return this.invertedAdjustedLog((<D3.Scale.LinearScale> this._d3Scale).invert(x));
+      return this.invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
     protected _getDomain() {
@@ -96,6 +97,10 @@ export module Scales {
       this._untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       super._setDomain(transformedDomain);
+    }
+
+    protected _setActualDomain(values: number[]) {
+      this._d3Scale.domain(values);
     }
 
     public ticks(): number[] {
@@ -203,6 +208,18 @@ export module Scales {
 
     public _defaultExtent(): number[] {
       return [0, this._base];
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
+    }
+
+    public getDefaultTicks(): number[] {
+      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 
   }

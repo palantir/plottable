@@ -3,6 +3,7 @@
 module Plottable {
 export module Scales {
   export class Time extends QuantitativeScale<Date> {
+    private _d3Scale: D3.Scale.TimeScale;
     /**
      * Constructs a TimeScale.
      *
@@ -44,6 +45,38 @@ export module Scales {
       var endTimeValue = new Date().valueOf();
       var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
+    }
+
+    public scale(value: Date): number {
+      return this._d3Scale(value);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setActualDomain(values: Date[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
+    }
+
+    public invert(value: number) {
+      return this._d3Scale.invert(value);
+    }
+
+    public getDefaultTicks(): Date[] {
+      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    }
+
+    public _niceDomain(domain: Date[], count?: number) {
+      return Utils.D3Scale.niceDomain(<D3.Scale.QuantitativeScale> <D3.Scale.Scale> this._d3Scale, domain, count);
     }
   }
 }

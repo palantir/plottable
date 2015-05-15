@@ -8,6 +8,8 @@ export module Scales {
     // The maximum number of colors we are getting from CSS stylesheets
     private static MAXIMUM_COLORS_FROM_CSS = 256;
 
+    private _d3Scale: D3.Scale.OrdinalScale;
+
     /**
      * Constructs a ColorScale.
      *
@@ -82,11 +84,27 @@ export module Scales {
     // Modifying the original scale method so that colors that are looped are lightened according
     // to how many times they are looped.
     public scale(value: string): string {
-      var color = super.scale(value);
+      var color = this._d3Scale(value);
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
       var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
       return Utils.Methods.lightenColor(color, modifyFactor);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setActualDomain(values: string[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: string[]) {
+      this._d3Scale.range(values);
     }
   }
 }

@@ -449,8 +449,8 @@ describe("Plots", () => {
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator("bars", animator);
       var svg = TestMethods.generateSVG();
-      plot.x((d) => d.x, x);
-      plot.y((d) => d.y, y);
+      plot.x((d: any) => d.x, x);
+      plot.y((d: any) => d.y, y);
       plot.renderTo(svg);
       assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
       svg.remove();
