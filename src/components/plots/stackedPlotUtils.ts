@@ -33,5 +33,13 @@ module Plottable {
       return dataArray;
     }
 
+    public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
+      return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
+    }
+
+    public static valueAccessor(plot: XYPlot<any, any>, orientation: string) {
+      return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
+    }
+
   }
 }

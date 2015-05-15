@@ -57,8 +57,9 @@ module Plottable {
     }
 
     public _updateStackExtents() {
-      var valueAccessor = this._valueAccessor();
-      var keyAccessor = this._keyAccessor();
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
       var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -94,8 +95,9 @@ module Plottable {
      * to be determined correctly on the overall datasets
      */
     public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
-      var keyAccessor = this._keyAccessor();
-      var valueAccessor = this._valueAccessor();
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
       this._datasetKeysInOrder.forEach((k, index) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -122,7 +124,8 @@ module Plottable {
     }
 
     public _getDomainKeys(): string[] {
-      var keyAccessor = this._keyAccessor();
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var domainKeys = d3.set();
 
       this._datasetKeysInOrder.forEach((k) => {
@@ -137,8 +140,9 @@ module Plottable {
     }
 
     public _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[] {
-      var keyAccessor = this._keyAccessor();
-      var valueAccessor = this._valueAccessor();
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
       var domainKeys = this._getDomainKeys();
 
       var dataMapArray = this._datasetKeysInOrder.map(() => {
@@ -179,12 +183,5 @@ module Plottable {
       }
     }
 
-    public _keyAccessor(): Accessor<X> | Accessor<Y> {
-       return this._isVertical ? this.x().accessor : this.y().accessor;
-    }
-
-    public _valueAccessor(): Accessor<number> {
-       return this._isVertical ? this.y().accessor : this.x().accessor;
-    }
   }
 }

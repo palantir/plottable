@@ -124,14 +124,6 @@ export module Plots {
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
-
-    public _keyAccessor(): Accessor<X> | Accessor<Y> {
-      return Stacked.prototype._keyAccessor.call(this);
-    }
-
-    public _valueAccessor(): Accessor<number> {
-      return Stacked.prototype._valueAccessor.call(this);
-    }
     // ===== /Stack logic =====
   }
 }
