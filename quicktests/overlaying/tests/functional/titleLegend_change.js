@@ -87,17 +87,17 @@ function run(svg, data, Plottable) {
     renderGrape.detach();
     renderOrange.detach();
     renderBanana.detach();
-    renderArea.add(scatterPlot).add(linePlot);
+    renderArea.append(scatterPlot).append(linePlot);
   }
 
   function sixPlots() {
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
-    renderArea.add(renderApple)
-              .add(renderBanana)
-              .add(renderOrange)
-              .add(renderGrape)
-              .add(scatterPlot)
-              .add(linePlot);
+    renderArea.append(renderApple)
+              .append(renderBanana)
+              .append(renderOrange)
+              .append(renderGrape)
+              .append(scatterPlot)
+              .append(linePlot);
     basicTable.redraw();
   }
 
