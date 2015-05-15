@@ -115,10 +115,6 @@ export module Plots {
       Stacked.prototype._updateStackExtents.call(this);
     }
 
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._stack.call(this, dataArray);
-    }
-
     public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
       Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
     }

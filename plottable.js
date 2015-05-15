@@ -7886,6 +7886,17 @@ var Plottable;
     var StackedPlotUtils = (function () {
         function StackedPlotUtils() {
         }
+        /**
+         * Feeds the data through d3's stack layout function which will calculate
+         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         */
+        StackedPlotUtils.stack = function (dataArray, domainKeys) {
+            var outFunction = function (d, y0, y) {
+                d.offset = y0;
+            };
+            d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
+            return dataArray;
+        };
         return StackedPlotUtils;
     })();
     Plottable.StackedPlotUtils = StackedPlotUtils;
@@ -7963,7 +7974,7 @@ var Plottable;
                     return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                 });
             });
-            this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+            this._setDatasetStackOffsets(Plottable.StackedPlotUtils.stack(positiveDataMapArray, domainKeys), Plottable.StackedPlotUtils.stack(negativeDataMapArray, domainKeys));
             this._updateStackExtents();
         };
         Stacked.prototype._updateStackExtents = function () {
@@ -7994,18 +8005,6 @@ var Plottable;
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-        };
-        /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
-         */
-        Stacked.prototype._stack = function (dataArray) {
-            var _this = this;
-            var outFunction = function (d, y0, y) {
-                d.offset = y0;
-            };
-            d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return _this._getDomainKeys().map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
-            return dataArray;
         };
         /**
          * After the stack offsets have been determined on each separate dataset, the offsets need
@@ -8231,9 +8230,6 @@ var Plottable;
             StackedArea.prototype._updateStackExtents = function () {
                 Plottable.Stacked.prototype._updateStackExtents.call(this);
             };
-            StackedArea.prototype._stack = function (dataArray) {
-                return Plottable.Stacked.prototype._stack.call(this, dataArray);
-            };
             StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
                 Plottable.Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
@@ -8362,9 +8358,6 @@ var Plottable;
             };
             StackedBar.prototype._updateStackExtents = function () {
                 Plottable.Stacked.prototype._updateStackExtents.call(this);
-            };
-            StackedBar.prototype._stack = function (dataArray) {
-                return Plottable.Stacked.prototype._stack.call(this, dataArray);
             };
             StackedBar.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
                 Plottable.Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);

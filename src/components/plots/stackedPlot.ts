@@ -77,7 +77,10 @@ module Plottable {
         });
       });
 
-      this._setDatasetStackOffsets(this._stack(positiveDataMapArray), this._stack(negativeDataMapArray));
+      this._setDatasetStackOffsets(
+        StackedPlotUtils.stack(positiveDataMapArray, domainKeys),
+        StackedPlotUtils.stack(negativeDataMapArray, domainKeys)
+        );
       this._updateStackExtents();
     }
 
@@ -112,24 +115,6 @@ module Plottable {
       }, 0);
 
       this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-    }
-
-    /**
-     * Feeds the data through d3's stack layout function which will calculate
-     * the stack offsets and use the the function declared in .out to set the offsets on the data.
-     */
-    public _stack(dataArray: D3.Map<Plots.StackedDatum>[]) {
-      var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
-        d.offset = y0;
-      };
-
-      d3.layout.stack()
-               .x((d) => d.key)
-               .y((d) => +d.value)
-               .values((d) => this._getDomainKeys().map((domainKey) => d.get(domainKey)))
-               .out(outFunction)(dataArray);
-
-      return dataArray;
     }
 
     /**
