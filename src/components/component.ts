@@ -466,7 +466,7 @@ module Plottable {
     }
 
     public parent(): ComponentContainer;
-    public parent(parent: ComponentContainer): any;
+    public parent(parent: ComponentContainer): Component;
     public parent(parent?: ComponentContainer): any {
       if (parent === undefined) {
        return this._parent;

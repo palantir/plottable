@@ -65,7 +65,7 @@ module Plottable {
     /**
      * Invokes a callback on each Component in the ComponentContainer.
      */
-    protected _forEach(callback: (component: Component) => any) {
+    protected _forEach(callback: (component: Component) => void) {
       throw new Error("_forEach() is not implemented on ComponentContainer");
     }
 

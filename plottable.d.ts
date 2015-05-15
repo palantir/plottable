@@ -1537,7 +1537,7 @@ declare module Plottable {
          */
         offDetach(callback: ComponentCallback): Component;
         parent(): ComponentContainer;
-        parent(parent: ComponentContainer): any;
+        parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1622,7 +1622,7 @@ declare module Plottable {
         /**
          * Invokes a callback on each Component in the ComponentContainer.
          */
-        protected _forEach(callback: (component: Component) => any): void;
+        protected _forEach(callback: (component: Component) => void): void;
         /**
          * Destroys the ComponentContainer and all Components within it.
          */

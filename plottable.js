@@ -5710,7 +5710,7 @@ var Plottable;
                 }
                 if (!this.has(component)) {
                     var currentComponent = this._rows[row] && this._rows[row][col];
-                    if (currentComponent) {
+                    if (currentComponent != null) {
                         throw new Error("cell is occupied");
                     }
                     component.detach();
