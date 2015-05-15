@@ -18,10 +18,10 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} mode the mode of the plot.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
-      super(xScale, yScale, isVertical);
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, mode = Bars.Mode.VERTICAL) {
+      super(xScale, yScale, mode);
     }
 
     protected _generateAttrToProjector() {

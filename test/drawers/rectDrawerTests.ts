@@ -32,7 +32,7 @@ describe("Drawers", () => {
       var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Category();
-      var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+      var barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bars.Mode.HORIZONTAL);
 
       var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> barPlot)._getDrawer = () => drawer;

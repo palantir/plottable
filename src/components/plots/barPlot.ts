@@ -2,6 +2,12 @@
 
 module Plottable {
 export module Plots {
+  export module Bars {
+    export class Mode {
+      public static VERTICAL = "vertical";
+      public static HORIZONTAL = "horizontal";
+    }
+  }
   export class Bar<X, Y> extends XYPlot<X, Y> {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
@@ -21,15 +27,15 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} mode the mode of the plot.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, mode = Bars.Mode.VERTICAL) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = isVertical;
+      this._isVertical = mode === Bars.Mode.VERTICAL;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());

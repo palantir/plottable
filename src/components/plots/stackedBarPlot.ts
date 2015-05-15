@@ -11,10 +11,10 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale the x scale of the plot.
      * @param {Scale} yScale the y scale of the plot.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} mode the mode of the plot.
      */
-    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
-      super(xScale, yScale, isVertical);
+    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, mode = Bars.Mode.VERTICAL) {
+      super(xScale, yScale, mode);
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {

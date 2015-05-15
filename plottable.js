@@ -7187,6 +7187,17 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
+        var Bars;
+        (function (Bars) {
+            var Mode = (function () {
+                function Mode() {
+                }
+                Mode.VERTICAL = "vertical";
+                Mode.HORIZONTAL = "horizontal";
+                return Mode;
+            })();
+            Bars.Mode = Mode;
+        })(Bars = Plots.Bars || (Plots.Bars = {}));
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
@@ -7195,11 +7206,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} mode the mode of the plot.
              */
-            function Bar(xScale, yScale, isVertical) {
+            function Bar(xScale, yScale, mode) {
                 var _this = this;
-                if (isVertical === void 0) { isVertical = true; }
+                if (mode === void 0) { mode = Bars.Mode.VERTICAL; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
@@ -7209,7 +7220,7 @@ var Plottable;
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
-                this._isVertical = isVertical;
+                this._isVertical = mode === Bars.Mode.VERTICAL;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
@@ -7829,11 +7840,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} mode the mode of the plot.
              */
-            function ClusteredBar(xScale, yScale, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale, isVertical);
+            function ClusteredBar(xScale, yScale, mode) {
+                if (mode === void 0) { mode = Plots.Bars.Mode.VERTICAL; }
+                _super.call(this, xScale, yScale, mode);
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -8271,11 +8282,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} mode the mode of the plot.
              */
-            function StackedBar(xScale, yScale, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale, isVertical);
+            function StackedBar(xScale, yScale, mode) {
+                if (mode === void 0) { mode = Plots.Bars.Mode.VERTICAL; }
+                _super.call(this, xScale, yScale, mode);
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
