@@ -22,6 +22,7 @@ function run(svg, data, Plottable) {
         animator.maxTotalDuration(2000);
         animator.maxIterativeDelay(100);
 
+    var dataset = new Plottable.Dataset(data);
 
     var vbar = new Plottable.Plots.Bar(xScale, yScale)
       .x(function(d) { return d.x; }, xScale)
@@ -29,7 +30,7 @@ function run(svg, data, Plottable) {
       .attr("fill", function(d) { return d.type; }, colorScale)
       .labelsEnabled(true)
       .labelFormatter(function(text){return text + "!";})
-      .addDataset(new Plottable.Dataset(data))
+      .addDataset(dataset)
       .animator( "bars", animator)
       .animate(true);
 
@@ -41,7 +42,7 @@ function run(svg, data, Plottable) {
 
 
     var cb = function(){
-      vbar.datasets()[0].data(data);
+      dataset.data(data);
     };
     var click = new Plottable.Interactions.Click().onClick(cb);
 
