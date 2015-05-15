@@ -7881,6 +7881,17 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var StackedPlotUtils = (function () {
+        function StackedPlotUtils() {
+        }
+        return StackedPlotUtils;
+    })();
+    Plottable.StackedPlotUtils = StackedPlotUtils;
+})(Plottable || (Plottable = {}));
+
+///<reference path="../../reference.ts" />
 var __extends = this.__extends || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8190,6 +8201,15 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
+            StackedArea.prototype._extentsForProperty = function (attr) {
+                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
+            };
+            StackedArea.prototype._updateExtentsForProperty = function (property) {
+                Plottable.Stacked.prototype._updateExtentsForProperty.call(this, property);
+            };
+            StackedArea.prototype._getPlotMetadataForDataset = function (key) {
+                return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
             // ===== Stack logic from StackedPlot =====
             StackedArea.prototype._updateStackOffsets = function () {
                 var _this = this;
@@ -8223,20 +8243,11 @@ var Plottable;
             StackedArea.prototype._generateDefaultMapArray = function () {
                 return Plottable.Stacked.prototype._generateDefaultMapArray.call(this);
             };
-            StackedArea.prototype._extentsForProperty = function (attr) {
-                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
-            };
             StackedArea.prototype._keyAccessor = function () {
                 return Plottable.Stacked.prototype._keyAccessor.call(this);
             };
             StackedArea.prototype._valueAccessor = function () {
                 return Plottable.Stacked.prototype._valueAccessor.call(this);
-            };
-            StackedArea.prototype._getPlotMetadataForDataset = function (key) {
-                return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
-            };
-            StackedArea.prototype._updateExtentsForProperty = function (property) {
-                Plottable.Stacked.prototype._updateExtentsForProperty.call(this, property);
             };
             return StackedArea;
         })(Plots.Area);
@@ -8342,6 +8353,9 @@ var Plottable;
             StackedBar.prototype._updateExtentsForProperty = function (property) {
                 Plottable.Stacked.prototype._updateExtentsForProperty.call(this, property);
             };
+            StackedBar.prototype._extentsForProperty = function (attr) {
+                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
+            };
             // ===== Stack logic from StackedPlot =====
             StackedBar.prototype._updateStackOffsets = function () {
                 Plottable.Stacked.prototype._updateStackOffsets.call(this);
@@ -8360,9 +8374,6 @@ var Plottable;
             };
             StackedBar.prototype._generateDefaultMapArray = function () {
                 return Plottable.Stacked.prototype._generateDefaultMapArray.call(this);
-            };
-            StackedBar.prototype._extentsForProperty = function (attr) {
-                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
             };
             StackedBar.prototype._keyAccessor = function () {
                 return Plottable.Stacked.prototype._keyAccessor.call(this);

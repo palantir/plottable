@@ -109,6 +109,18 @@ export module Plots {
       return ["x", "y", "defined"];
     }
 
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
+    }
+
+    protected _updateExtentsForProperty(property: string) {
+      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
+    }
+
+    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    }
+
     // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
@@ -146,10 +158,6 @@ export module Plots {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    protected _extentsForProperty(attr: string) {
-      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
-    }
-
     public _keyAccessor(): Accessor<X> {
       return Stacked.prototype._keyAccessor.call(this);
     }
@@ -158,13 +166,6 @@ export module Plots {
       return Stacked.prototype._valueAccessor.call(this);
     }
 
-    public _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
-    }
-
-    protected _updateExtentsForProperty(property: string) {
-      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
-    }
     // ===== /Stack logic =====
   }
 }

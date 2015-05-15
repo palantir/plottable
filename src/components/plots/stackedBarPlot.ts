@@ -102,6 +102,10 @@ export module Plots {
       (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
     }
 
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
+    }
+
     // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       Stacked.prototype._updateStackOffsets.call(this);
@@ -125,10 +129,6 @@ export module Plots {
 
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       return Stacked.prototype._generateDefaultMapArray.call(this);
-    }
-
-    protected _extentsForProperty(attr: string) {
-      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
     public _keyAccessor(): Accessor<X> | Accessor<Y> {

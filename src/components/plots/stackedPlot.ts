@@ -118,7 +118,7 @@ module Plottable {
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    public _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[] {
+    public _stack(dataArray: D3.Map<Plots.StackedDatum>[]) {
       var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
