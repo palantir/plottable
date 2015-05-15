@@ -209,11 +209,7 @@ module Plottable {
      *
      * @returns {Component} The calling Component
      */
-    public render(immediately = false) {
-      if (immediately) {
-        this._render();
-        return this;
-      }
+    public render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
         RenderController.registerToRender(this);
       }
@@ -226,7 +222,9 @@ module Plottable {
       }
     }
 
-    protected _render() {/* overwrite */}
+    public renderImmediately() {
+      return this;
+    }
 
     /**
      * Causes the Component to recompute layout and redraw.

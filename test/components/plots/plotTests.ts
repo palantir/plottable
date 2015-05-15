@@ -4,9 +4,9 @@ var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 
-  public render(immediately: boolean) {
+  public render() {
     ++this.renders;
-    return super.render(immediately);
+    return super.render();
   }
 }
 

@@ -221,12 +221,13 @@ module Plottable {
       return attrToAppliedProjector;
     }
 
-    protected _render() {
+    public renderImmediately() {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
         this._animateOnNextRender = false;
       }
+      return this;
     }
 
     /**
