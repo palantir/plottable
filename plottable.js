@@ -7883,6 +7883,9 @@ var Plottable;
 ///<reference path="../../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    var Plots;
+    (function (Plots) {
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
     var StackedPlotUtils = (function () {
         function StackedPlotUtils() {
         }
