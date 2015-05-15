@@ -3010,7 +3010,7 @@ declare module Plottable {
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
-        _getDomainKeys(): string[];
+        _getDomainKeys(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): string[];
         protected _extentsForProperty(attr: string): any[];
     }
 }
@@ -3044,7 +3044,6 @@ declare module Plottable {
             protected _extentsForProperty(attr: string): any;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
-            _getDomainKeys(): any;
         }
     }
 }
@@ -3076,7 +3075,6 @@ declare module Plottable {
             protected _extentsForProperty(attr: string): any;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
-            _getDomainKeys(): any;
         }
     }
 }

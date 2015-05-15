@@ -37,9 +37,9 @@ module Plottable {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var domainKeys = this._getDomainKeys();
       var datasetKeys = this._datasetKeysInOrder;
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      var domainKeys = Stacked.prototype._getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
         (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
@@ -106,14 +106,17 @@ module Plottable {
       this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
-    public _getDomainKeys(): string[] {
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+    public _getDomainKeys(
+        keyAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>
+        ) {
+
       var domainKeys = d3.set();
 
-      this._datasetKeysInOrder.forEach((k) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
+      datasetKeys.forEach((k) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
           domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
         });

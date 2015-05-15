@@ -125,8 +125,8 @@ export module Plots {
     // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
-      var domainKeys = this._getDomainKeys();
       var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      var domainKeys = Stacked.prototype._getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -141,10 +141,6 @@ export module Plots {
 
     public _updateStackExtents() {
       Stacked.prototype._updateStackExtents.call(this);
-    }
-
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
     }
     // ===== /Stack logic =====
   }

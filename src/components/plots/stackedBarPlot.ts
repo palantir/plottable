@@ -115,10 +115,6 @@ export module Plots {
     public _updateStackExtents() {
       Stacked.prototype._updateStackExtents.call(this);
     }
-
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
-    }
     // ===== /Stack logic =====
   }
 }
