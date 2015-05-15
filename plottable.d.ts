@@ -2975,6 +2975,7 @@ declare module Plottable {
         };
     }
     class StackedPlotUtils {
+        static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
         /**
          * Feeds the data through d3's stack layout function which will calculate
          * the stack offsets and use the the function declared in .out to set the offsets on the data.
@@ -3005,7 +3006,6 @@ declare module Plottable {
 declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
         x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
         y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
         _onDatasetUpdate(): void;

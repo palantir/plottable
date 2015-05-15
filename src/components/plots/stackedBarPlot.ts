@@ -92,8 +92,9 @@ export module Plots {
       return this;
     }
 
-    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    protected _getPlotMetadataForDataset(key: string) {
+      var metadata = super._getPlotMetadataForDataset(key);
+      return StackedPlotUtils.stackedPlotMetadata(metadata);
     }
 
     protected _updateExtentsForProperty(property: string) {

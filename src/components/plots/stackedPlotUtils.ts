@@ -15,6 +15,12 @@ module Plottable {
   }
 
   export class StackedPlotUtils {
+    public static stackedPlotMetadata(metadata: Plots.PlotMetadata) {
+      var stackedMetadata = <Plots.StackedPlotMetadata> metadata;
+      stackedMetadata.offsets = d3.map();
+      return stackedMetadata;
+    }
+
     /**
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.

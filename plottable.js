@@ -7889,6 +7889,11 @@ var Plottable;
     var StackedPlotUtils = (function () {
         function StackedPlotUtils() {
         }
+        StackedPlotUtils.stackedPlotMetadata = function (metadata) {
+            var stackedMetadata = metadata;
+            stackedMetadata.offsets = d3.map();
+            return stackedMetadata;
+        };
         /**
          * Feeds the data through d3's stack layout function which will calculate
          * the stack offsets and use the the function declared in .out to set the offsets on the data.
@@ -7984,11 +7989,6 @@ var Plottable;
             _super.apply(this, arguments);
             this._stackedExtent = [0, 0];
         }
-        Stacked.prototype._getPlotMetadataForDataset = function (key) {
-            var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-            metadata.offsets = d3.map();
-            return metadata;
-        };
         Stacked.prototype.x = function (x, scale) {
             if (this._projectorsReady()) {
                 this._updateStackOffsets();
@@ -8179,7 +8179,8 @@ var Plottable;
                 return ["x", "y", "defined"];
             };
             StackedArea.prototype._getPlotMetadataForDataset = function (key) {
-                return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plottable.StackedPlotUtils.stackedPlotMetadata(metadata);
             };
             StackedArea.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
@@ -8308,7 +8309,8 @@ var Plottable;
                 return this;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {
-                return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
+                return Plottable.StackedPlotUtils.stackedPlotMetadata(metadata);
             };
             StackedBar.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);

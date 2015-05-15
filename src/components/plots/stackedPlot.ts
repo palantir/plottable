@@ -6,12 +6,6 @@ module Plottable {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata {
-      var metadata = <Plots.StackedPlotMetadata> super._getPlotMetadataForDataset(key);
-      metadata.offsets = d3.map();
-      return metadata;
-    }
-
     public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
       if (this._projectorsReady()) {
         this._updateStackOffsets();
