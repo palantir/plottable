@@ -89,7 +89,7 @@ module Plottable {
      * @returns {R} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
-      return null;
+      throw new Error("subclasses should override functionality");
     }
 
     /**
@@ -119,7 +119,7 @@ module Plottable {
     }
 
     protected _getDomain(): D[] {
-      return [];
+      throw new Error("subclasses should override _getDomain");
     }
 
     protected _setDomain(values: D[]) {
@@ -132,7 +132,7 @@ module Plottable {
     }
 
     protected _setActualDomain(values: D[]) {
-      // Subclasses should override
+      throw new Error("subclasses should override _setActualDomain");
     }
 
     /**
@@ -166,11 +166,11 @@ module Plottable {
     }
 
     protected _getRange(): R[] {
-      return [];
+      throw new Error("subclasses should override _getRange");
     }
 
     protected _setRange(values: R[]) {
-      // Subclasses should override
+      throw new Error("subclasses should override _setRange");
     }
 
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {

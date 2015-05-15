@@ -1597,7 +1597,7 @@ var Plottable;
          * @returns {R} The range value corresponding to the supplied domain value.
          */
         Scale.prototype.scale = function (value) {
-            return null;
+            throw new Error("subclasses should override functionality");
         };
         Scale.prototype.domain = function (values) {
             if (values == null) {
@@ -1610,7 +1610,7 @@ var Plottable;
             }
         };
         Scale.prototype._getDomain = function () {
-            return [];
+            throw new Error("subclasses should override _getDomain");
         };
         Scale.prototype._setDomain = function (values) {
             if (!this._domainModificationInProgress) {
@@ -1621,7 +1621,7 @@ var Plottable;
             }
         };
         Scale.prototype._setActualDomain = function (values) {
-            // Subclasses should override
+            throw new Error("subclasses should override _setActualDomain");
         };
         Scale.prototype.range = function (values) {
             if (values == null) {
@@ -1633,10 +1633,10 @@ var Plottable;
             }
         };
         Scale.prototype._getRange = function () {
-            return [];
+            throw new Error("subclasses should override _getRange");
         };
         Scale.prototype._setRange = function (values) {
-            // Subclasses should override
+            throw new Error("subclasses should override _setRange");
         };
         Scale.prototype.addExtentsProvider = function (provider) {
             this._extentsProviders.add(provider);
