@@ -41,8 +41,6 @@ export module Scales {
       if (base <= 1) {
         throw new Error("ModifiedLogScale: The base must be > 1");
       }
-      this.autoMin(-Infinity);
-      this.autoMax(Infinity);
     }
 
     /**

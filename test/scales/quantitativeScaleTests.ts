@@ -35,24 +35,22 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [0, 1]);
     });
 
-    it("autoMin()", () => {
+    it("min()", () => {
       var scale = new Plottable.Scales.Linear();
-      assert.strictEqual(scale.autoMin(), -Infinity, "autoMin() defaults to -Infinity");
-      var desiredDomain = [-10, 10];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [desiredDomain]);
-      scale.autoMin(0);
-      assert.strictEqual(scale.domain()[0], 0, "lower end of domain was set to autoMin() value");
-      assert.strictEqual(scale.domain()[1], desiredDomain[1], "upper end of domain was set to desired value");
+      var desiredDomain = [-5, 5];
+      scale.addExtentsProvider(() => [desiredDomain]);
+      var minValue = -10;
+      scale.min(minValue);
+      assert.deepEqual(scale.domain(), [minValue, desiredDomain[1]], "lower value in domain was set to minValue");
     });
 
-    it("autoMax()", () => {
+    it("max()", () => {
       var scale = new Plottable.Scales.Linear();
-      assert.strictEqual(scale.autoMax(), Infinity, "autoMax() defaults to +Infinity");
-      var desiredDomain = [-10, 10];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [desiredDomain]);
-      scale.autoMax(0);
-      assert.strictEqual(scale.domain()[0], desiredDomain[0], "lower end of domain was set to desired value");
-      assert.strictEqual(scale.domain()[1], 0, "upper end of domain was set to autoMax() value");
+      var desiredDomain = [-5, 5];
+      scale.addExtentsProvider(() => [desiredDomain]);
+      var maxValue = 10;
+      scale.max(maxValue);
+      assert.deepEqual(scale.domain(), [desiredDomain[0], maxValue], "upper value in domain was set to maxValue");
     });
   });
 });

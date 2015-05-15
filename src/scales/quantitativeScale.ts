@@ -4,8 +4,8 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
-    private _autoMin: D;
-    private _autoMax: D;
+    private _min: D;
+    private _max: D;
     public _userSetDomainer = false;
     private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
@@ -26,25 +26,13 @@ module Plottable {
 
     protected _getExtent(): D[] {
       var computedExtent = this._domainer.computeDomain(this._getAllExtents(), this);
-      var e0 = computedExtent[0];
-      var e1 = computedExtent[1];
-      if (this._autoMin != null) {
-        if (e0 < this._autoMin) {
-          e0 = this._autoMin;
-        }
-        if (e1 < this._autoMin) {
-          e1 = this._autoMin;
-        }
+      if (this._min != null) {
+        computedExtent[0] = this._min;
       }
-      if (this._autoMax != null) {
-        if (e0 > this._autoMax) {
-          e0 = this._autoMax;
-        }
-        if (e1 > this._autoMax) {
-          e1 = this._autoMax;
-        }
+      if (this._max != null) {
+        computedExtent[1] = this._max;
       }
-      return [e0, e1];
+      return computedExtent;
     }
 
     /**
@@ -66,16 +54,18 @@ module Plottable {
     /**
      * Gets the minimum domain value when autoDomain()-ing. 
      */
-    public autoMin(): D;
+    public min(): D;
     /**
      * Sets the minimum domain value when autoDomain()-ing.
+     * 
+     * @returns {QuantitativeScale<D>} The calling QuantitativeScale.
      */
-    public autoMin(value: D): QuantitativeScale<D>;
-    public autoMin(value?: D): any {
+    public min(value: D): QuantitativeScale<D>;
+    public min(value?: D): any {
       if (value === undefined) {
-        return this._autoMin;
+        return this._min;
       }
-      this._autoMin = value;
+      this._min = value;
       this._autoDomainIfAutomaticMode();
       return this;
     }
@@ -83,16 +73,18 @@ module Plottable {
     /**
      * Gets the maximum domain value when autoDomain()-ing.
      */
-    public autoMax(): D;
+    public max(): D;
     /**
      * Sets the maximum domain value when autoDomain()-ing.
+     *
+     *  @returns {QuantitativeScale<D>} The calling QuantitativeScale.
      */
-    public autoMax(value: D): QuantitativeScale<D>;
-    public autoMax(value?: D): any {
+    public max(value: D): QuantitativeScale<D>;
+    public max(value?: D): any {
       if (value === undefined) {
-        return this._autoMax;
+        return this._max;
       }
-      this._autoMax = value;
+      this._max = value;
       this._autoDomainIfAutomaticMode();
       return this;
     }

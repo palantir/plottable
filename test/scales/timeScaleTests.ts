@@ -41,28 +41,26 @@ describe("Scales", () => {
       assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
     });
 
-    it("autoMin()", () => {
+    it("min()", () => {
       var scale = new Plottable.Scales.Time();
-      // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
-      assert.strictEqual(scale.autoMin().getTime(), -8640000000000000, "default autoMin() is smallest possible date");
-      var desiredDomain = [new Date(-1000), new Date(1000)];
-      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [desiredDomain]);
-      scale.autoMin(new Date(0));
+      var desiredDomain = [new Date(-5), new Date(5)];
+      scale.addExtentsProvider(() => [desiredDomain]);
+      var minValue = new Date(-10);
+      scale.min(minValue);
       var domain = scale.domain();
-      assert.strictEqual(domain[0].getTime(), 0, "lower end of domain was set to autoMin() value");
-      assert.strictEqual(domain[1].getTime(), desiredDomain[1].getTime(), "upper end of domain was set to desired value");
+      assert.deepEqual(domain[0].getTime(), minValue.getTime(), "lower value in domain was set to minValue");
+      assert.deepEqual(domain[1].getTime(), desiredDomain[1].getTime(), "upper value in domain unchanged");
     });
 
-    it("autoMax()", () => {
+    it("max()", () => {
       var scale = new Plottable.Scales.Time();
-      // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
-      assert.strictEqual(scale.autoMax().getTime(), 8640000000000000, "default autoMax() is largest possible date");
-      var desiredDomain = [new Date(-1000), new Date(1000)];
-      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [desiredDomain]);
-      scale.autoMax(new Date(0));
+      var desiredDomain = [new Date(-5), new Date(5)];
+      scale.addExtentsProvider(() => [desiredDomain]);
+      var maxValue = new Date(10);
+      scale.max(maxValue);
       var domain = scale.domain();
-      assert.strictEqual(domain[0].getTime(), desiredDomain[0].getTime(), "upper end of domain was set to desired value");
-      assert.strictEqual(domain[1].getTime(), 0, "upper end of domain was set to autoMin() value");
+      assert.deepEqual(domain[0].getTime(), desiredDomain[0].getTime(), "lower value in domain unchanged");
+      assert.deepEqual(domain[1].getTime(), maxValue.getTime(), "upper value in domain was set to maxValue");
     });
   });
 });

@@ -1658,25 +1658,13 @@ var Plottable;
         }
         QuantitativeScale.prototype._getExtent = function () {
             var computedExtent = this._domainer.computeDomain(this._getAllExtents(), this);
-            var e0 = computedExtent[0];
-            var e1 = computedExtent[1];
-            if (this._autoMin != null) {
-                if (e0 < this._autoMin) {
-                    e0 = this._autoMin;
-                }
-                if (e1 < this._autoMin) {
-                    e1 = this._autoMin;
-                }
+            if (this._min != null) {
+                computedExtent[0] = this._min;
             }
-            if (this._autoMax != null) {
-                if (e0 > this._autoMax) {
-                    e0 = this._autoMax;
-                }
-                if (e1 > this._autoMax) {
-                    e1 = this._autoMax;
-                }
+            if (this._max != null) {
+                computedExtent[1] = this._max;
             }
-            return [e0, e1];
+            return computedExtent;
         };
         /**
          * Retrieves the domain value corresponding to a supplied range value.
@@ -1690,19 +1678,19 @@ var Plottable;
         QuantitativeScale.prototype.domain = function (values) {
             return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
         };
-        QuantitativeScale.prototype.autoMin = function (value) {
+        QuantitativeScale.prototype.min = function (value) {
             if (value === undefined) {
-                return this._autoMin;
+                return this._min;
             }
-            this._autoMin = value;
+            this._min = value;
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        QuantitativeScale.prototype.autoMax = function (value) {
+        QuantitativeScale.prototype.max = function (value) {
             if (value === undefined) {
-                return this._autoMax;
+                return this._max;
             }
-            this._autoMax = value;
+            this._max = value;
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -1779,8 +1767,6 @@ var Plottable;
             __extends(Linear, _super);
             function Linear(scale) {
                 _super.call(this, scale == null ? d3.scale.linear() : scale);
-                this.autoMin(-Infinity);
-                this.autoMax(Infinity);
             }
             Linear.prototype._defaultExtent = function () {
                 return [0, 1];
@@ -1839,8 +1825,6 @@ var Plottable;
                 if (base <= 1) {
                     throw new Error("ModifiedLogScale: The base must be > 1");
                 }
-                this.autoMin(-Infinity);
-                this.autoMax(Infinity);
             }
             /**
              * Returns an adjusted log10 value for graphing purposes.  The first
@@ -2189,9 +2173,6 @@ var Plottable;
             function Time(scale) {
                 // need to cast since d3 time scales do not descend from QuantitativeScale scales
                 _super.call(this, scale == null ? d3.time.scale() : scale);
-                // Minimum and maximum dates; http://ecma-international.org/ecma-262/5.1/#sec-15.9.1.1
-                this.autoMin(new Date(-8640000000000000));
-                this.autoMax(new Date(8640000000000000));
             }
             /**
              * Specifies the interval between ticks
