@@ -32,6 +32,7 @@ export module Plots {
       this._isVertical = isVertical;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
+      this.attr("width", () => this._getBarPixelWidth());
     }
 
     protected _getDrawer(key: string) {
@@ -364,7 +365,6 @@ export module Plots {
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
-      if (widthF == null) { widthF = () => this._getBarPixelWidth(); }
       var originalPositionFn = attrToProjector[primaryAttr];
       var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset, m));
@@ -410,6 +410,7 @@ export module Plots {
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
+      if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
       var barScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
       if (barScale instanceof Plottable.Scales.Category) {

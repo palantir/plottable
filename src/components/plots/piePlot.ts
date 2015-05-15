@@ -8,7 +8,6 @@ export module Plots {
    */
   export class Pie extends Plot {
 
-    private _colorScale: Scales.Color;
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
@@ -20,7 +19,6 @@ export module Plots {
      */
     constructor() {
       super();
-      this._colorScale = new Scales.Color();
       this.innerRadius(0);
       this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.classed("pie-plot", true);

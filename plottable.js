@@ -6594,7 +6594,6 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
-                this._colorScale = new Plottable.Scales.Color();
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.classed("pie-plot", true);
@@ -7197,6 +7196,7 @@ var Plottable;
              * @param {boolean} isVertical if the plot if vertical.
              */
             function Bar(xScale, yScale, isVertical) {
+                var _this = this;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
@@ -7210,6 +7210,7 @@ var Plottable;
                 this._isVertical = isVertical;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
+                this.attr("width", function () { return _this._getBarPixelWidth(); });
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, this._isVertical);
@@ -7460,9 +7461,6 @@ var Plottable;
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
                 var positionF = attrToProjector[secondaryAttr];
                 var widthF = attrToProjector["width"];
-                if (widthF == null) {
-                    widthF = function () { return _this._getBarPixelWidth(); };
-                }
                 var originalPositionFn = attrToProjector[primaryAttr];
                 var heightF = function (d, i, dataset, m) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset, m));
@@ -7501,6 +7499,9 @@ var Plottable;
              */
             Bar.prototype._getBarPixelWidth = function () {
                 var _this = this;
+                if (!this._projectorsReady()) {
+                    return 0;
+                }
                 var barPixelWidth;
                 var barScale = this._isVertical ? this.x().scale : this.y().scale;
                 if (barScale instanceof Plottable.Scales.Category) {

@@ -3,7 +3,6 @@
 module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
-    private _defaultStrokeColor: string;
 
     /**
      * Constructs a LinePlot.
