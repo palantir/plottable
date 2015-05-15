@@ -99,6 +99,24 @@ module Plottable {
       return stackOffsets;
     }
 
+    public static getDomainKeys(
+        keyAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>
+        ) {
+
+      var domainKeys = d3.set();
+      datasetKeys.forEach((k) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+        });
+      });
+
+      return domainKeys.values();
+    }
+
     public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
       return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
     }

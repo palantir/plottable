@@ -125,8 +125,8 @@ export module Plots {
     // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
-      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-      var domainKeys = Stacked.prototype._getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, this._isVertical ? "vertical" : "horizontal");
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;

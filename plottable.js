@@ -7947,6 +7947,17 @@ var Plottable;
             });
             return stackOffsets;
         };
+        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
+            var domainKeys = d3.set();
+            datasetKeys.forEach(function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+                dataset.data().forEach(function (datum, index) {
+                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+                });
+            });
+            return domainKeys.values();
+        };
         StackedPlotUtils.keyAccessor = function (plot, orientation) {
             return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
         };
@@ -8002,7 +8013,7 @@ var Plottable;
             var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
             var datasetKeys = this._datasetKeysInOrder;
             var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-            var domainKeys = Stacked.prototype._getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+            var domainKeys = Plottable.StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
             var dataMapArray = Plottable.StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
             var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                 return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
@@ -8050,17 +8061,6 @@ var Plottable;
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-        };
-        Stacked.prototype._getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
-            var domainKeys = d3.set();
-            datasetKeys.forEach(function (k) {
-                var dataset = keyToPlotDatasetKey.get(k).dataset;
-                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-                dataset.data().forEach(function (datum, index) {
-                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
-                });
-            });
-            return domainKeys.values();
         };
         Stacked.prototype._extentsForProperty = function (attr) {
             var extents = _super.prototype._extentsForProperty.call(this, attr);
@@ -8196,8 +8196,8 @@ var Plottable;
                 if (!this._projectorsReady()) {
                     return;
                 }
-                var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-                var domainKeys = Plottable.Stacked.prototype._getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
+                var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, this._isVertical ? "vertical" : "horizontal");
+                var domainKeys = Plottable.StackedPlotUtils.getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
                 var keySets = this._datasetKeysInOrder.map(function (k) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
