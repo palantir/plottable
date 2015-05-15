@@ -3,7 +3,6 @@
 module Plottable {
 export module Plots {
   export class Scatter<X, Y> extends XYPlot<X, Y> {
-    private _defaultFillColor: string;
     private static _SIZE_KEY = "size";
     private static _SYMBOL_KEY = "symbol";
 
@@ -17,12 +16,13 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("scatter-plot", true);
-      this._defaultFillColor = new Scales.Color().range()[0];
 
       this.animator("symbols-reset", new Animators.Null());
       this.animator("symbols", new Animators.Base()
                                            .duration(250)
                                            .delay(5));
+      this.attr("opacity", 0.6);
+      this.attr("fill", new Scales.Color().range()[0]);
     }
 
     protected _getDrawer(key: string) {
@@ -32,8 +32,6 @@ export module Plots {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
-      attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
 
       return attrToProjector;
