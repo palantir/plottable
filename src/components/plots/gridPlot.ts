@@ -59,8 +59,8 @@ export module Plots {
         super.x(<number | _Accessor> x);
       } else {
         super.x(<any | _Accessor> x, scale);
-        var catScale = (<Scales.Category> <any> scale);
         if (scale instanceof Scales.Category) {
+          var catScale = (<Scales.Category> <any> scale);
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
           this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
@@ -81,8 +81,8 @@ export module Plots {
         super.y(<number | _Accessor> y);
       } else {
         super.y(<any | _Accessor> y, scale);
-        var catScale = (<Scales.Category> <any> scale);
         if (scale instanceof Scales.Category) {
+          var catScale = (<Scales.Category> <any> scale);
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
           this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {

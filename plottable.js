@@ -7275,8 +7275,8 @@ var Plottable;
                 }
                 else {
                     _super.prototype.x.call(this, x, scale);
-                    var catScale = scale;
                     if (scale instanceof Plottable.Scales.Category) {
+                        var catScale = scale;
                         this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2; });
                         this.x2(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2; });
                     }
@@ -7296,8 +7296,8 @@ var Plottable;
                 }
                 else {
                     _super.prototype.y.call(this, y, scale);
-                    var catScale = scale;
                     if (scale instanceof Plottable.Scales.Category) {
+                        var catScale = scale;
                         this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2; });
                         this.y2(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2; });
                     }
