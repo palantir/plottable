@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Grid extends Rectangle<any, any> {
+  export class Grid<X, Y> extends Rectangle<any, any> {
 
     /**
      * Constructs a GridPlot.
@@ -16,16 +16,16 @@ export module Plots {
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale<any, any>, yScale: Scale<any, any>) {
+    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding for category scales
       if (xScale instanceof Scales.Category) {
-        xScale.innerPadding(0).outerPadding(0);
+        (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
       }
       if (yScale instanceof Scales.Category) {
-        yScale.innerPadding(0).outerPadding(0);
+        (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
       }
 
       this.animator("cells", new Animators.Null());
@@ -48,20 +48,18 @@ export module Plots {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
     }
 
-    public x(): Plots.AccessorScaleBinding<any, number>;
-    public x(x: number | _Accessor): Grid;
-    public x(x: any | _Accessor, scale: Scale<any, number>): Grid;
-    public x(x?: number | _Accessor | any, scale?: Scale<any, number>): any {
+    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor<number>> x);
       } else {
-        super.x(<any | _Accessor> x, scale);
+        super.x(<X | Accessor<X>> x, scale);
         if (scale instanceof Scales.Category) {
-          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
-          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
+          var xCatScale = (<Scales.Category> <any> scale);
+          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - xCatScale.rangeBand() / 2);
+          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + xCatScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)));
         }
@@ -69,20 +67,18 @@ export module Plots {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<any, number>;
-    public y(y: number | _Accessor): Grid;
-    public y(y: any | _Accessor, scale: Scale<any, number>): Grid;
-    public y(y?: number | _Accessor | any, scale?: Scale<any, number>): any {
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor<number>> y);
       } else {
-        super.y(<any | _Accessor> y, scale);
+        super.y(<Y | Accessor<Y>> y, scale);
         if (scale instanceof Scales.Category) {
-          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2);
-          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2);
+          var yCatScale = (<Scales.Category> <any> scale);
+          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - yCatScale.rangeBand() / 2);
+          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + yCatScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)));
         }

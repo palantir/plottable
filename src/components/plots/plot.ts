@@ -25,7 +25,7 @@ module Plottable {
     }
 
     export interface AccessorScaleBinding<D, R> {
-      accessor: _Accessor;
+      accessor: Accessor<any>;
       scale?: Scale<D, R>;
     }
   }
@@ -141,10 +141,11 @@ module Plottable {
       this.render();
     }
 
-    public attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
-    public attr(attr: string, attrValue: number | string | _Accessor): Plot;
-    public attr<D>(attr: string, attrValue: D | _Accessor, scale: Scale<D, number | string>): Plot;
-    public attr<D>(attr: string, attrValue?: number | string | _Accessor | D, scale?: Scale<D, number | string>): any {
+    public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+    public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+    public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
+    public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
+                   scale?: Scale<A, number | string>): any {
       if (attrValue == null) {
         return this._attrBindings.get(attr);
       }
@@ -283,12 +284,12 @@ module Plottable {
       this._updateExtentsForKey(property, this._propertyBindings, this._propertyExtents, this._filterForProperty(property));
     }
 
-    protected _filterForProperty(property: string): _Accessor {
+    protected _filterForProperty(property: string): Accessor<boolean> {
       return null;
     }
 
     private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>,
-        extents: D3.Map<any[]>, filter: _Accessor) {
+        extents: D3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       extents.set(key, this._datasetKeysInOrder.map((key) => {
@@ -299,7 +300,7 @@ module Plottable {
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: _Accessor, plotMetadata: any, filter: _Accessor): any[] {
+    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, plotMetadata: any, filter: Accessor<boolean>): any[] {
       var data = dataset.data();
       if (filter != null) {
         data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));

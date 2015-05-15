@@ -24,17 +24,14 @@ module Plottable {
       return metadata;
     }
 
-    public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | _Accessor): XYPlot<X, Y>;
-    public x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
-    public x(x?: number | _Accessor | X, scale?: Scale<X, number>): any {
+    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
       if (scale == null) {
-        super.x(<number | _Accessor> x);
+        super.x(<number | Accessor<number>> x);
       } else {
-        super.x(<X | _Accessor> x, scale);
+        super.x(<X | Accessor<X>> x, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -42,17 +39,14 @@ module Plottable {
       return this;
     }
 
-    public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | _Accessor): XYPlot<X, Y>;
-    public y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
-    public y(y?: number | _Accessor | Y, scale?: Scale<Y, number>): any {
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
       }
       if (scale == null) {
-        super.y(<number | _Accessor> y);
+        super.y(<number | Accessor<number>> y);
       } else {
-        super.y(<Y | _Accessor> y, scale);
+        super.y(<Y | Accessor<Y>> y, scale);
       }
       if (this.x().accessor != null && this.y().accessor != null) {
         this._updateStackOffsets();
@@ -100,7 +94,7 @@ module Plottable {
         }
         return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
         }, 0);
       }, 0);
 
@@ -113,7 +107,7 @@ module Plottable {
         }
         return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
           return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
         }, 0);
       }, 0);
 
@@ -154,7 +148,7 @@ module Plottable {
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var key = keyAccessor(datum, datumIndex, dataset, plotMetadata);
+          var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
           var positiveOffset = positiveDataMap.get(key).offset;
           var negativeOffset = negativeDataMap.get(key).offset;
 
@@ -200,7 +194,7 @@ module Plottable {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          var key = keyAccessor(datum, index, dataset, plotMetadata);
+          var key = String(keyAccessor(datum, index, dataset, plotMetadata));
           var value = valueAccessor(datum, index, dataset, plotMetadata);
           dataMapArray[datasetIndex].set(key, {key: key, value: value});
         });
@@ -228,11 +222,11 @@ module Plottable {
       }
     }
 
-    public _keyAccessor(): _Accessor {
+    public _keyAccessor(): Accessor<X> | Accessor<Y> {
        return this._isVertical ? this.x().accessor : this.y().accessor;
     }
 
-    public _valueAccessor(): _Accessor {
+    public _valueAccessor(): Accessor<number> {
        return this._isVertical ? this.y().accessor : this.x().accessor;
     }
   }

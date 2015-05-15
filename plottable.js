@@ -7147,8 +7147,9 @@ var Plottable;
                 else {
                     _super.prototype.x.call(this, x, scale);
                     if (scale instanceof Plottable.Scales.Category) {
-                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) - scale.rangeBand() / 2; });
-                        this.x2(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) + scale.rangeBand() / 2; });
+                        var xCatScale = scale;
+                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) - xCatScale.rangeBand() / 2; });
+                        this.x2(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) + xCatScale.rangeBand() / 2; });
                     }
                     else if (scale instanceof Plottable.QuantitativeScale) {
                         this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)); });
@@ -7167,8 +7168,9 @@ var Plottable;
                 else {
                     _super.prototype.y.call(this, y, scale);
                     if (scale instanceof Plottable.Scales.Category) {
-                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) - scale.rangeBand() / 2; });
-                        this.y2(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) + scale.rangeBand() / 2; });
+                        var yCatScale = scale;
+                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) - yCatScale.rangeBand() / 2; });
+                        this.y2(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) + yCatScale.rangeBand() / 2; });
                     }
                     else if (scale instanceof Plottable.QuantitativeScale) {
                         this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)); });
@@ -7602,10 +7604,6 @@ var Plottable;
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
             }
-            Line.prototype._rejectNullsAndNaNs = function (d, i, dataset, plotMetadata, accessor) {
-                var value = accessor(d, i, dataset, plotMetadata);
-                return value != null && value === value;
-            };
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
             };
@@ -7631,7 +7629,6 @@ var Plottable;
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
@@ -7642,7 +7639,11 @@ var Plottable;
                 });
                 var xFunction = attrToProjector["x"];
                 var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i, dataset, m) { return _this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && _this._rejectNullsAndNaNs(d, i, dataset, m, yFunction); };
+                attrToProjector["defined"] = function (d, i, dataset, m) {
+                    var xValue = xFunction(d, i, dataset, m);
+                    var yValue = yFunction(d, i, dataset, m);
+                    return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
+                };
                 attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
                 attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
@@ -7986,7 +7987,7 @@ var Plottable;
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
                 }
                 return Plottable.Utils.Methods.max(data, function (datum, i) {
-                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
                 }, 0);
             }, 0);
             var minStackExtent = Plottable.Utils.Methods.min(this._datasetKeysInOrder, function (k) {
@@ -7997,7 +7998,7 @@ var Plottable;
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
                 }
                 return Plottable.Utils.Methods.min(data, function (datum, i) {
-                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(keyAccessor(datum, i, dataset, plotMetadata));
+                    return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
@@ -8029,7 +8030,7 @@ var Plottable;
                 var negativeDataMap = negativeDataMapArray[index];
                 var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset, plotMetadata) <= 0; });
                 dataset.data().forEach(function (datum, datumIndex) {
-                    var key = keyAccessor(datum, datumIndex, dataset, plotMetadata);
+                    var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
                     var positiveOffset = positiveDataMap.get(key).offset;
                     var negativeOffset = negativeDataMap.get(key).offset;
                     var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
@@ -8071,7 +8072,7 @@ var Plottable;
                 var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                 var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                 dataset.data().forEach(function (datum, index) {
-                    var key = keyAccessor(datum, index, dataset, plotMetadata);
+                    var key = String(keyAccessor(datum, index, dataset, plotMetadata));
                     var value = valueAccessor(datum, index, dataset, plotMetadata);
                     dataMapArray[datasetIndex].set(key, { key: key, value: value });
                 });

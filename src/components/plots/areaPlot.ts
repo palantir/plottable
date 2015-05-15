@@ -29,9 +29,9 @@ export module Plots {
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
-    public y0(y0: number | _Accessor): Area<X>;
-    public y0(y0: number | _Accessor, y0Scale: Scale<number, number>): Area<X>;
-    public y0(y0?: number | _Accessor, y0Scale?: Scale<number, number>): any {
+    public y0(y0: number | Accessor<number>): Area<X>;
+    public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
+    public y0(y0?: number | Accessor<number>, y0Scale?: Scale<number, number>): any {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }

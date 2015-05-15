@@ -6,7 +6,7 @@ export module Plots {
    * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
    * One usecase is to show how much funding departments are given out of a total budget.
    */
-  export class Pie<D> extends Plot {
+  export class Pie extends Plot {
 
     private _colorScale: Scales.Color;
     private static _INNER_RADIUS_KEY = "inner-radius";
@@ -74,10 +74,10 @@ export module Plots {
       return allPlotData;
     }
 
-    public sectorValue(): AccessorScaleBinding<D, number>;
-    public sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-    public sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public sectorValue(sectorValue?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public sectorValue<S>(): AccessorScaleBinding<S, number>;
+    public sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+    public sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+    public sectorValue<S>(sectorValue?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
@@ -86,10 +86,10 @@ export module Plots {
       return this;
     }
 
-    public innerRadius(): AccessorScaleBinding<D, number>;
-    public innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-    public innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public innerRadius(innerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public innerRadius<R>(): AccessorScaleBinding<R, number>;
+    public innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+    public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public innerRadius<R>(innerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (innerRadius == null) {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
@@ -98,10 +98,10 @@ export module Plots {
       return this;
     }
 
-    public outerRadius(): AccessorScaleBinding<D, number>;
-    public outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-    public outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-    public outerRadius(outerRadius?: number | _Accessor | D, scale?: Scale<D, number>): any {
+    public outerRadius<R>(): AccessorScaleBinding<R, number>;
+    public outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+    public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+    public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (outerRadius == null) {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }

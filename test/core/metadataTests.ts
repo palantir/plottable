@@ -212,7 +212,7 @@ describe("Metadata", () => {
       plot.destroy();
     };
 
-    var checkPiePlot = (plot: Plottable.Plots.Pie<number>) => {
+    var checkPiePlot = (plot: Plottable.Plots.Pie) => {
       plot.sectorValue((d) => d.x).addDataset(dataset1);
 
       // This should not crash. If some metadata is not passed, undefined property error will be raised during accessor call.
@@ -228,7 +228,7 @@ describe("Metadata", () => {
     checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
     checkXYPlot(new Plottable.Plots.Bar(xScale, yScale, false));
     checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
-    checkPiePlot(new Plottable.Plots.Pie<number>());
+    checkPiePlot(new Plottable.Plots.Pie());
     svg.remove();
   });
 });

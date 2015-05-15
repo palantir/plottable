@@ -406,7 +406,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
       var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
@@ -447,7 +447,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
       plot.attr("fill", "fill");
-      plot.x((d) => d.x, xScale).y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
       var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
       var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);

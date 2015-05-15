@@ -7,7 +7,7 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = TestMethods.generateSVG(400, 400);
-      var plot = new Plottable.Plots.Pie<number>();
+      var plot = new Plottable.Plots.Pie();
       plot.sectorValue((d) => d.value);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
@@ -20,14 +20,14 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
-    var piePlot: Plottable.Plots.Pie<number>;
+    var piePlot: Plottable.Plots.Pie;
     var renderArea: D3.Selection;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleData = [{value: 5, value2: 10, type: "A"}, {value: 15, value2: 10, type: "B"}];
       simpleDataset = new Plottable.Dataset(simpleData);
-      piePlot = new Plottable.Plots.Pie<number>();
+      piePlot = new Plottable.Plots.Pie();
       piePlot.addDataset(simpleDataset);
       piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
@@ -233,7 +233,7 @@ describe("Plots", () => {
         { v: 1 },
       ];
 
-      var plot = new Plottable.Plots.Pie<number>();
+      var plot = new Plottable.Plots.Pie();
       plot.addDataset(new Plottable.Dataset(data1));
       plot.sectorValue((d) => d.v);
 
@@ -258,7 +258,7 @@ describe("Plots", () => {
         { v: 1 },
       ];
 
-      var plot = new Plottable.Plots.Pie<number>();
+      var plot = new Plottable.Plots.Pie();
       plot.addDataset(new Plottable.Dataset(data1));
       plot.sectorValue((d) => d.v);
 
