@@ -33,36 +33,36 @@ function run(svg, data, Plottable) {
   var ABlabel = new Plottable.Components.Label("Combined");
 
   var Aplot = new Plottable.Plots.Pie();
-    Aplot.addDataset(new Plottable.Dataset(data[0]));
-    Aplot.sectorValue(function(d) { return d.percent; });
-    Aplot.attr("fill", function(d) { return d.region; }, colorScale);
-    Aplot.innerRadius(40);
-    Aplot.outerRadius(80);
-    Aplot = Alabel.above(Aplot);
+  Aplot.addDataset(new Plottable.Dataset(data[0]));
+  Aplot.sectorValue(function(d) { return d.percent; });
+  Aplot.attr("fill", function(d) { return d.region; }, colorScale);
+  Aplot.innerRadius(40);
+  Aplot.outerRadius(80);
+  var AGroup = new Plottable.Components.Group([Aplot, Alabel]);
 
   var Bplot = new Plottable.Plots.Pie();
-    Bplot.addDataset(new Plottable.Dataset(data[1]));
-    Bplot.sectorValue(function(d) { return d.percent; });
-    Bplot.attr("fill", function(d) { return d.region; }, colorScale);
-    Bplot.innerRadius(40);
-    Bplot.outerRadius(80);
-    Bplot = Blabel.above(Bplot);
+  Bplot.addDataset(new Plottable.Dataset(data[1]));
+  Bplot.sectorValue(function(d) { return d.percent; });
+  Bplot.attr("fill", function(d) { return d.region; }, colorScale);
+  Bplot.innerRadius(40);
+  Bplot.outerRadius(80);
+  var BGroup = new Plottable.Components.Group([Bplot, Blabel]);
 
   var ABplot = new Plottable.Plots.Pie();
-    ABplot.addDataset(new Plottable.Dataset(data[2]));
-    ABplot.sectorValue(function(d) { return d.percent; });
-    ABplot.attr("fill", function(d) { return d.region; }, colorScale);
-    ABplot.innerRadius(50);
-    ABplot.outerRadius(100);
-    ABplot = ABlabel.above(ABplot);
+  ABplot.addDataset(new Plottable.Dataset(data[2]));
+  ABplot.sectorValue(function(d) { return d.percent; });
+  ABplot.attr("fill", function(d) { return d.region; }, colorScale);
+  ABplot.innerRadius(50);
+  ABplot.outerRadius(100);
+  var ABGroup = new Plottable.Components.Group([ABplot, ABlabel]);
 
   var productPlots = new Plottable.Components.Table([
-      [Aplot],
-      [Bplot],
+      [AGroup],
+      [BGroup],
   ]);
 
   var allPlots = new Plottable.Components.Table([
-      [productPlots, ABplot, legend]
+      [productPlots, ABGroup, legend]
   ]);
 
   var chart = new Plottable.Components.Table([

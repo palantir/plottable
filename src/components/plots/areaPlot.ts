@@ -7,7 +7,6 @@ export module Plots {
    */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
-    private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,13 +24,16 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      var defaultColor = new Scales.Color().range()[0];
+      this.attr("fill-opacity", 0.25);
+      this.attr("fill", defaultColor);
+      this.attr("stroke", defaultColor);
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
-    public y0(y0: number | _Accessor): Area<X>;
-    public y0(y0: number | _Accessor, y0Scale: Scale<number, number>): Area<X>;
-    public y0(y0?: number | _Accessor, y0Scale?: Scale<number, number>): any {
+    public y0(y0: number | Accessor<number>): Area<X>;
+    public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
+    public y0(y0?: number | Accessor<number>, y0Scale?: Scale<number, number>): any {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
@@ -79,14 +81,6 @@ export module Plots {
       var wholeDatumAttributes = super._wholeDatumAttributes();
       wholeDatumAttributes.push("y0");
       return wholeDatumAttributes;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["fill-opacity"] = attrToProjector["fill-opacity"] || d3.functor(0.25);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultFillColor);
-      return attrToProjector;
     }
   }
 }

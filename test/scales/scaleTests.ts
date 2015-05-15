@@ -131,12 +131,12 @@ describe("Scales", () => {
       renderAreaD2.addDataset(ds2);
       renderAreaD2.x((d: any) => d.x, xScale);
       renderAreaD2.y((d: any) => d.y, yScale);
-      var renderAreas = renderAreaD1.below(renderAreaD2);
+      var renderAreas = new Plottable.Components.Group([renderAreaD1, renderAreaD2]);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
       renderAreaD1.detach();
       assert.deepEqual(xScale.domain(), [1, 2], "resize on plot.detach()");
-      renderAreas.below(renderAreaD1);
+      renderAreas.append(renderAreaD1);
       assert.deepEqual(xScale.domain(), [0, 2], "resize on plot.merge()");
       svg.remove();
     });

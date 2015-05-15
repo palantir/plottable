@@ -605,7 +605,9 @@ declare module Plottable {
     /**
      * Access specific datum property.
      */
-    type _Accessor = (datum: any, index?: number, dataset?: Dataset, plotMetadata?: Plots.PlotMetadata) => any;
+    interface Accessor<T> {
+        (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+    }
     /**
      * Retrieves scaled datum property.
      */
@@ -618,7 +620,7 @@ declare module Plottable {
      * Defines a way how specific attribute needs be retrieved before rendering.
      */
     type _Projection = {
-        accessor: _Accessor;
+        accessor: Accessor<any>;
         scale?: Scale<any, any>;
         attribute: string;
     };
@@ -1395,7 +1397,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type AnchorCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => any;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1423,23 +1425,23 @@ declare module Plottable {
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback The callback to be added.
          *
          * @return {Component}
          */
-        onAnchor(callback: AnchorCallback): Component;
+        onAnchor(callback: ComponentCallback): Component;
         /**
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
-        offAnchor(callback: AnchorCallback): Component;
+        offAnchor(callback: ComponentCallback): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
@@ -1538,35 +1540,6 @@ declare module Plottable {
          * @returns {boolean} Whether the component has a fixed height.
          */
         fixedHeight(): boolean;
-        _merge(c: Component, below: boolean): Components.Group;
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        above(c: Component): Components.Group;
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        below(c: Component): Components.Group;
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -1576,8 +1549,23 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
-        _parent(): ComponentContainer;
-        _parent(parentElement: ComponentContainer): any;
+        /**
+         * Adds a callback to be called when th Component is detach()-ed.
+         *
+         * @param {ComponentCallback} callback The callback to be added.
+         * @return {Component} The calling Component.
+         */
+        onDetach(callback: ComponentCallback): Component;
+        /**
+         * Removes a callback to be called when th Component is detach()-ed.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback The callback to be removed.
+         * @return {Component} The calling Component.
+         */
+        offDetach(callback: ComponentCallback): Component;
+        parent(): ComponentContainer;
+        parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1640,40 +1628,32 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
+        constructor();
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
         /**
-         * Removes the specified Component from the ComponentContainer
-         *
-         * @param c Component the Component to remove.
+         * Checks whether the specified Component is in the ComponentContainer.
          */
-        remove(c: Component): void;
+        has(component: Component): boolean;
+        protected _adoptAndAnchor(component: Component): void;
         /**
-         * Adds the specified Component to the ComponentContainer.
-         *
-         * @param c Component the component to add
-         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         * Removes the specified Component from the ComponentContainer.
          */
-        add(c: Component, prepend?: boolean): boolean;
+        remove(component: Component): ComponentContainer;
         /**
-         * Returns a list of components in the ComponentContainer.
+         * Carry out the actual removal of a Component.
+         * Implementation dependent on the type of container.
          *
-         * @returns {Component[]} the contained Components
+         * @return {boolean} true if the Component was successfully removed, false otherwise.
          */
-        components(): Component[];
+        protected _remove(component: Component): boolean;
         /**
-         * Returns true iff the ComponentContainer is empty.
-         *
-         * @returns {boolean} Whether the calling ComponentContainer is empty.
+         * Invokes a callback on each Component in the ComponentContainer.
          */
-        empty(): boolean;
+        protected _forEach(callback: (component: Component) => void): void;
         /**
-         * Detaches all components contained in the ComponentContainer, and
-         * empties the ComponentContainer.
-         *
-         * @returns {ComponentContainer} The calling ComponentContainer
+         * Destroys the ComponentContainer and all Components within it.
          */
-        detachAll(): ComponentContainer;
         destroy(): void;
     }
 }
@@ -1686,18 +1666,18 @@ declare module Plottable {
              * Constructs a Component.Group.
              *
              * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * each other. Components added later will be rendered on top of existing Components.
              *
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Group.
+             */
+            has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1705,6 +1685,12 @@ declare module Plottable {
             };
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * @return {Component[]} The Components in this Group.
+             */
+            components(): Component[];
+            append(component: Component): Group;
+            protected _remove(component: Component): boolean;
         }
     }
 }
@@ -2314,6 +2300,11 @@ declare module Plottable {
              * null can be used if a cell is empty. (default = [])
              */
             constructor(rows?: Component[][]);
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Table.
+             */
+            has(component: Component): boolean;
             /**
              * Adds a Component in the specified row and column position.
              *
@@ -2321,9 +2312,9 @@ declare module Plottable {
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(a, 0, 0);
-             * table.addComponent(b, 0, 1);
-             * table.addComponent(c, 1, 1);
+             * table.add(a, 0, 0);
+             * table.add(b, 0, 1);
+             * table.add(c, 1, 1);
              * ```
              *
              * @param {Component} component The Component to be added.
@@ -2331,13 +2322,8 @@ declare module Plottable {
              * @param {number} col The column in which to add the Component.
              * @returns {Table} The calling Table.
              */
-            addComponent(component: Component, row: number, col: number): Table;
-            /**
-             * Removes a Component.
-             *
-             * @param {Component} component The Component to be removed.
-             */
-            removeComponent(component: Component): void;
+            add(component: Component, row: number, col: number): Table;
+            protected _remove(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
@@ -2477,7 +2463,7 @@ declare module Plottable {
             selection: D3.Selection;
         };
         interface AccessorScaleBinding<D, R> {
-            accessor: _Accessor;
+            accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
     }
@@ -2515,9 +2501,9 @@ declare module Plottable {
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.PlotAnimator;
         protected _onDatasetUpdate(): void;
-        attr<D>(attr: string): Plots.AccessorScaleBinding<D, number | string>;
-        attr(attr: string, attrValue: number | string | _Accessor): Plot;
-        attr<D>(attr: string, attrValue: D | _Accessor, scale: Scale<D, number | string>): Plot;
+        attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+        attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         /**
@@ -2543,7 +2529,7 @@ declare module Plottable {
          */
         protected _updateExtents(): void;
         protected _updateExtentsForProperty(property: string): void;
-        protected _filterForProperty(property: string): _Accessor;
+        protected _filterForProperty(property: string): Accessor<boolean>;
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2621,27 +2607,26 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Pie<D> extends Plot {
+        class Pie extends Plot {
             /**
              * Constructs a PiePlot.
              *
              * @constructor
              */
             constructor();
-            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie<D>;
-            addDataset(dataset: Dataset): Pie<D>;
-            protected _generateAttrToProjector(): AttributeToProjector;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
+            addDataset(dataset: Dataset): Pie;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
-            sectorValue(): AccessorScaleBinding<D, number>;
-            sectorValue(sectorValue: number | _Accessor): Plots.Pie<D>;
-            sectorValue(sectorValue: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-            innerRadius(): AccessorScaleBinding<D, number>;
-            innerRadius(innerRadius: number | _Accessor): Plots.Pie<D>;
-            innerRadius(innerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
-            outerRadius(): AccessorScaleBinding<D, number>;
-            outerRadius(outerRadius: number | _Accessor): Plots.Pie<D>;
-            outerRadius(outerRadius: D | _Accessor, scale: Scale<D, number>): Plots.Pie<D>;
+            sectorValue<S>(): AccessorScaleBinding<S, number>;
+            sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+            sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+            innerRadius<R>(): AccessorScaleBinding<R, number>;
+            innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+            innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            outerRadius<R>(): AccessorScaleBinding<R, number>;
+            outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+            outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
         }
     }
 }
@@ -2662,11 +2647,11 @@ declare module Plottable {
          */
         constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
         x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | _Accessor): XYPlot<X, Y>;
-        x(x: X | _Accessor, xScale: Scale<X, number>): XYPlot<X, Y>;
+        x(x: number | Accessor<number>): XYPlot<X, Y>;
+        x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
         y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | _Accessor): XYPlot<X, Y>;
-        y(y: Y | _Accessor, yScale: Scale<Y, number>): XYPlot<X, Y>;
+        y(y: number | Accessor<number>): XYPlot<X, Y>;
+        y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2725,17 +2710,17 @@ declare module Plottable {
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x1(): AccessorScaleBinding<X, number>;
-            x1(x1: number | _Accessor): Plots.Rectangle<X, Y>;
-            x1(x1: X | _Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            x1(x1: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
             x2(): AccessorScaleBinding<X, number>;
-            x2(x2: number | _Accessor): Plots.Rectangle<X, Y>;
-            x2(x2: X | _Accessor, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-            y1(): AccessorScaleBinding<X, number>;
-            y1(y1: number | _Accessor): Plots.Rectangle<X, Y>;
-            y1(y1: Y | _Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-            y2(): AccessorScaleBinding<X, number>;
-            y2(y2: number | _Accessor): Plots.Rectangle<X, Y>;
-            y2(y2: Y | _Accessor, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            y1(): AccessorScaleBinding<Y, number>;
+            y1(y1: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            y1(y1: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y2(): AccessorScaleBinding<Y, number>;
+            y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
         }
     }
 }
@@ -2756,11 +2741,11 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
-            size(): AccessorScaleBinding<X, number>;
-            size(size: number | _Accessor): Plots.Scatter<X, Y>;
-            size(size: any | _Accessor, scale: Scale<any, number>): Plots.Scatter<X, Y>;
+            size<S>(): AccessorScaleBinding<S, number>;
+            size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+            size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
             symbol(): AccessorScaleBinding<any, any>;
-            symbol(symbol: _Accessor): Plots.Scatter<X, Y>;
+            symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         }
@@ -2770,7 +2755,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Grid extends Rectangle<any, any> {
+        class Grid<X, Y> extends Rectangle<any, any> {
             /**
              * Constructs a GridPlot.
              *
@@ -2783,16 +2768,12 @@ declare module Plottable {
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>);
-            addDataset(dataset: Dataset): Grid;
+            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
+            addDataset(dataset: Dataset): Grid<X, Y>;
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            x(): Plots.AccessorScaleBinding<any, number>;
-            x(x: number | _Accessor): Grid;
-            x(x: any | _Accessor, scale: Scale<any, number>): Grid;
-            y(): Plots.AccessorScaleBinding<any, number>;
-            y(y: number | _Accessor): Grid;
-            y(y: any | _Accessor, scale: Scale<any, number>): Grid;
+            x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
         }
     }
 }
@@ -2928,7 +2909,6 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor): boolean;
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2968,16 +2948,13 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             y0(): Plots.AccessorScaleBinding<number, number>;
-            y0(y0: number | _Accessor): Area<X>;
-            y0(y0: number | _Accessor, y0Scale: Scale<number, number>): Area<X>;
+            y0(y0: number | Accessor<number>): Area<X>;
+            y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             protected _wholeDatumAttributes(): string[];
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
-            };
         }
     }
 }
@@ -3026,12 +3003,8 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(): Plots.AccessorScaleBinding<X, number>;
-        x(x: number | _Accessor): XYPlot<X, Y>;
-        x(x: X | _Accessor, scale: Scale<X, number>): XYPlot<X, Y>;
-        y(): Plots.AccessorScaleBinding<Y, number>;
-        y(y: number | _Accessor): XYPlot<X, Y>;
-        y(y: Y | _Accessor, scale: Scale<Y, number>): XYPlot<X, Y>;
+        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
+        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
@@ -3049,8 +3022,8 @@ declare module Plottable {
         _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): _Accessor;
-        _valueAccessor(): _Accessor;
+        _keyAccessor(): Accessor<X> | Accessor<Y>;
+        _valueAccessor(): Accessor<number>;
     }
 }
 
@@ -3069,12 +3042,8 @@ declare module Plottable {
             protected _getDrawer(key: string): Drawers.Area;
             _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
-            x(): Plots.AccessorScaleBinding<X, number>;
-            x(x: number | _Accessor): StackedArea<X>;
-            x(x: X | _Accessor, xScale: Scale<X, number>): Area<X>;
-            y(): Plots.AccessorScaleBinding<number, number>;
-            y(y: number | _Accessor): StackedArea<X>;
-            y(y: number | _Accessor, yScale: Scale<number, number>): Area<X>;
+            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
             protected _additionalPaint(): void;
             protected _updateYDomainer(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
@@ -3089,8 +3058,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor<X>;
+            _valueAccessor(): Accessor<number>;
             _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
         }
@@ -3112,12 +3081,8 @@ declare module Plottable {
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             protected _getAnimator(key: string): Animators.PlotAnimator;
-            x(): Plots.AccessorScaleBinding<X, number>;
-            x(x: number | _Accessor): StackedBar<X, Y>;
-            x(x: X | _Accessor, xScale: Scale<X, number>): StackedBar<X, Y>;
-            y(): Plots.AccessorScaleBinding<Y, number>;
-            y(y: number | _Accessor): StackedBar<X, Y>;
-            y(y: Y | _Accessor, yScale: Scale<Y, number>): StackedBar<X, Y>;
+            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
+            y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
@@ -3132,8 +3097,8 @@ declare module Plottable {
             _getDomainKeys(): any;
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): _Accessor;
-            _valueAccessor(): _Accessor;
+            _keyAccessor(): Accessor<X> | Accessor<Y>;
+            _valueAccessor(): Accessor<number>;
         }
     }
 }

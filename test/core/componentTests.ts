@@ -21,15 +21,15 @@ describe("Component behavior", () => {
     c = new Plottable.Component();
   });
 
-  describe("anchor", () => {
-    it("anchoring works as expected", () => {
+  describe("anchor()", () => {
+    it("anchor()-ing works as expected", () => {
       c.anchor(svg);
       assert.strictEqual((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
       svg.remove();
     });
 
-    it("can re-anchor to a different element", () => {
+    it("can re-anchor() to a different element", () => {
       c.anchor(svg);
 
       var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -40,6 +40,106 @@ describe("Component behavior", () => {
       svg.remove();
       svg2.remove();
     });
+
+    describe("anchor() callbacks", () => {
+      it("callbacks called on anchor()-ing", () => {
+        var callbackCalled = false;
+        var passedComponent: Plottable.Component;
+        var callback = (component: Plottable.Component) => {
+          callbackCalled = true;
+          passedComponent = component;
+        };
+        c.onAnchor(callback);
+        c.anchor(svg);
+        assert.isTrue(callbackCalled, "callback was called on anchor()-ing");
+        assert.strictEqual(passedComponent, c, "callback was passed the Component that anchor()-ed");
+
+        var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        callbackCalled = false;
+        c.anchor(svg2);
+        assert.isTrue(callbackCalled, "callback was called on anchor()-ing to a new <svg>");
+        assert.strictEqual(passedComponent, c, "callback was passed the Component that anchor()-ed");
+
+        svg.remove();
+        svg2.remove();
+      });
+
+      it("callbacks called immediately if already anchor()-ed", () => {
+        var callbackCalled = false;
+        var passedComponent: Plottable.Component;
+        var callback = (component: Plottable.Component) => {
+          callbackCalled = true;
+          passedComponent = component;
+        };
+        c.anchor(svg);
+        c.onAnchor(callback);
+        assert.isTrue(callbackCalled, "callback was immediately if Component was already anchor()-ed");
+        assert.strictEqual(passedComponent, c, "callback was passed the Component that anchor()-ed");
+        svg.remove();
+      });
+
+      it("removing callbacks", () => {
+        var callbackCalled = false;
+        var callback = (component: Plottable.Component) => {
+          callbackCalled = true;
+        };
+        c.onAnchor(callback);
+        c.offAnchor(callback);
+        c.anchor(svg);
+        assert.isFalse(callbackCalled, "removed callback is not called");
+        svg.remove();
+      });
+    });
+  });
+
+  describe("detach()", () => {
+    it("detach() works as expected", () => {
+      var c1 = new Plottable.Component();
+
+      c1.renderTo(svg);
+      assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
+      c1.detach();
+      assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
+
+      svg.remove();
+    });
+
+    it("components can be detach()-ed even if not anchor()-ed", () => {
+      var c = new Plottable.Component();
+      c.detach(); // no error thrown
+      svg.remove();
+    });
+
+    it("callbacks called on detach()-ing", () => {
+      c = new Plottable.Component();
+      c.renderTo(svg);
+
+      var callbackCalled = false;
+      var passedComponent: Plottable.Component;
+      var callback = (component: Plottable.Component) => {
+        callbackCalled = true;
+        passedComponent = component;
+      };
+      c.onDetach(callback);
+      c.detach();
+      assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
+      assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
+      svg.remove();
+    });
+  });
+
+  it("parent()", () => {
+    var c = new Plottable.Component();
+    var acceptingContainer = {
+      has: (component: Plottable.Component) => true
+    };
+    c.parent(<any> acceptingContainer);
+    assert.strictEqual(c.parent(), acceptingContainer, "Component's parent was set if the Component is contained in the parent");
+    var rejectingContainer = {
+      has: (component: Plottable.Component) => false
+    };
+    assert.throws(() => c.parent(<any> rejectingContainer), Error, "invalid parent");
+    svg.remove();
   });
 
   describe("computeLayout", () => {
@@ -219,18 +319,7 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("detach() works as expected", () => {
-    var c1 = new Plottable.Component();
-
-    c1.renderTo(svg);
-    assert.isTrue(svg.node().hasChildNodes(), "the svg has children");
-    c1.detach();
-    assert.isFalse(svg.node().hasChildNodes(), "the svg has no children");
-
-    svg.remove();
-  });
-
-  it("can't reuse component if it's been remove()-ed", () => {
+  it("can't reuse component if it's been destroy()-ed", () => {
     var c1 = new Plottable.Component();
     c1.renderTo(svg);
     c1.destroy();
@@ -242,7 +331,7 @@ describe("Component behavior", () => {
   it("redraw() works as expected", () => {
     var cg = new Plottable.Components.Group();
     var c = TestMethods.makeFixedSizeComponent(10, 10);
-    cg.add(c);
+    cg.append(c);
     cg.renderTo(svg);
     assert.strictEqual(cg.height(), 300, "height() is the entire available height");
     assert.strictEqual(cg.width(), 400, "width() is the entire available width");
@@ -253,20 +342,14 @@ describe("Component behavior", () => {
     svg.remove();
   });
 
-  it("components can be detached even if not anchored", () => {
-    var c = new Plottable.Component();
-    c.detach(); // no error thrown
-    svg.remove();
-  });
-
   it("component remains in own cell", () => {
     var horizontalComponent = new Plottable.Component();
     var verticalComponent = new Plottable.Component();
     var placeHolder = new Plottable.Component();
-    var t = new Plottable.Components.Table().addComponent(verticalComponent, 0, 0)
-                                 .addComponent(new Plottable.Component(), 0, 1)
-                                 .addComponent(placeHolder, 1, 0)
-                                 .addComponent(horizontalComponent, 1, 1);
+    var t = new Plottable.Components.Table().add(verticalComponent, 0, 0)
+                                 .add(new Plottable.Component(), 0, 1)
+                                 .add(placeHolder, 1, 0)
+                                 .add(horizontalComponent, 1, 1);
     t.renderTo(svg);
     horizontalComponent.xAlignment("center");
     verticalComponent.yAlignment("bottom");
@@ -327,14 +410,14 @@ describe("Component behavior", () => {
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);
 
-    group.add(plot);
+    group.append(plot);
 
-    assert.deepEqual(plot._parent(), group, "the plot should be inside the group");
+    assert.deepEqual(plot.parent(), group, "the plot should be inside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_1, "the plot should occupy the entire space of the first svg");
 
     plot.renderTo(svg2);
 
-    assert.strictEqual(plot._parent(), null, "the plot should be outside the group");
+    assert.strictEqual(plot.parent(), null, "the plot should be outside the group");
     assert.strictEqual(plot.height(), SVG_HEIGHT_2, "the plot should occupy the entire space of the second svg");
 
     svg1.remove();

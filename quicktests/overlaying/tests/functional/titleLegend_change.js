@@ -58,7 +58,7 @@ function run(svg, data, Plottable) {
   renderOrange.attr("fill", colorProjector);
   renderGrape.attr("fill", colorProjector);
 
-  var renderArea = scatterPlot.below(linePlot);
+  var renderArea = new Plottable.Components.Group([scatterPlot, linePlot]);
   function emptyTitle() {
     title1.text("");
   }
@@ -87,20 +87,17 @@ function run(svg, data, Plottable) {
     renderGrape.detach();
     renderOrange.detach();
     renderBanana.detach();
-    renderArea
-    .below(scatterPlot)
-    .below(linePlot);
+    renderArea.append(scatterPlot).append(linePlot);
   }
 
   function sixPlots() {
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
-    renderArea
-    .below(renderApple)
-    .below(renderBanana)
-    .below(renderOrange)
-    .below(renderGrape)
-    .below(scatterPlot)
-    .below(linePlot);
+    renderArea.append(renderApple)
+              .append(renderBanana)
+              .append(renderOrange)
+              .append(renderGrape)
+              .append(scatterPlot)
+              .append(linePlot);
     basicTable.redraw();
   }
 

@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type AnchorCallback = (component: Component) => any;
+  export type ComponentCallback = (component: Component) => any;
 
   export module Components {
     export class Alignment {
@@ -22,7 +22,7 @@ module Plottable {
     protected _clipPathEnabled = false;
     private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
-    private _parentElement: ComponentContainer;
+    private _parent: ComponentContainer;
     private _xAlignment: string = "left";
     private static _xAlignToProportion: { [alignment: string]: number } = {
       "left": 0,
@@ -46,7 +46,8 @@ module Plottable {
     private _height: number;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
-    private _onAnchorCallbacks = new Utils.CallbackSet<AnchorCallback>();
+    private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
+    private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
     /**
      * Attaches the Component as a child of a given D3 Selection.
@@ -56,7 +57,7 @@ module Plottable {
      */
     public anchor(selection: D3.Selection) {
       if (this._destroyed) {
-        throw new Error("Can't reuse remove()-ed components!");
+        throw new Error("Can't reuse destroy()-ed components!");
       }
 
       if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -84,11 +85,11 @@ module Plottable {
      * Adds a callback to be called on anchoring the Component to the DOM.
      * If the component is already anchored, the callback is called immediately.
      *
-     * @param {AnchorCallback} callback The callback to be added.
+     * @param {ComponentCallback} callback The callback to be added.
      *
      * @return {Component}
      */
-    public onAnchor(callback: AnchorCallback) {
+    public onAnchor(callback: ComponentCallback) {
       if (this._isAnchored) {
         callback(this);
       }
@@ -100,18 +101,18 @@ module Plottable {
      * Removes a callback to be called on anchoring the Component to the DOM.
      * The callback is identified by reference equality.
      *
-     * @param {AnchorCallback} callback The callback to be removed.
+     * @param {ComponentCallback} callback The callback to be removed.
      *
      * @return {Component}
      */
-    public offAnchor(callback: AnchorCallback) {
+    public offAnchor(callback: ComponentCallback) {
       this._onAnchorCallbacks.delete(callback);
       return this;
     }
 
     /**
      * Creates additional elements as necessary for the Component to function.
-     * Called during _anchor() if the Component's element has not been created yet.
+     * Called during anchor() if the Component's element has not been created yet.
      * Override in subclasses to provide additional functionality.
      */
     protected _setup() {
@@ -240,7 +241,7 @@ module Plottable {
         if (this._isTopLevelComponent) {
           this._scheduleComputeLayout();
         } else {
-          this._parent().redraw();
+          this.parent().redraw();
         }
       }
       return this;
@@ -421,53 +422,6 @@ module Plottable {
       return false;
     }
 
-    public _merge(c: Component, below: boolean): Components.Group {
-      var cg: Components.Group;
-      if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
-        cg = (<Plottable.Components.Group> c);
-        cg.add(this, below);
-        return cg;
-      } else {
-        var mergedComponents = below ? [this, c] : [c, this];
-        cg = new Plottable.Components.Group(mergedComponents);
-        return cg;
-      }
-    }
-
-    /**
-     * Merges this Component above another Component, returning a
-     * ComponentGroup. This is used to layer Components on top of each other.
-     *
-     * There are four cases:
-     * Component + Component: Returns a ComponentGroup with the first component after the second component.
-     * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-     * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-     *
-     * @param {Component} c The component to merge in.
-     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-     */
-    public above(c: Component): Components.Group {
-      return this._merge(c, false);
-    }
-
-    /**
-     * Merges this Component below another Component, returning a
-     * ComponentGroup. This is used to layer Components on top of each other.
-     *
-     * There are four cases:
-     * Component + Component: Returns a ComponentGroup with the first component before the second component.
-     * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-     * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-     * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-     *
-     * @param {Component} c The component to merge in.
-     * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-     */
-    public below(c: Component): Components.Group {
-      return this._merge(c, true);
-    }
-
     /**
      * Detaches a Component from the DOM. The component can be reused.
      *
@@ -477,29 +431,51 @@ module Plottable {
      * @returns The calling Component.
      */
     public detach() {
+      this.parent(null);
+
       if (this._isAnchored) {
         this._element.remove();
       }
-
-      var parent: ComponentContainer = this._parent();
-
-      if (parent != null) {
-        parent.remove(this);
-      }
       this._isAnchored = false;
-      this._parentElement = null;
+
+      this._onDetachCallbacks.callCallbacks(this);
       return this;
     }
 
-    public _parent(): ComponentContainer;
-    public _parent(parentElement: ComponentContainer): any;
-    public _parent(parentElement?: ComponentContainer): any {
-      if (parentElement === undefined) {
-        return this._parentElement;
-      }
+    /**
+     * Adds a callback to be called when th Component is detach()-ed.
+     *
+     * @param {ComponentCallback} callback The callback to be added.
+     * @return {Component} The calling Component.
+     */
+    public onDetach(callback: ComponentCallback) {
+      this._onDetachCallbacks.add(callback);
+      return this;
+    }
 
-      this.detach();
-      this._parentElement = parentElement;
+    /**
+     * Removes a callback to be called when th Component is detach()-ed.
+     * The callback is identified by reference equality.
+     *
+     * @param {ComponentCallback} callback The callback to be removed.
+     * @return {Component} The calling Component.
+     */
+    public offDetach(callback: ComponentCallback) {
+      this._onDetachCallbacks.delete(callback);
+      return this;
+    }
+
+    public parent(): ComponentContainer;
+    public parent(parent: ComponentContainer): Component;
+    public parent(parent?: ComponentContainer): any {
+      if (parent === undefined) {
+       return this._parent;
+      }
+      if (parent !== null && !parent.has(this)) {
+        throw new Error("Passed invalid parent");
+      }
+      this._parent = parent;
+      return this;
     }
 
     /**
@@ -548,12 +524,12 @@ module Plottable {
      */
     public originToSVG(): Point {
       var origin = this.origin();
-      var ancestor = this._parent();
+      var ancestor = this.parent();
       while (ancestor != null) {
         var ancestorOrigin = ancestor.origin();
         origin.x += ancestorOrigin.x;
         origin.y += ancestorOrigin.y;
-        ancestor = ancestor._parent();
+        ancestor = ancestor.parent();
       }
       return origin;
     }

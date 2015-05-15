@@ -14,7 +14,6 @@ export module Plots {
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
-    private _defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -27,12 +26,13 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this._defaultFillColor = new Scales.Color().range()[0];
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
       this._isVertical = isVertical;
       this.baseline(0);
+      this.attr("fill", new Scales.Color().range()[0]);
+      this.attr("width", () => this._getBarPixelWidth());
     }
 
     protected _getDrawer(key: string) {
@@ -365,7 +365,6 @@ export module Plots {
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
-      if (widthF == null) { widthF = () => this._getBarPixelWidth(); }
       var originalPositionFn = attrToProjector[primaryAttr];
       var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset, m));
@@ -399,8 +398,6 @@ export module Plots {
           originalPositionFn(d, i, dataset, m) <= scaledBaseline;
       }
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
-
       return attrToProjector;
     }
 
@@ -413,6 +410,7 @@ export module Plots {
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
+      if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
       var barScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
       if (barScale instanceof Plottable.Scales.Category) {

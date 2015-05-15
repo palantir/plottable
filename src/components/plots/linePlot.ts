@@ -3,7 +3,6 @@
 module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
-    private _defaultStrokeColor: string;
 
     /**
      * Constructs a LinePlot.
@@ -20,12 +19,8 @@ export module Plots {
                                          .duration(600)
                                          .easing("exp-in-out"));
 
-      this._defaultStrokeColor = new Scales.Color().range()[0];
-    }
-
-    protected _rejectNullsAndNaNs(d: any, i: number, dataset: Dataset, plotMetadata: any, accessor: _Accessor) {
-      var value = accessor(d, i, dataset, plotMetadata);
-      return value != null && value === value;
+      this.attr("stroke", new Scales.Color().range()[0]);
+      this.attr("stroke-width", "2px");
     }
 
     protected _getDrawer(key: string) {
@@ -71,11 +66,11 @@ export module Plots {
       var xFunction = attrToProjector["x"];
       var yFunction = attrToProjector["y"];
 
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) =>
-          this._rejectNullsAndNaNs(d, i, dataset, m, xFunction) && this._rejectNullsAndNaNs(d, i, dataset, m, yFunction);
-
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
-      attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: any) => {
+        var xValue = xFunction(d, i, dataset, m);
+        var yValue = yFunction(d, i, dataset, m);
+        return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
+      };
 
       return attrToProjector;
     }
