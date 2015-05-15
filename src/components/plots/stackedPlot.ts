@@ -56,10 +56,19 @@ module Plottable {
         });
       });
 
-      this._setDatasetStackOffsets(
+      var stackOffsets = StackedPlotUtils.generateStackOffsets(
         StackedPlotUtils.stack(positiveDataMapArray, domainKeys),
-        StackedPlotUtils.stack(negativeDataMapArray, domainKeys)
-        );
+        StackedPlotUtils.stack(negativeDataMapArray, domainKeys),
+        keyAccessor,
+        valueAccessor,
+        datasetKeys,
+        keyToPlotDatasetKey);
+
+      for (var datasetKey in stackOffsets) {
+        var plotMetadata = <Plots.StackedPlotMetadata> this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+        plotMetadata.offsets = stackOffsets[datasetKey];
+      }
+
       this._updateStackExtents();
     }
 
@@ -95,34 +104,6 @@ module Plottable {
       }, 0);
 
       this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-    }
-
-    /**
-     * After the stack offsets have been determined on each separate dataset, the offsets need
-     * to be determined correctly on the overall datasets
-     */
-    public _setDatasetStackOffsets(
-        positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
-        negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
-
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-
-      var stackOffsets = StackedPlotUtils.generateStackOffsets(
-        positiveDataMapArray,
-        negativeDataMapArray,
-        keyAccessor,
-        valueAccessor,
-        datasetKeys,
-        keyToPlotDatasetKey);
-
-      for (var datasetKey in stackOffsets) {
-        var plotMetadata = <Plots.StackedPlotMetadata> this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
-        plotMetadata.offsets = stackOffsets[datasetKey];
-      }
     }
 
     public _getDomainKeys(): string[] {

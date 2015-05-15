@@ -3010,11 +3010,6 @@ declare module Plottable {
         _onDatasetUpdate(): void;
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
-        /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
-         */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
@@ -3050,7 +3045,6 @@ declare module Plottable {
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
         }
     }
@@ -3083,7 +3077,6 @@ declare module Plottable {
             protected _extentsForProperty(attr: string): any;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
         }
     }

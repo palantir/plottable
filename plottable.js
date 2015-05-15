@@ -8014,7 +8014,11 @@ var Plottable;
                     return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                 });
             });
-            this._setDatasetStackOffsets(Plottable.StackedPlotUtils.stack(positiveDataMapArray, domainKeys), Plottable.StackedPlotUtils.stack(negativeDataMapArray, domainKeys));
+            var stackOffsets = Plottable.StackedPlotUtils.generateStackOffsets(Plottable.StackedPlotUtils.stack(positiveDataMapArray, domainKeys), Plottable.StackedPlotUtils.stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+            for (var datasetKey in stackOffsets) {
+                var plotMetadata = this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+                plotMetadata.offsets = stackOffsets[datasetKey];
+            }
             this._updateStackExtents();
         };
         Stacked.prototype._updateStackExtents = function () {
@@ -8046,22 +8050,6 @@ var Plottable;
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-        };
-        /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
-         */
-        Stacked.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-            var orientation = this._isVertical ? "vertical" : "horizontal";
-            var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
-            var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
-            var datasetKeys = this._datasetKeysInOrder;
-            var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-            var stackOffsets = Plottable.StackedPlotUtils.generateStackOffsets(positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-            for (var datasetKey in stackOffsets) {
-                var plotMetadata = this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
-                plotMetadata.offsets = stackOffsets[datasetKey];
-            }
         };
         Stacked.prototype._getDomainKeys = function () {
             var _this = this;
@@ -8229,9 +8217,6 @@ var Plottable;
             StackedArea.prototype._updateStackExtents = function () {
                 Plottable.Stacked.prototype._updateStackExtents.call(this);
             };
-            StackedArea.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plottable.Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
-            };
             StackedArea.prototype._getDomainKeys = function () {
                 return Plottable.Stacked.prototype._getDomainKeys.call(this);
             };
@@ -8346,9 +8331,6 @@ var Plottable;
             };
             StackedBar.prototype._updateStackExtents = function () {
                 Plottable.Stacked.prototype._updateStackExtents.call(this);
-            };
-            StackedBar.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-                Plottable.Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
             };
             StackedBar.prototype._getDomainKeys = function () {
                 return Plottable.Stacked.prototype._getDomainKeys.call(this);
