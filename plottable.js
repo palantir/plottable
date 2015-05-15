@@ -3485,7 +3485,7 @@ var Plottable;
             return this;
         };
         ComponentContainer.prototype.renderImmediately = function () {
-            this._forEach(function (c) { return c.render(); });
+            this._forEach(function (c) { return c.renderImmediately(); });
             return this;
         };
         /**

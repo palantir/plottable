@@ -25,7 +25,7 @@ module Plottable {
     }
 
     public renderImmediately() {
-      this._forEach((c) => c.render());
+      this._forEach((c) => c.renderImmediately());
       return this;
     }
 
