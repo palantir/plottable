@@ -2964,6 +2964,16 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Plots {
+        interface StackedPlotMetadata extends PlotMetadata {
+            offsets: D3.Map<number>;
+        }
+        type StackedDatum = {
+            key: any;
+            value: number;
+            offset?: number;
+        };
+    }
     class StackedPlotUtils {
         /**
          * Feeds the data through d3's stack layout function which will calculate
@@ -2979,16 +2989,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
-        interface StackedPlotMetadata extends PlotMetadata {
-            offsets: D3.Map<number>;
-        }
-        type StackedDatum = {
-            key: any;
-            value: number;
-            offset?: number;
-        };
-    }
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;

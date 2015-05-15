@@ -7914,9 +7914,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Plots;
-    (function (Plots) {
-    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
     var Stacked = (function (_super) {
         __extends(Stacked, _super);
         function Stacked() {

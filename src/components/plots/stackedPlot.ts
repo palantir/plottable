@@ -2,18 +2,6 @@
 
 module Plottable {
 
-  export module Plots {
-    export interface StackedPlotMetadata extends PlotMetadata {
-      offsets: D3.Map<number>;
-    }
-
-    export type StackedDatum = {
-      key: any;
-      value: number;
-      offset?: number;
-    }
-  }
-
   export class Stacked<X, Y> extends XYPlot<X, Y> {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;

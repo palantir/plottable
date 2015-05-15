@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Plots", () => {
 
   describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.Stacked<number, number>;
+    var stackedPlot: Plottable.Plots.StackedBar<number, number>;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
@@ -166,14 +166,14 @@ describe("Plots", () => {
   });
 
   describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.Stacked<number, number>;
+    var stackedPlot: Plottable.Plots.StackedArea<number>;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       stackedPlot = new Plottable.Plots.StackedArea(xScale, yScale);
-      stackedPlot.x((d) => d.x, xScale);
-      stackedPlot.y((d) => d.y, yScale);
+      stackedPlot.x((d: any) => d.x, xScale);
+      stackedPlot.y((d: any) => d.y, yScale);
 
       (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Drawers.AbstractDrawer(key);
       (<any> stackedPlot)._isVertical = true;
@@ -325,7 +325,6 @@ describe("Plots", () => {
       assert.doesNotThrow(() => stackedPlot.removeDataset(dataset1), Error);
     });
   });
-
 
   describe("auto scale domain on numeric", () => {
     var svg: D3.Selection;
