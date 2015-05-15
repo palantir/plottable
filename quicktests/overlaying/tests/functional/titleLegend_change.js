@@ -101,7 +101,6 @@ function run(svg, data, Plottable) {
     .below(renderGrape)
     .below(scatterPlot)
     .below(linePlot);
-    basicTable.renderTo();
   }
 
   twoPlots();
