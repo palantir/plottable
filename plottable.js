@@ -7631,17 +7631,10 @@ var Plottable;
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i, dataset, m) { return data.length > 0 ? projector(data[0], i, dataset, m) : null; };
                 });
-                var xFunction = attrToProjector["x"];
-                var yFunction = attrToProjector["y"];
-                attrToProjector["defined"] = function (d, i, dataset, m) {
-                    var xValue = xFunction(d, i, dataset, m);
-                    var yValue = yFunction(d, i, dataset, m);
-                    return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
-                };
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
-                return ["x", "y"];
+                return ["x", "y", "defined"];
             };
             Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
