@@ -1537,7 +1537,7 @@ declare module Plottable {
          */
         offDetach(callback: ComponentCallback): Component;
         parent(): ComponentContainer;
-        parent(parentElement: ComponentContainer): any;
+        parent(parent: ComponentContainer): any;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1620,11 +1620,9 @@ declare module Plottable {
          */
         protected _remove(component: Component): boolean;
         /**
-         * Returns a list of components in the ComponentContainer.
-         *
-         * @returns {Component[]} the contained Components
+         * Invokes a callback on each Component in the ComponentContainer.
          */
-        protected _components(): Component[];
+        protected _forEach(callback: (component: Component) => any): void;
         /**
          * Destroys the ComponentContainer and all Components within it.
          */
@@ -1646,6 +1644,11 @@ declare module Plottable {
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Group.
+             */
+            has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -1658,7 +1661,6 @@ declare module Plottable {
              * @return {Component[]} The Components in this Group.
              */
             components(): Component[];
-            protected _components(): Component[];
             append(component: Component): Group;
             protected _remove(component: Component): boolean;
         }
@@ -2270,7 +2272,11 @@ declare module Plottable {
              * null can be used if a cell is empty. (default = [])
              */
             constructor(rows?: Component[][]);
-            protected _components(): Component[];
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Table.
+             */
+            has(component: Component): boolean;
             /**
              * Adds a Component in the specified row and column position.
              *

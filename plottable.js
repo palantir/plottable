@@ -3481,18 +3481,18 @@ var Plottable;
         ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
             _super.prototype.anchor.call(this, selection);
-            this._components().forEach(function (c) { return c.anchor(_this._content); });
+            this._forEach(function (c) { return c.anchor(_this._content); });
             return this;
         };
         ComponentContainer.prototype.render = function () {
-            this._components().forEach(function (c) { return c.render(); });
+            this._forEach(function (c) { return c.render(); });
             return this;
         };
         /**
          * Checks whether the specified Component is in the ComponentContainer.
          */
         ComponentContainer.prototype.has = function (component) {
-            return this._components().indexOf(component) >= 0;
+            throw new Error("has() is not implemented on ComponentContainer");
         };
         ComponentContainer.prototype._adoptAndAnchor = function (component) {
             component.parent(this);
@@ -3523,19 +3523,17 @@ var Plottable;
             return false;
         };
         /**
-         * Returns a list of components in the ComponentContainer.
-         *
-         * @returns {Component[]} the contained Components
+         * Invokes a callback on each Component in the ComponentContainer.
          */
-        ComponentContainer.prototype._components = function () {
-            return [];
+        ComponentContainer.prototype._forEach = function (callback) {
+            throw new Error("_forEach() is not implemented on ComponentContainer");
         };
         /**
          * Destroys the ComponentContainer and all Components within it.
          */
         ComponentContainer.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
-            this._components().slice().forEach(function (c) { return c.destroy(); });
+            this._forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -3568,12 +3566,21 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
-                this._componentList = [];
+                this._components = [];
                 this.classed("component-group", true);
                 components.forEach(function (c) { return _this.append(c); });
             }
+            Group.prototype._forEach = function (callback) {
+                this._components.forEach(callback);
+            };
+            /**
+             * Checks whether the specified Component is in the Group.
+             */
+            Group.prototype.has = function (component) {
+                return this._components.indexOf(component) >= 0;
+            };
             Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this._components().map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
+                var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
                 return {
                     minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
                     minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
@@ -3582,8 +3589,8 @@ var Plottable;
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this._components().forEach(function (c) {
-                    c.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
+                this._forEach(function (component) {
+                    component.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
                 });
                 return this;
             };
@@ -3594,33 +3601,30 @@ var Plottable;
                 };
             };
             Group.prototype.fixedWidth = function () {
-                return this._components().every(function (c) { return c.fixedWidth(); });
+                return this._components.every(function (c) { return c.fixedWidth(); });
             };
             Group.prototype.fixedHeight = function () {
-                return this._components().every(function (c) { return c.fixedHeight(); });
+                return this._components.every(function (c) { return c.fixedHeight(); });
             };
             /**
              * @return {Component[]} The Components in this Group.
              */
             Group.prototype.components = function () {
-                return this._componentList.slice();
-            };
-            Group.prototype._components = function () {
-                return this._componentList;
+                return this._components.slice();
             };
             Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();
-                    this._componentList.push(component);
+                    this._components.push(component);
                     this._adoptAndAnchor(component);
                     this.redraw();
                 }
                 return this;
             };
             Group.prototype._remove = function (component) {
-                var removeIndex = this._componentList.indexOf(component);
+                var removeIndex = this._components.indexOf(component);
                 if (removeIndex >= 0) {
-                    this._componentList.splice(removeIndex, 1);
+                    this._components.splice(removeIndex, 1);
                     return true;
                 }
                 return false;
@@ -5661,8 +5665,27 @@ var Plottable;
                     });
                 });
             }
-            Table.prototype._components = function () {
-                return d3.merge(this._rows).filter(function (component) { return component != null; });
+            Table.prototype._forEach = function (callback) {
+                for (var r = 0; r < this._nRows; r++) {
+                    for (var c = 0; c < this._nCols; c++) {
+                        if (this._rows[r][c] != null) {
+                            callback(this._rows[r][c]);
+                        }
+                    }
+                }
+            };
+            /**
+             * Checks whether the specified Component is in the Table.
+             */
+            Table.prototype.has = function (component) {
+                for (var r = 0; r < this._nRows; r++) {
+                    for (var c = 0; c < this._nCols; c++) {
+                        if (this._rows[r][c] === component) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
             };
             /**
              * Adds a Component in the specified row and column position.

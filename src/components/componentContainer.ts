@@ -15,20 +15,20 @@ module Plottable {
 
     public anchor(selection: D3.Selection) {
       super.anchor(selection);
-      this._components().forEach((c) => c.anchor(this._content));
+      this._forEach((c) => c.anchor(this._content));
       return this;
     }
 
     public render() {
-      this._components().forEach((c) => c.render());
+      this._forEach((c) => c.render());
       return this;
     }
 
     /**
      * Checks whether the specified Component is in the ComponentContainer.
      */
-    public has(component: Component) {
-      return this._components().indexOf(component) >= 0;
+    public has(component: Component): boolean {
+      throw new Error("has() is not implemented on ComponentContainer");
     }
 
     protected _adoptAndAnchor(component: Component) {
@@ -63,12 +63,10 @@ module Plottable {
     }
 
     /**
-     * Returns a list of components in the ComponentContainer.
-     *
-     * @returns {Component[]} the contained Components
+     * Invokes a callback on each Component in the ComponentContainer.
      */
-    protected _components(): Component[] {
-      return [];
+    protected _forEach(callback: (component: Component) => any) {
+      throw new Error("_forEach() is not implemented on ComponentContainer");
     }
 
     /**
@@ -76,7 +74,7 @@ module Plottable {
      */
     public destroy() {
       super.destroy();
-      this._components().slice().forEach((c: Component) => c.destroy());
+      this._forEach((c: Component) => c.destroy());
     }
   }
 }

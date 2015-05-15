@@ -58,8 +58,28 @@ export module Components {
       });
     }
 
-    protected _components(): Component[] {
-      return d3.merge(this._rows).filter((component: Component) => component != null);
+    protected _forEach(callback: (component: Component) => any) {
+      for (var r = 0; r < this._nRows; r++) {
+        for (var c = 0; c < this._nCols; c++) {
+          if (this._rows[r][c] != null) {
+            callback(this._rows[r][c]);
+          }
+        }
+      }
+    }
+
+    /**
+     * Checks whether the specified Component is in the Table.
+     */
+    public has(component: Component) {
+      for (var r = 0; r < this._nRows; r++) {
+        for (var c = 0; c < this._nCols; c++) {
+          if (this._rows[r][c] === component) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     /**
