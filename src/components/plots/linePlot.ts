@@ -20,8 +20,7 @@ export module Plots {
                                          .duration(600)
                                          .easing("exp-in-out"));
 
-      this._defaultStrokeColor = new Scales.Color().range()[0];
-      this.attr("stroke", this._defaultStrokeColor);
+      this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }
 

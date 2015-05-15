@@ -14,7 +14,6 @@ export module Plots {
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
-    private _defaultFillColor: string;
 
     /**
      * Constructs a BarPlot.
@@ -27,13 +26,12 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
-      this._defaultFillColor = new Scales.Color().range()[0];
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
       this._isVertical = isVertical;
       this.baseline(0);
-      this.attr("fill", this._defaultFillColor);
+      this.attr("fill", new Scales.Color().range()[0]);
     }
 
     protected _getDrawer(key: string) {

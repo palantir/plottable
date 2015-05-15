@@ -7,7 +7,6 @@ export module Plots {
    */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
-    private _defaultFillColor: string;
 
     /**
      * Constructs an AreaPlot.
@@ -25,10 +24,10 @@ export module Plots {
       this.animator("main", new Animators.Base()
                                         .duration(600)
                                         .easing("exp-in-out"));
-      this._defaultFillColor = new Scales.Color().range()[0];
+      var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
-      this.attr("fill", this._defaultFillColor);
-      this.attr("stroke", this._defaultFillColor);
+      this.attr("fill", defaultColor);
+      this.attr("stroke", defaultColor);
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;

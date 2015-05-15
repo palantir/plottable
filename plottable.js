@@ -6925,9 +6925,8 @@ var Plottable;
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.classed("rectangle-plot", true);
-                this.attr("fill", this._defaultFillColor);
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
             Rectangle.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, true);
@@ -7022,11 +7021,10 @@ var Plottable;
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("scatter-plot", true);
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("symbols-reset", new Plottable.Animators.Null());
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
                 this.attr("opacity", 0.6);
-                this.attr("fill", this._defaultFillColor);
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
             Scatter.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Symbol(key);
@@ -7212,13 +7210,12 @@ var Plottable;
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
                 this._isVertical = isVertical;
                 this.baseline(0);
-                this.attr("fill", this._defaultFillColor);
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, this._isVertical);
@@ -7601,8 +7598,7 @@ var Plottable;
                 this.classed("line-plot", true);
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
-                this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
-                this.attr("stroke", this._defaultStrokeColor);
+                this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
             Line.prototype._getDrawer = function (key) {
@@ -7758,10 +7754,10 @@ var Plottable;
                 this.y0(0, yScale); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
-                this._defaultFillColor = new Plottable.Scales.Color().range()[0];
+                var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
-                this.attr("fill", this._defaultFillColor);
-                this.attr("stroke", this._defaultFillColor);
+                this.attr("fill", defaultColor);
+                this.attr("stroke", defaultColor);
             }
             Area.prototype.y0 = function (y0, y0Scale) {
                 if (y0 == null) {

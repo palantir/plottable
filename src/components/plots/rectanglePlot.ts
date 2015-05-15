@@ -7,7 +7,6 @@ export module Plots {
     private static _X2_KEY = "x2";
     private static _Y1_KEY = "y1";
     private static _Y2_KEY = "y2";
-    private _defaultFillColor: string;
 
     /**
      * Constructs a RectanglePlot.
@@ -22,9 +21,8 @@ export module Plots {
      */
     constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
-      this._defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);
-      this.attr("fill", this._defaultFillColor);
+      this.attr("fill", new Scales.Color().range()[0]);
     }
 
     protected _getDrawer(key: string) {
