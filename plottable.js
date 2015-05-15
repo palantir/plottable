@@ -7917,6 +7917,36 @@ var Plottable;
             });
             return dataMapArray;
         };
+        /**
+         * After the stack offsets have been determined on each separate dataset, the offsets need
+         * to be determined correctly on the overall datasets
+         */
+        StackedPlotUtils.generateStackOffsets = function (positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey) {
+            var stackOffsets = {};
+            datasetKeys.forEach(function (k, index) {
+                stackOffsets[k] = d3.map();
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+                var positiveDataMap = positiveDataMapArray[index];
+                var negativeDataMap = negativeDataMapArray[index];
+                var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset, plotMetadata) <= 0; });
+                dataset.data().forEach(function (datum, datumIndex) {
+                    var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
+                    var positiveOffset = positiveDataMap.get(key).offset;
+                    var negativeOffset = negativeDataMap.get(key).offset;
+                    var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
+                    var offset;
+                    if (!+value) {
+                        offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+                    }
+                    else {
+                        offset = value > 0 ? positiveOffset : negativeOffset;
+                    }
+                    stackOffsets[k].set(key, offset);
+                });
+            });
+            return stackOffsets;
+        };
         StackedPlotUtils.keyAccessor = function (plot, orientation) {
             return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
         };
@@ -8022,45 +8052,16 @@ var Plottable;
          * to be determined correctly on the overall datasets
          */
         Stacked.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-            var stackOffsets = Stacked.prototype.generateStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+            var orientation = this._isVertical ? "vertical" : "horizontal";
+            var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
+            var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
+            var datasetKeys = this._datasetKeysInOrder;
+            var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+            var stackOffsets = Plottable.StackedPlotUtils.generateStackOffsets(positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
             for (var datasetKey in stackOffsets) {
                 var plotMetadata = this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
                 plotMetadata.offsets = stackOffsets[datasetKey];
             }
-        };
-        /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
-         */
-        Stacked.prototype.generateStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
-            var _this = this;
-            var orientation = this._isVertical ? "vertical" : "horizontal";
-            var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
-            var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
-            var stackOffsets = {};
-            this._datasetKeysInOrder.forEach(function (k, index) {
-                stackOffsets[k] = d3.map();
-                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
-                var positiveDataMap = positiveDataMapArray[index];
-                var negativeDataMap = negativeDataMapArray[index];
-                var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset, plotMetadata) <= 0; });
-                dataset.data().forEach(function (datum, datumIndex) {
-                    var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
-                    var positiveOffset = positiveDataMap.get(key).offset;
-                    var negativeOffset = negativeDataMap.get(key).offset;
-                    var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
-                    var offset;
-                    if (!+value) {
-                        offset = isAllNegativeValues ? negativeOffset : positiveOffset;
-                    }
-                    else {
-                        offset = value > 0 ? positiveOffset : negativeOffset;
-                    }
-                    stackOffsets[k].set(key, offset);
-                });
-            });
-            return stackOffsets;
         };
         Stacked.prototype._getDomainKeys = function () {
             var _this = this;

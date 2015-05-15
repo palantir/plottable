@@ -105,52 +105,24 @@ module Plottable {
         positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
         negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
 
-      var stackOffsets = Stacked.prototype.generateStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+
+      var stackOffsets = StackedPlotUtils.generateStackOffsets(
+        positiveDataMapArray,
+        negativeDataMapArray,
+        keyAccessor,
+        valueAccessor,
+        datasetKeys,
+        keyToPlotDatasetKey);
 
       for (var datasetKey in stackOffsets) {
         var plotMetadata = <Plots.StackedPlotMetadata> this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
         plotMetadata.offsets = stackOffsets[datasetKey];
       }
-    }
-
-
-    /**
-     * After the stack offsets have been determined on each separate dataset, the offsets need
-     * to be determined correctly on the overall datasets
-     */
-    public generateStackOffsets(
-        positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
-        negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-      var stackOffsets: {[key:string]:D3.Map<number>} = {};
-
-      this._datasetKeysInOrder.forEach((k, index) => {
-        stackOffsets[k] = d3.map();
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
-        var positiveDataMap = positiveDataMapArray[index];
-        var negativeDataMap = negativeDataMapArray[index];
-        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
-
-        dataset.data().forEach((datum: any, datumIndex: number) => {
-          var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
-          var positiveOffset = positiveDataMap.get(key).offset;
-          var negativeOffset = negativeDataMap.get(key).offset;
-
-          var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
-          var offset: number;
-          if (!+value) {
-            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
-          } else {
-            offset = value > 0 ? positiveOffset : negativeOffset;
-          }
-          stackOffsets[k].set(key, offset);
-        });
-      });
-      return stackOffsets;
     }
 
     public _getDomainKeys(): string[] {

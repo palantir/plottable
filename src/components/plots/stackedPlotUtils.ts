@@ -59,6 +59,46 @@ module Plottable {
       return dataMapArray;
     }
 
+    /**
+     * After the stack offsets have been determined on each separate dataset, the offsets need
+     * to be determined correctly on the overall datasets
+     */
+    public static generateStackOffsets(
+      positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
+      negativeDataMapArray: D3.Map<Plots.StackedDatum>[],
+      keyAccessor: Accessor<any>,
+      valueAccessor: Accessor<any>,
+      datasetKeys: string[],
+      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+
+      var stackOffsets: { [key: string]: D3.Map<number> } = {};
+
+      datasetKeys.forEach((k, index) => {
+        stackOffsets[k] = d3.map();
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+        var positiveDataMap = positiveDataMapArray[index];
+        var negativeDataMap = negativeDataMapArray[index];
+        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
+
+        dataset.data().forEach((datum: any, datumIndex: number) => {
+          var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
+          var positiveOffset = positiveDataMap.get(key).offset;
+          var negativeOffset = negativeDataMap.get(key).offset;
+
+          var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
+          var offset: number;
+          if (!+value) {
+            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+          } else {
+            offset = value > 0 ? positiveOffset : negativeOffset;
+          }
+          stackOffsets[k].set(key, offset);
+        });
+      });
+      return stackOffsets;
+    }
+
     public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
       return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
     }
