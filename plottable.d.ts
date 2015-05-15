@@ -2712,9 +2712,6 @@ declare module Plottable {
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Symbol;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
-            };
             size<S>(): AccessorScaleBinding<S, number>;
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
             size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
@@ -2722,6 +2719,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected _generatePropertyToProjectors(): AttributeToProjector;
         }
     }
 }
