@@ -151,8 +151,8 @@ module Plottable {
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
       attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {

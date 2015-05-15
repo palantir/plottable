@@ -2574,7 +2574,7 @@ declare module Plottable {
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
-        protected _generatePropertyToProjectors(): AttributeToProjector;
+        protected _propertyProjectors(): AttributeToProjector;
     }
 }
 
@@ -2650,7 +2650,7 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected _generatePropertyToProjectors(): AttributeToProjector;
+        protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         protected _updateXDomainer(): void;
         protected _updateYDomainer(): void;
@@ -2721,7 +2721,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
-            protected _generatePropertyToProjectors(): AttributeToProjector;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

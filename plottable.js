@@ -6199,7 +6199,7 @@ var Plottable;
                 var fn = scale ? function (d, i, dataset, m) { return scale.scale(accessor(d, i, dataset, m)); } : accessor;
                 h[attr] = fn;
             });
-            var propertyProjectors = this._generatePropertyToProjectors();
+            var propertyProjectors = this._propertyProjectors();
             Object.keys(propertyProjectors).forEach(function (key) {
                 if (h[key] == null) {
                     h[key] = propertyProjectors[key];
@@ -6547,7 +6547,7 @@ var Plottable;
             scale.addExtentsProvider(this._extentsProvider);
             scale._autoDomainIfAutomaticMode();
         };
-        Plot.prototype._generatePropertyToProjectors = function () {
+        Plot.prototype._propertyProjectors = function () {
             var attrToProjector = {};
             this._propertyBindings.forEach(function (key, binding) {
                 var scaledAccessor = function (d, i, dataset, m) { return binding.scale.scale(binding.accessor(d, i, dataset, m)); };
@@ -6789,8 +6789,8 @@ var Plottable;
             this._adjustXDomainOnChangeFromY();
             return this;
         };
-        XYPlot.prototype._generatePropertyToProjectors = function () {
-            var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
+        XYPlot.prototype._propertyProjectors = function () {
+            var attrToProjector = _super.prototype._propertyProjectors.call(this);
             var positionXFn = attrToProjector["x"];
             var positionYFn = attrToProjector["y"];
             attrToProjector["defined"] = function (d, i, dataset, m) {
@@ -7054,8 +7054,8 @@ var Plottable;
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
             };
-            Scatter.prototype._generatePropertyToProjectors = function () {
-                var propertyToProjectors = _super.prototype._generatePropertyToProjectors.call(this);
+            Scatter.prototype._propertyProjectors = function () {
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 var xProjector = propertyToProjectors[Plottable.XYPlot._X_KEY];
                 var yProjector = propertyToProjectors[Plottable.XYPlot._Y_KEY];
                 var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];

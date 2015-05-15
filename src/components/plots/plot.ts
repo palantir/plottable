@@ -187,7 +187,7 @@ module Plottable {
         var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         h[attr] = fn;
       });
-      var propertyProjectors = this._generatePropertyToProjectors();
+      var propertyProjectors = this._propertyProjectors();
       Object.keys(propertyProjectors).forEach((key) => {
         if (h[key] == null) {
           h[key] = propertyProjectors[key];
@@ -582,7 +582,7 @@ module Plottable {
       scale._autoDomainIfAutomaticMode();
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
+    protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => {
         var scaledAccessor = (d: any, i: number, dataset: Dataset, m: any) => binding.scale.scale(binding.accessor(d, i, dataset, m));

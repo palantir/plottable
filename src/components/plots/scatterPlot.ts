@@ -82,8 +82,8 @@ export module Plots {
       return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var propertyToProjectors = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
 
       var xProjector = propertyToProjectors[XYPlot._X_KEY];
       var yProjector = propertyToProjectors[XYPlot._Y_KEY];
