@@ -144,8 +144,8 @@ export module Components {
       return true;
     }
 
-    protected _render() {
-      super._render();
+    public renderImmediately() {
+      super.renderImmediately();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);
@@ -162,6 +162,7 @@ export module Components {
                         textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
+      return this;
     }
   }
 }

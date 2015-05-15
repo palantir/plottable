@@ -39,7 +39,7 @@ export module Plots {
       }
       this._bindProperty(Area._Y0_KEY, y0, y0Scale);
       this._updateYDomainer();
-      this._render();
+      this.renderImmediately();
       return this;
     }
 

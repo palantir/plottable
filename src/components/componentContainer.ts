@@ -24,6 +24,11 @@ module Plottable {
       return this;
     }
 
+    public renderImmediately() {
+      this._forEach((c) => c.render());
+      return this;
+    }
+
     /**
      * Checks whether the specified Component is in the ComponentContainer.
      */
