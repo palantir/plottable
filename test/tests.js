@@ -4374,6 +4374,36 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
+    describe("This is failing", function () {
+        var stackedPlot;
+        beforeEach(function () {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            stackedPlot = new Plottable.Plots.StackedBar(xScale, yScale);
+            stackedPlot.x(function (d) { return d.x; }, xScale);
+            stackedPlot.y(function (d) { return d.y; }, yScale);
+            stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
+            stackedPlot._isVertical = true;
+        });
+        it("project can be called after addDataset", function () {
+            var data0 = [
+                { a: 1, b: 2 }
+            ];
+            var data1 = [
+                { a: 1, b: 4 }
+            ];
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds0PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[0]).plotMetadata;
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+            assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
+            stackedPlot.x(function (d) { return d.a; });
+            stackedPlot.y(function (d) { return d.b; });
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
+        });
+    });
     describe("Stacked Plot Stacking", function () {
         var stackedPlot;
         beforeEach(function () {
