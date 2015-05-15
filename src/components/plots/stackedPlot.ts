@@ -34,8 +34,15 @@ module Plottable {
     }
 
     public _updateStackOffsets() {
-      var dataMapArray = this._generateDefaultMapArray();
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
       var domainKeys = this._getDomainKeys();
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+
+      var dataMapArray = StackedPlotUtils.generateDefaultMapArray
+        (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
 
       var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -94,7 +101,9 @@ module Plottable {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
+    public _setDatasetStackOffsets(
+        positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
+        negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
@@ -137,31 +146,6 @@ module Plottable {
       });
 
       return domainKeys.values();
-    }
-
-    public _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[] {
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var domainKeys = this._getDomainKeys();
-
-      var dataMapArray = this._datasetKeysInOrder.map(() => {
-        return Utils.Methods.populateMap(domainKeys, (domainKey) => {
-          return {key: domainKey, value: 0};
-        });
-      });
-
-      this._datasetKeysInOrder.forEach((k, datasetIndex) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-        dataset.data().forEach((datum, index) => {
-          var key = String(keyAccessor(datum, index, dataset, plotMetadata));
-          var value = valueAccessor(datum, index, dataset, plotMetadata);
-          dataMapArray[datasetIndex].set(key, {key: key, value: value});
-        });
-      });
-
-      return dataMapArray;
     }
 
     protected _updateExtentsForProperty(property: string) {

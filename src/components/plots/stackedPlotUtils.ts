@@ -33,6 +33,32 @@ module Plottable {
       return dataArray;
     }
 
+    public static generateDefaultMapArray(
+        keyAccessor: Accessor<any>,
+        valueAccessor: Accessor<any>,
+        domainKeys: string[],
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+
+      var dataMapArray = datasetKeys.map(() => {
+        return Utils.Methods.populateMap(domainKeys, (domainKey) => {
+          return { key: domainKey, value: 0 };
+        });
+      });
+
+      datasetKeys.forEach((key, datasetIndex) => {
+        var dataset = keyToPlotDatasetKey.get(key).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(key).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          var key = String(keyAccessor(datum, index, dataset, plotMetadata));
+          var value = valueAccessor(datum, index, dataset, plotMetadata);
+          dataMapArray[datasetIndex].set(key, { key: key, value: value });
+        });
+      });
+
+      return dataMapArray;
+    }
+
     public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
       return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
     }

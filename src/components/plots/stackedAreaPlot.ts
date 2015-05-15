@@ -147,10 +147,6 @@ export module Plots {
     public _getDomainKeys() {
       return Stacked.prototype._getDomainKeys.call(this);
     }
-
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._generateDefaultMapArray.call(this);
-    }
     // ===== /Stack logic =====
   }
 }

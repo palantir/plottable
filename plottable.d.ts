@@ -2984,6 +2984,10 @@ declare module Plottable {
             value: number;
             offset?: number;
         }>[];
+        static generateDefaultMapArray(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, domainKeys: string[], datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): D3.Map<{
+            key: string;
+            value: number;
+        }>[];
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
@@ -3005,7 +3009,6 @@ declare module Plottable {
          */
         _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
         _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
         protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
     }
@@ -3042,7 +3045,6 @@ declare module Plottable {
             _updateStackExtents(): void;
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
         }
     }
 }
@@ -3076,7 +3078,6 @@ declare module Plottable {
             _updateStackExtents(): void;
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
         }
     }
 }
