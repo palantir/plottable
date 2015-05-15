@@ -53,8 +53,8 @@ export module Scales {
       "#B10026"  // red
     ];
     private _colorRange: string[];
-    private _colorScale: D3.Scale.QuantitativeScale;
-    private _d3Scale: D3.Scale.QuantitativeScale;
+    private _colorScale: D3.Scale.QuantitativeScale<number>;
+    private _d3Scale: D3.Scale.QuantitativeScale<number>;
 
     /**
      * An InterpolatedColorScale maps numbers to color strings.
@@ -93,7 +93,7 @@ export module Scales {
      * 
      * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
-    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale {
+    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale<number> {
       return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
     }
 

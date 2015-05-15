@@ -169,7 +169,7 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         module D3Scale {
-            function niceDomain<D>(scale: D3.Scale.QuantitativeScale, domain: D[], count?: number): any[];
+            function niceDomain<D>(scale: D3.Scale.QuantitativeScale<D>, domain: D[], count?: number): any[];
         }
     }
 }

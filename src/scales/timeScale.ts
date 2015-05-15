@@ -76,7 +76,7 @@ export module Scales {
     }
 
     public _niceDomain(domain: Date[], count?: number) {
-      return Utils.D3Scale.niceDomain(<D3.Scale.QuantitativeScale> <D3.Scale.Scale> this._d3Scale, domain, count);
+      return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
     }
   }
 }
