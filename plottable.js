@@ -8022,11 +8022,24 @@ var Plottable;
          * to be determined correctly on the overall datasets
          */
         Stacked.prototype._setDatasetStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
+            var stackOffsets = Stacked.prototype.generateStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+            for (var datasetKey in stackOffsets) {
+                var plotMetadata = this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+                plotMetadata.offsets = stackOffsets[datasetKey];
+            }
+        };
+        /**
+         * After the stack offsets have been determined on each separate dataset, the offsets need
+         * to be determined correctly on the overall datasets
+         */
+        Stacked.prototype.generateStackOffsets = function (positiveDataMapArray, negativeDataMapArray) {
             var _this = this;
             var orientation = this._isVertical ? "vertical" : "horizontal";
             var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
             var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
+            var stackOffsets = {};
             this._datasetKeysInOrder.forEach(function (k, index) {
+                stackOffsets[k] = d3.map();
                 var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                 var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
                 var positiveDataMap = positiveDataMapArray[index];
@@ -8044,9 +8057,10 @@ var Plottable;
                     else {
                         offset = value > 0 ? positiveOffset : negativeOffset;
                     }
-                    plotMetadata.offsets.set(key, offset);
+                    stackOffsets[k].set(key, offset);
                 });
             });
+            return stackOffsets;
         };
         Stacked.prototype._getDomainKeys = function () {
             var _this = this;

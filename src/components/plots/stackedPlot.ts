@@ -104,11 +104,31 @@ module Plottable {
     public _setDatasetStackOffsets(
         positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
         negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
+
+      var stackOffsets = Stacked.prototype.generateStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+
+      for (var datasetKey in stackOffsets) {
+        var plotMetadata = <Plots.StackedPlotMetadata> this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+        plotMetadata.offsets = stackOffsets[datasetKey];
+      }
+    }
+
+
+    /**
+     * After the stack offsets have been determined on each separate dataset, the offsets need
+     * to be determined correctly on the overall datasets
+     */
+    public generateStackOffsets(
+        positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
+        negativeDataMapArray: D3.Map<Plots.StackedDatum>[]) {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
+      var stackOffsets: {[key:string]:D3.Map<number>} = {};
+
       this._datasetKeysInOrder.forEach((k, index) => {
+        stackOffsets[k] = d3.map();
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
@@ -127,9 +147,10 @@ module Plottable {
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;
           }
-          plotMetadata.offsets.set(key, offset);
+          stackOffsets[k].set(key, offset);
         });
       });
+      return stackOffsets;
     }
 
     public _getDomainKeys(): string[] {
