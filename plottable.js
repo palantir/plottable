@@ -6598,6 +6598,7 @@ var Plottable;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.classed("pie-plot", true);
+                this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -6618,13 +6619,6 @@ var Plottable;
                 }
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
-            };
-            Pie.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var defaultFillFunction = function (d, i) { return _this._colorScale.scale(String(i)); };
-                attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-                return attrToProjector;
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");

@@ -24,6 +24,7 @@ export module Plots {
       this.innerRadius(0);
       this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.classed("pie-plot", true);
+      this.attr("fill", (d, i) => String(i), new Scales.Color());
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -46,15 +47,6 @@ export module Plots {
       }
       super.addDataset(dataset);
       return this;
-    }
-
-    protected _generateAttrToProjector(): AttributeToProjector {
-      var attrToProjector = super._generateAttrToProjector();
-
-      var defaultFillFunction = (d: any, i: number) => this._colorScale.scale(String(i));
-      attrToProjector["fill"] = attrToProjector["fill"] || defaultFillFunction;
-
-      return attrToProjector;
     }
 
     protected _getDrawer(key: string) {
