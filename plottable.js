@@ -7602,6 +7602,8 @@ var Plottable;
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this._defaultStrokeColor = new Plottable.Scales.Color().range()[0];
+                this.attr("stroke", this._defaultStrokeColor);
+                this.attr("stroke-width", "2px");
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
@@ -7643,8 +7645,6 @@ var Plottable;
                     var yValue = yFunction(d, i, dataset, m);
                     return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
                 };
-                attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
-                attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {

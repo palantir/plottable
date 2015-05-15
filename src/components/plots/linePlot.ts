@@ -21,6 +21,8 @@ export module Plots {
                                          .easing("exp-in-out"));
 
       this._defaultStrokeColor = new Scales.Color().range()[0];
+      this.attr("stroke", this._defaultStrokeColor);
+      this.attr("stroke-width", "2px");
     }
 
     protected _getDrawer(key: string) {
@@ -71,9 +73,6 @@ export module Plots {
         var yValue = yFunction(d, i, dataset, m);
         return xValue != null && xValue === xValue && yValue != null && yValue === yValue;
       };
-
-      attrToProjector["stroke"] = attrToProjector["stroke"] || d3.functor(this._defaultStrokeColor);
-      attrToProjector["stroke-width"] = attrToProjector["stroke-width"] || d3.functor("2px");
 
       return attrToProjector;
     }
