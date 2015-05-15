@@ -13,30 +13,14 @@ module Plottable {
     }
 
     public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
-      if (x == null) {
-        return super.x();
-      }
-      if (scale == null) {
-        super.x(<number | Accessor<number>> x);
-      } else {
-        super.x(<X | Accessor<X>> x, scale);
-      }
-      if (this.x().accessor != null && this.y().accessor != null) {
+      if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
       return this;
     }
 
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
-      if (y == null) {
-        return super.y();
-      }
-      if (scale == null) {
-        super.y(<number | Accessor<number>> y);
-      } else {
-        super.y(<Y | Accessor<Y>> y, scale);
-      }
-      if (this.x().accessor != null && this.y().accessor != null) {
+      if (this._projectorsReady()) {
         this._updateStackOffsets();
       }
       return this;

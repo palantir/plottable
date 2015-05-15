@@ -37,11 +37,10 @@ export module Plots {
       }
       if (xScale == null) {
         super.x(<number | Accessor<number>> x);
-        Stacked.prototype.x.apply(this, [x]);
       } else {
         super.x(<X | Accessor<X>> x, xScale);
-        Stacked.prototype.x.apply(this, [x, xScale]);
       }
+      Stacked.prototype.x.call(this, x, xScale);
       return this;
     }
 
@@ -51,11 +50,10 @@ export module Plots {
       }
       if (yScale == null) {
         super.y(<number | Accessor<number>> y);
-        Stacked.prototype.y.apply(this, [y]);
       } else {
         super.y(<Y | Accessor<Y>> y, yScale);
-        Stacked.prototype.y.apply(this, [y, yScale]);
       }
+      Stacked.prototype.y.call(this, y, yScale);
       return this;
     }
 

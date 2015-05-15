@@ -7926,31 +7926,13 @@ var Plottable;
             return metadata;
         };
         Stacked.prototype.x = function (x, scale) {
-            if (x == null) {
-                return _super.prototype.x.call(this);
-            }
-            if (scale == null) {
-                _super.prototype.x.call(this, x);
-            }
-            else {
-                _super.prototype.x.call(this, x, scale);
-            }
-            if (this.x().accessor != null && this.y().accessor != null) {
+            if (this._projectorsReady()) {
                 this._updateStackOffsets();
             }
             return this;
         };
         Stacked.prototype.y = function (y, scale) {
-            if (y == null) {
-                return _super.prototype.y.call(this);
-            }
-            if (scale == null) {
-                _super.prototype.y.call(this, y);
-            }
-            else {
-                _super.prototype.y.call(this, y, scale);
-            }
-            if (this.x().accessor != null && this.y().accessor != null) {
+            if (this._projectorsReady()) {
                 this._updateStackOffsets();
             }
             return this;
@@ -8142,12 +8124,11 @@ var Plottable;
                 }
                 if (xScale == null) {
                     _super.prototype.x.call(this, x);
-                    Plottable.Stacked.prototype.x.apply(this, [x]);
                 }
                 else {
                     _super.prototype.x.call(this, x, xScale);
-                    Plottable.Stacked.prototype.x.apply(this, [x, xScale]);
                 }
+                Plottable.Stacked.prototype.x.call(this, x, xScale);
                 return this;
             };
             StackedArea.prototype.y = function (y, yScale) {
@@ -8156,12 +8137,11 @@ var Plottable;
                 }
                 if (yScale == null) {
                     _super.prototype.y.call(this, y);
-                    Plottable.Stacked.prototype.y.apply(this, [y]);
                 }
                 else {
                     _super.prototype.y.call(this, y, yScale);
-                    Plottable.Stacked.prototype.y.apply(this, [y, yScale]);
                 }
+                Plottable.Stacked.prototype.y.call(this, y, yScale);
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {
@@ -8296,12 +8276,11 @@ var Plottable;
                 }
                 if (xScale == null) {
                     _super.prototype.x.call(this, x);
-                    Plottable.Stacked.prototype.x.apply(this, [x]);
                 }
                 else {
                     _super.prototype.x.call(this, x, xScale);
-                    Plottable.Stacked.prototype.x.apply(this, [x, xScale]);
                 }
+                Plottable.Stacked.prototype.x.call(this, x, xScale);
                 return this;
             };
             StackedBar.prototype.y = function (y, yScale) {
@@ -8310,12 +8289,11 @@ var Plottable;
                 }
                 if (yScale == null) {
                     _super.prototype.y.call(this, y);
-                    Plottable.Stacked.prototype.y.apply(this, [y]);
                 }
                 else {
                     _super.prototype.y.call(this, y, yScale);
-                    Plottable.Stacked.prototype.y.apply(this, [y, yScale]);
                 }
+                Plottable.Stacked.prototype.y.call(this, y, yScale);
                 return this;
             };
             StackedBar.prototype._generateAttrToProjector = function () {
