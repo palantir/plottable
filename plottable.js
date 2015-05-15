@@ -7056,8 +7056,8 @@ var Plottable;
             };
             Scatter.prototype._generatePropertyToProjectors = function () {
                 var propertyToProjectors = _super.prototype._generatePropertyToProjectors.call(this);
-                var xProjector = propertyToProjectors["x"];
-                var yProjector = propertyToProjectors["y"];
+                var xProjector = propertyToProjectors[Plottable.XYPlot._X_KEY];
+                var yProjector = propertyToProjectors[Plottable.XYPlot._Y_KEY];
                 var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
                 delete propertyToProjectors[Scatter._SIZE_KEY];
                 propertyToProjectors["transform"] = function (datum, index, dataset, plotMetadata) { return "translate(" + xProjector(datum, index, dataset, plotMetadata) + "," + yProjector(datum, index, dataset, plotMetadata) + ")"; };

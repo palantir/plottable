@@ -85,8 +85,8 @@ export module Plots {
     protected _generatePropertyToProjectors(): AttributeToProjector {
       var propertyToProjectors = super._generatePropertyToProjectors();
 
-      var xProjector = propertyToProjectors["x"];
-      var yProjector = propertyToProjectors["y"];
+      var xProjector = propertyToProjectors[XYPlot._X_KEY];
+      var yProjector = propertyToProjectors[XYPlot._Y_KEY];
 
       var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
       delete propertyToProjectors[Scatter._SIZE_KEY];

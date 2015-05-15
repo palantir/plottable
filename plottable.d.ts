@@ -2608,6 +2608,8 @@ declare module Plottable {
 
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
+        protected static _X_KEY: string;
+        protected static _Y_KEY: string;
         /**
          * Constructs an XYPlot.
          *
