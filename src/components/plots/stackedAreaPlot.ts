@@ -107,16 +107,19 @@ export module Plots {
       return ["x", "y", "defined"];
     }
 
-    protected _extentsForProperty(attr: string) {
-      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
+    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
+      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
     protected _updateExtentsForProperty(property: string) {
-      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
+      super._updateExtentsForProperty(property);
+      if ((property === "x" || property === "y") && this._projectorsReady()) {
+        this._updateStackExtents();
+      }
     }
 
-    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
     // ===== Stack logic from StackedPlot =====

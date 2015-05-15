@@ -122,13 +122,6 @@ module Plottable {
       return domainKeys.values();
     }
 
-    protected _updateExtentsForProperty(property: string) {
-      super._updateExtentsForProperty(property);
-      if ((property === "x" || property === "y") && this._projectorsReady()) {
-        this._updateStackExtents();
-      }
-    }
-
     protected _extentsForProperty(attr: string) {
       var extents = super._extentsForProperty(attr);
       var primaryAttr = this._isVertical ? "y" : "x";

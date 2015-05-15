@@ -3011,7 +3011,6 @@ declare module Plottable {
         _updateStackOffsets(): void;
         _updateStackExtents(): void;
         _getDomainKeys(): string[];
-        protected _updateExtentsForProperty(property: string): void;
         protected _extentsForProperty(attr: string): any[];
     }
 }
@@ -3040,9 +3039,9 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _extentsForProperty(attr: string): any;
-            protected _updateExtentsForProperty(property: string): void;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            protected _updateExtentsForProperty(property: string): void;
+            protected _extentsForProperty(attr: string): any;
             _updateStackOffsets(): void;
             _updateStackExtents(): void;
             _getDomainKeys(): any;

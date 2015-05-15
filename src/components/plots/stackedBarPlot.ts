@@ -97,7 +97,10 @@ export module Plots {
     }
 
     protected _updateExtentsForProperty(property: string) {
-      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
+      super._updateExtentsForProperty(property);
+      if ((property === "x" || property === "y") && this._projectorsReady()) {
+        this._updateStackExtents();
+      }
     }
 
     protected _extentsForProperty(attr: string) {

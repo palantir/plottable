@@ -8065,12 +8065,6 @@ var Plottable;
             });
             return domainKeys.values();
         };
-        Stacked.prototype._updateExtentsForProperty = function (property) {
-            _super.prototype._updateExtentsForProperty.call(this, property);
-            if ((property === "x" || property === "y") && this._projectorsReady()) {
-                this._updateStackExtents();
-            }
-        };
         Stacked.prototype._extentsForProperty = function (attr) {
             var extents = _super.prototype._extentsForProperty.call(this, attr);
             var primaryAttr = this._isVertical ? "y" : "x";
@@ -8187,14 +8181,17 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            StackedArea.prototype._extentsForProperty = function (attr) {
-                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
-            };
-            StackedArea.prototype._updateExtentsForProperty = function (property) {
-                Plottable.Stacked.prototype._updateExtentsForProperty.call(this, property);
-            };
             StackedArea.prototype._getPlotMetadataForDataset = function (key) {
                 return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+            };
+            StackedArea.prototype._updateExtentsForProperty = function (property) {
+                _super.prototype._updateExtentsForProperty.call(this, property);
+                if ((property === "x" || property === "y") && this._projectorsReady()) {
+                    this._updateStackExtents();
+                }
+            };
+            StackedArea.prototype._extentsForProperty = function (attr) {
+                return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
             };
             // ===== Stack logic from StackedPlot =====
             StackedArea.prototype._updateStackOffsets = function () {
@@ -8320,7 +8317,10 @@ var Plottable;
                 return Plottable.Stacked.prototype._getPlotMetadataForDataset.call(this, key);
             };
             StackedBar.prototype._updateExtentsForProperty = function (property) {
-                Plottable.Stacked.prototype._updateExtentsForProperty.call(this, property);
+                _super.prototype._updateExtentsForProperty.call(this, property);
+                if ((property === "x" || property === "y") && this._projectorsReady()) {
+                    this._updateStackExtents();
+                }
             };
             StackedBar.prototype._extentsForProperty = function (attr) {
                 return Plottable.Stacked.prototype._extentsForProperty.call(this, attr);
