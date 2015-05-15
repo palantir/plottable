@@ -1371,7 +1371,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type AnchorCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => any;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1399,23 +1399,23 @@ declare module Plottable {
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback The callback to be added.
          *
          * @return {Component}
          */
-        onAnchor(callback: AnchorCallback): Component;
+        onAnchor(callback: ComponentCallback): Component;
         /**
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
-        offAnchor(callback: AnchorCallback): Component;
+        offAnchor(callback: ComponentCallback): Component;
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
@@ -1514,35 +1514,6 @@ declare module Plottable {
          * @returns {boolean} Whether the component has a fixed height.
          */
         fixedHeight(): boolean;
-        _merge(c: Component, below: boolean): Components.Group;
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        above(c: Component): Components.Group;
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        below(c: Component): Components.Group;
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -1552,8 +1523,23 @@ declare module Plottable {
          * @returns The calling Component.
          */
         detach(): Component;
-        _parent(): ComponentContainer;
-        _parent(parentElement: ComponentContainer): any;
+        /**
+         * Adds a callback to be called when th Component is detach()-ed.
+         *
+         * @param {ComponentCallback} callback The callback to be added.
+         * @return {Component} The calling Component.
+         */
+        onDetach(callback: ComponentCallback): Component;
+        /**
+         * Removes a callback to be called when th Component is detach()-ed.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback The callback to be removed.
+         * @return {Component} The calling Component.
+         */
+        offDetach(callback: ComponentCallback): Component;
+        parent(): ComponentContainer;
+        parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
          * listening to (effectively destroying it).
@@ -1616,40 +1602,32 @@ declare module Plottable {
 
 declare module Plottable {
     class ComponentContainer extends Component {
+        constructor();
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
         /**
-         * Removes the specified Component from the ComponentContainer
-         *
-         * @param c Component the Component to remove.
+         * Checks whether the specified Component is in the ComponentContainer.
          */
-        remove(c: Component): void;
+        has(component: Component): boolean;
+        protected _adoptAndAnchor(component: Component): void;
         /**
-         * Adds the specified Component to the ComponentContainer.
-         *
-         * @param c Component the component to add
-         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
+         * Removes the specified Component from the ComponentContainer.
          */
-        add(c: Component, prepend?: boolean): boolean;
+        remove(component: Component): ComponentContainer;
         /**
-         * Returns a list of components in the ComponentContainer.
+         * Carry out the actual removal of a Component.
+         * Implementation dependent on the type of container.
          *
-         * @returns {Component[]} the contained Components
+         * @return {boolean} true if the Component was successfully removed, false otherwise.
          */
-        components(): Component[];
+        protected _remove(component: Component): boolean;
         /**
-         * Returns true iff the ComponentContainer is empty.
-         *
-         * @returns {boolean} Whether the calling ComponentContainer is empty.
+         * Invokes a callback on each Component in the ComponentContainer.
          */
-        empty(): boolean;
+        protected _forEach(callback: (component: Component) => void): void;
         /**
-         * Detaches all components contained in the ComponentContainer, and
-         * empties the ComponentContainer.
-         *
-         * @returns {ComponentContainer} The calling ComponentContainer
+         * Destroys the ComponentContainer and all Components within it.
          */
-        detachAll(): ComponentContainer;
         destroy(): void;
     }
 }
@@ -1662,18 +1640,18 @@ declare module Plottable {
              * Constructs a Component.Group.
              *
              * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * each other. Components added later will be rendered on top of existing Components.
              *
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
              */
             constructor(components?: Component[]);
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Group.
+             */
+            has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            _merge(c: Component, below: boolean): Group;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
             protected _getSize(availableWidth: number, availableHeight: number): {
                 width: number;
@@ -1681,6 +1659,12 @@ declare module Plottable {
             };
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * @return {Component[]} The Components in this Group.
+             */
+            components(): Component[];
+            append(component: Component): Group;
+            protected _remove(component: Component): boolean;
         }
     }
 }
@@ -2290,6 +2274,11 @@ declare module Plottable {
              * null can be used if a cell is empty. (default = [])
              */
             constructor(rows?: Component[][]);
+            protected _forEach(callback: (component: Component) => any): void;
+            /**
+             * Checks whether the specified Component is in the Table.
+             */
+            has(component: Component): boolean;
             /**
              * Adds a Component in the specified row and column position.
              *
@@ -2297,9 +2286,9 @@ declare module Plottable {
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(a, 0, 0);
-             * table.addComponent(b, 0, 1);
-             * table.addComponent(c, 1, 1);
+             * table.add(a, 0, 0);
+             * table.add(b, 0, 1);
+             * table.add(c, 1, 1);
              * ```
              *
              * @param {Component} component The Component to be added.
@@ -2307,13 +2296,8 @@ declare module Plottable {
              * @param {number} col The column in which to add the Component.
              * @returns {Table} The calling Table.
              */
-            addComponent(component: Component, row: number, col: number): Table;
-            /**
-             * Removes a Component.
-             *
-             * @param {Component} component The Component to be removed.
-             */
-            removeComponent(component: Component): void;
+            add(component: Component, row: number, col: number): Table;
+            protected _remove(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**

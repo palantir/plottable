@@ -35,16 +35,17 @@ function run(svg, data, Plottable) {
   var yAxisBottom2 = new Plottable.Axes.Numeric(yScale, "right").tickLabelPosition("bottom");
   var yAxisTable2 = new Plottable.Components.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
-  var renderAreaD1 = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
-  renderAreaD1.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
+  scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+  var renderGroup = new Plottable.Components.Group([scatterPlot, gridlines]);
 
   var basicTable = new Plottable.Components.Table([[null, xAxisTable2, null],
-                                    [yAxisTable, renderAreaD1.above(gridlines), yAxisTable2],
+                                    [yAxisTable, renderGroup, yAxisTable2],
                                     [null, xAxisTable, null]]);
 
   basicTable.renderTo(svg);
 
-  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(renderAreaD1);
+  new Plottable.Interactions.PanZoom(xScale, yScale).attachTo(renderGroup);
 
 }

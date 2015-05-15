@@ -27,7 +27,7 @@ function run(svg, data, Plottable) {
     .attr("yval", function(d) { return d.y; })
     .labelsEnabled(true);
 
-  var center = clusteredBarRenderer.below(new Plottable.Components.Legend(colorScale));
+  var center = new Plottable.Components.Group([clusteredBarRenderer, new Plottable.Components.Legend(colorScale)]);
 
   new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]

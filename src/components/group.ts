@@ -3,16 +3,13 @@
 module Plottable {
 export module Components {
   export class Group extends ComponentContainer {
+    private _components: Component[] = [];
 
     /**
      * Constructs a Component.Group.
      *
      * A Component.Group is a set of Components that will be rendered on top of
-     * each other. When you call Component.above(Component) or Component.below(Component),
-     * it creates and returns a Component.Group.
-     *
-     * Note that the order of the components will determine placement on the z-axis,
-     * with the previous items rendered below the later items.
+     * each other. Components added later will be rendered on top of existing Components.
      *
      * @constructor
      * @param {Component[]} components The Components in the resultant Component.Group (default = []).
@@ -20,26 +17,32 @@ export module Components {
     constructor(components: Component[] = []) {
       super();
       this.classed("component-group", true);
-      components.forEach((c: Component) => this.add(c));
+      components.forEach((c: Component) => this.append(c));
+    }
+
+    protected _forEach(callback: (component: Component) => any) {
+      this._components.forEach(callback);
+    }
+
+    /**
+     * Checks whether the specified Component is in the Group.
+     */
+    public has(component: Component) {
+      return this._components.indexOf(component) >= 0;
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var requests = this.components().map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
+      var requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
         minWidth: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
         minHeight: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
       };
     }
 
-    public _merge(c: Component, below: boolean): Group {
-      this.add(c, !below);
-      return this;
-    }
-
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      this.components().forEach((c) => {
-        c.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
+      this._forEach((component) => {
+        component.computeLayout({ x: 0, y: 0 }, this.width(), this.height());
       });
       return this;
     }
@@ -52,12 +55,39 @@ export module Components {
     }
 
     public fixedWidth(): boolean {
-      return this.components().every((c) => c.fixedWidth());
+      return this._components.every((c) => c.fixedWidth());
     }
 
     public fixedHeight(): boolean {
-      return this.components().every((c) => c.fixedHeight());
+      return this._components.every((c) => c.fixedHeight());
     }
+
+    /**
+     * @return {Component[]} The Components in this Group.
+     */
+    public components(): Component[] {
+      return this._components.slice();
+    }
+
+    public append(component: Component) {
+      if (component != null && !this.has(component)) {
+        component.detach();
+        this._components.push(component);
+        this._adoptAndAnchor(component);
+        this.redraw();
+      }
+      return this;
+    }
+
+    protected _remove(component: Component) {
+      var removeIndex = this._components.indexOf(component);
+      if (removeIndex >= 0) {
+        this._components.splice(removeIndex, 1);
+        return true;
+      }
+      return false;
+    }
+
   }
 }
 }

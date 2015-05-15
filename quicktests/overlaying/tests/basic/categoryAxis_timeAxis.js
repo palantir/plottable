@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Category(yScale, "left");
 
   var gridlines = new Plottable.Components.Gridlines(xScale, null);
-  var renderGroup = hBarPlot.above(gridlines);
+  var renderGroup = new Plottable.Components.Group([hBarPlot, gridlines]);
 
   var chart = new Plottable.Components.Table([
                                             [yAxis, renderGroup],

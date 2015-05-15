@@ -52,10 +52,34 @@ export module Components {
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
           if (component != null) {
-            this.addComponent(component, rowIndex, colIndex);
+            this.add(component, rowIndex, colIndex);
           }
         });
       });
+    }
+
+    protected _forEach(callback: (component: Component) => any) {
+      for (var r = 0; r < this._nRows; r++) {
+        for (var c = 0; c < this._nCols; c++) {
+          if (this._rows[r][c] != null) {
+            callback(this._rows[r][c]);
+          }
+        }
+      }
+    }
+
+    /**
+     * Checks whether the specified Component is in the Table.
+     */
+    public has(component: Component) {
+      for (var r = 0; r < this._nRows; r++) {
+        for (var c = 0; c < this._nCols; c++) {
+          if (this._rows[r][c] === component) {
+            return true;
+          }
+        }
+      }
+      return false;
     }
 
     /**
@@ -65,9 +89,9 @@ export module Components {
      * could call
      * ```typescript
      * var table = new Table();
-     * table.addComponent(a, 0, 0);
-     * table.addComponent(b, 0, 1);
-     * table.addComponent(c, 1, 1);
+     * table.add(a, 0, 0);
+     * table.add(b, 0, 1);
+     * table.add(c, 1, 1);
      * ```
      *
      * @param {Component} component The Component to be added.
@@ -75,43 +99,38 @@ export module Components {
      * @param {number} col The column in which to add the Component.
      * @returns {Table} The calling Table.
      */
-    public addComponent(component: Component, row: number, col: number): Table {
-
+    public add(component: Component, row: number, col: number) {
       if (component == null) {
         throw Error("Cannot add null to a table cell");
       }
 
-      var currentComponent = this._rows[row] && this._rows[row][col];
-
-      if (currentComponent) {
-        component = component.above(currentComponent);
-      }
-
-      if (super.add(component)) {
+      if (!this.has(component)) {
+        var currentComponent = this._rows[row] && this._rows[row][col];
+        if (currentComponent != null) {
+          throw new Error("cell is occupied");
+        }
+        component.detach();
         this._nRows = Math.max(row + 1, this._nRows);
         this._nCols = Math.max(col + 1, this._nCols);
         this._padTableToSize(this._nRows, this._nCols);
-
         this._rows[row][col] = component;
+
+        this._adoptAndAnchor(component);
+        this.redraw();
       }
       return this;
     }
 
-    /**
-     * Removes a Component.
-     * 
-     * @param {Component} component The Component to be removed.
-     */
-    public removeComponent(component: Component) {
-      super.remove(component);
+    protected _remove(component: Component) {
       for (var r = 0; r < this._nRows; r++) {
         for (var c = 0; c < this._nCols; c++) {
           if (this._rows[r][c] === component) {
             this._rows[r][c] = null;
-            return;
+            return true;
           }
         }
       }
+      return false;
     }
 
     private _iterateLayout(availableWidth: number, availableHeight: number, isFinalOffer = false): _IterateLayoutResult {

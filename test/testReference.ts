@@ -41,7 +41,6 @@
 
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
-///<reference path="core/componentContainerTests.ts" />
 ///<reference path="core/componentGroupTests.ts" />
 ///<reference path="core/componentTests.ts" />
 ///<reference path="core/datasetTests.ts" />

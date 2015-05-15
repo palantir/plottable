@@ -21,6 +21,7 @@ function run(svg, data, Plottable) {
   var plot2 = new Plottable.Plots.Line(xScale2, yScale);
   plot2.addDataset(ds2);
   plot2.x(function(d) { return d.x; }, xScale2).y(function(d) { return d.y; }, yScale);
+  var plots = new Plottable.Components.Group([plot1, plot2]);
 
   var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");
   var xAxis2 = new Plottable.Axes.Category(xScale2, "bottom");
@@ -31,8 +32,10 @@ function run(svg, data, Plottable) {
                                               [xAxis2],
                                               [new Plottable.Components.Label("")]]);
 
-  var chart = new Plottable.Components.Table([[yAxis, plot1.below(plot2)],
-   [null,  xAxes]]);
+  var chart = new Plottable.Components.Table([
+    [yAxis, plots],
+    [null,  xAxes]
+  ]);
 
   chart.renderTo(svg);
 

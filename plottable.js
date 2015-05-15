@@ -2991,6 +2991,7 @@ var Plottable;
             this._cssClasses = ["component"];
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
+            this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
         }
         /**
          * Attaches the Component as a child of a given D3 Selection.
@@ -3000,7 +3001,7 @@ var Plottable;
          */
         Component.prototype.anchor = function (selection) {
             if (this._destroyed) {
-                throw new Error("Can't reuse remove()-ed components!");
+                throw new Error("Can't reuse destroy()-ed components!");
             }
             if (selection.node().nodeName.toLowerCase() === "svg") {
                 // svg node gets the "plottable" CSS class
@@ -3026,7 +3027,7 @@ var Plottable;
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the component is already anchored, the callback is called immediately.
          *
-         * @param {AnchorCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback The callback to be added.
          *
          * @return {Component}
          */
@@ -3041,7 +3042,7 @@ var Plottable;
          * Removes a callback to be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {AnchorCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback The callback to be removed.
          *
          * @return {Component}
          */
@@ -3051,7 +3052,7 @@ var Plottable;
         };
         /**
          * Creates additional elements as necessary for the Component to function.
-         * Called during _anchor() if the Component's element has not been created yet.
+         * Called during anchor() if the Component's element has not been created yet.
          * Override in subclasses to provide additional functionality.
          */
         Component.prototype._setup = function () {
@@ -3175,7 +3176,7 @@ var Plottable;
                     this._scheduleComputeLayout();
                 }
                 else {
-                    this._parent().redraw();
+                    this.parent().redraw();
                 }
             }
             return this;
@@ -3310,51 +3311,6 @@ var Plottable;
         Component.prototype.fixedHeight = function () {
             return false;
         };
-        Component.prototype._merge = function (c, below) {
-            var cg;
-            if (Plottable.Components.Group.prototype.isPrototypeOf(c)) {
-                cg = c;
-                cg.add(this, below);
-                return cg;
-            }
-            else {
-                var mergedComponents = below ? [this, c] : [c, this];
-                cg = new Plottable.Components.Group(mergedComponents);
-                return cg;
-            }
-        };
-        /**
-         * Merges this Component above another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component after the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component prepended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component appended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group after the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        Component.prototype.above = function (c) {
-            return this._merge(c, false);
-        };
-        /**
-         * Merges this Component below another Component, returning a
-         * ComponentGroup. This is used to layer Components on top of each other.
-         *
-         * There are four cases:
-         * Component + Component: Returns a ComponentGroup with the first component before the second component.
-         * ComponentGroup + Component: Returns the ComponentGroup with the Component appended.
-         * Component + ComponentGroup: Returns the ComponentGroup with the Component prepended.
-         * ComponentGroup + ComponentGroup: Returns a new ComponentGroup with the first group before the second group.
-         *
-         * @param {Component} c The component to merge in.
-         * @returns {ComponentGroup} The relevant ComponentGroup out of the above four cases.
-         */
-        Component.prototype.below = function (c) {
-            return this._merge(c, true);
-        };
         /**
          * Detaches a Component from the DOM. The component can be reused.
          *
@@ -3364,23 +3320,44 @@ var Plottable;
          * @returns The calling Component.
          */
         Component.prototype.detach = function () {
+            this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
             }
-            var parent = this._parent();
-            if (parent != null) {
-                parent.remove(this);
-            }
             this._isAnchored = false;
-            this._parentElement = null;
+            this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
-        Component.prototype._parent = function (parentElement) {
-            if (parentElement === undefined) {
-                return this._parentElement;
+        /**
+         * Adds a callback to be called when th Component is detach()-ed.
+         *
+         * @param {ComponentCallback} callback The callback to be added.
+         * @return {Component} The calling Component.
+         */
+        Component.prototype.onDetach = function (callback) {
+            this._onDetachCallbacks.add(callback);
+            return this;
+        };
+        /**
+         * Removes a callback to be called when th Component is detach()-ed.
+         * The callback is identified by reference equality.
+         *
+         * @param {ComponentCallback} callback The callback to be removed.
+         * @return {Component} The calling Component.
+         */
+        Component.prototype.offDetach = function (callback) {
+            this._onDetachCallbacks.delete(callback);
+            return this;
+        };
+        Component.prototype.parent = function (parent) {
+            if (parent === undefined) {
+                return this._parent;
             }
-            this.detach();
-            this._parentElement = parentElement;
+            if (parent !== null && !parent.has(this)) {
+                throw new Error("Passed invalid parent");
+            }
+            this._parent = parent;
+            return this;
         };
         /**
          * Removes a Component from the DOM and disconnects it from everything it's
@@ -3424,12 +3401,12 @@ var Plottable;
          */
         Component.prototype.originToSVG = function () {
             var origin = this.origin();
-            var ancestor = this._parent();
+            var ancestor = this.parent();
             while (ancestor != null) {
                 var ancestorOrigin = ancestor.origin();
                 origin.x += ancestorOrigin.x;
                 origin.y += ancestorOrigin.y;
-                ancestor = ancestor._parent();
+                ancestor = ancestor.parent();
             }
             return origin;
         };
@@ -3497,86 +3474,66 @@ var Plottable;
     var ComponentContainer = (function (_super) {
         __extends(ComponentContainer, _super);
         function ComponentContainer() {
-            _super.apply(this, arguments);
-            this._components = [];
+            var _this = this;
+            _super.call(this);
+            this._detachCallback = function (component) { return _this.remove(component); };
         }
         ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
             _super.prototype.anchor.call(this, selection);
-            this.components().forEach(function (c) { return c.anchor(_this._content); });
+            this._forEach(function (c) { return c.anchor(_this._content); });
             return this;
         };
         ComponentContainer.prototype.render = function () {
-            this._components.forEach(function (c) { return c.render(); });
+            this._forEach(function (c) { return c.render(); });
             return this;
         };
         /**
-         * Removes the specified Component from the ComponentContainer
-         *
-         * @param c Component the Component to remove.
+         * Checks whether the specified Component is in the ComponentContainer.
          */
-        ComponentContainer.prototype.remove = function (c) {
-            var removeIndex = this._components.indexOf(c);
-            if (removeIndex >= 0) {
-                this.components().splice(removeIndex, 1);
+        ComponentContainer.prototype.has = function (component) {
+            throw new Error("has() is not implemented on ComponentContainer");
+        };
+        ComponentContainer.prototype._adoptAndAnchor = function (component) {
+            component.parent(this);
+            component.onDetach(this._detachCallback);
+            if (this._isAnchored) {
+                component.anchor(this._content);
+            }
+        };
+        /**
+         * Removes the specified Component from the ComponentContainer.
+         */
+        ComponentContainer.prototype.remove = function (component) {
+            if (this.has(component)) {
+                component.offDetach(this._detachCallback);
+                this._remove(component);
+                component.detach();
                 this.redraw();
             }
-        };
-        /**
-         * Adds the specified Component to the ComponentContainer.
-         *
-         * @param c Component the component to add
-         * @param prepend boolean whether the component should be prepended to the componentContainer or not.
-         */
-        ComponentContainer.prototype.add = function (c, prepend) {
-            if (prepend === void 0) { prepend = false; }
-            if (!c || this._components.indexOf(c) >= 0) {
-                return false;
-            }
-            if (prepend) {
-                this.components().unshift(c);
-            }
-            else {
-                this.components().push(c);
-            }
-            c._parent(this);
-            if (this._isAnchored) {
-                c.anchor(this._content);
-            }
-            this.redraw();
-            return true;
-        };
-        /**
-         * Returns a list of components in the ComponentContainer.
-         *
-         * @returns {Component[]} the contained Components
-         */
-        ComponentContainer.prototype.components = function () {
-            return this._components;
-        };
-        /**
-         * Returns true iff the ComponentContainer is empty.
-         *
-         * @returns {boolean} Whether the calling ComponentContainer is empty.
-         */
-        ComponentContainer.prototype.empty = function () {
-            return this._components.length === 0;
-        };
-        /**
-         * Detaches all components contained in the ComponentContainer, and
-         * empties the ComponentContainer.
-         *
-         * @returns {ComponentContainer} The calling ComponentContainer
-         */
-        ComponentContainer.prototype.detachAll = function () {
-            // Calling c.remove() will mutate this._components because the component will call this._parent._removeComponent(this)
-            // Since mutating an array while iterating over it is dangerous, we instead iterate over a copy generated by Arr.slice()
-            this.components().slice().forEach(function (c) { return c.detach(); });
             return this;
         };
+        /**
+         * Carry out the actual removal of a Component.
+         * Implementation dependent on the type of container.
+         *
+         * @return {boolean} true if the Component was successfully removed, false otherwise.
+         */
+        ComponentContainer.prototype._remove = function (component) {
+            return false;
+        };
+        /**
+         * Invokes a callback on each Component in the ComponentContainer.
+         */
+        ComponentContainer.prototype._forEach = function (callback) {
+            throw new Error("_forEach() is not implemented on ComponentContainer");
+        };
+        /**
+         * Destroys the ComponentContainer and all Components within it.
+         */
         ComponentContainer.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
-            this.components().slice().forEach(function (c) { return c.destroy(); });
+            this._forEach(function (c) { return c.destroy(); });
         };
         return ComponentContainer;
     })(Plottable.Component);
@@ -3600,11 +3557,7 @@ var Plottable;
              * Constructs a Component.Group.
              *
              * A Component.Group is a set of Components that will be rendered on top of
-             * each other. When you call Component.above(Component) or Component.below(Component),
-             * it creates and returns a Component.Group.
-             *
-             * Note that the order of the components will determine placement on the z-axis,
-             * with the previous items rendered below the later items.
+             * each other. Components added later will be rendered on top of existing Components.
              *
              * @constructor
              * @param {Component[]} components The Components in the resultant Component.Group (default = []).
@@ -3613,25 +3566,31 @@ var Plottable;
                 var _this = this;
                 if (components === void 0) { components = []; }
                 _super.call(this);
+                this._components = [];
                 this.classed("component-group", true);
-                components.forEach(function (c) { return _this.add(c); });
+                components.forEach(function (c) { return _this.append(c); });
             }
+            Group.prototype._forEach = function (callback) {
+                this._components.forEach(callback);
+            };
+            /**
+             * Checks whether the specified Component is in the Group.
+             */
+            Group.prototype.has = function (component) {
+                return this._components.indexOf(component) >= 0;
+            };
             Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var requests = this.components().map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
+                var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
                 return {
                     minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
                     minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
                 };
             };
-            Group.prototype._merge = function (c, below) {
-                this.add(c, !below);
-                return this;
-            };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 var _this = this;
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-                this.components().forEach(function (c) {
-                    c.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
+                this._forEach(function (component) {
+                    component.computeLayout({ x: 0, y: 0 }, _this.width(), _this.height());
                 });
                 return this;
             };
@@ -3642,10 +3601,33 @@ var Plottable;
                 };
             };
             Group.prototype.fixedWidth = function () {
-                return this.components().every(function (c) { return c.fixedWidth(); });
+                return this._components.every(function (c) { return c.fixedWidth(); });
             };
             Group.prototype.fixedHeight = function () {
-                return this.components().every(function (c) { return c.fixedHeight(); });
+                return this._components.every(function (c) { return c.fixedHeight(); });
+            };
+            /**
+             * @return {Component[]} The Components in this Group.
+             */
+            Group.prototype.components = function () {
+                return this._components.slice();
+            };
+            Group.prototype.append = function (component) {
+                if (component != null && !this.has(component)) {
+                    component.detach();
+                    this._components.push(component);
+                    this._adoptAndAnchor(component);
+                    this.redraw();
+                }
+                return this;
+            };
+            Group.prototype._remove = function (component) {
+                var removeIndex = this._components.indexOf(component);
+                if (removeIndex >= 0) {
+                    this._components.splice(removeIndex, 1);
+                    return true;
+                }
+                return false;
             };
             return Group;
         })(Plottable.ComponentContainer);
@@ -5678,11 +5660,33 @@ var Plottable;
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
-                            _this.addComponent(component, rowIndex, colIndex);
+                            _this.add(component, rowIndex, colIndex);
                         }
                     });
                 });
             }
+            Table.prototype._forEach = function (callback) {
+                for (var r = 0; r < this._nRows; r++) {
+                    for (var c = 0; c < this._nCols; c++) {
+                        if (this._rows[r][c] != null) {
+                            callback(this._rows[r][c]);
+                        }
+                    }
+                }
+            };
+            /**
+             * Checks whether the specified Component is in the Table.
+             */
+            Table.prototype.has = function (component) {
+                for (var r = 0; r < this._nRows; r++) {
+                    for (var c = 0; c < this._nCols; c++) {
+                        if (this._rows[r][c] === component) {
+                            return true;
+                        }
+                    }
+                }
+                return false;
+            };
             /**
              * Adds a Component in the specified row and column position.
              *
@@ -5690,9 +5694,9 @@ var Plottable;
              * could call
              * ```typescript
              * var table = new Table();
-             * table.addComponent(a, 0, 0);
-             * table.addComponent(b, 0, 1);
-             * table.addComponent(c, 1, 1);
+             * table.add(a, 0, 0);
+             * table.add(b, 0, 1);
+             * table.add(c, 1, 1);
              * ```
              *
              * @param {Component} component The Component to be added.
@@ -5700,37 +5704,35 @@ var Plottable;
              * @param {number} col The column in which to add the Component.
              * @returns {Table} The calling Table.
              */
-            Table.prototype.addComponent = function (component, row, col) {
+            Table.prototype.add = function (component, row, col) {
                 if (component == null) {
                     throw Error("Cannot add null to a table cell");
                 }
-                var currentComponent = this._rows[row] && this._rows[row][col];
-                if (currentComponent) {
-                    component = component.above(currentComponent);
-                }
-                if (_super.prototype.add.call(this, component)) {
+                if (!this.has(component)) {
+                    var currentComponent = this._rows[row] && this._rows[row][col];
+                    if (currentComponent != null) {
+                        throw new Error("cell is occupied");
+                    }
+                    component.detach();
                     this._nRows = Math.max(row + 1, this._nRows);
                     this._nCols = Math.max(col + 1, this._nCols);
                     this._padTableToSize(this._nRows, this._nCols);
                     this._rows[row][col] = component;
+                    this._adoptAndAnchor(component);
+                    this.redraw();
                 }
                 return this;
             };
-            /**
-             * Removes a Component.
-             *
-             * @param {Component} component The Component to be removed.
-             */
-            Table.prototype.removeComponent = function (component) {
-                _super.prototype.remove.call(this, component);
+            Table.prototype._remove = function (component) {
                 for (var r = 0; r < this._nRows; r++) {
                     for (var c = 0; c < this._nCols; c++) {
                         if (this._rows[r][c] === component) {
                             this._rows[r][c] = null;
-                            return;
+                            return true;
                         }
                     }
                 }
+                return false;
             };
             Table.prototype._iterateLayout = function (availableWidth, availableHeight, isFinalOffer) {
                 if (isFinalOffer === void 0) { isFinalOffer = false; }
