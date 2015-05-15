@@ -33,6 +33,7 @@ export module Plots {
       this.animator("baseline", new Animators.Null());
       this._isVertical = isVertical;
       this.baseline(0);
+      this.attr("fill", this._defaultFillColor);
     }
 
     protected _getDrawer(key: string) {
@@ -398,8 +399,6 @@ export module Plots {
         attrToProjector["positive"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
           originalPositionFn(d, i, dataset, m) <= scaledBaseline;
       }
-
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
 
       return attrToProjector;
     }

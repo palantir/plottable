@@ -24,6 +24,7 @@ export module Plots {
       super(xScale, yScale);
       this._defaultFillColor = new Scales.Color().range()[0];
       this.classed("rectangle-plot", true);
+      this.attr("fill", this._defaultFillColor);
     }
 
     protected _getDrawer(key: string) {
@@ -55,7 +56,6 @@ export module Plots {
       delete attrToProjector["x2"];
       delete attrToProjector["y2"];
 
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       return attrToProjector;
     }
 

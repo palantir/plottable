@@ -23,6 +23,8 @@ export module Plots {
       this.animator("symbols", new Animators.Base()
                                            .duration(250)
                                            .delay(5));
+      this.attr("opacity", 0.6);
+      this.attr("fill", this._defaultFillColor);
     }
 
     protected _getDrawer(key: string) {
@@ -32,8 +34,6 @@ export module Plots {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
       attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
-      attrToProjector["opacity"] = attrToProjector["opacity"] || d3.functor(0.6);
-      attrToProjector["fill"] = attrToProjector["fill"] || d3.functor(this._defaultFillColor);
       attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
 
       return attrToProjector;
