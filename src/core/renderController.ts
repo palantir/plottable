@@ -22,8 +22,8 @@ module Plottable {
   export module RenderController {
     var _componentsNeedingRender = new Utils.Set<Component>();
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
-    var _animationRequested: boolean = false;
-    var _isCurrentlyFlushing: boolean = false;
+    var _animationRequested = false;
+    var _isCurrentlyFlushing = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
     export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
