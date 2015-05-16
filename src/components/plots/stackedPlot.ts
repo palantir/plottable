@@ -3,7 +3,6 @@
 module Plottable {
 
   export class Stacked<X, Y> extends XYPlot<X, Y> {
-    private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
     public _updateStackOffsets() {
