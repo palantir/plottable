@@ -25,7 +25,7 @@ module Plottable {
     }
 
     public renderImmediately() {
-      this._forEach((c) => c.renderImmediately());
+      this._forEach((c) => c.render());
       return this;
     }
 
@@ -60,7 +60,7 @@ module Plottable {
     /**
      * Carry out the actual removal of a Component.
      * Implementation dependent on the type of container.
-     * 
+     *
      * @return {boolean} true if the Component was successfully removed, false otherwise.
      */
     protected _remove(component: Component) {

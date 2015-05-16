@@ -1243,6 +1243,7 @@ var Plottable;
     var RenderController;
     (function (RenderController) {
         var _componentsNeedingRender = new Plottable.Utils.Set();
+        var _componentsCurrentlyRendering = new Plottable.Utils.Set();
         var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
         var _animationRequested = false;
         RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
@@ -1273,7 +1274,9 @@ var Plottable;
          * @param {Component} component Any Plottable component.
          */
         function registerToRender(component) {
-            _componentsNeedingRender.add(component);
+            if (!_componentsCurrentlyRendering.has(component)) {
+                _componentsNeedingRender.add(component);
+            }
             requestRender();
         }
         RenderController.registerToRender = registerToRender;
@@ -1306,9 +1309,9 @@ var Plottable;
                 // Layout
                 _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
                 _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                var toRender = _componentsNeedingRender;
+                _componentsCurrentlyRendering = _componentsNeedingRender;
                 _componentsNeedingRender = new Plottable.Utils.Set(); // new Components might queue while we're looping
-                toRender.values().forEach(function (component) {
+                _componentsCurrentlyRendering.values().forEach(function (component) {
                     try {
                         component.renderImmediately();
                     }
@@ -1321,6 +1324,7 @@ var Plottable;
                 });
                 _animationRequested = false;
             }
+            _componentsCurrentlyRendering = new Plottable.Utils.Set();
             if (_componentsNeedingRender.values().length !== 0) {
                 requestRender();
             }
@@ -3485,7 +3489,7 @@ var Plottable;
             return this;
         };
         ComponentContainer.prototype.renderImmediately = function () {
-            this._forEach(function (c) { return c.renderImmediately(); });
+            this._forEach(function (c) { return c.render(); });
             return this;
         };
         /**

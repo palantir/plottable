@@ -21,6 +21,7 @@ module Plottable {
    */
   export module RenderController {
     var _componentsNeedingRender = new Utils.Set<Component>();
+    var _componentsCurrentlyRendering = new Utils.Set<Component>();
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested: boolean = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
@@ -52,7 +53,9 @@ module Plottable {
      * @param {Component} component Any Plottable component.
      */
     export function registerToRender(component: Component) {
-      _componentsNeedingRender.add(component);
+      if (!_componentsCurrentlyRendering.has(component)) {
+        _componentsNeedingRender.add(component);
+      }
       requestRender();
     }
 
@@ -87,9 +90,9 @@ module Plottable {
         _componentsNeedingComputeLayout.values().forEach((component) => component.computeLayout());
         _componentsNeedingComputeLayout = new Utils.Set<Component>();
 
-        var toRender = _componentsNeedingRender;
+        _componentsCurrentlyRendering = _componentsNeedingRender;
         _componentsNeedingRender = new Utils.Set<Component>(); // new Components might queue while we're looping
-        toRender.values().forEach((component) => {
+        _componentsCurrentlyRendering.values().forEach((component) => {
           try {
             component.renderImmediately();
           } catch (err) {
@@ -99,6 +102,7 @@ module Plottable {
         });
         _animationRequested = false;
       }
+      _componentsCurrentlyRendering = new Utils.Set<Component>();
       if (_componentsNeedingRender.values().length !== 0) {
         requestRender();
       }
