@@ -8023,7 +8023,6 @@ var Plottable;
             var datasetKeys = this._datasetKeysInOrder;
             var keyToPlotDatasetKey = this._key2PlotDatasetKey;
             var domainKeys = Plottable.StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
-            var filter = this._filterForProperty(this._isVertical ? "y" : "x");
             var dataMapArray = Plottable.StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
             var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                 return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
@@ -8037,7 +8036,7 @@ var Plottable;
             });
             var stackOffsets = Plottable.StackedPlotUtils.generateStackOffsets(Plottable.StackedPlotUtils.stack(positiveDataMapArray, domainKeys), Plottable.StackedPlotUtils.stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
             for (var datasetKey in stackOffsets) {
-                var plotMetadata = this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+                var plotMetadata = keyToPlotDatasetKey.get(datasetKey).plotMetadata;
                 plotMetadata.offsets = stackOffsets[datasetKey];
             }
         };
@@ -8100,8 +8099,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 return this;
@@ -8122,8 +8121,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 return this;
@@ -8154,8 +8153,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 _super.prototype._onDatasetUpdate.call(this);
@@ -8279,8 +8278,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 return this;
@@ -8301,8 +8300,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 return this;
@@ -8334,8 +8333,8 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._updateStackOffsets();
                 if (this._projectorsReady()) {
+                    this._updateStackOffsets();
                     this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                 }
                 _super.prototype._onDatasetUpdate.call(this);

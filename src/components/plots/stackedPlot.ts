@@ -6,7 +6,6 @@ module Plottable {
     protected _isVertical: boolean;
 
     public _updateStackOffsets() {
-
       if (!this._projectorsReady()) {
         return;
       }
@@ -17,7 +16,6 @@ module Plottable {
       var datasetKeys = this._datasetKeysInOrder;
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
         (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
@@ -43,7 +41,7 @@ module Plottable {
         keyToPlotDatasetKey);
 
       for (var datasetKey in stackOffsets) {
-        var plotMetadata = <Plots.StackedPlotMetadata> this._key2PlotDatasetKey.get(datasetKey).plotMetadata;
+        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
         plotMetadata.offsets = stackOffsets[datasetKey];
       }
     }

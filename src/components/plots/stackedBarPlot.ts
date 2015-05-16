@@ -49,8 +49,8 @@ export module Plots {
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._updateStackOffsets();
       if (this._projectorsReady()) {
+        this._updateStackOffsets();
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
       return this;
@@ -73,8 +73,8 @@ export module Plots {
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._updateStackOffsets();
       if (this._projectorsReady()) {
+        this._updateStackOffsets();
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
       return this;
@@ -118,8 +118,8 @@ export module Plots {
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._updateStackOffsets();
       if (this._projectorsReady()) {
+        this._updateStackOffsets();
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
       super._onDatasetUpdate();
