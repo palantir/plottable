@@ -15,6 +15,43 @@ module Plottable {
   }
 
   export class StackedPlotUtils {
+
+    public static updateStackExtents(
+      keyAccessor: Accessor<any>,
+      valueAccessor: Accessor<any>,
+      datasetKeys: string[],
+      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+      filter: Accessor<boolean>) {
+
+      var maxStackExtent = Utils.Methods.max<string, number>(datasetKeys, (k: string) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+        var data = dataset.data();
+        if (filter != null) {
+          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        }
+        return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
+          return +valueAccessor(datum, i, dataset, plotMetadata) +
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
+        }, 0);
+      }, 0);
+
+      var minStackExtent = Utils.Methods.min<string, number>(datasetKeys, (k: string) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+        var data = dataset.data();
+        if (filter != null) {
+          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        }
+        return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
+          return +valueAccessor(datum, i, dataset, plotMetadata) +
+            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
+        }, 0);
+      }, 0);
+
+      return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+    }
+
     public static stackedPlotMetadata(metadata: Plots.PlotMetadata) {
       var stackedMetadata = <Plots.StackedPlotMetadata> metadata;
       stackedMetadata.offsets = d3.map();

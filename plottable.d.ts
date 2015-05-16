@@ -2975,6 +2975,7 @@ declare module Plottable {
         };
     }
     class StackedPlotUtils {
+        static updateStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
         static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
         /**
          * Feeds the data through d3's stack layout function which will calculate
@@ -3007,7 +3008,6 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _updateStackOffsets(): void;
-        _updateStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
     }
 }
 
