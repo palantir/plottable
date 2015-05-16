@@ -97,7 +97,6 @@ function run(svg, data, Plottable) {
               .append(renderGrape)
               .append(scatterPlot)
               .append(linePlot);
-    basicTable.redraw();
   }
 
   twoPlots();
