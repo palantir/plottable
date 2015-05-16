@@ -6,11 +6,6 @@ module Plottable {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public _onDatasetUpdate() {
-      this._updateStackOffsets();
-      super._onDatasetUpdate();
-    }
-
     public _updateStackOffsets() {
 
       if (!this._projectorsReady()) {

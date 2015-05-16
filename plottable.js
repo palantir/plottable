@@ -7989,10 +7989,6 @@ var Plottable;
             _super.apply(this, arguments);
             this._stackedExtent = [0, 0];
         }
-        Stacked.prototype._onDatasetUpdate = function () {
-            this._updateStackOffsets();
-            _super.prototype._onDatasetUpdate.call(this);
-        };
         Stacked.prototype._updateStackOffsets = function () {
             if (!this._projectorsReady()) {
                 return;
