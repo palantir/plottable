@@ -90,7 +90,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X_KEY);
       }
       this._bindProperty(Rectangle._X_KEY, x, scale);
-      this._render();
+      this.renderImmediately();
       return this;
     }
 
@@ -102,7 +102,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X1_KEY);
       }
       this._bindProperty(Rectangle._X1_KEY, x1, scale);
-      this._render();
+      this.renderImmediately();
       return this;
     }
 
@@ -114,7 +114,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y_KEY);
       }
       this._bindProperty(Rectangle._Y_KEY, y, scale);
-      this._render();
+      this.renderImmediately();
       return this;
     }
 
@@ -126,7 +126,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y1_KEY);
       }
       this._bindProperty(Rectangle._Y1_KEY, y1, scale);
-      this._render();
+      this.renderImmediately();
       return this;
     }
 
@@ -148,7 +148,6 @@ export module Plots {
         return (scaledMax - scaledMin) / Math.abs(max - min);
       }
     }
-
   }
 }
 }

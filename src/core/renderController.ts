@@ -91,7 +91,7 @@ module Plottable {
         _componentsNeedingRender = new Utils.Set<Component>(); // new Components might queue while we're looping
         toRender.values().forEach((component) => {
           try {
-            component.render(true);
+            component.renderImmediately();
           } catch (err) {
             // throw error with timeout to avoid interrupting further renders
             window.setTimeout(() => { throw err; }, 0);

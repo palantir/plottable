@@ -172,8 +172,8 @@ export module Components {
       return this._orientation !== "horizontal";
     }
 
-    protected _render() {
-      super._render();
+    public renderImmediately() {
+      super.renderImmediately();
 
       var domain = this._scale.domain();
 
@@ -278,6 +278,7 @@ export module Components {
         "x": swatchX,
         "y": swatchY
       });
+      return this;
     }
 
   }
