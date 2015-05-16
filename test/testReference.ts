@@ -31,7 +31,6 @@
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
-///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/rectanglePlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
 ///<reference path="components/plots/stackedPlotTests.ts" />

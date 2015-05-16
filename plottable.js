@@ -6911,8 +6911,8 @@ var Plottable;
              * Constructs a RectanglePlot.
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the left and right bounds of the rectangle (x1 and x2 respectively)
-             * as well as the bottom and top bounds (y1 and y2 respectively)
+             * project the left and right bounds of the rectangle (x and x1 respectively)
+             * as well as the bottom and top bounds (y and y1 respectively)
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
@@ -6920,36 +6920,66 @@ var Plottable;
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.animator("cells", new Plottable.Animators.Null());
                 this.classed("rectangle-plot", true);
-                this.attr("fill", new Plottable.Scales.Color().range()[0]);
+                // The x and y scales should render in bands with no padding for category scales
+                if (xScale instanceof Plottable.Scales.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
             }
             Rectangle.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, true);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
-                var x1Attr = attrToProjector["x1"];
-                var y1Attr = attrToProjector["y1"];
-                var x2Attr = attrToProjector["x2"];
-                var y2Attr = attrToProjector["y2"];
-                // Generate width based on difference, then adjust for the correct x origin
-                attrToProjector["width"] = function (d, i, dataset, m) { return Math.abs(x2Attr(d, i, dataset, m) - x1Attr(d, i, dataset, m)); };
-                attrToProjector["x"] = function (d, i, dataset, m) { return Math.min(x1Attr(d, i, dataset, m), x2Attr(d, i, dataset, m)); };
-                // Generate height based on difference, then adjust for the correct y origin
-                attrToProjector["height"] = function (d, i, dataset, m) { return Math.abs(y2Attr(d, i, dataset, m) - y1Attr(d, i, dataset, m)); };
-                attrToProjector["y"] = function (d, i, dataset, m) {
-                    return Math.max(y1Attr(d, i, dataset, m), y2Attr(d, i, dataset, m)) - attrToProjector["height"](d, i, dataset, m);
-                };
+                var xAttr = attrToProjector[Rectangle._X_KEY];
+                var x1Attr = attrToProjector[Rectangle._X1_KEY];
+                var yAttr = attrToProjector[Rectangle._Y_KEY];
+                var y1Attr = attrToProjector[Rectangle._Y1_KEY];
+                // Get the scales for convenience
+                var xScale = this.x().scale;
+                var yScale = this.y().scale;
+                // In order to define a range from x, x1 has to also be set.
+                // If x1 is not set, auto-centering logic will be applied to x.
+                // The above also applies to y/y1.
+                if (x1Attr) {
+                    attrToProjector["width"] = function (d, i, dataset, m) { return Math.abs(x1Attr(d, i, dataset, m) - xAttr(d, i, dataset, m)); };
+                    attrToProjector["x"] = function (d, i, dataset, m) { return Math.min(x1Attr(d, i, dataset, m), xAttr(d, i, dataset, m)); };
+                }
+                else {
+                    attrToProjector["width"] = function (d, i, dataset, m) { return _this._bandWidth(xScale); };
+                    attrToProjector["x"] = function (d, i, dataset, m) { return xAttr(d, i, dataset, m) - 0.5 * attrToProjector["width"](d, i, dataset, m); };
+                }
+                if (y1Attr) {
+                    attrToProjector["height"] = function (d, i, dataset, m) { return Math.abs(y1Attr(d, i, dataset, m) - yAttr(d, i, dataset, m)); };
+                    attrToProjector["y"] = function (d, i, dataset, m) {
+                        return Math.max(y1Attr(d, i, dataset, m), yAttr(d, i, dataset, m)) - attrToProjector["height"](d, i, dataset, m);
+                    };
+                }
+                else {
+                    attrToProjector["height"] = function (d, i, dataset, m) { return _this._bandWidth(yScale); };
+                    attrToProjector["y"] = function (d, i, dataset, m) { return yAttr(d, i, dataset, m) - 0.5 * attrToProjector["height"](d, i, dataset, m); };
+                }
                 // Clean up the attributes projected onto the SVG elements
                 delete attrToProjector["x1"];
                 delete attrToProjector["y1"];
-                delete attrToProjector["x2"];
-                delete attrToProjector["y2"];
                 return attrToProjector;
             };
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+            };
+            Rectangle.prototype.x = function (x, scale) {
+                if (x == null) {
+                    return this._propertyBindings.get(Rectangle._X_KEY);
+                }
+                this._bindProperty(Rectangle._X_KEY, x, scale);
+                this._render();
+                return this;
             };
             Rectangle.prototype.x1 = function (x1, scale) {
                 if (x1 == null) {
@@ -6959,11 +6989,11 @@ var Plottable;
                 this._render();
                 return this;
             };
-            Rectangle.prototype.x2 = function (x2, scale) {
-                if (x2 == null) {
-                    return this._propertyBindings.get(Rectangle._X2_KEY);
+            Rectangle.prototype.y = function (y, scale) {
+                if (y == null) {
+                    return this._propertyBindings.get(Rectangle._Y_KEY);
                 }
-                this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                this._bindProperty(Rectangle._Y_KEY, y, scale);
                 this._render();
                 return this;
             };
@@ -6975,18 +7005,28 @@ var Plottable;
                 this._render();
                 return this;
             };
-            Rectangle.prototype.y2 = function (y2, scale) {
-                if (y2 == null) {
-                    return this._propertyBindings.get(Rectangle._Y2_KEY);
+            Rectangle.prototype._bandWidth = function (scale) {
+                var _this = this;
+                if (scale instanceof Plottable.Scales.Category) {
+                    return scale.rangeBand();
                 }
-                this._bindProperty(Rectangle._Y2_KEY, y2, scale);
-                this._render();
-                return this;
+                else {
+                    var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+                    var accessorData = d3.set(Plottable.Utils.Methods.flatten(this._datasetKeysInOrder.map(function (k) {
+                        var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                        var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+                        return dataset.data().map(function (d, i) { return accessor(d, i, dataset, plotMetadata).valueOf(); });
+                    }))).values().map(function (value) { return +value; });
+                    // Get the absolute difference between min and max
+                    var min = Plottable.Utils.Methods.min(accessorData, 0);
+                    var max = Plottable.Utils.Methods.max(accessorData, 0);
+                    var scaledMin = scale.scale(min);
+                    var scaledMax = scale.scale(max);
+                    return (scaledMax - scaledMin) / Math.abs(max - min);
+                }
             };
             Rectangle._X1_KEY = "x1";
-            Rectangle._X2_KEY = "x2";
             Rectangle._Y1_KEY = "y1";
-            Rectangle._Y2_KEY = "y2";
             return Rectangle;
         })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
@@ -7074,105 +7114,6 @@ var Plottable;
             return Scatter;
         })(Plottable.XYPlot);
         Plots.Scatter = Scatter;
-    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Plots;
-    (function (Plots) {
-        var Grid = (function (_super) {
-            __extends(Grid, _super);
-            /**
-             * Constructs a GridPlot.
-             *
-             * A GridPlot is used to shade a grid of data. Each datum is a cell on the
-             * grid, and the datum can control what color it is.
-             *
-             * @constructor
-             * @param {Scale.Scale} xScale The x scale to use.
-             * @param {Scale.Scale} yScale The y scale to use.
-             * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
-             * to use for each grid cell.
-             */
-            function Grid(xScale, yScale) {
-                _super.call(this, xScale, yScale);
-                this.classed("grid-plot", true);
-                // The x and y scales should render in bands with no padding for category scales
-                if (xScale instanceof Plottable.Scales.Category) {
-                    xScale.innerPadding(0).outerPadding(0);
-                }
-                if (yScale instanceof Plottable.Scales.Category) {
-                    yScale.innerPadding(0).outerPadding(0);
-                }
-                this.animator("cells", new Plottable.Animators.Null());
-            }
-            Grid.prototype.addDataset = function (dataset) {
-                if (this._datasetKeysInOrder.length === 1) {
-                    Plottable.Utils.Methods.warn("Only one dataset is supported in Grid plots");
-                    return this;
-                }
-                _super.prototype.addDataset.call(this, dataset);
-                return this;
-            };
-            Grid.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Rect(key, true);
-            };
-            Grid.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
-            };
-            Grid.prototype.x = function (x, scale) {
-                var _this = this;
-                if (x == null) {
-                    return _super.prototype.x.call(this);
-                }
-                if (scale == null) {
-                    _super.prototype.x.call(this, x);
-                }
-                else {
-                    _super.prototype.x.call(this, x, scale);
-                    if (scale instanceof Plottable.Scales.Category) {
-                        var xCatScale = scale;
-                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) - xCatScale.rangeBand() / 2; });
-                        this.x2(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)) + xCatScale.rangeBand() / 2; });
-                    }
-                    else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.x1(function (d, i, dataset, m) { return scale.scale(_this.x().accessor(d, i, dataset, m)); });
-                    }
-                }
-                return this;
-            };
-            Grid.prototype.y = function (y, scale) {
-                var _this = this;
-                if (y == null) {
-                    return _super.prototype.y.call(this);
-                }
-                if (scale == null) {
-                    _super.prototype.y.call(this, y);
-                }
-                else {
-                    _super.prototype.y.call(this, y, scale);
-                    if (scale instanceof Plottable.Scales.Category) {
-                        var yCatScale = scale;
-                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) - yCatScale.rangeBand() / 2; });
-                        this.y2(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)) + yCatScale.rangeBand() / 2; });
-                    }
-                    else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.y1(function (d, i, dataset, m) { return scale.scale(_this.y().accessor(d, i, dataset, m)); });
-                    }
-                }
-                return this;
-            };
-            return Grid;
-        })(Plots.Rectangle);
-        Plots.Grid = Grid;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
