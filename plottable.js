@@ -8046,17 +8046,15 @@ var Plottable;
                 }, 0);
             }, 0);
             this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+            return this._stackedExtent;
         };
         Stacked.prototype._extentsForProperty = function (attr) {
-            var extents = _super.prototype._extentsForProperty.call(this, attr);
             var primaryAttr = this._isVertical ? "y" : "x";
-            if (attr === primaryAttr && this._stackedExtent) {
-                var clonedExtents = extents.slice();
-                clonedExtents.push(this._stackedExtent);
-                return clonedExtents;
+            if (attr === primaryAttr) {
+                return [this._stackedExtent];
             }
             else {
-                return extents;
+                return _super.prototype._extentsForProperty.call(this, attr);
             }
         };
         return Stacked;

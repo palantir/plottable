@@ -3007,7 +3007,7 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+        _updateStackExtents(): number[];
         protected _extentsForProperty(attr: string): any[];
     }
 }
