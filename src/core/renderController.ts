@@ -15,7 +15,7 @@ module Plottable {
    * call
    * ```typescript
    * Plottable.RenderController.setRenderPolicy(
-   *   new Plottable.RenderPolicy.Immediate()
+   *   new Plottable.RenderPolicies.Immediate()
    * );
    * ```
    */
@@ -23,6 +23,7 @@ module Plottable {
     var _componentsNeedingRender = new Utils.Set<Component>();
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested: boolean = false;
+    var _isCurrentlyFlushing: boolean = false;
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
     export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
@@ -52,6 +53,9 @@ module Plottable {
      * @param {Component} component Any Plottable component.
      */
     export function registerToRender(component: Component) {
+      if (_isCurrentlyFlushing) {
+        Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+      }
       _componentsNeedingRender.add(component);
       requestRender();
     }
@@ -64,7 +68,8 @@ module Plottable {
      */
     export function registerToComputeLayout(component: Component) {
       _componentsNeedingComputeLayout.add(component);
-      registerToRender(component);
+      _componentsNeedingRender.add(component);
+      requestRender();
     }
 
     function requestRender() {
@@ -84,23 +89,26 @@ module Plottable {
     export function flush() {
       if (_animationRequested) {
         // Layout
-        _componentsNeedingComputeLayout.values().forEach((component) => component.computeLayout());
-        _componentsNeedingComputeLayout = new Utils.Set<Component>();
+        _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
 
-        var toRender = _componentsNeedingRender;
-        _componentsNeedingRender = new Utils.Set<Component>(); // new Components might queue while we're looping
-        toRender.values().forEach((component) => {
+        // Top level render; Containers will put their children in the toRender queue
+        _componentsNeedingRender.values().forEach((component: Component) => component.render());
+
+        _isCurrentlyFlushing = true;
+        var failed = new Utils.Set<Component>();
+        _componentsNeedingRender.values().forEach((component: Component) => {
           try {
             component.renderImmediately();
           } catch (err) {
             // throw error with timeout to avoid interrupting further renders
             window.setTimeout(() => { throw err; }, 0);
+            failed.add(component);
           }
         });
+        _componentsNeedingComputeLayout = new Utils.Set<Component>();
+        _componentsNeedingRender = failed;
         _animationRequested = false;
-      }
-      if (_componentsNeedingRender.values().length !== 0) {
-        requestRender();
+        _isCurrentlyFlushing = false;
       }
     }
   }
