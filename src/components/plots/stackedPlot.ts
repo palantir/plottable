@@ -53,10 +53,14 @@ module Plottable {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-      var maxStackExtent = Utils.Methods.max<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var maxStackExtent = Utils.Methods.max<string, number>(datasetKeys, (k: string) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
         var data = dataset.data();
         if (filter != null) {
           data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
@@ -67,9 +71,9 @@ module Plottable {
         }, 0);
       }, 0);
 
-      var minStackExtent = Utils.Methods.min<string, number>(this._datasetKeysInOrder, (k: string) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>this._key2PlotDatasetKey.get(k).plotMetadata;
+      var minStackExtent = Utils.Methods.min<string, number>(datasetKeys, (k: string) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
         var data = dataset.data();
         if (filter != null) {
           data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));

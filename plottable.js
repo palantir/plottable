@@ -8017,14 +8017,15 @@ var Plottable;
             this._updateStackExtents();
         };
         Stacked.prototype._updateStackExtents = function () {
-            var _this = this;
             var orientation = this._isVertical ? "vertical" : "horizontal";
             var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
             var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
+            var datasetKeys = this._datasetKeysInOrder;
+            var keyToPlotDatasetKey = this._key2PlotDatasetKey;
             var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-            var maxStackExtent = Plottable.Utils.Methods.max(this._datasetKeysInOrder, function (k) {
-                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+            var maxStackExtent = Plottable.Utils.Methods.max(datasetKeys, function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
                 var data = dataset.data();
                 if (filter != null) {
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
@@ -8033,9 +8034,9 @@ var Plottable;
                     return +valueAccessor(datum, i, dataset, plotMetadata) + plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
                 }, 0);
             }, 0);
-            var minStackExtent = Plottable.Utils.Methods.min(this._datasetKeysInOrder, function (k) {
-                var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                var plotMetadata = _this._key2PlotDatasetKey.get(k).plotMetadata;
+            var minStackExtent = Plottable.Utils.Methods.min(datasetKeys, function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
                 var data = dataset.data();
                 if (filter != null) {
                     data = data.filter(function (d, i) { return filter(d, i, dataset, plotMetadata); });
