@@ -121,7 +121,12 @@ export module Plots {
     }
 
     protected _extentsForProperty(attr: string) {
-      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
+      var primaryAttr = this._isVertical ? "y" : "x";
+      if (attr === primaryAttr) {
+        return [this._stackedExtent];
+      } else {
+        return super._extentsForProperty(attr);
+      }
     }
 
     // ===== Stack logic from StackedPlot =====

@@ -83,15 +83,5 @@ module Plottable {
       this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
       return this._stackedExtent;
     }
-
-    protected _extentsForProperty(attr: string) {
-      var primaryAttr = this._isVertical ? "y" : "x";
-      if (attr === primaryAttr) {
-        return [this._stackedExtent];
-      } else {
-        return super._extentsForProperty(attr);
-      }
-    }
-
   }
 }
