@@ -3007,8 +3007,7 @@ declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
         _updateStackOffsets(): void;
-        _updateStackExtents(): number[];
-        protected _extentsForProperty(attr: string): any[];
+        _updateStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
     }
 }
 
@@ -3038,9 +3037,8 @@ declare module Plottable {
             protected _wholeDatumAttributes(): string[];
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            protected _extentsForProperty(attr: string): any;
+            protected _extentsForProperty(attr: string): any[];
             _updateStackOffsets(): void;
-            _updateStackExtents(): void;
         }
     }
 }
@@ -3069,9 +3067,8 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            protected _extentsForProperty(attr: string): any;
+            protected _extentsForProperty(attr: string): any[];
             _updateStackOffsets(): void;
-            _updateStackExtents(): void;
         }
     }
 }

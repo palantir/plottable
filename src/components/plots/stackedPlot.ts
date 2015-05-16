@@ -17,6 +17,7 @@ module Plottable {
       var datasetKeys = this._datasetKeysInOrder;
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
         (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
@@ -46,18 +47,26 @@ module Plottable {
         plotMetadata.offsets = stackOffsets[datasetKey];
       }
 
-      this._updateStackExtents();
+      // this._stackedExtent = Stacked.prototype._updateStackExtents(keyAccessor, valueAccessor, datasetKey, keyToPlotDatasetKey, filter);
     }
 
-    public _updateStackExtents() {
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+    public _updateStackExtents(
+        keyAccessor: Accessor<any>,
+        valueAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        filter: Accessor<boolean>) {
+      // var orientation = this._isVertical ? "vertical" : "horizontal";
+      // var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      // var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      // var datasetKeys = this._datasetKeysInOrder;
+      // var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      // var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      console.log(valueAccessor);
+
+
       var maxStackExtent = Utils.Methods.max<string, number>(datasetKeys, (k: string) => {
         var dataset = keyToPlotDatasetKey.get(k).dataset;
         var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
@@ -84,8 +93,7 @@ module Plottable {
         }, 0);
       }, 0);
 
-      this._stackedExtent = [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-      return this._stackedExtent;
+      return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
   }
 }
