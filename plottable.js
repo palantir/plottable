@@ -1236,7 +1236,7 @@ var Plottable;
      * call
      * ```typescript
      * Plottable.RenderController.setRenderPolicy(
-     *   new Plottable.RenderPolicy.Immediate()
+     *   new Plottable.RenderPolicies.Immediate()
      * );
      * ```
      */
@@ -1245,6 +1245,7 @@ var Plottable;
         var _componentsNeedingRender = new Plottable.Utils.Set();
         var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
         var _animationRequested = false;
+        var _isCurrentlyFlushing = false;
         RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
         function setRenderPolicy(policy) {
             if (typeof (policy) === "string") {
@@ -1273,6 +1274,9 @@ var Plottable;
          * @param {Component} component Any Plottable component.
          */
         function registerToRender(component) {
+            if (_isCurrentlyFlushing) {
+                Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+            }
             _componentsNeedingRender.add(component);
             requestRender();
         }
@@ -1285,7 +1289,8 @@ var Plottable;
          */
         function registerToComputeLayout(component) {
             _componentsNeedingComputeLayout.add(component);
-            registerToRender(component);
+            _componentsNeedingRender.add(component);
+            requestRender();
         }
         RenderController.registerToComputeLayout = registerToComputeLayout;
         function requestRender() {
@@ -1305,10 +1310,11 @@ var Plottable;
             if (_animationRequested) {
                 // Layout
                 _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
-                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                var toRender = _componentsNeedingRender;
-                _componentsNeedingRender = new Plottable.Utils.Set(); // new Components might queue while we're looping
-                toRender.values().forEach(function (component) {
+                // Top level render; Containers will put their children in the toRender queue
+                _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
+                _isCurrentlyFlushing = true;
+                var failed = new Plottable.Utils.Set();
+                _componentsNeedingRender.values().forEach(function (component) {
                     try {
                         component.renderImmediately();
                     }
@@ -1317,12 +1323,13 @@ var Plottable;
                         window.setTimeout(function () {
                             throw err;
                         }, 0);
+                        failed.add(component);
                     }
                 });
+                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
+                _componentsNeedingRender = failed;
                 _animationRequested = false;
-            }
-            if (_componentsNeedingRender.values().length !== 0) {
-                requestRender();
+                _isCurrentlyFlushing = false;
             }
         }
         RenderController.flush = flush;
@@ -3482,10 +3489,6 @@ var Plottable;
         };
         ComponentContainer.prototype.render = function () {
             this._forEach(function (c) { return c.render(); });
-            return this;
-        };
-        ComponentContainer.prototype.renderImmediately = function () {
-            this._forEach(function (c) { return c.renderImmediately(); });
             return this;
         };
         /**

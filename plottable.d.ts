@@ -561,7 +561,7 @@ declare module Plottable {
      * call
      * ```typescript
      * Plottable.RenderController.setRenderPolicy(
-     *   new Plottable.RenderPolicy.Immediate()
+     *   new Plottable.RenderPolicies.Immediate()
      * );
      * ```
      */
@@ -1605,7 +1605,6 @@ declare module Plottable {
         constructor();
         anchor(selection: D3.Selection): ComponentContainer;
         render(): ComponentContainer;
-        renderImmediately(): ComponentContainer;
         /**
          * Checks whether the specified Component is in the ComponentContainer.
          */
