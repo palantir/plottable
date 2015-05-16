@@ -44,7 +44,7 @@ export module Plots {
       } else {
         super.x(<X | Accessor<X>> x, xScale);
       }
-      Stacked.prototype.x.call(this, x, xScale);
+      this._updateStackOffsets();
       return this;
     }
 
@@ -57,7 +57,7 @@ export module Plots {
       } else {
         super.y(<number | Accessor<number>> y, yScale);
       }
-      Stacked.prototype.y.call(this, y, yScale);
+      this._updateStackOffsets();
       return this;
     }
 

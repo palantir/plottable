@@ -7989,25 +7989,14 @@ var Plottable;
             _super.apply(this, arguments);
             this._stackedExtent = [0, 0];
         }
-        Stacked.prototype.x = function (x, scale) {
-            if (this._projectorsReady()) {
-                this._updateStackOffsets();
-            }
-            return this;
-        };
-        Stacked.prototype.y = function (y, scale) {
-            if (this._projectorsReady()) {
-                this._updateStackOffsets();
-            }
-            return this;
-        };
         Stacked.prototype._onDatasetUpdate = function () {
-            if (this._projectorsReady()) {
-                this._updateStackOffsets();
-            }
+            this._updateStackOffsets();
             _super.prototype._onDatasetUpdate.call(this);
         };
         Stacked.prototype._updateStackOffsets = function () {
+            if (!this._projectorsReady()) {
+                return;
+            }
             var orientation = this._isVertical ? "vertical" : "horizontal";
             var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
             var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
@@ -8126,7 +8115,7 @@ var Plottable;
                 else {
                     _super.prototype.x.call(this, x, xScale);
                 }
-                Plottable.Stacked.prototype.x.call(this, x, xScale);
+                this._updateStackOffsets();
                 return this;
             };
             StackedArea.prototype.y = function (y, yScale) {
@@ -8139,7 +8128,7 @@ var Plottable;
                 else {
                     _super.prototype.y.call(this, y, yScale);
                 }
-                Plottable.Stacked.prototype.y.call(this, y, yScale);
+                this._updateStackOffsets();
                 return this;
             };
             StackedArea.prototype._additionalPaint = function () {
@@ -8267,7 +8256,7 @@ var Plottable;
                 else {
                     _super.prototype.x.call(this, x, xScale);
                 }
-                Plottable.Stacked.prototype.x.call(this, x, xScale);
+                this._updateStackOffsets();
                 return this;
             };
             StackedBar.prototype.y = function (y, yScale) {
@@ -8280,7 +8269,7 @@ var Plottable;
                 else {
                     _super.prototype.y.call(this, y, yScale);
                 }
-                Plottable.Stacked.prototype.y.call(this, y, yScale);
+                this._updateStackOffsets();
                 return this;
             };
             StackedBar.prototype._generateAttrToProjector = function () {

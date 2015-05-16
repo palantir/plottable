@@ -6,28 +6,17 @@ module Plottable {
     private _stackedExtent = [0, 0];
     protected _isVertical: boolean;
 
-    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-      }
-      return this;
-    }
-
-    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-      }
-      return this;
-    }
-
     public _onDatasetUpdate() {
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-      }
+      this._updateStackOffsets();
       super._onDatasetUpdate();
     }
 
     public _updateStackOffsets() {
+
+      if (!this._projectorsReady()) {
+        return;
+      }
+
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
