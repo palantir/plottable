@@ -235,7 +235,8 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bars.Mode.HORIZONTAL);
+      renderer = new Plottable.Plots.StackedBar(xScale, yScale);
+      renderer.orientation(Plottable.Orientation.HORIZONTAL);
       renderer.y((d) => d.name, yScale);
       renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
@@ -370,7 +371,8 @@ describe("Plots", () => {
         {y: "C", x: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bars.Mode.HORIZONTAL);
+      plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      plot.orientation(Plottable.Orientation.HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));

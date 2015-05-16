@@ -13,8 +13,8 @@ export module Plots {
      * @param {Scale} yScale the y scale of the plot.
      * @param {string} mode the mode of the plot.
      */
-    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, mode = Bars.Mode.VERTICAL) {
-      super(xScale, yScale, mode);
+    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>) {
+      super(xScale, yScale);
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {

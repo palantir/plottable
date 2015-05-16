@@ -2754,13 +2754,11 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class Orientation {
+        static VERTICAL: string;
+        static HORIZONTAL: string;
+    }
     module Plots {
-        module Bars {
-            class Mode {
-                static VERTICAL: string;
-                static HORIZONTAL: string;
-            }
-        }
         class Bar<X, Y> extends XYPlot<X, Y> {
             protected static _BarAlignmentToFactor: {
                 [alignment: string]: number;
@@ -2775,7 +2773,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} mode the mode of the plot.
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, mode?: string);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -2863,6 +2861,20 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
+            /**
+             * Gets the orientation of the Plots.Bar.
+             *
+             * @returns {string} the current orientation.
+             */
+            orientation(): string;
+            /**
+             * Sets the orientation of the Plots.Bar.
+             *
+             * @param {string} orientation The desired orientation
+             * (horizontal/vertical).
+             * @returns {Plots.Bar} The calling Plots.Bar.
+             */
+            orientation(orientation: string): Plots.Bar<X, Y>;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -2958,7 +2970,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} mode the mode of the plot.
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, mode?: string);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
@@ -3059,7 +3071,7 @@ declare module Plottable {
              * @param {Scale} yScale the y scale of the plot.
              * @param {string} mode the mode of the plot.
              */
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, mode?: string);
+            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;

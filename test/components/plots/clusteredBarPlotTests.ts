@@ -125,7 +125,8 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale, Plottable.Plots.Bars.Mode.HORIZONTAL);
+      renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale);
+      renderer.orientation(Plottable.Orientation.HORIZONTAL);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
@@ -253,7 +254,8 @@ describe("Plots", () => {
       var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
       var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
-      plot = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bars.Mode.HORIZONTAL);
+      plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
+      plot.orientation(Plottable.Orientation.HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
