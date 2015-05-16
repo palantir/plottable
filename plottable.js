@@ -8151,8 +8151,8 @@ var Plottable;
                 }
             };
             StackedArea.prototype._onDatasetUpdate = function () {
+                this._updateStackOffsets();
                 _super.prototype._onDatasetUpdate.call(this);
-                Plottable.Stacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedArea.prototype._generateAttrToProjector = function () {
@@ -8293,8 +8293,8 @@ var Plottable;
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
             };
             StackedBar.prototype._onDatasetUpdate = function () {
+                this._updateStackOffsets();
                 _super.prototype._onDatasetUpdate.call(this);
-                Plottable.Stacked.prototype._onDatasetUpdate.apply(this);
                 return this;
             };
             StackedBar.prototype._getPlotMetadataForDataset = function (key) {

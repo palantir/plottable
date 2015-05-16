@@ -85,8 +85,8 @@ export module Plots {
     }
 
     protected _onDatasetUpdate() {
+      this._updateStackOffsets();
       super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
