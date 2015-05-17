@@ -44,7 +44,8 @@ module.exports = function(grunt) {
       updateConfigs: ['pkg'],
       commit: false,
       createTag: false,
-      push: false
+      push: false,
+      prereleaseName: "rc"
     }
   };
 
