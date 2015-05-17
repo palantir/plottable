@@ -1664,7 +1664,14 @@ var Plottable;
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
         }
         QuantitativeScale.prototype._getExtent = function () {
-            return this._domainer.computeDomain(this._getAllExtents(), this);
+            var computedExtent = this._domainer.computeDomain(this._getAllExtents(), this);
+            if (this._min != null) {
+                computedExtent[0] = this._min;
+            }
+            if (this._max != null) {
+                computedExtent[1] = this._max;
+            }
+            return computedExtent;
         };
         /**
          * Retrieves the domain value corresponding to a supplied range value.
@@ -1677,6 +1684,22 @@ var Plottable;
         };
         QuantitativeScale.prototype.domain = function (values) {
             return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
+        };
+        QuantitativeScale.prototype.min = function (value) {
+            if (value === undefined) {
+                return this._min;
+            }
+            this._min = value;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.max = function (value) {
+            if (value === undefined) {
+                return this._max;
+            }
+            this._max = value;
+            this._autoDomainIfAutomaticMode();
+            return this;
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };

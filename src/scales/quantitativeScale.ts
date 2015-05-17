@@ -4,6 +4,8 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
+    private _min: D;
+    private _max: D;
     public _userSetDomainer = false;
     private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
@@ -23,7 +25,14 @@ module Plottable {
     }
 
     protected _getExtent(): D[] {
-      return this._domainer.computeDomain(this._getAllExtents(), this);
+      var computedExtent = this._domainer.computeDomain(this._getAllExtents(), this);
+      if (this._min != null) {
+        computedExtent[0] = this._min;
+      }
+      if (this._max != null) {
+        computedExtent[1] = this._max;
+      }
+      return computedExtent;
     }
 
     /**
@@ -40,6 +49,44 @@ module Plottable {
     public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {
       return super.domain(values); // need to override type sig to enable method chaining:/
+    }
+
+    /**
+     * Gets the minimum domain value when autoDomain()-ing. 
+     */
+    public min(): D;
+    /**
+     * Sets the minimum domain value when autoDomain()-ing.
+     * 
+     * @returns {QuantitativeScale<D>} The calling QuantitativeScale.
+     */
+    public min(value: D): QuantitativeScale<D>;
+    public min(value?: D): any {
+      if (value === undefined) {
+        return this._min;
+      }
+      this._min = value;
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    /**
+     * Gets the maximum domain value when autoDomain()-ing.
+     */
+    public max(): D;
+    /**
+     * Sets the maximum domain value when autoDomain()-ing.
+     *
+     *  @returns {QuantitativeScale<D>} The calling QuantitativeScale.
+     */
+    public max(value: D): QuantitativeScale<D>;
+    public max(value?: D): any {
+      if (value === undefined) {
+        return this._max;
+      }
+      this._max = value;
+      this._autoDomainIfAutomaticMode();
+      return this;
     }
 
     protected _setDomain(values: D[]) {

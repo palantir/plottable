@@ -3,7 +3,6 @@
 module Plottable {
 export module Scales {
   export class Linear extends QuantitativeScale<number> {
-
     /**
      * Constructs a new LinearScale.
      *

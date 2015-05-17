@@ -7146,36 +7146,6 @@ describe("Scales", function () {
             svg.remove();
         });
     });
-    describe("Quantitative Scales", function () {
-        it("autorange defaults to [0, 1] if no perspectives set", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.autoDomain();
-            var d = scale.domain();
-            assert.strictEqual(d[0], 0);
-            assert.strictEqual(d[1], 1);
-        });
-        it("domain can't include NaN or Infinity", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.domain([0, 1]);
-            scale.domain([5, Infinity]);
-            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
-            scale.domain([5, -Infinity]);
-            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
-            scale.domain([NaN, 7]);
-            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
-            scale.domain([-1, 5]);
-            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
-        });
-        it("custom tick generator", function () {
-            var scale = new Plottable.Scales.Linear();
-            scale.domain([0, 10]);
-            var ticks = scale.ticks();
-            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
-            ticks = scale.ticks();
-            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
-        });
-    });
     describe("Category Scales", function () {
         it("rangeBand is updated when domain changes", function () {
             var scale = new Plottable.Scales.Category();
@@ -7337,6 +7307,57 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Scales", function () {
+    describe("Quantitative Scales", function () {
+        it("domain can't include NaN or Infinity", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([0, 1]);
+            scale.domain([5, Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "Infinity containing domain was ignored");
+            scale.domain([5, -Infinity]);
+            assert.deepEqual(scale.domain(), [0, 1], "-Infinity containing domain was ignored");
+            scale.domain([NaN, 7]);
+            assert.deepEqual(scale.domain(), [0, 1], "NaN containing domain was ignored");
+            scale.domain([-1, 5]);
+            assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
+        });
+        it("custom tick generator", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([0, 10]);
+            var ticks = scale.ticks();
+            assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
+            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
+            ticks = scale.ticks();
+            assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+        });
+    });
+    describe("Linear", function () {
+        it("autorange defaults to [0, 1]", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [0, 1]);
+        });
+        it("min()", function () {
+            var scale = new Plottable.Scales.Linear();
+            var desiredDomain = [-5, 5];
+            scale.addExtentsProvider(function () { return [desiredDomain]; });
+            var minValue = -10;
+            scale.min(minValue);
+            assert.deepEqual(scale.domain(), [minValue, desiredDomain[1]], "lower value in domain was set to minValue");
+        });
+        it("max()", function () {
+            var scale = new Plottable.Scales.Linear();
+            var desiredDomain = [-5, 5];
+            scale.addExtentsProvider(function () { return [desiredDomain]; });
+            var maxValue = 10;
+            scale.max(maxValue);
+            assert.deepEqual(scale.domain(), [desiredDomain[0], maxValue], "upper value in domain was set to maxValue");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Scales", function () {
     describe("Modified Log Scale", function () {
         var scale;
         var base = 10;
@@ -7434,41 +7455,63 @@ describe("Scales", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("TimeScale tests", function () {
-    it("can't set reversed domain", function () {
-        var scale = new Plottable.Scales.Time();
-        assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");
-    });
-    it("tickInterval produces correct number of ticks", function () {
-        var scale = new Plottable.Scales.Time();
-        // 100 year span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
-        var ticks = scale.tickInterval(Plottable.TimeInterval.year);
-        assert.strictEqual(ticks.length, 101, "generated correct number of ticks");
-        // 1 year span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
-        ticks = scale.tickInterval(Plottable.TimeInterval.month);
-        assert.strictEqual(ticks.length, 12, "generated correct number of ticks");
-        ticks = scale.tickInterval(Plottable.TimeInterval.month, 3);
-        assert.strictEqual(ticks.length, 4, "generated correct number of ticks");
-        // 1 month span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
-        ticks = scale.tickInterval(Plottable.TimeInterval.day);
-        assert.strictEqual(ticks.length, 32, "generated correct number of ticks");
-        // 1 day span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
-        ticks = scale.tickInterval(Plottable.TimeInterval.hour);
-        assert.strictEqual(ticks.length, 24, "generated correct number of ticks");
-        // 1 hour span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
-        ticks = scale.tickInterval(Plottable.TimeInterval.minute);
-        assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
-        ticks = scale.tickInterval(Plottable.TimeInterval.minute, 10);
-        assert.strictEqual(ticks.length, 7, "generated correct number of ticks");
-        // 1 minute span
-        scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
-        ticks = scale.tickInterval(Plottable.TimeInterval.second);
-        assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
+describe("Scales", function () {
+    describe("Time Scale", function () {
+        it("can't set reversed domain", function () {
+            var scale = new Plottable.Scales.Time();
+            assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");
+        });
+        it("tickInterval produces correct number of ticks", function () {
+            var scale = new Plottable.Scales.Time();
+            // 100 year span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2100, 0, 1, 0, 0, 0, 0)]);
+            var ticks = scale.tickInterval(Plottable.TimeInterval.year);
+            assert.strictEqual(ticks.length, 101, "generated correct number of ticks");
+            // 1 year span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 11, 31, 0, 0, 0, 0)]);
+            ticks = scale.tickInterval(Plottable.TimeInterval.month);
+            assert.strictEqual(ticks.length, 12, "generated correct number of ticks");
+            ticks = scale.tickInterval(Plottable.TimeInterval.month, 3);
+            assert.strictEqual(ticks.length, 4, "generated correct number of ticks");
+            // 1 month span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 1, 1, 0, 0, 0, 0)]);
+            ticks = scale.tickInterval(Plottable.TimeInterval.day);
+            assert.strictEqual(ticks.length, 32, "generated correct number of ticks");
+            // 1 day span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 23, 0, 0, 0)]);
+            ticks = scale.tickInterval(Plottable.TimeInterval.hour);
+            assert.strictEqual(ticks.length, 24, "generated correct number of ticks");
+            // 1 hour span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 1, 0, 0, 0)]);
+            ticks = scale.tickInterval(Plottable.TimeInterval.minute);
+            assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
+            ticks = scale.tickInterval(Plottable.TimeInterval.minute, 10);
+            assert.strictEqual(ticks.length, 7, "generated correct number of ticks");
+            // 1 minute span
+            scale.domain([new Date(2000, 0, 1, 0, 0, 0, 0), new Date(2000, 0, 1, 0, 1, 0, 0)]);
+            ticks = scale.tickInterval(Plottable.TimeInterval.second);
+            assert.strictEqual(ticks.length, 61, "generated correct number of ticks");
+        });
+        it("min()", function () {
+            var scale = new Plottable.Scales.Time();
+            var desiredDomain = [new Date(-5), new Date(5)];
+            scale.addExtentsProvider(function () { return [desiredDomain]; });
+            var minValue = new Date(-10);
+            scale.min(minValue);
+            var domain = scale.domain();
+            assert.deepEqual(domain[0].getTime(), minValue.getTime(), "lower value in domain was set to minValue");
+            assert.deepEqual(domain[1].getTime(), desiredDomain[1].getTime(), "upper value in domain unchanged");
+        });
+        it("max()", function () {
+            var scale = new Plottable.Scales.Time();
+            var desiredDomain = [new Date(-5), new Date(5)];
+            scale.addExtentsProvider(function () { return [desiredDomain]; });
+            var maxValue = new Date(10);
+            scale.max(maxValue);
+            var domain = scale.domain();
+            assert.deepEqual(domain[0].getTime(), desiredDomain[0].getTime(), "lower value in domain unchanged");
+            assert.deepEqual(domain[1].getTime(), maxValue.getTime(), "upper value in domain was set to maxValue");
+        });
     });
 });
 
