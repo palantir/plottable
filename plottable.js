@@ -7935,6 +7935,23 @@ var Plottable;
             stackedMetadata.offsets = d3.map();
             return stackedMetadata;
         };
+        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
+            var domainKeys = d3.set();
+            datasetKeys.forEach(function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+                dataset.data().forEach(function (datum, index) {
+                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+                });
+            });
+            return domainKeys.values();
+        };
+        StackedPlotUtils.keyAccessor = function (plot, orientation) {
+            return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
+        };
+        StackedPlotUtils.valueAccessor = function (plot, orientation) {
+            return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
+        };
         /**
          * Feeds the data through d3's stack layout function which will calculate
          * the stack offsets and use the the function declared in .out to set the offsets on the data.
@@ -7992,23 +8009,6 @@ var Plottable;
                 });
             });
             return stackOffsets;
-        };
-        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
-            var domainKeys = d3.set();
-            datasetKeys.forEach(function (k) {
-                var dataset = keyToPlotDatasetKey.get(k).dataset;
-                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-                dataset.data().forEach(function (datum, index) {
-                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
-                });
-            });
-            return domainKeys.values();
-        };
-        StackedPlotUtils.keyAccessor = function (plot, orientation) {
-            return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
-        };
-        StackedPlotUtils.valueAccessor = function (plot, orientation) {
-            return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
         };
         return StackedPlotUtils;
     })();

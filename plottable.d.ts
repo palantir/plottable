@@ -2980,26 +2980,6 @@ declare module Plottable {
             [key: string]: D3.Map<number>;
         };
         static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
-        /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
-         */
-        static stack(dataArray: D3.Map<Plots.StackedDatum>[], domainKeys: string[]): D3.Map<{
-            key: any;
-            value: number;
-            offset?: number;
-        }>[];
-        static generateDefaultMapArray(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, domainKeys: string[], datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): D3.Map<{
-            key: string;
-            value: number;
-        }>[];
-        /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
-         */
-        static generateStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
-            [key: string]: D3.Map<number>;
-        };
         static getDomainKeys(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): string[];
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;

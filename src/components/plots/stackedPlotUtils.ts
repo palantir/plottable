@@ -92,11 +92,36 @@ module Plottable {
       return stackedMetadata;
     }
 
+    public static getDomainKeys(
+      keyAccessor: Accessor<any>,
+      datasetKeys: string[],
+      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+
+      var domainKeys = d3.set();
+      datasetKeys.forEach((k) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+        });
+      });
+
+      return domainKeys.values();
+    }
+
+    public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
+      return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
+    }
+
+    public static valueAccessor(plot: XYPlot<any, any>, orientation: string) {
+      return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
+    }
+
     /**
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    public static stack(dataArray: D3.Map<Plots.StackedDatum>[], domainKeys: string[]) {
+    private static stack(dataArray: D3.Map<Plots.StackedDatum>[], domainKeys: string[]) {
       var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -110,7 +135,7 @@ module Plottable {
       return dataArray;
     }
 
-    public static generateDefaultMapArray(
+    private static generateDefaultMapArray(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         domainKeys: string[],
@@ -140,7 +165,7 @@ module Plottable {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    public static generateStackOffsets(
+    private static generateStackOffsets(
         positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
         negativeDataMapArray: D3.Map<Plots.StackedDatum>[],
         keyAccessor: Accessor<any>,
@@ -175,31 +200,5 @@ module Plottable {
       });
       return stackOffsets;
     }
-
-    public static getDomainKeys(
-        keyAccessor: Accessor<any>,
-        datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
-
-      var domainKeys = d3.set();
-      datasetKeys.forEach((k) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-        dataset.data().forEach((datum, index) => {
-          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
-        });
-      });
-
-      return domainKeys.values();
-    }
-
-    public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
-      return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
-    }
-
-    public static valueAccessor(plot: XYPlot<any, any>, orientation: string) {
-      return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
-    }
-
   }
 }
