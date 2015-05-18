@@ -1,0 +1,4 @@
+test/*
+.editorconfig
+.gitignore
+Gruntfile.coffee

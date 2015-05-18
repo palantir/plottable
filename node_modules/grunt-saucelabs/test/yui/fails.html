@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Single failing YUI test</title>
+  <script type="text/javascript" src="http://yui.yahooapis.com/3.10.1/build/yui/yui-min.js"></script>
+</head>
+<body>
+  <div id="testLogger">
+  </div>
+  <script type="text/javascript">
+    YUI().use('node', 'test-console', 'test', function (Y) {
+
+      Y.namespace('failing');
+
+      Y.failing.FailingTestCase = new Y.Test.Case({
+        name: 'Failing test',
+        testFails: function () {
+          Y.Assert.fail('fails');
+        }
+      });
+
+      Y.failing.FailingTestSuite = new Y.Test.Suite('Test suite');
+      Y.failing.FailingTestSuite.add(Y.failing.FailingTestCase);
+
+      //create the console
+      (new Y.Test.Console({
+        newestOnTop: false,
+        filters: {
+          pass: true,
+          fail: true
+        }
+      })).render('#testLogger');
+
+      Y.Test.Runner.add(Y.failing.FailingTestSuite);
+      Y.Test.Runner.run();
+    });
+  </script>
+</body>
+</html>

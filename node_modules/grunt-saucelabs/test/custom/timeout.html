@@ -1,0 +1,23 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>Single custom test which times out.</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript">
+      window.onload = function () {
+        setTimeout(function () {
+          window.global_test_results = {
+            passed: 1,
+            failed: 0,
+            total: 1,
+            duration: 1000,
+            tests: ''
+          };
+        }, 10000);
+      };
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

@@ -1,0 +1,36 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+    <title>Single qunit test which triggers an error in Sauce Labs</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script type="text/javascript">
+      window.onload = function () {
+        // A too big test result causes Sauce Labs to fail. When queried via the REST API
+        // the job's 'passed' property will be null, and on the dashboard the job's status
+        // will be 'Finished'.
+        var source = '';
+        for (var i = 0; i < 100000; i++) {
+          source += 'a';
+        }
+
+        window.global_test_results = {
+          tests: [{
+            name: 'foo',
+            result: false,
+            expected: null,
+            actual: null,
+            source: source
+          }],
+          runtime: 147438,
+          url: 'http://127.0.0.1:9999/qunit/error.html',
+          failed: 1,
+          passed: 0,
+          total: 1
+        };
+      };
+    </script>
+  </head>
+  <body>
+  </body>
+</html>

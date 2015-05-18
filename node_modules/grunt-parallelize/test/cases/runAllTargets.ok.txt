@@ -1,0 +1,35 @@
+Running "parallelize:echofilesrc" (parallelize) task
+    
+    Running "parallelize:echofilesrc:test_src" (parallelize) task
+        
+        Running "echofilesrc:test_src" (echofilesrc) task
+        - ../fixtures/1.js
+        - ../fixtures/2.js
+        
+        Done, without errors.
+            
+        Running "echofilesrc:test_src" (echofilesrc) task
+        - ../fixtures/3.js
+        - ../fixtures/4.js
+        
+        Done, without errors.
+        
+    Done, without errors.
+        
+    Running "parallelize:echofilesrc:test_filesArray" (parallelize) task
+        
+        Running "echofilesrc:test_filesArray" (echofilesrc) task
+        - ../fixtures/1.js
+        - ../fixtures/2.js
+        
+        Done, without errors.
+            
+        Running "echofilesrc:test_filesArray" (echofilesrc) task
+        - ../fixtures/3.js
+        - ../fixtures/4.js
+        
+        Done, without errors.
+        
+    Done, without errors.
+    
+Done, without errors.

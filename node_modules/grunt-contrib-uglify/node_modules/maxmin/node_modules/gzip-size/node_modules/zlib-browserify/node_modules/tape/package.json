@@ -1,0 +1,60 @@
+{
+  "name": "tape",
+  "version": "0.2.2",
+  "description": "tap-producing test harness for node and browsers",
+  "main": "index.js",
+  "bin": {},
+  "directories": {
+    "example": "example",
+    "test": "test"
+  },
+  "dependencies": {
+    "jsonify": "~0.0.0",
+    "deep-equal": "~0.0.0",
+    "defined": "~0.0.0"
+  },
+  "devDependencies": {
+    "tap": "~0.3.0",
+    "falafel": "~0.1.4"
+  },
+  "scripts": {
+    "test": "tap test/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/substack/tape.git"
+  },
+  "homepage": "https://github.com/substack/tape",
+  "keywords": [
+    "tap",
+    "test",
+    "harness",
+    "assert",
+    "browser"
+  ],
+  "author": {
+    "name": "James Halliday",
+    "email": "mail@substack.net",
+    "url": "http://substack.net"
+  },
+  "license": "MIT",
+  "_id": "tape@0.2.2",
+  "dist": {
+    "shasum": "64ccfa4b7ecf4a0060007e61716d424781671637",
+    "tarball": "http://registry.npmjs.org/tape/-/tape-0.2.2.tgz"
+  },
+  "_npmVersion": "1.1.59",
+  "_npmUser": {
+    "name": "substack",
+    "email": "mail@substack.net"
+  },
+  "maintainers": [
+    {
+      "name": "substack",
+      "email": "mail@substack.net"
+    }
+  ],
+  "_shasum": "64ccfa4b7ecf4a0060007e61716d424781671637",
+  "_resolved": "https://registry.npmjs.org/tape/-/tape-0.2.2.tgz",
+  "_from": "tape@>=0.2.2 <0.3.0"
+}
