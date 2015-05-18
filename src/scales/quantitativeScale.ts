@@ -71,7 +71,7 @@ module Plottable {
         return this._padProportion;
       }
       if (padProportion < 0) {
-        throw Error("padProportion must be non-negative");
+        throw new Error("padProportion must be non-negative");
       }
       this._padProportion = padProportion;
       this._autoDomainIfAutomaticMode();
