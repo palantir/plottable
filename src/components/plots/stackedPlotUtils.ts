@@ -16,6 +16,9 @@ module Plottable {
 
   export class StackedPlotUtils {
 
+    /**
+     * @return {[number]} The extent that spans all the stacked data
+     */
     public static computeStackExtents(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
@@ -52,6 +55,9 @@ module Plottable {
       return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
+    /**
+     * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
+     */
     public static computeStackOffsets(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,

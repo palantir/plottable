@@ -7889,6 +7889,9 @@ var Plottable;
     var StackedPlotUtils = (function () {
         function StackedPlotUtils() {
         }
+        /**
+         * @return {[number]} The extent that spans all the stacked data
+         */
         StackedPlotUtils.computeStackExtents = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter) {
             var maxStackExtent = Plottable.Utils.Methods.max(datasetKeys, function (k) {
                 var dataset = keyToPlotDatasetKey.get(k).dataset;
@@ -7914,6 +7917,9 @@ var Plottable;
             }, 0);
             return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
         };
+        /**
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
+         */
         StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey) {
             var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
             var dataMapArray = StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);

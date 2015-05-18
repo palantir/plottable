@@ -2975,7 +2975,13 @@ declare module Plottable {
         };
     }
     class StackedPlotUtils {
+        /**
+         * @return {[number]} The extent that spans all the stacked data
+         */
         static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
+        /**
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
+         */
         static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
             [key: string]: D3.Map<number>;
         };
