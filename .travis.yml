@@ -3,6 +3,8 @@ node_js:
 - '0.10'
 notifications:
   email: false
+addons:
+  sauce_connect: true
 env:
   global:
   - secure: D/VxpQ0fvxqD75Qgwa0HcxbQYNsIv+D7RJ+khiAwNlsluY9VKH84O0hmCQ1ijHKrUTGbSEqAkbNS+D0hvngmSfLCgsNhZyDVTZ0s2kzjV2v5jXrvppr7TmBsCUcp6+5CEgoL/0UL3w+Me3bq9WioMDD0AkmAwAdR/B2LJojEsEY=
