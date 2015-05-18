@@ -135,7 +135,7 @@ export module Plots {
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       if (this._projectorsReady()) {
-        this._updateStackOffsets();
+        Stacked.prototype._updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
     }

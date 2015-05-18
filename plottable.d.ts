@@ -3007,7 +3007,7 @@ declare module Plottable {
 declare module Plottable {
     class Stacked<X, Y> extends XYPlot<X, Y> {
         protected _isVertical: boolean;
-        _updateStackOffsets(): void;
+        _updateStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
     }
 }
 

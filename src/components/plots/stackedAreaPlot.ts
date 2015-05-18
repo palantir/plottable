@@ -153,7 +153,7 @@ export module Plots {
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       if (this._projectorsReady()) {
-        this._updateStackOffsets();
+        this._updateStackOffsets()
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
     }
@@ -161,8 +161,14 @@ export module Plots {
     // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, this._isVertical ? "vertical" : "horizontal");
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, this._datasetKeysInOrder, this._key2PlotDatasetKey);
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
       var keySets = this._datasetKeysInOrder.map((k) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
@@ -170,9 +176,9 @@ export module Plots {
       });
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same.  Plot may produce unintended behavior.");
+        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
-      Stacked.prototype._updateStackOffsets.call(this);
+      Stacked.prototype._updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
     }
 
     // ===== /Stack logic =====

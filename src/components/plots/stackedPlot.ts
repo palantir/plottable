@@ -5,16 +5,12 @@ module Plottable {
   export class Stacked<X, Y> extends XYPlot<X, Y> {
     protected _isVertical: boolean;
 
-    public _updateStackOffsets() {
-      // if (!this._projectorsReady()) {
-      //   return;
-      // }
+    public _updateStackOffsets(
+        keyAccessor: Accessor<any>,
+        valueAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
 
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
