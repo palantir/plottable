@@ -8027,25 +8027,6 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Stacked = (function (_super) {
-        __extends(Stacked, _super);
-        function Stacked() {
-            _super.apply(this, arguments);
-        }
-        return Stacked;
-    })(Plottable.XYPlot);
-    Plottable.Stacked = Stacked;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
     var Plots;
     (function (Plots) {
         var StackedArea = (function (_super) {

@@ -3006,13 +3006,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Stacked<X, Y> extends XYPlot<X, Y> {
-        protected _isVertical: boolean;
-    }
-}
-
-
-declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
             /**
