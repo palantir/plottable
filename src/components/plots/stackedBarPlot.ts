@@ -22,6 +22,7 @@ export module Plots {
      * 3
      * 4
      * 4
+     * 5
      */
     protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
