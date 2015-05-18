@@ -465,7 +465,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DatasetCallback = (dataset: Dataset) => any;
+    type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
          * Constructs a new set.
@@ -1371,7 +1371,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ComponentCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
             static TOP: string;
@@ -3288,7 +3288,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type MouseCallback = (p: Point, event: MouseEvent) => any;
+        type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3413,7 +3413,7 @@ declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        }, event: TouchEvent) => any;
+        }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3509,7 +3509,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -3588,7 +3588,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ClickCallback = (point: Point) => any;
+    type ClickCallback = (point: Point) => void;
     module Interactions {
         class Click extends Interaction {
             protected _anchor(component: Component): void;
@@ -3666,7 +3666,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type PointerCallback = (point: Point) => any;
+    type PointerCallback = (point: Point) => void;
     module Interactions {
         class Pointer extends Interaction {
             protected _anchor(component: Component): void;
@@ -3744,7 +3744,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragCallback = (start: Point, end: Point) => any;
+    type DragCallback = (start: Point, end: Point) => void;
     module Interactions {
         class Drag extends Interaction {
             protected _anchor(component: Component): void;
@@ -3820,7 +3820,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragBoxCallback = (bounds: Bounds) => any;
+    type DragBoxCallback = (bounds: Bounds) => void;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;

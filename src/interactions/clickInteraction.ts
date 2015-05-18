@@ -2,7 +2,7 @@
 
 module Plottable {
 
-export type ClickCallback = (point: Point) => any;
+export type ClickCallback = (point: Point) => void;
 
 export module Interactions {
   export class Click extends Interaction {

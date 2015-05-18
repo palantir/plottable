@@ -2,6 +2,7 @@
 
 module Plottable {
 export type KeyCallback = (keyCode: number) => void;
+
 export module Interactions {
   export class Key extends Interaction {
     /**

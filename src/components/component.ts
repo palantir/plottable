@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type ComponentCallback = (component: Component) => any;
+  export type ComponentCallback = (component: Component) => void;
 
   export module Components {
     export class Alignment {
