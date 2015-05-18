@@ -1,0 +1,9 @@
+.gitmodules
+.project
+.travis.yml
+.tslintrc
+Gruntfile.js
+tslint.json
+build/tslint-tests.js
+src/
+test/

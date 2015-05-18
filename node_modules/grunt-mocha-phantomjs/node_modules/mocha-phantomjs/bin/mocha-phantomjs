@@ -1,0 +1,159 @@
+#!/usr/bin/env node
+
+var program = require('commander'),
+      spawn = require('child_process').spawn,
+         fs = require('fs'),
+       path = require('path'),
+     exists = fs.existsSync || path.existsSync,
+ fileExists = function (path) {
+                return fs.existsSync(path) && !fs.statSync(path).isDirectory();
+              },
+        cwd = process.cwd(),
+    cookies = [],
+    headers = {},
+   settings = {};
+
+function keyValue(val, store) {
+  val = val.split('=');
+  key = val.shift();
+  val = val.join('=');
+  if (val === 'true') {
+    val = true;
+  } else if (val === 'false') {
+    val = false;
+  }
+  store[key] = val;
+  return val;
+}
+
+function cookiesParser(val) {
+  val = JSON.parse(val);
+  cookies.push(val);
+  return val;
+}
+function header(val) {
+  return keyValue(val, headers);
+}
+function setting(val) {
+  return keyValue(val, settings);
+}
+function viewport(val) {
+  val = val.split('x');
+  return {
+    width: parseFloat(val[0]),
+    height: parseFloat(val[1])
+  };
+}
+function resolveHooks(val) {
+  var absPath = path.resolve(process.cwd(), val);
+
+  if (!exists(absPath)) {
+    for (var i = 0; i < module.paths.length - 1; i++) {
+      absPath = path.join(module.paths[i], val);
+      if (exists(absPath)) return absPath;
+    };
+  }
+
+  return absPath;
+}
+
+program
+  .version(JSON.parse(fs.readFileSync(__dirname + '/../package.json', 'utf8')).version)
+  .usage('[options] page')
+  .option('-R, --reporter <name>',       'specify the reporter to use', 'spec')
+  .option('-f, --file <filename>',       'specify the file to dump reporter output')
+  .option('-t, --timeout <timeout>',     'specify the test startup timeout to use', parseInt, 6000)
+  .option('-g, --grep <pattern>',        'only run tests matching <pattern>')
+  .option('-i, --invert',                'invert --grep matches')
+  .option('-b, --bail',                  'exit on the first test failure')
+  .option('-A, --agent <userAgent>',     'specify the user agent to use')
+  .option('-c, --cookies <Object>',      'phantomjs cookie object http://git.io/RmPxgA', cookiesParser) // http://git.io/RmPxgA
+  .option('-h, --header <name>=<value>', 'specify custom header', header)
+  .option('-k, --hooks <path>',          'path to hooks module', resolveHooks)
+  .option('-s, --setting <key>=<value>', 'specify specific phantom settings', setting)
+  .option('-v, --view <width>x<height>', 'specify phantom viewport size', viewport)
+  .option('-C, --no-color',              'disable color escape codes')
+  .option('-p, --path <path>',           'path to PhantomJS binary')
+  .option('--ignore-resource-errors',    'ignore resource errors');
+  
+program.on('--help', function(){
+  console.log('  Examples:');
+  console.log('');
+  console.log('    $ mocha-phantomjs -R dot /test/file.html');
+  console.log('    $ mocha-phantomjs http://testserver.com/file.html');
+  console.log('    $ mocha-phantomjs -p ~/bin/phantomjs /test/file.html');
+  console.log('');
+});
+
+program.parse(process.argv);
+
+if (!program.args.length) { program.outputHelp(); process.exit(1); };
+if (program.agent) { settings.userAgent = program.agent; }
+
+var script   = fs.realpathSync(__dirname + '/../lib/mocha-phantomjs.coffee');
+var reporter = program.reporter;
+var page     = function(){
+  var arg = program.args[0];
+  if (arg.match(/file:\/\//))   { return arg; };
+  if (arg.match(/http:\/\//))   { return arg; };
+  if (arg.match(/https:\/\//))  { return arg; };
+  if (exists(arg))              { return arg; };
+  if (exists(cwd+'/'+arg))      { return fs.realpathSync(cwd+'/'+arg); };
+  return arg;
+}();
+var config = JSON.stringify({
+  hooks: program.hooks,
+  timeout: program.timeout,
+  cookies: cookies,
+  headers: headers,
+  settings: settings,
+  viewportSize: program.view,
+  useColors: program.color,
+  bail: program.bail,
+  file: program.file,
+  grep: program.grep,
+  invert: program.invert,
+  ignoreResourceErrors: program.ignoreResourceErrors
+});
+
+if (reporter) {
+  if (fileExists(reporter)) {
+    reporter = path.resolve(process.cwd(), reporter);
+  } else if (fileExists(reporter + '.js')) {
+    reporter = path.resolve(process.cwd(), reporter + '.js');
+  }
+}
+
+var phantomPath
+if (program.path) {
+  phantomPath = path.resolve(program.path);
+  if (!exists(phantomPath)) {
+    console.error("PhantomJS does not exist at '" + program.path + "'");
+    process.exit(-2);
+  }
+} else {
+  phantomPath = require('phantomjs').path || '/usr/local/bin/phantomjs';
+}
+
+var phantomjs = spawn(phantomPath, [script, page, reporter, config]);
+phantomjs.stdout.pipe(process.stdout);
+phantomjs.stderr.pipe(process.stderr);
+phantomjs.on('exit', function(code){
+  if (code == null) {
+    if (phantomjs.signalCode !== null) {
+      console.log("phantomjs terminated with signal " + phantomjs.signalCode);
+    }
+    code = -1;
+  } else if (code === 127) {
+    console.log("Perhaps phantomjs is not installed?");
+  }
+
+  process.exit(code);
+});
+phantomjs.on('error', function(e) {
+  console.error('An error occurred trying to launch phantomjs at "' + phantomPath + '": ' + e);
+  if (!program.path) {
+    console.error('You can specify an explicit path to phantomjs via the `-p` option.');
+  }
+  process.exit(-2);
+});

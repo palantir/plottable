@@ -1,0 +1,68 @@
+{
+  "name": "maxmin",
+  "version": "0.1.0",
+  "description": "Get a pretty output of the original, minified, gzipped size of a string or buffer: 130 B → 91 B → 53 B (gzip)",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sindresorhus/maxmin"
+  },
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "http://sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "index.js"
+  ],
+  "keywords": [
+    "string",
+    "buffer",
+    "pretty",
+    "color",
+    "gzip",
+    "minified",
+    "min",
+    "max",
+    "diff",
+    "difference"
+  ],
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "dependencies": {
+    "gzip-size": "^0.1.0",
+    "pretty-bytes": "^0.1.0",
+    "chalk": "^0.4.0"
+  },
+  "bugs": {
+    "url": "https://github.com/sindresorhus/maxmin/issues"
+  },
+  "homepage": "https://github.com/sindresorhus/maxmin",
+  "_id": "maxmin@0.1.0",
+  "dist": {
+    "shasum": "95d81c5289e3a9d30f7fc7dc559c024e5030c9d0",
+    "tarball": "http://registry.npmjs.org/maxmin/-/maxmin-0.1.0.tgz"
+  },
+  "_from": "maxmin@>=0.1.0 <0.2.0",
+  "_npmVersion": "1.4.4",
+  "_npmUser": {
+    "name": "sindresorhus",
+    "email": "sindresorhus@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "sindresorhus",
+      "email": "sindresorhus@gmail.com"
+    }
+  ],
+  "directories": {},
+  "_shasum": "95d81c5289e3a9d30f7fc7dc559c024e5030c9d0",
+  "_resolved": "https://registry.npmjs.org/maxmin/-/maxmin-0.1.0.tgz"
+}

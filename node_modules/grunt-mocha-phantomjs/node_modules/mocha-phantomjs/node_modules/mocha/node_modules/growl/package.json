@@ -1,0 +1,30 @@
+{
+  "name": "growl",
+  "version": "1.7.0",
+  "description": "Growl unobtrusive notifications",
+  "author": {
+    "name": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca"
+  },
+  "main": "./lib/growl.js",
+  "_id": "growl@1.7.0",
+  "dist": {
+    "shasum": "de2d66136d002e112ba70f3f10c31cf7c350b2da",
+    "tarball": "http://registry.npmjs.org/growl/-/growl-1.7.0.tgz"
+  },
+  "_npmVersion": "1.1.66",
+  "_npmUser": {
+    "name": "tjholowaychuk",
+    "email": "tj@vision-media.ca"
+  },
+  "maintainers": [
+    {
+      "name": "tjholowaychuk",
+      "email": "tj@vision-media.ca"
+    }
+  ],
+  "directories": {},
+  "_shasum": "de2d66136d002e112ba70f3f10c31cf7c350b2da",
+  "_resolved": "https://registry.npmjs.org/growl/-/growl-1.7.0.tgz",
+  "_from": "growl@>=1.7.0 <1.8.0"
+}

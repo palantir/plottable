@@ -1,0 +1,7 @@
+built
+doc
+src
+tests
+Jakefile
+.travis.yml
+scripts/

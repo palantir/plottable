@@ -1,0 +1,34 @@
+{
+  "name": "batch",
+  "version": "0.5.0",
+  "description": "Simple async batch",
+  "author": {
+    "name": "TJ Holowaychuk",
+    "email": "tj@vision-media.ca"
+  },
+  "devDependencies": {
+    "mocha": "*",
+    "should": "*"
+  },
+  "main": "index",
+  "_id": "batch@0.5.0",
+  "dist": {
+    "shasum": "fd2e05a7a5d696b4db9314013e285d8ff3557ec3",
+    "tarball": "http://registry.npmjs.org/batch/-/batch-0.5.0.tgz"
+  },
+  "_from": "batch@0.5.0",
+  "_npmVersion": "1.2.30",
+  "_npmUser": {
+    "name": "tjholowaychuk",
+    "email": "tj@vision-media.ca"
+  },
+  "maintainers": [
+    {
+      "name": "tjholowaychuk",
+      "email": "tj@vision-media.ca"
+    }
+  ],
+  "directories": {},
+  "_shasum": "fd2e05a7a5d696b4db9314013e285d8ff3557ec3",
+  "_resolved": "https://registry.npmjs.org/batch/-/batch-0.5.0.tgz"
+}

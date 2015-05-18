@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+- '0.8'
+- '0.10'
+before_install:
+- npm install -g npm@~1.4.6
+env:
+  global:
+  - secure: AZm528FDhL3k36l7TLnbd6iiH20cY98D1cBGn2dYn76jxP53cICF/uc6PmCSVqvlp2lCyfVTjEoHRIj9jOHDsgCD2BCiqg8KHBFGbyGkdCFKFM2mCBGIr9MxjtAqLLOnW3QDZYipJB9dpO3al5Ic6u6CgCt35Upgea3xx8qW4yg=
+  - secure: DBxDcbc9TJoOmxnaUKMzFHBnvEwP/Wx2Cr2VA69lu94w6b7IB7REmCC91Tt40pIkqNOQ3hViEFWp6VX23N2er2vR9bZSsfKYZlc+yQwbA2QXvWWTfxgDpBa50FpbdAFfrMgBrxBhjN4PVQviSCaixqUAkpOsFfpyUtOvpED1XsM=

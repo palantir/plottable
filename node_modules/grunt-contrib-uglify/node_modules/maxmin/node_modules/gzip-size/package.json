@@ -1,0 +1,71 @@
+{
+  "name": "gzip-size",
+  "version": "0.1.1",
+  "description": "Get the gzipped size of a string or buffer",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/sindresorhus/gzip-size"
+  },
+  "bin": {
+    "gzip-size": "cli.js"
+  },
+  "author": {
+    "name": "Sindre Sorhus",
+    "email": "sindresorhus@gmail.com",
+    "url": "http://sindresorhus.com"
+  },
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha"
+  },
+  "files": [
+    "index.js",
+    "cli.js"
+  ],
+  "keywords": [
+    "cli",
+    "bin",
+    "app",
+    "tool",
+    "zlib",
+    "gzip",
+    "compressed",
+    "size",
+    "string",
+    "buffer"
+  ],
+  "dependencies": {
+    "concat-stream": "^1.4.1",
+    "zlib-browserify": "^0.0.3"
+  },
+  "devDependencies": {
+    "mocha": "*"
+  },
+  "bugs": {
+    "url": "https://github.com/sindresorhus/gzip-size/issues"
+  },
+  "homepage": "https://github.com/sindresorhus/gzip-size",
+  "_id": "gzip-size@0.1.1",
+  "dist": {
+    "shasum": "ae33483b6fc8224e8342296de108ef93757f76e0",
+    "tarball": "http://registry.npmjs.org/gzip-size/-/gzip-size-0.1.1.tgz"
+  },
+  "_from": "gzip-size@>=0.1.0 <0.2.0",
+  "_npmVersion": "1.4.6",
+  "_npmUser": {
+    "name": "sindresorhus",
+    "email": "sindresorhus@gmail.com"
+  },
+  "maintainers": [
+    {
+      "name": "sindresorhus",
+      "email": "sindresorhus@gmail.com"
+    }
+  ],
+  "directories": {},
+  "_shasum": "ae33483b6fc8224e8342296de108ef93757f76e0",
+  "_resolved": "https://registry.npmjs.org/gzip-size/-/gzip-size-0.1.1.tgz"
+}

@@ -1,0 +1,36 @@
+language: node_js
+
+node_js:
+  - "0.10"
+
+env:
+  global:
+  - secure: |-
+      RtkktGYx5Diounj1rD8EbWZICRtN1/LiAkhK49A2eS0dtkfPEEByPWkynC9f
+      4FYLDEoNXhRHFNL/j87QNeagpowuG7hRSt0Ftk9g+Qzg7acpiQeQXMuZFgsj
+      TGrWvD/yT7VBaoYkAYOTFR5/T0mbUdFZcNUFsohJma8GZ6zug5s=
+  - secure: |-
+      IYuxUdwc9Xe+UOWoNvD/TS4yNaM3LEtiM3NIYtOaC4AIqUYl6f1pPVOG6kPh
+      rAQ4HdtE4XX5m1vdSmeeH8iL6jMQrjeQEK59HEDHU7Pyp1V9tpOVO8CjZ6/j
+      5A1GkbdFX4nbIttln83SvUps+ShVbCkiOJDtzUUx6Y7D0n2mqtg=
+  - secure: |-
+      fZXuDKZBDY8anYaoZE3M6f+5U9oOxsYu6cR+h7zXP5P+I5djwO9/bIduJ638
+      Q3uHy4jRu/PjNbMW/Eq9LFbdI7odNiOtZqikE0dvQvrlFS3Z+XqXES4I1ef8
+      zkP183w3LESZo2MA/iWtADxSY8e4ws1UJ7gwNH4P2sw+Qcxr+Q4=
+
+install:
+  - npm install -g grunt-cli
+  - npm install
+
+before_script:
+  - ./travis.sh before
+
+after_success:
+  - ./travis.sh merge
+
+after_failure:
+  - ./travis.sh revert
+
+notifications:
+  email:
+    on_success: never
