@@ -2103,7 +2103,7 @@ declare module Plottable {
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
              * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
@@ -2124,17 +2124,17 @@ declare module Plottable {
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
-             * Gets the current comparator for Legend's entries.
+             * Gets the current comparator for the Legend's entries.
              * @returns {(a: string, b: string) => number} The current comparator.
              */
             comparator(): (a: string, b: string) => number;
             /**
-             * Sets a new comparator for Legend's entires.
+             * Sets a new comparator for the Legend's entries.
              *
-             * @param {(a: string, b: string) => number} compareFunction If provided, the new compare function.
+             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
              * @returns {Legend} The calling Legend.
              */
-            comparator(compareFunction: (a: string, b: string) => number): Legend;
+            comparator(comparator: (a: string, b: string) => number): Legend;
             /**
              * Gets the current color scale from the Legend.
              *

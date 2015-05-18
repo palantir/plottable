@@ -5078,7 +5078,7 @@ var Plottable;
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
              * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
@@ -5097,7 +5097,7 @@ var Plottable;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
                 this.xAlignment("right").yAlignment("top");
-                this._sortFn = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
+                this._comparator = function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); };
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
             Legend.prototype._setup = function () {
@@ -5119,12 +5119,12 @@ var Plottable;
                     return this;
                 }
             };
-            Legend.prototype.comparator = function (compareFunction) {
-                if (compareFunction == null) {
-                    return this._sortFn;
+            Legend.prototype.comparator = function (comparator) {
+                if (comparator == null) {
+                    return this._comparator;
                 }
                 else {
-                    this._sortFn = compareFunction;
+                    this._comparator = comparator;
                     this.redraw();
                     return this;
                 }

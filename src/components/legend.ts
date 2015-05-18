@@ -19,7 +19,7 @@ export module Components {
     private _padding = 5;
     private _scale: Scales.Color;
     private _maxEntriesPerRow: number;
-    private _sortFn: (a: string, b: string) => number;
+    private _comparator: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
@@ -29,7 +29,7 @@ export module Components {
     /**
      * Creates a Legend.
      *
-     * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+     * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
      * The entries will be displayed in the order of the `scale` domain.
      *
      * @constructor
@@ -49,7 +49,7 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
 
       this.xAlignment("right").yAlignment("top");
-      this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this._comparator = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
@@ -86,22 +86,22 @@ export module Components {
     }
 
     /**
-     * Gets the current comparator for Legend's entries.
+     * Gets the current comparator for the Legend's entries.
      * @returns {(a: string, b: string) => number} The current comparator.
      */
     public comparator(): (a: string, b: string) => number;
     /**
-     * Sets a new comparator for Legend's entires.
+     * Sets a new comparator for the Legend's entries.
      *
-     * @param {(a: string, b: string) => number} compareFunction If provided, the new compare function.
+     * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
      * @returns {Legend} The calling Legend.
      */
-    public comparator(compareFunction: (a: string, b: string) => number): Legend;
-    public comparator(compareFunction?: (a: string, b: string) => number): any {
-      if (compareFunction == null) {
-        return this._sortFn;
+    public comparator(comparator: (a: string, b: string) => number): Legend;
+    public comparator(comparator?: (a: string, b: string) => number): any {
+      if (comparator == null) {
+        return this._comparator;
       } else {
-        this._sortFn = compareFunction;
+        this._comparator = comparator;
         this.redraw();
         return this;
       }
