@@ -52,7 +52,7 @@ module Plottable {
       return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
     }
 
-    public static updateStackOffsets(
+    public static computeStackOffsets(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         datasetKeys: string[],

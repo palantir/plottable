@@ -138,7 +138,7 @@ export module Plots {
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      var stackOffsets = StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+      var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
 
       for (var datasetKey in stackOffsets) {
         if (!stackOffsets.hasOwnProperty(datasetKey)) {
