@@ -5078,22 +5078,22 @@ var Plottable;
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-             * The entries will be displayed in the order of the `colorScale` domain.
+             * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+             * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
-             * @param {Scale.Color} colorScale
+             * @param {Scale.Color} scale
              */
-            function Legend(colorScale) {
+            function Legend(scale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(1);
-                if (colorScale == null) {
+                if (scale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
-                this._scale = colorScale;
+                this._scale = scale;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
                 this.xAlignment("right").yAlignment("top");
@@ -5119,12 +5119,12 @@ var Plottable;
                     return this;
                 }
             };
-            Legend.prototype.sortFunction = function (newFn) {
-                if (newFn == null) {
+            Legend.prototype.comparator = function (compareFunction) {
+                if (compareFunction == null) {
                     return this._sortFn;
                 }
                 else {
-                    this._sortFn = newFn;
+                    this._sortFn = compareFunction;
                     this.redraw();
                     return this;
                 }
@@ -5150,7 +5150,7 @@ var Plottable;
                 var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
                 var entryNames = this._scale.domain().slice();
-                entryNames.sort(this.sortFunction());
+                entryNames.sort(this.comparator());
                 var entryLengths = d3.map();
                 var untruncatedEntryLengths = d3.map();
                 entryNames.forEach(function (entryName) {

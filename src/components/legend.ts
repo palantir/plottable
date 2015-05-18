@@ -29,22 +29,22 @@ export module Components {
     /**
      * Creates a Legend.
      *
-     * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-     * The entries will be displayed in the order of the `colorScale` domain.
+     * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+     * The entries will be displayed in the order of the `scale` domain.
      *
      * @constructor
-     * @param {Scale.Color} colorScale
+     * @param {Scale.Color} scale
      */
-    constructor(colorScale: Scales.Color) {
+    constructor(scale: Scales.Color) {
       super();
       this.classed("legend", true);
       this.maxEntriesPerRow(1);
 
-      if (colorScale == null ) {
+      if (scale == null ) {
         throw new Error("Legend requires a colorScale");
       }
 
-      this._scale = colorScale;
+      this._scale = scale;
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
 
@@ -86,22 +86,22 @@ export module Components {
     }
 
     /**
-     * Gets the current sort function for Legend's entries.
-     * @returns {(a: string, b: string) => number} The current sort function.
+     * Gets the current comparator for Legend's entries.
+     * @returns {(a: string, b: string) => number} The current comparator.
      */
-    public sortFunction(): (a: string, b: string) => number;
+    public comparator(): (a: string, b: string) => number;
     /**
-     * Sets a new sort function for Legend's entires.
+     * Sets a new comparator for Legend's entires.
      *
-     * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+     * @param {(a: string, b: string) => number} compareFunction If provided, the new compare function.
      * @returns {Legend} The calling Legend.
      */
-    public sortFunction(newFn: (a: string, b: string) => number): Legend;
-    public sortFunction(newFn?: (a: string, b: string) => number): any {
-      if (newFn == null) {
+    public comparator(compareFunction: (a: string, b: string) => number): Legend;
+    public comparator(compareFunction?: (a: string, b: string) => number): any {
+      if (compareFunction == null) {
         return this._sortFn;
       } else {
-        this._sortFn = newFn;
+        this._sortFn = compareFunction;
         this.redraw();
         return this;
       }
@@ -143,7 +143,7 @@ export module Components {
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
       var entryNames = this._scale.domain().slice();
-      entryNames.sort(this.sortFunction());
+      entryNames.sort(this.comparator());
 
       var entryLengths: D3.Map<number> = d3.map();
       var untruncatedEntryLengths: D3.Map<number> = d3.map();
