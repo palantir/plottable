@@ -45,18 +45,9 @@ export module Plots {
       } else {
         super.x(<X | Accessor<X>> x, xScale);
       }
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      this._doStackUpdate();
 
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-        this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
-      }
       return this;
     }
 
@@ -69,18 +60,9 @@ export module Plots {
       } else {
         super.y(<number | Accessor<number>> y, yScale);
       }
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      this._doStackUpdate();
 
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-        this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
-      }
       return this;
     }
 
@@ -108,18 +90,8 @@ export module Plots {
     }
 
     protected _onDatasetUpdate() {
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+      this._doStackUpdate();
 
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-      if (this._projectorsReady()) {
-        this._updateStackOffsets();
-        this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
-      }
       super._onDatasetUpdate();
       return this;
     }
@@ -168,6 +140,21 @@ export module Plots {
         return [this._stackedExtent];
       } else {
         return super._extentsForProperty(attr);
+      }
+    }
+
+    private _doStackUpdate(){
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+
+      if (this._projectorsReady()) {
+        this._updateStackOffsets();
+        this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
     }
 

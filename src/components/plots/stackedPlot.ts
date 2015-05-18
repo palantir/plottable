@@ -6,9 +6,9 @@ module Plottable {
     protected _isVertical: boolean;
 
     public _updateStackOffsets() {
-      if (!this._projectorsReady()) {
-        return;
-      }
+      // if (!this._projectorsReady()) {
+      //   return;
+      // }
 
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
