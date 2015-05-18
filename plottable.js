@@ -2405,6 +2405,7 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype.scale = function (value) {
+                // HACKHACK D3 Quantitative Scales should return their interpolator return type
                 return this._d3Scale(value);
             };
             InterpolatedColor.prototype._getDomain = function () {
@@ -2414,10 +2415,10 @@ var Plottable;
                 this._d3Scale.domain(values);
             };
             InterpolatedColor.prototype._getRange = function () {
-                return this._d3Scale.range();
+                return this.colorRange();
             };
             InterpolatedColor.prototype._setRange = function (values) {
-                this._d3Scale.range(values);
+                this.colorRange(values);
             };
             InterpolatedColor.REDS = [
                 "#FFFFFF",

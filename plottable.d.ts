@@ -1157,7 +1157,7 @@ declare module Plottable {
          *
          * By default it generates a linear scale internally.
          */
-        class InterpolatedColor extends Scale<number, number> {
+        class InterpolatedColor extends Scale<number, string> {
             static REDS: string[];
             static BLUES: string[];
             static POSNEG: string[];
@@ -1189,11 +1189,11 @@ declare module Plottable {
              */
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
-            scale(value: number): number;
+            scale(value: number): string;
             protected _getDomain(): any[];
             protected _setActualDomain(values: number[]): void;
-            protected _getRange(): any[];
-            protected _setRange(values: number[]): void;
+            protected _getRange(): string[];
+            protected _setRange(values: string[]): void;
         }
     }
 }
