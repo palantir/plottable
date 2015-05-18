@@ -154,17 +154,8 @@ export module Plots {
       var datasetKeys = this._datasetKeysInOrder;
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
 
-      var keySets = datasetKeys.map((k) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset, plotMetadata).toString())).values();
-      });
-
-      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
-      }
+      StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey);
 
       var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
 

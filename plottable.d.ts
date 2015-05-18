@@ -2979,8 +2979,8 @@ declare module Plottable {
         static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
             [key: string]: D3.Map<number>;
         };
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
         static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
-        static getDomainKeys(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): string[];
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }

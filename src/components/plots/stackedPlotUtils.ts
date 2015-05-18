@@ -86,27 +86,27 @@ module Plottable {
       return stackOffsets;
     }
 
+    public static checkSameDomainForStacks(
+        keyAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+
+      var keySets = datasetKeys.map((k) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset, plotMetadata).toString())).values();
+      });
+
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
+        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+      }
+    }
+
     public static stackedPlotMetadata(metadata: Plots.PlotMetadata) {
       var stackedMetadata = <Plots.StackedPlotMetadata> metadata;
       stackedMetadata.offsets = d3.map();
       return stackedMetadata;
-    }
-
-    public static getDomainKeys(
-      keyAccessor: Accessor<any>,
-      datasetKeys: string[],
-      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
-
-      var domainKeys = d3.set();
-      datasetKeys.forEach((k) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-        dataset.data().forEach((datum, index) => {
-          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
-        });
-      });
-
-      return domainKeys.values();
     }
 
     public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
@@ -133,6 +133,23 @@ module Plottable {
         .out(outFunction)(dataArray);
 
       return dataArray;
+    }
+
+    private static getDomainKeys(
+      keyAccessor: Accessor<any>,
+      datasetKeys: string[],
+      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+
+      var domainKeys = d3.set();
+      datasetKeys.forEach((k) => {
+        var dataset = keyToPlotDatasetKey.get(k).dataset;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+        });
+      });
+
+      return domainKeys.values();
     }
 
     private static generateDefaultMapArray(

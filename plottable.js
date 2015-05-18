@@ -7930,21 +7930,21 @@ var Plottable;
             var stackOffsets = StackedPlotUtils.generateStackOffsets(StackedPlotUtils.stack(positiveDataMapArray, domainKeys), StackedPlotUtils.stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
             return stackOffsets;
         };
+        StackedPlotUtils.checkSameDomainForStacks = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
+            var keySets = datasetKeys.map(function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+                return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset, plotMetadata).toString(); })).values();
+            });
+            var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+            if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+            }
+        };
         StackedPlotUtils.stackedPlotMetadata = function (metadata) {
             var stackedMetadata = metadata;
             stackedMetadata.offsets = d3.map();
             return stackedMetadata;
-        };
-        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
-            var domainKeys = d3.set();
-            datasetKeys.forEach(function (k) {
-                var dataset = keyToPlotDatasetKey.get(k).dataset;
-                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-                dataset.data().forEach(function (datum, index) {
-                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
-                });
-            });
-            return domainKeys.values();
         };
         StackedPlotUtils.keyAccessor = function (plot, orientation) {
             return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
@@ -7962,6 +7962,17 @@ var Plottable;
             };
             d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
             return dataArray;
+        };
+        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasetKeys, keyToPlotDatasetKey) {
+            var domainKeys = d3.set();
+            datasetKeys.forEach(function (k) {
+                var dataset = keyToPlotDatasetKey.get(k).dataset;
+                var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
+                dataset.data().forEach(function (datum, index) {
+                    domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+                });
+            });
+            return domainKeys.values();
         };
         StackedPlotUtils.generateDefaultMapArray = function (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey) {
             var dataMapArray = datasetKeys.map(function () {
@@ -8151,15 +8162,7 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                var domainKeys = Plottable.StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
-                var keySets = datasetKeys.map(function (k) {
-                    var dataset = keyToPlotDatasetKey.get(k).dataset;
-                    var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset, plotMetadata).toString(); })).values();
-                });
-                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
-                    Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
-                }
+                Plottable.StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey);
                 var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
                 for (var datasetKey in stackOffsets) {
                     if (!stackOffsets.hasOwnProperty(datasetKey)) {
