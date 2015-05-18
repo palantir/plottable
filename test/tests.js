@@ -2533,19 +2533,19 @@ describe("Plots", function () {
         it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.autorange('none');
             svg.remove();
         });
         it("automatically adjusting Y domain when no points are visible", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             xScale.domain([-0.5, 0.5]);
             assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
             svg.remove();
         });
         it("automatically adjusting Y domain when X scale is replaced", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             var newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
             plot.x(xAccessor, newXScale);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
@@ -2556,19 +2556,19 @@ describe("Plots", function () {
         it("automatically adjusting X domain over visible points", function () {
             yScale.domain([-3, 3]);
             assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            plot.autorange('x');
             assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-            plot.automaticallyAdjustXScaleOverVisiblePoints(false);
+            plot.autorange('none');
             svg.remove();
         });
         it("automatically adjusting X domain when no points are visible", function () {
-            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            plot.autorange('x');
             yScale.domain([-0.5, 0.5]);
             assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
             svg.remove();
         });
         it("automatically adjusting X domain when Y scale is replaced", function () {
-            plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+            plot.autorange('x');
             var newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
             plot.y(yAccessor, newYScale);
             assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
@@ -2577,7 +2577,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("showAllData()", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -2585,16 +2585,16 @@ describe("Plots", function () {
             svg.remove();
         });
         it("show all data without auto adjust domain", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             xScale.domain([-0.5, 0.5]);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(false);
+            plot.autorange('none');
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("listeners are deregistered after removal", function () {
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             plot.destroy();
             var xScaleCallbacks = xScale._callbacks.values();
             assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
@@ -3900,7 +3900,7 @@ describe("Plots", function () {
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
             xScale.domain(["b", "c"]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             svg.remove();
         });
@@ -4538,7 +4538,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedArea(xScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4547,7 +4547,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4581,7 +4581,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedArea(yScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, yScale).y(function (d) { return d.y; }, yScale);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4590,7 +4590,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+            plot.autorange('y');
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();

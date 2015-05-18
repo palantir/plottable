@@ -6786,6 +6786,24 @@ var Plottable;
             return this;
         };
         /**
+         * Sets the automatic domain adjustment for visible points to operate
+         * against the X axis, Y axis, or neither.
+         */
+        XYPlot.prototype.autorange = function (adjustment) {
+            if (adjustment == 'x') {
+                this.automaticallyAdjustYScaleOverVisiblePoints(false);
+                this.automaticallyAdjustXScaleOverVisiblePoints(true);
+            }
+            else if (adjustment == 'y') {
+                this.automaticallyAdjustXScaleOverVisiblePoints(false);
+                this.automaticallyAdjustYScaleOverVisiblePoints(true);
+            }
+            else if (adjustment == 'none') {
+                this.automaticallyAdjustXScaleOverVisiblePoints(false);
+                this.automaticallyAdjustYScaleOverVisiblePoints(false);
+            }
+        };
+        /**
          * Sets the automatic domain adjustment over visible points for y scale.
          *
          * If autoAdjustment is true adjustment is immediately performend.

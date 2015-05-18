@@ -122,6 +122,23 @@ module Plottable {
       }
       return this;
     }
+    
+    /** 
+     * Sets the automatic domain adjustment for visible points to operate 
+     * against the X axis, Y axis, or neither.
+     */
+     public autorange(adjustment : string): any {
+       if (adjustment == 'x') {
+         this.automaticallyAdjustYScaleOverVisiblePoints(false);
+         this.automaticallyAdjustXScaleOverVisiblePoints(true);
+       } else if (adjustment == 'y') {
+         this.automaticallyAdjustXScaleOverVisiblePoints(false);
+         this.automaticallyAdjustYScaleOverVisiblePoints(true);
+       } else if (adjustment =='none') {
+         this.automaticallyAdjustXScaleOverVisiblePoints(false);
+         this.automaticallyAdjustYScaleOverVisiblePoints(false);
+       }
+     }
 
     /**
      * Sets the automatic domain adjustment over visible points for y scale.
@@ -131,7 +148,7 @@ module Plottable {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
+    private automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
       this._autoAdjustYScaleDomain = autoAdjustment;
       this._adjustYDomainOnChangeFromX();
       return this;
@@ -145,7 +162,7 @@ module Plottable {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
+    private automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
       this._autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
