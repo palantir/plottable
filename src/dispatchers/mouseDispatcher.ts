@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatchers {
-  export type MouseCallback = (p: Point, event: MouseEvent) => any;
+  export type MouseCallback = (p: Point, event: MouseEvent) => void;
 
   export class Mouse extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
