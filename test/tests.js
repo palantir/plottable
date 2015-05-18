@@ -3936,8 +3936,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
             rectanglePlot.addDataset(new Plottable.Dataset(DATA));
-            rectanglePlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            rectanglePlot.x1(function (d) { return d.x; }, xScale).y1(function (d) { return d.y; }, yScale).x1(function (d) { return d.x1; }, xScale).y1(function (d) { return d.y1; }, yScale).renderTo(svg);
+            rectanglePlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).x1(function (d) { return d.x1; }, xScale).y1(function (d) { return d.y1; }, yScale).renderTo(svg);
             VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
             svg.remove();
         });

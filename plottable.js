@@ -6920,7 +6920,9 @@ var Plottable;
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
              * project the left and right bounds of the rectangle (x and x1 respectively)
-             * as well as the bottom and top bounds (y and y1 respectively)
+             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
+             * not set, the plot will apply auto-centering logic to the extent of x/y (all
+             * values are treated as categories regardless of their scale)
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
@@ -6949,28 +6951,27 @@ var Plottable;
                 var x1Attr = attrToProjector[Rectangle._X1_KEY];
                 var yAttr = attrToProjector[Rectangle._Y_KEY];
                 var y1Attr = attrToProjector[Rectangle._Y1_KEY];
-                // Get the scales for convenience
                 var xScale = this.x().scale;
                 var yScale = this.y().scale;
                 // In order to define a range from x, x1 has to also be set.
                 // If x1 is not set, auto-centering logic will be applied to x.
                 // The above also applies to y/y1.
-                if (x1Attr) {
+                if (x1Attr != null) {
                     attrToProjector["width"] = function (d, i, dataset, m) { return Math.abs(x1Attr(d, i, dataset, m) - xAttr(d, i, dataset, m)); };
                     attrToProjector["x"] = function (d, i, dataset, m) { return Math.min(x1Attr(d, i, dataset, m), xAttr(d, i, dataset, m)); };
                 }
                 else {
-                    attrToProjector["width"] = function (d, i, dataset, m) { return _this._bandWidth(xScale); };
+                    attrToProjector["width"] = function (d, i, dataset, m) { return _this._rectangleWidth(xScale); };
                     attrToProjector["x"] = function (d, i, dataset, m) { return xAttr(d, i, dataset, m) - 0.5 * attrToProjector["width"](d, i, dataset, m); };
                 }
-                if (y1Attr) {
+                if (y1Attr != null) {
                     attrToProjector["height"] = function (d, i, dataset, m) { return Math.abs(y1Attr(d, i, dataset, m) - yAttr(d, i, dataset, m)); };
                     attrToProjector["y"] = function (d, i, dataset, m) {
                         return Math.max(y1Attr(d, i, dataset, m), yAttr(d, i, dataset, m)) - attrToProjector["height"](d, i, dataset, m);
                     };
                 }
                 else {
-                    attrToProjector["height"] = function (d, i, dataset, m) { return _this._bandWidth(yScale); };
+                    attrToProjector["height"] = function (d, i, dataset, m) { return _this._rectangleWidth(yScale); };
                     attrToProjector["y"] = function (d, i, dataset, m) { return yAttr(d, i, dataset, m) - 0.5 * attrToProjector["height"](d, i, dataset, m); };
                 }
                 // Clean up the attributes projected onto the SVG elements
@@ -7013,7 +7014,7 @@ var Plottable;
                 this.renderImmediately();
                 return this;
             };
-            Rectangle.prototype._bandWidth = function (scale) {
+            Rectangle.prototype._rectangleWidth = function (scale) {
                 var _this = this;
                 if (scale instanceof Plottable.Scales.Category) {
                     return scale.rangeBand();

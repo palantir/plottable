@@ -32,9 +32,7 @@ describe("Plots", () => {
       var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
       rectanglePlot.x((d) => d.x, xScale)
-                   .y((d) => d.y, yScale);
-      rectanglePlot.x1((d) => d.x, xScale)
-                   .y1((d) => d.y, yScale)
+                   .y((d) => d.y, yScale)
                    .x1((d) => d.x1, xScale)
                    .y1((d) => d.y1, yScale)
                    .renderTo(svg);
