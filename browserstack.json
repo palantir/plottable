@@ -1,6 +1,4 @@
 {
-    "username": process.env.BROWSERSTACK_USERNAME,
-    "key": process.env.BROWSERSTACK_KEY,
     "test_path": "test/tests.html",
     "test_framework": "mocha",
     "timeout": 30,
