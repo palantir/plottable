@@ -2673,7 +2673,9 @@ declare module Plottable {
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
              * project the left and right bounds of the rectangle (x and x1 respectively)
-             * as well as the bottom and top bounds (y and y1 respectively)
+             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
+             * not set, the plot will apply auto-centering logic to the extent of x/y (all
+             * values are treated as categories regardless of their scale)
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
