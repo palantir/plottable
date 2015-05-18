@@ -63,8 +63,10 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scales.Linear().domain([0, 1]);
-      yScale = new Plottable.Scales.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 1]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       colorAccessor = (d: any, i: number, m: any) => d3.rgb(d.foo, d.bar, i).toString();

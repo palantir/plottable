@@ -45,7 +45,6 @@
 ///<reference path="core/componentTests.ts" />
 ///<reference path="core/datasetTests.ts" />
 ///<reference path="core/tableTests.ts" />
-///<reference path="core/domainerTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/modifiedLogScaleTests.ts" />

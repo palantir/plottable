@@ -204,6 +204,12 @@ export module Scales {
       return [0, this._base];
     }
 
+    protected _expandSingleValueDomain(singleValueDomain: number[]): number[] {
+      if (singleValueDomain[0] === singleValueDomain[1]) {
+        return [singleValueDomain[0] / this._base, singleValueDomain[1] * this._base];
+      }
+      return singleValueDomain;
+    }
   }
 }
 }

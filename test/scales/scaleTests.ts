@@ -42,11 +42,11 @@ describe("Scales", () => {
       data = [{foo: 2, bar: 1}, {foo: 5, bar: -20}, {foo: 0, bar: 0}];
       dataset = new Plottable.Dataset(data);
       scale = new Plottable.Scales.Linear();
+      scale.padProportion(0);
     });
 
     it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
       scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
-      scale.domainer(new Plottable.Domainer().pad().nice());
       assert.isTrue((<any> scale)._autoDomainAutomatically,
                           "the autoDomain flag is still set after autoranginging and padding and nice-ing");
       scale.domain([0, 5]);
@@ -117,8 +117,9 @@ describe("Scales", () => {
       var ds1 = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
       var ds2 = new Plottable.Dataset([{x: 1, y: 1}, {x: 2, y: 2}]);
       var xScale = new Plottable.Scales.Linear();
+      xScale.padProportion(0);
       var yScale = new Plottable.Scales.Linear();
-      xScale.domainer(new Plottable.Domainer());
+      yScale.padProportion(0);
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
       renderAreaD1.x((d) => d.x, xScale);
@@ -138,13 +139,22 @@ describe("Scales", () => {
     });
   });
 
-  describe("Quantitative Scales", () => {
-    it("autorange defaults to [0, 1] if no perspectives set", () => {
+  describe("Linear Scales", () => {
+    it("autoDomain() defaults to [0, 1]", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
       var d = scale.domain();
       assert.strictEqual(d[0], 0);
       assert.strictEqual(d[1], 1);
+    });
+
+    it("autoDomain() expands single value to [value - 1, value + 1]", () => {
+      var scale = new Plottable.Scales.Linear();
+      scale.padProportion(0);
+      var singleValue = 15;
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[singleValue, singleValue]]);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
     });
 
     it("domain can't include NaN or Infinity", () => {
@@ -172,7 +182,6 @@ describe("Scales", () => {
   });
 
   describe("Category Scales", () => {
-
     it("rangeBand is updated when domain changes", () => {
       var scale = new Plottable.Scales.Category();
       scale.range([0, 2679]);

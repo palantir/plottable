@@ -2216,7 +2216,7 @@ describe("Plots", function () {
         it("Changing Plot.dataset().data to [] causes scale to contract", function () {
             var ds1 = new Plottable.Dataset([0, 1, 2]);
             var ds2 = new Plottable.Dataset([1, 2, 3]);
-            var s = new Plottable.Scales.Linear();
+            var s = new Plottable.Scales.Linear().padProportion(0);
             var svg1 = TestMethods.generateSVG(100, 100);
             var svg2 = TestMethods.generateSVG(100, 100);
             new Plottable.Plot().addDataset(ds1).attr("x", function (x) { return x; }, s).renderTo(svg1);
@@ -2441,8 +2441,8 @@ describe("Plots", function () {
             assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
         });
         it("extent registration works as intended", function () {
-            var scale1 = new Plottable.Scales.Linear();
-            var scale2 = new Plottable.Scales.Linear();
+            var scale1 = new Plottable.Scales.Linear().padProportion(0);
+            var scale2 = new Plottable.Scales.Linear().padProportion(0);
             var d1 = new Plottable.Dataset([1, 2, 3]);
             var d2 = new Plottable.Dataset([4, 99, 999]);
             var d3 = new Plottable.Dataset([-1, -2, -3]);
@@ -2541,7 +2541,7 @@ describe("Plots", function () {
         it("automatically adjusting Y domain when no points are visible", function () {
             plot.automaticallyAdjustYScaleOverVisiblePoints(true);
             xScale.domain([-0.5, 0.5]);
-            assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+            assert.deepEqual(yScale.domain(), [0, 1], "scale uses default domain");
             svg.remove();
         });
         it("automatically adjusting Y domain when X scale is replaced", function () {
@@ -2564,7 +2564,7 @@ describe("Plots", function () {
         it("automatically adjusting X domain when no points are visible", function () {
             plot.automaticallyAdjustXScaleOverVisiblePoints(true);
             yScale.domain([-0.5, 0.5]);
-            assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+            assert.deepEqual(xScale.domain(), [0, 1], "scale uses default domain");
             svg.remove();
         });
         it("automatically adjusting X domain when Y scale is replaced", function () {
@@ -2870,8 +2870,10 @@ describe("Plots", function () {
         var linePlot;
         var renderArea;
         before(function () {
-            xScale = new Plottable.Scales.Linear().domain([0, 1]);
-            yScale = new Plottable.Scales.Linear().domain([0, 1]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 1]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
@@ -3105,6 +3107,23 @@ describe("Plots", function () {
             assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
+        it("adds a padding exception to the y scale at the constant y0 value", function () {
+            var svg = TestMethods.generateSVG(400, 400);
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            var constantY0 = 30;
+            yScale.addExtentsProvider(function (scale) { return [[constantY0, constantY0 + 10]]; });
+            yScale.autoDomain();
+            assert.operator(yScale.domain()[0], "<", constantY0, "lower end of y Scale's domain is normally padded");
+            var plot = new Plottable.Plots.Area(xScale, yScale);
+            plot.x(function (d) { return d.x; }, xScale);
+            plot.y(function (d) { return d.y; }, yScale);
+            plot.y0(constantY0, yScale);
+            plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
+            plot.renderTo(svg);
+            assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
+            svg.remove();
+        });
     });
     describe("AreaPlot", function () {
         var svg;
@@ -3120,8 +3139,10 @@ describe("Plots", function () {
         var areaPlot;
         var renderArea;
         before(function () {
-            xScale = new Plottable.Scales.Linear().domain([0, 1]);
-            yScale = new Plottable.Scales.Linear().domain([0, 1]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 1]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             y0Accessor = function () { return 0; };
@@ -4330,8 +4351,10 @@ describe("Plots", function () {
             ;
             beforeEach(function () {
                 svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scales.Linear().domain([0, 9]);
-                yScale = new Plottable.Scales.Linear().domain([0, 81]);
+                xScale = new Plottable.Scales.Linear();
+                xScale.domain([0, 9]);
+                yScale = new Plottable.Scales.Linear();
+                yScale.domain([0, 81]);
                 circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
                 circlePlot.addDataset(quadraticDataset);
                 circlePlot.attr("fill", colorAccessor);
@@ -4521,7 +4544,8 @@ describe("Plots", function () {
         var dataset2;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 2]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 2]);
             yScale = new Plottable.Scales.Linear();
             dataset1 = new Plottable.Dataset([
                 { x: 1, y: 1 },
@@ -4653,8 +4677,10 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
-            yScale = new Plottable.Scales.Linear().domain([0, 4]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 4]);
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
                 { x: 1, y: 1, type: "a" },
@@ -4734,7 +4760,8 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
             yScale = new Plottable.Scales.Linear();
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
@@ -4910,8 +4937,10 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
-            yScale = new Plottable.Scales.Linear().domain([0, 4]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 4]);
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
                 { x: 1, yTest: 1, type: "a" },
@@ -5046,7 +5075,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Category();
-            yScale = new Plottable.Scales.Linear().domain([0, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 3]);
             originalData1 = [
                 { x: "A", y: 1 },
                 { x: "B", y: 2 }
@@ -5222,7 +5252,8 @@ describe("Plots", function () {
         var bandWidth = 0;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([0, 6]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 6]);
             yScale = new Plottable.Scales.Category();
             var data1 = [
                 { name: "jon", y: 0, type: "q1" },
@@ -5452,7 +5483,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Category();
-            yScale = new Plottable.Scales.Linear().domain([0, 2]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 2]);
             originalData1 = [
                 { x: "A", y: 1 },
                 { x: "B", y: 2 }
@@ -5529,7 +5561,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             yScale = new Plottable.Scales.Category();
-            xScale = new Plottable.Scales.Linear().domain([0, 2]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 2]);
             var data1 = [
                 { y: "A", x: 1 },
                 { y: "B", x: 2 }
@@ -6864,174 +6897,6 @@ describe("Tables", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
-describe("Domainer", function () {
-    var scale;
-    var domainer;
-    beforeEach(function () {
-        scale = new Plottable.Scales.Linear();
-        domainer = new Plottable.Domainer();
-    });
-    it("pad() works in general case", function () {
-        scale.addExtentsProvider(function (scale) { return [[100, 200]]; });
-        scale.autoDomain();
-        scale.domainer(new Plottable.Domainer().pad(0.2));
-        assert.closeTo(scale.domain()[0], 90, 0.1, "lower bound of domain correct");
-        assert.closeTo(scale.domain()[1], 210, 0.1, "upper bound of domain correct");
-    });
-    it("pad() works for date scales", function () {
-        var timeScale = new Plottable.Scales.Time();
-        var f = d3.time.format("%x");
-        var d1 = f.parse("06/02/2014");
-        var d2 = f.parse("06/03/2014");
-        timeScale.addExtentsProvider(function (scale) { return [[d1, d2]]; });
-        timeScale.autoDomain();
-        timeScale.domainer(new Plottable.Domainer().pad());
-        var dd1 = timeScale.domain()[0];
-        var dd2 = timeScale.domain()[1];
-        assert.isDefined(dd1.toDateString, "padDomain produced dates");
-        assert.isNotNull(dd1.toDateString, "padDomain produced dates");
-        assert.notEqual(d1.valueOf(), dd1.valueOf(), "date1 changed");
-        assert.notEqual(d2.valueOf(), dd2.valueOf(), "date2 changed");
-        assert.strictEqual(dd1.valueOf(), dd1.valueOf(), "date1 is not NaN");
-        assert.strictEqual(dd2.valueOf(), dd2.valueOf(), "date2 is not NaN");
-    });
-    it("pad() defaults to [v-1, v+1] if there's only one numeric value", function () {
-        domainer.pad();
-        var domain = domainer.computeDomain([[5, 5]], scale);
-        assert.deepEqual(domain, [4, 6]);
-    });
-    it("pad() defaults to [v-1 day, v+1 day] if there's only one date value", function () {
-        var d = new Date(2000, 5, 5);
-        var d2 = new Date(2000, 5, 5);
-        var dayBefore = new Date(2000, 5, 4);
-        var dayAfter = new Date(2000, 5, 6);
-        domainer.pad();
-        var domain = domainer.computeDomain([[d, d2]], scale);
-        assert.strictEqual(domain[0], dayBefore.valueOf(), "domain start was set to the day before");
-        assert.strictEqual(domain[1], dayAfter.valueOf(), "domain end was set to the day after");
-    });
-    it("pad() only takes the last value", function () {
-        domainer.pad(1000).pad(4).pad(0.1);
-        var domain = domainer.computeDomain([[100, 200]], scale);
-        assert.deepEqual(domain, [95, 205]);
-    });
-    it("pad() will pad beyond 0 by default", function () {
-        domainer.pad(0.1);
-        var domain = domainer.computeDomain([[0, 100]], scale);
-        assert.deepEqual(domain, [-5, 105]);
-    });
-    it("pad() works with scales that have 0-size domain", function () {
-        scale.domain([5, 5]);
-        var domain = domainer.computeDomain([[0, 100]], scale);
-        assert.deepEqual(domain, [0, 100]);
-        domainer.pad(0.1);
-        domain = domainer.computeDomain([[0, 100]], scale);
-        assert.deepEqual(domain, [0, 100]);
-    });
-    it("paddingException(n) will not pad beyond n", function () {
-        domainer.pad(0.1).addPaddingException("keyLeft", 0).addPaddingException("keyRight", 200);
-        var domain = domainer.computeDomain([[0, 100]], scale);
-        assert.deepEqual(domain, [0, 105], "padding exceptions can be added by key");
-        domain = domainer.computeDomain([[-100, 0]], scale);
-        assert.deepEqual(domain, [-105, 0]);
-        domain = domainer.computeDomain([[0, 200]], scale);
-        assert.deepEqual(domain, [0, 200]);
-        domainer.removePaddingException("keyLeft");
-        domain = domainer.computeDomain([[0, 200]], scale);
-        assert.deepEqual(domain, [-10, 200], "paddingExceptions can be removed by key");
-        domainer.removePaddingException("keyRight");
-        domain = domainer.computeDomain([[0, 200]], scale);
-        assert.notEqual(domain[1], 200, "unregistered paddingExceptions can be removed using boolean argument");
-    });
-    it("paddingException(n) works on dates", function () {
-        var startDate = new Date(2000, 5, 5);
-        var endDate = new Date(2003, 0, 1);
-        var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
-        timeScale.autoDomain();
-        domainer.pad().addPaddingException("key", startDate);
-        timeScale.domainer(domainer);
-        var domain = timeScale.domain();
-        assert.deepEqual(domain[0], startDate);
-        assert.isTrue(endDate < domain[1]);
-    });
-    it("include(n) works an expected", function () {
-        domainer.addIncludedValue("key1", 5);
-        var domain = domainer.computeDomain([[0, 10]], scale);
-        assert.deepEqual(domain, [0, 10]);
-        domain = domainer.computeDomain([[0, 3]], scale);
-        assert.deepEqual(domain, [0, 5]);
-        domain = domainer.computeDomain([[100, 200]], scale);
-        assert.deepEqual(domain, [5, 200]);
-        domainer.addIncludedValue("key2", -3).addIncludedValue("key3", 0).addIncludedValue("key4", 10);
-        domain = domainer.computeDomain([[100, 200]], scale);
-        assert.deepEqual(domain, [-3, 200]);
-        domain = domainer.computeDomain([[0, 0]], scale);
-        assert.deepEqual(domain, [-3, 10]);
-        domainer.removeIncludedValue("key4");
-        domain = domainer.computeDomain([[100, 200]], scale);
-        assert.deepEqual(domain, [-3, 200]);
-        domain = domainer.computeDomain([[-100, -50]], scale);
-        assert.deepEqual(domain, [-100, 5]);
-        domainer.addIncludedValue("key5", 10);
-        domain = domainer.computeDomain([[-100, -50]], scale);
-        assert.deepEqual(domain, [-100, 10], "unregistered includedValues can be added");
-        domainer.removeIncludedValue("key5");
-        domain = domainer.computeDomain([[-100, -50]], scale);
-        assert.deepEqual(domain, [-100, 5], "unregistered includedValues can be removed with addOrRemove argument");
-    });
-    it("include(n) works on dates", function () {
-        var includedDate = new Date(2000, 5, 5);
-        var startDate = new Date(2000, 5, 6);
-        var endDate = new Date(2003, 0, 1);
-        var timeScale = new Plottable.Scales.Time();
-        timeScale.addExtentsProvider(function (scale) { return [[startDate, endDate]]; });
-        timeScale.autoDomain();
-        domainer.addIncludedValue("key", includedDate);
-        timeScale.domainer(domainer);
-        assert.deepEqual(timeScale.domain(), [includedDate, endDate], "domain was expanded to contain included date");
-    });
-    it("exceptions are setup properly on an area plot", function () {
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
-        var data = [{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 5 }];
-        var dataset = new Plottable.Dataset(data);
-        var r = new Plottable.Plots.Area(xScale, yScale);
-        r.addDataset(dataset);
-        var svg = TestMethods.generateSVG();
-        r.x(function (d) { return d.x; }, xScale);
-        r.y(function (d) { return d.y; }, yScale);
-        r.renderTo(svg);
-        function getExceptions() {
-            yScale.autoDomain();
-            var yDomain = yScale.domain();
-            var exceptions = [];
-            if (yDomain[0] === 0) {
-                exceptions.push(0);
-            }
-            if (yDomain[1] === 5) {
-                exceptions.push(5);
-            }
-            return exceptions;
-        }
-        assert.deepEqual(getExceptions(), [0], "initializing the plot adds a padding exception at 0");
-        // assert.deepEqual(getExceptions(), [], "Initially there are no padding exceptions");
-        r.y0(function (d) { return d.y0; }, yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 1");
-        r.y0(0, yScale);
-        assert.deepEqual(getExceptions(), [0], "projecting constant y0 adds the exception back");
-        r.y0(5, yScale);
-        assert.deepEqual(getExceptions(), [5], "projecting a different constant y0 removed the old exception and added a new one");
-        r.y0(function (d) { return d.y0; }, yScale);
-        assert.deepEqual(getExceptions(), [], "projecting a non-constant y0 removes the padding exception 2");
-        dataset.data([{ x: 0, y: 0, y0: 0 }, { x: 5, y: 5, y0: 0 }]);
-        assert.deepEqual(getExceptions(), [0], "changing to constant values via change in datasource adds exception");
-        svg.remove();
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
 describe("Scales", function () {
     it("Scale alerts listeners when its domain is updated", function () {
         var scale = new Plottable.Scale(d3.scale.identity());
@@ -7067,10 +6932,10 @@ describe("Scales", function () {
             data = [{ foo: 2, bar: 1 }, { foo: 5, bar: -20 }, { foo: 0, bar: 0 }];
             dataset = new Plottable.Dataset(data);
             scale = new Plottable.Scales.Linear();
+            scale.padProportion(0);
         });
         it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
             scale.addExtentsProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
-            scale.domainer(new Plottable.Domainer().pad().nice());
             assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
             scale.domain([0, 5]);
             assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -7126,8 +6991,9 @@ describe("Scales", function () {
             var ds1 = new Plottable.Dataset([{ x: 0, y: 0 }, { x: 1, y: 1 }]);
             var ds2 = new Plottable.Dataset([{ x: 1, y: 1 }, { x: 2, y: 2 }]);
             var xScale = new Plottable.Scales.Linear();
+            xScale.padProportion(0);
             var yScale = new Plottable.Scales.Linear();
-            xScale.domainer(new Plottable.Domainer());
+            yScale.padProportion(0);
             var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
             renderAreaD1.addDataset(ds1);
             renderAreaD1.x(function (d) { return d.x; }, xScale);
@@ -7146,13 +7012,21 @@ describe("Scales", function () {
             svg.remove();
         });
     });
-    describe("Quantitative Scales", function () {
-        it("autorange defaults to [0, 1] if no perspectives set", function () {
+    describe("Linear Scales", function () {
+        it("autoDomain() defaults to [0, 1]", function () {
             var scale = new Plottable.Scales.Linear();
             scale.autoDomain();
             var d = scale.domain();
             assert.strictEqual(d[0], 0);
             assert.strictEqual(d[1], 1);
+        });
+        it("autoDomain() expands single value to [value - 1, value + 1]", function () {
+            var scale = new Plottable.Scales.Linear();
+            scale.padProportion(0);
+            var singleValue = 15;
+            scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
         });
         it("domain can't include NaN or Infinity", function () {
             var scale = new Plottable.Scales.Linear();
@@ -7368,20 +7242,23 @@ describe("Scales", function () {
         });
         it("domain defaults to [0, base]", function () {
             scale = new Plottable.Scales.ModifiedLog(base);
-            assert.deepEqual(scale.domain(), [0, base]);
+            assert.deepEqual(scale.domain(), [0, base], "default domain is [0, base]");
         });
-        it("works with a Domainer", function () {
-            scale.addExtentsProvider(function (scale) { return [[0, base * 2]]; });
-            var domain = scale.domain();
-            scale.domainer(new Plottable.Domainer().pad(0.1));
-            assert.operator(scale.domain()[0], "<", domain[0]);
-            assert.operator(domain[1], "<", scale.domain()[1]);
-            scale.domainer(new Plottable.Domainer().nice());
-            assert.operator(scale.domain()[0], "<=", domain[0]);
-            assert.operator(domain[1], "<=", scale.domain()[1]);
-            scale = new Plottable.Scales.ModifiedLog(base);
-            scale.domainer(new Plottable.Domainer());
-            assert.deepEqual(scale.domain(), [0, base]);
+        it("can be padded", function () {
+            scale.addExtentsProvider(function (scale) { return [[0, base]]; });
+            scale.padProportion(0);
+            var unpaddedDomain = scale.domain();
+            scale.padProportion(0.1);
+            assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
+            assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
+        });
+        it("autoDomain() expands single value to [value / base, value * base]", function () {
+            var scale = new Plottable.Scales.ModifiedLog();
+            scale.padProportion(0);
+            var singleValue = 15;
+            scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
         });
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];
@@ -7400,8 +7277,7 @@ describe("Scales", function () {
             assert.operator(betweenPivots.length, ">", 0, "should be ticks between -base and base");
         });
         it("works on inverted domain", function () {
-            scale.addExtentsProvider(function (scale) { return [[200, -100]]; });
-            scale.autoDomain();
+            scale.domain([200, -100]);
             var range = scale.range();
             assert.closeTo(scale.scale(-100), range[1], epsilon);
             assert.closeTo(scale.scale(200), range[0], epsilon);
@@ -7435,6 +7311,41 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeScale tests", function () {
+    it("can be padded", function () {
+        var scale = new Plottable.Scales.Time();
+        scale.padProportion(0);
+        var unpaddedDomain = scale.domain();
+        scale.addExtentsProvider(function (scale) { return [unpaddedDomain]; });
+        scale.padProportion(0.1);
+        assert.operator(scale.domain()[0].getTime(), "<", unpaddedDomain[0].getTime(), "left side of domain was padded");
+        assert.operator(scale.domain()[1].getTime(), ">", unpaddedDomain[1].getTime(), "right side of domain was padded");
+    });
+    it("respects padding exceptions", function () {
+        var scale = new Plottable.Scales.Time();
+        var minValue = new Date(2000, 5, 4);
+        var maxValue = new Date(2000, 5, 6);
+        scale.addExtentsProvider(function (scale) { return [[minValue, maxValue]]; });
+        scale.padProportion(0.1);
+        assert.operator(scale.domain()[0].getTime(), "<", minValue.getTime(), "left side of domain is normally padded");
+        assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(), "right side of domain is normally padded");
+        var exceptionKey = "unitTests";
+        scale.addPaddingException(exceptionKey, minValue);
+        assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(), "left side of domain isn't padded if it matches the exception");
+        scale.addPaddingException(exceptionKey, maxValue);
+        assert.strictEqual(scale.domain()[1].getTime(), maxValue.getTime(), "right side of domain isn't padded if it matches the exception");
+    });
+    it("autoDomain() expands single value to [value - 1 day, value + 1 day]", function () {
+        var scale = new Plottable.Scales.Time();
+        scale.padProportion(0);
+        var singleValue = new Date(2000, 5, 5);
+        var dayBefore = new Date(2000, 5, 4);
+        var dayAfter = new Date(2000, 5, 6);
+        scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+        scale.autoDomain();
+        var domain = scale.domain();
+        assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "left side of domain was expaded by one day");
+        assert.strictEqual(domain[1].getTime(), dayAfter.getTime(), "right side of domain was expaded by one day");
+    });
     it("can't set reversed domain", function () {
         var scale = new Plottable.Scales.Time();
         assert.throws(function () { return scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]); }, "chronological");

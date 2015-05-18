@@ -44,8 +44,17 @@ export module Scales {
 
     public _defaultExtent(): Date[] {
       var endTimeValue = new Date().valueOf();
-      var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+      var startTimeValue = endTimeValue - MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
+      var startTime = singleValueDomain[0].getTime();
+      var endTime = singleValueDomain[1].getTime();
+      if (startTime === endTime) {
+        return [new Date(startTime - MILLISECONDS_IN_ONE_DAY), new Date(endTime + MILLISECONDS_IN_ONE_DAY)];
+      }
+      return singleValueDomain;
     }
   }
 }

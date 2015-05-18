@@ -20,8 +20,16 @@ export module Scales {
     }
 
     public _defaultExtent(): number[] {
-        return [0, 1];
+      return [0, 1];
     }
+
+    protected _expandSingleValueDomain(singleValueDomain: number[]) {
+      if (singleValueDomain[0] === singleValueDomain[1]) {
+        return [singleValueDomain[0] - 1, singleValueDomain[1] + 1];
+      }
+      return singleValueDomain;
+    }
+
   }
 }
 }
