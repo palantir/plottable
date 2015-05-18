@@ -7889,7 +7889,7 @@ var Plottable;
     var StackedPlotUtils = (function () {
         function StackedPlotUtils() {
         }
-        StackedPlotUtils.updateStackExtents = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter) {
+        StackedPlotUtils.computeStackExtents = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter) {
             var maxStackExtent = Plottable.Utils.Methods.max(datasetKeys, function (k) {
                 var dataset = keyToPlotDatasetKey.get(k).dataset;
                 var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
@@ -8134,7 +8134,7 @@ var Plottable;
                     var datasetKeys = this._datasetKeysInOrder;
                     var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                     var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                    var extents = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+                    var extents = Plottable.StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                     this._stackedExtent = extents;
                 }
             };
@@ -8167,7 +8167,7 @@ var Plottable;
                     Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
                 Plottable.StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-                this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+                this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
             };
             return StackedArea;
         })(Plots.Area);
@@ -8279,7 +8279,7 @@ var Plottable;
                     var datasetKeys = this._datasetKeysInOrder;
                     var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                     var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                    var extents = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+                    var extents = Plottable.StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
                     this._stackedExtent = extents;
                 }
             };
@@ -8303,7 +8303,7 @@ var Plottable;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 Plottable.StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-                this._stackedExtent = Plottable.StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+                this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
             };
             return StackedBar;
         })(Plots.Bar);

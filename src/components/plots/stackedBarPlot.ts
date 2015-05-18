@@ -111,7 +111,7 @@ export module Plots {
         var keyToPlotDatasetKey = this._key2PlotDatasetKey;
         var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-        var extents = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
         this._stackedExtent = extents;
       }
     }
@@ -139,7 +139,7 @@ export module Plots {
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-      this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
     }
   }
 }

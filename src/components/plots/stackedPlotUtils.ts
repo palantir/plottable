@@ -16,7 +16,7 @@ module Plottable {
 
   export class StackedPlotUtils {
 
-    public static updateStackExtents(
+    public static computeStackExtents(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         datasetKeys: string[],
