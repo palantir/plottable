@@ -7274,7 +7274,6 @@ var Plottable;
                         qscale.removePaddingException(this);
                         qscale.removeIncludedValue(this);
                     }
-                    qscale._autoDomainIfAutomaticMode();
                 }
             };
             Bar.prototype._additionalPaint = function (time) {
@@ -7647,7 +7646,6 @@ var Plottable;
                 else {
                     yScale.removePaddingException(this);
                 }
-                yScale._autoDomainIfAutomaticMode();
             };
             Area.prototype._getResetYFunction = function () {
                 return this._generateAttrToProjector()["y0"];
@@ -8033,7 +8031,6 @@ var Plottable;
                 var scale = this.y().scale;
                 scale.addPaddingException(this, 0);
                 scale.addIncludedValue(this, 0);
-                scale._autoDomainIfAutomaticMode();
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);

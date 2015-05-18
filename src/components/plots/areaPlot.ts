@@ -66,7 +66,6 @@ export module Plots {
       } else {
         yScale.removePaddingException(this);
       }
-      yScale._autoDomainIfAutomaticMode();
     }
 
     protected _getResetYFunction() {

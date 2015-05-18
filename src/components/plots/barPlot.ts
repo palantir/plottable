@@ -277,7 +277,6 @@ export module Plots {
           qscale.removePaddingException(this);
           qscale.removeIncludedValue(this);
         }
-        qscale._autoDomainIfAutomaticMode();
       }
     }
 
