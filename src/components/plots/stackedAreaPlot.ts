@@ -159,7 +159,7 @@ export module Plots {
     }
 
     // ===== Stack logic from StackedPlot =====
-    public _updateStackOffsets() {
+    private _updateStackOffsets() {
       if (!this._projectorsReady()) { return; }
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
@@ -178,7 +178,7 @@ export module Plots {
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
-      Stacked.prototype._updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+      StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
     }
 
     // ===== /Stack logic =====
