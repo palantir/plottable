@@ -3069,6 +3069,9 @@ declare module Plottable {
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
+            /**
+             * To be removed
+             */
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
             _keyAccessor(): Accessor<X> | Accessor<Y>;

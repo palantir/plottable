@@ -8369,6 +8369,9 @@ var Plottable;
             StackedBar.prototype._getDomainKeys = function () {
                 return Plottable.Stacked.prototype._getDomainKeys.call(this);
             };
+            /**
+             * To be removed
+             */
             StackedBar.prototype._generateDefaultMapArray = function () {
                 return Plottable.Stacked.prototype._generateDefaultMapArray.call(this);
             };

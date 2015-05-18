@@ -123,6 +123,9 @@ export module Plots {
       return Stacked.prototype._getDomainKeys.call(this);
     }
 
+    /**
+     * To be removed
+     */
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
