@@ -166,7 +166,16 @@ export module Plots {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
 
-      StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+      var stackOffsets = StackedPlotUtils.updateStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+
+      for (var datasetKey in stackOffsets) {
+        if (!stackOffsets.hasOwnProperty(datasetKey)) {
+          continue;
+        }
+        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
+        plotMetadata.offsets = stackOffsets[datasetKey];
+      }
+
       this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
     }
   }

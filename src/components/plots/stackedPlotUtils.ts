@@ -83,13 +83,7 @@ module Plottable {
         datasetKeys,
         keyToPlotDatasetKey);
 
-      for (var datasetKey in stackOffsets) {
-        if (!stackOffsets.hasOwnProperty(datasetKey)) {
-          continue;
-        }
-        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
-        plotMetadata.offsets = stackOffsets[datasetKey];
-      }
+      return stackOffsets;
     }
 
     public static stackedPlotMetadata(metadata: Plots.PlotMetadata) {

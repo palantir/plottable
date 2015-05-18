@@ -2976,7 +2976,9 @@ declare module Plottable {
     }
     class StackedPlotUtils {
         static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
-        static updateStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
+        static updateStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
+            [key: string]: D3.Map<number>;
+        };
         static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
         /**
          * Feeds the data through d3's stack layout function which will calculate
