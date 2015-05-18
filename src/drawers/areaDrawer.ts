@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   export class Area extends Line {
     public static AREA_CLASS = "area";
 
@@ -43,7 +43,7 @@ export module _Drawer {
                        y0Function: AppliedProjector,
                        y1Function: AppliedProjector,
                        definedFunction: AppliedProjector) {
-      if(!definedFunction) {
+      if (!definedFunction) {
         definedFunction = () => true;
       }
 
@@ -61,7 +61,7 @@ export module _Drawer {
         // HACKHACK Forced to use anycast to access protected var
         (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       }
-      var attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];
       var y1Function      = attrToProjector["y"];

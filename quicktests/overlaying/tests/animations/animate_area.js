@@ -12,21 +12,21 @@ function run(svg, data, Plottable) {
 
   var doAnimate = true;
 
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var areaRenderer = new Plottable.Plot.Area(xScale, yScale)
+  var areaRenderer = new Plottable.Plots.Area(xScale, yScale)
             .addDataset(dataset)
             .attr("opacity", 0.75)
-            .project("x", "x", xScale)
-            .project("y", "y", yScale)
+            .x(function(d) { return d.x; }, xScale)
+            .y(function(d) { return d.y; }, yScale)
             .animate(doAnimate);
 
-  var areaChart = new Plottable.Component.Table([[yAxis, areaRenderer],
+  var areaChart = new Plottable.Components.Table([[yAxis, areaRenderer],
    [null,  xAxis]]);
 
   areaChart.renderTo(svg);
@@ -36,5 +36,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  areaRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
+  new Plottable.Interactions.Click().onClick(cb).attachTo(areaRenderer);
 }

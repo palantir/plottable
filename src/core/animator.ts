@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Animator {
+export module Animators {
 
   export interface PlotAnimator {
     /**
@@ -24,7 +24,7 @@ export module Animator {
     getTiming(numberOfIterations: number): number;
   }
 
-  export type PlotAnimatorMap = { [animatorKey: string] : PlotAnimator; };
+  export type PlotAnimatorMap = { [animatorKey: string]: PlotAnimator; };
 
 }
 }

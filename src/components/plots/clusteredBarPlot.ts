@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export interface ClusteredPlotMetadata extends PlotMetadata {
     position: number;
   }
@@ -20,7 +20,7 @@ export module Plot {
      * @param {Scale} yScale The y scale to use.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale.AbstractScale<X, number>, yScale: Scale.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
@@ -34,10 +34,10 @@ export module Plot {
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
-      attrToProjector["x"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        this._isVertical ? xAttr(d, i, u, m) + m.position : xAttr(d, u, u, m);
-      attrToProjector["y"] = (d: any, i: number, u: any, m: ClusteredPlotMetadata) =>
-        this._isVertical ? yAttr(d, i, u, m) : yAttr(d, i, u, m) + m.position;
+      attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
+        this._isVertical ? xAttr(d, i, dataset, m) + m.position : xAttr(d, i, dataset, m);
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
+        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + m.position;
 
       return attrToProjector;
     }
@@ -50,16 +50,16 @@ export module Plot {
       });
     }
 
-    private _makeInnerScale(){
-      var innerScale = new Scale.Category();
+    private _makeInnerScale() {
+      var innerScale = new Scales.Category();
       innerScale.domain(this._datasetKeysInOrder);
-      if (!this._projections["width"]) {
+      if (!this._attrBindings.get("width")) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
-        var projection = this._projections["width"];
+        var projection = this._attrBindings.get("width");
         var accessor = projection.accessor;
         var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, u: any, m: PlotMetadata) => scale.scale(accessor(d, i, u, m)) : accessor;
+        var fn = scale ? (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
         innerScale.range([0, fn(null, 0, null, null)]);
       }
       return innerScale;

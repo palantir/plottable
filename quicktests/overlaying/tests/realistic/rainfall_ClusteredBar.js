@@ -11,27 +11,27 @@ function makeData() {
 function run(svg, data, Plottable){
   "use strict";
 
-  var xScale = new Plottable.Scale.Category();
-  var yScale = new Plottable.Scale.Linear();
-  var colorScale = new Plottable.Scale.Color();
+  var xScale = new Plottable.Scales.Category();
+  var yScale = new Plottable.Scales.Linear();
+  var colorScale = new Plottable.Scales.Color();
 
-  var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var clusteredPlot = new Plottable.Plot.ClusteredBar(xScale, yScale, true)
-    .addDataset(data[0])
-    .addDataset(data[1])
-    .addDataset(data[2])
-    .project("x", "month", xScale)
-    .project("y", "avg", yScale)
-    .project("label", "avg")
-    .project("fill", "city", colorScale);
+  var clusteredPlot = new Plottable.Plots.ClusteredBar(xScale, yScale, true)
+    .addDataset(new Plottable.Dataset(data[0]))
+    .addDataset(new Plottable.Dataset(data[1]))
+    .addDataset(new Plottable.Dataset(data[2]))
+    .x(function(d) { return d.month; }, xScale)
+    .y(function(d) { return d.avg; }, yScale)
+    .attr("label", function(d) { return d.avg; })
+    .attr("fill", function(d) { return d.city; }, colorScale);
 
-  var legend = new Plottable.Component.Legend(colorScale);
-  var title = new Plottable.Component.TitleLabel("Average Rainfall in Different Cities between 2013-2014", "horizontal" );
-  var yUnitLabel = new Plottable.Component.AxisLabel("Inches", "left" );
+  var legend = new Plottable.Components.Legend(colorScale);
+  var title = new Plottable.Components.Label("Average Rainfall in Different Cities between 2013-2014", "horizontal" ).classed("title-label", true);
+  var yUnitLabel = new Plottable.Components.Label("Inches", "left" ).classed("axis-label", true);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [null         ,   null    ,   title        ],
                                             [null         ,   null    ,   legend       ],
                                             [yUnitLabel   ,   yAxis   ,   clusteredPlot],

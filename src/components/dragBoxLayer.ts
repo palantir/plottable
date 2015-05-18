@@ -1,7 +1,10 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+
+export type DragBoxCallback = (bounds: Bounds) => any;
+
+export module Components {
   type _EdgeIndicator = {
     top: boolean;
     bottom: boolean;
@@ -9,8 +12,8 @@ export module Component {
     right: boolean;
   }
 
-  export class DragBoxLayer extends Component.SelectionBoxLayer {
-    private _dragInteraction: Interaction.Drag;
+  export class DragBoxLayer extends Components.SelectionBoxLayer {
+    private _dragInteraction: Interactions.Drag;
     private _detectionEdgeT: D3.Selection;
     private _detectionEdgeB: D3.Selection;
     private _detectionEdgeL: D3.Selection;
@@ -24,9 +27,9 @@ export module Component {
     private _resizable = false;
     protected _hasCorners = true;
 
-    private _dragStartCallback: (b: Bounds) => any;
-    private _dragCallback: (b: Bounds) => any;
-    private _dragEndCallback: (b: Bounds) => any;
+    private _dragStartCallbacks: Utils.CallbackSet<DragBoxCallback>;
+    private _dragCallbacks: Utils.CallbackSet<DragBoxCallback>;
+    private _dragEndCallbacks: Utils.CallbackSet<DragBoxCallback>;
 
     constructor() {
       super();
@@ -36,12 +39,16 @@ export module Component {
        * user's cursor from changing outside the DragBoxLayer, where they
        * wouldn't be able to grab the edges or corners for resizing.
        */
-      this.clipPathEnabled = true;
+      this._clipPathEnabled = true;
       this.classed("drag-box-layer", true);
 
-      this._dragInteraction = new Interaction.Drag();
+      this._dragInteraction = new Interactions.Drag();
       this._setUpCallbacks();
-      this.registerInteraction(this._dragInteraction);
+      this._dragInteraction.attachTo(this);
+
+      this._dragStartCallbacks = new Utils.CallbackSet<DragBoxCallback>();
+      this._dragCallbacks = new Utils.CallbackSet<DragBoxCallback>();
+      this._dragEndCallbacks = new Utils.CallbackSet<DragBoxCallback>();
     }
 
     private _setUpCallbacks() {
@@ -71,9 +78,7 @@ export module Component {
         // copy points so changes to topLeft and bottomRight don't mutate bounds
         topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
         bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-        if (this._dragStartCallback) {
-          this._dragStartCallback(bounds);
-        }
+        this._dragStartCallbacks.callCallbacks(bounds);
       });
 
       this._dragInteraction.onDrag((s: Point, e: Point) => {
@@ -99,9 +104,7 @@ export module Component {
           bottomRight: bottomRight
         });
 
-        if (this._dragCallback) {
-          this._dragCallback(this.bounds());
-        }
+        this._dragCallbacks.callCallbacks(this.bounds());
       });
 
       this._dragInteraction.onDragEnd((s: Point, e: Point) => {
@@ -109,9 +112,7 @@ export module Component {
           this.boxVisible(false);
         }
 
-        if (this._dragEndCallback) {
-          this._dragEndCallback(this.bounds());
-        }
+        this._dragEndCallbacks.callCallbacks(this.bounds());
       });
     }
 
@@ -172,8 +173,8 @@ export module Component {
       return edges;
     }
 
-    public _doRender() {
-      super._doRender();
+    public renderImmediately() {
+      super.renderImmediately();
       if (this.boxVisible()) {
         var bounds = this.bounds();
         var t = bounds.topLeft.y;
@@ -204,6 +205,7 @@ export module Component {
           this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
           this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
         }
+        return this;
       }
     }
 
@@ -228,7 +230,7 @@ export module Component {
         throw new Error("detection radius cannot be negative.");
       }
       this._detectionRadius = r;
-      this._render();
+      this.render();
       return this;
     }
 
@@ -261,69 +263,69 @@ export module Component {
     }
 
     /**
-     * Gets the callback that is called when dragging starts.
-     *
-     * @returns {(b: Bounds) => any} The callback called when dragging starts.
-     */
-    public onDragStart(): (b: Bounds) => any;
-    /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
-    public onDragStart(cb: (b: Bounds) => any): DragBoxLayer;
-    public onDragStart(cb?: (b: Bounds) => any): any {
-      if (cb === undefined) {
-        return this._dragStartCallback;
-      } else {
-        this._dragStartCallback = cb;
-        return this;
-      }
+    public onDragStart(callback: DragBoxCallback) {
+      this._dragStartCallbacks.add(callback);
+      return this;
     }
 
     /**
-     * Gets the callback that is called during dragging.
+     * Removes a callback to be called when dragging starts.
      *
-     * @returns {(b: Bounds) => any} The callback called during dragging.
+     * @param {DragBoxCallback} callback The callback to be removed.
+     * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
-    public onDrag(): (b: Bounds) => any;
+    public offDragStart(callback: DragBoxCallback) {
+      this._dragStartCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Sets a callback to be called during dragging.
      *
-     * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
-    public onDrag(cb: (b: Bounds) => any): DragBoxLayer;
-    public onDrag(cb?: (b: Bounds) => any): any {
-      if (cb === undefined) {
-        return this._dragCallback;
-      } else {
-        this._dragCallback = cb;
-        return this;
-      }
+    public onDrag(callback: DragBoxCallback) {
+      this._dragCallbacks.add(callback);
+      return this;
     }
 
     /**
-     * Gets the callback that is called when dragging ends.
+     * Removes a callback to be called during dragging.
      *
-     * @returns {(b: Bounds) => any} The callback called when dragging ends.
+     * @param {DragBoxCallback} callback The callback to be removed.
+     * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
-    public onDragEnd(): (b: Bounds) => any;
+    public offDrag(callback: DragBoxCallback) {
+      this._dragCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Sets a callback to be called when the dragging ends.
      *
-     * @param {(b: Bounds) => any} cb The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
-    public onDragEnd(cb: (b: Bounds) => any): DragBoxLayer;
-    public onDragEnd(cb?: (b: Bounds) => any): any {
-      if (cb === undefined) {
-        return this._dragEndCallback;
-      } else {
-        this._dragEndCallback = cb;
-        return this;
-      }
+    public onDragEnd(callback: DragBoxCallback) {
+      this._dragEndCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback to be called when the dragging ends.
+     *
+     * @param {DragBoxCallback} callback The callback to be removed.
+     * @returns {DragBoxLayer} The calling DragBoxLayer.
+     */
+    public offDragEnd(callback: DragBoxCallback) {
+      this._dragEndCallbacks.delete(callback);
+      return this;
     }
 
   }

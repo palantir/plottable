@@ -3,19 +3,18 @@
 describe("Drawers", () => {
   describe("Arc Drawer", () => {
     it("getPixelPoint", () => {
-      var svg = generateSVG(300, 300);
+      var svg = TestMethods.generateSVG(300, 300);
       var data = [{value: 10}, {value: 10}, {value: 10}, {value: 10}];
-      var piePlot = new Plottable.Plot.Pie();
+      var piePlot = new Plottable.Plots.Pie();
 
-      var drawer = new Plottable._Drawer.Arc("one");
+      var drawer = new Plottable.Drawers.Arc("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> piePlot)._getDrawer = () => drawer;
 
-      piePlot.addDataset("one", data);
-      piePlot.project("value", "value");
+      piePlot.addDataset(new Plottable.Dataset(data));
+      piePlot.sectorValue((d) => d.value);
       piePlot.renderTo(svg);
 
       piePlot.getAllSelections().each(function (datum: any, index: number) {
-        var selection = d3.select(this);
         var pixelPoint = drawer._getPixelPoint(datum, index);
         var radius = 75;
         var angle = Math.PI / 4 + ((Math.PI * index) / 2);

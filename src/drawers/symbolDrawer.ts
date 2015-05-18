@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   export class Symbol extends Element {
 
     constructor(key: string) {
@@ -12,7 +12,7 @@ export module _Drawer {
 
     protected _drawStep(step: AppliedDrawStep) {
       var attrToProjector = step.attrToProjector;
-      this._attrToProjector = <AttributeToAppliedProjector>_Util.Methods.copyMap(step.attrToProjector);
+      this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
 
       var xProjector = attrToProjector["x"];
       var yProjector = attrToProjector["y"];

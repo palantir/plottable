@@ -6,12 +6,12 @@ describe("Plots", () => {
   describe("AreaPlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Area(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var plot = new Plottable.Plots.Area(xScale, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -21,8 +21,8 @@ describe("Plots", () => {
 
   describe("AreaPlot", () => {
     var svg: D3.Selection;
-    var xScale: Plottable.Scale.Linear;
-    var yScale: Plottable.Scale.Linear;
+    var xScale: Plottable.Scales.Linear;
+    var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
     var yAccessor: any;
     var y0Accessor: any;
@@ -30,12 +30,12 @@ describe("Plots", () => {
     var fillAccessor: any;
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
-    var areaPlot: Plottable.Plot.Area<number>;
+    var areaPlot: Plottable.Plots.Area<number>;
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scale.Linear().domain([0, 1]);
-      yScale = new Plottable.Scale.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear().domain([0, 1]);
+      yScale = new Plottable.Scales.Linear().domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       y0Accessor = () => 0;
@@ -44,28 +44,28 @@ describe("Plots", () => {
     });
 
     beforeEach(() => {
-      svg = generateSVG(500, 500);
+      svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plot.Area(xScale, yScale);
-      areaPlot.addDataset("sd", simpleDataset)
-              .project("x", xAccessor, xScale)
-              .project("y", yAccessor, yScale)
-              .project("y0", y0Accessor, yScale)
-              .project("fill", fillAccessor)
-              .project("stroke", colorAccessor)
+      areaPlot = new Plottable.Plots.Area(xScale, yScale);
+      areaPlot.addDataset(simpleDataset);
+      areaPlot.x(xAccessor, xScale)
+              .y(yAccessor, yScale);
+      areaPlot.y0(y0Accessor, yScale)
+              .attr("fill", fillAccessor)
+              .attr("stroke", colorAccessor)
               .renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
     });
 
     it("draws area and line correctly", () => {
       var areaPath = renderArea.select(".area");
-      assert.strictEqual(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
+      assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
       assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
       var areaComputedStyle = window.getComputedStyle(areaPath.node());
       assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
       var linePath = renderArea.select(".line");
-      assert.strictEqual(normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
+      assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
@@ -73,11 +73,11 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.project("y0", (d: any) => d.bar / 2, yScale);
+      areaPlot.y0((d) => d.bar / 2, yScale);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");
-      assert.equal(normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
+      assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
       svg.remove();
     });
 
@@ -104,27 +104,27 @@ describe("Plots", () => {
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
 
-      var areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
+      var areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=NaN case)");
 
       dataWithNaN[2] = { foo: NaN, bar: 0.4 };
       simpleDataset.data(dataWithNaN);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=NaN case)");
 
       var dataWithUndefined = areaData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (y=undefined case)");
 
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       simpleDataset.data(dataWithUndefined);
 
-      areaPathString = normalizePath(areaPath.attr("d"));
-      assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
+      areaPathString = TestMethods.normalizePath(areaPath.attr("d"));
+      TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
 
       svg.remove();
     });
@@ -133,46 +133,33 @@ describe("Plots", () => {
 
       it("retrieves all selections with no args", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
+        areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
         var allAreas = areaPlot.getAllSelections();
-        var allAreas2 = areaPlot.getAllSelections((<any> areaPlot)._datasetKeysInOrder);
-        assert.deepEqual(allAreas, allAreas2, "all areas/lines retrieved");
-
         assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
         assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections("newTwo");
+      it("retrieves correct selections", () => {
+        var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+        areaPlot.addDataset(twoPointDataset);
+        var allAreas = areaPlot.getAllSelections([twoPointDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+        assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections(["newTwo"]);
+      it("skips invalid Datasets", () => {
+        var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
+        areaPlot.addDataset(twoPointDataset);
+        var dummyDataset = new Plottable.Dataset([]);
+        var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
-        areaPlot.addDataset("newTwo", new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections(["newTwo", "test"]);
-        assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
-        var selectionData = allAreas.data();
-        assert.include(selectionData, newTwoPointData, "new dataset data in selection data");
+        assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
         svg.remove();
       });
@@ -180,11 +167,11 @@ describe("Plots", () => {
 
     it("retains original classes when class is projected", () => {
       var newClassProjector = () => "pink";
-      areaPlot.project("class", newClassProjector);
+      areaPlot.attr("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable._Drawer.Area.AREA_CLASS);
+      var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable._Drawer.Area.AREA_CLASS));
+      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
       svg.remove();
     });
   });

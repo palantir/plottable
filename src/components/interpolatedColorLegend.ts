@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class InterpolatedColorLegend extends AbstractComponent {
+export module Components {
+  export class InterpolatedColorLegend extends Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _scale: Scale.InterpolatedColor;
+    private _scale: Scales.InterpolatedColor;
     private _orientation: String ;
     private _padding = 5;
     private _numSwatches = 10;
@@ -16,6 +16,7 @@ export module Component {
     private _swatchBoundingBox: D3.Selection;
     private _lowerLabel: D3.Selection;
     private _upperLabel: D3.Selection;
+    private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
 
     /**
      * The css class applied to the legend labels.
@@ -34,24 +35,23 @@ export module Component {
      * @param {string} orientation (horizontal/left/right).
      * @param {Formatter} The labels are formatted using this function.
      */
-    constructor(interpolatedColorScale: Scale.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
+    constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
       super();
       if (interpolatedColorScale == null ) {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
       }
       this._scale = interpolatedColorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._redrawCallback = (scale) => this.redraw();
+      this._scale.onUpdate(this._redrawCallback);
       this._formatter = formatter;
       this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
 
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
 
-    public remove() {
-      super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+    public destroy() {
+      super.destroy();
+      this._scale.offUpdate(this._redrawCallback);
     }
 
     /**
@@ -72,7 +72,7 @@ export module Component {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -90,7 +90,7 @@ export module Component {
      *
      * @returns {string} The current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the InterpolatedColorLegend.
      *
@@ -98,15 +98,23 @@ export module Component {
      *
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orient(newOrientation: string): InterpolatedColorLegend;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): InterpolatedColorLegend;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._ensureOrientation(newOrientation);
-        this._invalidateLayout();
+        this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+        this.redraw();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
 
     private _generateTicks() {
@@ -132,7 +140,7 @@ export module Component {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var textHeight = this._measurer.measure().height;
 
       var ticks = this._generateTicks();
@@ -144,7 +152,7 @@ export module Component {
       var desiredHeight: number;
       var desiredWidth: number;
       if (this._isVertical()) {
-        var longestWidth = _Util.Methods.max(labelWidths, 0);
+        var longestWidth = Utils.Methods.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
         desiredHeight = this._padding + numSwatches * textHeight + this._padding;
       } else {
@@ -155,10 +163,8 @@ export module Component {
       }
 
       return {
-        width : desiredWidth,
-        height: desiredHeight,
-        wantsWidth: offeredWidth < desiredWidth,
-        wantsHeight: offeredHeight < desiredHeight
+        minWidth: desiredWidth,
+        minHeight: desiredHeight
       };
     }
 
@@ -166,12 +172,11 @@ export module Component {
       return this._orientation !== "horizontal";
     }
 
-    public _doRender() {
-      super._doRender();
+    public renderImmediately() {
+      super.renderImmediately();
 
       var domain = this._scale.domain();
 
-      var textHeight = this._measurer.measure().height;
       var text0 = this._formatter(domain[0]);
       var text0Width = this._measurer.measure(text0).width;
       var text1 = this._formatter(domain[1]);
@@ -273,6 +278,7 @@ export module Component {
         "x": swatchX,
         "y": swatchY
       });
+      return this;
     }
 
   }

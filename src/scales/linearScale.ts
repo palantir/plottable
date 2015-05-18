@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Linear extends AbstractQuantitative<number> {
+export module Scales {
+  export class Linear extends QuantitativeScale<number> {
 
     /**
      * Constructs a new LinearScale.
@@ -19,14 +19,8 @@ export module Scale {
       super(scale == null ? d3.scale.linear() : scale);
     }
 
-    /**
-     * Constructs a copy of the LinearScale with the same domain and range but
-     * without any registered listeners.
-     *
-     * @returns {Linear} A copy of the calling LinearScale.
-     */
-    public copy(): Linear {
-      return new Linear(this._d3Scale.copy());
+    public _defaultExtent(): number[] {
+        return [0, 1];
     }
   }
 }

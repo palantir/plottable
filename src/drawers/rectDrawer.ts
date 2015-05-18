@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Drawer {
+export module Drawers {
   var LABEL_VERTICAL_PADDING = 5;
   var LABEL_HORIZONTAL_PADDING = 5;
   export class Rect extends Element {
@@ -33,7 +33,7 @@ export module _Drawer {
       return this._labelsTooWide;
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i, userMetadata, plotMetadata).toString();
         var w = attrToProjector["width"](d, i, userMetadata, plotMetadata);
@@ -43,7 +43,7 @@ export module _Drawer {
         var positive = attrToProjector["positive"](d, i, userMetadata, plotMetadata);
         var measurement = this._measurer.measure(text);
         var color = attrToProjector["fill"](d, i, userMetadata, plotMetadata);
-        var dark = _Util.Color.contrast("white", color) * 1.6 < _Util.Color.contrast("black", color);
+        var dark = Utils.Colors.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
 
@@ -94,9 +94,9 @@ export module _Drawer {
       return { x: x, y: y };
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plot.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata) {
       var attrToProjector = drawSteps[0].attrToProjector;
-      var isValidNumber = Plottable._Util.Methods.isValidNumber;
+      var isValidNumber = Plottable.Utils.Methods.isValidNumber;
       data = data.filter(function(e: any, i: number) {
         return isValidNumber(attrToProjector["x"](e, null, userMetadata, plotMetadata)) &&
                isValidNumber(attrToProjector["y"](e, null, userMetadata, plotMetadata)) &&

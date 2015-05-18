@@ -1,7 +1,7 @@
 {
   "name": "plottable.js",
   "description": "A library for creating charts out of D3",
-  "version": "0.54.0",
+  "version": "1.0.0-rc1",
   "repository": {
     "type": "git",
     "url": "https://github.com/palantir/plottable.git"
@@ -16,7 +16,8 @@
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
     "grunt-ts": "~1.12.1",
-    "grunt-tslint": "2.0.0",
+    "grunt-tslint": "2.2.0-beta",
+    "tslint": "2.2.0-beta",
     "grunt-contrib-concat": "~0.3.0",
     "grunt-mocha-phantomjs": "0.6.1",
     "grunt-contrib-connect": "~0.6.0",
@@ -26,7 +27,7 @@
     "grunt-sed": "~0.1.1",
     "grunt-git": "~0.2.6",
     "grunt-contrib-clean": "~0.4.0",
-    "grunt-bump": "0.0.13",
+    "grunt-bump": "0.3.1",
     "grunt-contrib-compress": "~0.9.1",
     "grunt-contrib-uglify": "~0.4.0",
     "grunt-shell": "0.7.0",

@@ -15,7 +15,7 @@ describe("Plots", () => {
     ];
 
     var VERIFY_CELLS = (cells: D3.Selection) => {
-      assert.equal(cells[0].length, 5);
+      assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: D3.Selection, i: number) {
         var cell = d3.select(this);
         assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
@@ -26,18 +26,18 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      var xScale        = new Plottable.Scale.Linear();
-      var yScale        = new Plottable.Scale.Linear();
-      var svg           = generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var rectanglePlot = new Plottable.Plot.Rectangle(xScale, yScale);
-      rectanglePlot.addDataset(DATA)
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
-              .project("x1", "x", xScale)
-              .project("y1", "y", yScale)
-              .project("x2", "x2", xScale)
-              .project("y2", "y2", yScale)
-              .renderTo(svg);
+      var xScale        = new Plottable.Scales.Linear();
+      var yScale        = new Plottable.Scales.Linear();
+      var svg           = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      rectanglePlot.addDataset(new Plottable.Dataset(DATA));
+      rectanglePlot.x((d) => d.x, xScale)
+                   .y((d) => d.y, yScale);
+      rectanglePlot.x1((d) => d.x, xScale)
+                   .y1((d) => d.y, yScale)
+                   .x2((d) => d.x2, xScale)
+                   .y2((d) => d.y2, yScale)
+                   .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
     });
@@ -45,7 +45,7 @@ describe("Plots", () => {
 
   describe("fail safe tests", () => {
     it("illegal rectangles don't get displayed", () => {
-      var svg = generateSVG();
+      var svg = TestMethods.generateSVG();
 
       var data1 = [
         { x: "A", y1: 1, y2: 2, v: 1 },
@@ -56,16 +56,15 @@ describe("Plots", () => {
         { x: "F", y1: 6, y2: 7, v: 6 }
       ];
 
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
-      var cScale = new Plottable.Scale.Color();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plot.Grid(xScale, yScale, cScale);
+      var plot = new Plottable.Plots.Grid(xScale, yScale);
       plot
-        .project("x", "x", xScale)
-        .project("y", "y1", yScale)
-        .project("y2", "y2", yScale);
-      plot.addDataset(data1);
+        .x((d: any) => d.x, xScale)
+        .y((d: any) => d.y1, yScale)
+        .y2((d: any) => d.y2, yScale);
+      plot.addDataset(new Plottable.Dataset(data1));
 
       plot.renderTo(svg);
 
@@ -76,13 +75,13 @@ describe("Plots", () => {
 
       rectanglesSelection.each(function(d: any, i: number) {
         var sel = d3.select(this);
-        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("x")),
+        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("x")),
           "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
-        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("y")),
+        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("y")),
           "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
-        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("height")),
+        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("height")),
           "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
-        assert.isFalse(Plottable._Util.Methods.isNaN(+sel.attr("width")),
+        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("width")),
           "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
       });
 

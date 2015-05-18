@@ -1,26 +1,47 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-  export class Click extends AbstractInteraction {
 
-    private _mouseDispatcher: Plottable.Dispatcher.Mouse;
-    private _touchDispatcher: Plottable.Dispatcher.Touch;
-    private _clickCallback: (p: Point) => any;
+export type ClickCallback = (point: Point) => any;
+
+export module Interactions {
+  export class Click extends Interaction {
+
+    private _mouseDispatcher: Plottable.Dispatchers.Mouse;
+    private _touchDispatcher: Plottable.Dispatchers.Touch;
     private _clickedDown = false;
+    private _onClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
+    private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
 
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown("Interaction.Click" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp("Interaction.Click" + this.getID(), (p: Point) => this._handleClickUp(p));
+    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handleClickDown(idToPoint[ids[0]]);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
+    private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._clickedDown = false;
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Click" + this.getID(), (ids, idToPoint) =>
-                                                                               this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd("Interaction.Click" + this.getID(), (ids, idToPoint) =>
-                                                                               this._handleClickUp(idToPoint[ids[0]]));
+    protected _anchor(component: Component) {
+      super._anchor(component);
+
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+    }
+
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+      this._touchDispatcher = null;
     }
 
     private _handleClickDown(p: Point) {
@@ -32,33 +53,33 @@ export module Interaction {
 
     private _handleClickUp(p: Point) {
       var translatedPoint = this._translateToComponentSpace(p);
-      if (this._clickedDown && this._isInsideComponent(translatedPoint) && (this._clickCallback != null)) {
-        this._clickCallback(translatedPoint);
+      if (this._clickedDown && this._isInsideComponent(translatedPoint)) {
+        this._onClickCallbacks.callCallbacks(translatedPoint);
       }
       this._clickedDown = false;
     }
 
     /**
-     * Gets the callback called when the Component is clicked.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onClick(): (p: Point) => any;
-    /**
      * Sets the callback called when the Component is clicked.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {ClickCallback} callback The callback to set.
      * @return {Interaction.Click} The calling Interaction.Click.
      */
-    public onClick(callback: (p: Point) => any): Interaction.Click;
-    public onClick(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._clickCallback;
-      }
-      this._clickCallback = callback;
+    public onClick(callback: ClickCallback) {
+      this._onClickCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes the callback from click.
+     *
+     * @param {ClickCallback} callback The callback to remove.
+     * @return {Interaction.Click} The calling Interaction.Click.
+     */
+    public offClick(callback: ClickCallback) {
+      this._onClickCallbacks.delete(callback);
+      return this;
+    }
   }
 }
 }

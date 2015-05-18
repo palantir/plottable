@@ -1,10 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class Time extends AbstractQuantitative<any> {
-    public _typeCoercer = (d: any) => d && d._isAMomentObject || d instanceof Date ? d : new Date(d);
-
+export module Scales {
+  export class Time extends QuantitativeScale<Date> {
     /**
      * Constructs a TimeScale.
      *
@@ -15,36 +13,39 @@ export module Scale {
      */
     constructor();
     constructor(scale: D3.Scale.LinearScale);
-    constructor(scale?: any) {
-      // need to cast since d3 time scales do not descend from Quantitative scales
+    constructor(scale?: D3.Scale.LinearScale) {
+      // need to cast since d3 time scales do not descend from QuantitativeScale scales
       super(scale == null ? (<any>d3.time.scale()) : scale);
     }
 
-    public tickInterval(interval: D3.Time.Interval, step?: number): any[] {
+    /**
+     * Specifies the interval between ticks
+     *
+     * @param {string} interval TimeInterval string specifying the interval unit measure
+     * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
+     *
+     * @return {Date[]}
+     */
+    public tickInterval(interval: string, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
+      var d3Interval = Formatters.timeIntervalToD3Time(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
-      return tempScale.ticks(interval.range, step);
+      return tempScale.ticks(d3Interval.range, step);
     }
 
-    protected _setDomain(values: any[]) {
-      // attempt to parse dates
-      values = values.map(this._typeCoercer);
+    protected _setDomain(values: Date[]) {
       if (values[1] < values[0]) {
         throw new Error("Scale.Time domain values must be in chronological order");
       }
       return super._setDomain(values);
     }
 
-    public copy(): Time {
-      return new Time(this._d3Scale.copy());
-    }
-
-    public _defaultExtent(): any[] {
-      var endTime = new Date().valueOf();
-      var startTime = endTime - Plottable.MILLISECONDS_IN_ONE_DAY;
-      return [startTime, endTime];
+    public _defaultExtent(): Date[] {
+      var endTimeValue = new Date().valueOf();
+      var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+      return [new Date(startTimeValue), new Date(endTimeValue)];
     }
   }
 }
