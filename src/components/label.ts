@@ -98,7 +98,7 @@ export module Components {
       } else {
         if (angle === -90 || angle === 0 || angle === 90) {
           this._angle = angle;
-        } else {          
+        } else {
           throw new Error(angle + " is not a valid angle for LabelComponent");
         }
         this.redraw();
