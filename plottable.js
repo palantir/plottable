@@ -8281,6 +8281,9 @@ var Plottable;
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale, isVertical);
             }
+            /**
+             * a
+             */
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
                     if (this.animator(key)) {

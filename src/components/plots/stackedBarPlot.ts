@@ -17,6 +17,9 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
+    /**
+     * a
+     */
     protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {

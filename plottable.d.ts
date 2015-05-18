@@ -3054,6 +3054,9 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
+            /**
+             * a
+             */
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
