@@ -143,7 +143,7 @@ export module Plots {
       }
     }
 
-    private _doStackUpdate(){
+    private _doStackUpdate() {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
@@ -153,7 +153,7 @@ export module Plots {
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       if (this._projectorsReady()) {
-        this._updateStackOffsets()
+        this._updateStackOffsets();
         this._stackedExtent = StackedPlotUtils.updateStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
       }
     }

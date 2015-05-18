@@ -7929,6 +7929,9 @@ var Plottable;
             });
             var stackOffsets = StackedPlotUtils.generateStackOffsets(StackedPlotUtils.stack(positiveDataMapArray, domainKeys), StackedPlotUtils.stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
             for (var datasetKey in stackOffsets) {
+                if (!stackOffsets.hasOwnProperty(datasetKey)) {
+                    continue;
+                }
                 var plotMetadata = keyToPlotDatasetKey.get(datasetKey).plotMetadata;
                 plotMetadata.offsets = stackOffsets[datasetKey];
             }

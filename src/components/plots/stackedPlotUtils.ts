@@ -17,11 +17,11 @@ module Plottable {
   export class StackedPlotUtils {
 
     public static updateStackExtents(
-      keyAccessor: Accessor<any>,
-      valueAccessor: Accessor<any>,
-      datasetKeys: string[],
-      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
-      filter: Accessor<boolean>) {
+        keyAccessor: Accessor<any>,
+        valueAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        filter: Accessor<boolean>) {
 
       var maxStackExtent = Utils.Methods.max<string, number>(datasetKeys, (k: string) => {
         var dataset = keyToPlotDatasetKey.get(k).dataset;
@@ -84,6 +84,9 @@ module Plottable {
         keyToPlotDatasetKey);
 
       for (var datasetKey in stackOffsets) {
+        if (!stackOffsets.hasOwnProperty(datasetKey)) {
+          continue;
+        }
         var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
         plotMetadata.offsets = stackOffsets[datasetKey];
       }
@@ -144,12 +147,12 @@ module Plottable {
      * to be determined correctly on the overall datasets
      */
     public static generateStackOffsets(
-      positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
-      negativeDataMapArray: D3.Map<Plots.StackedDatum>[],
-      keyAccessor: Accessor<any>,
-      valueAccessor: Accessor<any>,
-      datasetKeys: string[],
-      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+        positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
+        negativeDataMapArray: D3.Map<Plots.StackedDatum>[],
+        keyAccessor: Accessor<any>,
+        valueAccessor: Accessor<any>,
+        datasetKeys: string[],
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
 
       var stackOffsets: { [key: string]: D3.Map<number> } = {};
 
@@ -182,8 +185,7 @@ module Plottable {
     public static getDomainKeys(
         keyAccessor: Accessor<any>,
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>
-        ) {
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
 
       var domainKeys = d3.set();
       datasetKeys.forEach((k) => {
