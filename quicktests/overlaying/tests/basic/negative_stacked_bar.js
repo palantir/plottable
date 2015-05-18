@@ -12,58 +12,64 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  var xScale1 = new Plottable.Scale.Category();
-  var yScale1 = new Plottable.Scale.Linear();
-  var xScale2 = new Plottable.Scale.Linear();
-  var yScale2 = new Plottable.Scale.Category();
+  var xScale1 = new Plottable.Scales.Category();
+  var yScale1 = new Plottable.Scales.Linear();
+  var xScale2 = new Plottable.Scales.Linear();
+  var yScale2 = new Plottable.Scales.Category();
 
-  var colorScale = new Plottable.Scale.Color();
+  var colorScale = new Plottable.Scales.Color();
 
-  var xAxis1 = new Plottable.Axis.Category(xScale1, "bottom");
-  var yAxis1 = new Plottable.Axis.Numeric(yScale1, "left");
-  var xAxis2 = new Plottable.Axis.Numeric(xScale2, "bottom");
-  var yAxis2 = new Plottable.Axis.Category(yScale2, "left");
+  var xAxis1 = new Plottable.Axes.Category(xScale1, "bottom");
+  var yAxis1 = new Plottable.Axes.Numeric(yScale1, "left");
+  var xAxis2 = new Plottable.Axes.Numeric(xScale2, "bottom");
+  var yAxis2 = new Plottable.Axes.Category(yScale2, "left");
 
-  var legend = new Plottable.Component.Legend(colorScale);
-  legend.xAlign("center");
+  var legend = new Plottable.Components.Legend(colorScale);
+  legend.xAlignment("center");
 
-  var title = new Plottable.Component.TitleLabel("Sample Net Earnings by Teams");
+  var title = new Plottable.Components.Label("Sample Net Earnings by Teams").classed("title-label", true);
 
-  var verticalPlot = new Plottable.Plot.StackedBar(xScale1, yScale1, true)
-    .project("x", "quarter", xScale1)
-    .project("y", "earnings", yScale1)
-    .project("fill", "team", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
-    .addDataset("d4", data[3])
-    .addDataset("d5", data[4])
-    .barLabelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix())
+  var dataset1 = new Plottable.Dataset(data[0]);
+  var dataset2 = new Plottable.Dataset(data[1]);
+  var dataset3 = new Plottable.Dataset(data[2]);
+  var dataset4 = new Plottable.Dataset(data[3]);
+  var dataset5 = new Plottable.Dataset(data[4]);
+
+  var verticalPlot = new Plottable.Plots.StackedBar(xScale1, yScale1, true)
+    .x(function(d) { return d.quarter; }, xScale1)
+    .y(function(d) { return d.earnings; }, yScale1)
+    .attr("fill", function(d) { return d.team; }, colorScale)
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3)
+    .addDataset(dataset4)
+    .addDataset(dataset5)
+    .labelsEnabled(true)
+    .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 
-  var horizontalPlot = new Plottable.Plot.StackedBar(xScale2, yScale2, false)
-    .project("x", "earnings", xScale2)
-    .project("y", "quarter", yScale2)
-    .project("fill", "team", colorScale)
-    .addDataset("d1", data[0])
-    .addDataset("d2", data[1])
-    .addDataset("d3", data[2])
-    .addDataset("d4", data[3])
-    .addDataset("d5", data[4])
-    .barLabelsEnabled(true)
-    .barLabelFormatter(Plottable.Formatters.siSuffix())
+  var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, false)
+    .x(function(d) { return d.earnings; }, xScale2)
+    .y(function(d) { return d.quarter; }, yScale2)
+    .attr("fill", function(d) { return d.team; }, colorScale)
+    .addDataset(dataset1)
+    .addDataset(dataset2)
+    .addDataset(dataset3)
+    .addDataset(dataset4)
+    .addDataset(dataset5)
+    .labelsEnabled(true)
+    .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 
-  var chart1 = new Plottable.Component.Table([
+  var chart1 = new Plottable.Components.Table([
     [yAxis1, verticalPlot], [null, xAxis1]
     ]);
 
-  var chart2 = new Plottable.Component.Table([
+  var chart2 = new Plottable.Components.Table([
     [yAxis2, horizontalPlot], [null, xAxis2]
     ]);
 
-  var finalchart = new Plottable.Component.Table([
+  var finalchart = new Plottable.Components.Table([
     [title],
     [legend],
     [chart1],

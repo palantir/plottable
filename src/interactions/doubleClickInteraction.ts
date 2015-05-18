@@ -1,34 +1,50 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-
+export module Interactions {
   enum ClickState {NotClicked, SingleClicked, DoubleClicked};
+  export class DoubleClick extends Interaction {
 
-  export class DoubleClick extends AbstractInteraction {
-
-    private _mouseDispatcher: Plottable.Dispatcher.Mouse;
-    private _touchDispatcher: Plottable.Dispatcher.Touch;
-    private _doubleClickCallback: (p: Point) => any;
+    private _mouseDispatcher: Plottable.Dispatchers.Mouse;
+    private _touchDispatcher: Plottable.Dispatchers.Touch;
     private _clickState = ClickState.NotClicked;
     private _clickedDown = false;
     private _clickedPoint: Point;
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
+    private _onDoubleClickCallbacks = new Utils.CallbackSet<ClickCallback>();
 
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> component.content().node());
-      this._mouseDispatcher.onMouseDown("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickDown(p));
-      this._mouseDispatcher.onMouseUp("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleClickUp(p));
-      this._mouseDispatcher.onDblClick("Interaction.DoubleClick" + this.getID(), (p: Point) => this._handleDblClick());
+    private _mouseDownCallback = (p: Point) => this._handleClickDown(p);
+    private _mouseUpCallback = (p: Point) => this._handleClickUp(p);
+    private _dblClickCallback = (p: Point) => this._handleDblClick();
+    private _touchStartCallback = (ids: number[], idToPoint: Point[]) => this._handleClickDown(idToPoint[ids[0]]);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[]) => this._handleClickUp(idToPoint[ids[0]]);
+    private _touchCancelCallback = (ids: number[], idToPoint: Point[]) => this._handleClickCancel();
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> component.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickDown(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchEnd("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickUp(idToPoint[ids[0]]));
-      this._touchDispatcher.onTouchCancel("Interaction.DoubleClick" + this.getID(), (ids, idToPoint) =>
-                                                                                     this._handleClickCancel());
+    protected _anchor(component: Component) {
+      super._anchor(component);
+
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> component.content().node());
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+      this._mouseDispatcher.onDblClick(this._dblClickCallback);
+
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> component.content().node());
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+    }
+
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+      this._mouseDispatcher.offDblClick(this._dblClickCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+      this._touchDispatcher = null;
     }
 
     private _handleClickDown(p: Point) {
@@ -54,9 +70,7 @@ export module Interaction {
 
     private _handleDblClick() {
       if (this._clickState === ClickState.DoubleClicked) {
-        if (this._doubleClickCallback) {
-          this._doubleClickCallback(this._clickedPoint);
-        }
+        this._onDoubleClickCallbacks.callCallbacks(this._clickedPoint);
         this._clickState = ClickState.NotClicked;
       }
     }
@@ -71,26 +85,26 @@ export module Interaction {
     }
 
     /**
-     * Gets the callback called when the Component is double-clicked.
-     *
-     * @return {(p: Point) => any} The current callback.
-     */
-    public onDoubleClick(): (p: Point) => any;
-    /**
      * Sets the callback called when the Component is double-clicked.
      *
-     * @param {(p: Point) => any} callback The callback to set.
+     * @param {ClickCallback} callback The callback to set.
      * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
      */
-    public onDoubleClick(callback: (p: Point) => any): Interaction.DoubleClick;
-    public onDoubleClick(callback?: (p: Point) => any): any {
-      if (callback === undefined) {
-        return this._doubleClickCallback;
-      }
-      this._doubleClickCallback = callback;
+    public onDoubleClick(callback: ClickCallback) {
+      this._onDoubleClickCallbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes the callback called when the Component is double-clicked.
+     *
+     * @param {ClickCallback} callback The callback to remove.
+     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     */
+    public offDoubleClick(callback: ClickCallback) {
+      this._onDoubleClickCallbacks.delete(callback);
+      return this;
+    }
   }
 }
 }

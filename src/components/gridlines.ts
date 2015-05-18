@@ -1,12 +1,14 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Gridlines extends AbstractComponent {
-    private _xScale: Scale.AbstractQuantitative<any>;
-    private _yScale: Scale.AbstractQuantitative<any>;
+export module Components {
+  export class Gridlines extends Component {
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
     private _xLinesContainer: D3.Selection;
     private _yLinesContainer: D3.Selection;
+
+    private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
 
     /**
      * Creates a set of Gridlines.
@@ -15,32 +17,33 @@ export module Component {
      * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
      * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
      */
-    constructor(xScale: Scale.AbstractQuantitative<any>, yScale: Scale.AbstractQuantitative<any>) {
-      if (xScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(xScale))) {
-        throw new Error("xScale needs to inherit from Scale.AbstractQuantitative");
+    constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>) {
+      if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {
+        throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
       }
-      if (yScale != null && !(Scale.AbstractQuantitative.prototype.isPrototypeOf(yScale))) {
-        throw new Error("yScale needs to inherit from Scale.AbstractQuantitative");
+      if (yScale != null && !(QuantitativeScale.prototype.isPrototypeOf(yScale))) {
+        throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
       }
       super();
       this.classed("gridlines", true);
       this._xScale = xScale;
       this._yScale = yScale;
+      this._renderCallback = (scale) => this.render();
       if (this._xScale) {
-        this._xScale.broadcaster.registerListener(this, () => this._render());
+        this._xScale.onUpdate(this._renderCallback);
       }
       if (this._yScale) {
-        this._yScale.broadcaster.registerListener(this, () => this._render());
+        this._yScale.onUpdate(this._renderCallback);
       }
     }
 
-    public remove() {
-      super.remove();
+    public destroy() {
+      super.destroy();
       if (this._xScale) {
-        this._xScale.broadcaster.deregisterListener(this);
+        this._xScale.offUpdate(this._renderCallback);
       }
       if (this._yScale) {
-        this._yScale.broadcaster.deregisterListener(this);
+        this._yScale.offUpdate(this._renderCallback);
       }
       return this;
     }
@@ -51,10 +54,11 @@ export module Component {
       this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
     }
 
-    public _doRender() {
-      super._doRender();
+    public renderImmediately() {
+      super.renderImmediately();
       this._redrawXLines();
       this._redrawYLines();
+      return this;
     }
 
     private _redrawXLines() {

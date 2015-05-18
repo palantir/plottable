@@ -1,6 +1,6 @@
 
 module Plottable {
-export module _Util {
+export module Utils {
   export module DOM {
     /**
      * Gets the bounding box of an element.
@@ -126,6 +126,11 @@ export module _Util {
         return elem;
       }
       return null; // not in the DOM
+    }
+
+    var _latestClipPathId = 0;
+    export function getUniqueClipPathId() {
+      return "plottableClipPath" + ++_latestClipPathId;
     }
   }
 }

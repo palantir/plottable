@@ -4,8 +4,8 @@ var assert = chai.assert;
 describe("Category Axes", () => {
   it("re-renders appropriately when data is changed", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "left");
+    var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var ca = new Plottable.Axes.Category(xScale, "left");
     ca.renderTo(svg);
     assert.deepEqual((<any> ca)._tickLabelContainer.selectAll(".tick-label").data(), xScale.domain(), "tick labels render domain");
     assert.doesNotThrow(() => xScale.domain(["bar", "baz", "bam"]));
@@ -15,22 +15,20 @@ describe("Category Axes", () => {
 
   it("requests appropriate space when the scale has no domain", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var scale = new Plottable.Scale.Category();
-    var ca = new Plottable.Axis.Category(scale);
-    ca._anchor(svg);
-    var s = ca._requestedSpace(400, 400);
-    assert.operator(s.width, ">=", 0, "it requested 0 or more width");
-    assert.operator(s.height, ">=", 0, "it requested 0 or more height");
-    assert.isFalse(s.wantsWidth, "it doesn't want width");
-    assert.isFalse(s.wantsHeight, "it doesn't want height");
+    var scale = new Plottable.Scales.Category();
+    var ca = new Plottable.Axes.Category(scale);
+    ca.anchor(svg);
+    var s = ca.requestedSpace(400, 400);
+    assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
+    assert.operator(s.minHeight, ">=", 0, "it requested 0 or more height");
     svg.remove();
   });
 
   it("doesnt blow up for non-string data", () => {
     var svg = TestMethods.generateSVG(1000, 400);
     var domain: any[] = [null, undefined, true, 2, "foo"];
-    var scale = new Plottable.Scale.Category().domain(domain);
-    var axis = new Plottable.Axis.Category(scale);
+    var scale = new Plottable.Scales.Category().domain(domain);
+    var axis = new Plottable.Axes.Category(scale);
     axis.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
     assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
@@ -40,8 +38,8 @@ describe("Category Axes", () => {
   it("uses the formatter if supplied", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var domain = ["Air", "Bi", "Sea"];
-    var scale = new Plottable.Scale.Category().domain(domain);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var scale = new Plottable.Scales.Category().domain(domain);
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     var addPlane = (l: string) => l + "plane";
     axis.formatter(addPlane);
     axis.renderTo(svg);
@@ -55,8 +53,8 @@ describe("Category Axes", () => {
 
   it("width accounts for gutter. ticklength, and padding on vertical axes", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "left");
+    var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var ca = new Plottable.Axes.Category(xScale, "left");
     ca.renderTo(svg);
 
     var axisWidth = ca.width();
@@ -76,8 +74,8 @@ describe("Category Axes", () => {
 
   it("height accounts for gutter. ticklength, and padding on horizontal axes", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var xScale = new Plottable.Scale.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
-    var ca = new Plottable.Axis.Category(xScale, "bottom");
+    var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
+    var ca = new Plottable.Axes.Category(xScale, "bottom");
     ca.renderTo(svg);
 
     var axisHeight = ca.height();
@@ -99,8 +97,8 @@ describe("Category Axes", () => {
     var SVG_WIDTH = 400;
     var svg = TestMethods.generateSVG(SVG_WIDTH, 100);
     var years = ["2000", "2001", "2002", "2003"];
-    var scale = new Plottable.Scale.Category().domain(years).range([0, SVG_WIDTH]);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var scale = new Plottable.Scales.Category().domain(years).range([0, SVG_WIDTH]);
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
 
     var ticks = (<any> axis)._content.selectAll("text");
@@ -128,15 +126,15 @@ describe("Category Axes", () => {
   it("axis should request more space if there's not enough space to fit the text", () => {
     var svg = TestMethods.generateSVG(300, 300);
     var years = ["2000", "2001", "2002", "2003"];
-    var scale = new Plottable.Scale.Category().domain(years);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var scale = new Plottable.Scales.Category().domain(years);
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
-    var requestedSpace = axis._requestedSpace(300, 10);
-    assert.isTrue(requestedSpace.wantsHeight, "axis should ask for more space (horizontal orientation)");
-    axis.orient("left");
-    requestedSpace = axis._requestedSpace(10, 300);
-    assert.isTrue(requestedSpace.wantsWidth, "axis should ask for more space (vertical orientation)");
-
+    var smallDimension = 10;
+    var spaceRequest = axis.requestedSpace(300, smallDimension);
+    assert.operator(spaceRequest.minHeight, ">", smallDimension, "horizontal axis requested more height if constrained");
+    axis.orientation("left");
+    spaceRequest = axis.requestedSpace(smallDimension, 300);
+    assert.operator(spaceRequest.minWidth, ">", smallDimension, "vertical axis requested more width if constrained");
     svg.remove();
   });
 
@@ -146,20 +144,20 @@ describe("Category Axes", () => {
         for (var i = 0; i < tickLabels[0].length; i++) {
           var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
           var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
-          assert.isFalse(Plottable._Util.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
+          assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
         }
     }
 
     var svg = TestMethods.generateSVG(400, 300);
-    var yScale = new Plottable.Scale.Category();
-    var axis = new Plottable.Axis.Category(yScale, "left");
+    var yScale = new Plottable.Scales.Category();
+    var axis = new Plottable.Axes.Category(yScale, "left");
     yScale.domain(["A", "B", "C"]);
     axis.renderTo(svg);
 
     var tickLabels = (<any> axis)._content.selectAll(".tick-label");
     var tickMarks = (<any> axis)._content.selectAll(".tick-mark");
     verifyTickLabelOverlaps(tickLabels, tickMarks);
-    axis.orient("right");
+    axis.orientation("right");
     verifyTickLabelOverlaps(tickLabels, tickMarks);
     svg.remove();
   });
@@ -167,16 +165,16 @@ describe("Category Axes", () => {
   it("axis should request more space when rotated than not rotated", () => {
     var svg = TestMethods.generateSVG(300, 300);
     var labels = ["label1", "label2", "label100"];
-    var scale = new Plottable.Scale.Category().domain(labels);
-    var axis = new Plottable.Axis.Category(scale, "bottom");
+    var scale = new Plottable.Scales.Category().domain(labels);
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
 
-    var requestedSpace = axis._requestedSpace(300, 50);
-    var flatHeight = requestedSpace.height;
+    var requestedSpace = axis.requestedSpace(300, 50);
+    var flatHeight = requestedSpace.minHeight;
 
     axis.tickLabelAngle(-90);
-    requestedSpace = axis._requestedSpace(300, 50);
-    assert.isTrue(flatHeight < requestedSpace.height, "axis should request more height when tick labels are rotated");
+    requestedSpace = axis.requestedSpace(300, 50);
+    assert.isTrue(flatHeight < requestedSpace.minHeight, "axis should request more height when tick labels are rotated");
 
     svg.remove();
   });

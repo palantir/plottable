@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Legend extends AbstractComponent {
+export module Components {
+  export class Legend extends Component {
     /**
      * The css class applied to each legend row
      */
@@ -17,38 +17,38 @@ export module Component {
     public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
     private _padding = 5;
-    private _scale: Scale.Color;
+    private _scale: Scales.Color;
     private _maxEntriesPerRow: number;
     private _sortFn: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
+    private _redrawCallback: ScaleCallback<Scales.Color>;
 
     /**
      * Creates a Legend.
      *
-     * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-     * The entries will be displayed in the order of the `colorScale` domain.
+     * The legend consists of a series of legend entries, each with a color and label taken from the `scale`.
+     * The entries will be displayed in the order of the `scale` domain.
      *
      * @constructor
-     * @param {Scale.Color} colorScale
+     * @param {Scale.Color} scale
      */
-    constructor(colorScale: Scale.Color) {
+    constructor(scale: Scales.Color) {
       super();
       this.classed("legend", true);
       this.maxEntriesPerRow(1);
 
-      if (colorScale == null ) {
+      if (scale == null ) {
         throw new Error("Legend requires a colorScale");
       }
 
-      this._scale = colorScale;
-      this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
+      this._scale = scale;
+      this._redrawCallback = (scale) => this.redraw();
+      this._scale.onUpdate(this._redrawCallback);
 
-      this.xAlign("right").yAlign("top");
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
+      this.xAlignment("right").yAlignment("top");
       this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
@@ -80,29 +80,29 @@ export module Component {
         return this._maxEntriesPerRow;
       } else {
         this._maxEntriesPerRow = numEntries;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
 
     /**
-     * Gets the current sort function for Legend's entries.
-     * @returns {(a: string, b: string) => number} The current sort function.
+     * Gets the current comparator for Legend's entries.
+     * @returns {(a: string, b: string) => number} The current comparator.
      */
-    public sortFunction(): (a: string, b: string) => number;
+    public comparator(): (a: string, b: string) => number;
     /**
-     * Sets a new sort function for Legend's entires.
+     * Sets a new comparator for Legend's entires.
      *
-     * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+     * @param {(a: string, b: string) => number} compareFunction If provided, the new compare function.
      * @returns {Legend} The calling Legend.
      */
-    public sortFunction(newFn: (a: string, b: string) => number): Legend;
-    public sortFunction(newFn?: (a: string, b: string) => number): any {
-      if (newFn == null) {
+    public comparator(compareFunction: (a: string, b: string) => number): Legend;
+    public comparator(compareFunction?: (a: string, b: string) => number): any {
+      if (compareFunction == null) {
         return this._sortFn;
       } else {
-        this._sortFn = newFn;
-        this._invalidateLayout();
+        this._sortFn = compareFunction;
+        this.redraw();
         return this;
       }
     }
@@ -112,45 +112,49 @@ export module Component {
      *
      * @returns {ColorScale} The current color scale.
      */
-    public scale(): Scale.Color;
+    public scale(): Scales.Color;
     /**
      * Assigns a new color scale to the Legend.
      *
      * @param {Scale.Color} scale If provided, the new scale.
      * @returns {Legend} The calling Legend.
      */
-    public scale(scale: Scale.Color): Legend;
-    public scale(scale?: Scale.Color): any {
+    public scale(scale: Scales.Color): Legend;
+    public scale(scale?: Scales.Color): any {
       if (scale != null) {
-        this._scale.broadcaster.deregisterListener(this);
+        this._scale.offUpdate(this._redrawCallback);
         this._scale = scale;
-        this._scale.broadcaster.registerListener(this, () => this._invalidateLayout());
-        this._invalidateLayout();
+        this._scale.onUpdate(this._redrawCallback);
+        this.redraw();
         return this;
       } else {
         return this._scale;
       }
     }
 
-    public remove() {
-      super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+    public destroy() {
+      super.destroy();
+      this._scale.offUpdate(this._redrawCallback);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
       var textHeight = this._measurer.measure().height;
 
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-      var measureEntry = (entryText: string) => {
-        var originalEntryLength = (textHeight + this._measurer.measure(entryText).width + this._padding);
-        return Math.min(originalEntryLength, availableWidthForEntries);
-      };
 
-      var entries = this._scale.domain().slice();
-      entries.sort(this.sortFunction());
-      var entryLengths = _Util.Methods.populateMap(entries, measureEntry);
+      var entryNames = this._scale.domain().slice();
+      entryNames.sort(this.comparator());
 
-      var rows = this._packRows(availableWidthForEntries, entries, entryLengths);
+      var entryLengths: D3.Map<number> = d3.map();
+      var untruncatedEntryLengths: D3.Map<number> = d3.map();
+      entryNames.forEach((entryName) => {
+        var untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
+        var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
+        entryLengths.set(entryName, entryLength);
+        untruncatedEntryLengths.set(entryName, untruncatedEntryLength);
+      });
+
+      var rows = this._packRows(availableWidthForEntries, entryNames, entryLengths);
 
       var rowsAvailable = Math.floor((availableHeight - 2 * this._padding) / textHeight);
       if (rowsAvailable !== rowsAvailable) { // rowsAvailable can be NaN if this.textHeight = 0
@@ -160,33 +164,23 @@ export module Component {
       return {
         textHeight: textHeight,
         entryLengths: entryLengths,
+        untruncatedEntryLengths: untruncatedEntryLengths,
         rows: rows,
         numRowsToDraw: Math.max(Math.min(rowsAvailable, rows.length), 0)
       };
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var estimatedLayout = this._calculateLayoutInfo(offeredWidth, offeredHeight);
-      var rowLengths = estimatedLayout.rows.map((row: string[]) => {
-        return d3.sum(row, (entry: string) => estimatedLayout.entryLengths.get(entry));
+
+      var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
+        return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
+      var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
 
-      var longestRowLength = _Util.Methods.max(rowLengths, 0);
-
-      var longestUntruncatedEntryLength = _Util.Methods.max<string, number>(this._scale.domain(), (d: string) =>
-                                            this._measurer.measure(d).width, 0);
-      longestUntruncatedEntryLength += estimatedLayout.textHeight + this._padding;
-      var desiredWidth = this._padding + Math.max(longestRowLength, longestUntruncatedEntryLength);
-
-      var acceptableHeight = estimatedLayout.numRowsToDraw * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredHeight = estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding;
-      var desiredNumRows = Math.max(Math.ceil(this._scale.domain().length / this._maxEntriesPerRow), 1);
-      var wantsFitMoreEntriesInRow = estimatedLayout.rows.length > desiredNumRows;
       return {
-        width : this._padding + longestRowLength,
-        height: acceptableHeight,
-        wantsWidth: offeredWidth < desiredWidth || wantsFitMoreEntriesInRow,
-        wantsHeight: offeredHeight < desiredHeight
+        minWidth: this._padding + longestUntruncatedRowLength,
+        minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
       };
     }
 
@@ -205,7 +199,7 @@ export module Component {
         spaceLeft -= entryLength;
       });
 
-      if(currentRow.length !== 0) {
+      if (currentRow.length !== 0) {
         rows.push(currentRow);
       }
       return rows;
@@ -243,8 +237,8 @@ export module Component {
       return entry;
     }
 
-    public _doRender() {
-      super._doRender();
+    public renderImmediately() {
+      super.renderImmediately();
 
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
@@ -295,6 +289,7 @@ export module Component {
 
                       self._writer.write(value, maxTextLength, self.height(), writeOptions);
                     });
+      return this;
     }
 
     /**
@@ -316,9 +311,17 @@ export module Component {
         return this._symbolFactoryAccessor;
       } else {
         this._symbolFactoryAccessor = symbolFactoryAccessor;
-        this._render();
+        this.render();
         return this;
       }
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
   }
 }

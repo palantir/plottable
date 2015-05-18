@@ -1,14 +1,25 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Scale {
-  export class AbstractScale<D, R> extends Core.PlottableObject {
+
+  export interface ScaleCallback<S extends Scale<any, any>> {
+    (scale: S): any;
+  }
+
+  export module Scales {
+    export interface ExtentsProvider<D> {
+      (scale: Scale<D, any>): D[][];
+    }
+  }
+
+  export class Scale<D, R> {
     protected _d3Scale: D3.Scale.Scale;
+
+    private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
-    public broadcaster: Core.Broadcaster<AbstractScale<D, R>>;
-    private _rendererAttrID2Extent: {[rendererAttrID: string]: D[]} = {};
-    public _typeCoercer: (d: any) => any = (d: any) => d;
-    private _domainModificationInProgress: boolean = false;
+    private _domainModificationInProgress = false;
+    private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
+
     /**
      * Constructs a new Scale.
      *
@@ -20,17 +31,31 @@ export module Scale {
      * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
     constructor(scale: D3.Scale.Scale) {
-      super();
       this._d3Scale = scale;
-      this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
+      this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.values(this._rendererAttrID2Extent);
+      return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
     }
 
     protected _getExtent(): D[] {
       return []; // this should be overwritten
+    }
+
+    public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.add(callback);
+      return this;
+    }
+
+    public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
+      this._callbacks.delete(callback);
+      return this;
+    }
+
+    protected _dispatchUpdate() {
+      this._callbacks.callCallbacks(this);
     }
 
     /**
@@ -40,7 +65,7 @@ export module Scale {
      * call this function if you want the domain to neccessarily include all
      * the data.
      *
-     * Extent: The [min, max] pair for a Scale.Quantitative, all covered
+     * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
      * strings for a Scale.Category.
      *
      * Perspective: A combination of a Dataset and an Accessor that
@@ -86,7 +111,7 @@ export module Scale {
      * input values.
      * @returns {Scale} The calling Scale.
      */
-    public domain(values: D[]): AbstractScale<D, R>;
+    public domain(values: D[]): Scale<D, R>;
     public domain(values?: D[]): any {
       if (values == null) {
         return this._getDomain();
@@ -102,10 +127,10 @@ export module Scale {
     }
 
     protected _setDomain(values: D[]) {
-      if(!this._domainModificationInProgress) {
+      if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
         this._d3Scale.domain(values);
-        this.broadcaster.broadcast();
+        this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
     }
@@ -130,7 +155,7 @@ export module Scale {
      * @param {R[]} values If provided, the new values for the range.
      * @returns {Scale} The calling Scale.
      */
-    public range(values: R[]): AbstractScale<D, R>;
+    public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
         return this._d3Scale.range();
@@ -140,37 +165,14 @@ export module Scale {
       }
     }
 
-    /**
-     * Constructs a copy of the Scale with the same domain and range but without
-     * any registered listeners.
-     *
-     * @returns {Scale} A copy of the calling Scale.
-     */
-    public copy(): AbstractScale<D, R> {
-      return new AbstractScale<D, R>(this._d3Scale.copy());
-    }
-
-    /**
-     * When a renderer determines that the extent of a projector has changed,
-     * it will call this function. This function should ensure that
-     * the scale has a domain at least large enough to include extent.
-     *
-     * @param {number} rendererID A unique indentifier of the renderer sending
-     *                 the new extent.
-     * @param {string} attr The attribute being projected, e.g. "x", "y0", "r"
-     * @param {D[]} extent The new extent to be included in the scale.
-     */
-    public _updateExtent(plotProvidedKey: string, attr: string, extent: D[]) {
-      this._rendererAttrID2Extent[plotProvidedKey + attr] = extent;
-      this._autoDomainIfAutomaticMode();
+    public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
+      this._extentsProviders.add(provider);
       return this;
     }
 
-    public _removeExtent(plotProvidedKey: string, attr: string) {
-      delete this._rendererAttrID2Extent[plotProvidedKey + attr];
-      this._autoDomainIfAutomaticMode();
+    public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
+      this._extentsProviders.delete(provider);
       return this;
     }
   }
-}
 }

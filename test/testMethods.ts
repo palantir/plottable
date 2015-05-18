@@ -18,29 +18,25 @@ module TestMethods {
     }
   }
 
-  export function verifySpaceRequest(sr: Plottable._SpaceRequest, w: number, h: number, ww: boolean, wh: boolean, message: string) {
-    assert.strictEqual(sr.width, w, message + " (space request: width)");
-    assert.strictEqual(sr.height, h, message + " (space request: height)");
-    assert.strictEqual(sr.wantsWidth, ww, message + " (space request: wantsWidth)");
-    assert.strictEqual(sr.wantsHeight, wh, message + " (space request: wantsHeight)");
+  export function verifySpaceRequest(sr: Plottable.SpaceRequest, expectedMinWidth: number, expectedMinHeight: number, message: string) {
+    assert.strictEqual(sr.minWidth, expectedMinWidth, message + " (space request: minWidth)");
+    assert.strictEqual(sr.minHeight, expectedMinHeight, message + " (space request: minHeight)");
   }
 
-  export function fixComponentSize(c: Plottable.Component.AbstractComponent, fixedWidth?: number, fixedHeight?: number) {
-    c._requestedSpace = function(w, h) {
+  export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
+    c.requestedSpace = function(w, h) {
       return {
-        width: fixedWidth == null ? 0 : fixedWidth,
-        height: fixedHeight == null ? 0 : fixedHeight,
-        wantsWidth: fixedWidth == null ? false : w < fixedWidth,
-        wantsHeight: fixedHeight == null ? false : h < fixedHeight
+        minWidth: fixedWidth  == null ? 0 : fixedWidth,
+        minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
-    (<any> c)._fixedWidthFlag = fixedWidth == null ? false : true;
-    (<any> c)._fixedHeightFlag = fixedHeight == null ? false : true;
+    (<any> c).fixedWidth = () => fixedWidth == null ? false : true;
+    (<any> c).fixedHeight = () => fixedHeight == null ? false : true;
     return c;
   }
 
   export function makeFixedSizeComponent(fixedWidth?: number, fixedHeight?: number) {
-    return fixComponentSize(new Plottable.Component.AbstractComponent(), fixedWidth, fixedHeight);
+    return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
   }
 
   export function getTranslate(element: D3.Selection) {
@@ -148,7 +144,7 @@ module TestMethods {
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var event: WheelEvent;
-    if (Plottable._Util.Methods.isIE()) {
+    if (Plottable.Utils.Methods.isIE()) {
       event = document.createEvent("WheelEvent");
       event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
     } else {
@@ -216,5 +212,16 @@ module TestMethods {
         assert.closeTo(+actualAreaPoint[1], +expectedAreaPoint[1], 0.1, msg);
       });
     });
+  }
+
+  export function verifyClipPath(c: Plottable.Component) {
+    var clipPathId = (<any>c)._boxContainer[0][0].firstChild.id;
+    var expectedPrefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
+    expectedPrefix = expectedPrefix.replace(/#.*/g, "");
+    var expectedClipPathURL = "url(" + expectedPrefix + "#" + clipPathId + ")";
+    // IE 9 has clipPath like 'url("#clipPath")', must accomodate
+    var normalizeClipPath = (s: string) => s.replace(/"/g, "");
+    assert.isTrue(normalizeClipPath((<any> c)._element.attr("clip-path")) === expectedClipPathURL,
+                  "the element has clip-path url attached");
   }
 }

@@ -1,8 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Axis {
-  export class AbstractAxis extends Component.AbstractComponent {
+  export class Axis<D> extends Component {
     /**
      * The css class applied to each end tick mark (the line on the end tick).
      */
@@ -18,7 +17,7 @@ export module Axis {
     protected _tickMarkContainer: D3.Selection;
     protected _tickLabelContainer: D3.Selection;
     protected _baseline: D3.Selection;
-    protected _scale: Scale.AbstractScale<any, number>;
+    protected _scale: Scale<D, number>;
     private _formatter: Formatter;
     private _orientation: string;
     protected _computedWidth: number;
@@ -28,6 +27,7 @@ export module Axis {
     private _tickLabelPadding = 10;
     private _gutter = 15;
     private _showEndTickLabels = false;
+    private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
     /**
      * Constructs an axis. An axis is a wrapper around a scale for rendering.
@@ -40,11 +40,11 @@ export module Axis {
      * @param {Formatter} Data is passed through this formatter before being
      * displayed.
      */
-    constructor(scale: Scale.AbstractScale<any, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
-      this.orient(orientation);
+      this.orientation(orientation);
       this._setDefaultAlignment();
       this.classed("axis", true);
       if (this._isHorizontal()) {
@@ -55,12 +55,13 @@ export module Axis {
 
       this.formatter(formatter);
 
-      this._scale.broadcaster.registerListener(this, () => this._rescale());
+      this._rescaleCallback = (scale) => this._rescale();
+      this._scale.onUpdate(this._rescaleCallback);
     }
 
-    public remove() {
-      super.remove();
-      this._scale.broadcaster.deregisterListener(this);
+    public destroy() {
+      super.destroy();
+      this._scale.offUpdate(this._rescaleCallback);
     }
 
     protected _isHorizontal() {
@@ -79,7 +80,7 @@ export module Axis {
       return this._computedHeight;
     }
 
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requestedWidth = 0;
       var requestedHeight = 0;
 
@@ -96,41 +97,40 @@ export module Axis {
       }
 
       return {
-        width : requestedWidth,
-        height: requestedHeight,
-        wantsWidth: !this._isHorizontal() && offeredWidth < requestedWidth,
-        wantsHeight: this._isHorizontal() && offeredHeight < requestedHeight
+        minWidth: requestedWidth,
+        minHeight: requestedHeight
       };
     }
 
-    public _isFixedHeight() {
+    public fixedHeight() {
       return this._isHorizontal();
     }
 
-    public _isFixedWidth() {
+    public fixedWidth() {
       return !this._isHorizontal();
     }
 
     protected _rescale() {
-      // default implementation; subclasses may call _invalidateLayout() here
-      this._render();
+      // default implementation; subclasses may call redraw() here
+      this.render();
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number, availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       if (this._isHorizontal()) {
         this._scale.range([0, this.width()]);
       } else {
         this._scale.range([this.height(), 0]);
       }
+      return this;
     }
 
     protected _setup() {
       super._setup();
       this._tickMarkContainer = this._content.append("g")
-                                            .classed(AbstractAxis.TICK_MARK_CLASS + "-container", true);
+                                            .classed(Axis.TICK_MARK_CLASS + "-container", true);
       this._tickLabelContainer = this._content.append("g")
-                                             .classed(AbstractAxis.TICK_LABEL_CLASS + "-container", true);
+                                             .classed(Axis.TICK_LABEL_CLASS + "-container", true);
       this._baseline = this._content.append("line").classed("baseline", true);
     }
 
@@ -138,21 +138,22 @@ export module Axis {
      * Function for generating tick values in data-space (as opposed to pixel values).
      * To be implemented by subclasses.
      */
-    protected _getTickValues(): any[] {
+    protected _getTickValues(): D[] {
       return [];
     }
 
-    public _doRender() {
+    public renderImmediately() {
       var tickMarkValues = this._getTickValues();
-      var tickMarks = this._tickMarkContainer.selectAll("." + AbstractAxis.TICK_MARK_CLASS).data(tickMarkValues);
-      tickMarks.enter().append("line").classed(AbstractAxis.TICK_MARK_CLASS, true);
+      var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+      tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
       tickMarks.attr(this._generateTickMarkAttrHash());
-      d3.select(tickMarks[0][0]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
                                 .attr(this._generateTickMarkAttrHash(true));
-      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(AbstractAxis.END_TICK_MARK_CLASS, true)
+      d3.select(tickMarks[0][tickMarkValues.length - 1]).classed(Axis.END_TICK_MARK_CLASS, true)
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
+      return this;
     }
 
     protected _generateBaselineAttrHash() {
@@ -163,7 +164,7 @@ export module Axis {
         y2: 0
       };
 
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
           baselineAttrHash.x2 = this.width();
           break;
@@ -207,7 +208,7 @@ export module Axis {
 
       var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
 
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
           tickMarkAttrHash["y2"] = tickLength;
           break;
@@ -230,28 +231,28 @@ export module Axis {
       return tickMarkAttrHash;
     }
 
-    public _invalidateLayout() {
+    public redraw() {
       this._computedWidth = null;
       this._computedHeight = null;
-      super._invalidateLayout();
+      return super.redraw();
     }
 
     protected _setDefaultAlignment() {
-      switch(this._orientation) {
+      switch (this._orientation) {
         case "bottom":
-          this.yAlign("top");
+          this.yAlignment("top");
           break;
 
         case "top":
-          this.yAlign("bottom");
+          this.yAlignment("bottom");
           break;
 
         case "left":
-          this.xAlign("right");
+          this.xAlignment("right");
           break;
 
         case "right":
-          this.xAlign("left");
+          this.xAlignment("left");
           break;
       }
     }
@@ -271,13 +272,13 @@ export module Axis {
      * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
      * @returns {Axis} The calling Axis.
      */
-    public formatter(formatter: Formatter): AbstractAxis;
+    public formatter(formatter: Formatter): Axis<D>;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
       }
       this._formatter = formatter;
-      this._invalidateLayout();
+      this.redraw();
       return this;
     }
 
@@ -293,7 +294,7 @@ export module Axis {
      * @param {number} length If provided, length of each tick.
      * @returns {Axis} The calling Axis.
      */
-    public tickLength(length: number): AbstractAxis;
+    public tickLength(length: number): Axis<D>;
     public tickLength(length?: number): any {
       if (length == null) {
         return this._tickLength;
@@ -302,7 +303,7 @@ export module Axis {
           throw new Error("tick length must be positive");
         }
         this._tickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -319,7 +320,7 @@ export module Axis {
      * @param {number} length If provided, the length of the end ticks.
      * @returns {BaseAxis} The calling Axis.
      */
-    public endTickLength(length: number): AbstractAxis;
+    public endTickLength(length: number): Axis<D>;
     public endTickLength(length?: number): any {
       if (length == null) {
         return this._endTickLength;
@@ -328,7 +329,7 @@ export module Axis {
           throw new Error("end tick length must be positive");
         }
         this._endTickLength = length;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -354,7 +355,7 @@ export module Axis {
      * @param {number} padding If provided, the desired padding.
      * @returns {Axis} The calling Axis.
      */
-    public tickLabelPadding(padding: number): AbstractAxis;
+    public tickLabelPadding(padding: number): Axis<D>;
     public tickLabelPadding(padding?: number): any {
       if (padding == null) {
         return this._tickLabelPadding;
@@ -363,7 +364,7 @@ export module Axis {
           throw new Error("tick label padding must be positive");
         }
         this._tickLabelPadding = padding;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -383,7 +384,7 @@ export module Axis {
      * @param {number} size If provided, the desired gutter.
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): AbstractAxis;
+    public gutter(size: number): Axis<D>;
     public gutter(size?: number): any {
       if (size == null) {
         return this._gutter;
@@ -392,7 +393,7 @@ export module Axis {
           throw new Error("gutter size must be positive");
         }
         this._gutter = size;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -402,7 +403,7 @@ export module Axis {
      *
      * @returns {number} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Axis.
      *
@@ -410,12 +411,12 @@ export module Axis {
      * (top/bottom/left/right).
      * @returns {Axis} The calling Axis.
      */
-    public orient(newOrientation: string): AbstractAxis;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): Axis<D>;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        var newOrientationLC = newOrientation.toLowerCase();
+        var newOrientationLC = orientation.toLowerCase();
         if (newOrientationLC !== "top" &&
             newOrientationLC !== "bottom" &&
             newOrientationLC !== "left" &&
@@ -423,7 +424,7 @@ export module Axis {
           throw new Error("unsupported orientation");
         }
         this._orientation = newOrientationLC;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -444,16 +445,14 @@ export module Axis {
      * labels.
      * @returns {Axis} The calling Axis.
      */
-    public showEndTickLabels(show: boolean): AbstractAxis;
+    public showEndTickLabels(show: boolean): Axis<D>;
     public showEndTickLabels(show?: boolean): any {
       if (show == null) {
         return this._showEndTickLabels;
       }
       this._showEndTickLabels = show;
-      this._render();
+      this.render();
       return this;
     }
-
   }
-}
 }

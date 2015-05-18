@@ -8,18 +8,18 @@ describe("Plots", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
       var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Bar(xScale, yScale);
-      plot.project("x", (d: any) => d.x, xScale);
-      plot.project("y", (d: any) => d.y, yScale);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var plot = new Plottable.Plots.Bar(xScale, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
     });
 
-    function assertPlotDataEqual(expected: Plottable.Plot.PlotData, actual: Plottable.Plot.PlotData,
+    function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
         msg: string) {
       assert.deepEqual(expected.data, actual.data, msg);
       assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -30,29 +30,29 @@ describe("Plots", () => {
     describe("Vertical Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.Category;
-      var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.Bar<string, number>;
+      var xScale: Plottable.Scales.Category;
+      var yScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<string, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Category().domain(["A", "B"]);
-        yScale = new Plottable.Scale.Linear();
+        xScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        yScale = new Plottable.Scales.Linear();
         var data = [
           {x: "A", y: 1},
           {x: "B", y: -1.5},
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -99,7 +99,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getBar()", () => {
+      it("getBars()", () => {
         var bar: D3.Selection = barPlot.getBars(155, 150); // in the middle of bar 0
 
         assert.lengthOf(bar[0], 1, "getBar returns a bar");
@@ -260,7 +260,7 @@ describe("Plots", () => {
         });
 
         it("handles empty plots gracefully", () => {
-          barPlot = new Plottable.Plot.Bar(xScale, yScale);
+          barPlot = new Plottable.Plots.Bar(xScale, yScale);
 
           var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
           assert.lengthOf(closest.data, 0, "empty plots return empty data");
@@ -275,29 +275,29 @@ describe("Plots", () => {
     describe("Vertical Bar Plot modified log scale", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.ModifiedLog;
-      var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.Bar<number, number>;
+      var xScale: Plottable.Scales.ModifiedLog;
+      var yScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.ModifiedLog();
-        yScale = new Plottable.Scale.Linear();
+        xScale = new Plottable.Scales.ModifiedLog();
+        yScale = new Plottable.Scales.Linear();
         var data = [
           {x: 2, y: 1},
           {x: 10, y: -1.5},
           {x: 100, y: 1}
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
         yScale.domain([-2, 2]);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -325,27 +325,27 @@ describe("Plots", () => {
     describe("Vertical Bar Plot linear scale", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.Linear;
-      var yScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.Bar<number, number>;
+      var xScale: Plottable.Scales.Linear;
+      var yScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<number, number>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scale.Linear();
-        yScale = new Plottable.Scale.Linear();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
         var data = [
           {x: 2, y: 1},
           {x: 10, y: -1.5},
           {x: 100, y: 1}
         ];
+        barPlot = new Plottable.Plots.Bar(xScale, yScale);
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plot.Bar(xScale, yScale);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -371,21 +371,21 @@ describe("Plots", () => {
 
       it("sensible bar width one datum", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 10, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}]));
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
         svg.remove();
       });
 
       it("sensible bar width same datum", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 10, y: 2}, {x: 10, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 10, y: 2}, {x: 10, y: 2}]));
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
         svg.remove();
       });
 
       it("sensible bar width unsorted data", () => {
         barPlot.removeDataset(dataset);
-        barPlot.addDataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]);
+        barPlot.addDataset(new Plottable.Dataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]));
         var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
         assert.closeTo((<any> barPlot)._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
         svg.remove();
@@ -394,8 +394,8 @@ describe("Plots", () => {
 
     describe("Vertical Bar Plot time scale", () => {
       var svg: D3.Selection;
-      var barPlot: Plottable.Plot.Bar<number, number>;
-      var xScale: Plottable.Scale.Time;
+      var barPlot: Plottable.Plots.Bar<Date, number>;
+      var xScale: Plottable.Scales.Time;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(600, 400);
@@ -405,12 +405,12 @@ describe("Plots", () => {
           { x: "12/01/95", y: 2, type: "a" },
           { x: "12/01/96", y: 2, type: "a" },
           { x: "12/01/97", y: 2, type: "a" }];
-        xScale = new Plottable.Scale.Time();
-        var yScale = new Plottable.Scale.Linear();
-        barPlot = new Plottable.Plot.Bar(xScale, yScale);
-        barPlot.addDataset(data)
-               .project("x", (d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
-               .project("y", "y", yScale)
+        xScale = new Plottable.Scales.Time();
+        var yScale = new Plottable.Scales.Linear();
+        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot.addDataset(new Plottable.Dataset(data));
+        barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
+               .y((d) => d.y, yScale)
                .renderTo(svg);
       });
 
@@ -426,15 +426,15 @@ describe("Plots", () => {
     describe("Horizontal Bar Plot", () => {
       var svg: D3.Selection;
       var dataset: Plottable.Dataset;
-      var yScale: Plottable.Scale.Category;
-      var xScale: Plottable.Scale.Linear;
-      var barPlot: Plottable.Plot.Bar<number, string>;
+      var yScale: Plottable.Scales.Category;
+      var xScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<number, string>;
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        yScale = new Plottable.Scale.Category().domain(["A", "B"]);
-        xScale = new Plottable.Scale.Linear();
+        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        xScale = new Plottable.Scales.Linear();
         xScale.domain([-3, 3]);
 
         var data = [
@@ -443,13 +443,12 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-
-        barPlot = new Plottable.Plot.Bar(xScale, yScale, false);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
-        barPlot.project("x", "x", xScale);
-        barPlot.project("y", "y", yScale);
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
       });
 
@@ -502,7 +501,7 @@ describe("Plots", () => {
         var bar1 = d3.select(bars[0][1]);
         var bar0y = bar0.data()[0].y;
         var bar1y = bar1.data()[0].y;
-        barPlot.project("width", 10);
+        barPlot.attr("width", 10);
         assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
         assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
         assert.closeTo(TestMethods.numAttr(bar0, "width"), 100, 0.01, "bar0 width");
@@ -637,23 +636,23 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot With Bar Labels", () => {
-      var plot: Plottable.Plot.Bar<string, number>;
+      var plot: Plottable.Plots.Bar<string, number>;
       var data: any[];
       var dataset: Plottable.Dataset;
-      var xScale: Plottable.Scale.Category;
-      var yScale: Plottable.Scale.Linear;
+      var xScale: Plottable.Scales.Category;
+      var yScale: Plottable.Scales.Linear;
       var svg: D3.Selection;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         data = [{x: "foo", y: 5}, {x: "bar", y: 640}, {x: "zoo", y: 12345}];
+        xScale = new Plottable.Scales.Category();
+        yScale = new Plottable.Scales.Linear();
         dataset = new Plottable.Dataset(data);
-        xScale = new Plottable.Scale.Category();
-        yScale = new Plottable.Scale.Linear();
-        plot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
+        plot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
         plot.addDataset(dataset);
-        plot.project("x", "x", xScale);
-        plot.project("y", "y", yScale);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
       });
 
       it("bar labels disabled by default", () => {
@@ -665,7 +664,7 @@ describe("Plots", () => {
 
       it("bar labels render properly", () => {
         plot.renderTo(svg);
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
         assert.strictEqual(texts[0], "640", "first label is 640");
@@ -674,17 +673,17 @@ describe("Plots", () => {
       });
 
       it("bar labels hide if bars too skinny", () => {
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         plot.renderTo(svg);
-        plot.barLabelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
+        plot.labelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "no text drawn");
         svg.remove();
       });
 
       it("formatters are used properly", () => {
-        plot.barLabelsEnabled(true);
-        plot.barLabelFormatter((n: number) => n.toString() + "%");
+        plot.labelsEnabled(true);
+        plot.labelFormatter((n: number) => n.toString() + "%");
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
@@ -694,7 +693,7 @@ describe("Plots", () => {
       });
 
       it("bar labels are removed instantly on dataset change", (done) => {
-        plot.barLabelsEnabled(true);
+        plot.labelsEnabled(true);
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
@@ -717,76 +716,56 @@ describe("Plots", () => {
     });
 
     describe("getAllSelections", () => {
-      var verticalBarPlot: Plottable.Plot.Bar<string, number>;
+      var verticalBarPlot: Plottable.Plots.Bar<string, number>;
       var dataset: Plottable.Dataset;
       var svg: D3.Selection;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset();
-        var xScale = new Plottable.Scale.Category();
-        var yScale = new Plottable.Scale.Linear();
-        verticalBarPlot = new Plottable.Plot.Bar<string, number>(xScale, yScale);
-        verticalBarPlot.project("x", "x", xScale);
-        verticalBarPlot.project("y", "y", yScale);
+        var xScale = new Plottable.Scales.Category();
+        var yScale = new Plottable.Scales.Linear();
+        verticalBarPlot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
+        verticalBarPlot.x((d) => d.x, xScale);
+        verticalBarPlot.y((d) => d.y, yScale);
       });
 
       it("retrieves all dataset selections with no args", () => {
         var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
+        verticalBarPlot.addDataset(new Plottable.Dataset(barData));
         verticalBarPlot.renderTo(svg);
 
         var allBars = verticalBarPlot.getAllSelections();
-        var allBars2 = verticalBarPlot.getAllSelections((<any> verticalBarPlot)._datasetKeysInOrder);
-        assert.deepEqual(allBars, allBars2, "both ways of getting all selections work");
+        assert.strictEqual(allBars.size(), 3, "retrieved all bars");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (string arg)", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset(barData2);
+      it("retrieves correct selections for supplied Datasets", () => {
+        var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        var dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        verticalBarPlot.addDataset(dataset1);
+        verticalBarPlot.addDataset(dataset2);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections("a");
+        var allBars = verticalBarPlot.getAllSelections([dataset1]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
       });
 
-      it("retrieves correct selections (array arg)", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
+      it("skips invalid Datasets", () => {
+        var dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        var notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        verticalBarPlot.addDataset(dataset1);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections(["a", "b"]);
-        assert.strictEqual(allBars.size(), 6, "all bars retrieved");
-        var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
-        assert.includeMembers(selectionData, barData2, "second dataset data in selection data");
-
-        svg.remove();
-      });
-
-      it("skips invalid keys", () => {
-        var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
-        var barData2 = [{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }];
-        verticalBarPlot.addDataset("a", barData);
-        verticalBarPlot.addDataset("b", barData2);
-        verticalBarPlot.renderTo(svg);
-
-        var allBars = verticalBarPlot.getAllSelections(["a", "c"]);
+        var allBars = verticalBarPlot.getAllSelections([dataset1, notAddedDataset]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
-        assert.includeMembers(selectionData, barData, "first dataset data in selection data");
+        assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
       });
@@ -795,15 +774,15 @@ describe("Plots", () => {
 
     it("plot auto domain scale to visible points on Category scale", () => {
       var svg = TestMethods.generateSVG(500, 500);
-      var xAccessor = (d: any, i: number, u: any) => d.a;
-      var yAccessor = (d: any, i: number, u: any) => d.b + u.foo;
+      var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a;
+      var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
-      var plot = new Plottable.Plot.Bar(xScale, yScale);
-      plot.addDataset(simpleDataset)
-          .project("x", xAccessor, xScale)
-          .project("y", yAccessor, yScale)
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
+      var plot = new Plottable.Plots.Bar(xScale, yScale);
+      plot.addDataset(simpleDataset);
+      plot.x(xAccessor, xScale)
+          .y(yAccessor, yScale)
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");

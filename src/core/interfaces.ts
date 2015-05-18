@@ -2,15 +2,17 @@ module Plottable {
   /**
    * Access specific datum property.
    */
-  export type _Accessor = (datum: any, index?: number, userMetadata?: any, plotMetadata?: Plot.PlotMetadata) => any;
+  export interface Accessor<T> {
+    (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+  }
 
   /**
    * Retrieves scaled datum property.
    */
-  export type _Projector = (datum: any, index: number, userMetadata: any, plotMetadata: Plot.PlotMetadata) => any;
+  export type _Projector = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
 
   /**
-   * Projector with applied user and plot metadata
+   * Projector with dataset and plot metadata
    */
   export type AppliedProjector = (datum: any, index: number) => any;
 
@@ -18,8 +20,8 @@ module Plottable {
    * Defines a way how specific attribute needs be retrieved before rendering.
    */
   export type _Projection = {
-    accessor: _Accessor;
-    scale?: Scale.AbstractScale<any, any>;
+    accessor: Accessor<any>;
+    scale?: Scale<any, any>;
     attribute: string;
   }
 
@@ -35,21 +37,9 @@ module Plottable {
 
   export type AttributeToAppliedProjector = { [attrToSet: string]: AppliedProjector; };
 
-  /**
-   * A simple bounding box.
-   */
-  export type SelectionArea = {
-    xMin: number;
-    xMax: number;
-    yMin: number;
-    yMax: number;
-  }
-
-  export type _SpaceRequest = {
-    width: number;
-    height: number;
-    wantsWidth: boolean;
-    wantsHeight: boolean;
+  export type SpaceRequest = {
+    minWidth: number;
+    minHeight: number;
   }
 
   /**

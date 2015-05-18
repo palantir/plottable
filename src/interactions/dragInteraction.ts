@@ -1,36 +1,51 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-  export class Drag extends AbstractInteraction {
+
+export type DragCallback = (start: Point, end: Point) => any;
+
+export module Interactions {
+  export class Drag extends Interaction {
     private _dragging = false;
     private _constrain = true;
-    private _mouseDispatcher: Plottable.Dispatcher.Mouse;
-    private _touchDispatcher: Dispatcher.Touch;
+    private _mouseDispatcher: Dispatchers.Mouse;
+    private _touchDispatcher: Dispatchers.Touch;
     private _dragOrigin: Point;
-    private _dragStartCallback: (p: Point) => any;
-    private _dragCallback: (start: Point, end: Point) => any;
-    private _dragEndCallback: (start: Point, end: Point) => any;
+    private _dragStartCallbacks = new Utils.CallbackSet<DragCallback>();
+    private _dragCallbacks = new Utils.CallbackSet<DragCallback>();
+    private _dragEndCallbacks = new Utils.CallbackSet<DragCallback>();
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._mouseDispatcher.onMouseDown("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._startDrag(p, e));
-      this._mouseDispatcher.onMouseMove("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._doDrag(p, e));
-      this._mouseDispatcher.onMouseUp("Interaction.Drag" + this.getID(),
-        (p: Point, e: MouseEvent) => this._endDrag(p, e));
+    private _mouseDownCallback = (p: Point, e: MouseEvent) => this._startDrag(p, e);
+    private _mouseMoveCallback = (p: Point, e: MouseEvent) => this._doDrag(p, e);
+    private _mouseUpCallback = (p: Point, e: MouseEvent) => this._endDrag(p, e);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._startDrag(idToPoint[ids[0]], e);
+    private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._doDrag(idToPoint[ids[0]], e);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], e: UIEvent) => this._endDrag(idToPoint[ids[0]], e);
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._startDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchMove("Interaction.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._doDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchEnd("Interaction.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._endDrag(idToPoint[ids[0]], e));
-      this._touchDispatcher.onTouchCancel("Interaction.Drag" + this.getID(),
-        (ids, idToPoint, e) => this._dragging = false);
+    protected _anchor(component: Component) {
+      super._anchor(component);
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._mouseDispatcher.onMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.onMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.onMouseUp(this._mouseUpCallback);
+
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+    }
+
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offMouseDown(this._mouseDownCallback);
+      this._mouseDispatcher.offMouseMove(this._mouseMoveCallback);
+      this._mouseDispatcher.offMouseUp(this._mouseUpCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher = null;
     }
 
     private _translateAndConstrain(p: Point) {
@@ -40,61 +55,53 @@ export module Interaction {
       }
 
       return {
-        x: _Util.Methods.clamp(translatedP.x, 0, this._componentToListenTo.width()),
-        y: _Util.Methods.clamp(translatedP.y, 0, this._componentToListenTo.height())
+        x: Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+        y: Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
       };
     }
 
-    private _startDrag(p: Point, e: UIEvent) {
-      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
+    private _startDrag(point: Point, event: UIEvent) {
+      if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
         return;
       }
-      var translatedP = this._translateToComponentSpace(p);
+      var translatedP = this._translateToComponentSpace(point);
       if (this._isInsideComponent(translatedP)) {
-        e.preventDefault();
+        event.preventDefault();
         this._dragging = true;
         this._dragOrigin = translatedP;
-        if (this._dragStartCallback) {
-          this._dragStartCallback(this._dragOrigin);
-        }
+        this._dragStartCallbacks.callCallbacks(this._dragOrigin);
       }
     }
 
-    private _doDrag(p: Point, e: UIEvent) {
+    private _doDrag(point: Point, event: UIEvent) {
       if (this._dragging) {
-        if (this._dragCallback) {
-          var constrainedP = this._translateAndConstrain(p);
-          this._dragCallback(this._dragOrigin, constrainedP);
-        }
+        this._dragCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
       }
     }
 
-    private _endDrag(p: Point, e: UIEvent) {
-      if (e instanceof MouseEvent && (<MouseEvent> e).button !== 0) {
+    private _endDrag(point: Point, event: UIEvent) {
+      if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
         return;
       }
       if (this._dragging) {
         this._dragging = false;
-        if (this._dragEndCallback) {
-          var constrainedP = this._translateAndConstrain(p);
-          this._dragEndCallback(this._dragOrigin, constrainedP);
-        }
+        this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
       }
     }
 
     /**
-     * Returns whether or not this Interaction constrains Points passed to its
+     * Returns whether or not this Interactions constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point
      * inside the Component will be passed to the callback instead of the actual
      * cursor position.
      *
-     * @return {boolean} Whether or not the Interaction.Drag constrains.
+     * @return {boolean} Whether or not the Interactions.Drag constrains.
      */
     public constrainToComponent(): boolean;
     /**
-     * Sets whether or not this Interaction constrains Points passed to its
+     * Sets whether or not this Interactions constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point
@@ -102,7 +109,7 @@ export module Interaction {
      * cursor position.
      *
      * @param {boolean} constrain Whether or not to constrain Points.
-     * @return {Interaction.Drag} The calling Interaction.Drag.
+     * @return {Interactions.Drag} The calling Interactions.Drag.
      */
     public constrainToComponent(constrain: boolean): Drag;
     public constrainToComponent(constrain?: boolean): any {
@@ -114,69 +121,69 @@ export module Interaction {
     }
 
     /**
-     * Gets the callback that is called when dragging starts.
-     *
-     * @returns {(start: Point) => any} The callback called when dragging starts.
-     */
-    public onDragStart(): (start: Point) => any;
-    /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {(start: Point) => any} cb The callback to be called. Takes in a Point in pixels.
-     * @returns {Drag} The calling Interaction.Drag.
+     * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
+     * @returns {Drag} The calling Interactions.Drag.
      */
-    public onDragStart(cb: (start: Point) => any): Drag;
-    public onDragStart(cb?: (start: Point) => any): any {
-      if (cb === undefined) {
-        return this._dragStartCallback;
-      } else {
-        this._dragStartCallback = cb;
-        return this;
-      }
+    public onDragStart(callback: DragCallback) {
+      this._dragStartCallbacks.add(callback);
+      return this;
     }
 
     /**
-     * Gets the callback that is called during dragging.
+     * Removes the callback to be called when dragging starts.
      *
-     * @returns {(start: Point, end: Point) => any} The callback called during dragging.
+     * @param {DragCallback} callback The callback to be removed.
+     * @returns {Drag} The calling Interactions.Drag.
      */
-    public onDrag(): (start: Point, end: Point) => any;
+    public offDragStart(callback: DragCallback) {
+      this._dragStartCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
-     * @returns {Drag} The calling Interaction.Drag.
+     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+     * @returns {Drag} The calling Interactions.Drag.
      */
-    public onDrag(cb: (start: Point, end: Point) => any): Drag;
-    public onDrag(cb?: (start: Point, end: Point) => any): any {
-      if (cb === undefined) {
-        return this._dragCallback;
-      } else {
-        this._dragCallback = cb;
-        return this;
-      }
+    public onDrag(callback: DragCallback) {
+      this._dragCallbacks.add(callback);
+      return this;
     }
 
     /**
-     * Gets the callback that is called when dragging ends.
+     * Removes a callback to be called during dragging.
      *
-     * @returns {(start: Point, end: Point) => any} The callback called when dragging ends.
+     * @param {DragCallback} callback The callback to be removed.
+     * @returns {Drag} The calling Interactions.Drag.
      */
-    public onDragEnd(): (start: Point, end: Point) => any;
+    public offDrag(callback: DragCallback) {
+      this._dragCallbacks.delete(callback);
+      return this;
+    }
+
     /**
      * Adds a callback to be called when the dragging ends.
      *
-     * @param {(start: Point, end: Point) => any} cb The callback to be called. Takes in Points in pixels.
-     * @returns {Drag} The calling Interaction.Drag.
+     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
+     * @returns {Drag} The calling Interactions.Drag.
      */
-    public onDragEnd(cb: (start: Point, end: Point) => any): Drag;
-    public onDragEnd(cb?: (start: Point, end: Point) => any): any {
-      if (cb === undefined) {
-        return this._dragEndCallback;
-      } else {
-        this._dragEndCallback = cb;
-        return this;
-      }
+    public onDragEnd(callback: DragCallback) {
+      this._dragEndCallbacks.add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback to be called when the dragging ends.
+     *
+     * @param {DragCallback} callback The callback to be removed
+     * @returns {Drag} The calling Interactions.Drag.
+     */
+    public offDragEnd(callback: DragCallback) {
+      this._dragEndCallbacks.delete(callback);
+      return this;
     }
   }
 }

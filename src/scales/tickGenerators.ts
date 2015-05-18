@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export module Scale {
+  export module Scales {
     export module TickGenerators {
       // HACKHACK: Generic types in type definition fails compilation
       // https://github.com/Microsoft/TypeScript/issues/1616
       export interface TickGenerator<D> {
-        (scale: Plottable.Scale.AbstractQuantitative<D>): D[];
+        (scale: Plottable.QuantitativeScale<D>): D[];
       }
       /**
        * Creates a tick generator using the specified interval.
@@ -17,12 +17,12 @@ module Plottable {
        *
        * @returns {TickGenerator} A tick generator using the specified interval.
        */
-      export function intervalTickGenerator(interval: number) : TickGenerator<number> {
-        if(interval <= 0) {
+      export function intervalTickGenerator(interval: number): TickGenerator<number> {
+        if (interval <= 0) {
            throw new Error("interval must be positive number");
         }
 
-        return function(s: Scale.AbstractQuantitative<number>) {
+        return function(s: QuantitativeScale<number>) {
           var domain = s.domain();
           var low = Math.min(domain[0], domain[1]);
           var high = Math.max(domain[0], domain[1]);
@@ -30,7 +30,7 @@ module Plottable {
           var numTicks = Math.floor((high - firstTick) / interval) + 1;
 
           var lowTicks = low % interval === 0 ? [] : [low];
-          var middleTicks = _Util.Methods.range(0, numTicks).map(t => firstTick + t * interval);
+          var middleTicks = Utils.Methods.range(0, numTicks).map(t => firstTick + t * interval);
           var highTicks = high % interval === 0 ? [] : [high];
 
           return lowTicks.concat(middleTicks).concat(highTicks);
@@ -45,7 +45,7 @@ module Plottable {
        * @returns {TickGenerator} A tick generator returning only integer ticks.
        */
       export function integerTickGenerator(): TickGenerator<number> {
-        return function(s: Scale.AbstractQuantitative<number>) {
+        return function(s: QuantitativeScale<number>) {
           var defaultTicks = s.getDefaultTicks();
           return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
         };

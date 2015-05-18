@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
+export module Components {
   export class YDragBoxLayer extends DragBoxLayer {
     constructor() {
       super();
@@ -9,10 +9,10 @@ export module Component {
       this._hasCorners = false;
     }
 
-    public _computeLayout(offeredXOrigin?: number, offeredYOrigin?: number,
-                          availableWidth?: number, availableHeight?: number) {
-      super._computeLayout(offeredXOrigin, offeredYOrigin, availableWidth, availableHeight);
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
       this.bounds(this.bounds()); // set correct bounds when width/height changes
+      return this;
     }
 
     protected _setBounds(newBounds: Bounds) {

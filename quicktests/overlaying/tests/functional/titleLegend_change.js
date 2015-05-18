@@ -20,45 +20,44 @@ function run(svg, data, Plottable) {
   var dataseries6 = new Plottable.Dataset(data[1].slice(20, 30));
   dataseries6.metadata({name: "grapes"});
 
-  var colorScale1 = new Plottable.Scale.Color();
+  var colorScale1 = new Plottable.Scales.Color();
   colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
 
   //Axis
   var domainer_X = new Plottable.Domainer().addPaddingException(0);
   var domainer_Y = new Plottable.Domainer().addPaddingException(0);
-  var xScale = new Plottable.Scale.Linear().domainer(domainer_X);
-  var yScale = new Plottable.Scale.Linear().domainer(domainer_Y);
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var xScale = new Plottable.Scales.Linear().domainer(domainer_X);
+  var yScale = new Plottable.Scales.Linear().domainer(domainer_Y);
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
 
-  // metadata is broken
-  var colorProjector = function(d, i, m) {
-    return colorScale1.scale(m.name);
+  var colorProjector = function(d, i, dataset) {
+    return dataset.metadata().name;
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries1);
-  scatterPlot.project("x", "x", xScale).project("y", "y", yScale);
-  var linePlot = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries2);
-  linePlot.project("x", "x", xScale).project("y", "y", yScale);
-  var renderApple = new Plottable.Plot.Area(xScale, yScale).addDataset(dataseries3);
-  renderApple.project("x", "x", xScale).project("y", "y", yScale);
-  var renderBanana = new Plottable.Plot.Line(xScale, yScale).addDataset(dataseries4);
-  renderBanana.project("x", "x", xScale).project("y", "y", yScale);
-  var renderOrange = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries5);
-  renderOrange.project("x", "x", xScale).project("y", "y", yScale);
-  var renderGrape = new Plottable.Plot.Scatter(xScale, yScale).addDataset(dataseries6);
-  renderGrape.project("x", "x", xScale).project("y", "y", yScale);
+  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
+  scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
+  linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
+  renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
+  renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
+  renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+  var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
+  renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
-  scatterPlot.attr("fill", colorProjector);
-  linePlot.attr("stroke", colorProjector);
-  renderApple.attr("fill", colorProjector);
-  renderBanana.attr("stroke", colorProjector);
-  renderOrange.attr("fill", colorProjector);
-  renderGrape.attr("fill", colorProjector);
+  scatterPlot.attr("fill", colorProjector, colorScale1);
+  linePlot.attr("stroke", colorProjector, colorScale1);
+  renderApple.attr("fill", colorProjector, colorScale1);
+  renderBanana.attr("stroke", colorProjector, colorScale1);
+  renderOrange.attr("fill", colorProjector, colorScale1);
+  renderGrape.attr("fill", colorProjector, colorScale1);
 
-  var renderArea = scatterPlot.below(linePlot);
+  var renderArea = new Plottable.Components.Group([scatterPlot, linePlot]);
   function emptyTitle() {
     title1.text("");
   }
@@ -87,55 +86,54 @@ function run(svg, data, Plottable) {
     renderGrape.detach();
     renderOrange.detach();
     renderBanana.detach();
-    renderArea
-    .below(scatterPlot)
-    .below(linePlot);
+    renderArea.append(scatterPlot).append(linePlot);
   }
 
   function sixPlots() {
     colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
-    renderArea
-    .below(renderApple)
-    .below(renderBanana)
-    .below(renderOrange)
-    .below(renderGrape)
-    .below(scatterPlot)
-    .below(linePlot);
+    renderArea.append(renderApple)
+              .append(renderBanana)
+              .append(renderOrange)
+              .append(renderGrape)
+              .append(scatterPlot)
+              .append(linePlot);
   }
 
   twoPlots();
 
   //title + legend
-  var title1 = new Plottable.Component.TitleLabel( "Two Data Series", "horizontal");
-  var legend1 = new Plottable.Component.Legend(colorScale1);
+  var title1 = new Plottable.Components.Label( "Two Data Series", "horizontal").classed("title-label", true);
+  var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
-  var titleTable = new Plottable.Component.Table([[title1, legend1]]);
+  var titleTable = new Plottable.Components.Table([[title1, legend1]]);
 
-  var noTitleLabel  = new Plottable.Component.Label("no title", "horizontal");
-  var shortTitleLabel  = new Plottable.Component.Label("tiny title", "horizontal");
-  var longTitleLabel  = new Plottable.Component.Label("long title", "horizontal");
-  var noPlotsLabel  = new Plottable.Component.Label("no plots", "horizontal");
-  var shortLegendLabel  = new Plottable.Component.Label("two plots", "horizontal");
-  var tallLegendLabel  = new Plottable.Component.Label("six plots", "horizontal");
+  var noTitleLabel  = new Plottable.Components.Label("no title", "horizontal");
+  var shortTitleLabel  = new Plottable.Components.Label("tiny title", "horizontal");
+  var longTitleLabel  = new Plottable.Components.Label("long title", "horizontal");
+  var noPlotsLabel  = new Plottable.Components.Label("no plots", "horizontal");
+  var shortLegendLabel  = new Plottable.Components.Label("two plots", "horizontal");
+  var tallLegendLabel  = new Plottable.Components.Label("six plots", "horizontal");
 
-  var labelTable = new Plottable.Component.Table([[noTitleLabel, noPlotsLabel],
+  var labelTable = new Plottable.Components.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],
-    [longTitleLabel, tallLegendLabel]]);
+    [longTitleLabel, tallLegendLabel]
+  ]);
 
-  var basicTable = new Plottable.Component.Table([[null, titleTable],
-   [yAxis, renderArea],
-   [null, xAxis],
-   [null, labelTable]]);
+  var basicTable = new Plottable.Components.Table([[null, titleTable],
+    [yAxis, renderArea],
+    [null, xAxis],
+    [null, labelTable]
+  ]);
 
   basicTable.renderTo(svg);
 
 
-  noTitleLabel.registerInteraction(new Plottable.Interaction.Click().onClick(emptyTitle));
-  shortTitleLabel.registerInteraction(new Plottable.Interaction.Click().onClick(smallTitle));
-  longTitleLabel.registerInteraction(new Plottable.Interaction.Click().onClick(longTitle));
-  noPlotsLabel.registerInteraction(new Plottable.Interaction.Click().onClick(noPlots));
-  shortLegendLabel.registerInteraction(new Plottable.Interaction.Click().onClick(twoPlots));
-  tallLegendLabel.registerInteraction(new Plottable.Interaction.Click().onClick(sixPlots));
+  new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
+  new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);
+  new Plottable.Interactions.Click().onClick(longTitle).attachTo(longTitleLabel);
+  new Plottable.Interactions.Click().onClick(noPlots).attachTo(noPlotsLabel);
+  new Plottable.Interactions.Click().onClick(twoPlots).attachTo(shortLegendLabel);
+  new Plottable.Interactions.Click().onClick(sixPlots).attachTo(tallLegendLabel);
 
 
 }

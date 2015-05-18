@@ -1,8 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class SelectionBoxLayer extends AbstractComponent {
+export module Components {
+  export class SelectionBoxLayer extends Component {
     protected _box: D3.Selection;
     private _boxArea: D3.Selection;
     private _boxVisible = false;
@@ -14,8 +14,6 @@ export module Component {
     constructor() {
       super();
       this.classed("selection-box-layer", true);
-      this._fixedWidthFlag = true;
-      this._fixedHeightFlag = true;
     }
 
     protected _setup() {
@@ -51,7 +49,7 @@ export module Component {
       }
 
       this._setBounds(newBounds);
-      this._render();
+      this.render();
       return this;
     }
 
@@ -70,7 +68,7 @@ export module Component {
       };
     }
 
-    public _doRender() {
+    public renderImmediately() {
       if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
@@ -84,6 +82,7 @@ export module Component {
       } else {
         this._box.remove();
       }
+      return this;
     }
 
     /**
@@ -105,8 +104,16 @@ export module Component {
       }
 
       this._boxVisible = show;
-      this._render();
+      this.render();
       return this;
+    }
+
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
     }
   }
 }
