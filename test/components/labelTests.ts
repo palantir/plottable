@@ -26,7 +26,8 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
+    var label = new Plottable.Components.Label("LEFT-ROTATED LABEL");
+    label.angle(-90);
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
@@ -40,7 +41,8 @@ describe("Labels", () => {
   // Skipping due to FF odd client bounding rect computation - #1470.
   it.skip("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
+    var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL");
+    label.angle(90);
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
@@ -113,11 +115,11 @@ describe("Labels", () => {
   });
 
   it("unsupported alignments and orientations are unsupported", () => {
-    assert.throws(() => new Plottable.Components.Label("foo", "bar"), Error, "not a valid orientation");
+    assert.throws(() => new Plottable.Components.Label("foo").angle(10), Error, "10 is not a valid angle for LabelComponent");
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Label orientation can be changed after label is created", () => {
+  it.skip("Label angle can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Components.Label("CHANGING ORIENTATION");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -128,7 +130,7 @@ describe("Labels", () => {
     var bbox = Plottable.Utils.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
-    label.orientation("right");
+    label.angle(90);
     text = content.select("text");
     bbox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);

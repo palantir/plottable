@@ -1174,7 +1174,8 @@ describe("NumericAxis", function () {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var yLabel = new Plottable.Components.Label("LABEL", "left");
+        var yLabel = new Plottable.Components.Label("LABEL");
+        yLabel.angle(-90);
         yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.x(function (d) { return d.x; }, xScale);
@@ -1506,7 +1507,8 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
+        var label = new Plottable.Components.Label("LEFT-ROTATED LABEL");
+        label.angle(-90);
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         label.renderTo(svg);
         var content = label._content;
@@ -1519,7 +1521,8 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
+        var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL");
+        label.angle(90);
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         label.renderTo(svg);
         var content = label._content;
@@ -1585,10 +1588,10 @@ describe("Labels", function () {
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
-        assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
+        assert.throws(function () { return new Plottable.Components.Label("foo").angle(10); }, Error, "10 is not a valid angle for LabelComponent");
     });
     // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Label orientation can be changed after label is created", function () {
+    it.skip("Label angle can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.Label("CHANGING ORIENTATION");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1597,7 +1600,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var bbox = Plottable.Utils.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
-        label.orientation("right");
+        label.angle(90);
         text = content.select("text");
         bbox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
