@@ -561,7 +561,7 @@ declare module Plottable {
      * call
      * ```typescript
      * Plottable.RenderController.setRenderPolicy(
-     *   new Plottable.RenderPolicy.Immediate()
+     *   new Plottable.RenderPolicies.Immediate()
      * );
      * ```
      */
@@ -1441,8 +1441,8 @@ declare module Plottable {
          *
          * @returns {Component} The calling Component
          */
-        render(immediately?: boolean): Component;
-        protected _render(): void;
+        render(): Component;
+        renderImmediately(): Component;
         /**
          * Causes the Component to recompute layout and redraw.
          *
@@ -1713,7 +1713,7 @@ declare module Plottable {
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<D>;
         protected _setup(): void;
         protected _getTickValues(): D[];
-        protected _render(): void;
+        renderImmediately(): Axis<D>;
         protected _generateBaselineAttrHash(): {
             x1: number;
             y1: number;
@@ -1906,7 +1906,7 @@ declare module Plottable {
             };
             protected _setup(): void;
             protected _getTickValues(): any[];
-            protected _render(): Time;
+            renderImmediately(): Time;
         }
     }
 }
@@ -1932,7 +1932,7 @@ declare module Plottable {
             protected _computeHeight(): number;
             protected _getTickValues(): number[];
             protected _rescale(): void;
-            protected _render(): void;
+            renderImmediately(): Numeric;
             /**
              * Gets the tick label position relative to the tick marks.
              *
@@ -2012,7 +2012,7 @@ declare module Plottable {
              * See tracking at https://github.com/palantir/plottable/issues/504
              */
             tickLabelAngle(angle: number): Category;
-            protected _render(): Category;
+            renderImmediately(): Category;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Axis<string>;
         }
     }
@@ -2079,7 +2079,7 @@ declare module Plottable {
             padding(padAmount: number): Label;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
-            protected _render(): void;
+            renderImmediately(): Label;
         }
     }
 }
@@ -2157,7 +2157,7 @@ declare module Plottable {
              * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
              */
             getEntry(position: Point): D3.Selection;
-            protected _render(): void;
+            renderImmediately(): Legend;
             /**
              * Gets the symbolFactoryAccessor of the legend, which dictates how
              * the symbol in each entry is drawn.
@@ -2231,7 +2231,7 @@ declare module Plottable {
             fixedHeight(): boolean;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            protected _render(): void;
+            renderImmediately(): InterpolatedColorLegend;
         }
     }
 }
@@ -2250,7 +2250,7 @@ declare module Plottable {
             constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
             destroy(): Gridlines;
             protected _setup(): void;
-            protected _render(): void;
+            renderImmediately(): Gridlines;
         }
     }
 }
@@ -2396,7 +2396,7 @@ declare module Plottable {
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
-            protected _render(): void;
+            renderImmediately(): SelectionBoxLayer;
             /**
              * Gets whether the box is being shown.
              *
@@ -2490,7 +2490,7 @@ declare module Plottable {
          * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
          */
         generateProjectors(dataset: Dataset): AttributeToAppliedProjector;
-        protected _render(): void;
+        renderImmediately(): Plot;
         /**
          * Enables or disables animation.
          *
@@ -3841,7 +3841,7 @@ declare module Plottable {
             protected _hasCorners: boolean;
             constructor();
             protected _setup(): void;
-            protected _render(): void;
+            renderImmediately(): DragBoxLayer;
             /**
              * Gets the detection radius of the drag box.
              *

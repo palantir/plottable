@@ -32,9 +32,8 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
 
-  // metadata is broken
   var colorProjector = function(d, i, dataset) {
-    return colorScale1.scale(dataset.metadata().name);
+    return dataset.metadata().name;
   };
 
   //rendering
@@ -51,12 +50,12 @@ function run(svg, data, Plottable) {
   var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
   renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
-  scatterPlot.attr("fill", colorProjector);
-  linePlot.attr("stroke", colorProjector);
-  renderApple.attr("fill", colorProjector);
-  renderBanana.attr("stroke", colorProjector);
-  renderOrange.attr("fill", colorProjector);
-  renderGrape.attr("fill", colorProjector);
+  scatterPlot.attr("fill", colorProjector, colorScale1);
+  linePlot.attr("stroke", colorProjector, colorScale1);
+  renderApple.attr("fill", colorProjector, colorScale1);
+  renderBanana.attr("stroke", colorProjector, colorScale1);
+  renderOrange.attr("fill", colorProjector, colorScale1);
+  renderGrape.attr("fill", colorProjector, colorScale1);
 
   var renderArea = new Plottable.Components.Group([scatterPlot, linePlot]);
   function emptyTitle() {
@@ -98,7 +97,6 @@ function run(svg, data, Plottable) {
               .append(renderGrape)
               .append(scatterPlot)
               .append(linePlot);
-    basicTable.redraw();
   }
 
   twoPlots();

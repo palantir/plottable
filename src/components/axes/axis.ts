@@ -142,7 +142,7 @@ module Plottable {
       return [];
     }
 
-    protected _render() {
+    public renderImmediately() {
       var tickMarkValues = this._getTickValues();
       var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
       tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
@@ -153,6 +153,7 @@ module Plottable {
                                                       .attr(this._generateTickMarkAttrHash(true));
       tickMarks.exit().remove();
       this._baseline.attr(this._generateBaselineAttrHash());
+      return this;
     }
 
     protected _generateBaselineAttrHash() {

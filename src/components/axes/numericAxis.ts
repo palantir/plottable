@@ -91,8 +91,8 @@ export module Axes {
       this.render();
     }
 
-    protected _render() {
-      super._render();
+    public renderImmediately() {
+      super.renderImmediately();
 
       var tickLabelAttrHash = {
         x: <any> 0,
@@ -209,6 +209,7 @@ export module Axes {
           this._tickLabelPositioning === "right") {
         this._hideTickMarksWithoutLabel();
       }
+      return this;
     }
 
     private _showAllTickMarks() {

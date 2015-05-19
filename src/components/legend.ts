@@ -237,8 +237,8 @@ export module Components {
       return entry;
     }
 
-    protected _render() {
-      super._render();
+    public renderImmediately() {
+      super.renderImmediately();
 
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
@@ -289,6 +289,7 @@ export module Components {
 
                       self._writer.write(value, maxTextLength, self.height(), writeOptions);
                     });
+      return this;
     }
 
     /**

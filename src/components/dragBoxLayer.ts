@@ -173,8 +173,8 @@ export module Components {
       return edges;
     }
 
-    protected _render() {
-      super._render();
+    public renderImmediately() {
+      super.renderImmediately();
       if (this.boxVisible()) {
         var bounds = this.bounds();
         var t = bounds.topLeft.y;
@@ -205,6 +205,7 @@ export module Components {
           this._detectionCornerBL.attr({ cx: l, cy: b, r: this._detectionRadius });
           this._detectionCornerBR.attr({ cx: r, cy: b, r: this._detectionRadius });
         }
+        return this;
       }
     }
 

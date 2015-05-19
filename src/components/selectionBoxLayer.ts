@@ -68,7 +68,7 @@ export module Components {
       };
     }
 
-    protected _render() {
+    public renderImmediately() {
       if (this._boxVisible) {
         var t = this._boxBounds.topLeft.y;
         var b = this._boxBounds.bottomRight.y;
@@ -82,6 +82,7 @@ export module Components {
       } else {
         this._box.remove();
       }
+      return this;
     }
 
     /**
