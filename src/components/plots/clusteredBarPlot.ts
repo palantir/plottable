@@ -4,7 +4,7 @@ module Plottable {
 export module Plots {
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
-    private _datasetOffsets: Utils.Map<Dataset, number>;
+    private _clusterOffsets: Utils.Map<Dataset, number>;
 
     /**
      * Creates a ClusteredBarPlot.
@@ -20,7 +20,7 @@ export module Plots {
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
-      this._datasetOffsets = new Utils.Map<Dataset, number>();
+      this._clusterOffsets = new Utils.Map<Dataset, number>();
     }
 
     protected _generateAttrToProjector() {
@@ -34,16 +34,16 @@ export module Plots {
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
       attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this._isVertical ? xAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset) : xAttr(d, i, dataset, m);
+        this._isVertical ? xAttr(d, i, dataset, m) + this._clusterOffsets.get(dataset) : xAttr(d, i, dataset, m);
       attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset);
+        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + this._clusterOffsets.get(dataset);
 
       return attrToProjector;
     }
 
     private _updateClusterPosition() {
       var innerScale = this._makeInnerScale();
-      this.datasets().forEach((d, i) => this._datasetOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
+      this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
     }
 
     private _makeInnerScale() {
