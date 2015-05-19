@@ -125,14 +125,14 @@ module Plottable {
     protected _setDomain(values: D[]) {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
-        this._setActualDomain(values);
+        this._setBackingDomain(values);
         this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
     }
 
-    protected _setActualDomain(values: D[]) {
-      throw new Error("subclasses should override _setActualDomain");
+    protected _setBackingDomain(values: D[]) {
+      throw new Error("subclasses should override _setBackingDomain");
     }
 
     /**

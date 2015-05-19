@@ -99,7 +99,7 @@ export module Scales {
       super._setDomain(transformedDomain);
     }
 
-    protected _setActualDomain(values: number[]) {
+    protected _setBackingDomain(values: number[]) {
       this._d3Scale.domain(values);
     }
 

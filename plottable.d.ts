@@ -827,7 +827,7 @@ declare module Plottable {
         domain(values: D[]): Scale<D, R>;
         protected _getDomain(): D[];
         protected _setDomain(values: D[]): void;
-        protected _setActualDomain(values: D[]): void;
+        protected _setBackingDomain(values: D[]): void;
         /**
          * Gets the range.
          *
@@ -938,7 +938,7 @@ declare module Plottable {
             _defaultExtent(): number[];
             scale(value: number): number;
             protected _getDomain(): any[];
-            protected _setActualDomain(values: number[]): void;
+            protected _setBackingDomain(values: number[]): void;
             protected _getRange(): any[];
             protected _setRange(values: number[]): void;
             invert(value: number): number;
@@ -982,7 +982,7 @@ declare module Plottable {
             invert(x: number): number;
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
-            protected _setActualDomain(values: number[]): void;
+            protected _setBackingDomain(values: number[]): void;
             ticks(): number[];
             _niceDomain(domain: number[], count?: number): number[];
             /**
@@ -1081,7 +1081,7 @@ declare module Plottable {
             outerPadding(outerPadding: number): Category;
             scale(value: string): number;
             protected _getDomain(): any[];
-            protected _setActualDomain(values: string[]): void;
+            protected _setBackingDomain(values: string[]): void;
             protected _getRange(): any[];
             protected _setRange(values: number[]): void;
         }
@@ -1104,7 +1104,7 @@ declare module Plottable {
             protected _getExtent(): string[];
             scale(value: string): string;
             protected _getDomain(): any[];
-            protected _setActualDomain(values: string[]): void;
+            protected _setBackingDomain(values: string[]): void;
             protected _getRange(): any[];
             protected _setRange(values: string[]): void;
         }
@@ -1137,7 +1137,7 @@ declare module Plottable {
             _defaultExtent(): Date[];
             scale(value: Date): number;
             protected _getDomain(): any[];
-            protected _setActualDomain(values: Date[]): void;
+            protected _setBackingDomain(values: Date[]): void;
             protected _getRange(): any[];
             protected _setRange(values: number[]): void;
             invert(value: number): Date;
@@ -1191,7 +1191,7 @@ declare module Plottable {
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
             protected _getDomain(): any[];
-            protected _setActualDomain(values: number[]): void;
+            protected _setBackingDomain(values: number[]): void;
             protected _getRange(): string[];
             protected _setRange(values: string[]): void;
         }

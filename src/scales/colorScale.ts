@@ -95,7 +95,7 @@ export module Scales {
       return this._d3Scale.domain();
     }
 
-    protected _setActualDomain(values: string[]) {
+    protected _setBackingDomain(values: string[]) {
       this._d3Scale.domain(values);
     }
 

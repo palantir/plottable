@@ -31,7 +31,7 @@ export module Scales {
       return this._d3Scale.domain();
     }
 
-    protected _setActualDomain(values: number[]) {
+    protected _setBackingDomain(values: number[]) {
       this._d3Scale.domain(values);
     }
 

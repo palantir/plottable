@@ -7061,14 +7061,14 @@ describe("Scales", function () {
             callbackWasCalled = true;
         };
         scale.onUpdate(testCallback);
-        scale._setActualDomain = function () { return null; };
+        scale._setBackingDomain = function () { return null; };
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
     it("Scale update listeners can be turned off", function () {
         var scale = new Plottable.Scale();
         scale._d3Scale = d3.scale.identity();
-        scale._setActualDomain = function () { return null; };
+        scale._setBackingDomain = function () { return null; };
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");

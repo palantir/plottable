@@ -1615,13 +1615,13 @@ var Plottable;
         Scale.prototype._setDomain = function (values) {
             if (!this._domainModificationInProgress) {
                 this._domainModificationInProgress = true;
-                this._setActualDomain(values);
+                this._setBackingDomain(values);
                 this._dispatchUpdate();
                 this._domainModificationInProgress = false;
             }
         };
-        Scale.prototype._setActualDomain = function (values) {
-            throw new Error("subclasses should override _setActualDomain");
+        Scale.prototype._setBackingDomain = function (values) {
+            throw new Error("subclasses should override _setBackingDomain");
         };
         Scale.prototype.range = function (values) {
             if (values == null) {
@@ -1773,7 +1773,7 @@ var Plottable;
             Linear.prototype._getDomain = function () {
                 return this._d3Scale.domain();
             };
-            Linear.prototype._setActualDomain = function (values) {
+            Linear.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             Linear.prototype._getRange = function () {
@@ -1889,7 +1889,7 @@ var Plottable;
                 var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
                 _super.prototype._setDomain.call(this, transformedDomain);
             };
-            ModifiedLog.prototype._setActualDomain = function (values) {
+            ModifiedLog.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             ModifiedLog.prototype.ticks = function () {
@@ -2091,7 +2091,7 @@ var Plottable;
             Category.prototype._getDomain = function () {
                 return this._d3Scale.domain();
             };
-            Category.prototype._setActualDomain = function (values) {
+            Category.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             Category.prototype._getRange = function () {
@@ -2197,7 +2197,7 @@ var Plottable;
             Color.prototype._getDomain = function () {
                 return this._d3Scale.domain();
             };
-            Color.prototype._setActualDomain = function (values) {
+            Color.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             Color.prototype._getRange = function () {
@@ -2273,7 +2273,7 @@ var Plottable;
             Time.prototype._getDomain = function () {
                 return this._d3Scale.domain();
             };
-            Time.prototype._setActualDomain = function (values) {
+            Time.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             Time.prototype._getRange = function () {
@@ -2411,7 +2411,7 @@ var Plottable;
             InterpolatedColor.prototype._getDomain = function () {
                 return this._d3Scale.domain();
             };
-            InterpolatedColor.prototype._setActualDomain = function (values) {
+            InterpolatedColor.prototype._setBackingDomain = function (values) {
                 this._d3Scale.domain(values);
             };
             InterpolatedColor.prototype._getRange = function () {
