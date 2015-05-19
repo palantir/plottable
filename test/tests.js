@@ -3111,10 +3111,9 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
+            yScale.padProportion(0.1);
             var constantY0 = 30;
             yScale.addExtentsProvider(function (scale) { return [[constantY0, constantY0 + 10]]; });
-            yScale.autoDomain();
-            assert.operator(yScale.domain()[0], "<", constantY0, "lower end of y Scale's domain is normally padded");
             var plot = new Plottable.Plots.Area(xScale, yScale);
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
