@@ -4,6 +4,47 @@ var assert = chai.assert;
 
 describe("Plots", () => {
 
+  describe("This is failing", () => {
+    var stackedPlot: Plottable.Plots.StackedBar<number, number>;
+
+    beforeEach(() => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      stackedPlot = new Plottable.Plots.StackedBar(xScale, yScale);
+      stackedPlot.x((d) => d.x, xScale);
+      stackedPlot.y((d) => d.y, yScale);
+
+      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Drawers.AbstractDrawer(key);
+      (<any> stackedPlot)._isVertical = true;
+    });
+
+    it("project can be called after addDataset", () => {
+      var data0 = [
+        { a: 1, b: 2 }
+      ];
+      var data1 = [
+        { a: 1, b: 4 }
+      ];
+
+      stackedPlot.addDataset(new Plottable.Dataset(data0));
+      stackedPlot.addDataset(new Plottable.Dataset(data1));
+
+      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
+      var ds0PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[0]).plotMetadata;
+      var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+
+      assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
+
+      stackedPlot.x((d) => d.a);
+      stackedPlot.y((d) => d.b);
+
+      assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
+    });
+
+  });
+
+
   describe("Stacked Plot Stacking", () => {
     var stackedPlot: Plottable.Stacked<number, number>;
 
