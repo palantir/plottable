@@ -380,7 +380,7 @@ describe("Component behavior", () => {
   it("components do not render unless allocated space", () => {
     var renderFlag = false;
     var c: any = new Plottable.Component();
-    c._render = () => renderFlag = true;
+    c.renderImmediately = () => renderFlag = true;
     c.anchor(svg);
     c._setup();
     c.render();
