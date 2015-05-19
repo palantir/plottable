@@ -1503,7 +1503,7 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    it("Left-rotated text is handled properly", function () {
+    it.skip("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1515,7 +1515,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    it("Right-rotated text is handled properly", function () {
+    it.skip("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1584,7 +1584,7 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    it("Label orientation can be changed after label is created", function () {
+    it.skip("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.Label("CHANGING ORIENTATION");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -4674,6 +4674,7 @@ describe("Plots", function () {
         });
         // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
         it.skip("auto scales correctly on stacked area", function () {
+            console.log(1);
             var plot = new Plottable.Plots.StackedArea(yScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, yScale).y(function (d) { return d.y; }, yScale);

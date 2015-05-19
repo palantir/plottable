@@ -359,6 +359,8 @@ describe("Plots", () => {
 
     // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
     it.skip("auto scales correctly on stacked area", () => {
+      console.log(1);
+
       var plot = new Plottable.Plots.StackedArea(yScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
