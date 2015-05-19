@@ -188,7 +188,7 @@ declare module Plottable {
              * @param {K} key Key associated with value to retrieve
              * @return {V} Value if found, undefined otherwise
              */
-            get(key: K): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
@@ -204,20 +204,20 @@ declare module Plottable {
              *
              * @return {V[]} The values in the store
              */
-            values(): any[];
+            values(): V[];
             /**
              * Return an array of keys in the key-value store
              *
              * @return {K[]} The keys in the store
              */
-            keys(): any[];
+            keys(): K[];
             /**
              * Execute a callback for each entry in the array.
              *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
+             * @param {(key: K, val?: V, index?: number) => void} callback The callback to execute
              * @return {any[]} The results of mapping the callback over the entries
              */
-            map(cb: (key?: K, val?: V, index?: number) => any): any[];
+            map(cb: (key?: K, value?: V, index?: number) => void): void[];
             /**
              * Delete a key from the key-value store. Return whether the key was present.
              *

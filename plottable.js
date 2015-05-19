@@ -384,12 +384,12 @@ var Plottable;
                     throw new Error("NaN may not be used as a key to the Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        this._keyValuePairs[i][1] = value;
+                    if (this._keyValuePairs[i].key === key) {
+                        this._keyValuePairs[i].value = value;
                         return true;
                     }
                 }
-                this._keyValuePairs.push([key, value]);
+                this._keyValuePairs.push({ key: key, value: value });
                 return false;
             };
             /**
@@ -400,8 +400,8 @@ var Plottable;
              */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        return this._keyValuePairs[i][1];
+                    if (this._keyValuePairs[i].key === key) {
+                        return this._keyValuePairs[i].value;
                     }
                 }
                 return undefined;
@@ -417,7 +417,7 @@ var Plottable;
              */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         return true;
                     }
                 }
@@ -429,7 +429,7 @@ var Plottable;
              * @return {V[]} The values in the store
              */
             Map.prototype.values = function () {
-                return this._keyValuePairs.map(function (x) { return x[1]; });
+                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.value; });
             };
             /**
              * Return an array of keys in the key-value store
@@ -437,17 +437,17 @@ var Plottable;
              * @return {K[]} The keys in the store
              */
             Map.prototype.keys = function () {
-                return this._keyValuePairs.map(function (x) { return x[0]; });
+                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.key; });
             };
             /**
              * Execute a callback for each entry in the array.
              *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
+             * @param {(key: K, val?: V, index?: number) => void} callback The callback to execute
              * @return {any[]} The results of mapping the callback over the entries
              */
             Map.prototype.map = function (cb) {
-                return this._keyValuePairs.map(function (kv, index) {
-                    return cb(kv[0], kv[1], index);
+                return this._keyValuePairs.map(function (keyValuePair, index) {
+                    return cb(keyValuePair.key, keyValuePair.value, index);
                 });
             };
             /**
@@ -458,7 +458,7 @@ var Plottable;
              */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs.splice(i, 1);
                         return true;
                     }
