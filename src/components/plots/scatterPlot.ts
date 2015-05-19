@@ -23,18 +23,13 @@ export module Plots {
                                            .delay(5));
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
+      this.size(6);
+      var circleSymbolFactory = SymbolFactories.circle();
+      this.symbol(() => circleSymbolFactory);
     }
 
     protected _getDrawer(key: string) {
       return new Plottable.Drawers.Symbol(key);
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
-      attrToProjector["symbol"] = attrToProjector["symbol"] || (() => SymbolFactories.circle());
-
-      return attrToProjector;
     }
 
     public size<S>(): AccessorScaleBinding<S, number>;
@@ -86,6 +81,26 @@ export module Plots {
       };
 
       return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+
+      var xProjector = propertyToProjectors[XYPlot._X_KEY];
+      var yProjector = propertyToProjectors[XYPlot._Y_KEY];
+
+      var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
+      delete propertyToProjectors[Scatter._SIZE_KEY];
+
+      propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) =>
+        "translate(" + xProjector(datum, index, dataset, plotMetadata) + "," + yProjector(datum, index, dataset, plotMetadata) + ")";
+
+      var symbolProjector = propertyToProjectors[Scatter._SYMBOL_KEY];
+      delete propertyToProjectors[Scatter._SYMBOL_KEY];
+
+      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) =>
+        symbolProjector(datum, index, dataset, plotMetadata)(sizeProjector(datum, index, dataset, plotMetadata));
+      return propertyToProjectors;
     }
   }
 }

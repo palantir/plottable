@@ -1,5 +1,5 @@
 /*!
-Plottable 0.54.0 (https://github.com/palantir/plottable)
+Plottable 1.0.0-rc1 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1073,7 +1073,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "0.54.0";
+    Plottable.version = "1.0.0-rc1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2945,18 +2945,7 @@ var Plottable;
                 this._className = "symbol";
             }
             Symbol.prototype._drawStep = function (step) {
-                var attrToProjector = step.attrToProjector;
                 this._attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                var rProjector = attrToProjector["size"];
-                delete attrToProjector["size"];
-                attrToProjector["transform"] = function (datum, index) { return "translate(" + xProjector(datum, index) + "," + yProjector(datum, index) + ")"; };
-                var symbolProjector = attrToProjector["symbol"];
-                delete attrToProjector["symbol"];
-                attrToProjector["d"] = attrToProjector["d"] || (function (datum, index) { return symbolProjector(datum, index)(rProjector(datum, index)); });
                 _super.prototype._drawStep.call(this, step);
             };
             Symbol.prototype._getPixelPoint = function (datum, index) {
@@ -6220,7 +6209,7 @@ var Plottable;
                 var fn = scale ? function (d, i, dataset, m) { return scale.scale(accessor(d, i, dataset, m)); } : accessor;
                 h[attr] = fn;
             });
-            var propertyProjectors = this._generatePropertyToProjectors();
+            var propertyProjectors = this._propertyProjectors();
             Object.keys(propertyProjectors).forEach(function (key) {
                 if (h[key] == null) {
                     h[key] = propertyProjectors[key];
@@ -6569,7 +6558,7 @@ var Plottable;
             scale.addExtentsProvider(this._extentsProvider);
             scale._autoDomainIfAutomaticMode();
         };
-        Plot.prototype._generatePropertyToProjectors = function () {
+        Plot.prototype._propertyProjectors = function () {
             var attrToProjector = {};
             this._propertyBindings.forEach(function (key, binding) {
                 var scaledAccessor = function (d, i, dataset, m) { return binding.scale.scale(binding.accessor(d, i, dataset, m)); };
@@ -6811,8 +6800,8 @@ var Plottable;
             this._adjustXDomainOnChangeFromY();
             return this;
         };
-        XYPlot.prototype._generatePropertyToProjectors = function () {
-            var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
+        XYPlot.prototype._propertyProjectors = function () {
+            var attrToProjector = _super.prototype._propertyProjectors.call(this);
             var positionXFn = attrToProjector["x"];
             var positionYFn = attrToProjector["y"];
             attrToProjector["defined"] = function (d, i, dataset, m) {
@@ -7031,15 +7020,12 @@ var Plottable;
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
+                this.size(6);
+                var circleSymbolFactory = Plottable.SymbolFactories.circle();
+                this.symbol(function () { return circleSymbolFactory; });
             }
             Scatter.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Symbol(key);
-            };
-            Scatter.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                attrToProjector["size"] = attrToProjector["size"] || d3.functor(6);
-                attrToProjector["symbol"] = attrToProjector["symbol"] || (function () { return Plottable.SymbolFactories.circle(); });
-                return attrToProjector;
             };
             Scatter.prototype.size = function (size, scale) {
                 if (size == null) {
@@ -7079,6 +7065,18 @@ var Plottable;
                     height: bbox.height
                 };
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+            };
+            Scatter.prototype._propertyProjectors = function () {
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
+                var xProjector = propertyToProjectors[Plottable.XYPlot._X_KEY];
+                var yProjector = propertyToProjectors[Plottable.XYPlot._Y_KEY];
+                var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
+                delete propertyToProjectors[Scatter._SIZE_KEY];
+                propertyToProjectors["transform"] = function (datum, index, dataset, plotMetadata) { return "translate(" + xProjector(datum, index, dataset, plotMetadata) + "," + yProjector(datum, index, dataset, plotMetadata) + ")"; };
+                var symbolProjector = propertyToProjectors[Scatter._SYMBOL_KEY];
+                delete propertyToProjectors[Scatter._SYMBOL_KEY];
+                propertyToProjectors["d"] = function (datum, index, dataset, plotMetadata) { return symbolProjector(datum, index, dataset, plotMetadata)(sizeProjector(datum, index, dataset, plotMetadata)); };
+                return propertyToProjectors;
             };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
