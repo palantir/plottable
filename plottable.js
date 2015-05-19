@@ -8284,6 +8284,7 @@ var Plottable;
             /**
              * a
              * ad
+             * 5
              */
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {

@@ -20,6 +20,7 @@ export module Plots {
     /**
      * a
      * ad
+     * 5
      */
     protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {

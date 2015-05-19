@@ -3057,6 +3057,7 @@ declare module Plottable {
             /**
              * a
              * ad
+             * 5
              */
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
