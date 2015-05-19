@@ -3138,7 +3138,7 @@ declare module Plottable {
             /**
              * The default duration of the animation in milliseconds
              */
-            static DEFAULT_DURATION_MILLISECONDS: number;
+            static DEFAULT_DURATION_MILLISECONDSA: number;
             /**
              * The default starting delay of the animation in milliseconds
              */
