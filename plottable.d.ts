@@ -3042,6 +3042,11 @@ declare module Plottable {
              * @param {boolean} isVertical if the plot if vertical.
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
+            /**
+             * a
+             * ad
+             * 5
+             */
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
@@ -3057,6 +3062,9 @@ declare module Plottable {
             _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
             _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
             _getDomainKeys(): any;
+            /**
+             * To be removed
+             */
             _generateDefaultMapArray(): D3.Map<StackedDatum>[];
             protected _extentsForProperty(attr: string): any;
             _keyAccessor(): Accessor<X> | Accessor<Y>;

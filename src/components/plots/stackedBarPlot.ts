@@ -17,6 +17,11 @@ export module Plots {
       super(xScale, yScale, isVertical);
     }
 
+    /**
+     * a
+     * ad
+     * 5
+     */
     protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
@@ -123,6 +128,9 @@ export module Plots {
       return Stacked.prototype._getDomainKeys.call(this);
     }
 
+    /**
+     * To be removed
+     */
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
       return Stacked.prototype._generateDefaultMapArray.call(this);
     }
