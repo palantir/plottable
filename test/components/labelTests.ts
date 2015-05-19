@@ -23,8 +23,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Left-rotated text is handled properly", () => {
+  it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -37,8 +36,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Right-rotated text is handled properly", () => {
+  it("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);

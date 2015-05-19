@@ -1503,8 +1503,7 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Left-rotated text is handled properly", function () {
+    it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1516,8 +1515,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Right-rotated text is handled properly", function () {
+    it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
