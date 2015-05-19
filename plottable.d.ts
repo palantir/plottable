@@ -3057,7 +3057,6 @@ declare module Plottable {
             /**
              * a
              * 3
-             * 4
              * 7
              */
             protected _getAnimator(key: string): Animators.PlotAnimator;
