@@ -66,13 +66,13 @@ function run(svg, data, Plottable) {
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
-                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
+                                  .autorange("y");
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
-                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
+                                  .autorange("y");
 
           // should be one line plot, pending #917
 
