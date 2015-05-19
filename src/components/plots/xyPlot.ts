@@ -124,11 +124,17 @@ module Plottable {
     }
 
     /** 
-     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  If 'x' or 'y' is
-     * specified the adjustment is immediately performed.
+     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  
      * 
-     * @param {string} scale Must be one of 'x', 'y', or 'none'.  'x' will adjust the x scale in relation to changes in the 'y' domain, 
-     * 'y' will adjust the y scale in relation to changes in the x domain, and 'none' means neither scale will change automatically.
+     * If 'x' or 'y' is specified the adjustment is immediately performed.
+     * 
+     * @param {string} scale Must be one of 'x', 'y', or 'none'.  
+     * 
+     * 'x' will adjust the x scale in relation to changes in the y domain.  
+     * 
+     * 'y' will adjust the y scale in relation to changes in the x domain.
+     * 
+     *  'none' means neither scale will change automatically.
      * 
      * @returns {XYPlot} The calling XYPlot.
      */
@@ -136,9 +142,11 @@ module Plottable {
       switch (scale) {
         case "x":
           this._autoAdjustXScaleDomain = true;
+          this._autoAdjustYScaleDomain = false;
           this._adjustXDomainOnChangeFromY();
           break;
         case "y":
+          this._autoAdjustXScaleDomain = false;
           this._autoAdjustYScaleDomain = true;
           this._adjustYDomainOnChangeFromX();
           break;
