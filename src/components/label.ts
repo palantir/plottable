@@ -1,16 +1,21 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Component {
-  export class Label extends AbstractComponent {
+export module Components {
+  export class Label extends Component {
+
+    // Css class for labels that are made for rendering titles.
+    public static TITLE_LABEL_CLASS = "title-label";
+
+    // Css class for labels that are made for rendering axis titles.
+    public static AXIS_LABEL_CLASS = "axis-label";
+
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
-    private _xAlignment: string;
-    private _yAlignment: string;
     private _padding: number;
 
     /**
@@ -27,51 +32,19 @@ export module Component {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orient(orientation);
-      this.xAlign("center").yAlign("center");
-      this._fixedHeightFlag = true;
-      this._fixedWidthFlag = true;
+      this.orientation(orientation);
+      this.xAlignment("center").yAlignment("center");
       this._padding = 0;
     }
 
-    /**
-     * Sets the horizontal side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["left", "center",
-     * "right"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public xAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.xAlign(alignmentLC);
-      this._xAlignment = alignmentLC;
-      return this;
-    }
-
-    /**
-     * Sets the vertical side the label will go to given the label is given more space that it needs
-     *
-     * @param {string} alignment The new setting, one of `["top", "center",
-     * "bottom"]`. Defaults to `"center"`.
-     * @returns {Label} The calling Label.
-     */
-    public yAlign(alignment: string): Label {
-      var alignmentLC = alignment.toLowerCase();
-      super.yAlign(alignmentLC);
-      this._yAlignment = alignmentLC;
-      return this;
-    }
-
-    public _requestedSpace(offeredWidth: number, offeredHeight: number): _SpaceRequest {
+    public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orient() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orient() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
-        width : desiredWidth,
-        height: desiredHeight,
-        wantsWidth : desiredWidth  > offeredWidth,
-        wantsHeight: desiredHeight > offeredHeight
+        minWidth: desiredWidth,
+        minHeight: desiredHeight
       };
     }
 
@@ -102,7 +75,7 @@ export module Component {
         return this._text;
       } else {
         this._text = displayText;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -112,7 +85,7 @@ export module Component {
      *
      * @returns {string} the current orientation.
      */
-    public orient(): string;
+    public orientation(): string;
     /**
      * Sets the orientation of the Label.
      *
@@ -120,18 +93,18 @@ export module Component {
      * (horizontal/left/right).
      * @returns {Label} The calling Label.
      */
-    public orient(newOrientation: string): Label;
-    public orient(newOrientation?: string): any {
-      if (newOrientation == null) {
+    public orientation(orientation: string): Label;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
         return this._orientation;
       } else {
-        newOrientation = newOrientation.toLowerCase();
-        if (newOrientation === "horizontal" || newOrientation === "left" || newOrientation === "right") {
-          this._orientation = newOrientation;
+        orientation = orientation.toLowerCase();
+        if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
+          this._orientation = orientation;
         } else {
-          throw new Error(newOrientation + " is not a valid orientation for LabelComponent");
+          throw new Error(orientation + " is not a valid orientation for LabelComponent");
         }
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
@@ -158,13 +131,21 @@ export module Component {
           throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
         }
         this._padding = padAmount;
-        this._invalidateLayout();
+        this.redraw();
         return this;
       }
     }
 
-    public _doRender() {
-      super._doRender();
+    public fixedWidth() {
+      return true;
+    }
+
+    public fixedHeight() {
+      return true;
+    }
+
+    public renderImmediately() {
+      super.renderImmediately();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
       var textMeasurement = this._measurer.measure(this._text);
@@ -176,35 +157,12 @@ export module Component {
       var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
                         selection: this._textContainer,
-                        xAlign: this._xAlignment,
-                        yAlign: this._yAlignment,
-                        textRotation: textRotation[this.orient()]
+                        xAlign: this.xAlignment(),
+                        yAlign: this.yAlignment(),
+                        textRotation: textRotation[this.orientation()]
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
-    }
-  }
-
-  export class TitleLabel extends Label {
-    /**
-     * Creates a TitleLabel, a type of label made for rendering titles.
-     *
-     * @constructor
-     */
-    constructor(text?: string, orientation?: string) {
-      super(text, orientation);
-      this.classed("title-label", true);
-    }
-  }
-
-  export class AxisLabel extends Label {
-    /**
-     * Creates a AxisLabel, a type of label made for rendering axis labels.
-     *
-     * @constructor
-     */
-    constructor(text?: string, orientation?: string) {
-      super(text, orientation);
-      this.classed("axis-label", true);
+      return this;
     }
   }
 }

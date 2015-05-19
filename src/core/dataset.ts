@@ -1,15 +1,13 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  type CachedExtent = {
-    accessor: _Accessor;
-    extent: any[];
-  }
-  export class Dataset extends Core.PlottableObject {
+
+  export type DatasetCallback = (dataset: Dataset) => void;
+
+  export class Dataset {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: _Util.StrictEqualityAssociativeArray;
-    public broadcaster: Core.Broadcaster<Dataset>;
+    private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
      * Constructs a new set.
@@ -22,11 +20,17 @@ module Plottable {
      * @param {any} metadata An object containing additional information (default = {}).
      */
     constructor(data: any[] = [], metadata: any = {}) {
-      super();
       this._data = data;
       this._metadata = metadata;
-      this._accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
-      this.broadcaster = new Core.Broadcaster(this);
+      this._callbacks = new Utils.CallbackSet<DatasetCallback>();
+    }
+
+    public onUpdate(callback: DatasetCallback) {
+      this._callbacks.add(callback);
+    }
+
+    public offUpdate(callback: DatasetCallback) {
+      this._callbacks.delete(callback);
     }
 
     /**
@@ -47,8 +51,7 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._callbacks.callCallbacks(this);
         return this;
       }
     }
@@ -72,35 +75,8 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._accessor2cachedExtent = new _Util.StrictEqualityAssociativeArray();
-        this.broadcaster.broadcast();
+        this._callbacks.callCallbacks(this);
         return this;
-      }
-    }
-
-    public _getExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any = {}): any[] {
-      var cachedExtent = this._accessor2cachedExtent.get(accessor);
-      if (cachedExtent === undefined) {
-        cachedExtent = this._computeExtent(accessor, typeCoercer, plotMetadata);
-        this._accessor2cachedExtent.set(accessor, cachedExtent);
-      }
-      return cachedExtent;
-    }
-
-    private _computeExtent(accessor: _Accessor, typeCoercer: (d: any) => any, plotMetadata: any): any[] {
-      var appliedAccessor = (d: any, i: number) => accessor(d, i, this._metadata, plotMetadata);
-      var mappedData = this._data.map(appliedAccessor).map(typeCoercer);
-      if (mappedData.length === 0) {
-        return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return _Util.Methods.uniq(mappedData);
-      } else {
-        var extent = d3.extent(mappedData);
-        if (extent[0] == null || extent[1] == null) {
-          return [];
-        } else {
-          return extent;
-        }
       }
     }
   }

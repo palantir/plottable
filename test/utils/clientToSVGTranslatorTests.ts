@@ -6,9 +6,9 @@ describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     var svg = TestMethods.generateSVG();
 
-    var t1 = Plottable._Util.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
+    var t1 = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
     assert.isNotNull(t1, "created a new ClientToSVGTranslator on a <svg>");
-    var t2 = Plottable._Util.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
+    var t2 = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
     assert.strictEqual(t1, t2, "returned the existing ClientToSVGTranslator if called again with same <svg>");
 
     svg.remove();
@@ -28,7 +28,7 @@ describe("ClientToSVGTranslator", () => {
       height: 30
     });
 
-    var translator = Plottable._Util.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
+    var translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
 
     var rectBCR = rect.node().getBoundingClientRect();
     var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);

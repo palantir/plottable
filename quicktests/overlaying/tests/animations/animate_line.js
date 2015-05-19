@@ -10,21 +10,21 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
   var doAnimate = true;
-  var xScale = new Plottable.Scale.Linear();
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Linear();
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
-  var yScale = new Plottable.Scale.Linear();
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
+  var yScale = new Plottable.Scales.Linear();
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var lineRenderer = new Plottable.Plot.Line(xScale, yScale)
+  var lineRenderer = new Plottable.Plots.Line(xScale, yScale)
               .addDataset(dataset)
-              .project("x", "x", xScale)
-              .project("y", "y", yScale)
+              .x(function(d) { return d.x; }, xScale)
+              .y(function(d) { return d.y; }, yScale)
               .attr("opacity", 0.75)
               .animate(doAnimate);
 
-  var lineChart = new Plottable.Component.Table([[yAxis, lineRenderer],
+  var lineChart = new Plottable.Components.Table([[yAxis, lineRenderer],
                                                  [null,  xAxis]]);
   lineChart.renderTo(svg);
 
@@ -33,5 +33,5 @@ function run(svg, data, Plottable) {
     dataset.data(d);
   };
 
-  lineRenderer.registerInteraction(new Plottable.Interaction.Click().onClick(cb));
+  new Plottable.Interactions.Click().onClick(cb).attachTo(lineRenderer);
 }

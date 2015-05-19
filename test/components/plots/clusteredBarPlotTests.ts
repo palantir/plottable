@@ -7,9 +7,9 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var xScale: Plottable.Scale.Category;
-    var yScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar<string, number>;
+    var xScale: Plottable.Scales.Category;
+    var yScale: Plottable.Scales.Linear;
+    var renderer: Plottable.Plots.ClusteredBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var axisHeight = 0;
@@ -19,8 +19,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scale.Category();
-      yScale = new Plottable.Scale.Linear().domain([0, 2]);
+      xScale = new Plottable.Scales.Category();
+      yScale = new Plottable.Scales.Linear().domain([0, 2]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -43,14 +43,14 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
+      renderer = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      new Plottable.Component.Table([[renderer], [xAxis]]).renderTo(svg);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+      new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
       bandWidth = xScale.rangeBand();
     });
@@ -101,9 +101,9 @@ describe("Plots", () => {
     var svg: D3.Selection;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
-    var yScale: Plottable.Scale.Category;
-    var xScale: Plottable.Scale.Linear;
-    var renderer: Plottable.Plot.ClusteredBar<number, string>;
+    var yScale: Plottable.Scales.Category;
+    var xScale: Plottable.Scales.Linear;
+    var renderer: Plottable.Plots.ClusteredBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var rendererWidth: number;
@@ -111,8 +111,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      yScale = new Plottable.Scale.Category();
-      xScale = new Plottable.Scale.Linear().domain([0, 2]);
+      yScale = new Plottable.Scales.Category();
+      xScale = new Plottable.Scales.Linear().domain([0, 2]);
 
       var data1 = [
         {y: "A", x: 1},
@@ -125,14 +125,14 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plot.ClusteredBar<number, string>(xScale, yScale, false);
-      renderer.addDataset(data1);
-      renderer.addDataset(data2);
+      renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale, false);
+      renderer.addDataset(new Plottable.Dataset(data1));
+      renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
-      renderer.project("x", "x", xScale);
-      renderer.project("y", "y", yScale);
-      var yAxis = new Plottable.Axis.Category(yScale, "left");
-      new Plottable.Component.Table([[yAxis, renderer]]).renderTo(svg);
+      renderer.x((d) => d.x, xScale);
+      renderer.y((d) => d.y, yScale);
+      var yAxis = new Plottable.Axes.Category(yScale, "left");
+      new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
       bandWidth = yScale.rangeBand();
     });
@@ -179,28 +179,28 @@ describe("Plots", () => {
 
   describe("Clustered Bar Plot Missing Values", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.ClusteredBar<string, number>;
+    var plot: Plottable.Plots.ClusteredBar<string, number>;
 
     beforeEach(() => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Category();
-      var yScale = new Plottable.Scale.Linear();
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
 
       var data1 = [{x: "A", y: 1}, {x: "B", y: 2}, {x: "C", y: 1}];
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar<string, number>(xScale, yScale);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
+      plot = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
       plot.baseline(0);
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
-      var xAxis = new Plottable.Axis.Category(xScale, "bottom");
-      new Plottable.Component.Table([[plot], [xAxis]]).renderTo(svg);
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
+      var xAxis = new Plottable.Axes.Category(xScale, "bottom");
+      new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
     });
 
     it("renders correctly", () => {
@@ -240,25 +240,25 @@ describe("Plots", () => {
 
   describe("Horizontal Clustered Bar Plot Missing Values", () => {
     var svg: D3.Selection;
-    var plot: Plottable.Plot.ClusteredBar<number, string>;
+    var plot: Plottable.Plots.ClusteredBar<number, string>;
 
     beforeEach(() => {
       var SVG_WIDTH = 600;
       var SVG_HEIGHT = 400;
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scale.Linear();
-      var yScale = new Plottable.Scale.Category();
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Category();
 
       var data1 = [{y: "A", x: 1}, {y: "B", x: 2}, {y: "C", x: 1}];
       var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
       var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
-      plot = new Plottable.Plot.ClusteredBar(xScale, yScale, false);
-      plot.addDataset(data1);
-      plot.addDataset(data2);
-      plot.addDataset(data3);
-      plot.project("x", "x", xScale);
-      plot.project("y", "y", yScale);
+      plot = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
+      plot.addDataset(new Plottable.Dataset(data1));
+      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(new Plottable.Dataset(data3));
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
       plot.renderTo(svg);
     });
 

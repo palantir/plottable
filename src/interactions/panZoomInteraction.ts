@@ -1,21 +1,27 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Interaction {
-  export class PanZoom extends AbstractInteraction {
+export module Interactions {
+  export class PanZoom extends Interaction {
 
     /**
      * The number of pixels occupied in a line.
      */
     public static PIXELS_PER_LINE = 120;
 
-    private _xScale: Scale.AbstractQuantitative<any>;
-    private _yScale: Scale.AbstractQuantitative<any>;
-
-    private _dragInteraction: Interaction.Drag;
-    private _touchDispatcher: Dispatcher.Touch;
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
+    private _dragInteraction: Interactions.Drag;
+    private _mouseDispatcher: Dispatchers.Mouse;
+    private _touchDispatcher: Dispatchers.Touch;
 
     private _touchIds: D3.Map<Point>;
+
+    private _wheelCallback = (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e);
+    private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchStart(ids, idToPoint, e);
+    private _touchMoveCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handlePinch(ids, idToPoint, e);
+    private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
+    private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
     /**
      * Creates a PanZoomInteraction.
@@ -27,32 +33,42 @@ export module Interaction {
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
      * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
      */
-    constructor(xScale?: Scale.AbstractQuantitative<any>, yScale?: Scale.AbstractQuantitative<any>) {
+    constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
       this._xScale = xScale;
       this._yScale = yScale;
 
-      this._dragInteraction = new Interaction.Drag();
+      this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map();
     }
 
-    public _anchor(component: Component.AbstractComponent, hitBox: D3.Selection) {
-      super._anchor(component, hitBox);
-      this._dragInteraction._anchor(component, hitBox);
+    protected _anchor(component: Component) {
+      super._anchor(component);
+      this._dragInteraction.attachTo(component);
 
-      var mouseDispatcher = Dispatcher.Mouse.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      mouseDispatcher.onWheel("Interaction.PanZoom" + this.getID(), (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e));
+      this._mouseDispatcher = Dispatchers.Mouse.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._mouseDispatcher.onWheel(this._wheelCallback);
 
-      this._touchDispatcher = Dispatcher.Touch.getDispatcher(<SVGElement> this._componentToListenTo.content().node());
-      this._touchDispatcher.onTouchStart("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchStart(ids, idToPoint, e));
-      this._touchDispatcher.onTouchMove("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handlePinch(ids, idToPoint, e));
-      this._touchDispatcher.onTouchEnd("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
-      this._touchDispatcher.onTouchCancel("Interaction.PanZoom" + this.getID(),
-        (ids, idToPoint, e) => this._handleTouchEnd(ids, idToPoint, e));
+      this._touchDispatcher = Dispatchers.Touch.getDispatcher(<SVGElement> this._componentAttachedTo.content().node());
+      this._touchDispatcher.onTouchStart(this._touchStartCallback);
+      this._touchDispatcher.onTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.onTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.onTouchCancel(this._touchCancelCallback);
+    }
+
+    protected _unanchor() {
+      super._unanchor();
+      this._mouseDispatcher.offWheel(this._wheelCallback);
+      this._mouseDispatcher = null;
+
+      this._touchDispatcher.offTouchStart(this._touchStartCallback);
+      this._touchDispatcher.offTouchMove(this._touchMoveCallback);
+      this._touchDispatcher.offTouchEnd(this._touchEndCallback);
+      this._touchDispatcher.offTouchCancel(this._touchCancelCallback);
+      this._touchDispatcher = null;
+
+      this._dragInteraction.detachFrom(this._componentAttachedTo);
     }
 
     private _handleTouchStart(ids: number[], idToPoint: { [id: number]: Point; }, e: TouchEvent) {
@@ -121,12 +137,12 @@ export module Interaction {
       });
     }
 
-    private static magnifyScale<D>(scale: Scale.AbstractQuantitative<D>, magnifyAmount: number, centerValue: number) {
+    private static magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       scale.domain(scale.range().map(magnifyTransform));
     }
 
-    private static translateScale<D>(scale: Scale.AbstractQuantitative<D>, translateAmount: number) {
+    private static translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
     }

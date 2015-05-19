@@ -63,7 +63,7 @@ describe("Interactions", () => {
         outData = hd;
       });
 
-      testTarget.registerInteraction(hoverInteraction);
+      hoverInteraction.attachTo(testTarget);
       target = testTarget.background();
     });
 

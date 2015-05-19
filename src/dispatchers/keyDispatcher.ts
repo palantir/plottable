@@ -1,12 +1,12 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatcher {
-  export type KeyCallback = (keyCode: number, e: KeyboardEvent) => any;
+export module Dispatchers {
+  export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
 
-  export class Key extends AbstractDispatcher {
+  export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
-    private _keydownBroadcaster: Core.Broadcaster<Dispatcher.Key>;
+    private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
 
     /**
      * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -14,7 +14,7 @@ export module Dispatcher {
      *
      * @return {Dispatcher.Key} A Dispatcher.Key
      */
-    public static getDispatcher(): Dispatcher.Key {
+    public static getDispatcher(): Dispatchers.Key {
       var dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
       if (dispatcher == null) {
         dispatcher = new Key();
@@ -34,30 +34,34 @@ export module Dispatcher {
 
       this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
-      this._keydownBroadcaster = new Core.Broadcaster(this);
-      this._broadcasters = [this._keydownBroadcaster];
-    }
-
-    protected _getWrappedCallback(callback: Function): Core.BroadcasterCallback<Dispatcher.Key> {
-      return (d: Dispatcher.Key, e: KeyboardEvent) => callback(e.keyCode, e);
+      this._keydownCallbacks = new Utils.CallbackSet<KeyCallback>();
+      this._callbacks = [this._keydownCallbacks];
     }
 
     /**
-     * Registers a callback to be called whenever a key is pressed,
-     * or removes the callback if `null` is passed as the callback.
+     * Registers a callback to be called whenever a key is pressed.
      *
-     * @param {any} key The registration key associated with the callback.
-     *                  Registration key uniqueness is determined by deep equality.
      * @param {KeyCallback} callback
      * @return {Dispatcher.Key} The calling Dispatcher.Key.
      */
-    public onKeyDown(key: any, callback: KeyCallback): Key {
-      this._setCallback(this._keydownBroadcaster, key, callback);
+    public onKeyDown(callback: KeyCallback): Key {
+      this.setCallback(this._keydownCallbacks, callback);
       return this;
     }
 
-    private _processKeydown(e: KeyboardEvent) {
-      this._keydownBroadcaster.broadcast(e);
+    /**
+     * Removes the callback to be called whenever a key is pressed.
+     *
+     * @param {KeyCallback} callback
+     * @return {Dispatcher.Key} The calling Dispatcher.Key.
+     */
+    public offKeyDown(callback: KeyCallback): Key {
+      this.unsetCallback(this._keydownCallbacks, callback);
+      return this;
+    }
+
+    private _processKeydown(event: KeyboardEvent) {
+      this._keydownCallbacks.callCallbacks(event.keyCode, event);
     }
   }
 }

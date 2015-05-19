@@ -10,20 +10,20 @@ describe("Interactions", () => {
 
     var eventTarget: D3.Selection;
 
-    var xScale: Plottable.Scale.AbstractQuantitative<number>;
-    var yScale: Plottable.Scale.AbstractQuantitative<number>;
+    var xScale: Plottable.QuantitativeScale<number>;
+    var yScale: Plottable.QuantitativeScale<number>;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-      var component = new Plottable.Component.AbstractComponent();
+      var component = new Plottable.Component();
       component.renderTo(svg);
 
-      xScale = new Plottable.Scale.Linear();
+      xScale = new Plottable.Scales.Linear();
       xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
-      yScale = new Plottable.Scale.Linear();
+      yScale = new Plottable.Scales.Linear();
       yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-      component.registerInteraction(new Plottable.Interaction.PanZoom(xScale, yScale));
+      (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
 
       eventTarget = component.background();
     });

@@ -12,25 +12,25 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scale.Time();
-  var yScale = new Plottable.Scale.Category();
+  var xScale = new Plottable.Scales.Time();
+  var yScale = new Plottable.Scales.Category();
 
-  var hBarPlot = new Plottable.Plot.Bar(xScale, yScale, false)
-    .addDataset(data)
-    .attr("x", function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
-    .project("y", "y", yScale);
+  var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, false)
+    .addDataset(new Plottable.Dataset(data))
+    .x(function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
+    .y(function(d) { return d.y; }, yScale);
 
-  var xAxis = new Plottable.Axis.Time(xScale, "bottom", Plottable.Formatters.multiTime());
-  var yAxis = new Plottable.Axis.Category(yScale, "left");
+  var xAxis = new Plottable.Axes.Time(xScale, "bottom", Plottable.Formatters.multiTime());
+  var yAxis = new Plottable.Axes.Category(yScale, "left");
 
-  var gridlines = new Plottable.Component.Gridlines(xScale, null);
-  var renderGroup = hBarPlot.above(gridlines);
+  var gridlines = new Plottable.Components.Gridlines(xScale, null);
+  var renderGroup = new Plottable.Components.Group([hBarPlot, gridlines]);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
                                             [yAxis, renderGroup],
                                             [null,  xAxis]]);
 
   chart.renderTo(svg);
 
-  hBarPlot.registerInteraction(new Plottable.Interaction.PanZoom(xScale, null));
+  new Plottable.Interactions.PanZoom(xScale, null).attachTo(hBarPlot);
 }

@@ -1,7 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module _Util {
+export module Utils {
   export module Methods {
 
     /**
@@ -33,7 +33,7 @@ export module _Util {
      * @param {string} The warnings to print
      */
     export function warn(warning: string) {
-      if (!Config.SHOW_WARNINGS) {
+      if (!Configs.SHOW_WARNINGS) {
         return;
       }
       /* tslint:disable:no-console */
@@ -73,25 +73,11 @@ export module _Util {
     export function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string> {
       var set: D3.Set<string> = d3.set();
       set1.forEach((v) => {
-        if(set2.has(<any> v)) { // checking a string is always appropriate due to d3.set implementation
+        if (set2.has(<any> v)) { // checking a string is always appropriate due to d3.set implementation
           set.add(v);
         }
       });
       return set;
-    }
-
-    /**
-     * Take an accessor object (may be a string to be made into a key, or a value, or a color code)
-     * and "activate" it by turning it into a function in (datum, index, metadata)
-     */
-    export function accessorize(accessor: any): _Accessor {
-      if (typeof(accessor) === "function") {
-        return (<_Accessor> accessor);
-      } else if (typeof(accessor) === "string" && accessor[0] !== "#") {
-        return (d: any, i: number, s: any) => d[accessor];
-      } else {
-        return (d: any, i: number, s: any) => accessor;
-      };
     }
 
     /**
@@ -206,45 +192,33 @@ export module _Util {
     }
 
     /**
-     * Computes the max value from the array.
-     *
-     * If type is not comparable then t will be converted to a comparable before computing max.
+     * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
+     * If no maximum value can be computed, returns defaultValue.
      */
-    export function max<C>(arr: C[], default_val: C): C;
-    export function max<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
-    export function max(arr: any[], one: any, two?: any): any {
-      if (arr.length === 0) {
-        if (typeof(one) !== "function") {
-          return one;
-        } else {
-          return two;
-        }
-      }
+    export function max<C>(array: C[], defaultValue: C): C;
+    export function max<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
+    export function max(array: any[], firstArg: any, secondArg?: any): any {
+      var accessor = typeof(firstArg) === "function" ? firstArg : null;
+      var defaultValue = accessor == null ? firstArg : secondArg;
       /* tslint:disable:ban */
-      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
-      return acc === undefined ? d3.max(arr) : d3.max(arr, acc);
+      var maxValue = accessor == null ? d3.max(array) : d3.max(array, accessor);
       /* tslint:enable:ban */
+      return maxValue !== undefined ? maxValue : defaultValue;
     }
 
     /**
-     * Computes the min value from the array.
-     *
-     * If type is not comparable then t will be converted to a comparable before computing min.
+     * Applies the accessor, if provided, to each element of `array` and returns the minimum value.
+     * If no minimum value can be computed, returns defaultValue.
      */
-    export function min<C>(arr: C[], default_val: C): C;
-    export function min<T, C>(arr: T[], acc: (x?: T, i?: number) => C, default_val: C): C;
-    export function min(arr: any[], one: any, two?: any): any {
-      if (arr.length === 0) {
-        if (typeof(one) !== "function") {
-          return one;
-        } else {
-          return two;
-        }
-      }
+    export function min<C>(array: C[], defaultValue: C): C;
+    export function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
+    export function min(array: any[], firstArg: any, secondArg?: any): any {
+      var accessor = typeof(firstArg) === "function" ? firstArg : null;
+      var defaultValue = accessor == null ? firstArg : secondArg;
       /* tslint:disable:ban */
-      var acc = typeof(one) === "function" ? one : typeof(two) === "function" ? two : undefined;
-      return acc === undefined ? d3.min(arr) : d3.min(arr, acc);
+      var minValue = accessor == null ? d3.min(array) : d3.min(array, accessor);
       /* tslint:enable:ban */
+      return minValue !== undefined ? minValue : defaultValue;
     }
 
     /**
@@ -259,7 +233,7 @@ export module _Util {
      * Numbers represented as strings do not pass this function
      */
     export function isValidNumber(n: any) {
-      return typeof n === "number" && !Plottable._Util.Methods.isNaN(n) && isFinite(n);
+      return typeof n === "number" && !Plottable.Utils.Methods.isNaN(n) && isFinite(n);
     }
 
     /**
@@ -275,7 +249,7 @@ export module _Util {
     }
 
     export function range(start: number, stop: number, step = 1): number[] {
-      if(step === 0) {
+      if (step === 0) {
         throw new Error("step cannot be 0");
       }
       var length = Math.max(Math.ceil((stop - start) / step), 0);

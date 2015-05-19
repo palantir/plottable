@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on mousedown", () => {
-      var ked = Plottable.Dispatcher.Key.getDispatcher();
+      var ked = Plottable.Dispatchers.Key.getDispatcher();
 
       var keyCodeToSend = 65;
 
@@ -16,13 +16,12 @@ describe("Dispatchers", () => {
         assert.isNotNull(e, "key event was passed to the callback");
       };
 
-      var keyString = "unit test";
-      ked.onKeyDown(keyString, callback);
+      ked.onKeyDown(callback);
 
       $("body").simulate("keydown", { keyCode: keyCodeToSend });
       assert.isTrue(keyDowned, "callback when a key was pressed");
 
-      ked.onKeyDown(keyString, null); // clean up
+      ked.offKeyDown(callback); // clean up
     });
   });
 });

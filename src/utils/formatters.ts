@@ -190,6 +190,31 @@ module Plottable {
     }
 
     /**
+     * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+     * If the provided TimeInterval is incorrect, the default is d3.time.year
+     */
+    export function timeIntervalToD3Time(timeInterval: string) {
+      switch (timeInterval) {
+      case TimeInterval.second:
+        return d3.time.second;
+      case TimeInterval.minute:
+        return d3.time.minute;
+      case TimeInterval.hour:
+        return d3.time.hour;
+      case TimeInterval.day:
+        return d3.time.day;
+      case TimeInterval.week:
+        return d3.time.week;
+      case TimeInterval.month:
+        return d3.time.month;
+      case TimeInterval.year:
+        return d3.time.year;
+      default:
+        throw Error("TimeInterval specified does not exist: " + timeInterval);
+      }
+    }
+
+    /**
      * Creates a formatter for relative dates.
      *
      * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)

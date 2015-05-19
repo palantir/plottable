@@ -24,48 +24,48 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var colorScale = new Plottable.Scale.Color();
-  var legend = new Plottable.Component.Legend(colorScale).xAlign("left");
+  var colorScale = new Plottable.Scales.Color();
+  var legend = new Plottable.Components.Legend(colorScale).xAlignment("left");
   legend.maxEntriesPerRow(1);
-  var title = new Plottable.Component.TitleLabel("Sales by Region");
-  var Alabel = new Plottable.Component.Label("Product A");
-  var Blabel = new Plottable.Component.Label("Product B");
-  var ABlabel = new Plottable.Component.Label("Combined");
+  var title = new Plottable.Components.Label("Sales by Region").classed("title-label", true);
+  var Alabel = new Plottable.Components.Label("Product A");
+  var Blabel = new Plottable.Components.Label("Product B");
+  var ABlabel = new Plottable.Components.Label("Combined");
 
-  var Aplot = new Plottable.Plot.Pie();
-    Aplot.addDataset("d1", data[0]);
-    Aplot.project("value", "percent");
-    Aplot.project("fill", "region", colorScale);
-    Aplot.project("inner-radius", 40);
-    Aplot.project("outer-radius", 80);
-    Aplot = Alabel.above(Aplot);
+  var Aplot = new Plottable.Plots.Pie();
+  Aplot.addDataset(new Plottable.Dataset(data[0]));
+  Aplot.sectorValue(function(d) { return d.percent; });
+  Aplot.attr("fill", function(d) { return d.region; }, colorScale);
+  Aplot.innerRadius(40);
+  Aplot.outerRadius(80);
+  var AGroup = new Plottable.Components.Group([Aplot, Alabel]);
 
-  var Bplot = new Plottable.Plot.Pie();
-    Bplot.addDataset("d2", data[1]);
-    Bplot.project("value", "percent");
-    Bplot.project("fill", "region", colorScale);
-    Bplot.project("inner-radius", 40);
-    Bplot.project("outer-radius", 80);
-    Bplot = Blabel.above(Bplot);
+  var Bplot = new Plottable.Plots.Pie();
+  Bplot.addDataset(new Plottable.Dataset(data[1]));
+  Bplot.sectorValue(function(d) { return d.percent; });
+  Bplot.attr("fill", function(d) { return d.region; }, colorScale);
+  Bplot.innerRadius(40);
+  Bplot.outerRadius(80);
+  var BGroup = new Plottable.Components.Group([Bplot, Blabel]);
 
-  var ABplot = new Plottable.Plot.Pie();
-    ABplot.addDataset("d3", data[2]);
-    ABplot.project("value", "percent");
-    ABplot.project("fill", "region", colorScale);
-    ABplot.project("inner-radius", 50);
-    ABplot.project("outer-radius", 100);
-    ABplot = ABlabel.above(ABplot);
+  var ABplot = new Plottable.Plots.Pie();
+  ABplot.addDataset(new Plottable.Dataset(data[2]));
+  ABplot.sectorValue(function(d) { return d.percent; });
+  ABplot.attr("fill", function(d) { return d.region; }, colorScale);
+  ABplot.innerRadius(50);
+  ABplot.outerRadius(100);
+  var ABGroup = new Plottable.Components.Group([ABplot, ABlabel]);
 
-  var productPlots = new Plottable.Component.Table([
-      [Aplot],
-      [Bplot],
+  var productPlots = new Plottable.Components.Table([
+      [AGroup],
+      [BGroup],
   ]);
 
-  var allPlots = new Plottable.Component.Table([
-      [productPlots, ABplot, legend]
+  var allPlots = new Plottable.Components.Table([
+      [productPlots, ABGroup, legend]
   ]);
 
-  var chart = new Plottable.Component.Table([
+  var chart = new Plottable.Components.Table([
       [title],
       [allPlots]
   ]);

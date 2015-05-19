@@ -1,9 +1,8 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
-  export class Grid extends Rectangle<any, any> {
-    private _colorScale: Scale.AbstractScale<any, string>;
+export module Plots {
+  export class Grid<X, Y> extends Rectangle<any, any> {
 
     /**
      * Constructs a GridPlot.
@@ -12,89 +11,79 @@ export module Plot {
      * grid, and the datum can control what color it is.
      *
      * @constructor
-     * @param {Scale.AbstractScale} xScale The x scale to use.
-     * @param {Scale.AbstractScale} yScale The y scale to use.
+     * @param {Scale.Scale} xScale The x scale to use.
+     * @param {Scale.Scale} yScale The y scale to use.
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale.AbstractScale<any, any>, yScale: Scale.AbstractScale<any, any>,
-      colorScale: Scale.AbstractScale<any, string>) {
+    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
       this.classed("grid-plot", true);
 
       // The x and y scales should render in bands with no padding for category scales
-      if (xScale instanceof Scale.Category) {
-        xScale.innerPadding(0).outerPadding(0);
+      if (xScale instanceof Scales.Category) {
+        (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
       }
-      if (yScale instanceof Scale.Category) {
-        yScale.innerPadding(0).outerPadding(0);
+      if (yScale instanceof Scales.Category) {
+        (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
       }
 
-      this._colorScale = colorScale;
-      this.animator("cells", new Animator.Null());
+      this.animator("cells", new Animators.Null());
     }
 
-    public addDataset(keyOrDataset: any, dataset?: any) {
+    public addDataset(dataset: Dataset) {
       if (this._datasetKeysInOrder.length === 1) {
-        _Util.Methods.warn("Only one dataset is supported in Grid plots");
+        Utils.Methods.warn("Only one dataset is supported in Grid plots");
         return this;
       }
-      super.addDataset(keyOrDataset, dataset);
+      super.addDataset(dataset);
       return this;
     }
 
     protected _getDrawer(key: string) {
-      return new _Drawer.Rect(key, true);
+      return new Drawers.Rect(key, true);
     }
 
-    /**
-     * @param {string} attrToSet One of ["x", "y", "x2", "y2", "fill"]. If "fill" is used,
-     * the data should return a valid CSS color.
-     */
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      super.project(attrToSet, accessor, scale);
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+    }
 
-      if (attrToSet === "x") {
-        if (scale instanceof Scale.Category) {
-          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
-          });
-          this.project("x2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
-          });
-        }
-        if (scale instanceof Scale.AbstractQuantitative) {
-          this.project("x1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["x"].accessor(d, i, u, m));
-          });
+    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      if (scale == null) {
+        super.x(<number | Accessor<number>> x);
+      } else {
+        super.x(<X | Accessor<X>> x, scale);
+        if (scale instanceof Scales.Category) {
+          var xCatScale = (<Scales.Category> <any> scale);
+          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - xCatScale.rangeBand() / 2);
+          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + xCatScale.rangeBand() / 2);
+        } else if (scale instanceof QuantitativeScale) {
+          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)));
         }
       }
-
-      if (attrToSet === "y") {
-        if (scale instanceof Scale.Category) {
-          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m)) - scale.rangeBand() / 2;
-          });
-          this.project("y2", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m)) + scale.rangeBand() / 2;
-          });
-        }
-        if (scale instanceof Scale.AbstractQuantitative) {
-          this.project("y1", (d: any, i: number, u: any, m: Plot.PlotMetadata) => {
-            return scale.scale(this._projections["y"].accessor(d, i, u, m));
-          });
-        }
-      }
-
-      if (attrToSet === "fill") {
-        this._colorScale = this._projections["fill"].scale;
-      }
-
       return this;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells")}];
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      if (scale == null) {
+        super.y(<number | Accessor<number>> y);
+      } else {
+        super.y(<Y | Accessor<Y>> y, scale);
+        if (scale instanceof Scales.Category) {
+          var yCatScale = (<Scales.Category> <any> scale);
+          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - yCatScale.rangeBand() / 2);
+          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + yCatScale.rangeBand() / 2);
+        } else if (scale instanceof QuantitativeScale) {
+          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)));
+        }
+      }
+      return this;
     }
   }
 }

@@ -1,7 +1,7 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-export module Plot {
+export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
 
     /**
@@ -13,22 +13,50 @@ export module Plot {
      * @param {Scale} yScale the y scale of the plot.
      * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale?: Scale.AbstractScale<X, number>, yScale?: Scale.AbstractScale<Y, number>, isVertical = true) {
+    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
     }
 
-    protected _getAnimator(key: string): Animator.PlotAnimator {
+    protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {
-          var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
+          var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
           var scaledBaseline = primaryScale.scale(this.baseline());
-          return new Animator.MovingRect(scaledBaseline, this._isVertical);
+          return new Animators.MovingRect(scaledBaseline, this._isVertical);
         }
       }
 
-      return new Animator.Null();
+      return new Animators.Null();
+    }
+
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+      if (xScale == null) {
+        super.x(<number | Accessor<number>> x);
+        Stacked.prototype.x.apply(this, [x]);
+      } else {
+        super.x(<X | Accessor<X>> x, xScale);
+        Stacked.prototype.x.apply(this, [x, xScale]);
+      }
+      return this;
+    }
+
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+      if (yScale == null) {
+        super.y(<number | Accessor<number>> y);
+        Stacked.prototype.y.apply(this, [y]);
+      } else {
+        super.y(<Y | Accessor<Y>> y, yScale);
+        Stacked.prototype.y.apply(this, [y, yScale]);
+      }
+      return this;
     }
 
     protected _generateAttrToProjector() {
@@ -36,84 +64,79 @@ export module Plot {
 
       var valueAttr = this._isVertical ? "y" : "x";
       var keyAttr = this._isVertical ? "x" : "y";
-      var primaryScale: Scale.AbstractScale<any, number> = this._isVertical ? this._yScale : this._xScale;
-      var primaryAccessor = this._projections[valueAttr].accessor;
-      var keyAccessor = this._projections[keyAttr].accessor;
-      var getStart = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        primaryScale.scale(m.offsets.get(keyAccessor(d, i, u, m)));
-      var getEnd = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, u, m) + m.offsets.get(keyAccessor(d, i, u, m)));
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
+      var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
+      var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        primaryScale.scale(m.offsets.get(keyAccessor(d, i, dataset, m)));
+      var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + m.offsets.get(keyAccessor(d, i, dataset, m)));
 
-      var heightF = (d: any, i: number, u: any, m: StackedPlotMetadata) => Math.abs(getEnd(d, i, u, m) - getStart(d, i, u, m));
+      var heightF = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) => {
+        return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
+      };
 
-      var attrFunction = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-
-        +primaryAccessor(d, i, u, m) < 0 ? getStart(d, i, u, m) : getEnd(d, i, u, m);
-      attrToProjector[valueAttr] = (d: any, i: number, u: any, m: StackedPlotMetadata) =>
-        this._isVertical ? attrFunction(d, i, u, m) : attrFunction(d, i, u, m) - heightF(d, i, u, m);
+      var attrFunction = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
+      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+        this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
 
       return attrToProjector;
     }
 
-    protected _generateDrawSteps(): _Drawer.DrawStep[] {
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
-    }
-
-    public project(attrToSet: string, accessor: any, scale?: Scale.AbstractScale<any, any>) {
-      super.project(attrToSet, accessor, scale);
-      AbstractStacked.prototype.project.apply(this, [attrToSet, accessor, scale]);
-      return this;
     }
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      AbstractStacked.prototype._onDatasetUpdate.apply(this);
+      Stacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
     protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return AbstractStacked.prototype._getPlotMetadataForDataset.call(this, key);
+      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
     }
 
-    protected _normalizeDatasets<A, B>(fromX: boolean): {a: A; b: B}[] {
-      return AbstractStacked.prototype._normalizeDatasets.call(this, fromX);
+    protected _updateExtentsForProperty(property: string) {
+      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
     }
 
-    // ===== Stack logic from AbstractStackedPlot =====
+    // ===== Stack logic from StackedPlot =====
     public _updateStackOffsets() {
-      AbstractStacked.prototype._updateStackOffsets.call(this);
+      Stacked.prototype._updateStackOffsets.call(this);
     }
 
     public _updateStackExtents() {
-      AbstractStacked.prototype._updateStackExtents.call(this);
+      Stacked.prototype._updateStackExtents.call(this);
     }
 
     public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return AbstractStacked.prototype._stack.call(this, dataArray);
+      return Stacked.prototype._stack.call(this, dataArray);
     }
 
     public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      AbstractStacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
+      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
     }
 
     public _getDomainKeys() {
-      return AbstractStacked.prototype._getDomainKeys.call(this);
+      return Stacked.prototype._getDomainKeys.call(this);
     }
 
     public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return AbstractStacked.prototype._generateDefaultMapArray.call(this);
+      return Stacked.prototype._generateDefaultMapArray.call(this);
     }
 
-    public _updateScaleExtents() {
-      AbstractStacked.prototype._updateScaleExtents.call(this);
+    protected _extentsForProperty(attr: string) {
+      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
     }
 
-    public _keyAccessor(): _Accessor {
-      return AbstractStacked.prototype._keyAccessor.call(this);
+    public _keyAccessor(): Accessor<X> | Accessor<Y> {
+      return Stacked.prototype._keyAccessor.call(this);
     }
 
-    public _valueAccessor(): _Accessor {
-      return AbstractStacked.prototype._valueAccessor.call(this);
+    public _valueAccessor(): Accessor<number> {
+      return Stacked.prototype._valueAccessor.call(this);
     }
     // ===== /Stack logic =====
   }
