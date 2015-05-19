@@ -101,26 +101,7 @@ export module Plots {
     protected _updateExtentsForProperty(property: string) {
       super._updateExtentsForProperty(property);
       if ((property === "x" || property === "y") && this._projectorsReady()) {
-        var orientation = this._isVertical ? "vertical" : "horizontal";
-        var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-        var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-        var datasetKeys = this._datasetKeysInOrder;
-        var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-        var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-        if (this._stackOffsets.keys().length === 0) {
-          var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-
-          for (var datasetKey in stackOffsets) {
-            if (!stackOffsets.hasOwnProperty(datasetKey)) {
-              continue;
-            }
-            this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
-          }
-        }
-        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
-        this._stackedExtent = extents;
+        this._updateStackExtentsAndOffsets();
       }
     }
 
