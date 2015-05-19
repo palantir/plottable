@@ -133,17 +133,21 @@ module Plottable {
      * @returns {XYPlot} The calling XYPlot.
      */
      public autorange(scale: string): XYPlot<X, Y> {
-       if (scale === "x") {
-         this._autoAdjustXScaleDomain = true;
-         this._adjustXDomainOnChangeFromY();
-       } else if (scale === "y") {
-         this._autoAdjustYScaleDomain = true;
-         this._adjustYDomainOnChangeFromX();
-       } else if (scale === "none") {
-         this._autoAdjustXScaleDomain = false;
-         this._autoAdjustYScaleDomain = false;
-       } else {
-         throw Error("Invalid scale value, must be 'x', 'y' or 'none'");
+       switch (scale) {
+         case "x":
+           this._autoAdjustXScaleDomain = true;
+           this._adjustXDomainOnChangeFromY();
+           break;
+         case "y":
+           this._autoAdjustYScaleDomain = true;
+           this._adjustYDomainOnChangeFromX();
+           break;
+         case "none":
+           this._autoAdjustXScaleDomain = false;
+           this._autoAdjustYScaleDomain = false;
+           break;
+         default:
+           throw Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
        }
        return this;
      }
