@@ -4,7 +4,7 @@ module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
     private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
-    private _stackedExtent: number[] = [];
+    private _stackedExtent: number[];
 
     /**
      * Constructs a StackedBar plot.
@@ -18,6 +18,7 @@ export module Plots {
     constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackedExtent = [];
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {

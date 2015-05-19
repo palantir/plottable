@@ -4,7 +4,7 @@ module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
     private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
-    private _stackedExtent: number[] = [];
+    private _stackedExtent: number[];
 
     private _isVertical: boolean;
     private _baseline: D3.Selection;
@@ -23,6 +23,7 @@ export module Plots {
       this._isVertical = true;
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackedExtent = [];
     }
 
     protected _getDrawer(key: string) {

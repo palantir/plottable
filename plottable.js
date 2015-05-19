@@ -8037,12 +8037,12 @@ var Plottable;
              */
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._stackedExtent = [];
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
+                this._stackedExtent = [];
             }
             StackedArea.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key).drawLine(false);
@@ -8198,8 +8198,8 @@ var Plottable;
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale, isVertical);
-                this._stackedExtent = [];
                 this._stackOffsets = new Plottable.Utils.Map();
+                this._stackedExtent = [];
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {
