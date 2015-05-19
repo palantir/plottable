@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackedExtent = [0, 0];
+    private _stackedExtent: number[] = [];
 
     /**
      * Constructs a StackedBar plot.

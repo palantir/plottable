@@ -8054,7 +8054,7 @@ var Plottable;
              */
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this._stackedExtent = [0, 0];
+                this._stackedExtent = [];
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
@@ -8210,7 +8210,7 @@ var Plottable;
             function StackedBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale, isVertical);
-                this._stackedExtent = [0, 0];
+                this._stackedExtent = [];
             }
             StackedBar.prototype._getAnimator = function (key) {
                 if (this._animate && this._animateOnNextRender) {

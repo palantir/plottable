@@ -4374,7 +4374,7 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
-    describe("Stacked Plot Stacking", function () {
+    describe("StackedBar Plot Stacking", function () {
         var stackedPlot;
         beforeEach(function () {
             var xScale = new Plottable.Scales.Linear();
@@ -4442,24 +4442,6 @@ describe("Plots", function () {
             assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
             assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
-        // it("project can be called after addDataset", () => {
-        //   var data0 = [
-        //     { a: 1, b: 2 }
-        //   ];
-        //   var data1 = [
-        //     { a: 1, b: 4 }
-        //   ];
-        //   stackedPlot.addDataset(new Plottable.Dataset(data0));
-        //   stackedPlot.addDataset(new Plottable.Dataset(data1));
-        //   // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-        //   var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-        //   var ds0PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[0]).plotMetadata;
-        //   var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-        //   assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
-        //   stackedPlot.x((d) => d.a);
-        //   stackedPlot.y((d) => d.b);
-        //   assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
-        // });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
                 { x: 1, y: "-2" }
@@ -4511,7 +4493,7 @@ describe("Plots", function () {
             assert.doesNotThrow(function () { return stackedPlot.removeDataset(dataset1); }, Error);
         });
     });
-    describe("Stacked Plot Stacking", function () {
+    describe("StackedArea Plot Stacking", function () {
         var stackedPlot;
         beforeEach(function () {
             var xScale = new Plottable.Scales.Linear();
@@ -4579,24 +4561,6 @@ describe("Plots", function () {
             assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
             assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
-        // it("project can be called after addDataset", () => {
-        //   var data0 = [
-        //     { a: 1, b: 2 }
-        //   ];
-        //   var data1 = [
-        //     { a: 1, b: 4 }
-        //   ];
-        //   stackedPlot.addDataset(new Plottable.Dataset(data0));
-        //   stackedPlot.addDataset(new Plottable.Dataset(data1));
-        //   // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-        //   var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-        //   var ds0PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[0]).plotMetadata;
-        //   var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-        //   assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
-        //   stackedPlot.x((d) => d.a);
-        //   stackedPlot.y((d) => d.b);
-        //   assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
-        // });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
                 { x: 1, y: "-2" }

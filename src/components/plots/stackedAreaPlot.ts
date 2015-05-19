@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackedExtent = [0, 0];
+    private _stackedExtent: number[] = [];
 
     private _isVertical: boolean;
     private _baseline: D3.Selection;
