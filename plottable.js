@@ -7819,6 +7819,7 @@ var Plottable;
             function ClusteredBar(xScale, yScale, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this, xScale, yScale, isVertical);
+                this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7830,21 +7831,18 @@ var Plottable;
                 attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
                 var xAttr = attrToProjector["x"];
                 var yAttr = attrToProjector["y"];
-                attrToProjector["x"] = function (d, i, dataset, m) { return _this._isVertical ? xAttr(d, i, dataset, m) + m.position : xAttr(d, i, dataset, m); };
-                attrToProjector["y"] = function (d, i, dataset, m) { return _this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + m.position; };
+                attrToProjector["x"] = this._isVertical ? function (d, i, ds, m) { return xAttr(d, i, ds, m) + _this._clusterOffsets.get(ds); } : function (d, i, ds, m) { return xAttr(d, i, ds, m); };
+                attrToProjector["y"] = this._isVertical ? function (d, i, ds, m) { return yAttr(d, i, ds, m); } : function (d, i, ds, m) { return yAttr(d, i, ds, m) + _this._clusterOffsets.get(ds); };
                 return attrToProjector;
             };
             ClusteredBar.prototype._updateClusterPosition = function () {
                 var _this = this;
                 var innerScale = this._makeInnerScale();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var plotMetadata = _this._key2PlotDatasetKey.get(key).plotMetadata;
-                    plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
-                });
+                this.datasets().forEach(function (d, i) { return _this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2); });
             };
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scales.Category();
-                innerScale.domain(this._datasetKeysInOrder);
+                innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
                 if (!this._attrBindings.get("width")) {
                     innerScale.range([0, this._getBarPixelWidth()]);
                 }
@@ -7860,11 +7858,6 @@ var Plottable;
             ClusteredBar.prototype._getDataToDraw = function () {
                 this._updateClusterPosition();
                 return _super.prototype._getDataToDraw.call(this);
-            };
-            ClusteredBar.prototype._getPlotMetadataForDataset = function (key) {
-                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-                metadata.position = 0;
-                return metadata;
             };
             return ClusteredBar;
         })(Plots.Bar);
