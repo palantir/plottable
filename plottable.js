@@ -6786,47 +6786,30 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the automatic domain adjustment for visible points to operate
-         * against the X axis, Y axis, or neither.
-         */
-        XYPlot.prototype.autorange = function (adjustment) {
-            if (adjustment == 'x') {
-                this.automaticallyAdjustYScaleOverVisiblePoints(false);
-                this.automaticallyAdjustXScaleOverVisiblePoints(true);
-            }
-            else if (adjustment == 'y') {
-                this.automaticallyAdjustXScaleOverVisiblePoints(false);
-                this.automaticallyAdjustYScaleOverVisiblePoints(true);
-            }
-            else if (adjustment == 'none') {
-                this.automaticallyAdjustXScaleOverVisiblePoints(false);
-                this.automaticallyAdjustYScaleOverVisiblePoints(false);
-            }
-        };
-        /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  If 'x' or 'y' is
+         * specified the adjustment is immediately performed.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
+         * @param {string} scale Must be one of 'x', 'y', or 'none'.  'x' will adjust the x scale in relation to changes in the 'y' domain,
+         * 'y' will adjust the y scale in relation to changes in the x domain, and 'none' means neither scale will change automatically.
          *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
          * @returns {XYPlot} The calling XYPlot.
          */
-        XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustYScaleDomain = autoAdjustment;
-            this._adjustYDomainOnChangeFromX();
-            return this;
-        };
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustXScaleDomain = autoAdjustment;
-            this._adjustXDomainOnChangeFromY();
+        XYPlot.prototype.autorange = function (scale) {
+            if (scale === "x") {
+                this._autoAdjustXScaleDomain = true;
+                this._adjustXDomainOnChangeFromY();
+            }
+            else if (scale === "y") {
+                this._autoAdjustYScaleDomain = true;
+                this._adjustYDomainOnChangeFromX();
+            }
+            else if (scale === "none") {
+                this._autoAdjustXScaleDomain = false;
+                this._autoAdjustYScaleDomain = false;
+            }
+            else {
+                throw Error("Invalid scale value, must be 'x', 'y' or 'none'");
+            }
             return this;
         };
         XYPlot.prototype._generatePropertyToProjectors = function () {
