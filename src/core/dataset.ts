@@ -7,7 +7,6 @@ module Plottable {
   export class Dataset {
     private _data: any[];
     private _metadata: any;
-    private _accessor2cachedExtent: Utils.Map<any, any>;
     private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
@@ -23,7 +22,6 @@ module Plottable {
     constructor(data: any[] = [], metadata: any = {}) {
       this._data = data;
       this._metadata = metadata;
-      this._accessor2cachedExtent = new Utils.Map<any, any>();
       this._callbacks = new Utils.CallbackSet<DatasetCallback>();
     }
 
@@ -53,7 +51,6 @@ module Plottable {
         return this._data;
       } else {
         this._data = data;
-        this._accessor2cachedExtent = new Utils.Map<any, any>();
         this._callbacks.callCallbacks(this);
         return this;
       }
@@ -78,7 +75,6 @@ module Plottable {
         return this._metadata;
       } else {
         this._metadata = metadata;
-        this._accessor2cachedExtent = new Utils.Map<any, any>();
         this._callbacks.callCallbacks(this);
         return this;
       }

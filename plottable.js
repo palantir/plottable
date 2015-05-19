@@ -1118,7 +1118,6 @@ var Plottable;
             if (metadata === void 0) { metadata = {}; }
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.Map();
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Dataset.prototype.onUpdate = function (callback) {
@@ -1133,7 +1132,6 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -1144,7 +1142,6 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
