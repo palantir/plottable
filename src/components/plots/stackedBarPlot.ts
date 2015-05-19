@@ -3,6 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
+    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
     private _stackedExtent: number[] = [];
 
     /**
@@ -16,6 +17,7 @@ export module Plots {
      */
     constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
+      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {
@@ -69,9 +71,9 @@ export module Plots {
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
       var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        primaryScale.scale(m.offsets.get(keyAccessor(d, i, dataset, m)));
+        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
       var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + m.offsets.get(keyAccessor(d, i, dataset, m)));
+        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
 
       var heightF = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) => {
         return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
@@ -111,7 +113,17 @@ export module Plots {
         var keyToPlotDatasetKey = this._key2PlotDatasetKey;
         var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+        if (this._stackOffsets.keys().length === 0) {
+          var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+
+          for (var datasetKey in stackOffsets) {
+            if (!stackOffsets.hasOwnProperty(datasetKey)) {
+              continue;
+            }
+            this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
+          }
+        }
+        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
         this._stackedExtent = extents;
       }
     }
@@ -144,11 +156,10 @@ export module Plots {
         if (!stackOffsets.hasOwnProperty(datasetKey)) {
           continue;
         }
-        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
-        plotMetadata.offsets = stackOffsets[datasetKey];
+        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
       }
 
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
     }
   }
 }

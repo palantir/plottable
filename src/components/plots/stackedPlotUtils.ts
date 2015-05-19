@@ -22,33 +22,29 @@ module Plottable {
     public static computeStackExtents(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
-        datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        datasets: Dataset[],
+        stackOffsets: Utils.Map<Dataset, D3.Map<number>>,
         filter: Accessor<boolean>) {
 
-      var maxStackExtent = Utils.Methods.max<string, number>(datasetKeys, (k: string) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+      var maxStackExtent = Utils.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
         var data = dataset.data();
         if (filter != null) {
-          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+          data = data.filter((d, i) => filter(d, i, dataset, null));
         }
         return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
+          return +valueAccessor(datum, i, dataset, null) +
+            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset, null)));
         }, 0);
       }, 0);
 
-      var minStackExtent = Utils.Methods.min<string, number>(datasetKeys, (k: string) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+      var minStackExtent = Utils.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
         var data = dataset.data();
         if (filter != null) {
-          data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+          data = data.filter((d, i) => filter(d, i, dataset, null));
         }
         return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset, plotMetadata) +
-            plotMetadata.offsets.get(String(keyAccessor(datum, i, dataset, plotMetadata)));
+          return +valueAccessor(datum, i, dataset, null) +
+            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset, null)));
         }, 0);
       }, 0);
 
