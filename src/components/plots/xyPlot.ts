@@ -138,8 +138,8 @@ module Plottable {
      * 
      * @returns {XYPlot} The calling XYPlot.
      */
-    public autorange(scale: string) {
-      switch (scale) {
+    public autorange(scaleName: string) {
+      switch (scaleName) {
         case "x":
           this._autoAdjustXScaleDomain = true;
           this._autoAdjustYScaleDomain = false;
@@ -155,7 +155,7 @@ module Plottable {
           this._autoAdjustYScaleDomain = false;
           break;
         default:
-          throw new Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
+          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
       }
       return this;
     }
