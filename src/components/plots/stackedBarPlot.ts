@@ -19,7 +19,6 @@ export module Plots {
 
     /**
      * a
-     * 3
      * 7
      */
     protected _getAnimator(key: string): Animators.PlotAnimator {

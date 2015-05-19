@@ -3056,7 +3056,6 @@ declare module Plottable {
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
             /**
              * a
-             * 3
              * 7
              */
             protected _getAnimator(key: string): Animators.PlotAnimator;
