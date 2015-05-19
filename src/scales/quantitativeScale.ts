@@ -4,9 +4,10 @@ module Plottable {
   export class QuantitativeScale<D> extends Scale<D, number> {
     protected static _DEFAULT_NUM_TICKS = 10;
     protected _d3Scale: D3.Scale.QuantitativeScale;
-    public _userSetDomainer = false;
-    private _domainer: Domainer = new Domainer();
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
+    private _padProportion = 0.05;
+    private _paddingExceptions: Utils.Map<any, D>;
+    private _includedValues: Utils.Map<any, D>;
 
     /**
      * Constructs a new QuantitativeScale.
@@ -20,10 +21,89 @@ module Plottable {
      */
     constructor(scale: D3.Scale.QuantitativeScale) {
       super(scale);
+      this._paddingExceptions = new Utils.Map<any, D>();
+      this._includedValues = new Utils.Map<any, D>();
     }
 
     protected _getExtent(): D[] {
-      return this._domainer.computeDomain(this._getAllExtents(), this);
+      var extents = this._getAllExtents().filter((extent) => extent.length > 0);
+      var defaultExtent = this._defaultExtent();
+      if (extents.length === 0) {
+        return defaultExtent;
+      }
+      var combinedExtent = [
+        Utils.Methods.min<D[], D>(extents, (extent) => extent[0], defaultExtent[0]),
+        Utils.Methods.max<D[], D>(extents, (extent) => extent[1], defaultExtent[1])
+      ];
+      var includedDomain = this._includeValues(combinedExtent);
+      var paddedDomain  = this._padDomain(includedDomain);
+      return paddedDomain;
+    }
+
+    public addPaddingException(key: any, exception: D) {
+      this._paddingExceptions.set(key, exception);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    public removePaddingException(key: any) {
+      this._paddingExceptions.delete(key);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    public addIncludedValue(key: any, value: D) {
+      this._includedValues.set(key, value);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    public removeIncludedValue(key: any) {
+      this._includedValues.delete(key);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    public padProportion(): number;
+    public padProportion(padProportion: number): QuantitativeScale<D>;
+    public padProportion(padProportion?: number): any {
+      if (padProportion == null) {
+        return this._padProportion;
+      }
+      if (padProportion < 0) {
+        throw new Error("padProportion must be non-negative");
+      }
+      this._padProportion = padProportion;
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    private _includeValues(domain: D[]) {
+      var includedValues = this._includedValues.values();
+      return includedValues.reduce(
+        (domain, value) => [Math.min(domain[0], value), Math.max(domain[1], value)],
+        domain
+      );
+    }
+
+    private _padDomain(domain: D[]) {
+      if (domain[0].valueOf() === domain[1].valueOf()) {
+        return this._expandSingleValueDomain(domain);
+      }
+      if (this._padProportion === 0) {
+        return domain;
+      }
+      var p = this._padProportion / 2;
+      var min = domain[0];
+      var max = domain[1];
+      var paddingExceptions = this._paddingExceptions.values();
+      var newMin = paddingExceptions.indexOf(min) === -1 ? this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p) : min;
+      var newMax = paddingExceptions.indexOf(max) === -1 ? this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p) : max;
+      return this._niceDomain([newMin, newMax]);
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: D[]): D[] {
+      return singleValueDomain;
     }
 
     /**
@@ -73,36 +153,6 @@ module Plottable {
      */
     public _niceDomain(domain: D[], count?: number): D[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
-    }
-
-    /**
-     * Gets a Domainer of a scale. A Domainer is responsible for combining
-     * multiple extents into a single domain.
-     *
-     * @return {Domainer} The scale's current domainer.
-     */
-    public domainer(): Domainer;
-    /**
-     * Sets a Domainer of a scale. A Domainer is responsible for combining
-     * multiple extents into a single domain.
-     *
-     * When you set domainer, we assume that you know what you want the domain
-     * to look like better that we do. Ensuring that the domain is padded,
-     * includes 0, etc., will be the responsability of the new domainer.
-     *
-     * @param {Domainer} domainer If provided, the new domainer.
-     * @return {QuantitativeScale} The calling QuantitativeScale.
-     */
-    public domainer(domainer: Domainer): QuantitativeScale<D>;
-    public domainer(domainer?: Domainer): any {
-      if (domainer == null) {
-        return this._domainer;
-      } else {
-        this._domainer = domainer;
-        this._userSetDomainer = true;
-        this._autoDomainIfAutomaticMode();
-        return this;
-      }
     }
 
     public _defaultExtent(): D[] {

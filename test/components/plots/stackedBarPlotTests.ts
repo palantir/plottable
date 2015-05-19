@@ -20,7 +20,8 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category();
-      yScale = new Plottable.Scales.Linear().domain([0, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 3]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -221,7 +222,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([0, 6]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 6]);
       yScale = new Plottable.Scales.Category();
 
       var data1 = [

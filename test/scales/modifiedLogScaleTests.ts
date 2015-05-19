@@ -38,23 +38,25 @@ describe("Scales", () => {
 
     it("domain defaults to [0, base]", () => {
       scale = new Plottable.Scales.ModifiedLog(base);
-      assert.deepEqual(scale.domain(), [0, base]);
+      assert.deepEqual(scale.domain(), [0, base], "default domain is [0, base]");
     });
 
-    it("works with a Domainer", () => {
-      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
-      var domain = scale.domain();
-      scale.domainer(new Plottable.Domainer().pad(0.1));
-      assert.operator(scale.domain()[0], "<", domain[0]);
-      assert.operator(domain[1], "<", scale.domain()[1]);
+    it("can be padded", () => {
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[0, base]]);
+      scale.padProportion(0);
+      var unpaddedDomain = scale.domain();
+      scale.padProportion(0.1);
+      assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
+      assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
+    });
 
-      scale.domainer(new Plottable.Domainer().nice());
-      assert.operator(scale.domain()[0], "<=", domain[0]);
-      assert.operator(domain[1], "<=", scale.domain()[1]);
-
-      scale = new Plottable.Scales.ModifiedLog(base);
-      scale.domainer(new Plottable.Domainer());
-      assert.deepEqual(scale.domain(), [0, base]);
+    it("autoDomain() expands single value to [value / base, value * base]", () => {
+      var scale = new Plottable.Scales.ModifiedLog();
+      scale.padProportion(0);
+      var singleValue = 15;
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[singleValue, singleValue]]);
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
     });
 
     it("gives reasonable values for ticks()", () => {
@@ -76,8 +78,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
-      scale.autoDomain();
+      scale.domain([200, -100]);
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
       assert.closeTo(scale.scale(200), range[0], epsilon);

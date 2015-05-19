@@ -15,8 +15,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
@@ -112,7 +114,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
@@ -324,8 +327,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [

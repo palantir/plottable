@@ -217,8 +217,10 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Linear().domain([0, 9]);
-        yScale = new Plottable.Scales.Linear().domain([0, 81]);
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, 9]);
+        yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, 81]);
         circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.attr("fill", colorAccessor);
