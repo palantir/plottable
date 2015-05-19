@@ -8,6 +8,8 @@ export module Plots {
 
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
+    private _datasetOffsets: Utils.Map<Dataset, number>;
+
     /**
      * Creates a ClusteredBarPlot.
      *
@@ -22,6 +24,7 @@ export module Plots {
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
+      this._datasetOffsets = new Utils.Map<Dataset, number>();
     }
 
     protected _generateAttrToProjector() {
@@ -35,24 +38,22 @@ export module Plots {
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
       attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
-        this._isVertical ? xAttr(d, i, dataset, m) + m.position : xAttr(d, i, dataset, m);
+        this._isVertical ? xAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset) : xAttr(d, i, dataset, m);
       attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
-        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + m.position;
+        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset);
 
       return attrToProjector;
     }
 
     private _updateClusterPosition() {
       var innerScale = this._makeInnerScale();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
-        plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
-      });
+      this.datasets().forEach((d, i) => this._datasetOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
     }
 
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
-      innerScale.domain(this._datasetKeysInOrder);
+      var fakeDomain = this.datasets().map((d, i) => String(i));
+      innerScale.domain(fakeDomain);
       if (!this._attrBindings.get("width")) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
