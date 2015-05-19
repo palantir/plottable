@@ -11,7 +11,6 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale the x scale of the plot.
      * @param {Scale} yScale the y scale of the plot.
-     * @param {string} mode the mode of the plot.
      */
     constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>) {
       super(xScale, yScale);

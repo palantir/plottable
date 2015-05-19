@@ -2771,7 +2771,6 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} mode the mode of the plot.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Rect;
@@ -2968,7 +2967,6 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} mode the mode of the plot.
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _generateAttrToProjector(): {
@@ -3069,7 +3067,6 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {string} mode the mode of the plot.
              */
             constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
             protected _getAnimator(key: string): Animators.PlotAnimator;

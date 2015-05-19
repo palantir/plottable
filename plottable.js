@@ -7203,7 +7203,6 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} mode the mode of the plot.
              */
             function Bar(xScale, yScale) {
                 var _this = this;
@@ -7846,7 +7845,6 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} mode the mode of the plot.
              */
             function ClusteredBar(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -8287,7 +8285,6 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {string} mode the mode of the plot.
              */
             function StackedBar(xScale, yScale) {
                 _super.call(this, xScale, yScale);
