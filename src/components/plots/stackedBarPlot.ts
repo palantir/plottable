@@ -3,6 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
+    private _stackedExtent: number[] = [];
 
     /**
      * Constructs a StackedBar plot.
@@ -37,11 +38,11 @@ export module Plots {
       }
       if (xScale == null) {
         super.x(<number | Accessor<number>> x);
-        Stacked.prototype.x.apply(this, [x]);
       } else {
         super.x(<X | Accessor<X>> x, xScale);
-        Stacked.prototype.x.apply(this, [x, xScale]);
       }
+
+      this._updateStackExtentsAndOffsets();
       return this;
     }
 
@@ -51,11 +52,11 @@ export module Plots {
       }
       if (yScale == null) {
         super.y(<number | Accessor<number>> y);
-        Stacked.prototype.y.apply(this, [y]);
       } else {
         super.y(<Y | Accessor<Y>> y, yScale);
-        Stacked.prototype.y.apply(this, [y, yScale]);
       }
+
+      this._updateStackExtentsAndOffsets();
       return this;
     }
 
@@ -89,56 +90,66 @@ export module Plots {
     }
 
     protected _onDatasetUpdate() {
+      this._updateStackExtentsAndOffsets();
       super._onDatasetUpdate();
-      Stacked.prototype._onDatasetUpdate.apply(this);
       return this;
     }
 
-    protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata {
-      return Stacked.prototype._getPlotMetadataForDataset.call(this, key);
+    protected _getPlotMetadataForDataset(key: string) {
+      var metadata = super._getPlotMetadataForDataset(key);
+      return StackedPlotUtils.stackedPlotMetadata(metadata);
     }
 
     protected _updateExtentsForProperty(property: string) {
-      (<any> Stacked.prototype)._updateExtentsForProperty.call(this, property);
-    }
+      super._updateExtentsForProperty(property);
+      if ((property === "x" || property === "y") && this._projectorsReady()) {
+        var orientation = this._isVertical ? "vertical" : "horizontal";
+        var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+        var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
 
-    // ===== Stack logic from StackedPlot =====
-    public _updateStackOffsets() {
-      Stacked.prototype._updateStackOffsets.call(this);
-    }
+        var datasetKeys = this._datasetKeysInOrder;
+        var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+        var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-    public _updateStackExtents() {
-      Stacked.prototype._updateStackExtents.call(this);
-    }
-
-    public _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._stack.call(this, dataArray);
-    }
-
-    public _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]) {
-      Stacked.prototype._setDatasetStackOffsets.call(this, positiveDataMapArray, negativeDataMapArray);
-    }
-
-    public _getDomainKeys() {
-      return Stacked.prototype._getDomainKeys.call(this);
-    }
-
-    public _generateDefaultMapArray(): D3.Map<StackedDatum>[] {
-      return Stacked.prototype._generateDefaultMapArray.call(this);
+        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+        this._stackedExtent = extents;
+      }
     }
 
     protected _extentsForProperty(attr: string) {
-      return (<any> Stacked.prototype)._extentsForProperty.call(this, attr);
+      var primaryAttr = this._isVertical ? "y" : "x";
+      if (attr === primaryAttr) {
+        return [this._stackedExtent];
+      } else {
+        return super._extentsForProperty(attr);
+      }
     }
 
-    public _keyAccessor(): Accessor<X> | Accessor<Y> {
-      return Stacked.prototype._keyAccessor.call(this);
-    }
+    private _updateStackExtentsAndOffsets() {
+      if (!this._projectorsReady()) {
+        return;
+      }
 
-    public _valueAccessor(): Accessor<number> {
-      return Stacked.prototype._valueAccessor.call(this);
+      var orientation = this._isVertical ? "vertical" : "horizontal";
+      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
+      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
+
+      var datasetKeys = this._datasetKeysInOrder;
+      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+
+      var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
+
+      for (var datasetKey in stackOffsets) {
+        if (!stackOffsets.hasOwnProperty(datasetKey)) {
+          continue;
+        }
+        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
+        plotMetadata.offsets = stackOffsets[datasetKey];
+      }
+
+      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
     }
-    // ===== /Stack logic =====
   }
 }
 }

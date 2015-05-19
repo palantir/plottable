@@ -2958,30 +2958,21 @@ declare module Plottable {
             offset?: number;
         };
     }
-    class Stacked<X, Y> extends XYPlot<X, Y> {
-        protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
-        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
-        _onDatasetUpdate(): void;
-        _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+    class StackedPlotUtils {
         /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         * @return {[number]} The extent that spans all the stacked data
          */
-        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
         /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
          */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
-        _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        protected _updateExtentsForProperty(property: string): void;
-        protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor<X> | Accessor<Y>;
-        _valueAccessor(): Accessor<number>;
+        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
+            [key: string]: D3.Map<number>;
+        };
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
+        static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
+        static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
+        static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
 }
 
@@ -3009,17 +3000,9 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X>;
-            _valueAccessor(): Accessor<number>;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3048,15 +3031,7 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X> | Accessor<Y>;
-            _valueAccessor(): Accessor<number>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
