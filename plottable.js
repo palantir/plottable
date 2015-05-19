@@ -363,33 +363,28 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
-         */
         var Map = (function () {
             function Map() {
                 this._keyValuePairs = [];
             }
             /**
-             * Set a new key/value pair in the store.
+             * Set a new key/value pair in the Map.
              *
-             * @param {K} key Key to set in the store
-             * @param {V} value Value to set in the store
-             * @return {boolean} True if key already in store, false otherwise
+             * @param {K} key Key to set in the Map
+             * @param {V} value Value to set in the Map
+             * @return {boolean} True if key already in Map, false otherwise
              */
             Map.prototype.set = function (key, value) {
                 if (key !== key) {
                     throw new Error("NaN may not be used as a key to the Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        this._keyValuePairs[i][1] = value;
+                    if (this._keyValuePairs[i].key === key) {
+                        this._keyValuePairs[i].value = value;
                         return true;
                     }
                 }
-                this._keyValuePairs.push([key, value]);
+                this._keyValuePairs.push({ key: key, value: value });
                 return false;
             };
             /**
@@ -400,8 +395,8 @@ var Plottable;
              */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
-                        return this._keyValuePairs[i][1];
+                    if (this._keyValuePairs[i].key === key) {
+                        return this._keyValuePairs[i].value;
                     }
                 }
                 return undefined;
@@ -417,48 +412,37 @@ var Plottable;
              */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         return true;
                     }
                 }
                 return false;
             };
             /**
-             * Return an array of the values in the key-value store
+             * Return an array of the values in the Map
              *
              * @return {V[]} The values in the store
              */
             Map.prototype.values = function () {
-                return this._keyValuePairs.map(function (x) { return x[1]; });
+                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.value; });
             };
             /**
-             * Return an array of keys in the key-value store
+             * Return an array of keys in the Map.
              *
              * @return {K[]} The keys in the store
              */
             Map.prototype.keys = function () {
-                return this._keyValuePairs.map(function (x) { return x[0]; });
+                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.key; });
             };
             /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            Map.prototype.map = function (cb) {
-                return this._keyValuePairs.map(function (kv, index) {
-                    return cb(kv[0], kv[1], index);
-                });
-            };
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
+             * Delete a key from the Map. Return whether the key was present.
              *
              * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
              */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
-                    if (this._keyValuePairs[i][0] === key) {
+                    if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs.splice(i, 1);
                         return true;
                     }
@@ -1134,7 +1118,6 @@ var Plottable;
             if (metadata === void 0) { metadata = {}; }
             this._data = data;
             this._metadata = metadata;
-            this._accessor2cachedExtent = new Plottable.Utils.Map();
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
         Dataset.prototype.onUpdate = function (callback) {
@@ -1149,7 +1132,6 @@ var Plottable;
             }
             else {
                 this._data = data;
-                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
@@ -1160,7 +1142,6 @@ var Plottable;
             }
             else {
                 this._metadata = metadata;
-                this._accessor2cachedExtent = new Plottable.Utils.Map();
                 this._callbacks.callCallbacks(this);
                 return this;
             }
