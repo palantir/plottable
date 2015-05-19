@@ -63,8 +63,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  // Test is flaky under SauceLabs for firefox version 30
-  it.skip("a legend with a long label does not overflow horizontally", () => {
+  it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     svg.attr("width", 100);
     legend.renderTo(svg);

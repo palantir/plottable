@@ -1540,8 +1540,7 @@ describe("Labels", function () {
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
-    // skipping because Dan is rewriting labels and the height test fails
-    it.skip("Superlong text is handled in a sane fashion", function () {
+    it("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = TestMethods.generateSVG(svgWidth, 80);
         var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
@@ -1585,8 +1584,7 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Label orientation can be changed after label is created", function () {
+    it("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.Label("CHANGING ORIENTATION");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1697,8 +1695,7 @@ describe("Legend", function () {
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
     });
-    // Test is flaky under SauceLabs for firefox version 30
-    it.skip("a legend with a long label does not overflow horizontally", function () {
+    it("a legend with a long label does not overflow horizontally", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
         svg.attr("width", 100);
         legend.renderTo(svg);

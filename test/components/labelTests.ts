@@ -63,8 +63,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // skipping because Dan is rewriting labels and the height test fails
-  it.skip("Superlong text is handled in a sane fashion", () => {
+  it("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = TestMethods.generateSVG(svgWidth, 80);
     var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
@@ -114,8 +113,7 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Components.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Label orientation can be changed after label is created", () => {
+  it("Label orientation can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Components.Label("CHANGING ORIENTATION");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
