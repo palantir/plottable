@@ -70,18 +70,18 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-      var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      var getStart = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
-      var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      var getEnd = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         primaryScale.scale(+primaryAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
 
-      var heightF = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) => {
+      var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
         return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
       };
 
-      var attrFunction = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      var attrFunction = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
-      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
 
       return attrToProjector;
@@ -95,11 +95,6 @@ export module Plots {
       this._updateStackExtentsAndOffsets();
       super._onDatasetUpdate();
       return this;
-    }
-
-    protected _getPlotMetadataForDataset(key: string) {
-      var metadata = super._getPlotMetadataForDataset(key);
-      return StackedPlotUtils.stackedPlotMetadata(metadata);
     }
 
     protected _updateExtentsForProperty(property: string) {

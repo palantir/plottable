@@ -103,9 +103,9 @@ export module Plots {
 
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         this.y().scale.scale(+yAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
+      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
 
       return attrToProjector;
@@ -113,11 +113,6 @@ export module Plots {
 
     protected _wholeDatumAttributes() {
       return ["x", "y", "defined"];
-    }
-
-    protected _getPlotMetadataForDataset(key: string) {
-      var metadata = super._getPlotMetadataForDataset(key);
-      return StackedPlotUtils.stackedPlotMetadata(metadata);
     }
 
     protected _updateExtentsForProperty(property: string) {

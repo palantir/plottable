@@ -8121,10 +8121,6 @@ var Plottable;
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            StackedArea.prototype._getPlotMetadataForDataset = function (key) {
-                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-                return Plottable.StackedPlotUtils.stackedPlotMetadata(metadata);
-            };
             StackedArea.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
                 if ((property === "x" || property === "y") && this._projectorsReady()) {
@@ -8273,10 +8269,6 @@ var Plottable;
                 this._updateStackExtentsAndOffsets();
                 _super.prototype._onDatasetUpdate.call(this);
                 return this;
-            };
-            StackedBar.prototype._getPlotMetadataForDataset = function (key) {
-                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-                return Plottable.StackedPlotUtils.stackedPlotMetadata(metadata);
             };
             StackedBar.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
