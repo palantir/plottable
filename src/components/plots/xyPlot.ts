@@ -132,25 +132,25 @@ module Plottable {
      * 
      * @returns {XYPlot} The calling XYPlot.
      */
-     public autorange(scale: string): XYPlot<X, Y> {
-       switch (scale) {
-         case "x":
-           this._autoAdjustXScaleDomain = true;
-           this._adjustXDomainOnChangeFromY();
-           break;
-         case "y":
-           this._autoAdjustYScaleDomain = true;
-           this._adjustYDomainOnChangeFromX();
-           break;
-         case "none":
-           this._autoAdjustXScaleDomain = false;
-           this._autoAdjustYScaleDomain = false;
-           break;
-         default:
-           throw Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
-       }
-       return this;
-     }
+    public autorange(scale: string) {
+      switch (scale) {
+        case "x":
+          this._autoAdjustXScaleDomain = true;
+          this._adjustXDomainOnChangeFromY();
+          break;
+        case "y":
+          this._autoAdjustYScaleDomain = true;
+          this._adjustYDomainOnChangeFromX();
+          break;
+        case "none":
+          this._autoAdjustXScaleDomain = false;
+          this._autoAdjustYScaleDomain = false;
+          break;
+        default:
+          throw Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
+      }
+      return this;
+    }
 
     protected _generatePropertyToProjectors(): AttributeToProjector {
       var attrToProjector = super._generatePropertyToProjectors();
