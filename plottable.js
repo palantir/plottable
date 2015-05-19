@@ -7842,8 +7842,7 @@ var Plottable;
             };
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scales.Category();
-                var fakeDomain = this.datasets().map(function (d, i) { return String(i); });
-                innerScale.domain(fakeDomain);
+                innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
                 if (!this._attrBindings.get("width")) {
                     innerScale.range([0, this._getBarPixelWidth()]);
                 }

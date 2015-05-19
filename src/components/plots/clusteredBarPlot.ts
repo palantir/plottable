@@ -50,8 +50,7 @@ export module Plots {
 
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
-      var fakeDomain = this.datasets().map((d, i) => String(i));
-      innerScale.domain(fakeDomain);
+      innerScale.domain(this.datasets().map((d, i) => String(i)));
       if (!this._attrBindings.get("width")) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
