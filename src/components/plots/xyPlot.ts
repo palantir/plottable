@@ -155,7 +155,7 @@ module Plottable {
           this._autoAdjustYScaleDomain = false;
           break;
         default:
-          throw Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
+          throw new Error("Invalid scale value '" + scale + "', must be 'x', 'y' or 'none'");
       }
       return this;
     }
