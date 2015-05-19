@@ -33,10 +33,12 @@ export module Plots {
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
-      attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this._isVertical ? xAttr(d, i, dataset, m) + this._clusterOffsets.get(dataset) : xAttr(d, i, dataset, m);
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + this._clusterOffsets.get(dataset);
+      attrToProjector["x"] = this._isVertical ?
+                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => xAttr(d, i, ds, m) + this._clusterOffsets.get(ds) :
+                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => xAttr(d, i, ds, m);
+      attrToProjector["y"] = this._isVertical ?
+                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => yAttr(d, i, ds, m) :
+                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => yAttr(d, i, ds, m) + this._clusterOffsets.get(ds);
 
       return attrToProjector;
     }

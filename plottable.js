@@ -7831,8 +7831,8 @@ var Plottable;
                 attrToProjector["height"] = !this._isVertical ? innerWidthF : attrToProjector["height"];
                 var xAttr = attrToProjector["x"];
                 var yAttr = attrToProjector["y"];
-                attrToProjector["x"] = function (d, i, dataset, m) { return _this._isVertical ? xAttr(d, i, dataset, m) + _this._clusterOffsets.get(dataset) : xAttr(d, i, dataset, m); };
-                attrToProjector["y"] = function (d, i, dataset, m) { return _this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + _this._clusterOffsets.get(dataset); };
+                attrToProjector["x"] = this._isVertical ? function (d, i, ds, m) { return xAttr(d, i, ds, m) + _this._clusterOffsets.get(ds); } : function (d, i, ds, m) { return xAttr(d, i, ds, m); };
+                attrToProjector["y"] = this._isVertical ? function (d, i, ds, m) { return yAttr(d, i, ds, m); } : function (d, i, ds, m) { return yAttr(d, i, ds, m) + _this._clusterOffsets.get(ds); };
                 return attrToProjector;
             };
             ClusteredBar.prototype._updateClusterPosition = function () {
