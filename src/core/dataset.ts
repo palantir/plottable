@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type DatasetCallback = (dataset: Dataset) => any;
+  export type DatasetCallback = (dataset: Dataset) => void;
 
   export class Dataset {
     private _data: any[];

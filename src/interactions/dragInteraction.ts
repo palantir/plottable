@@ -2,7 +2,7 @@
 
 module Plottable {
 
-export type DragCallback = (start: Point, end: Point) => any;
+export type DragCallback = (start: Point, end: Point) => void;
 
 export module Interactions {
   export class Drag extends Interaction {
