@@ -134,7 +134,7 @@ module Plottable {
      * 
      * 'y' will adjust the y scale in relation to changes in the x domain.
      * 
-     *  'none' means neither scale will change automatically.
+     * 'none' means neither scale will change automatically.
      * 
      * @returns {XYPlot} The calling XYPlot.
      */
