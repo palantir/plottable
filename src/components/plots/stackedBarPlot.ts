@@ -19,7 +19,6 @@ export module Plots {
 
     /**
      * a
-     * 7
      */
     protected _getAnimator(key: string): Animators.PlotAnimator {
       if (this._animate && this._animateOnNextRender) {
