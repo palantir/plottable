@@ -2,10 +2,6 @@
 
 module Plottable {
 export module Plots {
-  export interface ClusteredPlotMetadata extends PlotMetadata {
-    position: number;
-  }
-
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
 
     private _datasetOffsets: Utils.Map<Dataset, number>;
@@ -37,9 +33,9 @@ export module Plots {
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
-      attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
+      attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         this._isVertical ? xAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset) : xAttr(d, i, dataset, m);
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
         this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + this._datasetOffsets.get(dataset);
 
       return attrToProjector;
@@ -69,12 +65,6 @@ export module Plots {
     protected _getDataToDraw() {
       this._updateClusterPosition();
       return super._getDataToDraw();
-    }
-
-    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
-      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
-      metadata.position = 0;
-      return metadata;
     }
   }
 }

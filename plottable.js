@@ -7860,11 +7860,6 @@ var Plottable;
                 this._updateClusterPosition();
                 return _super.prototype._getDataToDraw.call(this);
             };
-            ClusteredBar.prototype._getPlotMetadataForDataset = function (key) {
-                var metadata = _super.prototype._getPlotMetadataForDataset.call(this, key);
-                metadata.position = 0;
-                return metadata;
-            };
             return ClusteredBar;
         })(Plots.Bar);
         Plots.ClusteredBar = ClusteredBar;
