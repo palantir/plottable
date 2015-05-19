@@ -1063,45 +1063,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Core;
-    (function (Core) {
-        /**
-         * Colors we use as defaults on a number of graphs.
-         */
-        var Colors = (function () {
-            function Colors() {
-            }
-            Colors.CORAL_RED = "#fd373e";
-            Colors.INDIGO = "#5279c7";
-            Colors.ROBINS_EGG_BLUE = "#06cccc";
-            Colors.FERN = "#63c261";
-            Colors.BURNING_ORANGE = "#ff7939";
-            Colors.ROYAL_HEATH = "#962565";
-            Colors.CONIFER = "#99ce50";
-            Colors.CERISE_RED = "#db2e65";
-            Colors.BRIGHT_SUN = "#fad419";
-            Colors.JACARTA = "#2c2b6f";
-            Colors.PLOTTABLE_COLORS = [
-                Colors.INDIGO,
-                Colors.CORAL_RED,
-                Colors.FERN,
-                Colors.BRIGHT_SUN,
-                Colors.JACARTA,
-                Colors.BURNING_ORANGE,
-                Colors.CERISE_RED,
-                Colors.CONIFER,
-                Colors.ROYAL_HEATH,
-                Colors.ROBINS_EGG_BLUE,
-            ];
-            return Colors;
-        })();
-        Core.Colors = Colors;
-    })(Core = Plottable.Core || (Plottable.Core = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var Dataset = (function () {
         /**
          * Constructs a new set.
