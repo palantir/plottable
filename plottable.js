@@ -7010,7 +7010,8 @@ var Plottable;
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.size(6);
-                this.symbol(function () { return Plottable.SymbolFactories.circle(); });
+                var circleSymbolFactory = Plottable.SymbolFactories.circle();
+                this.symbol(function () { return circleSymbolFactory; });
             }
             Scatter.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Symbol(key);

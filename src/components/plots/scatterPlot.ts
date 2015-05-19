@@ -24,7 +24,8 @@ export module Plots {
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
-      this.symbol(() => SymbolFactories.circle());
+      var circleSymbolFactory = SymbolFactories.circle();
+      this.symbol(() => circleSymbolFactory);
     }
 
     protected _getDrawer(key: string) {
