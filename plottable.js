@@ -8443,7 +8443,7 @@ var Plottable;
              * @constructor
              */
             function Base() {
-                this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
+                this._duration = Base.DEFAULT_DURATION_MILLISECONDSA;
                 this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
                 this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
@@ -8510,7 +8510,7 @@ var Plottable;
             /**
              * The default duration of the animation in milliseconds
              */
-            Base.DEFAULT_DURATION_MILLISECONDS = 300;
+            Base.DEFAULT_DURATION_MILLISECONDSA = 300;
             /**
              * The default starting delay of the animation in milliseconds
              */
