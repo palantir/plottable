@@ -2953,9 +2953,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface StackedPlotMetadata extends PlotMetadata {
-            offsets: D3.Map<number>;
-        }
         type StackedDatum = {
             key: any;
             value: number;
@@ -2974,7 +2971,6 @@ declare module Plottable {
             [key: string]: D3.Map<number>;
         };
         static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
-        static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }

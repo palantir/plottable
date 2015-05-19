@@ -7935,11 +7935,6 @@ var Plottable;
                 Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
             }
         };
-        StackedPlotUtils.stackedPlotMetadata = function (metadata) {
-            var stackedMetadata = metadata;
-            stackedMetadata.offsets = d3.map();
-            return stackedMetadata;
-        };
         StackedPlotUtils.keyAccessor = function (plot, orientation) {
             return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
         };

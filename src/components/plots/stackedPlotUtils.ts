@@ -3,10 +3,6 @@
 module Plottable {
 
   export module Plots {
-    export interface StackedPlotMetadata extends PlotMetadata {
-      offsets: D3.Map<number>;
-    }
-
     export type StackedDatum = {
       key: any;
       value: number;
@@ -105,12 +101,6 @@ module Plottable {
       }
     }
 
-    public static stackedPlotMetadata(metadata: Plots.PlotMetadata) {
-      var stackedMetadata = <Plots.StackedPlotMetadata> metadata;
-      stackedMetadata.offsets = d3.map();
-      return stackedMetadata;
-    }
-
     public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
       return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
     }
@@ -197,7 +187,7 @@ module Plottable {
       datasetKeys.forEach((k, index) => {
         stackOffsets[k] = d3.map();
         var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = <Plots.StackedPlotMetadata>keyToPlotDatasetKey.get(k).plotMetadata;
+        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
