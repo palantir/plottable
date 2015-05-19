@@ -849,7 +849,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
-        protected _getRange(): R[];
+        protected _getRange(): void;
         protected _setRange(values: R[]): void;
         addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
         removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
