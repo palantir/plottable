@@ -81,7 +81,7 @@ describe("Plots", () => {
 
       // check that clustering is correct
       var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("_0");
+      var off = innerScale.scale("0");
       var width = xScale.rangeBand() / 2;
       assert.closeTo(TestMethods.numAttr(bar0, "x") + TestMethods.numAttr(bar0, "width") / 2, xScale.scale(bar0X) - width + off, 0.01
           , "x pos correct for bar0");
@@ -166,7 +166,7 @@ describe("Plots", () => {
 
       // check that clustering is correct
       var innerScale = (<any>renderer)._makeInnerScale();
-      var off = innerScale.scale("_0");
+      var off = innerScale.scale("0");
       var width = yScale.rangeBand() / 2;
       assert.closeTo(TestMethods.numAttr(bar0, "y") + TestMethods.numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - width + off, 0.01
             , "y pos correct for bar0");

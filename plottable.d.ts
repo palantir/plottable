@@ -177,18 +177,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
-         */
         class Map<K, V> {
             /**
-             * Set a new key/value pair in the store.
+             * Set a new key/value pair in the Map.
              *
-             * @param {K} key Key to set in the store
-             * @param {V} value Value to set in the store
-             * @return {boolean} True if key already in store, false otherwise
+             * @param {K} key Key to set in the Map
+             * @param {V} value Value to set in the Map
+             * @return {boolean} True if key already in Map, false otherwise
              */
             set(key: K, value: V): boolean;
             /**
@@ -197,7 +192,7 @@ declare module Plottable {
              * @param {K} key Key associated with value to retrieve
              * @return {V} Value if found, undefined otherwise
              */
-            get(key: K): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
@@ -209,26 +204,19 @@ declare module Plottable {
              */
             has(key: K): boolean;
             /**
-             * Return an array of the values in the key-value store
+             * Return an array of the values in the Map
              *
              * @return {V[]} The values in the store
              */
-            values(): any[];
+            values(): V[];
             /**
-             * Return an array of keys in the key-value store
+             * Return an array of keys in the Map.
              *
              * @return {K[]} The keys in the store
              */
-            keys(): any[];
+            keys(): K[];
             /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            map(cb: (key?: K, val?: V, index?: number) => any): any[];
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
+             * Delete a key from the Map. Return whether the key was present.
              *
              * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
@@ -474,7 +462,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DatasetCallback = (dataset: Dataset) => any;
+    type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
          * Constructs a new set.
@@ -606,12 +594,12 @@ declare module Plottable {
      * Access specific datum property.
      */
     interface Accessor<T> {
-        (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+        (datum: any, index: number, dataset: Dataset): T;
     }
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
+    type _Projector = (datum: any, index: number, dataset: Dataset) => any;
     /**
      * Projector with dataset and plot metadata
      */
@@ -1288,7 +1276,7 @@ declare module Plottable {
              * @param{Dataset} dataset The Dataset
              * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
             /**
              * Retrieves the renderArea selection for the drawer
              *
@@ -1365,9 +1353,9 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
             _getPixelPoint(datum: any, index: number): Point;
-            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any): number;
         }
     }
 }
@@ -1378,7 +1366,7 @@ declare module Plottable {
         class Arc extends Element {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1397,7 +1385,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ComponentCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
             static TOP: string;
@@ -2129,13 +2117,13 @@ declare module Plottable {
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-             * The entries will be displayed in the order of the `colorScale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
+             * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
-             * @param {Scale.Color} colorScale
+             * @param {Scale.Color} scale
              */
-            constructor(colorScale: Scales.Color);
+            constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
@@ -2150,17 +2138,17 @@ declare module Plottable {
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
-             * Gets the current sort function for Legend's entries.
-             * @returns {(a: string, b: string) => number} The current sort function.
+             * Gets the current comparator for the Legend's entries.
+             * @returns {(a: string, b: string) => number} The current comparator.
              */
-            sortFunction(): (a: string, b: string) => number;
+            comparator(): (a: string, b: string) => number;
             /**
-             * Sets a new sort function for Legend's entires.
+             * Sets a new comparator for the Legend's entries.
              *
-             * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
              * @returns {Legend} The calling Legend.
              */
-            sortFunction(newFn: (a: string, b: string) => number): Legend;
+            comparator(comparator: (a: string, b: string) => number): Legend;
             /**
              * Gets the current color scale from the Legend.
              *
@@ -2451,12 +2439,8 @@ declare module Plottable {
         type PlotDatasetKey = {
             dataset: Dataset;
             drawer: Drawers.AbstractDrawer;
-            plotMetadata: PlotMetadata;
             key: string;
         };
-        interface PlotMetadata {
-            datasetKey: string;
-        }
         type PlotData = {
             data: any[];
             pixelPoints: Point[];
@@ -2565,12 +2549,6 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
-         * Gets the new plot metadata for new dataset with provided key
-         *
-         * @param {string} key The key of new dataset
-         */
-        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
-        /**
          * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
          * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
@@ -2654,7 +2632,7 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): XYPlot<X, Y>;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
-        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
+        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2708,7 +2686,7 @@ declare module Plottable {
             constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x1(): AccessorScaleBinding<X, number>;
@@ -2884,7 +2862,7 @@ declare module Plottable {
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
              * Gets the orientation of the Plots.Bar.
@@ -2927,10 +2905,10 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Line;
-            protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
+            protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
@@ -2970,7 +2948,7 @@ declare module Plottable {
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
         }
     }
@@ -2979,9 +2957,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface ClusteredPlotMetadata extends PlotMetadata {
-            position: number;
-        }
         class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
@@ -2996,10 +2971,9 @@ declare module Plottable {
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _getDataToDraw(): D3.Map<any[]>;
-            protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
@@ -3007,39 +2981,26 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface StackedPlotMetadata extends PlotMetadata {
-            offsets: D3.Map<number>;
-        }
         type StackedDatum = {
             key: any;
             value: number;
             offset?: number;
         };
     }
-    class Stacked<X, Y> extends XYPlot<X, Y> {
-        protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
-        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
-        _onDatasetUpdate(): void;
-        _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+    class StackedPlotUtils {
         /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         * @return {[number]} The extent that spans all the stacked data
          */
-        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[], stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
         /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
          */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
-        _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        protected _updateExtentsForProperty(property: string): void;
-        protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor<X> | Accessor<Y>;
-        _valueAccessor(): Accessor<number>;
+        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
+            [key: string]: D3.Map<number>;
+        };
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
+        static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
+        static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
 }
 
@@ -3064,20 +3025,11 @@ declare module Plottable {
             protected _updateYDomainer(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X>;
-            _valueAccessor(): Accessor<number>;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3099,21 +3051,12 @@ declare module Plottable {
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
-            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X> | Accessor<Y>;
-            _valueAccessor(): Accessor<number>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3285,7 +3228,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, dataset: Dataset) => any;
         }
     }
 }
@@ -3329,7 +3272,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type MouseCallback = (p: Point, event: MouseEvent) => any;
+        type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3454,7 +3397,7 @@ declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        }, event: TouchEvent) => any;
+        }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3550,7 +3493,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -3629,7 +3572,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ClickCallback = (point: Point) => any;
+    type ClickCallback = (point: Point) => void;
     module Interactions {
         class Click extends Interaction {
             protected _anchor(component: Component): void;
@@ -3707,7 +3650,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type PointerCallback = (point: Point) => any;
+    type PointerCallback = (point: Point) => void;
     module Interactions {
         class Pointer extends Interaction {
             protected _anchor(component: Component): void;
@@ -3785,7 +3728,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragCallback = (start: Point, end: Point) => any;
+    type DragCallback = (start: Point, end: Point) => void;
     module Interactions {
         class Drag extends Interaction {
             protected _anchor(component: Component): void;
@@ -3861,7 +3804,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragBoxCallback = (bounds: Bounds) => any;
+    type DragBoxCallback = (bounds: Bounds) => void;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;

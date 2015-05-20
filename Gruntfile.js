@@ -195,24 +195,7 @@ module.exports = function(grunt) {
     jshint: {
       files: ['Gruntfile.js', 'quicktests/**/*.js'],
       options: {
-          "curly": true,
-          "eqeqeq": true,
-          "evil": true,
-          "indent": 2,
-          "latedef": true,
-          "globals": {
-            "jQuery": true,
-            "d3": true,
-            "window": true,
-            "console": true,
-            "$": true,
-            "makeRandomData": true,
-            "setTimeout": true,
-            "document": true,
-            "Plottable": true
-          },
-          "strict": true,
-          "eqnull": true
+        jshintrc: '.jshintrc'
       }
     },
     parallelize: {

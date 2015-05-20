@@ -92,14 +92,14 @@ export module Plots {
       var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
       delete propertyToProjectors[Scatter._SIZE_KEY];
 
-      propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) =>
-        "translate(" + xProjector(datum, index, dataset, plotMetadata) + "," + yProjector(datum, index, dataset, plotMetadata) + ")";
+      propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
+        "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
 
       var symbolProjector = propertyToProjectors[Scatter._SYMBOL_KEY];
       delete propertyToProjectors[Scatter._SYMBOL_KEY];
 
-      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) =>
-        symbolProjector(datum, index, dataset, plotMetadata)(sizeProjector(datum, index, dataset, plotMetadata));
+      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
+        symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
       return propertyToProjectors;
     }
   }
