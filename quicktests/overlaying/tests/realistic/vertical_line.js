@@ -19,7 +19,6 @@ function run(svg, data, Plottable) {
   plot.x(function(d){ return d.y; }, xScale)
       .y(function(d){ return d.x; }, yScale)
       .autorange("x");
-;
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
