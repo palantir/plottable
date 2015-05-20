@@ -8,6 +8,8 @@ module Plottable {
     private _padProportion = 0.05;
     private _paddingExceptions: Utils.Map<any, D>;
     private _includedValues: Utils.Map<any, D>;
+    private _domainMin: D;
+    private _domainMax: D;
 
     /**
      * Constructs a new QuantitativeScale.
@@ -25,19 +27,64 @@ module Plottable {
       this._includedValues = new Utils.Map<any, D>();
     }
 
+    public autoDomain() {
+      this._domainMin = null;
+      this._domainMax = null;
+      super.autoDomain();
+      return this;
+    }
+
+    public _autoDomainIfAutomaticMode() {
+      if (this._domainMin != null && this._domainMax != null) {
+        this._setDomain([this._domainMin, this._domainMax]);
+        return;
+      }
+
+      var computedExtent = this._getExtent();
+
+      if (this._domainMin != null) {
+        var maxValue = computedExtent[1];
+        if (this._domainMin > maxValue) {
+          maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
+        }
+        this._setDomain([this._domainMin, maxValue]);
+        return;
+      }
+
+      if (this._domainMax != null) {
+        var minValue = computedExtent[0];
+        if (this._domainMax < minValue) {
+          minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
+        }
+        this._setDomain([minValue, this._domainMax]);
+        return;
+      }
+
+      super._autoDomainIfAutomaticMode();
+    }
+
     protected _getExtent(): D[] {
       var extents = this._getAllExtents().filter((extent) => extent.length > 0);
+      var extent: D[];
       var defaultExtent = this._defaultExtent();
       if (extents.length === 0) {
-        return defaultExtent;
+        extent = defaultExtent;
+      } else {
+        var combinedExtent = [
+          Utils.Methods.min<D[], D>(extents, (extent) => extent[0], defaultExtent[0]),
+          Utils.Methods.max<D[], D>(extents, (extent) => extent[1], defaultExtent[1])
+        ];
+        var includedDomain = this._includeValues(combinedExtent);
+        extent = this._padDomain(includedDomain);
       }
-      var combinedExtent = [
-        Utils.Methods.min<D[], D>(extents, (extent) => extent[0], defaultExtent[0]),
-        Utils.Methods.max<D[], D>(extents, (extent) => extent[1], defaultExtent[1])
-      ];
-      var includedDomain = this._includeValues(combinedExtent);
-      var paddedDomain  = this._padDomain(includedDomain);
-      return paddedDomain;
+
+      if (this._domainMin != null) {
+        extent[0] = this._domainMin;
+      }
+      if (this._domainMax != null) {
+        extent[1] = this._domainMax;
+      }
+      return extent;
     }
 
     public addPaddingException(key: any, exception: D) {
@@ -119,7 +166,29 @@ module Plottable {
     public domain(): D[];
     public domain(values: D[]): QuantitativeScale<D>;
     public domain(values?: D[]): any {
-      return super.domain(values); // need to override type sig to enable method chaining:/
+      if (values != null) {
+        this._domainMin = values[0];
+        this._domainMax = values[1];
+      }
+      return super.domain(values);
+    }
+
+    /**
+     * Sets just the lower end of the domain.
+     */
+    public domainMin(domainMin: D) {
+      this._domainMin = domainMin;
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    /**
+     * sets just the upper end of the domain.
+     */
+    public domainMax(domainMax: D) {
+      this._domainMax = domainMax;
+      this._autoDomainIfAutomaticMode();
+      return this;
     }
 
     protected _setDomain(values: D[]) {

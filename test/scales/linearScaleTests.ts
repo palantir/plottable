@@ -14,11 +14,88 @@ describe("Scales", () => {
 
     it("autoDomain() expands single value to [value - 1, value + 1]", () => {
       var scale = new Plottable.Scales.Linear();
-      scale.padProportion(0);
       var singleValue = 15;
       scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[singleValue, singleValue]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
+    });
+
+    it("domainMin()", () => {
+      var scale = new Plottable.Scales.Linear();
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+
+      var minBelowBottom = -10;
+      scale.domainMin(minBelowBottom);
+      assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
+
+      var minInMiddle = 0;
+      scale.domainMin(minInMiddle);
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
+
+      var minAboveTop = 10;
+      scale.domainMin(minAboveTop);
+      assert.deepEqual(scale.domain(), [minAboveTop, minAboveTop + 1],
+        "domain is set to [min, min + 1] if the requested value is above autoDomain()-ed max value");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+      scale.domainMin(minInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
+    });
+
+    it("domainMax()", () => {
+      var scale = new Plottable.Scales.Linear();
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+
+      var maxAboveTop = 10;
+      scale.domainMax(maxAboveTop);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
+
+      var maxInMiddle = 0;
+      scale.domainMax(maxInMiddle);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
+
+      var maxBelowBottom = -10;
+      scale.domainMax(maxBelowBottom);
+      assert.deepEqual(scale.domain(), [maxBelowBottom - 1, maxBelowBottom],
+        "domain is set to [max - 1, max] if the requested value is below autoDomain()-ed min value");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+      scale.domainMax(maxInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
+    });
+
+    it("domainMin() and domainMax() together", () => {
+      var scale = new Plottable.Scales.Linear();
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+
+      var desiredMin = -10;
+      var desiredMax = 10;
+      scale.domainMin(desiredMin);
+      scale.domainMax(desiredMax);
+      assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
+
+      scale.autoDomain();
+      var bigMin = 10;
+      var smallMax = -10;
+      scale.domainMin(bigMin);
+      scale.domainMax(smallMax);
+      assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
     });
 
     it("domain can't include NaN or Infinity", () => {

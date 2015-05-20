@@ -46,6 +46,91 @@ describe("TimeScale tests", () => {
     assert.throws(() => scale.domain([new Date("1985-10-26"), new Date("1955-11-05")]), "chronological");
   });
 
+  it("domainMin()", () => {
+    var scale = new Plottable.Scales.Time();
+    scale.padProportion(0);
+    var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
+    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+
+    var minBelowBottom = new Date("2015-04-01");
+    scale.domainMin(minBelowBottom);
+    assert.strictEqual(scale.domain()[0].getTime(), minBelowBottom.getTime(), "lower end of domain was set by domainMin()");
+
+    var minInMiddle = new Date("2015-06-01");
+    scale.domainMin(minInMiddle);
+    assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "lower end was set even if requested value cuts off some data");
+
+    var minAboveTop = new Date("2015-08-01");
+    var nextDay = new Date("2015-08-02");
+    scale.domainMin(minAboveTop);
+    var domain = scale.domain();
+    assert.strictEqual(domain[0].getTime(), minAboveTop.getTime(), "lower end was set even if requested value cuts off all data");
+    assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
+
+    scale.autoDomain();
+    assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+    scale.domainMin(minInMiddle);
+    var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
+    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain2]);
+    scale._autoDomainIfAutomaticMode();
+    assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMin()");
+  });
+
+  it("domainMax()", () => {
+    var scale = new Plottable.Scales.Time();
+    scale.padProportion(0);
+    var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
+    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+
+    var maxAboveTop = new Date("2015-08-01");
+    scale.domainMax(maxAboveTop);
+    assert.strictEqual(scale.domain()[1].getTime(), maxAboveTop.getTime(), "upper end of domain was set by domainMax()");
+
+    var maxInMiddle = new Date("2015-06-01");
+    scale.domainMax(maxInMiddle);
+    assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "upper end was set even if requested value cuts off some data");
+
+    var maxBelowBottom = new Date("2015-04-01");
+    var dayBefore = new Date("2015-03-31");
+    scale.domainMax(maxBelowBottom);
+    var domain = scale.domain();
+    assert.strictEqual(domain[1].getTime(), maxBelowBottom.getTime(), "upper end was set even if requested value cuts off all data");
+    assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
+
+    scale.autoDomain();
+    assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+    scale.domainMax(maxInMiddle);
+    var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
+    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain2]);
+    scale._autoDomainIfAutomaticMode();
+    assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMax()");
+  });
+
+    it("domainMin() and domainMax() together", () => {
+      var scale = new Plottable.Scales.Time();
+      scale.padProportion(0);
+    var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
+      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+
+      var desiredMin = new Date("2015-04-01");
+      var desiredMax = new Date("2015-08-01");
+      scale.domainMin(desiredMin);
+      scale.domainMax(desiredMax);
+      assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
+
+      scale.autoDomain();
+      var bigMin = new Date("2015-08-01");
+      var smallMax = new Date("2015-04-01");
+      scale.domainMin(bigMin);
+      assert.throws(() => scale.domainMax(smallMax), Error);
+
+      scale.autoDomain();
+      scale.domainMax(smallMax);
+      assert.throws(() => scale.domainMin(bigMin), Error);
+    });
+
   it("tickInterval produces correct number of ticks", () => {
     var scale = new Plottable.Scales.Time();
     // 100 year span

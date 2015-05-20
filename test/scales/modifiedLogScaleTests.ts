@@ -51,12 +51,89 @@ describe("Scales", () => {
     });
 
     it("autoDomain() expands single value to [value / base, value * base]", () => {
-      var scale = new Plottable.Scales.ModifiedLog();
       scale.padProportion(0);
       var singleValue = 15;
       scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[singleValue, singleValue]]);
       scale.autoDomain();
       assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
+    });
+
+    it("domainMin()", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var minBelowBottom = -10;
+      scale.domainMin(minBelowBottom);
+      assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
+
+      var minInMiddle = 0;
+      scale.domainMin(minInMiddle);
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
+
+      var minAboveTop = 10;
+      scale.domainMin(minAboveTop);
+      assert.deepEqual(scale.domain(), [minAboveTop, minAboveTop * base],
+        "domain is set to [min, min * base] if the requested value is above autoDomain()-ed max value");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+      scale.domainMin(minInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
+    });
+
+    it("domainMax()", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var maxAboveTop = 10;
+      scale.domainMax(maxAboveTop);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
+
+      var maxInMiddle = 0;
+      scale.domainMax(maxInMiddle);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
+
+      var maxBelowBottom = -10;
+      scale.domainMax(maxBelowBottom);
+      assert.deepEqual(scale.domain(), [maxBelowBottom / base, maxBelowBottom],
+        "domain is set to [max / base, max] if the requested value is below autoDomain()-ed min value");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+      scale.domainMax(maxInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
+    });
+
+    it("domainMin() and domainMax() together", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var desiredMin = -10;
+      var desiredMax = 10;
+      scale.domainMin(desiredMin);
+      scale.domainMax(desiredMax);
+      assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
+
+      scale.autoDomain();
+      var bigMin = 10;
+      var smallMax = -10;
+      scale.domainMin(bigMin);
+      scale.domainMax(smallMax);
+      assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
     });
 
     it("gives reasonable values for ticks()", () => {
