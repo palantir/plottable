@@ -60,15 +60,16 @@ describe("TimeScale tests", () => {
     scale.domainMin(minInMiddle);
     assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "lower end was set even if requested value cuts off some data");
 
-    var minAboveTop = new Date("2015-08-01");
-    var nextDay = new Date("2015-08-02");
-    scale.domainMin(minAboveTop);
-    var domain = scale.domain();
-    assert.strictEqual(domain[0].getTime(), minAboveTop.getTime(), "lower end was set even if requested value cuts off all data");
-    assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
-
     scale.autoDomain();
     assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+    var minEqualTop = new Date("2015-07-01");
+    var nextDay = new Date("2015-07-02");
+    scale.domainMin(minEqualTop);
+    var domain = scale.domain();
+    assert.strictEqual(domain[0].getTime(), minEqualTop.getTime(),
+      "lower end was set even if requested value is >= autoDomain()-ed max");
+    assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
 
     scale.domainMin(minInMiddle);
     var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
@@ -91,15 +92,16 @@ describe("TimeScale tests", () => {
     scale.domainMax(maxInMiddle);
     assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "upper end was set even if requested value cuts off some data");
 
-    var maxBelowBottom = new Date("2015-04-01");
-    var dayBefore = new Date("2015-03-31");
-    scale.domainMax(maxBelowBottom);
-    var domain = scale.domain();
-    assert.strictEqual(domain[1].getTime(), maxBelowBottom.getTime(), "upper end was set even if requested value cuts off all data");
-    assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
-
     scale.autoDomain();
     assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+    var maxEqualBottom = new Date("2015-05-01");
+    var dayBefore = new Date("2015-04-30");
+    scale.domainMax(maxEqualBottom);
+    var domain = scale.domain();
+    assert.strictEqual(domain[1].getTime(), maxEqualBottom.getTime(),
+      "upper end was set even if requested value is <= autoDomain()-ed min");
+    assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
 
     scale.domainMax(maxInMiddle);
     var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];

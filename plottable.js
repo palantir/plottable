@@ -1499,7 +1499,7 @@ var Plottable;
             var computedExtent = this._getExtent();
             if (this._domainMin != null) {
                 var maxValue = computedExtent[1];
-                if (this._domainMin > maxValue) {
+                if (this._domainMin >= maxValue) {
                     maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
                 }
                 this._setDomain([this._domainMin, maxValue]);
@@ -1507,7 +1507,7 @@ var Plottable;
             }
             if (this._domainMax != null) {
                 var minValue = computedExtent[0];
-                if (this._domainMax < minValue) {
+                if (this._domainMax <= minValue) {
                     minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
                 }
                 this._setDomain([minValue, this._domainMax]);
@@ -1608,7 +1608,7 @@ var Plottable;
             return _super.prototype.domain.call(this, values);
         };
         /**
-         * Sets just the lower end of the domain.
+         * Sets the lower end of the domain.
          */
         QuantitativeScale.prototype.domainMin = function (domainMin) {
             this._domainMin = domainMin;
@@ -1616,7 +1616,7 @@ var Plottable;
             return this;
         };
         /**
-         * sets just the upper end of the domain.
+         * Sets the upper end of the domain.
          */
         QuantitativeScale.prototype.domainMax = function (domainMax) {
             this._domainMax = domainMax;

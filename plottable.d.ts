@@ -793,11 +793,11 @@ declare module Plottable {
         domain(): D[];
         domain(values: D[]): QuantitativeScale<D>;
         /**
-         * Sets just the lower end of the domain.
+         * Sets the lower end of the domain.
          */
         domainMin(domainMin: D): QuantitativeScale<D>;
         /**
-         * sets just the upper end of the domain.
+         * Sets the upper end of the domain.
          */
         domainMax(domainMax: D): QuantitativeScale<D>;
         protected _setDomain(values: D[]): void;

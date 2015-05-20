@@ -34,13 +34,13 @@ describe("Scales", () => {
       scale.domainMin(minInMiddle);
       assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
 
-      var minAboveTop = 10;
-      scale.domainMin(minAboveTop);
-      assert.deepEqual(scale.domain(), [minAboveTop, minAboveTop + 1],
-        "domain is set to [min, min + 1] if the requested value is above autoDomain()-ed max value");
-
       scale.autoDomain();
       assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+      var minEqualTop = scale.domain()[1];
+      scale.domainMin(minEqualTop);
+      assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop + 1],
+        "domain is set to [min, min + 1] if the requested value is >= to autoDomain()-ed max value");
 
       scale.domainMin(minInMiddle);
       var requestedDomain2 = [-10, 10];
@@ -63,13 +63,13 @@ describe("Scales", () => {
       scale.domainMax(maxInMiddle);
       assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
 
-      var maxBelowBottom = -10;
-      scale.domainMax(maxBelowBottom);
-      assert.deepEqual(scale.domain(), [maxBelowBottom - 1, maxBelowBottom],
-        "domain is set to [max - 1, max] if the requested value is below autoDomain()-ed min value");
-
       scale.autoDomain();
       assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+      var maxEqualBottom = scale.domain()[0];
+      scale.domainMax(maxEqualBottom);
+      assert.deepEqual(scale.domain(), [maxEqualBottom - 1, maxEqualBottom],
+        "domain is set to [max - 1, max] if the requested value is <= to autoDomain()-ed min value");
 
       scale.domainMax(maxInMiddle);
       var requestedDomain2 = [-10, 10];

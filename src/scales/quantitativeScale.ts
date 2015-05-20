@@ -44,7 +44,7 @@ module Plottable {
 
       if (this._domainMin != null) {
         var maxValue = computedExtent[1];
-        if (this._domainMin > maxValue) {
+        if (this._domainMin >= maxValue) {
           maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
         }
         this._setDomain([this._domainMin, maxValue]);
@@ -53,7 +53,7 @@ module Plottable {
 
       if (this._domainMax != null) {
         var minValue = computedExtent[0];
-        if (this._domainMax < minValue) {
+        if (this._domainMax <= minValue) {
           minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
         }
         this._setDomain([minValue, this._domainMax]);
@@ -174,7 +174,7 @@ module Plottable {
     }
 
     /**
-     * Sets just the lower end of the domain.
+     * Sets the lower end of the domain.
      */
     public domainMin(domainMin: D) {
       this._domainMin = domainMin;
@@ -183,7 +183,7 @@ module Plottable {
     }
 
     /**
-     * sets just the upper end of the domain.
+     * Sets the upper end of the domain.
      */
     public domainMax(domainMax: D) {
       this._domainMax = domainMax;
