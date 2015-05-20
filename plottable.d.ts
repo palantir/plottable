@@ -2924,9 +2924,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface ClusteredPlotMetadata extends PlotMetadata {
-            position: number;
-        }
         class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
@@ -2945,7 +2942,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _getDataToDraw(): D3.Map<any[]>;
-            protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
