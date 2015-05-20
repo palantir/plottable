@@ -94,10 +94,7 @@ declare module chai
 		Throw(fn:Function, errType:Function, msg?:string):void;
 		Throw(fn:Function, errType:Function, regExp:RegExp):void;
 
-		doesNotThrow(fn:Function, msg?:string):void;
-		doesNotThrow(fn:Function, regExp:RegExp):void;
-		doesNotThrow(fn:Function, errType:Function, msg?:string):void;
-		doesNotThrow(fn:Function, regExp:RegExp, msg?:string):void;
+		doesNotThrow(fn: Function, err: Function | RegExp, msg?: string):void;
 
 		operator(val:any, operator:string, val2:any, msg?:string):void;
 		closeTo(act:number, exp:number, delta:number, msg?:string):void;
