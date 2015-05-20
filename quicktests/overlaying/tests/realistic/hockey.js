@@ -67,8 +67,5 @@ function run(svg, data, Plottable) {
                                              [null, null, xAxis],
                                              [null, null, xLabel]]);
   table.renderTo(svg); 
-
-
-
-  })
+  });
 }

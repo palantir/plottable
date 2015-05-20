@@ -28,11 +28,10 @@ function run(svg, data, Plottable) {
   plot.addDataset(ds);
   plot.x(function(d){ return d.lng; }, xScale)
       .y(function(d){ return d.lat; }, yScale)
-      .attr("fill", function(d){ return d.state}, cs);
+      .attr("fill", function(d){ return d.state; }, cs);
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
   table.renderTo(svg); 
-
   })
 }
