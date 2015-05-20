@@ -3,7 +3,8 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackedExtent: number[] = [];
+    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
+    private _stackedExtent: number[];
 
     private _isVertical: boolean;
     private _baseline: D3.Selection;
@@ -21,6 +22,8 @@ export module Plots {
       this.classed("area-plot", true);
       this._isVertical = true;
       this.attr("fill-opacity", 1);
+      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackedExtent = [];
     }
 
     protected _getDrawer(key: string) {
@@ -101,10 +104,10 @@ export module Plots {
 
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset, m) + m.offsets.get(xAccessor(d, i, dataset, m)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        this.y().scale.scale(m.offsets.get(xAccessor(d, i, dataset, m)));
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
+        this.y().scale.scale(+yAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
+      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
 
       return attrToProjector;
     }
@@ -113,24 +116,10 @@ export module Plots {
       return ["x", "y", "defined"];
     }
 
-    protected _getPlotMetadataForDataset(key: string) {
-      var metadata = super._getPlotMetadataForDataset(key);
-      return StackedPlotUtils.stackedPlotMetadata(metadata);
-    }
-
     protected _updateExtentsForProperty(property: string) {
       super._updateExtentsForProperty(property);
       if ((property === "x" || property === "y") && this._projectorsReady()) {
-        var orientation = this._isVertical ? "vertical" : "horizontal";
-        var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-        var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-        var datasetKeys = this._datasetKeysInOrder;
-        var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-        var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
-        this._stackedExtent = extents;
+        this._updateStackExtentsAndOffsets();
       }
     }
 
@@ -163,11 +152,10 @@ export module Plots {
         if (!stackOffsets.hasOwnProperty(datasetKey)) {
           continue;
         }
-        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
-        plotMetadata.offsets = stackOffsets[datasetKey];
+        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
       }
 
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
     }
   }
 }

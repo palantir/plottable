@@ -2949,9 +2949,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface StackedPlotMetadata extends PlotMetadata {
-            offsets: D3.Map<number>;
-        }
         type StackedDatum = {
             key: any;
             value: number;
@@ -2962,7 +2959,7 @@ declare module Plottable {
         /**
          * @return {[number]} The extent that spans all the stacked data
          */
-        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
+        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[], stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
         /**
          * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
          */
@@ -2970,7 +2967,6 @@ declare module Plottable {
             [key: string]: D3.Map<number>;
         };
         static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
-        static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
@@ -3000,7 +2996,6 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
         }
@@ -3029,7 +3024,6 @@ declare module Plottable {
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
-            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
         }

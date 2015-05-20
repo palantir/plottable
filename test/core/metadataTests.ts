@@ -197,10 +197,10 @@ describe("Metadata", () => {
 
     var checkXYPlot = (plot: Plottable.XYPlot<any, any>) => {
       var xAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: Plottable.Plots.PlotMetadata) => {
-          return d.x + dataset.metadata().foo + m.datasetKey.length;
+          return d.x + dataset.metadata().foo;
       };
       var yAccessor = (d: any, i: number, dataset: Plottable.Dataset, m: Plottable.Plots.PlotMetadata) => {
-          return d.y + dataset.metadata().foo - m.datasetKey.length;
+          return d.y + dataset.metadata().foo;
       };
       plot.addDataset(dataset1)
           .addDataset(dataset2);
