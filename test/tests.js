@@ -260,6 +260,7 @@ before(function () {
         window.Pixel_CloseTo_Requirement = 2;
     }
     else if (isFirefox) {
+        //HACKHACK #2122
         window.Pixel_CloseTo_Requirement = 2;
     }
     else {
