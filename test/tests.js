@@ -1174,8 +1174,7 @@ describe("NumericAxis", function () {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var yLabel = new Plottable.Components.Label("LABEL", "left");
-        yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+        var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.x(function (d) { return d.x; }, xScale);
         barPlot.y(function (d) { return d.y; }, yScale);
@@ -1489,8 +1488,7 @@ var assert = chai.assert;
 describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = TestMethods.generateSVG(400, 80);
-        var label = new Plottable.Components.Label("A CHART TITLE");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("A CHART TITLE");
         label.renderTo(svg);
         var content = label._content;
         assert.isTrue(label._element.classed("label"), "title element has label css class");
@@ -1506,8 +1504,7 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1519,8 +1516,7 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1531,8 +1527,7 @@ describe("Labels", function () {
     });
     it("Label text can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 80);
-        var label = new Plottable.Components.Label("a");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("a");
         label.renderTo(svg);
         assert.strictEqual(label._content.select("text").text(), "a", "the text starts at the specified string");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -1546,8 +1541,7 @@ describe("Labels", function () {
     it.skip("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = TestMethods.generateSVG(svgWidth, 80);
-        var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1558,8 +1552,7 @@ describe("Labels", function () {
     });
     it("text in a tiny box is truncated to empty string", function () {
         var svg = TestMethods.generateSVG(10, 10);
-        var label = new Plottable.Components.Label("Yeah, not gonna fit...");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
         label.renderTo(svg);
         var text = label._content.select("text");
         assert.strictEqual(text.text(), "", "text was truncated to empty string");
@@ -1578,7 +1571,7 @@ describe("Labels", function () {
     });
     it("if a label text is changed to empty string, width updates to 0", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var label = new Plottable.Components.Label("foo");
+        var label = new Plottable.Components.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
         assert.strictEqual(label.width(), 0, "width updated to 0");
@@ -1590,8 +1583,7 @@ describe("Labels", function () {
     // Skipping due to FF odd client bounding rect computation - #1470.
     it.skip("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var label = new Plottable.Components.Label("CHANGING ORIENTATION");
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+        var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");

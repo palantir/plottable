@@ -3,13 +3,6 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
-
-    // Css class for labels that are made for rendering titles.
-    public static TITLE_LABEL_CLASS = "title-label";
-
-    // Css class for labels that are made for rendering axis titles.
-    public static AXIS_LABEL_CLASS = "axis-label";
-
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _orientation: string;
@@ -163,6 +156,30 @@ export module Components {
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
       return this;
+    }
+  }
+
+  export class TitleLabel extends Label {
+    /**
+     * Creates a TitleLabel, a type of label made for rendering titles.
+     *
+     * @constructor
+     */
+    constructor(text?: string, orientation?: string) {
+      super(text, orientation);
+      this.classed("title-label", true);
+    }
+  }
+
+  export class AxisLabel extends Label {
+    /**
+     * Creates a AxisLabel, a type of label made for rendering axis labels.
+     *
+     * @constructor
+     */
+    constructor(text?: string, orientation?: string) {
+      super(text, orientation);
+      this.classed("axis-label", true);
     }
   }
 }
