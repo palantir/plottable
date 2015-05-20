@@ -12,8 +12,7 @@ export module Plots {
      * A RectanglePlot consists of a bunch of rectangles. The user is required to
      * project the left and right bounds of the rectangle (x and x1 respectively)
      * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
-     * not set, the plot will apply auto-centering logic to the extent of x/y (all
-     * values are treated as categories regardless of their scale)
+     * not set, the plot will apply auto-centering logic to the extent of x/y
      *
      * @constructor
      * @param {Scale.Scale} xScale The x scale to use.
@@ -22,7 +21,7 @@ export module Plots {
     constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
       super(xScale, yScale);
 
-      this.animator("cells", new Animators.Null());
+      this.animator("rectangles", new Animators.Null());
       this.classed("rectangle-plot", true);
 
       // The x and y scales should render in bands with no padding for category scales
@@ -49,10 +48,6 @@ export module Plots {
 
       var xScale = this.x().scale;
       var yScale = this.y().scale;
-
-      // In order to define a range from x, x1 has to also be set.
-      // If x1 is not set, auto-centering logic will be applied to x.
-      // The above also applies to y/y1.
 
       if (x1Attr != null) {
         attrToProjector["width"] = (d, i, dataset, m) => Math.abs(x1Attr(d, i, dataset, m) - xAttr(d, i, dataset, m));
@@ -88,11 +83,12 @@ export module Plots {
     public x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
       if (x == null) {
-        return this._propertyBindings.get(Rectangle._X_KEY);
+        return super.x();
       }
-      this._bindProperty(Rectangle._X_KEY, x, scale);
-      this.renderImmediately();
-      return this;
+      if (scale == null) {
+        return super.x(<number | Accessor<number>> x);
+      }
+      return super.x(<X | Accessor<X>> x, scale);
     }
 
     public x1(): AccessorScaleBinding<X, number>;
@@ -112,11 +108,12 @@ export module Plots {
     public y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
       if (y == null) {
-        return this._propertyBindings.get(Rectangle._Y_KEY);
+        return super.y();
       }
-      this._bindProperty(Rectangle._Y_KEY, y, scale);
-      this.renderImmediately();
-      return this;
+      if (scale == null) {
+        return super.y(<number | Accessor<number>> y);
+      }
+      return super.y(<Y | Accessor<Y>> y, scale);
     }
 
     public y1(): AccessorScaleBinding<Y, number>;

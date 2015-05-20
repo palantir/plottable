@@ -6905,8 +6905,7 @@ var Plottable;
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
              * project the left and right bounds of the rectangle (x and x1 respectively)
              * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
-             * not set, the plot will apply auto-centering logic to the extent of x/y (all
-             * values are treated as categories regardless of their scale)
+             * not set, the plot will apply auto-centering logic to the extent of x/y
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
@@ -6914,7 +6913,7 @@ var Plottable;
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.animator("cells", new Plottable.Animators.Null());
+                this.animator("rectangles", new Plottable.Animators.Null());
                 this.classed("rectangle-plot", true);
                 // The x and y scales should render in bands with no padding for category scales
                 if (xScale instanceof Plottable.Scales.Category) {
@@ -6937,9 +6936,6 @@ var Plottable;
                 var y1Attr = attrToProjector[Rectangle._Y1_KEY];
                 var xScale = this.x().scale;
                 var yScale = this.y().scale;
-                // In order to define a range from x, x1 has to also be set.
-                // If x1 is not set, auto-centering logic will be applied to x.
-                // The above also applies to y/y1.
                 if (x1Attr != null) {
                     attrToProjector["width"] = function (d, i, dataset, m) { return Math.abs(x1Attr(d, i, dataset, m) - xAttr(d, i, dataset, m)); };
                     attrToProjector["x"] = function (d, i, dataset, m) { return Math.min(x1Attr(d, i, dataset, m), xAttr(d, i, dataset, m)); };
@@ -6968,11 +6964,12 @@ var Plottable;
             };
             Rectangle.prototype.x = function (x, scale) {
                 if (x == null) {
-                    return this._propertyBindings.get(Rectangle._X_KEY);
+                    return _super.prototype.x.call(this);
                 }
-                this._bindProperty(Rectangle._X_KEY, x, scale);
-                this.renderImmediately();
-                return this;
+                if (scale == null) {
+                    return _super.prototype.x.call(this, x);
+                }
+                return _super.prototype.x.call(this, x, scale);
             };
             Rectangle.prototype.x1 = function (x1, scale) {
                 if (x1 == null) {
@@ -6984,11 +6981,12 @@ var Plottable;
             };
             Rectangle.prototype.y = function (y, scale) {
                 if (y == null) {
-                    return this._propertyBindings.get(Rectangle._Y_KEY);
+                    return _super.prototype.y.call(this);
                 }
-                this._bindProperty(Rectangle._Y_KEY, y, scale);
-                this.renderImmediately();
-                return this;
+                if (scale == null) {
+                    return _super.prototype.y.call(this, y);
+                }
+                return _super.prototype.y.call(this, y, scale);
             };
             Rectangle.prototype.y1 = function (y1, scale) {
                 if (y1 == null) {
