@@ -3532,6 +3532,11 @@ describe("Plots", function () {
                 barPlot.y(function (d) { return d.y; }, yScale);
                 barPlot.renderTo(svg);
             });
+            it("calculating width does not crash if handed invalid values", function () {
+                var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+                assert.doesNotThrow(function () { return barPlot.x(function (d) { return d.a; }, xScale); }, errMsg, "barPixelWidth does not crash on invalid values");
+                svg.remove();
+            });
             it("bar width takes an appropriate value", function () {
                 assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
