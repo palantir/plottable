@@ -42,7 +42,7 @@ export module Scales {
       return super._setDomain(values);
     }
 
-    public _defaultExtent(): Date[] {
+    protected _defaultExtent(): Date[] {
       var endTimeValue = new Date().valueOf();
       var startTimeValue = endTimeValue - MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];

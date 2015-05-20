@@ -19,7 +19,7 @@ export module Scales {
       super(scale == null ? d3.scale.linear() : scale);
     }
 
-    public _defaultExtent(): number[] {
+    protected _defaultExtent(): number[] {
       return [0, 1];
     }
 

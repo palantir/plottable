@@ -155,7 +155,7 @@ module Plottable {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
-    public _defaultExtent(): D[] {
+    protected _defaultExtent(): D[] {
       throw Error("The quantitative scale itself does not have a default extent");
     }
 
