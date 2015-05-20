@@ -34,11 +34,11 @@ export module Plots {
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
       attrToProjector["x"] = this._isVertical ?
-                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => xAttr(d, i, ds, m) + this._clusterOffsets.get(ds) :
-                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => xAttr(d, i, ds, m);
+                               (d: any, i: number, ds: Dataset) => xAttr(d, i, ds) + this._clusterOffsets.get(ds) :
+                               (d: any, i: number, ds: Dataset) => xAttr(d, i, ds);
       attrToProjector["y"] = this._isVertical ?
-                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => yAttr(d, i, ds, m) :
-                               (d: any, i: number, ds: Dataset, m: PlotMetadata) => yAttr(d, i, ds, m) + this._clusterOffsets.get(ds);
+                               (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) :
+                               (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) + this._clusterOffsets.get(ds);
 
       return attrToProjector;
     }
@@ -57,8 +57,8 @@ export module Plots {
         var projection = this._attrBindings.get("width");
         var accessor = projection.accessor;
         var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
-        innerScale.range([0, fn(null, 0, null, null)]);
+        var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
+        innerScale.range([0, fn(null, 0, null)]);
       }
       return innerScale;
     }

@@ -79,12 +79,11 @@ export module Drawers {
     }
 
     private _applyMetadata(attrToProjector: AttributeToProjector,
-                          dataset: Dataset,
-                          plotMetadata: Plots.PlotMetadata): AttributeToAppliedProjector {
+                          dataset: Dataset): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset, plotMetadata);
+          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset);
       });
 
       return modifiedAttrToProjector;
@@ -106,9 +105,9 @@ export module Drawers {
      * @param{Dataset} dataset The Dataset
      * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
+    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset, plotMetadata);
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset);
         this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
