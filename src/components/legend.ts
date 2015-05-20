@@ -49,7 +49,7 @@ export module Components {
       this._scale.onUpdate(this._redrawCallback);
 
       this.xAlignment("right").yAlignment("top");
-      this._comparator = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this.comparator((a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
