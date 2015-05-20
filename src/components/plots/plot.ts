@@ -196,31 +196,6 @@ module Plottable {
       return h;
     }
 
-    /**
-     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-     * in accordance with the given datasetKey.
-     *
-     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-     *
-     * @param {Dataset} dataset The dataset to generate the dictionary for
-     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-     */
-    public generateProjectors(dataset: Dataset): AttributeToAppliedProjector {
-      var attrToAppliedProjector: AttributeToAppliedProjector = {};
-      var datasetKey = this._keyForDataset(dataset);
-      if (datasetKey != null) {
-        var attrToProjector = this._generateAttrToProjector();
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        d3.entries(attrToProjector).forEach((keyValue: any) => {
-          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => {
-            return keyValue.value(datum, index, plotDatasetKey.dataset, plotMetadata);
-          };
-        });
-      }
-      return attrToAppliedProjector;
-    }
-
     public renderImmediately() {
       if (this._isAnchored) {
         this._paint();

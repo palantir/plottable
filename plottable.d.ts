@@ -2468,16 +2468,6 @@ declare module Plottable {
         attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
-        /**
-         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-         * in accordance with the given datasetKey.
-         *
-         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-         *
-         * @param {Dataset} dataset The dataset to generate the dictionary for
-         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-         */
-        generateProjectors(dataset: Dataset): AttributeToAppliedProjector;
         renderImmediately(): Plot;
         /**
          * Enables or disables animation.
