@@ -55,7 +55,7 @@ export module Scales {
       return this._d3Scale.domain();
     }
 
-    protected _setBackingDomain(values: Date[]) {
+    protected _setBackingScaleDomain(values: Date[]) {
       this._d3Scale.domain(values);
     }
 
