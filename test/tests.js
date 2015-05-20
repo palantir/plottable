@@ -4377,12 +4377,12 @@ describe("Plots", function () {
 ///<reference path="../../testReference.ts" />
 var assert = chai.assert;
 describe("Plots", function () {
-    describe("Stacked Plot Stacking", function () {
+    describe("StackedBar Plot Stacking", function () {
         var stackedPlot;
         beforeEach(function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            stackedPlot = new Plottable.Stacked(xScale, yScale);
+            stackedPlot = new Plottable.Plots.StackedBar(xScale, yScale);
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
             stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
@@ -4445,23 +4445,124 @@ describe("Plots", function () {
             assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
             assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
-        it("project can be called after addDataset", function () {
+        it("strings are coerced to numbers for stacking", function () {
             var data0 = [
-                { a: 1, b: 2 }
+                { x: 1, y: "-2" }
             ];
             var data1 = [
-                { a: 1, b: 4 }
+                { x: 1, y: "3" }
+            ];
+            var data2 = [
+                { x: 1, y: "-1" }
+            ];
+            var data3 = [
+                { x: 1, y: "5" }
+            ];
+            var data4 = [
+                { x: 1, y: "1" }
+            ];
+            var data5 = [
+                { x: 1, y: "-1" }
             ];
             stackedPlot.addDataset(new Plottable.Dataset(data0));
             stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            stackedPlot.addDataset(new Plottable.Dataset(data4));
+            stackedPlot.addDataset(new Plottable.Dataset(data5));
             // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
             var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds0PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[0]).plotMetadata;
+            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[2]).plotMetadata;
+            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
+            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[5]).plotMetadata;
+            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
+            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
+            assert.deepEqual(stackedPlot._stackedExtent, [-4, 9], "stacked extent is as normal");
+        });
+        it("stacks correctly on empty data", function () {
+            var dataset1 = new Plottable.Dataset([]);
+            var dataset2 = new Plottable.Dataset([]);
+            assert.doesNotThrow(function () { return stackedPlot.addDataset(dataset1); }, Error);
+            assert.doesNotThrow(function () { return stackedPlot.addDataset(dataset2); }, Error);
+        });
+        it("does not crash on stacking no datasets", function () {
+            var dataset1 = new Plottable.Dataset([
+                { x: 1, y: -2 }
+            ]);
+            stackedPlot.addDataset(dataset1);
+            assert.doesNotThrow(function () { return stackedPlot.removeDataset(dataset1); }, Error);
+        });
+    });
+    describe("StackedArea Plot Stacking", function () {
+        var stackedPlot;
+        beforeEach(function () {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            stackedPlot = new Plottable.Plots.StackedArea(xScale, yScale);
+            stackedPlot.x(function (d) { return d.x; }, xScale);
+            stackedPlot.y(function (d) { return d.y; }, yScale);
+            stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
+            stackedPlot._isVertical = true;
+        });
+        it("uses positive offset on stacking the 0 value", function () {
+            var data0 = [
+                { x: 1, y: 1 },
+                { x: 3, y: 1 }
+            ];
+            var data1 = [
+                { x: 1, y: 0 },
+                { x: 3, y: 1 }
+            ];
+            var data2 = [
+                { x: 1, y: -1 },
+                { x: 3, y: 1 }
+            ];
+            var data3 = [
+                { x: 1, y: 1 },
+                { x: 3, y: 1 }
+            ];
+            var data4 = [
+                { x: 1, y: 0 },
+                { x: 3, y: 1 }
+            ];
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            stackedPlot.addDataset(new Plottable.Dataset(data4));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
             var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-            assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
-            stackedPlot.x(function (d) { return d.a; });
-            stackedPlot.y(function (d) { return d.b; });
-            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
+            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
+            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
+        });
+        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
+            var data0 = [
+                { x: 1, y: -2 }
+            ];
+            var data1 = [
+                { x: 1, y: 0 }
+            ];
+            var data2 = [
+                { x: 1, y: -1 }
+            ];
+            var data3 = [
+                { x: 1, y: 0 }
+            ];
+            stackedPlot.addDataset(new Plottable.Dataset(data0));
+            stackedPlot.addDataset(new Plottable.Dataset(data1));
+            stackedPlot.addDataset(new Plottable.Dataset(data2));
+            stackedPlot.addDataset(new Plottable.Dataset(data3));
+            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
+            var keys = stackedPlot._key2PlotDatasetKey.keys();
+            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
+            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
+            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
+            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
         });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
@@ -7809,37 +7910,66 @@ describe("Formatters", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Map", function () {
-    it("Map works as expected", function () {
+    it("set() and get()", function () {
         var map = new Plottable.Utils.Map();
-        var o1 = {};
-        var o2 = {};
-        assert.isFalse(map.has(o1));
-        assert.isFalse(map.delete(o1));
-        assert.isUndefined(map.get(o1));
-        assert.isFalse(map.set(o1, "foo"));
-        assert.strictEqual(map.get(o1), "foo");
-        assert.isTrue(map.set(o1, "bar"));
-        assert.strictEqual(map.get(o1), "bar");
-        map.set(o2, "baz");
-        map.set(3, "bam");
-        map.set("3", "ball");
-        assert.strictEqual(map.get(o1), "bar");
-        assert.strictEqual(map.get(o2), "baz");
-        assert.strictEqual(map.get(3), "bam");
-        assert.strictEqual(map.get("3"), "ball");
-        assert.isTrue(map.delete(3));
-        assert.isUndefined(map.get(3));
-        assert.strictEqual(map.get(o2), "baz");
-        assert.strictEqual(map.get("3"), "ball");
+        var key1 = "key1";
+        var value1 = "1";
+        map.set(key1, value1);
+        assert.strictEqual(map.get(key1), value1, "value was successfully set on the Map");
+        var value1b = "1b";
+        map.set(key1, value1b);
+        assert.strictEqual(map.get(key1), value1b, "overwrote old value with new one");
+        var key2 = "key2";
+        assert.isUndefined(map.get(key2), "returns undefined if key is not present in the Map");
     });
-    it("Array-level operations (retrieve keys, vals, and map)", function () {
+    it("has()", function () {
         var map = new Plottable.Utils.Map();
-        map.set(2, "foo");
-        map.set(3, "bar");
-        map.set(4, "baz");
-        assert.deepEqual(map.values(), ["foo", "bar", "baz"]);
-        assert.deepEqual(map.keys(), [2, 3, 4]);
-        assert.deepEqual(map.map(function (k, v, i) { return [k, v, i]; }), [[2, "foo", 0], [3, "bar", 1], [4, "baz", 2]]);
+        var key1 = "key1";
+        var value1 = "1";
+        assert.isFalse(map.has(key1), "returns false if the key has not been set");
+        map.set(key1, value1);
+        assert.isTrue(map.has(key1), "returns true if the key has been set");
+        map.set(key1, undefined);
+        assert.isTrue(map.has(key1), "returns true if the value is explicitly set to undefined");
+    });
+    it("delete()", function () {
+        var map = new Plottable.Utils.Map();
+        var key1 = "key1";
+        var value1 = "1";
+        map.set(key1, value1);
+        assert.isTrue(map.delete(key1), "returns true if the key was present in the Map");
+        assert.isFalse(map.has(key1), "key is no longer present in the Map");
+        assert.isFalse(map.delete(key1), "returns false if the key was not present in the Map");
+    });
+    it("keys()", function () {
+        var map = new Plottable.Utils.Map();
+        var key1 = "key1";
+        var value1 = "1";
+        map.set(key1, value1);
+        var key2 = "key2";
+        var value2 = "2";
+        map.set(key2, value2);
+        assert.deepEqual(map.keys(), [key1, key2], "retrieved all keys");
+    });
+    it("keys()", function () {
+        var map = new Plottable.Utils.Map();
+        var key1 = "key1";
+        var value1 = "1";
+        map.set(key1, value1);
+        var key2 = "key2";
+        var value2 = "2";
+        map.set(key2, value2);
+        assert.deepEqual(map.keys(), [key1, key2], "retrieved all keys");
+    });
+    it("values()", function () {
+        var map = new Plottable.Utils.Map();
+        var key1 = "key1";
+        var value1 = "1";
+        map.set(key1, value1);
+        var key2 = "key2";
+        var value2 = "2";
+        map.set(key2, value2);
+        assert.deepEqual(map.values(), [value1, value2], "retrieved all values");
     });
 });
 
