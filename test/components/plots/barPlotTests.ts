@@ -349,6 +349,12 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
+      it("calculating width does not crash if handed invalid values", () => {
+        var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+        assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
+        svg.remove();
+      });
+
       it("bar width takes an appropriate value", () => {
         assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
         svg.remove();

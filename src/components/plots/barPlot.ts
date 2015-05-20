@@ -419,7 +419,9 @@ export module Plots {
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset).valueOf());
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset))
+                               .filter((d) => d != null)
+                               .map((d) => d.valueOf());
         }))).values().map((value) => +value);
 
         numberBarAccessorData.sort((a, b) => a - b);

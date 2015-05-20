@@ -3532,6 +3532,11 @@ describe("Plots", function () {
                 barPlot.y(function (d) { return d.y; }, yScale);
                 barPlot.renderTo(svg);
             });
+            it("calculating width does not crash if handed invalid values", function () {
+                var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+                assert.doesNotThrow(function () { return barPlot.x(function (d) { return d.a; }, xScale); }, errMsg, "barPixelWidth does not crash on invalid values");
+                svg.remove();
+            });
             it("bar width takes an appropriate value", function () {
                 assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
@@ -8252,18 +8257,18 @@ describe("Interactions", function () {
             var clickInteraction = new Plottable.Interactions.Click();
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "detaching an Interaction which was not attached should not throw an error");
+            }, Error, "detaching an Interaction which was not attached should not throw an error");
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detachFrom() twice should not throw an error");
+            }, Error, "calling detachFrom() twice should not throw an error");
             component.renderTo(svg);
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
+            }, Error, "calling detachFrom() twice should not throw an error even if the Component is anchored");
             svg.remove();
         });
         it("can move interaction from one component to another", function () {
