@@ -66,7 +66,7 @@
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />
-/// <reference path="components/plots/stackedPlot.ts" />
+/// <reference path="components/plots/stackedPlotUtils.ts" />
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
