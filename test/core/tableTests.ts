@@ -202,17 +202,15 @@ describe("Tables", () => {
   });
 
   it("table.requestedSpace works properly", () => {
-    // [0 1]
-    // [2 3]
     var c0 = new Plottable.Component();
     var c1 = TestMethods.makeFixedSizeComponent(50, 50);
     var c2 = TestMethods.makeFixedSizeComponent(20, 50);
     var c3 = TestMethods.makeFixedSizeComponent(20, 20);
 
-    var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
-
-    console.log(1);
-
+    var table = new Plottable.Components.Table([
+      [c0, c1],
+      [c2, c3]
+    ]);
 
     var spaceRequest = table.requestedSpace(30, 30);
     TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "1");
