@@ -1485,19 +1485,58 @@ var Plottable;
             this._paddingExceptions = new Plottable.Utils.Map();
             this._includedValues = new Plottable.Utils.Map();
         }
+        QuantitativeScale.prototype.autoDomain = function () {
+            this._domainMin = null;
+            this._domainMax = null;
+            _super.prototype.autoDomain.call(this);
+            return this;
+        };
+        QuantitativeScale.prototype._autoDomainIfAutomaticMode = function () {
+            if (this._domainMin != null && this._domainMax != null) {
+                this._setDomain([this._domainMin, this._domainMax]);
+                return;
+            }
+            var computedExtent = this._getExtent();
+            if (this._domainMin != null) {
+                var maxValue = computedExtent[1];
+                if (this._domainMin >= maxValue) {
+                    maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
+                }
+                this._setDomain([this._domainMin, maxValue]);
+                return;
+            }
+            if (this._domainMax != null) {
+                var minValue = computedExtent[0];
+                if (this._domainMax <= minValue) {
+                    minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
+                }
+                this._setDomain([minValue, this._domainMax]);
+                return;
+            }
+            _super.prototype._autoDomainIfAutomaticMode.call(this);
+        };
         QuantitativeScale.prototype._getExtent = function () {
             var extents = this._getAllExtents().filter(function (extent) { return extent.length > 0; });
+            var extent;
             var defaultExtent = this._defaultExtent();
             if (extents.length === 0) {
-                return defaultExtent;
+                extent = defaultExtent;
             }
-            var combinedExtent = [
-                Plottable.Utils.Methods.min(extents, function (extent) { return extent[0]; }, defaultExtent[0]),
-                Plottable.Utils.Methods.max(extents, function (extent) { return extent[1]; }, defaultExtent[1])
-            ];
-            var includedDomain = this._includeValues(combinedExtent);
-            var paddedDomain = this._padDomain(includedDomain);
-            return paddedDomain;
+            else {
+                var combinedExtent = [
+                    Plottable.Utils.Methods.min(extents, function (extent) { return extent[0]; }, defaultExtent[0]),
+                    Plottable.Utils.Methods.max(extents, function (extent) { return extent[1]; }, defaultExtent[1])
+                ];
+                var includedDomain = this._includeValues(combinedExtent);
+                extent = this._padDomain(includedDomain);
+            }
+            if (this._domainMin != null) {
+                extent[0] = this._domainMin;
+            }
+            if (this._domainMax != null) {
+                extent[1] = this._domainMax;
+            }
+            return extent;
         };
         QuantitativeScale.prototype.addPaddingException = function (key, exception) {
             this._paddingExceptions.set(key, exception);
@@ -1562,7 +1601,27 @@ var Plottable;
             return this._d3Scale.invert(value);
         };
         QuantitativeScale.prototype.domain = function (values) {
-            return _super.prototype.domain.call(this, values); // need to override type sig to enable method chaining:/
+            if (values != null) {
+                this._domainMin = values[0];
+                this._domainMax = values[1];
+            }
+            return _super.prototype.domain.call(this, values);
+        };
+        QuantitativeScale.prototype.domainMin = function (domainMin) {
+            if (domainMin == null) {
+                return this.domain()[0];
+            }
+            this._domainMin = domainMin;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.domainMax = function (domainMax) {
+            if (domainMax == null) {
+                return this.domain()[1];
+            }
+            this._domainMax = domainMax;
+            this._autoDomainIfAutomaticMode();
+            return this;
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
