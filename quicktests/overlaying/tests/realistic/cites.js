@@ -7,7 +7,8 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("../overlaying/tests/cities.csv").get(function(error, rows) {
-  var data = rows; 
+  var data = rows;
+  var ds = new Plottable.Dataset(data); 
 
   var csRange = [];
   for(var i = 0; i < 30; i++){
@@ -15,26 +16,23 @@ function run(svg, data, Plottable) {
     csRange.push(c);
   }
 
-  var cs = new Plottable.Scale.Color();
+  var cs = new Plottable.Scales.Color();
   cs.range(csRange);
 
-  var xScale = new Plottable.Scale.Linear().domain([-110, -90]);
-  var yScale = new Plottable.Scale.Linear().domain([25, 40]);
-  var xAxis = new Plottable.Axis.Numeric(xScale, "bottom");
-  var yAxis = new Plottable.Axis.Numeric(yScale, "left");
-  var plot = new Plottable.Plot.Scatter(xScale, yScale);
-  plot.addDataset(data);
-  plot.project("x", "lng", xScale)
-      .project("y", "lat", yScale)
-      .project("fill", function(d){ return d.state}, cs);
+  var xScale = new Plottable.Scales.Linear().domain([-110, -90]);
+  var yScale = new Plottable.Scales.Linear().domain([25, 40]);
+  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+  
+  var plot = new Plottable.Plots.Scatter(xScale, yScale);
+  plot.addDataset(ds);
+  plot.x(function(d){ return d.lng; }, xScale)
+      .y(function(d){ return d.lat; }, yScale)
+      .attr("fill", function(d){ return d.state}, cs);
 
-  var table = new Plottable.Component.Table([[yAxis, plot],
+  var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
   table.renderTo(svg); 
-
-  plot.registerInteraction(
-    new Plottable.Interaction.PanZoom(xScale, yScale)
-  );
 
   })
 }
