@@ -91,11 +91,9 @@ describe("Scales", () => {
 
     it("addExtentsProvider()", () => {
       scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
       scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
     });
 
@@ -104,11 +102,9 @@ describe("Scales", () => {
       scale.addExtentsProvider(posProvider);
       var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
       scale.addExtentsProvider(negProvider);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
       scale.removeExtentsProvider(negProvider);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
     });
 
@@ -153,7 +149,6 @@ describe("Scales", () => {
       scale.padProportion(0);
       var singleValue = 15;
       scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[singleValue, singleValue]]);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
     });
 

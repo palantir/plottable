@@ -273,7 +273,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
+      this._scales().forEach((scale) => scale.addExtentsProvider(this._extentsProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -574,13 +574,11 @@ module Plottable {
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
       scale.removeExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
       scale.addExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
     protected _generatePropertyToProjectors(): AttributeToProjector {

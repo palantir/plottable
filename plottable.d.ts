@@ -704,7 +704,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
-        _autoDomainIfAutomaticMode(): void;
+        protected _autoDomainIfAutomaticMode(): void;
         /**
          * Computes the range value corresponding to a given domain value. In other
          * words, apply the function to value.
