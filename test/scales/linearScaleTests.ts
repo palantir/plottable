@@ -29,6 +29,7 @@ describe("Scales", () => {
       var minBelowBottom = -10;
       scale.domainMin(minBelowBottom);
       assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
+      assert.strictEqual(scale.domainMin(), minBelowBottom, "returns the set minimum value");
 
       var minInMiddle = 0;
       scale.domainMin(minInMiddle);
@@ -36,6 +37,7 @@ describe("Scales", () => {
 
       scale.autoDomain();
       assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+      assert.strictEqual(scale.domainMin(), scale.domain()[0], "returns autoDomain()-ed min value after autoDomain()-ing");
 
       var minEqualTop = scale.domain()[1];
       scale.domainMin(minEqualTop);
@@ -58,6 +60,7 @@ describe("Scales", () => {
       var maxAboveTop = 10;
       scale.domainMax(maxAboveTop);
       assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
+      assert.strictEqual(scale.domainMax(), maxAboveTop, "returns the set maximum value");
 
       var maxInMiddle = 0;
       scale.domainMax(maxInMiddle);
@@ -65,6 +68,7 @@ describe("Scales", () => {
 
       scale.autoDomain();
       assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+      assert.strictEqual(scale.domainMax(), scale.domain()[1], "returns autoDomain()-ed max value after autoDomain()-ing");
 
       var maxEqualBottom = scale.domain()[0];
       scale.domainMax(maxEqualBottom);

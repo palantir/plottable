@@ -174,18 +174,42 @@ module Plottable {
     }
 
     /**
-     * Sets the lower end of the domain.
+     * Gets the lower end of the domain.
+     * 
+     * @return {D}
      */
-    public domainMin(domainMin: D) {
+    public domainMin(): D;
+    /**
+     * Sets the lower end of the domain.
+     * 
+     * @return {QuantitativeScale} The calling QuantitativeScale.
+     */
+    public domainMin(domainMin: D): QuantitativeScale<D>;
+    public domainMin(domainMin?: D): any {
+      if (domainMin == null) {
+        return this.domain()[0];
+      }
       this._domainMin = domainMin;
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
     /**
-     * Sets the upper end of the domain.
+     * Gets the upper end of the domain.
+     * 
+     * @return {D}
      */
-    public domainMax(domainMax: D) {
+    public domainMax(): D;
+    /**
+     * Sets the upper end of the domain.
+     * 
+     * @return {QuantitativeScale} The calling QuantitativeScale.
+     */
+    public domainMax(domainMax: D): QuantitativeScale<D>;
+    public domainMax(domainMax?: D): any {
+      if (domainMax == null) {
+        return this.domain()[1];
+      }
       this._domainMax = domainMax;
       this._autoDomainIfAutomaticMode();
       return this;

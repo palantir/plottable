@@ -1607,18 +1607,18 @@ var Plottable;
             }
             return _super.prototype.domain.call(this, values);
         };
-        /**
-         * Sets the lower end of the domain.
-         */
         QuantitativeScale.prototype.domainMin = function (domainMin) {
+            if (domainMin == null) {
+                return this.domain()[0];
+            }
             this._domainMin = domainMin;
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        /**
-         * Sets the upper end of the domain.
-         */
         QuantitativeScale.prototype.domainMax = function (domainMax) {
+            if (domainMax == null) {
+                return this.domain()[1];
+            }
             this._domainMax = domainMax;
             this._autoDomainIfAutomaticMode();
             return this;

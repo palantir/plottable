@@ -55,6 +55,7 @@ describe("TimeScale tests", () => {
     var minBelowBottom = new Date("2015-04-01");
     scale.domainMin(minBelowBottom);
     assert.strictEqual(scale.domain()[0].getTime(), minBelowBottom.getTime(), "lower end of domain was set by domainMin()");
+    assert.strictEqual(scale.domainMin().getTime(), minBelowBottom.getTime(), "returns the set minimum value");
 
     var minInMiddle = new Date("2015-06-01");
     scale.domainMin(minInMiddle);
@@ -62,6 +63,8 @@ describe("TimeScale tests", () => {
 
     scale.autoDomain();
     assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+    assert.strictEqual(scale.domainMin().getTime(), scale.domain()[0].getTime(),
+      "returns autoDomain()-ed min value after autoDomain()-ing");
 
     var minEqualTop = new Date("2015-07-01");
     var nextDay = new Date("2015-07-02");
@@ -87,6 +90,7 @@ describe("TimeScale tests", () => {
     var maxAboveTop = new Date("2015-08-01");
     scale.domainMax(maxAboveTop);
     assert.strictEqual(scale.domain()[1].getTime(), maxAboveTop.getTime(), "upper end of domain was set by domainMax()");
+    assert.strictEqual(scale.domainMax().getTime(), maxAboveTop.getTime(), "returns the set maximum value");
 
     var maxInMiddle = new Date("2015-06-01");
     scale.domainMax(maxInMiddle);
@@ -94,6 +98,8 @@ describe("TimeScale tests", () => {
 
     scale.autoDomain();
     assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+    assert.strictEqual(scale.domainMax().getTime(), scale.domain()[1].getTime(),
+      "returns autoDomain()-ed max value after autoDomain()-ing");
 
     var maxEqualBottom = new Date("2015-05-01");
     var dayBefore = new Date("2015-04-30");
