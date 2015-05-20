@@ -104,10 +104,10 @@ export module Plots {
 
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset, m)));
+      attrToProjector["y"] = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
 
       return attrToProjector;
     }

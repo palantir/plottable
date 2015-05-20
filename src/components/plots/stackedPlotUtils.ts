@@ -25,22 +25,22 @@ module Plottable {
       var maxStackExtent = Utils.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
         var data = dataset.data();
         if (filter != null) {
-          data = data.filter((d, i) => filter(d, i, dataset, null));
+          data = data.filter((d, i) => filter(d, i, dataset));
         }
         return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset, null) +
-            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset, null)));
+          return +valueAccessor(datum, i, dataset) +
+            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
         }, 0);
       }, 0);
 
       var minStackExtent = Utils.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
         var data = dataset.data();
         if (filter != null) {
-          data = data.filter((d, i) => filter(d, i, dataset, null));
+          data = data.filter((d, i) => filter(d, i, dataset));
         }
         return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
-          return +valueAccessor(datum, i, dataset, null) +
-            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset, null)));
+          return +valueAccessor(datum, i, dataset) +
+            stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
         }, 0);
       }, 0);
 
@@ -91,8 +91,7 @@ module Plottable {
 
       var keySets = datasetKeys.map((k) => {
         var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
-        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset, plotMetadata).toString())).values();
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
 
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
@@ -135,9 +134,8 @@ module Plottable {
       var domainKeys = d3.set();
       datasetKeys.forEach((k) => {
         var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          domainKeys.add(keyAccessor(datum, index, dataset, plotMetadata));
+          domainKeys.add(keyAccessor(datum, index, dataset));
         });
       });
 
@@ -159,10 +157,9 @@ module Plottable {
 
       datasetKeys.forEach((key, datasetIndex) => {
         var dataset = keyToPlotDatasetKey.get(key).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(key).plotMetadata;
         dataset.data().forEach((datum, index) => {
-          var key = String(keyAccessor(datum, index, dataset, plotMetadata));
-          var value = valueAccessor(datum, index, dataset, plotMetadata);
+          var key = String(keyAccessor(datum, index, dataset));
+          var value = valueAccessor(datum, index, dataset);
           dataMapArray[datasetIndex].set(key, { key: key, value: value });
         });
       });
@@ -187,17 +184,16 @@ module Plottable {
       datasetKeys.forEach((k, index) => {
         stackOffsets[k] = d3.map();
         var dataset = keyToPlotDatasetKey.get(k).dataset;
-        var plotMetadata = keyToPlotDatasetKey.get(k).plotMetadata;
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
-        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset, plotMetadata) <= 0);
+        var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);
 
         dataset.data().forEach((datum: any, datumIndex: number) => {
-          var key = String(keyAccessor(datum, datumIndex, dataset, plotMetadata));
+          var key = String(keyAccessor(datum, datumIndex, dataset));
           var positiveOffset = positiveDataMap.get(key).offset;
           var negativeOffset = negativeDataMap.get(key).offset;
 
-          var value = valueAccessor(datum, datumIndex, dataset, plotMetadata);
+          var value = valueAccessor(datum, datumIndex, dataset);
           var offset: number;
           if (!+value) {
             offset = isAllNegativeValues ? negativeOffset : positiveOffset;

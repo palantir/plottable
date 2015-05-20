@@ -39,13 +39,13 @@ export module Plots {
       var y2Attr = attrToProjector["y2"];
 
       // Generate width based on difference, then adjust for the correct x origin
-      attrToProjector["width"] = (d, i, dataset, m) => Math.abs(x2Attr(d, i, dataset, m) - x1Attr(d, i, dataset, m));
-      attrToProjector["x"] = (d, i, dataset, m) => Math.min(x1Attr(d, i, dataset, m), x2Attr(d, i, dataset, m));
+      attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - x1Attr(d, i, dataset));
+      attrToProjector["x"] = (d, i, dataset) => Math.min(x1Attr(d, i, dataset), x2Attr(d, i, dataset));
 
       // Generate height based on difference, then adjust for the correct y origin
-      attrToProjector["height"] = (d, i, dataset, m) => Math.abs(y2Attr(d, i, dataset, m) - y1Attr(d, i, dataset, m));
-      attrToProjector["y"] = (d, i, dataset, m) => {
-        return Math.max(y1Attr(d, i, dataset, m), y2Attr(d, i, dataset, m)) - attrToProjector["height"](d, i, dataset, m);
+      attrToProjector["height"] = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - y1Attr(d, i, dataset));
+      attrToProjector["y"] = (d, i, dataset) => {
+        return Math.max(y1Attr(d, i, dataset), y2Attr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
       };
 
       // Clean up the attributes projected onto the SVG elements

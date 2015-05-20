@@ -71,19 +71,19 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-      var getStart = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
-      var getEnd = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset, m)));
+      var getStart = (d: any, i: number, dataset: Dataset) =>
+        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+      var getEnd = (d: any, i: number, dataset: Dataset) =>
+        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
 
-      var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
-        return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
+      var heightF = (d: any, i: number, dataset: Dataset) => {
+        return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
       };
 
-      var attrFunction = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
-      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-        this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
+      var attrFunction = (d: any, i: number, dataset: Dataset) =>
+        +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
+      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
+        this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
 
       return attrToProjector;
     }

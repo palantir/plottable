@@ -36,7 +36,7 @@ export module Plots {
       // avoids lines zooming on from offscreen.
       var startValue = (domainMax < 0 && domainMax) || (domainMin > 0 && domainMin) || 0;
       var scaledStartValue = this.y().scale.scale(startValue);
-      return (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scaledStartValue;
+      return (d: any, i: number, dataset: Dataset) => scaledStartValue;
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -59,8 +59,8 @@ export module Plots {
       var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
-        attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset, m: any) =>
-          data.length > 0 ? projector(data[0], i, dataset, m) : null;
+        attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
+          data.length > 0 ? projector(data[0], i, dataset) : null;
       });
 
       return attrToProjector;
