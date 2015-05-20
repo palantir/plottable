@@ -1516,7 +1516,7 @@ describe("Labels", function () {
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
-    it.skip("Right-rotated text is handled properly", function () {
+    it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1586,7 +1586,7 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    it.skip("Label orientation can be changed after label is created", function () {
+    it("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.Label("CHANGING ORIENTATION");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
