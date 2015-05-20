@@ -168,18 +168,13 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
-         */
         class Map<K, V> {
             /**
-             * Set a new key/value pair in the store.
+             * Set a new key/value pair in the Map.
              *
-             * @param {K} key Key to set in the store
-             * @param {V} value Value to set in the store
-             * @return {boolean} True if key already in store, false otherwise
+             * @param {K} key Key to set in the Map
+             * @param {V} value Value to set in the Map
+             * @return {boolean} True if key already in Map, false otherwise
              */
             set(key: K, value: V): boolean;
             /**
@@ -188,7 +183,7 @@ declare module Plottable {
              * @param {K} key Key associated with value to retrieve
              * @return {V} Value if found, undefined otherwise
              */
-            get(key: K): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
@@ -200,26 +195,19 @@ declare module Plottable {
              */
             has(key: K): boolean;
             /**
-             * Return an array of the values in the key-value store
+             * Return an array of the values in the Map
              *
              * @return {V[]} The values in the store
              */
-            values(): any[];
+            values(): V[];
             /**
-             * Return an array of keys in the key-value store
+             * Return an array of keys in the Map.
              *
              * @return {K[]} The keys in the store
              */
-            keys(): any[];
+            keys(): K[];
             /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            map(cb: (key?: K, val?: V, index?: number) => any): any[];
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
+             * Delete a key from the Map. Return whether the key was present.
              *
              * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
@@ -465,7 +453,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DatasetCallback = (dataset: Dataset) => any;
+    type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
          * Constructs a new set.
@@ -1371,7 +1359,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ComponentCallback = (component: Component) => any;
+    type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
             static TOP: string;
@@ -2974,30 +2962,21 @@ declare module Plottable {
             offset?: number;
         };
     }
-    class Stacked<X, Y> extends XYPlot<X, Y> {
-        protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
-        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
-        _onDatasetUpdate(): void;
-        _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+    class StackedPlotUtils {
         /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         * @return {[number]} The extent that spans all the stacked data
          */
-        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, filter: Accessor<boolean>): number[];
         /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
          */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
-        _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        protected _updateExtentsForProperty(property: string): void;
-        protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor<X> | Accessor<Y>;
-        _valueAccessor(): Accessor<number>;
+        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
+            [key: string]: D3.Map<number>;
+        };
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
+        static stackedPlotMetadata(metadata: Plots.PlotMetadata): Plots.StackedPlotMetadata;
+        static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
+        static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
 }
 
@@ -3025,17 +3004,9 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X>;
-            _valueAccessor(): Accessor<number>;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
+            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3064,15 +3035,7 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X> | Accessor<Y>;
-            _valueAccessor(): Accessor<number>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3288,7 +3251,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type MouseCallback = (p: Point, event: MouseEvent) => any;
+        type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
             /**
              * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
@@ -3413,7 +3376,7 @@ declare module Plottable {
     module Dispatchers {
         type TouchCallback = (ids: number[], idToPoint: {
             [id: number]: Point;
-        }, event: TouchEvent) => any;
+        }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
             /**
              * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
@@ -3509,7 +3472,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode: number, event: KeyboardEvent) => any;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
              * Get a Dispatcher.Key. If one already exists it will be returned;
@@ -3588,7 +3551,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ClickCallback = (point: Point) => any;
+    type ClickCallback = (point: Point) => void;
     module Interactions {
         class Click extends Interaction {
             protected _anchor(component: Component): void;
@@ -3666,7 +3629,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type PointerCallback = (point: Point) => any;
+    type PointerCallback = (point: Point) => void;
     module Interactions {
         class Pointer extends Interaction {
             protected _anchor(component: Component): void;
@@ -3744,7 +3707,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragCallback = (start: Point, end: Point) => any;
+    type DragCallback = (start: Point, end: Point) => void;
     module Interactions {
         class Drag extends Interaction {
             protected _anchor(component: Component): void;
@@ -3820,7 +3783,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type DragBoxCallback = (bounds: Bounds) => any;
+    type DragBoxCallback = (bounds: Bounds) => void;
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;

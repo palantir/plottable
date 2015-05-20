@@ -2,7 +2,7 @@
 
 module Plottable {
 
-export type DragBoxCallback = (bounds: Bounds) => any;
+export type DragBoxCallback = (bounds: Bounds) => void;
 
 export module Components {
   type _EdgeIndicator = {
