@@ -5003,7 +5003,7 @@ var Plottable;
                         this._angle = angle;
                     }
                     else {
-                        throw new Error(angle + " is not a valid angle for LabelComponent");
+                        throw new Error(angle + " is not a valid angle for Label");
                     }
                     this.redraw();
                     return this;

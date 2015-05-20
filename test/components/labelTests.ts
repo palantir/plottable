@@ -24,7 +24,7 @@ describe("Labels", () => {
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Left-rotated text is handled properly", () => {
+  it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("LEFT-ROTATED LABEL");
     label.angle(-90);
@@ -39,7 +39,7 @@ describe("Labels", () => {
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Right-rotated text is handled properly", () => {
+  it("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL");
     label.angle(90);
@@ -115,7 +115,7 @@ describe("Labels", () => {
   });
 
   it("unsupported alignments and orientations are unsupported", () => {
-    assert.throws(() => new Plottable.Components.Label("foo").angle(10), Error, "10 is not a valid angle for LabelComponent");
+    assert.throws(() => new Plottable.Components.Label("foo").angle(10), Error, "10 is not a valid angle for Label");
   });
 
   // Skipping due to FF odd client bounding rect computation - #1470.
