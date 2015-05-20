@@ -134,10 +134,10 @@ module.exports = function(grunt) {
 
   var browsers = [{
     browserName: "firefox",
-    version: "30"
+    version: "37"
   }, {
     browserName: "chrome",
-    version: "35"
+    version: "42"
   }, {
     browserName: "internet explorer",
     version: "9",
