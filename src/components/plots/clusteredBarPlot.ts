@@ -18,10 +18,9 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
-      super(xScale, yScale, isVertical);
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
+      super(xScale, yScale);
     }
 
     protected _generateAttrToProjector() {
