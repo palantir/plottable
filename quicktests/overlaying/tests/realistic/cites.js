@@ -33,5 +33,5 @@ function run(svg, data, Plottable) {
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
   table.renderTo(svg); 
-  })
+  });
 }

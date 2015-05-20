@@ -93,21 +93,21 @@ function run(svg, data, Plottable){
 
   var innerPie = new Plottable.Plots.Pie();
   innerPie.addDataset(dataset);
-  innerPie.sectorValue(function(){ return .1;})
+  innerPie.sectorValue(function(){ return 0.1;})
   		  .innerRadius(25)
   		  .outerRadius(50)
   		  .attr("fill", function(d){ return d.type1;}, csType1);
 
   var midPie = new Plottable.Plots.Pie();
   midPie.addDataset(dataset);
-  midPie.sectorValue(function(){ return .1;})
+  midPie.sectorValue(function(){ return 0.1;})
   		  .innerRadius(50)
   		  .outerRadius(75)
   		  .attr("fill", function(d){ return d.type2;}, csType2);  		
 
   var outerPie = new Plottable.Plots.Pie();
   outerPie.addDataset(dataset);
-  outerPie.sectorValue(function(){ return .1;})
+  outerPie.sectorValue(function(){ return 0.1;})
   		  .innerRadius(75)
   		  .outerRadius(100)
   		  .attr("fill", function(d){ return d.type3;}, csType3);  		    
