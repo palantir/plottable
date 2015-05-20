@@ -6499,12 +6499,10 @@ var Plottable;
             scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._generatePropertyToProjectors = function () {
-            var attrToProjector = {};
-            this._propertyBindings.forEach(function (key, binding) {
-                var scaledAccessor = function (d, i, dataset) { return binding.scale.scale(binding.accessor(d, i, dataset)); };
-                attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
-            });
-            return attrToProjector;
+            return {};
+        };
+        Plot._scaledAccessor = function (binding) {
+            return binding.scale == null ? binding.accessor : function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
         };
         return Plot;
     })(Plottable.Component);
@@ -6597,6 +6595,13 @@ var Plottable;
                 this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
                 this.renderImmediately();
                 return this;
+            };
+            Pie.prototype._generatePropertyToProjectors = function () {
+                var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
+                attrToProjector[Pie._INNER_RADIUS_KEY] = Plottable.Plot._scaledAccessor(this.innerRadius());
+                attrToProjector[Pie._OUTER_RADIUS_KEY] = Plottable.Plot._scaledAccessor(this.outerRadius());
+                attrToProjector[Pie._SECTOR_VALUE_KEY] = Plottable.Plot._scaledAccessor(this.sectorValue());
+                return attrToProjector;
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
@@ -6741,12 +6746,13 @@ var Plottable;
             return this;
         };
         XYPlot.prototype._generatePropertyToProjectors = function () {
+            var _this = this;
             var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
-            var positionXFn = attrToProjector["x"];
-            var positionYFn = attrToProjector["y"];
+            attrToProjector["x"] = Plottable.Plot._scaledAccessor(this.x());
+            attrToProjector["y"] = Plottable.Plot._scaledAccessor(this.y());
             attrToProjector["defined"] = function (d, i, dataset) {
-                var positionX = positionXFn(d, i, dataset);
-                var positionY = positionYFn(d, i, dataset);
+                var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
+                var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
                 return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
             };
             return attrToProjector;
@@ -6922,6 +6928,14 @@ var Plottable;
                 this._bindProperty(Rectangle._Y2_KEY, y2, scale);
                 this.renderImmediately();
                 return this;
+            };
+            Rectangle.prototype._generatePropertyToProjectors = function () {
+                var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x1());
+                attrToProjector["y2"] = Plottable.Plot._scaledAccessor(this.y2());
+                attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y1());
+                return attrToProjector;
             };
             Rectangle._X1_KEY = "x1";
             Rectangle._X2_KEY = "x2";
@@ -7730,6 +7744,11 @@ var Plottable;
                 var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
                 wholeDatumAttributes.push("y0");
                 return wholeDatumAttributes;
+            };
+            Area.prototype._generatePropertyToProjectors = function () {
+                var attrToProjector = _super.prototype._generatePropertyToProjectors.call(this);
+                attrToProjector["y0"] = Plottable.Plot._scaledAccessor(this.y0());
+                return attrToProjector;
             };
             Area._Y0_KEY = "y0";
             return Area;

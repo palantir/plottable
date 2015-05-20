@@ -564,12 +564,13 @@ module Plottable {
     }
 
     protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => {
-        var scaledAccessor = (d: any, i: number, dataset: Dataset) => binding.scale.scale(binding.accessor(d, i, dataset));
-        attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
-      });
-      return attrToProjector;
+      return {};
+    }
+
+    protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
+      return binding.scale == null ?
+               binding.accessor :
+               (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
     }
   }
 }
