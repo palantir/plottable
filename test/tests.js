@@ -1853,18 +1853,18 @@ describe("Legend", function () {
         assert.deepEqual(legend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
         svg.remove();
     });
-    it("sortFunction() works as expected", function () {
+    it("comparator() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
         color.domain(newDomain);
         legend.renderTo(svg);
         var entries = legend._element.selectAll(entrySelector);
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
-        var sortFn = function (a, b) { return a.localeCompare(b); };
-        legend.sortFunction(sortFn);
+        var compareFunction = function (a, b) { return a.localeCompare(b); };
+        legend.comparator(compareFunction);
         entries = legend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        newDomain.sort(sortFn);
+        newDomain.sort(compareFunction);
         assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
         svg.remove();
     });

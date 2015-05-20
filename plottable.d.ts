@@ -2091,13 +2091,13 @@ declare module Plottable {
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-             * The entries will be displayed in the order of the `colorScale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
+             * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
-             * @param {Scale.Color} colorScale
+             * @param {Scale.Color} scale
              */
-            constructor(colorScale: Scales.Color);
+            constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
@@ -2112,17 +2112,17 @@ declare module Plottable {
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
-             * Gets the current sort function for Legend's entries.
-             * @returns {(a: string, b: string) => number} The current sort function.
+             * Gets the current comparator for the Legend's entries.
+             * @returns {(a: string, b: string) => number} The current comparator.
              */
-            sortFunction(): (a: string, b: string) => number;
+            comparator(): (a: string, b: string) => number;
             /**
-             * Sets a new sort function for Legend's entires.
+             * Sets a new comparator for the Legend's entries.
              *
-             * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
              * @returns {Legend} The calling Legend.
              */
-            sortFunction(newFn: (a: string, b: string) => number): Legend;
+            comparator(comparator: (a: string, b: string) => number): Legend;
             /**
              * Gets the current color scale from the Legend.
              *
