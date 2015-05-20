@@ -260,7 +260,7 @@ before(function () {
         window.Pixel_CloseTo_Requirement = 2;
     }
     else if (isFirefox) {
-        window.Pixel_CloseTo_Requirement = 1;
+        window.Pixel_CloseTo_Requirement = 2;
     }
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
@@ -1511,8 +1511,6 @@ describe("Labels", function () {
         var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable.Utils.DOM.getBBox(text);
-        //this one is problematic
-        console.log(1);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");

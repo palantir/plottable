@@ -13,7 +13,7 @@ before(() => {
   if (window.PHANTOMJS) {
     window.Pixel_CloseTo_Requirement = 2;
   } else if (isFirefox) {
-    window.Pixel_CloseTo_Requirement = 1;
+    window.Pixel_CloseTo_Requirement = 2;
   } else {
     window.Pixel_CloseTo_Requirement = 0.5;
   }
