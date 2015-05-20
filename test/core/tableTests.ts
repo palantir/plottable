@@ -251,7 +251,7 @@ describe("Tables", () => {
       verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
     });
 
-    it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
+    it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", () => {
       var c1 = new Mocks.FixedSizeComponent(490, 50);
       var c2 = new Plottable.Component();
       var c3 = new Plottable.Component();
@@ -261,7 +261,7 @@ describe("Tables", () => {
         [c3, c4]
       ]);
       var result = (<any> table)._iterateLayout(500, 500);
-      verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
+      verifyLayoutResult(result, [5, 5], [225, 225], [490, 0], [50, 0], false, false, "");
     });
 
     it("iterateLayout works in the case where all components are fixed-size", () => {
