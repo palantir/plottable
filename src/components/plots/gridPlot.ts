@@ -57,9 +57,9 @@ export module Plots {
       } else {
         super.x(<X | Accessor<X>> x, scale);
         if (scale instanceof Scales.Category) {
-          var xCatScale = (<Scales.Category> <any> scale);
-          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - xCatScale.rangeBand() / 2);
-          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + xCatScale.rangeBand() / 2);
+          var catScale = (<Scales.Category> <any> scale);
+          this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
+          this.x2((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.x1((d, i, dataset, m) => scale.scale(this.x().accessor(d, i, dataset, m)));
         }
@@ -76,9 +76,9 @@ export module Plots {
       } else {
         super.y(<Y | Accessor<Y>> y, scale);
         if (scale instanceof Scales.Category) {
-          var yCatScale = (<Scales.Category> <any> scale);
-          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - yCatScale.rangeBand() / 2);
-          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + yCatScale.rangeBand() / 2);
+          var catScale = (<Scales.Category> <any> scale);
+          this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) - catScale.rangeBand() / 2);
+          this.y2((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
           this.y1((d, i, dataset, m) => scale.scale(this.y().accessor(d, i, dataset, m)));
         }

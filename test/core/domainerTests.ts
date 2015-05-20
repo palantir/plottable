@@ -152,8 +152,8 @@ describe("Domainer", () => {
     var r = new Plottable.Plots.Area(xScale, yScale);
     r.addDataset(dataset);
     var svg = TestMethods.generateSVG();
-    r.x((d) => d.x, xScale);
-    r.y((d) => d.y, yScale);
+    r.x((d: any) => d.x, xScale);
+    r.y((d: any) => d.y, yScale);
     r.renderTo(svg);
 
     function getExceptions() {

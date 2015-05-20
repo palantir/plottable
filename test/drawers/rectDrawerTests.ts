@@ -13,8 +13,8 @@ describe("Drawers", () => {
       (<any> barPlot)._getDrawer = () => drawer;
 
       barPlot.addDataset(new Plottable.Dataset(data));
-      barPlot.x((d) => d.a, xScale);
-      barPlot.y((d) => d.b, yScale);
+      barPlot.x((d: any) => d.a, xScale);
+      barPlot.y((d: any) => d.b, yScale);
       barPlot.renderTo(svg);
 
       barPlot.getAllSelections().each(function (datum: any, index: number) {
@@ -38,8 +38,8 @@ describe("Drawers", () => {
       (<any> barPlot)._getDrawer = () => drawer;
 
       barPlot.addDataset(new Plottable.Dataset(data));
-      barPlot.x((d) => d.x, xScale);
-      barPlot.y((d) => d.y, yScale);
+      barPlot.x((d: any) => d.x, xScale);
+      barPlot.y((d: any) => d.y, yScale);
       barPlot.renderTo(svg);
 
       barPlot.getAllSelections().each(function(datum: any, index: number) {

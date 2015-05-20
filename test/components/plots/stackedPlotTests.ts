@@ -176,7 +176,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 2]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 2]);
       yScale = new Plottable.Scales.Linear();
 
       dataset1 = new Plottable.Dataset([
@@ -196,7 +197,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedArea(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
+      plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
@@ -208,7 +209,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
+      plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
@@ -249,7 +250,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedArea(yScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, yScale)
+      plot.x((d: any) => d.x, yScale)
           .y((d: any) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
@@ -261,7 +262,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
+      plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale);
       (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
       plot.renderTo(svg);
