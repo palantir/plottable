@@ -3,7 +3,8 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackedExtent: number[] = [];
+    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
+    private _stackedExtent: number[];
 
     /**
      * Constructs a StackedBar plot.
@@ -16,6 +17,8 @@ export module Plots {
      */
     constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
       super(xScale, yScale, isVertical);
+      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackedExtent = [];
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {
@@ -68,19 +71,19 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-      var getStart = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        primaryScale.scale(m.offsets.get(keyAccessor(d, i, dataset, m)));
-      var getEnd = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset, m) + m.offsets.get(keyAccessor(d, i, dataset, m)));
+      var getStart = (d: any, i: number, dataset: Dataset) =>
+        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+      var getEnd = (d: any, i: number, dataset: Dataset) =>
+        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
 
-      var heightF = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) => {
-        return Math.abs(getEnd(d, i, dataset, m) - getStart(d, i, dataset, m));
+      var heightF = (d: any, i: number, dataset: Dataset) => {
+        return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
       };
 
-      var attrFunction = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        +primaryAccessor(d, i, dataset, m) < 0 ? getStart(d, i, dataset, m) : getEnd(d, i, dataset, m);
-      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset, m: StackedPlotMetadata) =>
-        this._isVertical ? attrFunction(d, i, dataset, m) : attrFunction(d, i, dataset, m) - heightF(d, i, dataset, m);
+      var attrFunction = (d: any, i: number, dataset: Dataset) =>
+        +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
+      attrToProjector[valueAttr] = (d: any, i: number, dataset: Dataset) =>
+        this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset);
 
       return attrToProjector;
     }
@@ -95,24 +98,10 @@ export module Plots {
       return this;
     }
 
-    protected _getPlotMetadataForDataset(key: string) {
-      var metadata = super._getPlotMetadataForDataset(key);
-      return StackedPlotUtils.stackedPlotMetadata(metadata);
-    }
-
     protected _updateExtentsForProperty(property: string) {
       super._updateExtentsForProperty(property);
       if ((property === "x" || property === "y") && this._projectorsReady()) {
-        var orientation = this._isVertical ? "vertical" : "horizontal";
-        var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-        var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-        var datasetKeys = this._datasetKeysInOrder;
-        var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-        var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-
-        var extents = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
-        this._stackedExtent = extents;
+        this._updateStackExtentsAndOffsets();
       }
     }
 
@@ -144,11 +133,10 @@ export module Plots {
         if (!stackOffsets.hasOwnProperty(datasetKey)) {
           continue;
         }
-        var plotMetadata = <Plots.StackedPlotMetadata> keyToPlotDatasetKey.get(datasetKey).plotMetadata;
-        plotMetadata.offsets = stackOffsets[datasetKey];
+        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
       }
 
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, filter);
+      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
     }
   }
 }
