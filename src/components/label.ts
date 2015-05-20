@@ -160,6 +160,7 @@ export module Components {
   }
 
   export class TitleLabel extends Label {
+    public static TITLE_LABEL_CLASS = "title-label";
     /**
      * Creates a TitleLabel, a type of label made for rendering titles.
      *
@@ -167,11 +168,12 @@ export module Components {
      */
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
-      this.classed("title-label", true);
+      this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
     }
   }
 
   export class AxisLabel extends Label {
+    public static AXIS_LABEL_CLASS = "axis-label";
     /**
      * Creates a AxisLabel, a type of label made for rendering axis labels.
      *
@@ -179,7 +181,7 @@ export module Components {
      */
     constructor(text?: string, orientation?: string) {
       super(text, orientation);
-      this.classed("axis-label", true);
+      this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
     }
   }
 }

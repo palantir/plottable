@@ -5045,8 +5045,9 @@ var Plottable;
              */
             function TitleLabel(text, orientation) {
                 _super.call(this, text, orientation);
-                this.classed("title-label", true);
+                this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
             }
+            TitleLabel.TITLE_LABEL_CLASS = "title-label";
             return TitleLabel;
         })(Label);
         Components.TitleLabel = TitleLabel;
@@ -5059,8 +5060,9 @@ var Plottable;
              */
             function AxisLabel(text, orientation) {
                 _super.call(this, text, orientation);
-                this.classed("axis-label", true);
+                this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
             }
+            AxisLabel.AXIS_LABEL_CLASS = "axis-label";
             return AxisLabel;
         })(Label);
         Components.AxisLabel = AxisLabel;

@@ -2068,6 +2068,7 @@ declare module Plottable {
             renderImmediately(): Label;
         }
         class TitleLabel extends Label {
+            static TITLE_LABEL_CLASS: string;
             /**
              * Creates a TitleLabel, a type of label made for rendering titles.
              *
@@ -2076,6 +2077,7 @@ declare module Plottable {
             constructor(text?: string, orientation?: string);
         }
         class AxisLabel extends Label {
+            static AXIS_LABEL_CLASS: string;
             /**
              * Creates a AxisLabel, a type of label made for rendering axis labels.
              *
