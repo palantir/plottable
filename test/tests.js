@@ -1503,7 +1503,7 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    it.skip("Left-rotated text is handled properly", function () {
+    it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1511,8 +1511,11 @@ describe("Labels", function () {
         var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable.Utils.DOM.getBBox(text);
+        //this one is problematic
+        console.log(1);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
     it.skip("Right-rotated text is handled properly", function () {
@@ -1525,6 +1528,7 @@ describe("Labels", function () {
         var textBBox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
@@ -4674,7 +4678,6 @@ describe("Plots", function () {
         });
         // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
         it.skip("auto scales correctly on stacked area", function () {
-            console.log(1);
             var plot = new Plottable.Plots.StackedArea(yScale, yScale);
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, yScale).y(function (d) { return d.y; }, yScale);

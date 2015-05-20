@@ -23,7 +23,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  it.skip("Left-rotated text is handled properly", () => {
+  it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -31,8 +31,13 @@ describe("Labels", () => {
     var content = (<any> label)._content;
     var text = content.select("text");
     var textBBox = Plottable.Utils.DOM.getBBox(text);
+    //this one is problematic
+
+    console.log(1);
+
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
@@ -46,6 +51,7 @@ describe("Labels", () => {
     var textBBox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
