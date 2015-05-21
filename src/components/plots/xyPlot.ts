@@ -242,5 +242,10 @@ module Plottable {
     protected _projectorsReady() {
       return this.x().accessor != null && this.y().accessor != null;
     }
+
+    protected _getPixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      var attrToProjector = this._generateAttrToProjector();
+      return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+    }
   }
 }

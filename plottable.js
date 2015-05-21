@@ -6911,6 +6911,10 @@ var Plottable;
         XYPlot.prototype._projectorsReady = function () {
             return this.x().accessor != null && this.y().accessor != null;
         };
+        XYPlot.prototype._getPixelPoint = function (datum, index, dataset) {
+            var attrToProjector = this._generateAttrToProjector();
+            return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+        };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
         return XYPlot;
@@ -7117,10 +7121,6 @@ var Plottable;
                 var symbolProjector = Plottable.Plot._scaledAccessor(this.symbol());
                 propertyToProjectors["d"] = function (datum, index, dataset) { return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset)); };
                 return propertyToProjectors;
-            };
-            Scatter.prototype._getPixelPoint = function (datum, index, dataset) {
-                var attrToProjector = this._generateAttrToProjector();
-                return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
             };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
@@ -7787,10 +7787,6 @@ var Plottable;
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
                 };
-            };
-            Line.prototype._getPixelPoint = function (datum, index, dataset) {
-                var attrToProjector = this._generateAttrToProjector();
-                return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
             };
             return Line;
         })(Plottable.XYPlot);

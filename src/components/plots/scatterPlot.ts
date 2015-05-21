@@ -100,11 +100,6 @@ export module Plots {
         symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
       return propertyToProjectors;
     }
-
-    protected _getPixelPoint(datum: any, index: number, dataset: Dataset) {
-      var attrToProjector = this._generateAttrToProjector();
-      return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
-    }
   }
 }
 }

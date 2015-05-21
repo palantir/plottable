@@ -2633,6 +2633,7 @@ declare module Plottable {
          */
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
+        protected _getPixelPoint(datum: any, index: number, dataset: Dataset): Point;
     }
 }
 
@@ -2699,10 +2700,6 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             protected _propertyProjectors(): AttributeToProjector;
-            protected _getPixelPoint(datum: any, index: number, dataset: Dataset): {
-                x: any;
-                y: any;
-            };
         }
     }
 }
@@ -2904,7 +2901,6 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
-            _getPixelPoint(datum: any, index: number, dataset: Dataset): Point;
         }
     }
 }

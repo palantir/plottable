@@ -151,11 +151,6 @@ export module Plots {
         selection: d3.selectAll(closestElements)
       };
     }
-
-    public _getPixelPoint(datum: any, index: number, dataset: Dataset): Point {
-      var attrToProjector = this._generateAttrToProjector();
-      return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
-    }
   }
 }
 }
