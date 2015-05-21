@@ -1,12 +1,10 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
-  export class Orientation {
-    public static VERTICAL = "vertical";
-    public static HORIZONTAL = "horizontal";
-  }
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
+    public static ORIENTATION_VERTICAL = "vertical";
+    public static ORIENTATION_HORIZONTAL = "horizontal";
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -20,19 +18,23 @@ export module Plots {
     private _hideBarsIfAnyAreTooWide = true;
 
     /**
-     * Constructs a BarPlot.
+     * Constructs a Bar Plot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
+      if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+        throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+      }
+      this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = true;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
@@ -336,10 +338,10 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale<any, number>    = this._isVertical ? this.y().scale : this.x().scale;
-      var secondaryScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
-      var primaryAttr     = this._isVertical ? "y" : "x";
-      var secondaryAttr   = this._isVertical ? "x" : "y";
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      var secondaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
+      var primaryAttr = this._isVertical ? "y" : "x";
+      var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var positionF = attrToProjector[secondaryAttr];
@@ -381,30 +383,6 @@ export module Plots {
     }
 
     /**
-     * Gets the orientation of the Plots.Bar.
-     *
-     * @returns {string} the current orientation.
-     */
-    public orientation(): string;
-    /**
-     * Sets the orientation of the Plots.Bar.
-     *
-     * @param {string} orientation The desired orientation
-     * (horizontal/vertical).
-     * @returns {Plots.Bar} The calling Plots.Bar.
-     */
-    public orientation(orientation: string): Plots.Bar<X, Y>;
-    public orientation(orientation?: string): any {
-      if (orientation == null) {
-        return this._isVertical ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-      } else {
-        this._isVertical = orientation === Orientation.VERTICAL;
-        this.render();
-        return this;
-      }
-    }
-
-    /**
      * Computes the barPixelWidth of all the bars in the plot.
      *
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
@@ -415,7 +393,7 @@ export module Plots {
     protected _getBarPixelWidth(): number {
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
-      var barScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
+      var barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {

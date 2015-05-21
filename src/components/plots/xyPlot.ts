@@ -140,7 +140,7 @@ module Plottable {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
       this._autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
