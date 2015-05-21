@@ -74,9 +74,6 @@ module Plottable {
         });
       });
 
-      console.log(1);
-
-
       var stackOffsets = StackedPlotUtils.generateStackOffsets(
         StackedPlotUtils.stack(positiveDataMapArray, domainKeys),
         StackedPlotUtils.stack(negativeDataMapArray, domainKeys),
@@ -185,11 +182,11 @@ module Plottable {
         keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
         datasets: Dataset[]) {
 
-      var stackOffsets: { [key: string]: D3.Map<number> } = {};
+      var stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
 
-      datasetKeys.forEach((k, index) => {
-        stackOffsets[k] = d3.map();
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
+      // datasetKeys.forEach((k, index) => {
+      datasets.forEach((dataset, index) => {
+        stackOffsets.set(dataset, d3.map());
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);
@@ -206,7 +203,8 @@ module Plottable {
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;
           }
-          stackOffsets[k].set(key, offset);
+          // Can be improved by just setting this at the very end
+          stackOffsets.get(dataset).set(key, offset);
         });
       });
       return stackOffsets;
