@@ -23,8 +23,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Left-rotated text is handled properly", () => {
+  it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -34,11 +33,11 @@ describe("Labels", () => {
     var textBBox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Right-rotated text is handled properly", () => {
+  it("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
     var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -48,6 +47,7 @@ describe("Labels", () => {
     var textBBox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
@@ -65,8 +65,7 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // skipping because Dan is rewriting labels and the height test fails
-  it.skip("Superlong text is handled in a sane fashion", () => {
+  it("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = TestMethods.generateSVG(svgWidth, 80);
     var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
@@ -116,8 +115,7 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Components.Label("foo", "bar"), Error, "not a valid orientation");
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Label orientation can be changed after label is created", () => {
+  it("Label orientation can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var label = new Plottable.Components.Label("CHANGING ORIENTATION");
     label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);

@@ -260,7 +260,8 @@ before(function () {
         window.Pixel_CloseTo_Requirement = 2;
     }
     else if (isFirefox) {
-        window.Pixel_CloseTo_Requirement = 1;
+        // HACKHACK #2122
+        window.Pixel_CloseTo_Requirement = 2;
     }
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
@@ -1504,8 +1505,7 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Left-rotated text is handled properly", function () {
+    it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("LEFT-ROTATED LABEL", "left");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1515,10 +1515,10 @@ describe("Labels", function () {
         var textBBox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Right-rotated text is handled properly", function () {
+    it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
         var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL", "right");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1528,6 +1528,7 @@ describe("Labels", function () {
         var textBBox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
@@ -1543,8 +1544,7 @@ describe("Labels", function () {
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
-    // skipping because Dan is rewriting labels and the height test fails
-    it.skip("Superlong text is handled in a sane fashion", function () {
+    it("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = TestMethods.generateSVG(svgWidth, 80);
         var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
@@ -1588,8 +1588,7 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Label orientation can be changed after label is created", function () {
+    it("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.Label("CHANGING ORIENTATION");
         label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
@@ -1700,8 +1699,7 @@ describe("Legend", function () {
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
     });
-    // Test is flaky under SauceLabs for firefox version 30
-    it.skip("a legend with a long label does not overflow horizontally", function () {
+    it("a legend with a long label does not overflow horizontally", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
         svg.attr("width", 100);
         legend.renderTo(svg);
