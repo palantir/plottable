@@ -7981,7 +7981,7 @@ var Plottable;
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
         StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, datasets) {
-            var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
+            var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
             var dataMapArray = StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
             var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                 return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
@@ -8001,7 +8001,7 @@ var Plottable;
                 var dataset = keyToPlotDatasetKey.get(k).dataset;
                 return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
             });
-            var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
+            var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
             if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                 Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
             }
@@ -8023,10 +8023,12 @@ var Plottable;
             d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
             return dataArray;
         };
-        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey) {
+        /**
+         *
+         */
+        StackedPlotUtils.getDomainKeys = function (keyAccessor, datasets) {
             var domainKeys = d3.set();
-            datasetKeys.forEach(function (k) {
-                var dataset = keyToPlotDatasetKey.get(k).dataset;
+            datasets.forEach(function (dataset) {
                 dataset.data().forEach(function (datum, index) {
                     domainKeys.add(keyAccessor(datum, index, dataset));
                 });

@@ -57,7 +57,7 @@ module Plottable {
         keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
         datasets: Dataset[]) {
 
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
         (keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
@@ -95,7 +95,7 @@ module Plottable {
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
 
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
@@ -127,15 +127,12 @@ module Plottable {
       return dataArray;
     }
 
-    private static getDomainKeys(
-      keyAccessor: Accessor<any>,
-      datasets: Dataset[],
-      datasetKeys: string[],
-      keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
-
+    /**
+     *
+     */
+    private static getDomainKeys(keyAccessor: Accessor<any>, datasets: Dataset[]) {
       var domainKeys = d3.set();
-      datasetKeys.forEach((k) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
+      datasets.forEach((dataset) => {
         dataset.data().forEach((datum, index) => {
           domainKeys.add(keyAccessor(datum, index, dataset));
         });
