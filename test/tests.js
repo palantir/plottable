@@ -6768,7 +6768,11 @@ describe("Tables", function () {
         var c7 = TestMethods.makeFixedSizeComponent(null, 30);
         var c3 = TestMethods.makeFixedSizeComponent(50, null);
         var c5 = TestMethods.makeFixedSizeComponent(50, null);
-        var table = new Plottable.Components.Table([[null, c1, null], [c3, c4, c5], [null, c7, null]]);
+        var table = new Plottable.Components.Table([
+            [null, c1, null],
+            [c3, c4, c5],
+            [null, c7, null]
+        ]);
         var components = [c1, c3, c4, c5, c7];
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
