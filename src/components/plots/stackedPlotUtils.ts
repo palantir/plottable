@@ -57,10 +57,10 @@ module Plottable {
         keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
         datasets: Dataset[]) {
 
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
-        (keyAccessor, valueAccessor, domainKeys, datasetKeys, keyToPlotDatasetKey);
+        (keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
 
       var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -87,14 +87,15 @@ module Plottable {
     public static checkSameDomainForStacks(
         keyAccessor: Accessor<any>,
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        datasets: Dataset[]) {
 
       var keySets = datasetKeys.map((k) => {
         var dataset = keyToPlotDatasetKey.get(k).dataset;
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
 
-      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
+      var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets, datasetKeys, keyToPlotDatasetKey);
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
@@ -128,6 +129,7 @@ module Plottable {
 
     private static getDomainKeys(
       keyAccessor: Accessor<any>,
+      datasets: Dataset[],
       datasetKeys: string[],
       keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
 
@@ -147,7 +149,7 @@ module Plottable {
         valueAccessor: Accessor<any>,
         domainKeys: string[],
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+        datasets: Dataset[]) {
 
       var dataMapArray = datasetKeys.map(() => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -155,8 +157,7 @@ module Plottable {
         });
       });
 
-      datasetKeys.forEach((key, datasetIndex) => {
-        var dataset = keyToPlotDatasetKey.get(key).dataset;
+      datasets.forEach((dataset, datasetIndex) => {
         dataset.data().forEach((datum, index) => {
           var key = String(keyAccessor(datum, index, dataset));
           var value = valueAccessor(datum, index, dataset);
