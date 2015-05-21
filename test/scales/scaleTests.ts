@@ -401,10 +401,10 @@ describe("Scales", () => {
     });
 
     it("timeScale extent calculation works as expected", () => {
-      var date1 = new Date("2015-02-25 19:00");
-      var date2 = new Date("2015-02-24 19:00");
-      var date3 = new Date("2015-02-25 19:00");
-      var date4 = new Date("2015-02-26 19:00");
+      var date1 = new Date(2015, 2, 25, 19, 0, 0);
+      var date2 = new Date(2015, 2, 24, 19, 0, 0);
+      var date3 = new Date(2015, 2, 25, 19, 0, 0);
+      var date4 = new Date(2015, 2, 26, 19, 0, 0);
       var domain = [date1, date2, date3, date4];
 
       var scale = new Plottable.Scales.Time();
