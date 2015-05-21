@@ -52,8 +52,8 @@ export module Scales {
       this._d3Scale = scale;
     }
 
-    public extentOfValues(data: string[]) {
-      return Utils.Methods.uniq(data);
+    public extentOfValues(values: string[]) {
+      return Utils.Methods.uniq(values);
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388

@@ -21,8 +21,8 @@ module Plottable {
       throw new Error("Subclasses should override _invert");
     }
 
-    public extentOfValues(data: D[]) {
-      var extent = d3.extent(data);
+    public extentOfValues(values: D[]) {
+      var extent = d3.extent(values);
       if (extent[0] == null || extent[1] == null) {
         return [];
       } else {

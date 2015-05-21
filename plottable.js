@@ -1495,7 +1495,7 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
-        Scale.prototype.extentOfValues = function (data) {
+        Scale.prototype.extentOfValues = function (values) {
             return []; // this should be overwritten
         };
         Scale.prototype._getAllExtents = function () {
@@ -1632,8 +1632,8 @@ var Plottable;
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
         };
-        QuantitativeScale.prototype.extentOfValues = function (data) {
-            var extent = d3.extent(data);
+        QuantitativeScale.prototype.extentOfValues = function (values) {
+            var extent = d3.extent(values);
             if (extent[0] == null || extent[1] == null) {
                 return [];
             }
@@ -1979,8 +1979,8 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Category.prototype.extentOfValues = function (data) {
-                return Plottable.Utils.Methods.uniq(data);
+            Category.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
             };
             Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2124,8 +2124,8 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
-            Color.prototype.extentOfValues = function (data) {
-                return Plottable.Utils.Methods.uniq(data);
+            Color.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
@@ -2317,8 +2317,8 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
-            InterpolatedColor.prototype.extentOfValues = function (data) {
-                var extent = d3.extent(data);
+            InterpolatedColor.prototype.extentOfValues = function (values) {
+                var extent = d3.extent(values);
                 if (extent[0] == null || extent[1] == null) {
                     return [];
                 }

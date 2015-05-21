@@ -369,33 +369,33 @@ describe("Scales", () => {
 
   describe("extent calculation", () => {
     it("categoryScale gives the unique values when domain is stringy", () => {
-      var domain = ["1", "3", "2", "1"];
+      var values = ["1", "3", "2", "1"];
       var scale = new Plottable.Scales.Category();
-      var computedExtent = scale.extentOfValues(domain);
+      var computedExtent = scale.extentOfValues(values);
 
       assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
     });
 
     it("categoryScale gives the unique values when domain is numeric", () => {
-      var domain = [1, 3, 2, 1];
+      var values = [1, 3, 2, 1];
       var scale = new Plottable.Scales.Category();
-      var computedExtent = scale.extentOfValues(<any>domain);
+      var computedExtent = scale.extentOfValues(<any>values);
 
       assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
     });
 
     it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {
-      var domain = ["1", "3", "2", "1"];
+      var values = ["1", "3", "2", "1"];
       var scale = new Plottable.QuantitativeScale();
-      var computedExtent = scale.extentOfValues(domain);
+      var computedExtent = scale.extentOfValues(values);
 
       assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
     });
 
     it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", () => {
-      var domain = [1, 3, 2, 1];
+      var values = [1, 3, 2, 1];
       var scale = new Plottable.QuantitativeScale();
-      var computedExtent = scale.extentOfValues(domain);
+      var computedExtent = scale.extentOfValues(values);
 
       assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
     });
@@ -405,10 +405,10 @@ describe("Scales", () => {
       var date2 = new Date(2015, 2, 24, 19, 0, 0);
       var date3 = new Date(2015, 2, 25, 19, 0, 0);
       var date4 = new Date(2015, 2, 26, 19, 0, 0);
-      var domain = [date1, date2, date3, date4];
+      var values = [date1, date2, date3, date4];
 
       var scale = new Plottable.Scales.Time();
-      var computedExtent = scale.extentOfValues(domain);
+      var computedExtent = scale.extentOfValues(values);
 
       assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
     });

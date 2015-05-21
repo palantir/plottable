@@ -32,7 +32,7 @@ module Plottable {
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
-    public extentOfValues(data: D[]): D[] {
+    public extentOfValues(values: D[]): D[] {
       return []; // this should be overwritten
     }
 
