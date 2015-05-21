@@ -175,7 +175,7 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth  = Utils.DOM.getElementWidth(elem);
+          availableWidth = Utils.DOM.getElementWidth(elem);
           availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
@@ -198,7 +198,7 @@ module Plottable {
     protected _getSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
-        width: this.fixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
         height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }

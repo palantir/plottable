@@ -121,7 +121,7 @@ export module Utils {
     export function uniq<T>(arr: T[]): T[] {
       var seen: D3.Set<T> = d3.set();
       var result: T[] = [];
-      arr.forEach((x) =>  {
+      arr.forEach((x) => {
         if (!seen.has(x)) {
           seen.add(x);
           result.push(x);
