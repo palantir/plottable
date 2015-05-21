@@ -144,10 +144,6 @@ export module Drawers {
       return "";
     }
 
-    public _getPixelPoint(datum: any, index: number): Point {
-      return null;
-    }
-
     public _getSelection(index: number): D3.Selection {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);

@@ -222,7 +222,6 @@ describe("Plots", () => {
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
@@ -230,7 +229,6 @@ describe("Plots", () => {
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (key: string) => {
@@ -245,6 +243,15 @@ describe("Plots", () => {
       plot.addDataset(dataset1);
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
+
+      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
+          return data1PointConverter(datum, index);
+        } else {
+          return data2PointConverter(datum, index);
+        }
+      };
+
       plot.renderTo(svg);
 
       var allPlotData = plot.getAllPlotData();
@@ -288,7 +295,10 @@ describe("Plots", () => {
       circles.exit().remove();
       (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
       (<any> mockDrawer)._getSelector = () => "circle";
-      (<any> mockDrawer)._getPixelPoint = dataPointConverter;
+
+      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        return dataPointConverter(datum, index);
+      };
 
       // Mock _getDrawer to return the mock drawer
       (<any> plot)._getDrawer = () => mockDrawer;
@@ -329,14 +339,12 @@ describe("Plots", () => {
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (key: string) => {
@@ -347,8 +355,18 @@ describe("Plots", () => {
         }
       };
 
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
+      var dataset1 = new Plottable.Dataset(data1);
+      plot.addDataset(dataset1);
+      var dataset2 = new Plottable.Dataset(data2);
+      plot.addDataset(dataset2);
+
+      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
+          return data1PointConverter(datum, index);
+        } else {
+          return data2PointConverter(datum, index);
+        }
+      };
       plot.renderTo(svg);
 
       var queryPoint = {x: 1, y: 11};

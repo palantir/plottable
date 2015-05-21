@@ -79,8 +79,9 @@ export module Plots {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
+        var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
+          var pixelPoint = this._getPixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
@@ -149,6 +150,11 @@ export module Plots {
         pixelPoints: closestPixelPoints,
         selection: d3.selectAll(closestElements)
       };
+    }
+
+    public _getPixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      var attrToProjector = this._generateAttrToProjector();
+      return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
     }
   }
 }

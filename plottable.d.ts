@@ -1262,7 +1262,6 @@ declare module Plottable {
              */
             _getRenderArea(): D3.Selection;
             _getSelector(): string;
-            _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
         }
     }
@@ -1278,7 +1277,6 @@ declare module Plottable {
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
-            _getPixelPoint(datum: any, index: number): Point;
             _getSelection(index: number): D3.Selection;
         }
     }
@@ -1332,7 +1330,6 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
-            _getPixelPoint(datum: any, index: number): Point;
             draw(data: any[], drawSteps: DrawStep[], userMetadata: any): number;
         }
     }
@@ -2548,6 +2545,7 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
+        protected _getPixelPoint(datum: any, index: number, dataset: Dataset): Point;
     }
 }
 
@@ -2575,6 +2573,10 @@ declare module Plottable {
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
+            _getPixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: number;
+                y: number;
+            };
         }
     }
 }
@@ -2672,6 +2674,10 @@ declare module Plottable {
             y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
             y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _getPixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: any;
+                y: any;
+            };
         }
     }
 }
@@ -2697,6 +2703,10 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _getPixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: any;
+                y: any;
+            };
         }
     }
 }
@@ -2859,6 +2869,10 @@ declare module Plottable {
              */
             protected _getBarPixelWidth(): number;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            protected _getPixelPoint(datum: any, index: number, dataset: Dataset): {
+                x: any;
+                y: any;
+            };
         }
     }
 }
@@ -2894,6 +2908,7 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
+            _getPixelPoint(datum: any, index: number, dataset: Dataset): Point;
         }
     }
 }

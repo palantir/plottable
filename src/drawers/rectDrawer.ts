@@ -84,16 +84,6 @@ export module Drawers {
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
 
-    public _getPixelPoint(datum: any, index: number): Point {
-      var rectX = this._attrToProjector["x"](datum, index);
-      var rectY = this._attrToProjector["y"](datum, index);
-      var rectWidth = this._attrToProjector["width"](datum, index);
-      var rectHeight = this._attrToProjector["height"](datum, index);
-      var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
-      var y = this._isVertical ? rectY : rectY + rectHeight / 2;
-      return { x: x, y: y };
-    }
-
     public draw(data: any[], drawSteps: DrawStep[], userMetadata: any) {
       var attrToProjector = drawSteps[0].attrToProjector;
       var isValidNumber = Plottable.Utils.Methods.isValidNumber;

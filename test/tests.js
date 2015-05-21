@@ -419,73 +419,7 @@ describe("Drawers", function () {
 
 ///<reference path="../testReference.ts" />
 describe("Drawers", function () {
-    describe("Rect Drawer", function () {
-        it("getPixelPoint vertical", function () {
-            var svg = TestMethods.generateSVG(300, 300);
-            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
-            var xScale = new Plottable.Scales.Category();
-            var yScale = new Plottable.Scales.Linear();
-            var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            var drawer = new Plottable.Drawers.Rect("_0", true); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            barPlot._getDrawer = function () { return drawer; };
-            barPlot.addDataset(new Plottable.Dataset(data));
-            barPlot.x(function (d) { return d.a; }, xScale);
-            barPlot.y(function (d) { return d.b; }, yScale);
-            barPlot.renderTo(svg);
-            barPlot.getAllSelections().each(function (datum, index) {
-                var selection = d3.select(this);
-                var pixelPoint = drawer._getPixelPoint(datum, index);
-                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")) / 2, 1, "x coordinate correct");
-                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")), 1, "y coordinate correct");
-            });
-            svg.remove();
-        });
-        it("getPixelPoint horizontal", function () {
-            var svg = TestMethods.generateSVG(300, 300);
-            var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Category();
-            var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            barPlot.orientation(Plottable.Orientation.HORIZONTAL);
-            var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            barPlot._getDrawer = function () { return drawer; };
-            barPlot.addDataset(new Plottable.Dataset(data));
-            barPlot.x(function (d) { return d.x; }, xScale);
-            barPlot.y(function (d) { return d.y; }, yScale);
-            barPlot.renderTo(svg);
-            barPlot.getAllSelections().each(function (datum, index) {
-                var selection = d3.select(this);
-                var pixelPoint = drawer._getPixelPoint(datum, index);
-                assert.closeTo(pixelPoint.x, parseFloat(selection.attr("x")) + parseFloat(selection.attr("width")), 1, "x coordinate correct");
-                assert.closeTo(pixelPoint.y, parseFloat(selection.attr("y")) + parseFloat(selection.attr("height")) / 2, 1, "y coordinate correct");
-            });
-            svg.remove();
-        });
-    });
-});
-
-///<reference path="../testReference.ts" />
-describe("Drawers", function () {
     describe("Line Drawer", function () {
-        it("getPixelPoint", function () {
-            var svg = TestMethods.generateSVG(300, 300);
-            var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Linear();
-            var linePlot = new Plottable.Plots.Line(xScale, yScale);
-            var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-            linePlot._getDrawer = function () { return drawer; };
-            linePlot.addDataset(new Plottable.Dataset(data));
-            linePlot.x(function (d) { return d.a; }, xScale);
-            linePlot.y(function (d) { return d.b; }, yScale);
-            linePlot.renderTo(svg);
-            data.forEach(function (datum, index) {
-                var pixelPoint = drawer._getPixelPoint(datum, index);
-                assert.closeTo(pixelPoint.x, xScale.scale(datum.a), 1, "x coordinate correct for index " + index);
-                assert.closeTo(pixelPoint.y, yScale.scale(datum.b), 1, "y coordinate correct for index " + index);
-            });
-            svg.remove();
-        });
         it("getSelection", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
@@ -2289,14 +2223,12 @@ describe("Plots", function () {
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
-            mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
-            mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
                 if (key === "_0") {
@@ -2310,6 +2242,14 @@ describe("Plots", function () {
             plot.addDataset(dataset1);
             var dataset2 = new Plottable.Dataset(data2);
             plot.addDataset(dataset2);
+            plot._getPixelPoint = function (datum, index, dataset) {
+                if (dataset === dataset1) {
+                    return data1PointConverter(datum, index);
+                }
+                else {
+                    return data2PointConverter(datum, index);
+                }
+            };
             plot.renderTo(svg);
             var allPlotData = plot.getAllPlotData();
             assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
@@ -2347,7 +2287,9 @@ describe("Plots", function () {
             circles.exit().remove();
             mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer._getSelector = function () { return "circle"; };
-            mockDrawer._getPixelPoint = dataPointConverter;
+            plot._getPixelPoint = function (datum, index, dataset) {
+                return dataPointConverter(datum, index);
+            };
             // Mock _getDrawer to return the mock drawer
             plot._getDrawer = function () { return mockDrawer; };
             var dataset = new Plottable.Dataset(data);
@@ -2383,13 +2325,11 @@ describe("Plots", function () {
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
-            mockDrawer1._getPixelPoint = data1PointConverter;
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
-            mockDrawer2._getPixelPoint = data2PointConverter;
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (key) {
                 if (key === "ds1") {
@@ -2399,8 +2339,18 @@ describe("Plots", function () {
                     return mockDrawer2;
                 }
             };
-            plot.addDataset(new Plottable.Dataset(data1));
-            plot.addDataset(new Plottable.Dataset(data2));
+            var dataset1 = new Plottable.Dataset(data1);
+            plot.addDataset(dataset1);
+            var dataset2 = new Plottable.Dataset(data2);
+            plot.addDataset(dataset2);
+            plot._getPixelPoint = function (datum, index, dataset) {
+                if (dataset === dataset1) {
+                    return data1PointConverter(datum, index);
+                }
+                else {
+                    return data2PointConverter(datum, index);
+                }
+            };
             plot.renderTo(svg);
             var queryPoint = { x: 1, y: 11 };
             var closestPlotData = plot.getClosestPlotData(queryPoint);
