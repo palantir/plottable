@@ -54,7 +54,8 @@ module Plottable {
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        datasets: Dataset[]) {
 
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
 
@@ -73,13 +74,17 @@ module Plottable {
         });
       });
 
+      console.log(1);
+
+
       var stackOffsets = StackedPlotUtils.generateStackOffsets(
         StackedPlotUtils.stack(positiveDataMapArray, domainKeys),
         StackedPlotUtils.stack(negativeDataMapArray, domainKeys),
         keyAccessor,
         valueAccessor,
         datasetKeys,
-        keyToPlotDatasetKey);
+        keyToPlotDatasetKey,
+        datasets);
 
       return stackOffsets;
     }
@@ -177,7 +182,8 @@ module Plottable {
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>) {
+        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
+        datasets: Dataset[]) {
 
       var stackOffsets: { [key: string]: D3.Map<number> } = {};
 
