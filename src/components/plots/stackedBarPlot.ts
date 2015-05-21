@@ -13,9 +13,10 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale the x scale of the plot.
      * @param {Scale} yScale the y scale of the plot.
+     * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>) {
-      super(xScale, yScale);
+    constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical = true) {
+      super(xScale, yScale, isVertical);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
     }
