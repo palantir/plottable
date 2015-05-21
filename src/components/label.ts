@@ -14,12 +14,11 @@ export module Components {
     /**
      * Creates a Label.
      *
-     * A label is component that renders just text. The most common use of
-     * labels is to create a title or axis labels.
+     * A Label is a Component that draws a single line of text.
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
-     * @param {number} angle The rotation angle of the text (default = 0). 
+     * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
      */
     constructor(displayText = "", angle = 0) {
       super();
@@ -82,7 +81,7 @@ export module Components {
     /**
      * Sets the angle of the Label.
      *
-     * @param {number} angle If provided, the desired angle (0/-90/90)
+     * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
      * @returns {Label} The calling Label.
      */
     public angle(angle: number): Label;
