@@ -54,7 +54,6 @@ describe("Scales", () => {
       scale.padProportion(0);
       var singleValue = 15;
       scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[singleValue, singleValue]]);
-      scale.autoDomain();
       assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
     });
 
@@ -139,7 +138,6 @@ describe("Scales", () => {
     it("gives reasonable values for ticks()", () => {
       var providedExtents = [[0, base / 2]];
       scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => providedExtents);
-      scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
 

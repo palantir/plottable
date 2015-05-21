@@ -1446,10 +1446,12 @@ var Plottable;
         };
         Scale.prototype.addExtentsProvider = function (provider) {
             this._extentsProviders.add(provider);
+            this._autoDomainIfAutomaticMode();
             return this;
         };
         Scale.prototype.removeExtentsProvider = function (provider) {
             this._extentsProviders.delete(provider);
+            this._autoDomainIfAutomaticMode();
             return this;
         };
         return Scale;
@@ -6255,7 +6257,7 @@ var Plottable;
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
+            this._scales().forEach(function (scale) { return scale.addExtentsProvider(_this._extentsProvider); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             // Filters should never be applied to attributes
@@ -6516,12 +6518,10 @@ var Plottable;
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
             scale.removeExtentsProvider(this._extentsProvider);
-            scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
             scale.addExtentsProvider(this._extentsProvider);
-            scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._generatePropertyToProjectors = function () {
             var attrToProjector = {};

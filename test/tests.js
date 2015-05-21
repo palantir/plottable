@@ -7096,7 +7096,6 @@ describe("Scales", function () {
             var scale = new Plottable.Scales.Linear();
             var singleValue = 15;
             scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
-            scale.autoDomain();
             assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
         });
         it("domainMin()", function () {
@@ -7120,7 +7119,6 @@ describe("Scales", function () {
             scale.domainMin(minInMiddle);
             var requestedDomain2 = [-10, 10];
             scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-            scale._autoDomainIfAutomaticMode();
             assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
         });
         it("domainMax()", function () {
@@ -7144,7 +7142,6 @@ describe("Scales", function () {
             scale.domainMax(maxInMiddle);
             var requestedDomain2 = [-10, 10];
             scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-            scale._autoDomainIfAutomaticMode();
             assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
         });
         it("domainMin() and domainMax() together", function () {
@@ -7230,10 +7227,8 @@ describe("Scales", function () {
             });
             it("addExtentsProvider()", function () {
                 scale.addExtentsProvider(function (scale) { return [[0, 10]]; });
-                scale.autoDomain();
                 assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
                 scale.addExtentsProvider(function (scale) { return [[-10, 0]]; });
-                scale.autoDomain();
                 assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
             });
             it("removeExtentsProvider()", function () {
@@ -7241,10 +7236,8 @@ describe("Scales", function () {
                 scale.addExtentsProvider(posProvider);
                 var negProvider = function (scale) { return [[-10, 0]]; };
                 scale.addExtentsProvider(negProvider);
-                scale.autoDomain();
                 assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
                 scale.removeExtentsProvider(negProvider);
-                scale.autoDomain();
                 assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
             });
             it("should resize when a plot is removed", function () {
@@ -7324,7 +7317,6 @@ describe("Scales", function () {
             scale.padProportion(0);
             var singleValue = 15;
             scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
-            scale.autoDomain();
             assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
         });
         it("domainMin()", function () {
@@ -7391,7 +7383,6 @@ describe("Scales", function () {
         it("gives reasonable values for ticks()", function () {
             var providedExtents = [[0, base / 2]];
             scale.addExtentsProvider(function (scale) { return providedExtents; });
-            scale.autoDomain();
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
             providedExtents = [[-base * 2, base * 2]];

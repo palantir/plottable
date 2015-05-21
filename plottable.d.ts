@@ -704,7 +704,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
-        _autoDomainIfAutomaticMode(): void;
+        protected _autoDomainIfAutomaticMode(): void;
         /**
          * Computes the range value corresponding to a given domain value. In other
          * words, apply the function to value.
@@ -832,7 +832,7 @@ declare module Plottable {
          * numbers.
          */
         _niceDomain(domain: D[], count?: number): D[];
-        _defaultExtent(): D[];
+        protected _defaultExtent(): D[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -864,7 +864,7 @@ declare module Plottable {
              */
             constructor();
             constructor(scale: D3.Scale.LinearScale);
-            _defaultExtent(): number[];
+            protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
         }
     }
@@ -922,7 +922,7 @@ declare module Plottable {
              * @returns {ModifiedLog} The calling ModifiedLog.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
-            _defaultExtent(): number[];
+            protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
         }
     }
@@ -1047,7 +1047,7 @@ declare module Plottable {
              */
             tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
-            _defaultExtent(): Date[];
+            protected _defaultExtent(): Date[];
             protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
         }
     }

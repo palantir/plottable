@@ -200,7 +200,7 @@ export module Scales {
       }
     }
 
-    public _defaultExtent(): number[] {
+    protected _defaultExtent(): number[] {
       return [0, this._base];
     }
 
