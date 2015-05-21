@@ -25,6 +25,10 @@ export module Scales {
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
     }
 
+    public getExtendFromData(data: string[]): string[] {
+      return Utils.Methods.uniq(data);
+    }
+
     protected _getExtent(): string[] {
       var extents: string[][] = this._getAllExtents();
       return Utils.Methods.uniq(Utils.Methods.flatten(extents));

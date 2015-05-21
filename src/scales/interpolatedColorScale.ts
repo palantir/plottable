@@ -58,8 +58,8 @@ export module Scales {
 
     /**
      * An InterpolatedColorScale maps numbers to color strings.
-     * 
-     * @param {string[]} colors an array of strings representing color values in hex 
+     *
+     * @param {string[]} colors an array of strings representing color values in hex
      *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
      * @param {string} scaleType a string representing the underlying scale
      *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
@@ -88,9 +88,18 @@ export module Scales {
       this._d3Scale = this._D3InterpolatedScale();
     }
 
+    public getExtendFromData(data: number[]): number[] {
+      var extent = d3.extent(data);
+      if (extent[0] == null || extent[1] == null) {
+        return [];
+      } else {
+        return extent;
+      }
+    }
+
     /**
      * Generates the converted QuantitativeScale.
-     * 
+     *
      * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
     private _D3InterpolatedScale(): D3.Scale.QuantitativeScale<number> {
@@ -99,7 +108,7 @@ export module Scales {
 
     /**
      * Generates the d3 interpolator for colors.
-     * 
+     *
      * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
      */
     private _interpolateColors(): D3.Transition.Interpolate {

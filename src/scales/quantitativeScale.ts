@@ -21,6 +21,15 @@ module Plottable {
       throw new Error("Subclasses should override _invert");
     }
 
+    public getExtendFromData(data: D[]): D[] {
+      var extent = d3.extent(data);
+      if (extent[0] == null || extent[1] == null) {
+        return [];
+      } else {
+        return extent;
+      }
+    }
+
     protected _setDomain(values: D[]) {
       var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
       if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {

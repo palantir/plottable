@@ -1495,6 +1495,9 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
+        Scale.prototype.getExtendFromData = function (data) {
+            return [];
+        };
         Scale.prototype._getAllExtents = function () {
             var _this = this;
             return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
@@ -1628,6 +1631,15 @@ var Plottable;
          */
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
+        };
+        QuantitativeScale.prototype.getExtendFromData = function (data) {
+            var extent = d3.extent(data);
+            if (extent[0] == null || extent[1] == null) {
+                return [];
+            }
+            else {
+                return extent;
+            }
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
@@ -1967,6 +1979,9 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
+            Category.prototype.getExtendFromData = function (data) {
+                return Plottable.Utils.Methods.uniq(data);
+            };
             Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
@@ -2109,6 +2124,9 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
+            Color.prototype.getExtendFromData = function (data) {
+                return Plottable.Utils.Methods.uniq(data);
+            };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2299,6 +2317,15 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
+            InterpolatedColor.prototype.getExtendFromData = function (data) {
+                var extent = d3.extent(data);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                }
+                else {
+                    return extent;
+                }
+            };
             /**
              * Generates the converted QuantitativeScale.
              *
@@ -6358,30 +6385,23 @@ var Plottable;
             extents.set(key, this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
-                return _this._computeExtent(dataset, accScaleBinding.accessor, filter);
+                return _this._computeExtent(dataset, accScaleBinding, filter);
             }));
         };
-        Plot.prototype._computeExtent = function (dataset, accessor, filter) {
+        Plot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+            var accessor = accScaleBinding.accessor;
+            var scale = accScaleBinding.scale;
             var data = dataset.data();
             if (filter != null) {
                 data = data.filter(function (d, i) { return filter(d, i, dataset); });
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = data.map(appliedAccessor);
-            if (mappedData.length === 0) {
-                return [];
-            }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
+            if (scale) {
+                return scale.getExtendFromData(mappedData);
             }
             else {
-                var extent = d3.extent(mappedData);
-                if (extent[0] == null || extent[1] == null) {
-                    return [];
-                }
-                else {
-                    return extent;
-                }
+                return [];
             }
         };
         /**
