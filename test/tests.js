@@ -1176,7 +1176,8 @@ describe("NumericAxis", function () {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
+        var yLabel = new Plottable.Components.AxisLabel("LABEL");
+        yLabel.angle(-90);
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.x(function (d) { return d.x; }, xScale);
         barPlot.y(function (d) { return d.y; }, yScale);
@@ -1505,7 +1506,8 @@ describe("Labels", function () {
     });
     it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
+        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL");
+        label.angle(-90);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1517,7 +1519,8 @@ describe("Labels", function () {
     });
     it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
+        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL");
+        label.angle(90);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1579,7 +1582,7 @@ describe("Labels", function () {
         svg.remove();
     });
     it("unsupported alignments and orientations are unsupported", function () {
-        assert.throws(function () { return new Plottable.Components.Label("foo", "bar"); }, Error, "not a valid orientation");
+        assert.throws(function () { return new Plottable.Components.Label("foo").angle(10); }, Error, "10 is not a valid angle for Label");
     });
     it("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
@@ -1589,7 +1592,7 @@ describe("Labels", function () {
         var text = content.select("text");
         var bbox = Plottable.Utils.DOM.getBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
-        label.orientation("right");
+        label.angle(90);
         text = content.select("text");
         bbox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);

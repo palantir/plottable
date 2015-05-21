@@ -24,7 +24,8 @@ describe("Labels", () => {
 
   it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", "left");
+    var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL");
+    label.angle(-90);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -37,7 +38,8 @@ describe("Labels", () => {
 
   it("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", "right");
+    var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL");
+    label.angle(90);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -106,7 +108,7 @@ describe("Labels", () => {
   });
 
   it("unsupported alignments and orientations are unsupported", () => {
-    assert.throws(() => new Plottable.Components.Label("foo", "bar"), Error, "not a valid orientation");
+    assert.throws(() => new Plottable.Components.Label("foo").angle(10), Error, "10 is not a valid angle for Label");
   });
 
   it("Label orientation can be changed after label is created", () => {
@@ -119,7 +121,7 @@ describe("Labels", () => {
     var bbox = Plottable.Utils.DOM.getBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
-    label.orientation("right");
+    label.angle(90);
     text = content.select("text");
     bbox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);

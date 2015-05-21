@@ -304,7 +304,9 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scales.Category();
     var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Components.AxisLabel("LABEL", "left");
+
+    var yLabel = new Plottable.Components.AxisLabel("LABEL");
+    yLabel.angle(-90);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.x((d: any) => d.x, xScale);
     barPlot.y((d: any) => d.y, yScale);

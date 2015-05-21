@@ -5018,22 +5018,20 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
-            function Label(displayText, orientation) {
+            function Label(displayText) {
                 if (displayText === void 0) { displayText = ""; }
-                if (orientation === void 0) { orientation = "horizontal"; }
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                this.orientation(orientation);
+                this.angle(0);
                 this.xAlignment("center").yAlignment("center");
                 this._padding = 0;
             }
             Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this._measurer.measure(this._text);
-                var desiredWidth = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-                var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+                var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+                var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
                     minWidth: desiredWidth,
                     minHeight: desiredHeight
@@ -5057,17 +5055,16 @@ var Plottable;
                     return this;
                 }
             };
-            Label.prototype.orientation = function (orientation) {
-                if (orientation == null) {
-                    return this._orientation;
+            Label.prototype.angle = function (angle) {
+                if (angle == null) {
+                    return this._angle;
                 }
                 else {
-                    orientation = orientation.toLowerCase();
-                    if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-                        this._orientation = orientation;
+                    if (angle === -90 || angle === 0 || angle === 90) {
+                        this._angle = angle;
                     }
                     else {
-                        throw new Error(orientation + " is not a valid orientation for LabelComponent");
+                        throw new Error(angle + " is not a valid angle for Label");
                     }
                     this.redraw();
                     return this;
@@ -5103,12 +5100,11 @@ var Plottable;
                 this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                var textRotation = { horizontal: 0, right: 90, left: -90 };
                 var writeOptions = {
                     selection: this._textContainer,
                     xAlign: this.xAlignment(),
                     yAlign: this.yAlignment(),
-                    textRotation: textRotation[this.orientation()]
+                    textRotation: this.angle()
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
                 return this;
@@ -5123,8 +5119,8 @@ var Plottable;
              *
              * @constructor
              */
-            function TitleLabel(text, orientation) {
-                _super.call(this, text, orientation);
+            function TitleLabel(text) {
+                _super.call(this, text);
                 this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
@@ -5138,8 +5134,8 @@ var Plottable;
              *
              * @constructor
              */
-            function AxisLabel(text, orientation) {
-                _super.call(this, text, orientation);
+            function AxisLabel(text) {
+                _super.call(this, text);
                 this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";

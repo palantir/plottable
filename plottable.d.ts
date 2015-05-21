@@ -2022,9 +2022,8 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
-            constructor(displayText?: string, orientation?: string);
+            constructor(displayText?: string);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -2041,19 +2040,18 @@ declare module Plottable {
              */
             text(displayText: string): Label;
             /**
-             * Gets the orientation of the Label.
+             * Gets the angle of the Label.
              *
-             * @returns {string} the current orientation.
+             * @returns {number} the current angle.
              */
-            orientation(): string;
+            angle(): number;
             /**
-             * Sets the orientation of the Label.
+             * Sets the angle of the Label.
              *
-             * @param {string} newOrientation If provided, the desired orientation
-             * (horizontal/left/right).
+             * @param {number} angle If provided, the desired angle (0/-90/90)
              * @returns {Label} The calling Label.
              */
-            orientation(orientation: string): Label;
+            angle(angle: number): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2078,7 +2076,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string, orientation?: string);
+            constructor(text?: string);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
@@ -2087,7 +2085,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string, orientation?: string);
+            constructor(text?: string);
         }
     }
 }
