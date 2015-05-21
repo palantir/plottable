@@ -8057,7 +8057,7 @@ var Plottable;
             var stackOffsets = new Plottable.Utils.Map();
             // datasetKeys.forEach((k, index) => {
             datasets.forEach(function (dataset, index) {
-                stackOffsets.set(dataset, d3.map());
+                var datasetOffset = d3.map();
                 var positiveDataMap = positiveDataMapArray[index];
                 var negativeDataMap = negativeDataMapArray[index];
                 var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset) <= 0; });
@@ -8073,9 +8073,9 @@ var Plottable;
                     else {
                         offset = value > 0 ? positiveOffset : negativeOffset;
                     }
-                    // Can be improved by just setting this at the very end
-                    stackOffsets.get(dataset).set(key, offset);
+                    datasetOffset.set(key, offset);
                 });
+                stackOffsets.set(dataset, datasetOffset);
             });
             return stackOffsets;
         };
