@@ -373,15 +373,15 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Category();
       var computedExtent = scale.getExtentFromData(domain);
 
-      assert.deepEqual(computedExtent, ["1", "3", "2"], "The extent is made of all the unique values in the domain");
+      assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
     });
 
     it("categoryScale gives the unique values when domain is numeric", () => {
       var domain = [1, 3, 2, 1];
       var scale = new Plottable.Scales.Category();
-      var computedExtent = scale.getExtentFromData(domain);
+      var computedExtent = scale.getExtentFromData(<any>domain);
 
-      assert.deepEqual(computedExtent, [1, 3, 2], "The extent is made of all the unique values in the domain");
+      assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
     });
 
     it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {
@@ -389,7 +389,7 @@ describe("Scales", () => {
       var scale = new Plottable.QuantitativeScale();
       var computedExtent = scale.getExtentFromData(domain);
 
-      assert.deepEqual(computedExtent, ["1", "3"], "The extent is the miminum and the maximum value in the domain");
+      assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
     });
 
     it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", () => {
@@ -397,7 +397,7 @@ describe("Scales", () => {
       var scale = new Plottable.QuantitativeScale();
       var computedExtent = scale.getExtentFromData(domain);
 
-      assert.deepEqual(computedExtent, [1, 3], "The extent is the miminum and the maximum value in the domain");
+      assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
     });
 
     it("timeScale extent calculation works as expected", () => {
