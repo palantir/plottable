@@ -49,9 +49,6 @@ function run(svg, data, Plottable) {
     .animate(true);
 
   var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, "horizontal");
-  if (typeof horizontalPlot.orientation === "function") {
-    horizontalPlot.orientation("horizontal");
-  }
   horizontalPlot.x(function(d) { return d.earnings; }, xScale2)
     .y(function(d) { return d.quarter; }, yScale2)
     .attr("fill", function(d) { return d.team; }, colorScale)
