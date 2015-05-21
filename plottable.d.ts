@@ -2531,6 +2531,7 @@ declare module Plottable {
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _generatePropertyToProjectors(): AttributeToProjector;
+        protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
     }
 }
 
@@ -2557,6 +2558,7 @@ declare module Plottable {
             outerRadius<R>(): AccessorScaleBinding<R, number>;
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            protected _generatePropertyToProjectors(): AttributeToProjector;
         }
     }
 }
@@ -2651,6 +2653,7 @@ declare module Plottable {
             y2(): AccessorScaleBinding<Y, number>;
             y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
             y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            protected _generatePropertyToProjectors(): AttributeToProjector;
         }
     }
 }
@@ -2885,6 +2888,7 @@ declare module Plottable {
             protected _updateYDomainer(): void;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
+            protected _generatePropertyToProjectors(): AttributeToProjector;
         }
     }
 }

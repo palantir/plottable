@@ -108,6 +108,15 @@ export module Plots {
       this.renderImmediately();
       return this;
     }
+
+    protected _generatePropertyToProjectors(): AttributeToProjector {
+      var attrToProjector = super._generatePropertyToProjectors();
+      attrToProjector["x1"] = Plot._scaledAccessor(this.x1());
+      attrToProjector["y2"] = Plot._scaledAccessor(this.y2());
+      attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
+      attrToProjector["y1"] = Plot._scaledAccessor(this.y1());
+      return attrToProjector;
+    }
   }
 }
 }

@@ -97,6 +97,14 @@ export module Plots {
       this.renderImmediately();
       return this;
     }
+
+    protected _generatePropertyToProjectors(): AttributeToProjector {
+      var attrToProjector = super._generatePropertyToProjectors();
+      attrToProjector[Pie._INNER_RADIUS_KEY] = Plot._scaledAccessor(this.innerRadius());
+      attrToProjector[Pie._OUTER_RADIUS_KEY] = Plot._scaledAccessor(this.outerRadius());
+      attrToProjector[Pie._SECTOR_VALUE_KEY] = Plot._scaledAccessor(this.sectorValue());
+      return attrToProjector;
+    }
   }
 }
 }
