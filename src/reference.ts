@@ -2,6 +2,7 @@
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 /// <reference path="utils/utils.ts" />
+/// <reference path="utils/d3ScaleUtils.ts" />
 /// <reference path="utils/map.ts" />
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
@@ -15,7 +16,6 @@
 
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
-/// <reference path="core/colors.ts" />
 
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />

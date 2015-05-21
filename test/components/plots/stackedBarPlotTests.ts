@@ -20,7 +20,8 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category();
-      yScale = new Plottable.Scales.Linear().domain([0, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 3]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -221,7 +222,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([0, 6]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 6]);
       yScale = new Plottable.Scales.Category();
 
       var data1 = [
@@ -235,7 +237,8 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
+      renderer = new Plottable.Plots.StackedBar(xScale, yScale);
+      renderer.orientation(Plottable.Orientation.HORIZONTAL);
       renderer.y((d) => d.name, yScale);
       renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
@@ -370,7 +373,8 @@ describe("Plots", () => {
         {y: "C", x: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
+      plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      plot.orientation(Plottable.Orientation.HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
@@ -418,13 +422,15 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      plot.addDataset(ds1);
+      plot.addDataset(ds2);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
-      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
+      var ds1FirstColumnOffset = (<any> plot)._stackOffsets.get(ds1).get("A");
+      var ds2FirstColumnOffset = (<any> plot)._stackOffsets.get(ds2).get("A");
 
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
@@ -454,18 +460,22 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
 
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
-      plot.addDataset(new Plottable.Dataset(data3));
-      plot.addDataset(new Plottable.Dataset(data4));
-      plot.addDataset(new Plottable.Dataset(data5));
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      var ds5 = new Plottable.Dataset(data5);
+      plot.addDataset(ds1);
+      plot.addDataset(ds2);
+      plot.addDataset(ds3);
+      plot.addDataset(ds4);
+      plot.addDataset(ds5);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var keys = (<any> plot)._key2PlotDatasetKey.keys();
-      var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
-      var offset2 = (<any> plot)._key2PlotDatasetKey.get(keys[2]).plotMetadata.offsets.get("A");
-      var offset4 = (<any> plot)._key2PlotDatasetKey.get(keys[4]).plotMetadata.offsets.get("A");
+      var offset0 = (<any> plot)._stackOffsets.get(ds1).get("A");
+      var offset2 = (<any> plot)._stackOffsets.get(ds3).get("A");
+      var offset4 = (<any> plot)._stackOffsets.get(ds5).get("A");
 
       assert.strictEqual(offset0, 0,
         "Plot columns should start from offset 0 (at the very bottom)");
