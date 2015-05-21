@@ -304,11 +304,12 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scales.Category();
     var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Components.Label("LABEL", "left");
-    yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+
+    var yLabel = new Plottable.Components.AxisLabel("LABEL");
+    yLabel.angle(-90);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     barPlot.addDataset(dataset);
 
     var chart = new Plottable.Components.Table([
