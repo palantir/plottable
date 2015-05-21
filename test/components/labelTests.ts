@@ -6,8 +6,7 @@ describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {
     var svg = TestMethods.generateSVG(400, 80);
-    var label = new Plottable.Components.Label("A CHART TITLE");
-    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+    var label = new Plottable.Components.TitleLabel("A CHART TITLE");
     label.renderTo(svg);
 
     var content = (<any> label)._content;
@@ -23,40 +22,37 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
   it("Left-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.Label("LEFT-ROTATED LABEL");
+    var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL");
     label.angle(-90);
-    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
     var textBBox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
   it("Right-rotated text is handled properly", () => {
     var svg = TestMethods.generateSVG(100, 400);
-    var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL");
+    var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL");
     label.angle(90);
-    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
     var textBBox = Plottable.Utils.DOM.getBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+    assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
     svg.remove();
   });
 
   it("Label text can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 80);
-    var label = new Plottable.Components.Label("a");
-    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+    var label = new Plottable.Components.TitleLabel("a");
     label.renderTo(svg);
     assert.strictEqual((<any> label)._content.select("text").text(), "a", "the text starts at the specified string");
     assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -67,12 +63,10 @@ describe("Labels", () => {
     svg.remove();
   });
 
-  // skipping because Dan is rewriting labels and the height test fails
-  it.skip("Superlong text is handled in a sane fashion", () => {
+  it("Superlong text is handled in a sane fashion", () => {
     var svgWidth = 400;
     var svg = TestMethods.generateSVG(svgWidth, 80);
-    var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+    var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
@@ -84,8 +78,7 @@ describe("Labels", () => {
 
   it("text in a tiny box is truncated to empty string", () => {
     var svg = TestMethods.generateSVG(10, 10);
-    var label = new Plottable.Components.Label("Yeah, not gonna fit...");
-    label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+    var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
     label.renderTo(svg);
     var text = (<any> label)._content.select("text");
     assert.strictEqual(text.text(), "", "text was truncated to empty string");
@@ -107,7 +100,7 @@ describe("Labels", () => {
 
   it("if a label text is changed to empty string, width updates to 0", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var label = new Plottable.Components.Label("foo");
+    var label = new Plottable.Components.TitleLabel("foo");
     label.renderTo(svg);
     label.text("");
     assert.strictEqual(label.width(), 0, "width updated to 0");
@@ -118,11 +111,9 @@ describe("Labels", () => {
     assert.throws(() => new Plottable.Components.Label("foo").angle(10), Error, "10 is not a valid angle for Label");
   });
 
-  // Skipping due to FF odd client bounding rect computation - #1470.
-  it.skip("Label angle can be changed after label is created", () => {
+  it("Label orientation can be changed after label is created", () => {
     var svg = TestMethods.generateSVG(400, 400);
-    var label = new Plottable.Components.Label("CHANGING ORIENTATION");
-    label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+    var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
     label.renderTo(svg);
 
     var content = (<any> label)._content;

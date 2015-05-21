@@ -3,13 +3,13 @@ module Plottable {
    * Access specific datum property.
    */
   export interface Accessor<T> {
-    (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+    (datum: any, index: number, dataset: Dataset): T;
   }
 
   /**
    * Retrieves scaled datum property.
    */
-  export type _Projector = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
+  export type _Projector = (datum: any, index: number, dataset: Dataset) => any;
 
   /**
    * Projector with dataset and plot metadata

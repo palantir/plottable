@@ -260,7 +260,8 @@ before(function () {
         window.Pixel_CloseTo_Requirement = 2;
     }
     else if (isFirefox) {
-        window.Pixel_CloseTo_Requirement = 1;
+        // HACKHACK #2122
+        window.Pixel_CloseTo_Requirement = 2;
     }
     else {
         window.Pixel_CloseTo_Requirement = 0.5;
@@ -348,7 +349,7 @@ describe("Drawers", function () {
             var ds1 = { attrToProjector: {}, animator: a1 };
             var ds2 = { attrToProjector: {}, animator: a2 };
             var steps = [ds1, ds2];
-            drawer.draw([], steps, null, null);
+            drawer.draw([], steps, null);
             assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
         });
         it("drawer timing works for non-null animators", function (done) {
@@ -372,7 +373,7 @@ describe("Drawers", function () {
             var ds2 = { attrToProjector: {}, animator: a2 };
             var ds3 = { attrToProjector: {}, animator: a3 };
             var steps = [ds1, ds2, ds3];
-            drawer.draw([], steps, null, null);
+            drawer.draw([], steps, null);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
         it("_getSelection", function () {
@@ -444,7 +445,8 @@ describe("Drawers", function () {
             var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Category();
-            var barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+            var barPlot = new Plottable.Plots.Bar(xScale, yScale);
+            barPlot.orientation(Plottable.Orientation.HORIZONTAL);
             var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             barPlot._getDrawer = function () { return drawer; };
             barPlot.addDataset(new Plottable.Dataset(data));
@@ -1174,9 +1176,8 @@ describe("NumericAxis", function () {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
         var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-        var yLabel = new Plottable.Components.Label("LABEL");
+        var yLabel = new Plottable.Components.AxisLabel("LABEL");
         yLabel.angle(-90);
-        yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         var barPlot = new Plottable.Plots.Bar(xScale, yScale);
         barPlot.x(function (d) { return d.x; }, xScale);
         barPlot.y(function (d) { return d.y; }, yScale);
@@ -1490,8 +1491,7 @@ var assert = chai.assert;
 describe("Labels", function () {
     it("Standard text title label generates properly", function () {
         var svg = TestMethods.generateSVG(400, 80);
-        var label = new Plottable.Components.Label("A CHART TITLE");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("A CHART TITLE");
         label.renderTo(svg);
         var content = label._content;
         assert.isTrue(label._element.classed("label"), "title element has label css class");
@@ -1504,38 +1504,35 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
     it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("LEFT-ROTATED LABEL");
+        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL");
         label.angle(-90);
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
     it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.Label("RIGHT-ROTATED LABEL");
+        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL");
         label.angle(90);
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
         var textBBox = Plottable.Utils.DOM.getBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
+        assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
         svg.remove();
     });
     it("Label text can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 80);
-        var label = new Plottable.Components.Label("a");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("a");
         label.renderTo(svg);
         assert.strictEqual(label._content.select("text").text(), "a", "the text starts at the specified string");
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
@@ -1545,12 +1542,10 @@ describe("Labels", function () {
         assert.operator(label.height(), ">", 0, "rowMin is > 0 for non-empty string");
         svg.remove();
     });
-    // skipping because Dan is rewriting labels and the height test fails
-    it.skip("Superlong text is handled in a sane fashion", function () {
+    it("Superlong text is handled in a sane fashion", function () {
         var svgWidth = 400;
         var svg = TestMethods.generateSVG(svgWidth, 80);
-        var label = new Plottable.Components.Label("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("THIS LABEL IS SO LONG WHOEVER WROTE IT WAS PROBABLY DERANGED");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1561,8 +1556,7 @@ describe("Labels", function () {
     });
     it("text in a tiny box is truncated to empty string", function () {
         var svg = TestMethods.generateSVG(10, 10);
-        var label = new Plottable.Components.Label("Yeah, not gonna fit...");
-        label.classed(Plottable.Components.Label.TITLE_LABEL_CLASS, true);
+        var label = new Plottable.Components.TitleLabel("Yeah, not gonna fit...");
         label.renderTo(svg);
         var text = label._content.select("text");
         assert.strictEqual(text.text(), "", "text was truncated to empty string");
@@ -1581,7 +1575,7 @@ describe("Labels", function () {
     });
     it("if a label text is changed to empty string, width updates to 0", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var label = new Plottable.Components.Label("foo");
+        var label = new Plottable.Components.TitleLabel("foo");
         label.renderTo(svg);
         label.text("");
         assert.strictEqual(label.width(), 0, "width updated to 0");
@@ -1590,11 +1584,9 @@ describe("Labels", function () {
     it("unsupported alignments and orientations are unsupported", function () {
         assert.throws(function () { return new Plottable.Components.Label("foo").angle(10); }, Error, "10 is not a valid angle for Label");
     });
-    // Skipping due to FF odd client bounding rect computation - #1470.
-    it.skip("Label angle can be changed after label is created", function () {
+    it("Label orientation can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
-        var label = new Plottable.Components.Label("CHANGING ORIENTATION");
-        label.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+        var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1702,8 +1694,7 @@ describe("Legend", function () {
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
     });
-    // Test is flaky under SauceLabs for firefox version 30
-    it.skip("a legend with a long label does not overflow horizontally", function () {
+    it("a legend with a long label does not overflow horizontally", function () {
         color.domain(["foooboooloonoogoorooboopoo"]);
         svg.attr("width", 100);
         legend.renderTo(svg);
@@ -1856,18 +1847,18 @@ describe("Legend", function () {
         assert.deepEqual(legend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
         svg.remove();
     });
-    it("sortFunction() works as expected", function () {
+    it("comparator() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
         color.domain(newDomain);
         legend.renderTo(svg);
         var entries = legend._element.selectAll(entrySelector);
         var elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
         assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
-        var sortFn = function (a, b) { return a.localeCompare(b); };
-        legend.sortFunction(sortFn);
+        var compareFunction = function (a, b) { return a.localeCompare(b); };
+        legend.comparator(compareFunction);
         entries = legend._element.selectAll(entrySelector);
         elementTexts = entries.select("text")[0].map(function (node) { return d3.select(node).text(); });
-        newDomain.sort(sortFn);
+        newDomain.sort(compareFunction);
         assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
         svg.remove();
     });
@@ -2832,8 +2823,10 @@ describe("Plots", function () {
                 { foo: 0.6, bar: 0.6 },
                 { foo: 0.8, bar: 0.8 }
             ];
-            var xScale = new Plottable.Scales.Linear().domain([0, 1]);
-            var yScale = new Plottable.Scales.Linear().domain([0, 1]);
+            var xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 1]);
+            var yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 1]);
             var linePlot = new Plottable.Plots.Line(xScale, yScale);
             linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
             linePlot.x(function (d) { return d.foo; }, xScale);
@@ -2873,8 +2866,10 @@ describe("Plots", function () {
         var linePlot;
         var renderArea;
         before(function () {
-            xScale = new Plottable.Scales.Linear().domain([0, 1]);
-            yScale = new Plottable.Scales.Linear().domain([0, 1]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 1]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             colorAccessor = function (d, i, m) { return d3.rgb(d.foo, d.bar, i).toString(); };
@@ -3123,8 +3118,10 @@ describe("Plots", function () {
         var areaPlot;
         var renderArea;
         before(function () {
-            xScale = new Plottable.Scales.Linear().domain([0, 1]);
-            yScale = new Plottable.Scales.Linear().domain([0, 1]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 1]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 1]);
             xAccessor = function (d) { return d.foo; };
             yAccessor = function (d) { return d.bar; };
             y0Accessor = function () { return 0; };
@@ -3535,6 +3532,11 @@ describe("Plots", function () {
                 barPlot.y(function (d) { return d.y; }, yScale);
                 barPlot.renderTo(svg);
             });
+            it("calculating width does not crash if handed invalid values", function () {
+                var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+                assert.doesNotThrow(function () { return barPlot.x(function (d) { return d.a; }, xScale); }, errMsg, "barPixelWidth does not crash on invalid values");
+                svg.remove();
+            });
             it("bar width takes an appropriate value", function () {
                 assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
@@ -3611,7 +3613,8 @@ describe("Plots", function () {
                     { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+                barPlot = new Plottable.Plots.Bar(xScale, yScale);
+                barPlot.orientation(Plottable.Orientation.HORIZONTAL);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -4333,8 +4336,10 @@ describe("Plots", function () {
             ;
             beforeEach(function () {
                 svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                xScale = new Plottable.Scales.Linear().domain([0, 9]);
-                yScale = new Plottable.Scales.Linear().domain([0, 81]);
+                xScale = new Plottable.Scales.Linear();
+                xScale.domain([0, 9]);
+                yScale = new Plottable.Scales.Linear();
+                yScale.domain([0, 81]);
                 circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
                 circlePlot.addDataset(quadraticDataset);
                 circlePlot.attr("fill", colorAccessor);
@@ -4409,17 +4414,20 @@ describe("Plots", function () {
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            stackedPlot.addDataset(new Plottable.Dataset(data4));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            var ds4 = new Plottable.Dataset(data4);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            stackedPlot.addDataset(ds4);
+            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
+            var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
+            assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
+            assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
         });
         it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
             var data0 = [
@@ -4434,16 +4442,18 @@ describe("Plots", function () {
             var data3 = [
                 { x: 1, y: 0 }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
-            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
+            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
+            assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
+            assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
         });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
@@ -4464,22 +4474,26 @@ describe("Plots", function () {
             var data5 = [
                 { x: 1, y: "-1" }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            stackedPlot.addDataset(new Plottable.Dataset(data4));
-            stackedPlot.addDataset(new Plottable.Dataset(data5));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[2]).plotMetadata;
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[5]).plotMetadata;
-            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
-            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
-            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            var ds4 = new Plottable.Dataset(data4);
+            var ds5 = new Plottable.Dataset(data5);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            stackedPlot.addDataset(ds4);
+            stackedPlot.addDataset(ds5);
+            var stackOffset2 = stackedPlot._stackOffsets.get(ds2);
+            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
+            var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
+            var stackOffset5 = stackedPlot._stackOffsets.get(ds5);
+            assert.strictEqual(stackOffset2.get("1"), -2, "stacking on data1 numerical y value");
+            assert.strictEqual(stackOffset3.get("1"), 3, "stacking on data2 numerical y value");
+            assert.strictEqual(stackOffset4.get("1"), 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(stackOffset5.get("1"), -3, "stacking on data2 + data4 numerical y values");
             assert.deepEqual(stackedPlot._stackedExtent, [-4, 9], "stacked extent is as normal");
         });
         it("stacks correctly on empty data", function () {
@@ -4528,17 +4542,20 @@ describe("Plots", function () {
                 { x: 1, y: 0 },
                 { x: 3, y: 1 }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            stackedPlot.addDataset(new Plottable.Dataset(data4));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            var ds4 = new Plottable.Dataset(data4);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            stackedPlot.addDataset(ds4);
+            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
+            var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
+            assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
+            assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
         });
         it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
             var data0 = [
@@ -4553,16 +4570,18 @@ describe("Plots", function () {
             var data3 = [
                 { x: 1, y: 0 }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds1PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-            assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
-            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
+            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
+            assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
+            assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
         });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
@@ -4583,22 +4602,26 @@ describe("Plots", function () {
             var data5 = [
                 { x: 1, y: "-1" }
             ];
-            stackedPlot.addDataset(new Plottable.Dataset(data0));
-            stackedPlot.addDataset(new Plottable.Dataset(data1));
-            stackedPlot.addDataset(new Plottable.Dataset(data2));
-            stackedPlot.addDataset(new Plottable.Dataset(data3));
-            stackedPlot.addDataset(new Plottable.Dataset(data4));
-            stackedPlot.addDataset(new Plottable.Dataset(data5));
-            // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-            var keys = stackedPlot._key2PlotDatasetKey.keys();
-            var ds2PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[2]).plotMetadata;
-            var ds3PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-            var ds4PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-            var ds5PlotMetadata = stackedPlot._key2PlotDatasetKey.get(keys[5]).plotMetadata;
-            assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
-            assert.strictEqual(ds3PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
-            assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
-            assert.strictEqual(ds5PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
+            var ds0 = new Plottable.Dataset(data0);
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            var ds4 = new Plottable.Dataset(data4);
+            var ds5 = new Plottable.Dataset(data5);
+            stackedPlot.addDataset(ds0);
+            stackedPlot.addDataset(ds1);
+            stackedPlot.addDataset(ds2);
+            stackedPlot.addDataset(ds3);
+            stackedPlot.addDataset(ds4);
+            stackedPlot.addDataset(ds5);
+            var stackOffset2 = stackedPlot._stackOffsets.get(ds2);
+            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
+            var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
+            var stackOffset5 = stackedPlot._stackOffsets.get(ds5);
+            assert.strictEqual(stackOffset2.get("1"), -2, "stacking on data1 numerical y value");
+            assert.strictEqual(stackOffset3.get("1"), 3, "stacking on data2 numerical y value");
+            assert.strictEqual(stackOffset4.get("1"), 8, "stacking on data1 + data3 numerical y values");
+            assert.strictEqual(stackOffset5.get("1"), -3, "stacking on data2 + data4 numerical y values");
             assert.deepEqual(stackedPlot._stackedExtent, [-4, 9], "stacked extent is as normal");
         });
         it("stacks correctly on empty data", function () {
@@ -4625,7 +4648,8 @@ describe("Plots", function () {
         var dataset2;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 2]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 2]);
             yScale = new Plottable.Scales.Linear();
             dataset1 = new Plottable.Dataset([
                 { x: 1, y: 1 },
@@ -4757,8 +4781,10 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
-            yScale = new Plottable.Scales.Linear().domain([0, 4]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 4]);
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
                 { x: 1, y: 1, type: "a" },
@@ -4802,8 +4828,10 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var xScale = new Plottable.Scales.Linear().domain([1, 3]);
-            var yScale = new Plottable.Scales.Linear().domain([0, 4]);
+            var xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
+            var yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 4]);
             var colorScale = new Plottable.Scales.Color("10");
             var data1 = [
             ];
@@ -4838,7 +4866,8 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
             yScale = new Plottable.Scales.Linear();
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
@@ -5014,8 +5043,10 @@ describe("Plots", function () {
         var SVG_HEIGHT = 400;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([1, 3]);
-            yScale = new Plottable.Scales.Linear().domain([0, 4]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([1, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 4]);
             var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
             var data1 = [
                 { x: 1, yTest: 1, type: "a" },
@@ -5087,9 +5118,9 @@ describe("Plots", function () {
             plot.addDataset(dataset2);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get(2);
+            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get(2);
+            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get(2);
             assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) sh1uld have no offset on middle point");
             assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");
@@ -5121,9 +5152,9 @@ describe("Plots", function () {
             plot.addDataset(dataset2);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var ds0Point2Offset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-            var ds1Point2Offset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-            var ds2Point2Offset = plot._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get(2);
+            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get(2);
+            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get(2);
             assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) should have no offset on middle point");
             assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");
@@ -5150,7 +5181,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Category();
-            yScale = new Plottable.Scales.Linear().domain([0, 3]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 3]);
             originalData1 = [
                 { x: "A", y: 1 },
                 { x: "B", y: 2 }
@@ -5326,7 +5358,8 @@ describe("Plots", function () {
         var bandWidth = 0;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            xScale = new Plottable.Scales.Linear().domain([0, 6]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 6]);
             yScale = new Plottable.Scales.Category();
             var data1 = [
                 { name: "jon", y: 0, type: "q1" },
@@ -5338,7 +5371,8 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
+            renderer = new Plottable.Plots.StackedBar(xScale, yScale);
+            renderer.orientation(Plottable.Orientation.HORIZONTAL);
             renderer.y(function (d) { return d.name; }, yScale);
             renderer.x(function (d) { return d.y; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
@@ -5453,7 +5487,8 @@ describe("Plots", function () {
                 { y: "B", x: 1, type: "c" },
                 { y: "C", x: 7, type: "c" }
             ];
-            plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
+            plot = new Plottable.Plots.StackedBar(xScale, yScale);
+            plot.orientation(Plottable.Orientation.HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5489,12 +5524,14 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset(new Plottable.Dataset(data1));
-            plot.addDataset(new Plottable.Dataset(data2));
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            plot.addDataset(ds1);
+            plot.addDataset(ds2);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var ds1FirstColumnOffset = plot._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
-            var ds2FirstColumnOffset = plot._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
+            var ds1FirstColumnOffset = plot._stackOffsets.get(ds1).get("A");
+            var ds2FirstColumnOffset = plot._stackOffsets.get(ds2).get("A");
             assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
             assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
             assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
@@ -5519,17 +5556,21 @@ describe("Plots", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.addDataset(new Plottable.Dataset(data1));
-            plot.addDataset(new Plottable.Dataset(data2));
-            plot.addDataset(new Plottable.Dataset(data3));
-            plot.addDataset(new Plottable.Dataset(data4));
-            plot.addDataset(new Plottable.Dataset(data5));
+            var ds1 = new Plottable.Dataset(data1);
+            var ds2 = new Plottable.Dataset(data2);
+            var ds3 = new Plottable.Dataset(data3);
+            var ds4 = new Plottable.Dataset(data4);
+            var ds5 = new Plottable.Dataset(data5);
+            plot.addDataset(ds1);
+            plot.addDataset(ds2);
+            plot.addDataset(ds3);
+            plot.addDataset(ds4);
+            plot.addDataset(ds5);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var keys = plot._key2PlotDatasetKey.keys();
-            var offset0 = plot._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
-            var offset2 = plot._key2PlotDatasetKey.get(keys[2]).plotMetadata.offsets.get("A");
-            var offset4 = plot._key2PlotDatasetKey.get(keys[4]).plotMetadata.offsets.get("A");
+            var offset0 = plot._stackOffsets.get(ds1).get("A");
+            var offset2 = plot._stackOffsets.get(ds3).get("A");
+            var offset4 = plot._stackOffsets.get(ds5).get("A");
             assert.strictEqual(offset0, 0, "Plot columns should start from offset 0 (at the very bottom)");
             assert.strictEqual(offset2, 1, "third bar should have offset 1, because second bar was not rendered");
             assert.strictEqual(offset4, 3, "fifth bar should have offset 3, because fourth bar was not rendered");
@@ -5556,7 +5597,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             xScale = new Plottable.Scales.Category();
-            yScale = new Plottable.Scales.Linear().domain([0, 2]);
+            yScale = new Plottable.Scales.Linear();
+            yScale.domain([0, 2]);
             originalData1 = [
                 { x: "A", y: 1 },
                 { x: "B", y: 2 }
@@ -5608,7 +5650,7 @@ describe("Plots", function () {
             assert.closeTo(TestMethods.numAttr(bar3, "height"), (400 - axisHeight) / 2, 0.01, "height is correct for bar3");
             // check that clustering is correct
             var innerScale = renderer._makeInnerScale();
-            var off = innerScale.scale("_0");
+            var off = innerScale.scale("0");
             var width = xScale.rangeBand() / 2;
             assert.closeTo(TestMethods.numAttr(bar0, "x") + TestMethods.numAttr(bar0, "width") / 2, xScale.scale(bar0X) - width + off, 0.01, "x pos correct for bar0");
             assert.closeTo(TestMethods.numAttr(bar1, "x") + TestMethods.numAttr(bar1, "width") / 2, xScale.scale(bar1X) - width + off, 0.01, "x pos correct for bar1");
@@ -5633,7 +5675,8 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             yScale = new Plottable.Scales.Category();
-            xScale = new Plottable.Scales.Linear().domain([0, 2]);
+            xScale = new Plottable.Scales.Linear();
+            xScale.domain([0, 2]);
             var data1 = [
                 { y: "A", x: 1 },
                 { y: "B", x: 2 }
@@ -5644,7 +5687,8 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
+            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale);
+            renderer.orientation(Plottable.Orientation.HORIZONTAL);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
@@ -5677,7 +5721,7 @@ describe("Plots", function () {
             var bar3Y = bar3.data()[0].y;
             // check that clustering is correct
             var innerScale = renderer._makeInnerScale();
-            var off = innerScale.scale("_0");
+            var off = innerScale.scale("0");
             var width = yScale.rangeBand() / 2;
             assert.closeTo(TestMethods.numAttr(bar0, "y") + TestMethods.numAttr(bar0, "height") / 2, yScale.scale(bar0Y) - width + off, 0.01, "y pos correct for bar0");
             assert.closeTo(TestMethods.numAttr(bar1, "y") + TestMethods.numAttr(bar1, "height") / 2, yScale.scale(bar1Y) - width + off, 0.01, "y pos correct for bar1");
@@ -5743,7 +5787,8 @@ describe("Plots", function () {
             var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
             var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
             var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
-            plot = new Plottable.Plots.ClusteredBar(xScale, yScale, false);
+            plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
+            plot.orientation(Plottable.Orientation.HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5788,15 +5833,6 @@ describe("Metadata", function () {
         yScale = new Plottable.Scales.Linear();
         xScale.domain([0, 400]);
         yScale.domain([400, 0]);
-    });
-    it("plot metadata is set properly", function () {
-        var d1 = new Plottable.Dataset();
-        var d2 = new Plottable.Dataset();
-        var r = new Plottable.Plot().addDataset(d1).addDataset(d2);
-        r._datasetKeysInOrder.forEach(function (key) {
-            var plotMetadata = r._key2PlotDatasetKey.get(key).plotMetadata;
-            assert.propertyVal(plotMetadata, "datasetKey", key, "metadata has correct dataset key");
-        });
     });
     it("Dataset is passed in", function () {
         var svg = TestMethods.generateSVG(400, 400);
@@ -5853,100 +5889,17 @@ describe("Metadata", function () {
         assert.closeTo(parseFloat(c4Position[0]), 63, 0.01, "fourth circle is correct");
         svg.remove();
     });
-    it("plot metadata is applied", function () {
-        var svg = TestMethods.generateSVG(400, 400);
-        var xAccessor = function (d, i, dataset, m) { return d.x + (i + 1) * m.foo; };
-        var yAccessor = function () { return 0; };
-        var plot = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor, xScale).y(yAccessor, yScale);
-        plot._getPlotMetadataForDataset = function (key) {
-            return {
-                datasetKey: key,
-                foo: 10
-            };
-        };
-        plot.addDataset(new Plottable.Dataset(data1));
-        plot.addDataset(new Plottable.Dataset(data2));
-        plot.renderTo(svg);
-        var circles = plot.getAllSelections();
-        var c1 = d3.select(circles[0][0]);
-        var c2 = d3.select(circles[0][1]);
-        var c3 = d3.select(circles[0][2]);
-        var c4 = d3.select(circles[0][3]);
-        var c1Position = d3.transform(c1.attr("transform")).translate;
-        var c2Position = d3.transform(c2.attr("transform")).translate;
-        var c3Position = d3.transform(c3.attr("transform")).translate;
-        var c4Position = d3.transform(c4.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct");
-        assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct");
-        assert.closeTo(parseFloat(c3Position[0]), 12, 0.01, "third circle is correct");
-        assert.closeTo(parseFloat(c4Position[0]), 23, 0.01, "fourth circle is correct");
-        svg.remove();
-    });
-    it("plot metadata is per plot", function () {
-        var svg = TestMethods.generateSVG(400, 400);
-        var xAccessor = function (d, i, dataset, m) { return d.x + (i + 1) * m.foo; };
-        var yAccessor = function () { return 0; };
-        var plot1 = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor, xScale).y(yAccessor, yScale);
-        plot1._getPlotMetadataForDataset = function (key) {
-            return {
-                datasetKey: key,
-                foo: 10
-            };
-        };
-        var dataset1 = new Plottable.Dataset(data1);
-        var dataset2 = new Plottable.Dataset(data2);
-        plot1.addDataset(dataset1);
-        plot1.addDataset(dataset2);
-        var plot2 = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor, xScale).y(yAccessor, yScale);
-        plot2._getPlotMetadataForDataset = function (key) {
-            return {
-                datasetKey: key,
-                foo: 20
-            };
-        };
-        plot2.addDataset(dataset1);
-        plot2.addDataset(dataset2);
-        plot1.renderTo(svg);
-        plot2.renderTo(svg);
-        var circles = plot1.getAllSelections();
-        var c1 = d3.select(circles[0][0]);
-        var c2 = d3.select(circles[0][1]);
-        var c3 = d3.select(circles[0][2]);
-        var c4 = d3.select(circles[0][3]);
-        var c1Position = d3.transform(c1.attr("transform")).translate;
-        var c2Position = d3.transform(c2.attr("transform")).translate;
-        var c3Position = d3.transform(c3.attr("transform")).translate;
-        var c4Position = d3.transform(c4.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct for first plot");
-        assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct for first plot");
-        assert.closeTo(parseFloat(c3Position[0]), 12, 0.01, "third circle is correct for first plot");
-        assert.closeTo(parseFloat(c4Position[0]), 23, 0.01, "fourth circle is correct for first plot");
-        circles = plot2.getAllSelections();
-        c1 = d3.select(circles[0][0]);
-        c2 = d3.select(circles[0][1]);
-        c3 = d3.select(circles[0][2]);
-        c4 = d3.select(circles[0][3]);
-        c1Position = d3.transform(c1.attr("transform")).translate;
-        c2Position = d3.transform(c2.attr("transform")).translate;
-        c3Position = d3.transform(c3.attr("transform")).translate;
-        c4Position = d3.transform(c4.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 20, 0.01, "first circle is correct for second plot");
-        assert.closeTo(parseFloat(c2Position[0]), 41, 0.01, "second circle is correct for second plot");
-        assert.closeTo(parseFloat(c3Position[0]), 22, 0.01, "third circle is correct for second plot");
-        assert.closeTo(parseFloat(c4Position[0]), 43, 0.01, "fourth circle is correct for second plot");
-        svg.remove();
-    });
     it("each plot passes metadata to projectors", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var metadata = { foo: 11 };
         var dataset1 = new Plottable.Dataset(data1, metadata);
         var dataset2 = new Plottable.Dataset(data2, metadata);
         var checkXYPlot = function (plot) {
-            var xAccessor = function (d, i, dataset, m) {
-                return d.x + dataset.metadata().foo + m.datasetKey.length;
+            var xAccessor = function (d, i, dataset) {
+                return d.x + dataset.metadata().foo;
             };
-            var yAccessor = function (d, i, dataset, m) {
-                return d.y + dataset.metadata().foo - m.datasetKey.length;
+            var yAccessor = function (d, i, dataset) {
+                return d.y + dataset.metadata().foo;
             };
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(xAccessor, xScale).y(yAccessor, yScale);
@@ -5964,9 +5917,9 @@ describe("Metadata", function () {
         checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
         checkXYPlot(new Plottable.Plots.Bar(xScale, yScale));
         checkXYPlot(new Plottable.Plots.StackedBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale, false));
+        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale).orientation(Plottable.Orientation.HORIZONTAL));
         checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale, false));
+        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale).orientation(Plottable.Orientation.HORIZONTAL));
         checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
         checkPiePlot(new Plottable.Plots.Pie());
         svg.remove();
@@ -7138,18 +7091,22 @@ describe("Domainer", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     it("Scale alerts listeners when its domain is updated", function () {
-        var scale = new Plottable.Scale(d3.scale.identity());
+        var scale = new Plottable.Scale();
+        scale._d3Scale = d3.scale.identity();
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
             callbackWasCalled = true;
         };
         scale.onUpdate(testCallback);
+        scale._setBackingScaleDomain = function () { return null; };
         scale.domain([0, 10]);
         assert.isTrue(callbackWasCalled, "The registered callback was called");
     });
     it("Scale update listeners can be turned off", function () {
-        var scale = new Plottable.Scale(d3.scale.identity());
+        var scale = new Plottable.Scale();
+        scale._d3Scale = d3.scale.identity();
+        scale._setBackingScaleDomain = function () { return null; };
         var callbackWasCalled = false;
         var testCallback = function (listenable) {
             assert.strictEqual(listenable, scale, "Callback received the calling scale as the first argument");
@@ -7582,25 +7539,29 @@ describe("Tick generators", function () {
     describe("interval", function () {
         it("generate ticks within domain", function () {
             var start = 0.5, end = 4.01, interval = 1;
-            var scale = new Plottable.Scales.Linear().domain([start, end]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([start, end]);
             var ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
             assert.deepEqual(ticks, [0.5, 1, 2, 3, 4, 4.01], "generated ticks contains all possible ticks within range");
         });
         it("domain crossing 0", function () {
             var start = -1.5, end = 1, interval = 0.5;
-            var scale = new Plottable.Scales.Linear().domain([start, end]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([start, end]);
             var ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
             assert.deepEqual(ticks, [-1.5, -1, -0.5, 0, 0.5, 1], "generated all number divisible by 0.5 in domain");
         });
         it("generate ticks with reversed domain", function () {
             var start = -2.2, end = -7.6, interval = 2.5;
-            var scale = new Plottable.Scales.Linear().domain([start, end]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([start, end]);
             var ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
             assert.deepEqual(ticks, [-7.6, -7.5, -5, -2.5, -2.2], "generated all ticks between lower and higher value");
         });
         it("passing big interval", function () {
             var start = 0.5, end = 10.01, interval = 11;
-            var scale = new Plottable.Scales.Linear().domain([start, end]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([start, end]);
             var ticks = Plottable.Scales.TickGenerators.intervalTickGenerator(interval)(scale);
             assert.deepEqual(ticks, [0.5, 10.01], "no middle ticks were added");
         });
@@ -7611,22 +7572,26 @@ describe("Tick generators", function () {
     });
     describe("integer", function () {
         it("normal case", function () {
-            var scale = new Plottable.Scales.Linear().domain([0, 4]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([0, 4]);
             var ticks = Plottable.Scales.TickGenerators.integerTickGenerator()(scale);
             assert.deepEqual(ticks, [0, 1, 2, 3, 4], "only the integers are returned");
         });
         it("works across negative numbers", function () {
-            var scale = new Plottable.Scales.Linear().domain([-2, 1]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([-2, 1]);
             var ticks = Plottable.Scales.TickGenerators.integerTickGenerator()(scale);
             assert.deepEqual(ticks, [-2, -1, 0, 1], "only the integers are returned");
         });
         it("includes endticks", function () {
-            var scale = new Plottable.Scales.Linear().domain([-2.7, 1.5]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([-2.7, 1.5]);
             var ticks = Plottable.Scales.TickGenerators.integerTickGenerator()(scale);
             assert.deepEqual(ticks, [-2.5, -2, -1, 0, 1, 1.5], "end ticks are included");
         });
         it("all float ticks", function () {
-            var scale = new Plottable.Scales.Linear().domain([1.1, 1.5]);
+            var scale = new Plottable.Scales.Linear();
+            scale.domain([1.1, 1.5]);
             var ticks = Plottable.Scales.TickGenerators.integerTickGenerator()(scale);
             assert.deepEqual(ticks, [1.1, 1.5], "only the end ticks are returned");
         });
@@ -8323,18 +8288,18 @@ describe("Interactions", function () {
             var clickInteraction = new Plottable.Interactions.Click();
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "detaching an Interaction which was not attached should not throw an error");
+            }, Error, "detaching an Interaction which was not attached should not throw an error");
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detachFrom() twice should not throw an error");
+            }, Error, "calling detachFrom() twice should not throw an error");
             component.renderTo(svg);
             clickInteraction.attachTo(component);
             clickInteraction.detachFrom(component);
             assert.doesNotThrow(function () {
                 clickInteraction.detachFrom(component);
-            }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
+            }, Error, "calling detachFrom() twice should not throw an error even if the Component is anchored");
             svg.remove();
         });
         it("can move interaction from one component to another", function () {
