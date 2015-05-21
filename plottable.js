@@ -7818,7 +7818,7 @@ var Plottable;
             };
             Area.prototype.addDataset = function (dataset) {
                 // HACKHACK Drawers should take in a dataset instead of the key
-                var lineDrawer = new Plottable.Drawers.Line("foo");
+                var lineDrawer = new Plottable.Drawers.Line("");
                 if (this._isSetup) {
                     lineDrawer.setup(this._renderArea.append("g"));
                 }

@@ -59,7 +59,7 @@ export module Plots {
 
     public addDataset(dataset: Dataset) {
       // HACKHACK Drawers should take in a dataset instead of the key
-      var lineDrawer = new Drawers.Line("foo");
+      var lineDrawer = new Drawers.Line("");
       if (this._isSetup) {
         lineDrawer.setup(this._renderArea.append("g"));
       }
