@@ -1212,7 +1212,6 @@ declare module Plottable {
         class AbstractDrawer {
             protected _className: string;
             key: string;
-            protected _attrToProjector: AttributeToAppliedProjector;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1351,7 +1350,6 @@ declare module Plottable {
     module Drawers {
         class Symbol extends Element {
             constructor(key: string);
-            protected _drawStep(step: AppliedDrawStep): void;
         }
     }
 }

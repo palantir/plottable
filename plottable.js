@@ -2546,7 +2546,6 @@ var Plottable;
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
                     var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, dataset);
-                    _this._attrToProjector = Plottable.Utils.Methods.copyMap(appliedAttrToProjector);
                     return {
                         attrToProjector: appliedAttrToProjector,
                         animator: dr.animator
@@ -2947,7 +2946,6 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
                 var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
@@ -2992,10 +2990,6 @@ var Plottable;
                 this._svgElement = "path";
                 this._className = "symbol";
             }
-            Symbol.prototype._drawStep = function (step) {
-                this._attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                _super.prototype._drawStep.call(this, step);
-            };
             return Symbol;
         })(Drawers.Element);
         Drawers.Symbol = Symbol;

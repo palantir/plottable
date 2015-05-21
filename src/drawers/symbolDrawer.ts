@@ -10,10 +10,6 @@ export module Drawers {
       this._className = "symbol";
     }
 
-    protected _drawStep(step: AppliedDrawStep) {
-      this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      super._drawStep(step);
-    }
   }
 }
 }
