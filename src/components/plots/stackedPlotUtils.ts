@@ -79,8 +79,6 @@ module Plottable {
         StackedPlotUtils.stack(negativeDataMapArray, domainKeys),
         keyAccessor,
         valueAccessor,
-        datasetKeys,
-        keyToPlotDatasetKey,
         datasets);
 
       return stackOffsets;
@@ -178,13 +176,9 @@ module Plottable {
         negativeDataMapArray: D3.Map<Plots.StackedDatum>[],
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
-        datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
         datasets: Dataset[]) {
 
       var stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
-
-      // datasetKeys.forEach((k, index) => {
       datasets.forEach((dataset, index) => {
         var datasetOffset = d3.map();
         var positiveDataMap = positiveDataMapArray[index];
