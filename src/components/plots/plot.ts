@@ -273,6 +273,10 @@ module Plottable {
       var accessor = accScaleBinding.accessor;
       var scale = accScaleBinding.scale;
 
+      if (scale == null) {
+        return [];
+      }
+
       var data = dataset.data();
       if (filter != null) {
         data = data.filter((d, i) => filter(d, i, dataset));
@@ -280,11 +284,7 @@ module Plottable {
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
       var mappedData = data.map(appliedAccessor);
 
-      if (scale) {
-        return scale.getExtentFromDomain(mappedData);
-      } else {
-        return [];
-      }
+      return scale.getExtentFromDomain(mappedData);
     }
 
     /**
