@@ -7,6 +7,7 @@ export module Plots {
    */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
+    private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
 
     /**
      * Constructs an AreaPlot.
@@ -28,6 +29,12 @@ export module Plots {
       this.attr("fill-opacity", 0.25);
       this.attr("fill", defaultColor);
       this.attr("stroke", defaultColor);
+      this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
+    }
+
+    protected _setup() {
+      super._setup();
+      this._lineDrawers.values().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
@@ -50,13 +57,23 @@ export module Plots {
       }
     }
 
+    public addDataset(dataset: Dataset) {
+      // HACKHACK Drawers should take in a dataset instead of the key
+      var lineDrawer = new Drawers.Line("foo");
+      if (this._isSetup) {
+        lineDrawer.setup(this._renderArea.append("g"));
+      }
+      this._lineDrawers.set(dataset, lineDrawer);
+      super.addDataset(dataset);
+      return this;
+    }
+
     protected _additionalPaint() {
       var drawSteps = this._generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) => {
-        var lineDrawer = new Drawers.Line(k);
-        lineDrawer.setup(this._renderArea.append("g"));
-        lineDrawer.draw(dataToDraw.get(k), drawSteps, this._key2PlotDatasetKey.get(k).dataset);
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
       });
     }
 

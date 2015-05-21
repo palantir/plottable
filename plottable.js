@@ -7820,7 +7820,13 @@ var Plottable;
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
                 this.attr("stroke", defaultColor);
+                this._lineDrawers = new Plottable.Utils.Map();
             }
+            Area.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._lineDrawers.values().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+            };
             Area.prototype.y0 = function (y0, y0Scale) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
@@ -7836,14 +7842,23 @@ var Plottable;
                     this._updateYDomainer();
                 }
             };
+            Area.prototype.addDataset = function (dataset) {
+                // HACKHACK Drawers should take in a dataset instead of the key
+                var lineDrawer = new Plottable.Drawers.Line("foo");
+                if (this._isSetup) {
+                    lineDrawer.setup(this._renderArea.append("g"));
+                }
+                this._lineDrawers.set(dataset, lineDrawer);
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
+            };
             Area.prototype._additionalPaint = function () {
                 var _this = this;
                 var drawSteps = this._generateDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) {
-                    var lineDrawer = new Plottable.Drawers.Line(k);
-                    lineDrawer.setup(_this._renderArea.append("g"));
-                    lineDrawer.draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset);
+                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                    _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
                 });
             };
             Area.prototype._getDrawer = function (key) {

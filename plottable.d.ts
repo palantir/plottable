@@ -2913,10 +2913,12 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            protected _setup(): void;
             y0(): Plots.AccessorScaleBinding<number, number>;
             y0(y0: number | Accessor<number>): Area<X>;
             y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
+            addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
