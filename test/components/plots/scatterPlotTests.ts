@@ -72,8 +72,8 @@ describe("Plots", () => {
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                   .x((d) => d.x, xScale)
-                                   .y((d) => d.y, yScale)
+                                   .x((d: any) => d.x, xScale)
+                                   .y((d: any) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
@@ -101,8 +101,8 @@ describe("Plots", () => {
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
-                                   .x((d) => d.x, xScale)
-                                   .y((d) => d.y, yScale)
+                                   .x((d: any) => d.x, xScale)
+                                   .y((d: any) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
@@ -157,8 +157,8 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Scatter(xScale, yScale);
       plot.addDataset(dataset);
-      plot.x((d) => d.foo, xScale)
-          .y((d) => d.bar, yScale);
+      plot.x((d: any) => d.foo, xScale)
+          .y((d: any) => d.bar, yScale);
       plot.renderTo(svg);
 
       var dataWithNaN = data.slice();
@@ -217,13 +217,15 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        xScale = new Plottable.Scales.Linear().domain([0, 9]);
-        yScale = new Plottable.Scales.Linear().domain([0, 81]);
+        xScale = new Plottable.Scales.Linear();
+        xScale.domain([0, 9]);
+        yScale = new Plottable.Scales.Linear();
+        yScale.domain([0, 81]);
         circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
         circlePlot.addDataset(quadraticDataset);
         circlePlot.attr("fill", colorAccessor);
-        circlePlot.x((d) => d.x, xScale);
-        circlePlot.y((d) => d.y, yScale);
+        circlePlot.x((d: any) => d.x, xScale);
+        circlePlot.y((d: any) => d.y, yScale);
         circlePlot.renderTo(svg);
       });
 

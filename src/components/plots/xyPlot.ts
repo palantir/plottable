@@ -2,8 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    private static _X_KEY = "x";
-    private static _Y_KEY = "y";
+    protected static _X_KEY = "x";
+    protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
     private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
@@ -151,8 +151,8 @@ module Plottable {
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       attrToProjector["x"] = Plot._scaledAccessor(this.x());
       attrToProjector["y"] = Plot._scaledAccessor(this.y());
       attrToProjector["defined"] = (d: any, i: number, dataset: Dataset) => {

@@ -98,8 +98,8 @@ export module Plots {
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       attrToProjector[Pie._INNER_RADIUS_KEY] = Plot._scaledAccessor(this.innerRadius());
       attrToProjector[Pie._OUTER_RADIUS_KEY] = Plot._scaledAccessor(this.outerRadius());
       attrToProjector[Pie._SECTOR_VALUE_KEY] = Plot._scaledAccessor(this.sectorValue());

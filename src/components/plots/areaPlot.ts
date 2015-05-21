@@ -83,8 +83,8 @@ export module Plots {
       return wholeDatumAttributes;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       attrToProjector["y0"] = Plot._scaledAccessor(this.y0());
       return attrToProjector;
     }

@@ -109,8 +109,8 @@ export module Plots {
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       attrToProjector["x1"] = Plot._scaledAccessor(this.x1());
       attrToProjector["y2"] = Plot._scaledAccessor(this.y2());
       attrToProjector["x2"] = Plot._scaledAccessor(this.x2());

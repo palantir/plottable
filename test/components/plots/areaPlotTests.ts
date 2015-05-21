@@ -10,7 +10,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Area(xScale, yScale);
-      plot.x((d) => d.x, xScale);
+      plot.x((d: any) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
@@ -34,8 +34,10 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scales.Linear().domain([0, 1]);
-      yScale = new Plottable.Scales.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 1]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       y0Accessor = () => 0;
