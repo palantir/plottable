@@ -3252,6 +3252,11 @@ describe("Plots", function () {
             assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
+        it("rejects invalid orientations", function () {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            assert.throws(function () { return new Plottable.Plots.Bar(xScale, yScale, "diagonal"); }, Error);
+        });
         function assertPlotDataEqual(expected, actual, msg) {
             assert.deepEqual(expected.data, actual.data, msg);
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);

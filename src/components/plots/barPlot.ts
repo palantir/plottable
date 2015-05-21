@@ -28,10 +28,13 @@ export module Plots {
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
+      if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+        throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+      }
+      this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());

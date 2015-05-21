@@ -7273,10 +7273,13 @@ var Plottable;
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
+                if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+                }
+                this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
-                this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
