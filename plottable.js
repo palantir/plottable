@@ -8041,6 +8041,7 @@ var Plottable;
                     return { key: domainKey, value: 0 };
                 });
             });
+            console.log(1);
             datasets.forEach(function (dataset, datasetIndex) {
                 dataset.data().forEach(function (datum, index) {
                     var key = String(keyAccessor(datum, index, dataset));
@@ -8057,7 +8058,7 @@ var Plottable;
         StackedPlotUtils.generateStackOffsets = function (datasets, positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor) {
             var stackOffsets = new Plottable.Utils.Map();
             datasets.forEach(function (dataset, index) {
-                var datasetOffset = d3.map();
+                var datasetOffsets = d3.map();
                 var positiveDataMap = positiveDataMapArray[index];
                 var negativeDataMap = negativeDataMapArray[index];
                 var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset) <= 0; });
@@ -8073,9 +8074,9 @@ var Plottable;
                     else {
                         offset = value > 0 ? positiveOffset : negativeOffset;
                     }
-                    datasetOffset.set(key, offset);
+                    datasetOffsets.set(key, offset);
                 });
-                stackOffsets.set(dataset, datasetOffset);
+                stackOffsets.set(dataset, datasetOffsets);
             });
             return stackOffsets;
         };

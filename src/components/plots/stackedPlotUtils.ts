@@ -141,6 +141,9 @@ module Plottable {
         });
       });
 
+      console.log(1);
+
+
       datasets.forEach((dataset, datasetIndex) => {
         dataset.data().forEach((datum, index) => {
           var key = String(keyAccessor(datum, index, dataset));
@@ -165,7 +168,7 @@ module Plottable {
 
       var stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       datasets.forEach((dataset, index) => {
-        var datasetOffset = d3.map();
+        var datasetOffsets = d3.map();
         var positiveDataMap = positiveDataMapArray[index];
         var negativeDataMap = negativeDataMapArray[index];
         var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);
@@ -182,10 +185,10 @@ module Plottable {
           } else {
             offset = value > 0 ? positiveOffset : negativeOffset;
           }
-          datasetOffset.set(key, offset);
+          datasetOffsets.set(key, offset);
         });
 
-        stackOffsets.set(dataset, datasetOffset);
+        stackOffsets.set(dataset, datasetOffsets);
       });
       return stackOffsets;
     }
