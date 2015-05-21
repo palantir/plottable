@@ -371,7 +371,7 @@ describe("Scales", () => {
     it("categoryScale gives the unique values when domain is stringy", () => {
       var domain = ["1", "3", "2", "1"];
       var scale = new Plottable.Scales.Category();
-      var computedExtent = scale.getExtentFromData(domain);
+      var computedExtent = scale.getExtentFromDomain(domain);
 
       assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
     });
@@ -379,7 +379,7 @@ describe("Scales", () => {
     it("categoryScale gives the unique values when domain is numeric", () => {
       var domain = [1, 3, 2, 1];
       var scale = new Plottable.Scales.Category();
-      var computedExtent = scale.getExtentFromData(<any>domain);
+      var computedExtent = scale.getExtentFromDomain(<any>domain);
 
       assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
     });
@@ -387,7 +387,7 @@ describe("Scales", () => {
     it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {
       var domain = ["1", "3", "2", "1"];
       var scale = new Plottable.QuantitativeScale();
-      var computedExtent = scale.getExtentFromData(domain);
+      var computedExtent = scale.getExtentFromDomain(domain);
 
       assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
     });
@@ -395,7 +395,7 @@ describe("Scales", () => {
     it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", () => {
       var domain = [1, 3, 2, 1];
       var scale = new Plottable.QuantitativeScale();
-      var computedExtent = scale.getExtentFromData(domain);
+      var computedExtent = scale.getExtentFromDomain(domain);
 
       assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
     });
@@ -408,7 +408,7 @@ describe("Scales", () => {
       var domain = [date1, date2, date3, date4];
 
       var scale = new Plottable.Scales.Time();
-      var computedExtent = scale.getExtentFromData(domain);
+      var computedExtent = scale.getExtentFromDomain(domain);
 
       assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
     });
