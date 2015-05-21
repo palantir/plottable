@@ -53,7 +53,7 @@ module Plottable {
     public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>) {
       var domainKeys = StackedPlotUtils.getDomainKeys(datasets, keyAccessor);
 
-      var dataMapArray = StackedPlotUtils.generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+      var dataMapArray = StackedPlotUtils._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
       var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -67,10 +67,10 @@ module Plottable {
         });
       });
 
-      var stackOffsets = StackedPlotUtils.generateStackOffsets(
+      var stackOffsets = StackedPlotUtils._generateStackOffsets(
         datasets,
-        StackedPlotUtils.stack(positiveDataMapArray, domainKeys),
-        StackedPlotUtils.stack(negativeDataMapArray, domainKeys),
+        StackedPlotUtils._stack(positiveDataMapArray, domainKeys),
+        StackedPlotUtils._stack(negativeDataMapArray, domainKeys),
         keyAccessor,
         valueAccessor);
 
@@ -97,10 +97,25 @@ module Plottable {
     }
 
     /**
+     * Given an array of datasets and the accessor function for the key, computes the
+     * set reunion (no duplicates) of the domain of each dataset.
+     */
+    public static getDomainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
+      var domainKeys = d3.set();
+      datasets.forEach((dataset) => {
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset));
+        });
+      });
+
+      return domainKeys.values();
+    }
+
+    /**
      * Feeds the data through d3's stack layout function which will calculate
      * the stack offsets and use the the function declared in .out to set the offsets on the data.
      */
-    private static stack(dataArray: D3.Map<Plots.StackedDatum>[], domainKeys: string[]) {
+    private static _stack(dataArray: D3.Map<Plots.StackedDatum>[], domainKeys: string[]) {
       var outFunction = (d: Plots.StackedDatum, y0: number, y: number) => {
         d.offset = y0;
       };
@@ -114,22 +129,7 @@ module Plottable {
       return dataArray;
     }
 
-    /**
-     * Given an array of datasets and the accessor function for the key, computes the
-     * set reunion (no duplicates) of the domain of each dataset.
-     */
-    private static getDomainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
-      var domainKeys = d3.set();
-      datasets.forEach((dataset) => {
-        dataset.data().forEach((datum, index) => {
-          domainKeys.add(keyAccessor(datum, index, dataset));
-        });
-      });
-
-      return domainKeys.values();
-    }
-
-    private static generateDefaultMapArray(
+    private static _generateDefaultMapArray(
         datasets: Dataset[],
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
@@ -140,9 +140,6 @@ module Plottable {
           return { key: domainKey, value: 0 };
         });
       });
-
-      console.log(1);
-
 
       datasets.forEach((dataset, datasetIndex) => {
         dataset.data().forEach((datum, index) => {
@@ -159,7 +156,7 @@ module Plottable {
      * After the stack offsets have been determined on each separate dataset, the offsets need
      * to be determined correctly on the overall datasets
      */
-    private static generateStackOffsets(
+    private static _generateStackOffsets(
         datasets: Dataset[],
         positiveDataMapArray: D3.Map<Plots.StackedDatum>[],
         negativeDataMapArray: D3.Map<Plots.StackedDatum>[],

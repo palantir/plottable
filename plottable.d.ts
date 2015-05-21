@@ -2967,6 +2967,11 @@ declare module Plottable {
         static checkSameDomainForStacks(datasets: Dataset[], keyAccessor: Accessor<any>): void;
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
+        /**
+         * Given an array of datasets and the accessor function for the key, computes the
+         * set reunion (no duplicates) of the domain of each dataset.
+         */
+        static getDomainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
     }
 }
 
