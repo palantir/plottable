@@ -32,7 +32,7 @@ function run(svg, data, Plottable) {
   pointer.onPointerMove(function(p) {
     var cpd = plot.getClosestPlotData(p);
     if (cpd.data.length > 0) {
-      title.text(cpd.data[0].name);
+      title.text("" + cpd.data[0].name);
     } else {
       title.text("Who?");
     }
