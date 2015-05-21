@@ -53,13 +53,12 @@ module Plottable {
     public static computeStackOffsets(
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
-        datasetKeys: string[],
         datasets: Dataset[]) {
 
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
 
       var dataMapArray = StackedPlotUtils.generateDefaultMapArray
-        (keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
+        (keyAccessor, valueAccessor, domainKeys, datasets);
 
       var positiveDataMapArray: D3.Map<Plots.StackedDatum>[] = dataMapArray.map((dataMap) => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -139,10 +138,9 @@ module Plottable {
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         domainKeys: string[],
-        datasetKeys: string[],
         datasets: Dataset[]) {
 
-      var dataMapArray = datasetKeys.map(() => {
+      var dataMapArray = datasets.map(() => {
         return Utils.Methods.populateMap(domainKeys, (domainKey) => {
           return { key: domainKey, value: 0 };
         });

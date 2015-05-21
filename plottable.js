@@ -7980,9 +7980,9 @@ var Plottable;
         /**
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
-        StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, datasets) {
+        StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasets) {
             var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
-            var dataMapArray = StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
+            var dataMapArray = StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasets);
             var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                 return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
                     return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
@@ -8035,8 +8035,8 @@ var Plottable;
             });
             return domainKeys.values();
         };
-        StackedPlotUtils.generateDefaultMapArray = function (keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets) {
-            var dataMapArray = datasetKeys.map(function () {
+        StackedPlotUtils.generateDefaultMapArray = function (keyAccessor, valueAccessor, domainKeys, datasets) {
+            var dataMapArray = datasets.map(function () {
                 return Plottable.Utils.Methods.populateMap(domainKeys, function (domainKey) {
                     return { key: domainKey, value: 0 };
                 });
@@ -8211,7 +8211,7 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 Plottable.StackedPlotUtils.checkSameDomainForStacks(keyAccessor, this.datasets());
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
+                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, this.datasets());
                 stackOffsets.keys().forEach(function (dataset) {
                     _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
                 });
@@ -8339,9 +8339,8 @@ var Plottable;
                 var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
                 var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
                 var datasetKeys = this._datasetKeysInOrder;
-                var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
+                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, this.datasets());
                 stackOffsets.keys().forEach(function (dataset) {
                     _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
                 });
