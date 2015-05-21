@@ -6,7 +6,7 @@ export module Drawers {
     public static AREA_CLASS = "area";
 
     private _areaSelection: D3.Selection;
-    private _drawLine = true;
+    private _drawLine = false;
 
     protected _enterData(data: any[]) {
       if (this._drawLine) {

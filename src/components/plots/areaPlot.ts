@@ -116,6 +116,36 @@ export module Plots {
       return attrToProjector;
     }
 
+    public getAllSelections(datasets = this.datasets(), exclude = false) {
+      var allSelections = super.getAllSelections(datasets, exclude)[0];
+      if (exclude) {
+        datasets = this.datasets().filter((dataset) => datasets.indexOf(dataset) < 0);
+      }
+      var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
+                                .filter((drawer) => drawer != null);
+      lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
+      return d3.selectAll(allSelections);
+    }
+
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
+      var allPlotData = super.getAllPlotData(datasets);
+      var allElements = allPlotData.selection[0];
+
+      this._keysForDatasets(datasets).forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var drawer = plotDatasetKey.drawer;
+        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = drawer._getPixelPoint(datum, index);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
+          allElements.splice(index * 2 + 1, 0, drawer._getSelection(index).node());
+        });
+      });
+
+      return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
+    }
   }
 }
 }
