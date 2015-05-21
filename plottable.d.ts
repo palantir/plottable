@@ -1290,12 +1290,6 @@ declare module Plottable {
         class Area extends Line {
             static AREA_CLASS: string;
             protected _enterData(data: any[]): void;
-            /**
-             * Sets the value determining if line should be drawn.
-             *
-             * @param{boolean} draw The value determing if line should be drawn.
-             */
-            drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;

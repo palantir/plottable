@@ -6,37 +6,18 @@ export module Drawers {
     public static AREA_CLASS = "area";
 
     private _areaSelection: D3.Selection;
-    private _drawLine = false;
 
     protected _enterData(data: any[]) {
-      if (this._drawLine) {
-        super._enterData(data);
-      } else {
-        // HACKHACK Forced to use anycast to access protected var
-        (<any> AbstractDrawer).prototype._enterData.call(this, data);
-      }
+      // HACKHACK Forced to use anycast to access protected var
+      (<any> AbstractDrawer).prototype._enterData.call(this, data);
       this._areaSelection.datum(data);
-    }
-
-    /**
-     * Sets the value determining if line should be drawn.
-     *
-     * @param{boolean} draw The value determing if line should be drawn.
-     */
-    public drawLine(draw: boolean): Area {
-      this._drawLine = draw;
-      return this;
     }
 
     public setup(area: D3.Selection) {
       this._areaSelection = area.append("path")
                                .classed(Area.AREA_CLASS, true)
                                .style({ "stroke": "none" });
-      if (this._drawLine) {
-        super.setup(area);
-      } else {
-        AbstractDrawer.prototype.setup.call(this, area);
-      }
+      AbstractDrawer.prototype.setup.call(this, area);
     }
 
     private _createArea(xFunction: AppliedProjector,
@@ -55,12 +36,7 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      if (this._drawLine) {
-        super._drawStep(step);
-      } else {
-        // HACKHACK Forced to use anycast to access protected var
-        (<any> AbstractDrawer).prototype._drawStep.call(this, step);
-      }
+      (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       var xFunction       = attrToProjector["x"];
       var y0Function      = attrToProjector["y0"];

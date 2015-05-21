@@ -2676,35 +2676,15 @@ var Plottable;
             __extends(Area, _super);
             function Area() {
                 _super.apply(this, arguments);
-                this._drawLine = false;
             }
             Area.prototype._enterData = function (data) {
-                if (this._drawLine) {
-                    _super.prototype._enterData.call(this, data);
-                }
-                else {
-                    // HACKHACK Forced to use anycast to access protected var
-                    Drawers.AbstractDrawer.prototype._enterData.call(this, data);
-                }
+                // HACKHACK Forced to use anycast to access protected var
+                Drawers.AbstractDrawer.prototype._enterData.call(this, data);
                 this._areaSelection.datum(data);
-            };
-            /**
-             * Sets the value determining if line should be drawn.
-             *
-             * @param{boolean} draw The value determing if line should be drawn.
-             */
-            Area.prototype.drawLine = function (draw) {
-                this._drawLine = draw;
-                return this;
             };
             Area.prototype.setup = function (area) {
                 this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
-                if (this._drawLine) {
-                    _super.prototype.setup.call(this, area);
-                }
-                else {
-                    Drawers.AbstractDrawer.prototype.setup.call(this, area);
-                }
+                Drawers.AbstractDrawer.prototype.setup.call(this, area);
             };
             Area.prototype._createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
@@ -2713,13 +2693,7 @@ var Plottable;
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
             Area.prototype._drawStep = function (step) {
-                if (this._drawLine) {
-                    _super.prototype._drawStep.call(this, step);
-                }
-                else {
-                    // HACKHACK Forced to use anycast to access protected var
-                    Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
-                }
+                Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
@@ -8175,7 +8149,7 @@ var Plottable;
                 this._stackedExtent = [];
             }
             StackedArea.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Area(key).drawLine(false);
+                return new Plottable.Drawers.Area(key);
             };
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
