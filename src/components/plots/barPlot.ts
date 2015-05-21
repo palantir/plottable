@@ -359,9 +359,9 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale<any, number>  = this._isVertical ? this.y().scale : this.x().scale;
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var secondaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
-      var primaryAttr   = this._isVertical ? "y" : "x";
+      var primaryAttr = this._isVertical ? "y" : "x";
       var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 

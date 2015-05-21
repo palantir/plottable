@@ -114,9 +114,9 @@ export module Scales {
 
           // Determine indices for colors
           var tScaled = t * (colors.length - 1);
-          var i0    = Math.floor(tScaled);
-          var i1    = Math.ceil(tScaled);
-          var frac  = (tScaled - i0);
+          var i0 = Math.floor(tScaled);
+          var i1 = Math.ceil(tScaled);
+          var frac = (tScaled - i0);
 
           // Interpolate in the L*a*b color space
           return d3.interpolateLab(colors[i0], colors[i1])(frac);
