@@ -90,6 +90,12 @@ export module Components {
       if (angle == null) {
         return this._angle;
       } else {
+        angle %= 360;
+        if (angle > 180) {
+          angle -= 360;
+        } else if (angle < -180) {
+          angle += 360;
+        }
         if (angle === -90 || angle === 0 || angle === 90) {
           this._angle = angle;
         } else {
