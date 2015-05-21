@@ -83,18 +83,12 @@ module Plottable {
       return stackOffsets;
     }
 
-    public static checkSameDomainForStacks(
-        keyAccessor: Accessor<any>,
-        datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
-        datasets: Dataset[]) {
-
-      var keySets = datasetKeys.map((k) => {
-        var dataset = keyToPlotDatasetKey.get(k).dataset;
+    public static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasets: Dataset[]) {
+      var keySets = datasets.map((dataset) => {
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
-
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
+
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }

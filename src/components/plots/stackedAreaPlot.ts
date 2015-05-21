@@ -144,7 +144,7 @@ export module Plots {
       var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
+      StackedPlotUtils.checkSameDomainForStacks(keyAccessor, this.datasets());
 
       var stackOffsets = StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
 

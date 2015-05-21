@@ -2964,7 +2964,7 @@ declare module Plottable {
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
         static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], datasets: Dataset[]): Utils.Map<Dataset, D3.Map<number>>;
-        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>, datasets: Dataset[]): void;
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasets: Dataset[]): void;
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
