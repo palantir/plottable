@@ -53,7 +53,8 @@ export module Scales {
       "#B10026"  // red
     ];
     private _colorRange: string[];
-    private _colorScale: D3.Scale.QuantitativeScale;
+    private _colorScale: D3.Scale.QuantitativeScale<number>;
+    private _d3Scale: D3.Scale.QuantitativeScale<number>;
 
     /**
      * An InterpolatedColorScale maps numbers to color strings.
@@ -65,6 +66,7 @@ export module Scales {
      * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
      */
     constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
+      super();
       this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
@@ -83,7 +85,7 @@ export module Scales {
       if (this._colorScale == null) {
         throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
-      super(this._D3InterpolatedScale());
+      this._d3Scale = this._D3InterpolatedScale();
     }
 
     /**
@@ -91,7 +93,7 @@ export module Scales {
      * 
      * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
-    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale {
+    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale<number> {
       return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
     }
 
@@ -161,6 +163,27 @@ export module Scales {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
       }
       return this;
+    }
+
+    public scale(value: number) {
+      // HACKHACK D3 Quantitative Scales should return their interpolator return type
+      return <string> <any> this._d3Scale(value);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setBackingScaleDomain(values: number[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this.colorRange();
+    }
+
+    protected _setRange(values: string[]) {
+      this.colorRange(values);
     }
   }
 }

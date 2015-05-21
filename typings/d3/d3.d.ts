@@ -2653,19 +2653,19 @@ declare module D3 {
 
         export interface Scale extends GenericScale<Scale> { }
 
-        export interface GenericQuantitativeScale<S> extends GenericScale<S> {
+        export interface GenericQuantitativeScale<S, D> extends GenericScale<S> {
             /**
             * Get the range value corresponding to a given domain value.
             *
             * @param value Domain Value
             */
-            (value: number): number;
+            (value: D): number;
             /**
             * Get the domain value corresponding to a given range value.
             *
             * @param value Range Value
             */
-            invert(value: number): number;
+            invert(value: number): D;
             /**
             * Set the scale's output range, and enable rounding.
             *
@@ -2708,9 +2708,9 @@ declare module D3 {
             tickFormat(count: number, format?: string): (n: number) => string;
         }
 
-        export interface QuantitativeScale extends GenericQuantitativeScale<QuantitativeScale> { }
+        export interface QuantitativeScale<D> extends GenericQuantitativeScale<QuantitativeScale<D>, D> { }
 
-        export interface LinearScale extends GenericQuantitativeScale<LinearScale> { }
+        export interface LinearScale extends GenericQuantitativeScale<LinearScale, number> { }
 
         export interface IdentityScale extends GenericScale<IdentityScale> {
             /**
@@ -2739,11 +2739,11 @@ declare module D3 {
             tickFormat(count: number): (n: number) => string;
         }
 
-        export interface SqrtScale extends GenericQuantitativeScale<SqrtScale> { }
+        export interface SqrtScale extends GenericQuantitativeScale<SqrtScale, number> { }
 
-        export interface PowScale extends GenericQuantitativeScale<PowScale> { }
+        export interface PowScale extends GenericQuantitativeScale<PowScale, number> { }
 
-        export interface LogScale extends GenericQuantitativeScale<LogScale> { }
+        export interface LogScale extends GenericQuantitativeScale<LogScale, number> { }
 
         export interface OrdinalScale extends GenericScale<OrdinalScale> {
             rangePoints(interval: any[], padding?: number): OrdinalScale;
@@ -2761,21 +2761,11 @@ declare module D3 {
             quantiles(): any[];
         }
 
-        export interface TimeScale extends GenericScale<TimeScale> {
-            (value: Date): number;
-            invert(value: number): Date;
-            rangeRound: (values: any[]) => TimeScale;
-            interpolate: {
-                (): D3.Transition.Interpolate;
-                (factory: D3.Transition.InterpolateFactory): TimeScale;
-            };
-            clamp(clamp: boolean): TimeScale;
+        export interface TimeScale extends QuantitativeScale<Date> {
             ticks: {
                 (count: number): any[];
                 (range: D3.Time.Range, count: number): any[];
             };
-            tickFormat(count: number): (n: number) => string;
-            nice(count?: number): TimeScale;
         }
     }
 

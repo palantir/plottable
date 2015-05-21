@@ -1,6 +1,10 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
+  export class Orientation {
+    public static VERTICAL = "vertical";
+    public static HORIZONTAL = "horizontal";
+  }
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
@@ -21,15 +25,14 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = isVertical;
+      this._isVertical = true;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
@@ -401,6 +404,30 @@ export module Plots {
     }
 
     /**
+     * Gets the orientation of the Plots.Bar.
+     *
+     * @returns {string} the current orientation.
+     */
+    public orientation(): string;
+    /**
+     * Sets the orientation of the Plots.Bar.
+     *
+     * @param {string} orientation The desired orientation
+     * (horizontal/vertical).
+     * @returns {Plots.Bar} The calling Plots.Bar.
+     */
+    public orientation(orientation: string): Plots.Bar<X, Y>;
+    public orientation(orientation?: string): any {
+      if (orientation == null) {
+        return this._isVertical ? Orientation.VERTICAL : Orientation.HORIZONTAL;
+      } else {
+        this._isVertical = orientation === Orientation.VERTICAL;
+        this.render();
+        return this;
+      }
+    }
+
+    /**
      * Computes the barPixelWidth of all the bars in the plot.
      *
      * If the position scale of the plot is a CategoryScale and in bands mode, then the rangeBands function will be used.
@@ -419,7 +446,9 @@ export module Plots {
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset).valueOf());
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset))
+                               .filter((d) => d != null)
+                               .map((d) => d.valueOf());
         }))).values().map((value) => +value);
 
         numberBarAccessorData.sort((a, b) => a - b);
