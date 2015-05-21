@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data, { foo: "!" });
 
-  var plot = new Plottable.Plots.Bar(xScale, yScale, true)
+  var plot = new Plottable.Plots.Bar(xScale, yScale, "vertical")
     .addDataset(ds)
     .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
     .y(function(d) { return d.y; }, yScale)

@@ -445,8 +445,7 @@ describe("Drawers", function () {
             var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Category();
-            var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            barPlot.orientation(Plottable.Orientation.HORIZONTAL);
+            var barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             barPlot._getDrawer = function () { return drawer; };
             barPlot.addDataset(new Plottable.Dataset(data));
@@ -3253,6 +3252,11 @@ describe("Plots", function () {
             assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
+        it("rejects invalid orientations", function () {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            assert.throws(function () { return new Plottable.Plots.Bar(xScale, yScale, "diagonal"); }, Error);
+        });
         function assertPlotDataEqual(expected, actual, msg) {
             assert.deepEqual(expected.data, actual.data, msg);
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -3613,8 +3617,7 @@ describe("Plots", function () {
                     { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plots.Bar(xScale, yScale);
-                barPlot.orientation(Plottable.Orientation.HORIZONTAL);
+                barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -5371,8 +5374,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.StackedBar(xScale, yScale);
-            renderer.orientation(Plottable.Orientation.HORIZONTAL);
+            renderer = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.y(function (d) { return d.name; }, yScale);
             renderer.x(function (d) { return d.y; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
@@ -5487,8 +5489,7 @@ describe("Plots", function () {
                 { y: "B", x: 1, type: "c" },
                 { y: "C", x: 7, type: "c" }
             ];
-            plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.orientation(Plottable.Orientation.HORIZONTAL);
+            plot = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5687,8 +5688,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale);
-            renderer.orientation(Plottable.Orientation.HORIZONTAL);
+            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
@@ -5787,8 +5787,7 @@ describe("Plots", function () {
             var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
             var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
             var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
-            plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
-            plot.orientation(Plottable.Orientation.HORIZONTAL);
+            plot = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5917,9 +5916,9 @@ describe("Metadata", function () {
         checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
         checkXYPlot(new Plottable.Plots.Bar(xScale, yScale));
         checkXYPlot(new Plottable.Plots.StackedBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale).orientation(Plottable.Orientation.HORIZONTAL));
+        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
         checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale).orientation(Plottable.Orientation.HORIZONTAL));
+        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
         checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
         checkPiePlot(new Plottable.Plots.Pie());
         svg.remove();

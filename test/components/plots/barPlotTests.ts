@@ -19,6 +19,12 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("rejects invalid orientations", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      assert.throws(() => new Plottable.Plots.Bar(xScale, yScale, "diagonal"), Error);
+    });
+
     function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
         msg: string) {
       assert.deepEqual(expected.data, actual.data, msg);
@@ -449,8 +455,7 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale);
-        barPlot.orientation(Plottable.Orientation.HORIZONTAL);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
