@@ -2917,6 +2917,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>): Area<X>;
             y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
+            protected _additionalPaint(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;

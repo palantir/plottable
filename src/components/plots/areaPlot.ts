@@ -50,6 +50,16 @@ export module Plots {
       }
     }
 
+    protected _additionalPaint() {
+      var drawSteps = this._generateDrawSteps();
+      var dataToDraw = this._getDataToDraw();
+      this._datasetKeysInOrder.forEach((k, i) => {
+        var lineDrawer = new Drawers.Line(k);
+        lineDrawer.setup(this._renderArea.append("g"));
+        lineDrawer.draw(dataToDraw.get(k), drawSteps, this._key2PlotDatasetKey.get(k).dataset);
+      });
+    }
+
     protected _getDrawer(key: string) {
       return new Plottable.Drawers.Area(key);
     }

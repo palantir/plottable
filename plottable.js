@@ -7836,6 +7836,16 @@ var Plottable;
                     this._updateYDomainer();
                 }
             };
+            Area.prototype._additionalPaint = function () {
+                var _this = this;
+                var drawSteps = this._generateDrawSteps();
+                var dataToDraw = this._getDataToDraw();
+                this._datasetKeysInOrder.forEach(function (k, i) {
+                    var lineDrawer = new Plottable.Drawers.Line(k);
+                    lineDrawer.setup(_this._renderArea.append("g"));
+                    lineDrawer.draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset);
+                });
+            };
             Area.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);
             };
