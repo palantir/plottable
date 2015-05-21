@@ -7978,7 +7978,7 @@ var Plottable;
             return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
         };
         /**
-         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
+         * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
         StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, datasets) {
             var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasetKeys, keyToPlotDatasetKey);
@@ -8341,7 +8341,6 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                console.log(1);
                 var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
                 stackOffsets.keys().forEach(function (dataset) {
                     _this._stackOffsets.set(dataset, stackOffsets.get(dataset));

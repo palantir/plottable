@@ -48,7 +48,7 @@ module Plottable {
     }
 
     /**
-     * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
+     * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
      */
     public static computeStackOffsets(
         keyAccessor: Accessor<any>,
