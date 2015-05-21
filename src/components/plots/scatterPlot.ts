@@ -40,7 +40,7 @@ export module Plots {
         return this._propertyBindings.get(Scatter._SIZE_KEY);
       }
       this._bindProperty(Scatter._SIZE_KEY, size, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -51,7 +51,7 @@ export module Plots {
         return this._propertyBindings.get(Scatter._SYMBOL_KEY);
       }
       this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
-      this.renderImmediately();
+      this.render();
       return this;
     }
 

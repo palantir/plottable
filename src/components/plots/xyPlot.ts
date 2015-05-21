@@ -53,7 +53,7 @@ module Plottable {
         this._updateYExtentsAndAutodomain();
       }
       this._updateXDomainer();
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -70,7 +70,7 @@ module Plottable {
         this._updateXExtentsAndAutodomain();
       }
       this._updateYDomainer();
-      this.renderImmediately();
+      this.render();
       return this;
     }
 

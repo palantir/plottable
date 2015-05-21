@@ -6715,7 +6715,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
                 this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie.prototype.innerRadius = function (innerRadius, scale) {
@@ -6723,7 +6723,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
                 this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie.prototype.outerRadius = function (outerRadius, scale) {
@@ -6731,7 +6731,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
                 this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
@@ -6792,7 +6792,7 @@ var Plottable;
                 this._updateYExtentsAndAutodomain();
             }
             this._updateXDomainer();
-            this.renderImmediately();
+            this.render();
             return this;
         };
         XYPlot.prototype.y = function (y, yScale) {
@@ -6804,7 +6804,7 @@ var Plottable;
                 this._updateXExtentsAndAutodomain();
             }
             this._updateYDomainer();
-            this.renderImmediately();
+            this.render();
             return this;
         };
         XYPlot.prototype._filterForProperty = function (property) {
@@ -7032,7 +7032,7 @@ var Plottable;
                     return this._propertyBindings.get(Rectangle._X1_KEY);
                 }
                 this._bindProperty(Rectangle._X1_KEY, x1, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Rectangle.prototype.x2 = function (x2, scale) {
@@ -7040,7 +7040,7 @@ var Plottable;
                     return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
                 this._bindProperty(Rectangle._X2_KEY, x2, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Rectangle.prototype.y1 = function (y1, scale) {
@@ -7048,7 +7048,7 @@ var Plottable;
                     return this._propertyBindings.get(Rectangle._Y1_KEY);
                 }
                 this._bindProperty(Rectangle._Y1_KEY, y1, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Rectangle.prototype.y2 = function (y2, scale) {
@@ -7056,7 +7056,7 @@ var Plottable;
                     return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
                 this._bindProperty(Rectangle._Y2_KEY, y2, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Rectangle._X1_KEY = "x1";
@@ -7108,7 +7108,7 @@ var Plottable;
                     return this._propertyBindings.get(Scatter._SIZE_KEY);
                 }
                 this._bindProperty(Scatter._SIZE_KEY, size, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Scatter.prototype.symbol = function (symbol) {
@@ -7116,7 +7116,7 @@ var Plottable;
                     return this._propertyBindings.get(Scatter._SYMBOL_KEY);
                 }
                 this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Scatter.prototype._generateDrawSteps = function () {
@@ -7844,7 +7844,7 @@ var Plottable;
                 }
                 this._bindProperty(Area._Y0_KEY, y0, y0Scale);
                 this._updateYDomainer();
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Area.prototype._onDatasetUpdate = function () {
