@@ -6802,20 +6802,21 @@ describe("Tables", function () {
         assert.isTrue(table.fixedWidth(), "width fixed again once no subcomponent width not fixed");
         assert.isFalse(table.fixedHeight(), "height unfixed now that a subcomponent has unfixed height");
     });
-    it.skip("table.requestedSpace works properly", function () {
-        // [0 1]
-        // [2 3]
+    it("table.requestedSpace works properly", function () {
         var c0 = new Plottable.Component();
         var c1 = TestMethods.makeFixedSizeComponent(50, 50);
         var c2 = TestMethods.makeFixedSizeComponent(20, 50);
         var c3 = TestMethods.makeFixedSizeComponent(20, 20);
-        var table = new Plottable.Components.Table([[c0, c1], [c2, c3]]);
+        var table = new Plottable.Components.Table([
+            [c0, c1],
+            [c2, c3]
+        ]);
         var spaceRequest = table.requestedSpace(30, 30);
-        TestMethods.verifySpaceRequest(spaceRequest, 30, 30, "1");
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "1");
         spaceRequest = table.requestedSpace(50, 50);
-        TestMethods.verifySpaceRequest(spaceRequest, 50, 50, "2");
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "2");
         spaceRequest = table.requestedSpace(90, 90);
-        TestMethods.verifySpaceRequest(spaceRequest, 70, 90, "3");
+        TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "3");
         spaceRequest = table.requestedSpace(200, 200);
         TestMethods.verifySpaceRequest(spaceRequest, 70, 100, "4");
     });
@@ -6841,7 +6842,7 @@ describe("Tables", function () {
             var result = table._iterateLayout(500, 500);
             verifyLayoutResult(result, [215, 215], [220, 220], [50, 20], [50, 10], false, false, "");
         });
-        it.skip("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
+        it("iterateLayout works in the difficult case where there is a shortage of space and layout requires iterations", function () {
             var c1 = new Mocks.FixedSizeComponent(490, 50);
             var c2 = new Plottable.Component();
             var c3 = new Plottable.Component();
@@ -6851,7 +6852,7 @@ describe("Tables", function () {
                 [c3, c4]
             ]);
             var result = table._iterateLayout(500, 500);
-            verifyLayoutResult(result, [0, 0], [220, 220], [480, 20], [50, 10], true, false, "");
+            verifyLayoutResult(result, [5, 5], [225, 225], [490, 0], [50, 0], false, false, "");
         });
         it("iterateLayout works in the case where all components are fixed-size", function () {
             var c1 = new Mocks.FixedSizeComponent(50, 50);
