@@ -8024,7 +8024,8 @@ var Plottable;
             return dataArray;
         };
         /**
-         *
+         * Given an array of datasets and the accessor function for the key, computes the
+         * set reunion (no duplicates) of the domain of each dataset.
          */
         StackedPlotUtils.getDomainKeys = function (keyAccessor, datasets) {
             var domainKeys = d3.set();

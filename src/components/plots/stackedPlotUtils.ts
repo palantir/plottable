@@ -128,7 +128,8 @@ module Plottable {
     }
 
     /**
-     *
+     * Given an array of datasets and the accessor function for the key, computes the
+     * set reunion (no duplicates) of the domain of each dataset.
      */
     private static getDomainKeys(keyAccessor: Accessor<any>, datasets: Dataset[]) {
       var domainKeys = d3.set();
