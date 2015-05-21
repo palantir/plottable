@@ -32,7 +32,7 @@ module Plottable {
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
-    public getExtendFromData(data: D[]): D[] {
+    public getExtentFromData(data: D[]): D[] {
       return [];
     }
 

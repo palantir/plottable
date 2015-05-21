@@ -1495,7 +1495,7 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
-        Scale.prototype.getExtendFromData = function (data) {
+        Scale.prototype.getExtentFromData = function (data) {
             return [];
         };
         Scale.prototype._getAllExtents = function () {
@@ -1632,7 +1632,7 @@ var Plottable;
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
         };
-        QuantitativeScale.prototype.getExtendFromData = function (data) {
+        QuantitativeScale.prototype.getExtentFromData = function (data) {
             var extent = d3.extent(data);
             if (extent[0] == null || extent[1] == null) {
                 return [];
@@ -1979,7 +1979,7 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Category.prototype.getExtendFromData = function (data) {
+            Category.prototype.getExtentFromData = function (data) {
                 return Plottable.Utils.Methods.uniq(data);
             };
             Category.prototype._getExtent = function () {
@@ -2124,7 +2124,7 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
-            Color.prototype.getExtendFromData = function (data) {
+            Color.prototype.getExtentFromData = function (data) {
                 return Plottable.Utils.Methods.uniq(data);
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
@@ -2317,7 +2317,7 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
-            InterpolatedColor.prototype.getExtendFromData = function (data) {
+            InterpolatedColor.prototype.getExtentFromData = function (data) {
                 var extent = d3.extent(data);
                 if (extent[0] == null || extent[1] == null) {
                     return [];
@@ -6398,7 +6398,7 @@ var Plottable;
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = data.map(appliedAccessor);
             if (scale) {
-                return scale.getExtendFromData(mappedData);
+                return scale.getExtentFromData(mappedData);
             }
             else {
                 return [];

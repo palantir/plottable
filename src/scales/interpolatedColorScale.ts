@@ -88,7 +88,7 @@ export module Scales {
       this._d3Scale = this._D3InterpolatedScale();
     }
 
-    public getExtendFromData(data: number[]): number[] {
+    public getExtentFromData(data: number[]): number[] {
       var extent = d3.extent(data);
       if (extent[0] == null || extent[1] == null) {
         return [];

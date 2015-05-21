@@ -281,7 +281,7 @@ module Plottable {
       var mappedData = data.map(appliedAccessor);
 
       if (scale) {
-        return scale.getExtendFromData(mappedData);
+        return scale.getExtentFromData(mappedData);
       } else {
         return [];
       }
