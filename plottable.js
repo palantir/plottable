@@ -7105,7 +7105,7 @@ var Plottable;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["size"] = function () { return 0; };
+                    resetAttrToProjector["d"] = function () { return ""; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
