@@ -146,8 +146,7 @@ export module Plots {
 
       StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
 
-      var stackOffsets = StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor,
-        datasetKeys, keyToPlotDatasetKey, this.datasets());
+      var stackOffsets = StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
 
       stackOffsets.keys().forEach((dataset) => {
         this._stackOffsets.set(dataset, stackOffsets.get(dataset));

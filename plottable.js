@@ -7980,7 +7980,7 @@ var Plottable;
         /**
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
-        StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, datasets) {
+        StackedPlotUtils.computeStackOffsets = function (keyAccessor, valueAccessor, datasetKeys, datasets) {
             var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
             var dataMapArray = StackedPlotUtils.generateDefaultMapArray(keyAccessor, valueAccessor, domainKeys, datasetKeys, datasets);
             var positiveDataMapArray = dataMapArray.map(function (dataMap) {
@@ -8213,7 +8213,7 @@ var Plottable;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 Plottable.StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
+                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
                 stackOffsets.keys().forEach(function (dataset) {
                     _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
                 });
@@ -8343,7 +8343,7 @@ var Plottable;
                 var datasetKeys = this._datasetKeysInOrder;
                 var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey, this.datasets());
+                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
                 stackOffsets.keys().forEach(function (dataset) {
                     _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
                 });

@@ -54,7 +54,6 @@ module Plottable {
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
         datasetKeys: string[],
-        keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>,
         datasets: Dataset[]) {
 
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
