@@ -48,10 +48,12 @@ function run(svg, data, Plottable) {
     .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 
-  var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, false)
-    .x(function(d) { return d.earnings; }, xScale2)
+  var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, false);
+  if (typeof horizontalPlot.orientation === "function") {
+    horizontalPlot.orientation("horizontal");
+  }
+  horizontalPlot.x(function(d) { return d.earnings; }, xScale2)
     .y(function(d) { return d.quarter; }, yScale2)
-    .orientation("horizontal")
     .attr("fill", function(d) { return d.team; }, colorScale)
     .addDataset(dataset1)
     .addDataset(dataset2)
