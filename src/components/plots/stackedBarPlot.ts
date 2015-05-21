@@ -122,9 +122,7 @@ export module Plots {
       var orientation = this._isVertical ? "vertical" : "horizontal";
       var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
       var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       var stackOffsets = StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());

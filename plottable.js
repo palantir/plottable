@@ -8209,7 +8209,6 @@ var Plottable;
                 var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
                 var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
                 var datasetKeys = this._datasetKeysInOrder;
-                var keyToPlotDatasetKey = this._key2PlotDatasetKey;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 Plottable.StackedPlotUtils.checkSameDomainForStacks(keyAccessor, this.datasets());
                 var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(keyAccessor, valueAccessor, datasetKeys, this.datasets());
