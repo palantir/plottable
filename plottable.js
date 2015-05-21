@@ -2546,7 +2546,6 @@ var Plottable;
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
                     var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, dataset);
-                    _this._attrToProjector = Plottable.Utils.Methods.copyMap(appliedAttrToProjector);
                     return {
                         attrToProjector: appliedAttrToProjector,
                         animator: dr.animator
@@ -2573,9 +2572,6 @@ var Plottable;
             };
             AbstractDrawer.prototype._getSelector = function () {
                 return "";
-            };
-            AbstractDrawer.prototype._getPixelPoint = function (datum, index) {
-                return null;
             };
             AbstractDrawer.prototype._getSelection = function (index) {
                 var allSelections = this._getRenderArea().selectAll(this._getSelector());
@@ -2647,9 +2643,6 @@ var Plottable;
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
-            };
-            Line.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             Line.prototype._getSelection = function (index) {
                 return this._getRenderArea().select(this._getSelector());
@@ -2909,15 +2902,6 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
-            Rect.prototype._getPixelPoint = function (datum, index) {
-                var rectX = this._attrToProjector["x"](datum, index);
-                var rectY = this._attrToProjector["y"](datum, index);
-                var rectWidth = this._attrToProjector["width"](datum, index);
-                var rectHeight = this._attrToProjector["height"](datum, index);
-                var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
-                var y = this._isVertical ? rectY : rectY + rectHeight / 2;
-                return { x: x, y: y };
-            };
             Rect.prototype.draw = function (data, drawSteps, userMetadata) {
                 var attrToProjector = drawSteps[0].attrToProjector;
                 var isValidNumber = Plottable.Utils.Methods.isValidNumber;
@@ -2962,7 +2946,6 @@ var Plottable;
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
                 var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
@@ -2982,15 +2965,6 @@ var Plottable;
                     }
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, dataset);
-            };
-            Arc.prototype._getPixelPoint = function (datum, index) {
-                var innerRadiusAccessor = this._attrToProjector["inner-radius"];
-                var outerRadiusAccessor = this._attrToProjector["outer-radius"];
-                var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-                var startAngle = +this._getSelection(index).datum().startAngle;
-                var endAngle = +this._getSelection(index).datum().endAngle;
-                var avgAngle = (startAngle + endAngle) / 2;
-                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             return Arc;
         })(Drawers.Element);
@@ -3016,13 +2990,6 @@ var Plottable;
                 this._svgElement = "path";
                 this._className = "symbol";
             }
-            Symbol.prototype._drawStep = function (step) {
-                this._attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                _super.prototype._drawStep.call(this, step);
-            };
-            Symbol.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
-            };
             return Symbol;
         })(Drawers.Element);
         Drawers.Symbol = Symbol;
@@ -6539,8 +6506,9 @@ var Plottable;
                     return;
                 }
                 var drawer = plotDatasetKey.drawer;
+                var dataset = plotDatasetKey.dataset;
                 plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                    var pixelPoint = drawer._getPixelPoint(datum, index);
+                    var pixelPoint = _this._pixelPoint(datum, index, dataset);
                     if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                         return;
                     }
@@ -6599,6 +6567,9 @@ var Plottable;
         };
         Plot._scaledAccessor = function (binding) {
             return binding.scale == null ? binding.accessor : function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
+        };
+        Plot.prototype._pixelPoint = function (datum, index, dataset) {
+            return { x: 0, y: 0 };
         };
         return Plot;
     })(Plottable.Component);
@@ -6698,6 +6669,17 @@ var Plottable;
                 attrToProjector[Pie._OUTER_RADIUS_KEY] = Plottable.Plot._scaledAccessor(this.outerRadius());
                 attrToProjector[Pie._SECTOR_VALUE_KEY] = Plottable.Plot._scaledAccessor(this.sectorValue());
                 return attrToProjector;
+            };
+            Pie.prototype._pixelPoint = function (datum, index, dataset) {
+                var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+                var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+                var avgRadius = (innerRadius + outerRadius) / 2;
+                var scaledValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
+                var pie = d3.layout.pie().sort(null).value(function (d, i) { return scaledValueAccessor(d, i, dataset); })(dataset.data());
+                var startAngle = pie[index].startAngle;
+                var endAngle = pie[index].endAngle;
+                var avgAngle = (startAngle + endAngle) / 2;
+                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
@@ -6929,6 +6911,10 @@ var Plottable;
         XYPlot.prototype._projectorsReady = function () {
             return this.x().accessor != null && this.y().accessor != null;
         };
+        XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
+            var attrToProjector = this._generateAttrToProjector();
+            return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+        };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
         return XYPlot;
@@ -7032,6 +7018,16 @@ var Plottable;
                 attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
                 attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y1());
                 return attrToProjector;
+            };
+            Rectangle.prototype._pixelPoint = function (datum, index, dataset) {
+                var attrToProjector = this._generateAttrToProjector();
+                var rectX = attrToProjector["x"](datum, index, dataset);
+                var rectY = attrToProjector["y"](datum, index, dataset);
+                var rectWidth = attrToProjector["width"](datum, index, dataset);
+                var rectHeight = attrToProjector["height"](datum, index, dataset);
+                var x = rectX + rectWidth / 2;
+                var y = rectY + rectHeight / 2;
+                return { x: x, y: y };
             };
             Rectangle._X1_KEY = "x1";
             Rectangle._X2_KEY = "x2";
@@ -7632,6 +7628,16 @@ var Plottable;
                 });
                 return plotData;
             };
+            Bar.prototype._pixelPoint = function (datum, index, dataset) {
+                var attrToProjector = this._generateAttrToProjector();
+                var rectX = attrToProjector["x"](datum, index, dataset);
+                var rectY = attrToProjector["y"](datum, index, dataset);
+                var rectWidth = attrToProjector["width"](datum, index, dataset);
+                var rectHeight = attrToProjector["height"](datum, index, dataset);
+                var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
+                var y = this._isVertical ? rectY : rectY + rectHeight / 2;
+                return { x: x, y: y };
+            };
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
@@ -7720,8 +7726,9 @@ var Plottable;
                         return;
                     }
                     var drawer = plotDatasetKey.drawer;
+                    var dataset = plotDatasetKey.dataset;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                             return;
                         }

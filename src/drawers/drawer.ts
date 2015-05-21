@@ -21,7 +21,6 @@ export module Drawers {
     private _renderArea: D3.Selection;
     protected _className: string;
     public key: string;
-    protected _attrToProjector: AttributeToAppliedProjector;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -108,7 +107,6 @@ export module Drawers {
     public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset);
-        this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator
@@ -142,10 +140,6 @@ export module Drawers {
 
     public _getSelector(): string {
       return "";
-    }
-
-    public _getPixelPoint(datum: any, index: number): Point {
-      return null;
     }
 
     public _getSelection(index: number): D3.Selection {

@@ -117,6 +117,17 @@ export module Plots {
       attrToProjector["y1"] = Plot._scaledAccessor(this.y1());
       return attrToProjector;
     }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+      var attrToProjector = this._generateAttrToProjector();
+      var rectX = attrToProjector["x"](datum, index, dataset);
+      var rectY = attrToProjector["y"](datum, index, dataset);
+      var rectWidth = attrToProjector["width"](datum, index, dataset);
+      var rectHeight = attrToProjector["height"](datum, index, dataset);
+      var x = rectX + rectWidth / 2;
+      var y = rectY + rectHeight / 2;
+      return { x: x, y: y };
+    }
   }
 }
 }

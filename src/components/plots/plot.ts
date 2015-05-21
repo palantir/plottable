@@ -472,8 +472,9 @@ module Plottable {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
+        var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
+          var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
@@ -547,6 +548,10 @@ module Plottable {
       return binding.scale == null ?
                binding.accessor :
                (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      return { x: 0, y: 0 };
     }
   }
 }
