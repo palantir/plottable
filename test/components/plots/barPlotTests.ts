@@ -11,8 +11,8 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar(xScale, yScale);
-      plot.x((d) => d.x, xScale);
-      plot.y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
@@ -449,7 +449,8 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot.orientation(Plottable.Orientation.HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);

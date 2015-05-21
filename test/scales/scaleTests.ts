@@ -4,7 +4,8 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -12,12 +13,15 @@ describe("Scales", () => {
       callbackWasCalled = true;
     };
     scale.onUpdate(testCallback);
+    (<any> scale)._setBackingScaleDomain = () => null;
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
   });
 
   it("Scale update listeners can be turned off", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
+    (<any> scale)._setBackingScaleDomain = () => null;
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -121,12 +125,12 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
-      renderAreaD1.x((d) => d.x, xScale);
-      renderAreaD1.y((d) => d.y, yScale);
+      renderAreaD1.x((d: any) => d.x, xScale);
+      renderAreaD1.y((d: any) => d.y, yScale);
       var renderAreaD2 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD2.addDataset(ds2);
-      renderAreaD2.x((d) => d.x, xScale);
-      renderAreaD2.y((d) => d.y, yScale);
+      renderAreaD2.x((d: any) => d.x, xScale);
+      renderAreaD2.y((d: any) => d.y, yScale);
       var renderAreas = new Plottable.Components.Group([renderAreaD1, renderAreaD2]);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -204,8 +208,8 @@ describe("Scales", () => {
     var dataset = new Plottable.Dataset([dA, dB]);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.addDataset(dataset);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
