@@ -1534,8 +1534,15 @@ var Plottable;
             return this;
         };
         QuantitativeScale.prototype._includeValues = function (domain) {
-            var includedValues = this._includedValues.values();
-            return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
+            this._includedValues.values().forEach(function (value) {
+                if (value < domain[0]) {
+                    domain[0] = value;
+                }
+                if (value > domain[1]) {
+                    domain[1] = value;
+                }
+            });
+            return domain;
         };
         QuantitativeScale.prototype._padDomain = function (domain) {
             if (domain[0].valueOf() === domain[1].valueOf()) {

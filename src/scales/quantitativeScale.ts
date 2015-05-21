@@ -123,11 +123,15 @@ module Plottable {
     }
 
     private _includeValues(domain: D[]) {
-      var includedValues = this._includedValues.values();
-      return includedValues.reduce(
-        (domain, value) => [<D> <any>Math.min(<any>domain[0], <any>value), <D> <any>Math.max(<any>domain[1], <any>value)],
-        domain
-      );
+      this._includedValues.values().forEach((value) => {
+        if (value < domain[0]) {
+          domain[0] = value;
+        }
+        if (value > domain[1]) {
+          domain[1] = value;
+        }
+      });
+      return domain;
     }
 
     private _padDomain(domain: D[]) {
