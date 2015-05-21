@@ -255,12 +255,54 @@ export module Plots {
       return d3.selectAll(bars);
     }
 
-    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
-      var bars: any[] = [];
+    /**
+     * Gets the {Plots.PlotData} that correspond to the given pixel position.
+     * 
+     * @param {Point} p The provided pixel position as a {Point}
+     * @return {Plots.PlotData} The plot data that corresponds to the point.
+     */
+    public plotDataAt(p: Point) {
+  	  var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) => 
+        bars.concat(this._getBarsFromDataset(key, p.x, p.y))
+      , []);
+      return d3.selectAll(bars).data();
+    }
 
+    /**
+     * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+     * 
+     * @param {Extent} xRange The specified range of x values
+     * @param {Extent} yRange The specified range of y values
+     * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
+     */
+    public plotDataIn(xRange: Extent, yRange: Extent) {
+  	  var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) => 
+        bars.concat(this._getPlotData(key, xRange, yRange))
+      , []);
+      return bars;
+    }
+
+    private _getPlotData(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent) {
+      var data: Plots.PlotData[] = [];
       var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+          var plotData: Plots.PlotData;
+          plotData.selection = d3.select(this);
+          plotData.pixelPoints
+        }
+      });
+      return data;
+    }
+
+    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
+      var bars: any[] = [];
+      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
+      drawer._getRenderArea().selectAll("rect").each(function(d) {
+        if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+          var bar = d3.select(this);
+          
+          console.log(bar);
           bars.push(this);
         }
       });

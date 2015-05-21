@@ -7307,11 +7307,48 @@ var Plottable;
                 var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xValOrExtent, yValOrExtent)); }, []);
                 return d3.selectAll(bars);
             };
+            /**
+             * Gets the {Plots.PlotData} that correspond to the given pixel position.
+             *
+             * @param {Point} p The provided pixel position as a {Point}
+             * @return {Plots.PlotData} The plot data that corresponds to the point.
+             */
+            Bar.prototype.plotDataAt = function (p) {
+                var _this = this;
+                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, p.x, p.y)); }, []);
+                return d3.selectAll(bars).data();
+            };
+            /**
+             * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+             *
+             * @param {Extent} xRange The specified range of x values
+             * @param {Extent} yRange The specified range of y values
+             * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
+             */
+            Bar.prototype.plotDataIn = function (xRange, yRange) {
+                var _this = this;
+                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getPlotData(key, xRange, yRange)); }, []);
+                return bars;
+            };
+            Bar.prototype._getPlotData = function (key, xValOrExtent, yValOrExtent) {
+                var data = [];
+                var drawer = this._key2PlotDatasetKey.get(key).drawer;
+                drawer._getRenderArea().selectAll("rect").each(function (d) {
+                    if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+                        var plotData;
+                        plotData.selection = d3.select(this);
+                        plotData.pixelPoints;
+                    }
+                });
+                return data;
+            };
             Bar.prototype._getBarsFromDataset = function (key, xValOrExtent, yValOrExtent) {
                 var bars = [];
                 var drawer = this._key2PlotDatasetKey.get(key).drawer;
                 drawer._getRenderArea().selectAll("rect").each(function (d) {
                     if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+                        var bar = d3.select(this);
+                        console.log(bar);
                         bars.push(this);
                     }
                 });

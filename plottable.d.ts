@@ -2804,6 +2804,21 @@ declare module Plottable {
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
+            /**
+             * Gets the {Plots.PlotData} that correspond to the given pixel position.
+             *
+             * @param {Point} p The provided pixel position as a {Point}
+             * @return {Plots.PlotData} The plot data that corresponds to the point.
+             */
+            plotDataAt(p: Point): any[];
+            /**
+             * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+             *
+             * @param {Extent} xRange The specified range of x values
+             * @param {Extent} yRange The specified range of y values
+             * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
+             */
+            plotDataIn(xRange: Extent, yRange: Extent): any[];
             protected _updateDomainer(scale: Scale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;
