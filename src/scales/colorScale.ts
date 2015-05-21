@@ -52,7 +52,7 @@ export module Scales {
       this._d3Scale = scale;
     }
 
-    public getExtentFromDomain(data: string[]) {
+    public extentOfValues(data: string[]) {
       return Utils.Methods.uniq(data);
     }
 

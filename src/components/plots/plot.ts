@@ -284,7 +284,7 @@ module Plottable {
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
       var mappedData = data.map(appliedAccessor);
 
-      return scale.getExtentFromDomain(mappedData);
+      return scale.extentOfValues(mappedData);
     }
 
     /**

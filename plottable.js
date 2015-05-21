@@ -1495,7 +1495,7 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
-        Scale.prototype.getExtentFromDomain = function (data) {
+        Scale.prototype.extentOfValues = function (data) {
             return []; // this should be overwritten
         };
         Scale.prototype._getAllExtents = function () {
@@ -1632,7 +1632,7 @@ var Plottable;
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
         };
-        QuantitativeScale.prototype.getExtentFromDomain = function (data) {
+        QuantitativeScale.prototype.extentOfValues = function (data) {
             var extent = d3.extent(data);
             if (extent[0] == null || extent[1] == null) {
                 return [];
@@ -1979,7 +1979,7 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
-            Category.prototype.getExtentFromDomain = function (data) {
+            Category.prototype.extentOfValues = function (data) {
                 return Plottable.Utils.Methods.uniq(data);
             };
             Category.prototype._getExtent = function () {
@@ -2124,7 +2124,7 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
-            Color.prototype.getExtentFromDomain = function (data) {
+            Color.prototype.extentOfValues = function (data) {
                 return Plottable.Utils.Methods.uniq(data);
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
@@ -2317,7 +2317,7 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
-            InterpolatedColor.prototype.getExtentFromDomain = function (data) {
+            InterpolatedColor.prototype.extentOfValues = function (data) {
                 var extent = d3.extent(data);
                 if (extent[0] == null || extent[1] == null) {
                     return [];
@@ -6400,7 +6400,7 @@ var Plottable;
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = data.map(appliedAccessor);
-            return scale.getExtentFromDomain(mappedData);
+            return scale.extentOfValues(mappedData);
         };
         /**
          * Override in subclass to add special extents, such as included values
