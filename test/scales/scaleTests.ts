@@ -4,7 +4,8 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -12,12 +13,15 @@ describe("Scales", () => {
       callbackWasCalled = true;
     };
     scale.onUpdate(testCallback);
+    (<any> scale)._setBackingScaleDomain = () => null;
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
   });
 
   it("Scale update listeners can be turned off", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
+    (<any> scale)._setBackingScaleDomain = () => null;
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -66,8 +70,8 @@ describe("Scales", () => {
     var dataset = new Plottable.Dataset([dA, dB]);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.addDataset(dataset);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);

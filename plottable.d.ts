@@ -168,18 +168,22 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        /**
-         * An associative array that can be keyed by anything (inc objects).
-         * Uses pointer equality checks which is why this works.
-         * This power has a price: everything is linear time since it is actually backed by an array...
-         */
+        module D3Scale {
+            function niceDomain<D>(scale: D3.Scale.QuantitativeScale<D>, domain: D[], count?: number): any[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Utils {
         class Map<K, V> {
             /**
-             * Set a new key/value pair in the store.
+             * Set a new key/value pair in the Map.
              *
-             * @param {K} key Key to set in the store
-             * @param {V} value Value to set in the store
-             * @return {boolean} True if key already in store, false otherwise
+             * @param {K} key Key to set in the Map
+             * @param {V} value Value to set in the Map
+             * @return {boolean} True if key already in Map, false otherwise
              */
             set(key: K, value: V): boolean;
             /**
@@ -188,7 +192,7 @@ declare module Plottable {
              * @param {K} key Key associated with value to retrieve
              * @return {V} Value if found, undefined otherwise
              */
-            get(key: K): any;
+            get(key: K): V;
             /**
              * Test whether store has a value associated with given key.
              *
@@ -200,26 +204,19 @@ declare module Plottable {
              */
             has(key: K): boolean;
             /**
-             * Return an array of the values in the key-value store
+             * Return an array of the values in the Map
              *
              * @return {V[]} The values in the store
              */
-            values(): any[];
+            values(): V[];
             /**
-             * Return an array of keys in the key-value store
+             * Return an array of keys in the Map.
              *
              * @return {K[]} The keys in the store
              */
-            keys(): any[];
+            keys(): K[];
             /**
-             * Execute a callback for each entry in the array.
-             *
-             * @param {(key: K, val?: V, index?: number) => any} callback The callback to execute
-             * @return {any[]} The results of mapping the callback over the entries
-             */
-            map(cb: (key?: K, val?: V, index?: number) => any): any[];
-            /**
-             * Delete a key from the key-value store. Return whether the key was present.
+             * Delete a key from the Map. Return whether the key was present.
              *
              * @param {K} The key to remove
              * @return {boolean} Whether a matching entry was found and removed
@@ -443,28 +440,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Core {
-        /**
-         * Colors we use as defaults on a number of graphs.
-         */
-        class Colors {
-            static CORAL_RED: string;
-            static INDIGO: string;
-            static ROBINS_EGG_BLUE: string;
-            static FERN: string;
-            static BURNING_ORANGE: string;
-            static ROYAL_HEATH: string;
-            static CONIFER: string;
-            static CERISE_RED: string;
-            static BRIGHT_SUN: string;
-            static JACARTA: string;
-            static PLOTTABLE_COLORS: string[];
-        }
-    }
-}
-
-
-declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
@@ -597,12 +572,12 @@ declare module Plottable {
      * Access specific datum property.
      */
     interface Accessor<T> {
-        (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata): T;
+        (datum: any, index: number, dataset: Dataset): T;
     }
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
+    type _Projector = (datum: any, index: number, dataset: Dataset) => any;
     /**
      * Projector with dataset and plot metadata
      */
@@ -671,7 +646,6 @@ declare module Plottable {
         }
     }
     class Scale<D, R> {
-        protected _d3Scale: D3.Scale.Scale;
         /**
          * Constructs a new Scale.
          *
@@ -680,9 +654,8 @@ declare module Plottable {
          * from domain to range.
          *
          * @constructor
-         * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
          */
-        constructor(scale: D3.Scale.Scale);
+        constructor();
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
         onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
@@ -729,8 +702,9 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
-        protected _getDomain(): any[];
+        protected _getDomain(): void;
         protected _setDomain(values: D[]): void;
+        protected _setBackingScaleDomain(values: D[]): void;
         /**
          * Gets the range.
          *
@@ -752,6 +726,8 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
+        protected _getRange(): void;
+        protected _setRange(values: R[]): void;
         addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
         removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
@@ -761,7 +737,6 @@ declare module Plottable {
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected static _DEFAULT_NUM_TICKS: number;
-        protected _d3Scale: D3.Scale.QuantitativeScale;
         /**
          * Constructs a new QuantitativeScale.
          *
@@ -769,10 +744,8 @@ declare module Plottable {
          * is invertible and continuous.
          *
          * @constructor
-         * @param {D3.Scale.QuantitativeScale} scale The D3 QuantitativeScale
-         * backing the QuantitativeScale.
          */
-        constructor(scale: D3.Scale.QuantitativeScale);
+        constructor();
         autoDomain(): QuantitativeScale<D>;
         _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
@@ -831,7 +804,7 @@ declare module Plottable {
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        _niceDomain(domain: D[], count?: number): D[];
+        protected _niceDomain(domain: D[], count?: number): D[];
         protected _defaultExtent(): D[];
         /**
          * Gets the tick generator of the QuantitativeScale.
@@ -863,9 +836,16 @@ declare module Plottable {
              * LinearScale. If not supplied, uses a default scale.
              */
             constructor();
-            constructor(scale: D3.Scale.LinearScale);
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
+            scale(value: number): number;
+            protected _getDomain(): any[];
+            protected _setBackingScaleDomain(values: number[]): void;
+            protected _getRange(): any[];
+            protected _setRange(values: number[]): void;
+            invert(value: number): number;
+            getDefaultTicks(): number[];
+            protected _niceDomain(domain: number[], count?: number): number[];
         }
     }
 }
@@ -904,8 +884,9 @@ declare module Plottable {
             invert(x: number): number;
             protected _getDomain(): number[];
             protected _setDomain(values: number[]): void;
+            protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
-            _niceDomain(domain: number[], count?: number): number[];
+            protected _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
              *
@@ -924,6 +905,9 @@ declare module Plottable {
             showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
+            protected _getRange(): any[];
+            protected _setRange(values: number[]): void;
+            getDefaultTicks(): number[];
         }
     }
 }
@@ -932,7 +916,6 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
-            protected _d3Scale: D3.Scale.OrdinalScale;
             /**
              * Creates a CategoryScale.
              *
@@ -941,7 +924,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(scale?: D3.Scale.OrdinalScale);
+            constructor();
             protected _getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Category;
@@ -1000,6 +983,10 @@ declare module Plottable {
              */
             outerPadding(outerPadding: number): Category;
             scale(value: string): number;
+            protected _getDomain(): any[];
+            protected _setBackingScaleDomain(values: string[]): void;
+            protected _getRange(): any[];
+            protected _setRange(values: number[]): void;
         }
     }
 }
@@ -1019,6 +1006,10 @@ declare module Plottable {
             constructor(scaleType?: string);
             protected _getExtent(): string[];
             scale(value: string): string;
+            protected _getDomain(): any[];
+            protected _setBackingScaleDomain(values: string[]): void;
+            protected _getRange(): any[];
+            protected _setRange(values: string[]): void;
         }
     }
 }
@@ -1036,7 +1027,6 @@ declare module Plottable {
              * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
              */
             constructor();
-            constructor(scale: D3.Scale.LinearScale);
             /**
              * Specifies the interval between ticks
              *
@@ -1049,6 +1039,14 @@ declare module Plottable {
             protected _setDomain(values: Date[]): void;
             protected _defaultExtent(): Date[];
             protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
+            scale(value: Date): number;
+            protected _getDomain(): any[];
+            protected _setBackingScaleDomain(values: Date[]): void;
+            protected _getRange(): any[];
+            protected _setRange(values: number[]): void;
+            invert(value: number): Date;
+            getDefaultTicks(): Date[];
+            protected _niceDomain(domain: Date[], count?: number): any[];
         }
     }
 }
@@ -1095,6 +1093,11 @@ declare module Plottable {
              */
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
+            scale(value: number): string;
+            protected _getDomain(): any[];
+            protected _setBackingScaleDomain(values: number[]): void;
+            protected _getRange(): string[];
+            protected _setRange(values: string[]): void;
         }
     }
 }
@@ -1189,7 +1192,7 @@ declare module Plottable {
              * @param{Dataset} dataset The Dataset
              * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
             /**
              * Retrieves the renderArea selection for the drawer
              *
@@ -1266,9 +1269,9 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any, plotMetadata: Plots.PlotMetadata): void;
+            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
             _getPixelPoint(datum: any, index: number): Point;
-            draw(data: any[], drawSteps: DrawStep[], userMetadata: any, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], userMetadata: any): number;
         }
     }
 }
@@ -1279,7 +1282,7 @@ declare module Plottable {
         class Arc extends Element {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata): number;
+            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
             _getPixelPoint(datum: any, index: number): Point;
         }
     }
@@ -1949,8 +1952,6 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class Label extends Component {
-            static TITLE_LABEL_CLASS: string;
-            static AXIS_LABEL_CLASS: string;
             /**
              * Creates a Label.
              *
@@ -1959,9 +1960,8 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
              */
-            constructor(displayText?: string, orientation?: string);
+            constructor(displayText?: string);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -1978,19 +1978,18 @@ declare module Plottable {
              */
             text(displayText: string): Label;
             /**
-             * Gets the orientation of the Label.
+             * Gets the angle of the Label.
              *
-             * @returns {string} the current orientation.
+             * @returns {number} the current angle.
              */
-            orientation(): string;
+            angle(): number;
             /**
-             * Sets the orientation of the Label.
+             * Sets the angle of the Label.
              *
-             * @param {string} newOrientation If provided, the desired orientation
-             * (horizontal/left/right).
+             * @param {number} angle If provided, the desired angle (0/-90/90)
              * @returns {Label} The calling Label.
              */
-            orientation(orientation: string): Label;
+            angle(angle: number): Label;
             /**
              * Gets the amount of padding in pixels around the Label.
              *
@@ -2007,6 +2006,24 @@ declare module Plottable {
             fixedWidth(): boolean;
             fixedHeight(): boolean;
             renderImmediately(): Label;
+        }
+        class TitleLabel extends Label {
+            static TITLE_LABEL_CLASS: string;
+            /**
+             * Creates a TitleLabel, a type of label made for rendering titles.
+             *
+             * @constructor
+             */
+            constructor(text?: string);
+        }
+        class AxisLabel extends Label {
+            static AXIS_LABEL_CLASS: string;
+            /**
+             * Creates a AxisLabel, a type of label made for rendering axis labels.
+             *
+             * @constructor
+             */
+            constructor(text?: string);
         }
     }
 }
@@ -2030,13 +2047,13 @@ declare module Plottable {
             /**
              * Creates a Legend.
              *
-             * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-             * The entries will be displayed in the order of the `colorScale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
+             * The entries will be displayed in the order of the `scale` domain.
              *
              * @constructor
-             * @param {Scale.Color} colorScale
+             * @param {Scale.Color} scale
              */
-            constructor(colorScale: Scales.Color);
+            constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
              * Gets the current max number of entries in Legend row.
@@ -2051,17 +2068,17 @@ declare module Plottable {
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
-             * Gets the current sort function for Legend's entries.
-             * @returns {(a: string, b: string) => number} The current sort function.
+             * Gets the current comparator for the Legend's entries.
+             * @returns {(a: string, b: string) => number} The current comparator.
              */
-            sortFunction(): (a: string, b: string) => number;
+            comparator(): (a: string, b: string) => number;
             /**
-             * Sets a new sort function for Legend's entires.
+             * Sets a new comparator for the Legend's entries.
              *
-             * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
              * @returns {Legend} The calling Legend.
              */
-            sortFunction(newFn: (a: string, b: string) => number): Legend;
+            comparator(comparator: (a: string, b: string) => number): Legend;
             /**
              * Gets the current color scale from the Legend.
              *
@@ -2352,12 +2369,8 @@ declare module Plottable {
         type PlotDatasetKey = {
             dataset: Dataset;
             drawer: Drawers.AbstractDrawer;
-            plotMetadata: PlotMetadata;
             key: string;
         };
-        interface PlotMetadata {
-            datasetKey: string;
-        }
         type PlotData = {
             data: any[];
             pixelPoints: Point[];
@@ -2407,16 +2420,6 @@ declare module Plottable {
         attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
-        /**
-         * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-         * in accordance with the given datasetKey.
-         *
-         * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-         *
-         * @param {Dataset} dataset The dataset to generate the dictionary for
-         * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-         */
-        generateProjectors(dataset: Dataset): AttributeToAppliedProjector;
         renderImmediately(): Plot;
         /**
          * Enables or disables animation.
@@ -2466,12 +2469,6 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
-         * Gets the new plot metadata for new dataset with provided key
-         *
-         * @param {string} key The key of new dataset
-         */
-        protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata;
-        /**
          * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
          * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
@@ -2501,7 +2498,7 @@ declare module Plottable {
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
-        protected _generatePropertyToProjectors(): AttributeToProjector;
+        protected _propertyProjectors(): AttributeToProjector;
     }
 }
 
@@ -2535,6 +2532,8 @@ declare module Plottable {
 
 declare module Plottable {
     class XYPlot<X, Y> extends Plot {
+        protected static _X_KEY: string;
+        protected static _Y_KEY: string;
         /**
          * Constructs an XYPlot.
          *
@@ -2553,7 +2552,7 @@ declare module Plottable {
         y(): Plots.AccessorScaleBinding<Y, number>;
         y(y: number | Accessor<number>): XYPlot<X, Y>;
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
-        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => boolean;
+        protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
@@ -2575,7 +2574,7 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        protected _generatePropertyToProjectors(): AttributeToProjector;
+        protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.
@@ -2605,7 +2604,7 @@ declare module Plottable {
             constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x1(): AccessorScaleBinding<X, number>;
@@ -2637,9 +2636,6 @@ declare module Plottable {
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Symbol;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
-            };
             size<S>(): AccessorScaleBinding<S, number>;
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
             size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
@@ -2647,6 +2643,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
@@ -2679,6 +2676,10 @@ declare module Plottable {
 
 
 declare module Plottable {
+    class Orientation {
+        static VERTICAL: string;
+        static HORIZONTAL: string;
+    }
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> {
             protected static _BarAlignmentToFactor: {
@@ -2692,9 +2693,8 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -2777,8 +2777,22 @@ declare module Plottable {
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
+            /**
+             * Gets the orientation of the Plots.Bar.
+             *
+             * @returns {string} the current orientation.
+             */
+            orientation(): string;
+            /**
+             * Sets the orientation of the Plots.Bar.
+             *
+             * @param {string} orientation The desired orientation
+             * (horizontal/vertical).
+             * @returns {Plots.Bar} The calling Plots.Bar.
+             */
+            orientation(orientation: string): Plots.Bar<X, Y>;
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -2806,10 +2820,10 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Line;
-            protected _getResetYFunction(): (d: any, i: number, dataset: Dataset, m: PlotMetadata) => number;
+            protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
@@ -2849,7 +2863,7 @@ declare module Plottable {
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYScale(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
         }
     }
@@ -2858,9 +2872,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface ClusteredPlotMetadata extends PlotMetadata {
-            position: number;
-        }
         class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
              * Creates a ClusteredBarPlot.
@@ -2872,14 +2883,12 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _getDataToDraw(): D3.Map<any[]>;
-            protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata;
         }
     }
 }
@@ -2887,39 +2896,26 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        interface StackedPlotMetadata extends PlotMetadata {
-            offsets: D3.Map<number>;
-        }
         type StackedDatum = {
             key: any;
             value: number;
             offset?: number;
         };
     }
-    class Stacked<X, Y> extends XYPlot<X, Y> {
-        protected _isVertical: boolean;
-        _getPlotMetadataForDataset(key: string): Plots.StackedPlotMetadata;
-        x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any;
-        y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any;
-        _onDatasetUpdate(): void;
-        _updateStackOffsets(): void;
-        _updateStackExtents(): void;
+    class StackedPlotUtils {
         /**
-         * Feeds the data through d3's stack layout function which will calculate
-         * the stack offsets and use the the function declared in .out to set the offsets on the data.
+         * @return {[number]} The extent that spans all the stacked data
          */
-        _stack(dataArray: D3.Map<Plots.StackedDatum>[]): D3.Map<Plots.StackedDatum>[];
+        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[], stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
         /**
-         * After the stack offsets have been determined on each separate dataset, the offsets need
-         * to be determined correctly on the overall datasets
+         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
          */
-        _setDatasetStackOffsets(positiveDataMapArray: D3.Map<Plots.StackedDatum>[], negativeDataMapArray: D3.Map<Plots.StackedDatum>[]): void;
-        _getDomainKeys(): string[];
-        _generateDefaultMapArray(): D3.Map<Plots.StackedDatum>[];
-        protected _updateExtentsForProperty(property: string): void;
-        protected _extentsForProperty(attr: string): any[];
-        _keyAccessor(): Accessor<X> | Accessor<Y>;
-        _valueAccessor(): Accessor<number>;
+        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
+            [key: string]: D3.Map<number>;
+        };
+        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
+        static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
+        static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
 }
 
@@ -2944,20 +2940,11 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X>;
-            _valueAccessor(): Accessor<number>;
-            _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -2973,28 +2960,18 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {boolean} isVertical if the plot if vertical.
              */
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>);
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset, plotMetadata: PlotMetadata) => any;
+                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
-            protected _getPlotMetadataForDataset(key: string): StackedPlotMetadata;
             protected _updateExtentsForProperty(property: string): void;
-            _updateStackOffsets(): void;
-            _updateStackExtents(): void;
-            _stack(dataArray: D3.Map<StackedDatum>[]): D3.Map<StackedDatum>[];
-            _setDatasetStackOffsets(positiveDataMapArray: D3.Map<StackedDatum>[], negativeDataMapArray: D3.Map<StackedDatum>[]): void;
-            _getDomainKeys(): any;
-            _generateDefaultMapArray(): D3.Map<StackedDatum>[];
-            protected _extentsForProperty(attr: string): any;
-            _keyAccessor(): Accessor<X> | Accessor<Y>;
-            _valueAccessor(): Accessor<number>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3166,7 +3143,7 @@ declare module Plottable {
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => any;
+            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, dataset: Dataset) => any;
         }
     }
 }

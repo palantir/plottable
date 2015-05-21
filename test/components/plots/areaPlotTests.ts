@@ -10,7 +10,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Area(xScale, yScale);
-      plot.x((d) => d.x, xScale);
+      plot.x((d: any) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");

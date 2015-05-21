@@ -15,8 +15,10 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
 
-      var xScale = new Plottable.Scales.Linear().domain([0, 1]);
-      var yScale = new Plottable.Scales.Linear().domain([0, 1]);
+      var xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 1]);
+      var yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 1]);
 
       var linePlot = new Plottable.Plots.Line(xScale, yScale);
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
