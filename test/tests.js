@@ -2216,7 +2216,7 @@ describe("Plots", function () {
             plot.addDataset(dataset1);
             var dataset2 = new Plottable.Dataset(data2);
             plot.addDataset(dataset2);
-            plot._getPixelPoint = function (datum, index, dataset) {
+            plot._pixelPoint = function (datum, index, dataset) {
                 if (dataset === dataset1) {
                     return data1PointConverter(datum, index);
                 }
@@ -2261,7 +2261,7 @@ describe("Plots", function () {
             circles.exit().remove();
             mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer._getSelector = function () { return "circle"; };
-            plot._getPixelPoint = function (datum, index, dataset) {
+            plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
             };
             // Mock _getDrawer to return the mock drawer
@@ -2317,7 +2317,7 @@ describe("Plots", function () {
             plot.addDataset(dataset1);
             var dataset2 = new Plottable.Dataset(data2);
             plot.addDataset(dataset2);
-            plot._getPixelPoint = function (datum, index, dataset) {
+            plot._pixelPoint = function (datum, index, dataset) {
                 if (dataset === dataset1) {
                     return data1PointConverter(datum, index);
                 }

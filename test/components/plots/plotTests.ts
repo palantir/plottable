@@ -244,7 +244,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
 
-      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
         if (dataset === dataset1) {
           return data1PointConverter(datum, index);
         } else {
@@ -296,7 +296,7 @@ describe("Plots", () => {
       (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
       (<any> mockDrawer)._getSelector = () => "circle";
 
-      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
         return dataPointConverter(datum, index);
       };
 
@@ -360,7 +360,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
 
-      (<any> plot)._getPixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
         if (dataset === dataset1) {
           return data1PointConverter(datum, index);
         } else {
