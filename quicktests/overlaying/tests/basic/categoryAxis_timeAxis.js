@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Time();
   var yScale = new Plottable.Scales.Category();
 
-  var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+  var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
   if (typeof hBarPlot.orientation === "function") {
     hBarPlot.orientation("horizontal");
   }
