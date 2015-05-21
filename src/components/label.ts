@@ -19,12 +19,13 @@ export module Components {
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
+     * @param {number} angle The rotation angle of the text (default = 0). 
      */
-    constructor(displayText = "") {
+    constructor(displayText = "", angle = 0) {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.angle(0);
+      this.angle(angle);
       this.xAlignment("center").yAlignment("center");
       this._padding = 0;
     }
@@ -162,8 +163,8 @@ export module Components {
      *
      * @constructor
      */
-    constructor(text?: string) {
-      super(text);
+    constructor(text?: string, angle?: number) {
+      super(text, angle);
       this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
     }
   }
@@ -175,8 +176,8 @@ export module Components {
      *
      * @constructor
      */
-    constructor(text?: string) {
-      super(text);
+    constructor(text?: string, angle?: number) {
+      super(text, angle);
       this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
     }
   }

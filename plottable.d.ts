@@ -2022,8 +2022,9 @@ declare module Plottable {
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
+             * @param {number} angle The rotation angle of the text (default = 0).
              */
-            constructor(displayText?: string);
+            constructor(displayText?: string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -2076,7 +2077,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
@@ -2085,7 +2086,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
     }
 }

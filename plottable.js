@@ -5018,13 +5018,15 @@ var Plottable;
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
+             * @param {number} angle The rotation angle of the text (default = 0).
              */
-            function Label(displayText) {
+            function Label(displayText, angle) {
                 if (displayText === void 0) { displayText = ""; }
+                if (angle === void 0) { angle = 0; }
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                this.angle(0);
+                this.angle(angle);
                 this.xAlignment("center").yAlignment("center");
                 this._padding = 0;
             }
@@ -5119,8 +5121,8 @@ var Plottable;
              *
              * @constructor
              */
-            function TitleLabel(text) {
-                _super.call(this, text);
+            function TitleLabel(text, angle) {
+                _super.call(this, text, angle);
                 this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
@@ -5134,8 +5136,8 @@ var Plottable;
              *
              * @constructor
              */
-            function AxisLabel(text) {
-                _super.call(this, text);
+            function AxisLabel(text, angle) {
+                _super.call(this, text, angle);
                 this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";
