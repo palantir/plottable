@@ -505,9 +505,9 @@ export module Axes {
       var isInsideBBox = (tickBox: ClientRect) => {
         return (
           Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) &&
-          Math.floor(boundingBox.top)  <= Math.ceil(tickBox.top)  &&
-          Math.floor(tickBox.right)  <= Math.ceil(boundingBox.left + this.width()) &&
-          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top  + this.height())
+          Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) &&
+          Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + this.width()) &&
+          Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + this.height())
         );
       };
 

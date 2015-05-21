@@ -204,8 +204,8 @@ export module Axes {
       this._hideOverlappingTickLabels();
 
       if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
+          this._tickLabelPositioning === "top"  ||
+          this._tickLabelPositioning === "left" ||
           this._tickLabelPositioning === "right") {
         this._hideTickMarksWithoutLabel();
       }
@@ -395,9 +395,9 @@ export module Axes {
       var padding = this.tickLabelPadding();
 
       if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
-          this._tickLabelPositioning === "right"  ) {
+          this._tickLabelPositioning === "top"  ||
+          this._tickLabelPositioning === "left" ||
+          this._tickLabelPositioning === "right" ) {
         padding *= 3;
       }
 

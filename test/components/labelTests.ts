@@ -92,7 +92,7 @@ describe("Labels", () => {
                                  .add(new Plottable.Component(), 1, 0);
     t.renderTo(svg);
     var textTranslate = d3.transform((<any> label)._content.select("g").attr("transform")).translate;
-    var eleTranslate  = d3.transform((<any> label)._element.attr("transform")).translate;
+    var eleTranslate = d3.transform((<any> label)._element.attr("transform")).translate;
     var textWidth = Plottable.Utils.DOM.getBBox((<any> label)._content.select("text")).width;
     assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
     svg.remove();

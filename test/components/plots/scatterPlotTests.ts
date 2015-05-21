@@ -197,7 +197,7 @@ describe("Plots", () => {
         var renderArea = (<any> circlePlot)._renderArea;
         var renderAreaTransform = d3.transform(renderArea.attr("transform"));
         var translate = renderAreaTransform.translate;
-        var scale     = renderAreaTransform.scale;
+        var scale   = renderAreaTransform.scale;
         return function (datum: any, index: number) {
           // This function takes special care to compute the position of circles after taking svg transformation
           // into account.

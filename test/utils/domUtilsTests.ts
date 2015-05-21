@@ -62,10 +62,10 @@ describe("Utils.DOM", () => {
     });
 
     it("can accept multiple units and convert to pixels", () => {
-      var parent     = TestMethods.getSVGParent();
+      var parent   = TestMethods.getSVGParent();
       var parentElem = parent[0][0];
-      var child      = parent.append("div");
-      var childElem  = child[0][0];
+      var child    = parent.append("div");
+      var childElem = child[0][0];
 
       parent.style("width", "200px");
       parent.style("height", "50px");

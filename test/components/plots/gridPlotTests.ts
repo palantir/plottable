@@ -4,9 +4,9 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("GridPlot", () => {
-    var SVG_WIDTH  = 400;
+    var SVG_WIDTH = 400;
     var SVG_HEIGHT = 200;
-    var DATA       = [
+    var DATA     = [
       {x: "A", y: "U", magnitude: 0},
       {x: "B", y: "U", magnitude: 2},
       {x: "A", y: "V", magnitude: 16},

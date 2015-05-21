@@ -26,7 +26,7 @@ module TestMethods {
   export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
     c.requestedSpace = function(w, h) {
       return {
-        minWidth: fixedWidth  == null ? 0 : fixedWidth,
+        minWidth: fixedWidth == null ? 0 : fixedWidth,
         minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };

@@ -133,7 +133,7 @@ describe("Plots", () => {
 
       it("don't show points from outside of domain", () => {
         xScale.domain(["C"]);
-        var bars =  (<any> barPlot)._renderArea.selectAll("rect");
+        var bars = (<any> barPlot)._renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 0, "no bars have been rendered");
         svg.remove();
       });
