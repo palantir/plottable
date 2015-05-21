@@ -52,6 +52,10 @@ export module Scales {
       this._d3Scale = scale;
     }
 
+    public extentOfValues(values: string[]) {
+      return Utils.Methods.uniq(values);
+    }
+
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
       var extents = this._getAllExtents();

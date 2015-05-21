@@ -265,29 +265,26 @@ module Plottable {
       extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
-        return this._computeExtent(dataset, accScaleBinding.accessor, filter);
+        return this._computeExtent(dataset, accScaleBinding, filter);
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, filter: Accessor<boolean>): any[] {
+    private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+      var accessor = accScaleBinding.accessor;
+      var scale = accScaleBinding.scale;
+
+      if (scale == null) {
+        return [];
+      }
+
       var data = dataset.data();
       if (filter != null) {
         data = data.filter((d, i) => filter(d, i, dataset));
       }
       var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
       var mappedData = data.map(appliedAccessor);
-      if (mappedData.length === 0) {
-        return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return Utils.Methods.uniq(mappedData);
-      } else {
-        var extent = d3.extent(mappedData);
-        if (extent[0] == null || extent[1] == null) {
-          return [];
-        } else {
-          return extent;
-        }
-      }
+
+      return scale.extentOfValues(mappedData);
     }
 
     /**
