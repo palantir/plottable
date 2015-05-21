@@ -474,7 +474,7 @@ module Plottable {
         var drawer = plotDatasetKey.drawer;
         var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = this._getPixelPoint(datum, index, dataset);
+          var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
@@ -550,7 +550,7 @@ module Plottable {
                (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
     }
 
-    protected _getPixelPoint(datum: any, index: number, dataset: Dataset): Point {
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       return { x: 0, y: 0 };
     }
   }

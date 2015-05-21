@@ -503,7 +503,7 @@ export module Plots {
       return plotData;
     }
 
-    protected _getPixelPoint(datum: any, index: number, dataset: Dataset) {
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
       var attrToProjector = this._generateAttrToProjector();
       var rectX = attrToProjector["x"](datum, index, dataset);
       var rectY = attrToProjector["y"](datum, index, dataset);

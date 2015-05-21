@@ -106,7 +106,7 @@ export module Plots {
       return attrToProjector;
     }
 
-    public _getPixelPoint(datum: any, index: number, dataset: Dataset) {
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
       var innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
       var outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
       var avgRadius = (innerRadius + outerRadius) / 2;

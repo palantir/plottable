@@ -6508,7 +6508,7 @@ var Plottable;
                 var drawer = plotDatasetKey.drawer;
                 var dataset = plotDatasetKey.dataset;
                 plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                    var pixelPoint = _this._getPixelPoint(datum, index, dataset);
+                    var pixelPoint = _this._pixelPoint(datum, index, dataset);
                     if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                         return;
                     }
@@ -6568,7 +6568,7 @@ var Plottable;
         Plot._scaledAccessor = function (binding) {
             return binding.scale == null ? binding.accessor : function (d, i, ds) { return binding.scale.scale(binding.accessor(d, i, ds)); };
         };
-        Plot.prototype._getPixelPoint = function (datum, index, dataset) {
+        Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
         };
         return Plot;
@@ -6670,7 +6670,7 @@ var Plottable;
                 attrToProjector[Pie._SECTOR_VALUE_KEY] = Plottable.Plot._scaledAccessor(this.sectorValue());
                 return attrToProjector;
             };
-            Pie.prototype._getPixelPoint = function (datum, index, dataset) {
+            Pie.prototype._pixelPoint = function (datum, index, dataset) {
                 var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
                 var outerRadius = Plottable.Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
                 var avgRadius = (innerRadius + outerRadius) / 2;
@@ -6911,7 +6911,7 @@ var Plottable;
         XYPlot.prototype._projectorsReady = function () {
             return this.x().accessor != null && this.y().accessor != null;
         };
-        XYPlot.prototype._getPixelPoint = function (datum, index, dataset) {
+        XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
             var attrToProjector = this._generateAttrToProjector();
             return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
         };
@@ -7019,7 +7019,7 @@ var Plottable;
                 attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y1());
                 return attrToProjector;
             };
-            Rectangle.prototype._getPixelPoint = function (datum, index, dataset) {
+            Rectangle.prototype._pixelPoint = function (datum, index, dataset) {
                 var attrToProjector = this._generateAttrToProjector();
                 var rectX = attrToProjector["x"](datum, index, dataset);
                 var rectY = attrToProjector["y"](datum, index, dataset);
@@ -7628,7 +7628,7 @@ var Plottable;
                 });
                 return plotData;
             };
-            Bar.prototype._getPixelPoint = function (datum, index, dataset) {
+            Bar.prototype._pixelPoint = function (datum, index, dataset) {
                 var attrToProjector = this._generateAttrToProjector();
                 var rectX = attrToProjector["x"](datum, index, dataset);
                 var rectY = attrToProjector["y"](datum, index, dataset);
@@ -7728,7 +7728,7 @@ var Plottable;
                     var drawer = plotDatasetKey.drawer;
                     var dataset = plotDatasetKey.dataset;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = _this._getPixelPoint(datum, index, dataset);
+                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                             return;
                         }
