@@ -1342,7 +1342,6 @@ declare module Plottable {
             constructor(key: string);
             _drawStep(step: AppliedDrawStep): void;
             draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
-            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }
@@ -1353,7 +1352,6 @@ declare module Plottable {
         class Symbol extends Element {
             constructor(key: string);
             protected _drawStep(step: AppliedDrawStep): void;
-            _getPixelPoint(datum: any, index: number): Point;
         }
     }
 }

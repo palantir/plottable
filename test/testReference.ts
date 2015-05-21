@@ -11,7 +11,6 @@
 ///<reference path="globalInitialization.ts" />
 
 ///<reference path="drawers/drawerTests.ts" />
-///<reference path="drawers/arcDrawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />

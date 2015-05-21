@@ -54,16 +54,6 @@ export module Drawers {
       });
       return super.draw(pie, drawSteps, dataset);
     }
-
-    public _getPixelPoint(datum: any, index: number): Point {
-      var innerRadiusAccessor = this._attrToProjector["inner-radius"];
-      var outerRadiusAccessor = this._attrToProjector["outer-radius"];
-      var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-      var startAngle = +this._getSelection(index).datum().startAngle;
-      var endAngle = +this._getSelection(index).datum().endAngle;
-      var avgAngle = (startAngle + endAngle) / 2;
-      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-    }
   }
 }
 }

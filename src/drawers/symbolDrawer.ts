@@ -14,10 +14,6 @@ export module Drawers {
       this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       super._drawStep(step);
     }
-
-    public _getPixelPoint(datum: any, index: number): Point {
-      return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
-    }
   }
 }
 }

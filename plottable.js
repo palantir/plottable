@@ -2968,15 +2968,6 @@ var Plottable;
                 });
                 return _super.prototype.draw.call(this, pie, drawSteps, dataset);
             };
-            Arc.prototype._getPixelPoint = function (datum, index) {
-                var innerRadiusAccessor = this._attrToProjector["inner-radius"];
-                var outerRadiusAccessor = this._attrToProjector["outer-radius"];
-                var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-                var startAngle = +this._getSelection(index).datum().startAngle;
-                var endAngle = +this._getSelection(index).datum().endAngle;
-                var avgAngle = (startAngle + endAngle) / 2;
-                return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
-            };
             return Arc;
         })(Drawers.Element);
         Drawers.Arc = Arc;
@@ -3004,9 +2995,6 @@ var Plottable;
             Symbol.prototype._drawStep = function (step) {
                 this._attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 _super.prototype._drawStep.call(this, step);
-            };
-            Symbol.prototype._getPixelPoint = function (datum, index) {
-                return { x: this._attrToProjector["x"](datum, index), y: this._attrToProjector["y"](datum, index) };
             };
             return Symbol;
         })(Drawers.Element);
