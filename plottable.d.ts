@@ -2742,20 +2742,22 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Bar<X, Y> extends XYPlot<X, Y> {
+            static ORIENTATION_VERTICAL: string;
+            static ORIENTATION_HORIZONTAL: string;
             protected static _BarAlignmentToFactor: {
                 [alignment: string]: number;
             };
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
-             * Constructs a BarPlot.
+             * Constructs a Bar Plot.
              *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -2933,9 +2935,9 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -3011,9 +3013,9 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale?: Scale<X, number>, yScale?: Scale<Y, number>, isVertical?: boolean);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;

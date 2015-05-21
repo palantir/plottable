@@ -449,7 +449,7 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);

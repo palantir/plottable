@@ -3,6 +3,8 @@
 module Plottable {
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
+    public static ORIENTATION_VERTICAL = "vertical";
+    public static ORIENTATION_HORIZONTAL = "horizontal";
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -16,20 +18,20 @@ export module Plots {
     private _hideBarsIfAnyAreTooWide = true;
 
     /**
-     * Constructs a BarPlot.
+     * Constructs a Bar Plot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = isVertical;
+      this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());

@@ -7257,16 +7257,16 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
-             * Constructs a BarPlot.
+             * Constructs a Bar Plot.
              *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function Bar(xScale, yScale, isVertical) {
+            function Bar(xScale, yScale, orientation) {
                 var _this = this;
-                if (isVertical === void 0) { isVertical = true; }
+                if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
@@ -7276,7 +7276,7 @@ var Plottable;
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
-                this._isVertical = isVertical;
+                this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
@@ -7626,6 +7626,8 @@ var Plottable;
                 });
                 return plotData;
             };
+            Bar.ORIENTATION_VERTICAL = "vertical";
+            Bar.ORIENTATION_HORIZONTAL = "horizontal";
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
@@ -7888,11 +7890,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function ClusteredBar(xScale, yScale, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale, isVertical);
+            function ClusteredBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
@@ -8240,11 +8242,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
-             * @param {boolean} isVertical if the plot if vertical.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function StackedBar(xScale, yScale, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, xScale, yScale, isVertical);
+            function StackedBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
