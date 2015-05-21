@@ -2959,11 +2959,11 @@ declare module Plottable {
         /**
          * @return {[number]} The extent that spans all the stacked data
          */
-        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[], stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
+        static computeStackExtents(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
         /**
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
          */
-        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[]): Utils.Map<Dataset, D3.Map<number>>;
+        static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>): Utils.Map<Dataset, D3.Map<number>>;
         static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasets: Dataset[]): void;
         static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
         static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;

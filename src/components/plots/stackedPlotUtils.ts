@@ -16,9 +16,9 @@ module Plottable {
      * @return {[number]} The extent that spans all the stacked data
      */
     public static computeStackExtents(
+        datasets: Dataset[],
         keyAccessor: Accessor<any>,
         valueAccessor: Accessor<any>,
-        datasets: Dataset[],
         stackOffsets: Utils.Map<Dataset, D3.Map<number>>,
         filter: Accessor<boolean>) {
 
@@ -51,9 +51,9 @@ module Plottable {
      * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
      */
     public static computeStackOffsets(
+        datasets: Dataset[],
         keyAccessor: Accessor<any>,
-        valueAccessor: Accessor<any>,
-        datasets: Dataset[]) {
+        valueAccessor: Accessor<any>) {
 
       var domainKeys = StackedPlotUtils.getDomainKeys(keyAccessor, datasets);
 
