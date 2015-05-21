@@ -1496,7 +1496,7 @@ var Plottable;
             this._extentsProviders = new Plottable.Utils.Set();
         }
         Scale.prototype.getExtentFromData = function (data) {
-            return [];
+            return []; // this should be overwritten
         };
         Scale.prototype._getAllExtents = function () {
             var _this = this;

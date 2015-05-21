@@ -33,7 +33,7 @@ module Plottable {
     }
 
     public getExtentFromData(data: D[]): D[] {
-      return [];
+      return []; // this should be overwritten
     }
 
     protected _getAllExtents(): D[][] {
