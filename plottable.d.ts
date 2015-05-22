@@ -315,7 +315,7 @@ declare module Plottable {
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            static computeStackExtents(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
+            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.

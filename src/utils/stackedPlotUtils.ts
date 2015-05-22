@@ -50,7 +50,7 @@ module Plottable {
        *
        * @return {[number]} The extent that spans all the stacked data
        */
-      public static computeStackExtents(
+      public static computeStackExtent(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<any>,

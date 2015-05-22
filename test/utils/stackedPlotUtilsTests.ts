@@ -84,7 +84,7 @@ describe("Utils", () => {
       assert.strictEqual(stackOffsets.get(datasets[5]).get("Fred"), -5, "Offset 6 = 0 - 2 - 3");
     });
 
-    it("computeStackExtents() works as expected with positive values", () => {
+    it("computeStackExtent() works as expected with positive values", () => {
       var data1 = [{key: "Fred", value: 1}];
       var data2 = [{key: "Fred", value: 300}];
       var data3 = [{key: "Fred", value: 0}];
@@ -94,13 +94,13 @@ describe("Utils", () => {
       var stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
       var expectedStackExtents = [0, 303];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack up and the sum of their values is 303");
     });
 
-    it("computeStackExtents() works as expected with negative values", () => {
+    it("computeStackExtent() works as expected with negative values", () => {
       var data1 = [{key: "Barney", value: -1}];
       var data2 = [{key: "Barney", value: -300}];
       var data3 = [{key: "Barney", value: 0}];
@@ -110,13 +110,13 @@ describe("Utils", () => {
       var stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
       var expectedStackExtents = [-301, 0];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
     });
 
-    it("computeStackExtents() works as expected with mixed values", () => {
+    it("computeStackExtent() works as expected with mixed values", () => {
       var data1 = [{key: "Wilma", value: 100}];
       var data2 = [{key: "Wilma", value: -5}];
       var data3 = [{key: "Wilma", value: 0}];
@@ -128,13 +128,13 @@ describe("Utils", () => {
       var stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
       var expectedStackExtents = [-10, 120];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
     });
 
-    it("computeStackExtents() works as expected with mixed values and multiple datapoints", () => {
+    it("computeStackExtent() works as expected with mixed values and multiple datapoints", () => {
       var data1 = [
         {key: "Fred", value: 100},
         {key: "Barney", value: 15}
@@ -153,7 +153,7 @@ describe("Utils", () => {
       var stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+      var stackExtents = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
       var expectedStackExtents = [-50, 100];
 
       assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Barney has the smallest minimum stack (-50)");

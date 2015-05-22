@@ -763,7 +763,7 @@ var Plottable;
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            StackedPlot.computeStackExtents = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
+            StackedPlot.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
                 var maxStackExtent = Utils.Methods.max(datasets, function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
@@ -8201,7 +8201,7 @@ var Plottable;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
                 this._stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
@@ -8334,7 +8334,7 @@ var Plottable;
                 var valueAccessor = this._valueAccessor();
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             StackedBar.prototype._keyAccessor = function () {
                 return this._isVertical ? this.x().accessor : this.y().accessor;
