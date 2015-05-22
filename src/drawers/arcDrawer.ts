@@ -26,7 +26,6 @@ export module Drawers {
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       attrToProjector = this.retargetProjectors(attrToProjector);
-      this._attrToProjector = this.retargetProjectors(this._attrToProjector);
       var innerRadiusAccessor = attrToProjector["inner-radius"];
       var outerRadiusAccessor = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];
@@ -53,16 +52,6 @@ export module Drawers {
         }
       });
       return super.draw(pie, drawSteps, dataset);
-    }
-
-    public _getPixelPoint(datum: any, index: number): Point {
-      var innerRadiusAccessor = this._attrToProjector["inner-radius"];
-      var outerRadiusAccessor = this._attrToProjector["outer-radius"];
-      var avgRadius = (innerRadiusAccessor(datum, index) + outerRadiusAccessor(datum, index)) / 2;
-      var startAngle = +this._getSelection(index).datum().startAngle;
-      var endAngle = +this._getSelection(index).datum().endAngle;
-      var avgAngle = (startAngle + endAngle) / 2;
-      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
   }
 }

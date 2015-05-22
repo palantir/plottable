@@ -105,6 +105,21 @@ export module Plots {
       attrToProjector[Pie._SECTOR_VALUE_KEY] = Plot._scaledAccessor(this.sectorValue());
       return attrToProjector;
     }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+      var innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+      var outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+      var avgRadius = (innerRadius + outerRadius) / 2;
+
+      var scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var pie = d3.layout.pie()
+                         .sort(null)
+                         .value((d: any, i: number) => scaledValueAccessor(d, i, dataset))(dataset.data());
+      var startAngle = pie[index].startAngle;
+      var endAngle = pie[index].endAngle;
+      var avgAngle = (startAngle + endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+    }
   }
 }
 }
