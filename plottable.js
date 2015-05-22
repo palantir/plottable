@@ -2933,33 +2933,6 @@ var Plottable;
                 _super.call(this, key);
                 this._svgElement = "path";
             }
-            Arc.prototype.retargetProjectors = function (attrToProjector) {
-                var retargetedAttrToProjector = {};
-                d3.entries(attrToProjector).forEach(function (entry) {
-                    retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
-                });
-                return retargetedAttrToProjector;
-            };
-            Arc.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                var dProjector = attrToProjector["d"];
-                attrToProjector = this.retargetProjectors(attrToProjector);
-                attrToProjector["d"] = dProjector;
-                return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
-            };
-            Arc.prototype.draw = function (data, drawSteps, dataset) {
-                // HACKHACK Applying metadata should be done in base class
-                var valueAccessor = function (d, i) { return drawSteps[0].attrToProjector["sector-value"](d, i, dataset); };
-                data = data.filter(function (e) { return Plottable.Utils.Methods.isValidNumber(+valueAccessor(e, null)); });
-                var pie = d3.layout.pie().sort(null).value(valueAccessor)(data);
-                drawSteps.forEach(function (s) { return delete s.attrToProjector["sector-value"]; });
-                pie.forEach(function (slice) {
-                    if (slice.value < 0) {
-                        Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
-                    }
-                });
-                return _super.prototype.draw.call(this, pie, drawSteps, dataset);
-            };
             return Arc;
         })(Drawers.Element);
         Drawers.Arc = Arc;
@@ -6621,7 +6594,7 @@ var Plottable;
                 }
                 this._startAngles.set(dataset, []);
                 this._endAngles.set(dataset, []);
-                this._updatePieLayout();
+                this._updatePieAngles();
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
@@ -6629,12 +6602,12 @@ var Plottable;
                 _super.prototype.removeDataset.call(this, dataset);
                 this._startAngles.delete(dataset);
                 this._endAngles.delete(dataset);
-                this._updatePieLayout();
+                this._updatePieAngles();
                 return this;
             };
             Pie.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                this._updatePieLayout();
+                this._updatePieAngles();
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");
@@ -6654,7 +6627,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
                 this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
-                this._updatePieLayout();
+                this._updatePieAngles();
                 this.renderImmediately();
                 return this;
             };
@@ -6675,33 +6648,42 @@ var Plottable;
                 return this;
             };
             Pie.prototype._propertyProjectors = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
                 var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
                 attrToProjector["d"] = function (datum, index, ds) {
-                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds))(datum, index);
+                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds)).startAngle(_this._startAngles.get(ds)[index]).endAngle(_this._endAngles.get(ds)[index])(datum, index);
                 };
                 attrToProjector["sector-value"] = Plottable.Plot._scaledAccessor(this.sectorValue());
                 return attrToProjector;
             };
-            Pie.prototype._updatePieLayout = function () {
+            Pie.prototype._updatePieAngles = function () {
                 var _this = this;
                 if (this.sectorValue() == null) {
                     return;
                 }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 this.datasets().forEach(function (ds) {
-                    var data = ds.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(+sectorValueAccessor(d, i, ds)); });
+                    var data = ds.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
                     var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, ds); })(data);
                     if (pie.some(function (slice) { return slice.value < 0; })) {
                         Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
                     }
-                    pie.forEach(function (slice) {
-                        var index = slice.index;
-                        _this._startAngles.get(ds)[index] = slice.startAngle;
-                        _this._endAngles.get(ds)[index] = slice.endAngle;
-                    });
+                    _this._startAngles.set(ds, pie.map(function (slice) { return slice.startAngle; }));
+                    _this._endAngles.set(ds, pie.map(function (slice) { return slice.endAngle; }));
                 });
+            };
+            Pie.prototype._getDataToDraw = function () {
+                var _this = this;
+                var dataToDraw = _super.prototype._getDataToDraw.call(this);
+                var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
+                dataToDraw.forEach(function (datasetKey, data) {
+                    var ds = _this._key2PlotDatasetKey.get(datasetKey).dataset;
+                    var filteredData = data.filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
+                    dataToDraw.set(datasetKey, filteredData);
+                });
+                return dataToDraw;
             };
             Pie.prototype._pixelPoint = function (datum, index, dataset) {
                 var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);

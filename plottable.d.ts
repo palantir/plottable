@@ -1339,8 +1339,6 @@ declare module Plottable {
     module Drawers {
         class Arc extends Element {
             constructor(key: string);
-            _drawStep(step: AppliedDrawStep): void;
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
         }
     }
 }
@@ -2571,6 +2569,7 @@ declare module Plottable {
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _getDataToDraw(): D3.Map<any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;

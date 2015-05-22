@@ -49,7 +49,7 @@ export module Plots {
       }
       this._startAngles.set(dataset, []);
       this._endAngles.set(dataset, []);
-      this._updatePieLayout();
+      this._updatePieAngles();
       super.addDataset(dataset);
       return this;
     }
@@ -58,13 +58,13 @@ export module Plots {
       super.removeDataset(dataset);
       this._startAngles.delete(dataset);
       this._endAngles.delete(dataset);
-      this._updatePieLayout();
+      this._updatePieAngles();
       return this;
     }
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      this._updatePieLayout();
+      this._updatePieAngles();
     }
 
     protected _getDrawer(key: string) {
@@ -90,7 +90,7 @@ export module Plots {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
       this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
-      this._updatePieLayout();
+      this._updatePieAngles();
       this.renderImmediately();
       return this;
     }
@@ -126,27 +126,37 @@ export module Plots {
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
         return d3.svg.arc()
                      .innerRadius(innerRadiusAccessor(datum, index, ds))
-                     .outerRadius(outerRadiusAccessor(datum, index, ds))(datum, index);
+                     .outerRadius(outerRadiusAccessor(datum, index, ds))
+                     .startAngle(this._startAngles.get(ds)[index])
+                     .endAngle(this._endAngles.get(ds)[index])(datum, index);
       };
       attrToProjector["sector-value"] = Plot._scaledAccessor(this.sectorValue());
       return attrToProjector;
     }
 
-    private _updatePieLayout() {
+    private _updatePieAngles() {
       if (this.sectorValue() == null) { return; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       this.datasets().forEach((ds) => {
-        var data = ds.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(+sectorValueAccessor(d, i, ds)));
+        var data = ds.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
         var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, ds))(data);
         if (pie.some((slice) => slice.value < 0)) {
           Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
         }
-        pie.forEach((slice) => {
-          var index = slice.index;
-          this._startAngles.get(ds)[index] = slice.startAngle;
-          this._endAngles.get(ds)[index] = slice.endAngle;
-        });
+        this._startAngles.set(ds, pie.map((slice) => slice.startAngle));
+        this._endAngles.set(ds, pie.map((slice) => slice.endAngle));
       });
+    }
+
+    protected _getDataToDraw() {
+      var dataToDraw = super._getDataToDraw();
+      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      dataToDraw.forEach((datasetKey, data) => {
+        var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+        var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
+        dataToDraw.set(datasetKey, filteredData);
+      });
+      return dataToDraw;
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
