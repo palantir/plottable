@@ -2562,23 +2562,21 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
+         * If 'x' or 'y' is specified the adjustment is immediately performed.
          *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @param {string} scale Must be one of 'x', 'y', or 'none'.
+         *
+         * 'x' will adjust the x scale in relation to changes in the y domain.
+         *
+         * 'y' will adjust the y scale in relation to changes in the x domain.
+         *
+         * 'none' means neither scale will change automatically.
+         *
          * @returns {XYPlot} The calling XYPlot.
          */
-        automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
+        autorange(scaleName: string): XYPlot<X, Y>;
         protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**

@@ -6828,29 +6828,39 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
+         * If 'x' or 'y' is specified the adjustment is immediately performed.
          *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @param {string} scale Must be one of 'x', 'y', or 'none'.
+         *
+         * 'x' will adjust the x scale in relation to changes in the y domain.
+         *
+         * 'y' will adjust the y scale in relation to changes in the x domain.
+         *
+         * 'none' means neither scale will change automatically.
+         *
          * @returns {XYPlot} The calling XYPlot.
          */
-        XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustYScaleDomain = autoAdjustment;
-            this._adjustYDomainOnChangeFromX();
-            return this;
-        };
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustXScaleDomain = autoAdjustment;
-            this._adjustXDomainOnChangeFromY();
+        XYPlot.prototype.autorange = function (scaleName) {
+            switch (scaleName) {
+                case "x":
+                    this._autoAdjustXScaleDomain = true;
+                    this._autoAdjustYScaleDomain = false;
+                    this._adjustXDomainOnChangeFromY();
+                    break;
+                case "y":
+                    this._autoAdjustXScaleDomain = false;
+                    this._autoAdjustYScaleDomain = true;
+                    this._adjustYDomainOnChangeFromX();
+                    break;
+                case "none":
+                    this._autoAdjustXScaleDomain = false;
+                    this._autoAdjustYScaleDomain = false;
+                    break;
+                default:
+                    throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+            }
             return this;
         };
         XYPlot.prototype._propertyProjectors = function () {
