@@ -1503,10 +1503,20 @@ describe("Labels", function () {
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
     });
+    it("angle() error-checking", function () {
+        var label360 = new Plottable.Components.Label("noScope", 360);
+        assert.strictEqual(label360.angle(), 0, "angles are converted to range [-180, 180] (360 -> 0)");
+        var label270 = new Plottable.Components.Label("turnRight", 270);
+        assert.strictEqual(label270.angle(), -90, "angles are converted to range [-180, 180] (270 -> -90)");
+        var labelNeg270 = new Plottable.Components.Label("turnRight", -270);
+        assert.strictEqual(labelNeg270.angle(), 90, "angles are converted to range [-180, 180] (-270 -> 90)");
+        var badAngle = 10;
+        assert.throws(function () { return new Plottable.Components.Label("foo").angle(badAngle); }, Error);
+        assert.throws(function () { return new Plottable.Components.Label("foo", badAngle); }, Error);
+    });
     it("Left-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL");
-        label.angle(-90);
+        var label = new Plottable.Components.AxisLabel("LEFT-ROTATED LABEL", -90);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1518,8 +1528,7 @@ describe("Labels", function () {
     });
     it("Right-rotated text is handled properly", function () {
         var svg = TestMethods.generateSVG(100, 400);
-        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL");
-        label.angle(90);
+        var label = new Plottable.Components.AxisLabel("RIGHT-ROTATED LABEL", 90);
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
@@ -1580,10 +1589,7 @@ describe("Labels", function () {
         assert.strictEqual(label.width(), 0, "width updated to 0");
         svg.remove();
     });
-    it("unsupported alignments and orientations are unsupported", function () {
-        assert.throws(function () { return new Plottable.Components.Label("foo").angle(10); }, Error, "10 is not a valid angle for Label");
-    });
-    it("Label orientation can be changed after label is created", function () {
+    it("Label angle can be changed after label is created", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var label = new Plottable.Components.AxisLabel("CHANGING ORIENTATION");
         label.renderTo(svg);

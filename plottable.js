@@ -5023,18 +5023,19 @@ var Plottable;
             /**
              * Creates a Label.
              *
-             * A label is component that renders just text. The most common use of
-             * labels is to create a title or axis labels.
+             * A Label is a Component that draws a single line of text.
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
+             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
              */
-            function Label(displayText) {
+            function Label(displayText, angle) {
                 if (displayText === void 0) { displayText = ""; }
+                if (angle === void 0) { angle = 0; }
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                this.angle(0);
+                this.angle(angle);
                 this.xAlignment("center").yAlignment("center");
                 this._padding = 0;
             }
@@ -5070,6 +5071,13 @@ var Plottable;
                     return this._angle;
                 }
                 else {
+                    angle %= 360;
+                    if (angle > 180) {
+                        angle -= 360;
+                    }
+                    else if (angle < -180) {
+                        angle += 360;
+                    }
                     if (angle === -90 || angle === 0 || angle === 90) {
                         this._angle = angle;
                     }
@@ -5129,8 +5137,8 @@ var Plottable;
              *
              * @constructor
              */
-            function TitleLabel(text) {
-                _super.call(this, text);
+            function TitleLabel(text, angle) {
+                _super.call(this, text, angle);
                 this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
@@ -5144,8 +5152,8 @@ var Plottable;
              *
              * @constructor
              */
-            function AxisLabel(text) {
-                _super.call(this, text);
+            function AxisLabel(text, angle) {
+                _super.call(this, text, angle);
                 this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";

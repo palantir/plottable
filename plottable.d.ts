@@ -1959,13 +1959,13 @@ declare module Plottable {
             /**
              * Creates a Label.
              *
-             * A label is component that renders just text. The most common use of
-             * labels is to create a title or axis labels.
+             * A Label is a Component that draws a single line of text.
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
+             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
              */
-            constructor(displayText?: string);
+            constructor(displayText?: string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -1990,7 +1990,7 @@ declare module Plottable {
             /**
              * Sets the angle of the Label.
              *
-             * @param {number} angle If provided, the desired angle (0/-90/90)
+             * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
              * @returns {Label} The calling Label.
              */
             angle(angle: number): Label;
@@ -2018,7 +2018,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
@@ -2027,7 +2027,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
     }
 }
