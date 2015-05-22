@@ -49,7 +49,7 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -65,7 +65,7 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
