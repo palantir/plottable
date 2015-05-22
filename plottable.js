@@ -7898,8 +7898,9 @@ var Plottable;
                         return;
                     }
                     var drawer = plotDatasetKey.drawer;
+                    var dataset = plotDatasetKey.dataset;
                     plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
+                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                             return;
                         }
