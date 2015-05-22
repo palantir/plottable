@@ -295,7 +295,7 @@ describe("NumericAxis", () => {
   it("truncates long labels", () => {
     var dataset = new Plottable.Dataset([
       { x: "A", y: 500000000 },
-      { x: "B", y:  400000000 }
+      { x: "B", y: 400000000 }
     ]);
     var SVG_WIDTH = 120;
     var SVG_HEIGHT = 300;
@@ -388,7 +388,7 @@ describe("NumericAxis", () => {
     tickMarks.each(function() {
       var tickMark = d3.select(this);
       var tickMarkPosition = Number(tickMark.attr("x"));
-      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <=  SVG_WIDTH, "tick marks are located within the bounding SVG");
+      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
     });
     svg.remove();
   });

@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var verticalBarPlot = new Plottable.Plots.Bar(xScale, yScale, true)
+  var verticalBarPlot = new Plottable.Plots.Bar(xScale, yScale, "vertical")
                               .addDataset(dataset)
                               .x(function(d) { return d.x; }, xScale)
                               .y(function(d) { return d.y; }, yScale)

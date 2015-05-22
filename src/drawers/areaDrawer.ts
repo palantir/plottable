@@ -62,9 +62,9 @@ export module Drawers {
         (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       }
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var y1Function      = attrToProjector["y"];
+      var xFunction = attrToProjector["x"];
+      var y0Function = attrToProjector["y0"];
+      var y1Function = attrToProjector["y"];
       var definedFunction = attrToProjector["defined"];
       delete attrToProjector["x"];
       delete attrToProjector["y0"];

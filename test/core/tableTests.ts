@@ -159,9 +159,10 @@ describe("Tables", () => {
     var c7 = TestMethods.makeFixedSizeComponent(null, 30);
     var c3 = TestMethods.makeFixedSizeComponent(50, null);
     var c5 = TestMethods.makeFixedSizeComponent(50, null);
-    var table = new Plottable.Components.Table([[null, c1, null],
-                                     [c3  , c4, c5  ],
-                                     [null, c7, null]]);
+    var table = new Plottable.Components.Table([
+      [null, c1, null],
+      [c3, c4, c5],
+      [null, c7, null]]);
 
     var components = [c1, c3, c4, c5, c7];
 
@@ -171,9 +172,9 @@ describe("Tables", () => {
     var translates = elements.map((e) => TestMethods.getTranslate(e));
     var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
     // test the translates
-    assert.deepEqual(translates[0], [50, 0]  , "top axis translate");
+    assert.deepEqual(translates[0], [50, 0] , "top axis translate");
     assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
-    assert.deepEqual(translates[1], [0, 30]  , "left axis translate");
+    assert.deepEqual(translates[1], [0, 30] , "left axis translate");
     assert.deepEqual(translates[3], [350, 30], "right axis translate");
     assert.deepEqual(translates[2], [50, 30] , "plot translate");
     // test the bboxes
@@ -300,14 +301,14 @@ describe("Tables", () => {
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, null], [c5, c6]], "remove one element");
     });
 
-    it("does nothing when component is not found", () =>  {
+    it("does nothing when component is not found", () => {
       table = new Plottable.Components.Table([[c1, c2], [c3, c4]]);
       table.remove(c5);
 
       assert.deepEqual((<any> table)._rows, [[c1, c2], [c3, c4]], "remove nonexistent component");
     });
 
-    it("removing component twice should have same effect as removing it once", () =>  {
+    it("removing component twice should have same effect as removing it once", () => {
       table = new Plottable.Components.Table([[c1, c2, c3], [c4, c5, c6]]);
 
       table.remove(c1);

@@ -445,8 +445,7 @@ describe("Drawers", function () {
             var data = [{ a: "foo", b: 10 }, { a: "bar", b: 24 }];
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Category();
-            var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-            barPlot.orientation(Plottable.Orientation.HORIZONTAL);
+            var barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             var drawer = new Plottable.Drawers.Rect("_0", false); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             barPlot._getDrawer = function () { return drawer; };
             barPlot.addDataset(new Plottable.Dataset(data));
@@ -3253,6 +3252,11 @@ describe("Plots", function () {
             assert.strictEqual(plot.height(), 400, "was allocated height");
             svg.remove();
         });
+        it("rejects invalid orientations", function () {
+            var xScale = new Plottable.Scales.Linear();
+            var yScale = new Plottable.Scales.Linear();
+            assert.throws(function () { return new Plottable.Plots.Bar(xScale, yScale, "diagonal"); }, Error);
+        });
         function assertPlotDataEqual(expected, actual, msg) {
             assert.deepEqual(expected.data, actual.data, msg);
             assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
@@ -3613,8 +3617,7 @@ describe("Plots", function () {
                     { y: "B", x: 1 }
                 ];
                 dataset = new Plottable.Dataset(data);
-                barPlot = new Plottable.Plots.Bar(xScale, yScale);
-                barPlot.orientation(Plottable.Orientation.HORIZONTAL);
+                barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
                 barPlot.baseline(0);
@@ -3920,11 +3923,11 @@ describe("Plots", function () {
         var SVG_WIDTH = 300;
         var SVG_HEIGHT = 300;
         var DATA = [
-            { x: 0, y: 0, x1: 1, y1: 1 },
-            { x: 1, y: 1, x1: 2, y1: 2 },
-            { x: 2, y: 2, x1: 3, y1: 3 },
-            { x: 3, y: 3, x1: 4, y1: 4 },
-            { x: 4, y: 4, x1: 5, y1: 5 }
+            { x: 0, y: 0, x2: 1, y2: 1 },
+            { x: 1, y: 1, x2: 2, y2: 2 },
+            { x: 2, y: 2, x2: 3, y2: 3 },
+            { x: 3, y: 3, x2: 4, y2: 4 },
+            { x: 4, y: 4, x2: 5, y2: 5 }
         ];
         var VERIFY_CELLS = function (cells) {
             assert.strictEqual(cells[0].length, 5);
@@ -3942,7 +3945,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
             rectanglePlot.addDataset(new Plottable.Dataset(DATA));
-            rectanglePlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).x1(function (d) { return d.x1; }, xScale).y1(function (d) { return d.y1; }, yScale).renderTo(svg);
+            rectanglePlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).x2(function (d) { return d.x2; }, xScale).y2(function (d) { return d.y2; }, yScale).renderTo(svg);
             VERIFY_CELLS(rectanglePlot._renderArea.selectAll("rect"));
             svg.remove();
         });
@@ -3951,17 +3954,17 @@ describe("Plots", function () {
         it("illegal rectangles don't get displayed", function () {
             var svg = TestMethods.generateSVG();
             var data1 = [
-                { x: "A", y: 1, y1: 2, v: 1 },
-                { x: "B", y: 2, y1: 3, v: 2 },
-                { x: "C", y: 3, y1: NaN, v: 3 },
-                { x: "D", y: 4, y1: 5, v: 4 },
-                { x: "E", y: 5, y1: 6, v: 5 },
-                { x: "F", y: 6, y1: 7, v: 6 }
+                { x: "A", y: 1, y2: 2, v: 1 },
+                { x: "B", y: 2, y2: 3, v: 2 },
+                { x: "C", y: 3, y2: NaN, v: 3 },
+                { x: "D", y: 4, y2: 5, v: 4 },
+                { x: "E", y: 5, y2: 6, v: 5 },
+                { x: "F", y: 6, y2: 7, v: 6 }
             ];
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Rectangle(xScale, yScale);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).y1(function (d) { return d.y1; }, yScale);
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).y2(function (d) { return d.y2; }, yScale);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.renderTo(svg);
             var rectanglesSelection = plot._element.selectAll(".bar-area rect");
@@ -5195,8 +5198,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.StackedBar(xScale, yScale);
-            renderer.orientation(Plottable.Orientation.HORIZONTAL);
+            renderer = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.y(function (d) { return d.name; }, yScale);
             renderer.x(function (d) { return d.y; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
@@ -5311,8 +5313,7 @@ describe("Plots", function () {
                 { y: "B", x: 1, type: "c" },
                 { y: "C", x: 7, type: "c" }
             ];
-            plot = new Plottable.Plots.StackedBar(xScale, yScale);
-            plot.orientation(Plottable.Orientation.HORIZONTAL);
+            plot = new Plottable.Plots.StackedBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5511,8 +5512,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale);
-            renderer.orientation(Plottable.Orientation.HORIZONTAL);
+            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
@@ -5611,8 +5611,7 @@ describe("Plots", function () {
             var data1 = [{ y: "A", x: 1 }, { y: "B", x: 2 }, { y: "C", x: 1 }];
             var data2 = [{ y: "A", x: 2 }, { y: "B", x: 4 }];
             var data3 = [{ y: "B", x: 15 }, { y: "C", x: 15 }];
-            plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
-            plot.orientation(Plottable.Orientation.HORIZONTAL);
+            plot = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
@@ -5741,9 +5740,9 @@ describe("Metadata", function () {
         checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
         checkXYPlot(new Plottable.Plots.Bar(xScale, yScale));
         checkXYPlot(new Plottable.Plots.StackedBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale).orientation(Plottable.Orientation.HORIZONTAL));
+        checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
         checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale).orientation(Plottable.Orientation.HORIZONTAL));
+        checkXYPlot(new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
         checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
         checkPiePlot(new Plottable.Plots.Pie());
         svg.remove();
@@ -6592,7 +6591,11 @@ describe("Tables", function () {
         var c7 = TestMethods.makeFixedSizeComponent(null, 30);
         var c3 = TestMethods.makeFixedSizeComponent(50, null);
         var c5 = TestMethods.makeFixedSizeComponent(50, null);
-        var table = new Plottable.Components.Table([[null, c1, null], [c3, c4, c5], [null, c7, null]]);
+        var table = new Plottable.Components.Table([
+            [null, c1, null],
+            [c3, c4, c5],
+            [null, c7, null]
+        ]);
         var components = [c1, c3, c4, c5, c7];
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
@@ -7215,6 +7218,42 @@ describe("Scales", function () {
             assert.strictEqual("#ffffff", scale.scale(16));
             scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
+        });
+    });
+    describe("extent calculation", function () {
+        it("categoryScale gives the unique values when domain is stringy", function () {
+            var values = ["1", "3", "2", "1"];
+            var scale = new Plottable.Scales.Category();
+            var computedExtent = scale.extentOfValues(values);
+            assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
+        });
+        it("categoryScale gives the unique values when domain is numeric", function () {
+            var values = [1, 3, 2, 1];
+            var scale = new Plottable.Scales.Category();
+            var computedExtent = scale.extentOfValues(values);
+            assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
+        });
+        it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", function () {
+            var values = ["1", "3", "2", "1"];
+            var scale = new Plottable.QuantitativeScale();
+            var computedExtent = scale.extentOfValues(values);
+            assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
+        });
+        it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", function () {
+            var values = [1, 3, 2, 1];
+            var scale = new Plottable.QuantitativeScale();
+            var computedExtent = scale.extentOfValues(values);
+            assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
+        });
+        it("timeScale extent calculation works as expected", function () {
+            var date1 = new Date(2015, 2, 25, 19, 0, 0);
+            var date2 = new Date(2015, 2, 24, 19, 0, 0);
+            var date3 = new Date(2015, 2, 25, 19, 0, 0);
+            var date4 = new Date(2015, 2, 26, 19, 0, 0);
+            var values = [date1, date2, date3, date4];
+            var scale = new Plottable.Scales.Time();
+            var computedExtent = scale.extentOfValues(values);
+            assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
         });
     });
 });
