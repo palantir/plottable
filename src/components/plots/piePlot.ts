@@ -11,8 +11,8 @@ export module Plots {
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
-    private _startAngles: Utils.Map<Dataset, number[]>;
-    private _endAngles: Utils.Map<Dataset, number[]>;
+    private _startAngles: number[];
+    private _endAngles: number[];
 
     /**
      * Constructs a PiePlot.
@@ -25,8 +25,6 @@ export module Plots {
       this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.classed("pie-plot", true);
       this.attr("fill", (d, i) => String(i), new Scales.Color());
-      this._startAngles = new Utils.Map<Dataset, number[]>();
-      this._endAngles = new Utils.Map<Dataset, number[]>();
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -47,8 +45,6 @@ export module Plots {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
-      this._startAngles.set(dataset, []);
-      this._endAngles.set(dataset, []);
       this._updatePieAngles();
       super.addDataset(dataset);
       return this;
@@ -56,9 +52,8 @@ export module Plots {
 
     public removeDataset(dataset: Dataset) {
       super.removeDataset(dataset);
-      this._startAngles.delete(dataset);
-      this._endAngles.delete(dataset);
-      this._updatePieAngles();
+      this._startAngles = [];
+      this._endAngles = [];
       return this;
     }
 
@@ -126,24 +121,24 @@ export module Plots {
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
         return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                            .outerRadius(outerRadiusAccessor(datum, index, ds))
-                           .startAngle(this._startAngles.get(ds)[index])
-                           .endAngle(this._endAngles.get(ds)[index])(datum, index);
+                           .startAngle(this._startAngles[index])
+                           .endAngle(this._endAngles[index])(datum, index);
       };
       return attrToProjector;
     }
 
     private _updatePieAngles() {
       if (this.sectorValue() == null) { return; }
+      if (this.datasets().length === 0) { return; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      this.datasets().forEach((ds) => {
-        var data = ds.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
-        var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, ds))(data);
-        if (pie.some((slice) => slice.value < 0)) {
-          Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
-        }
-        this._startAngles.set(ds, pie.map((slice) => slice.startAngle));
-        this._endAngles.set(ds, pie.map((slice) => slice.endAngle));
-      });
+      var dataset = this.datasets()[0];
+      var data = dataset.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)));
+      var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      if (pie.some((slice) => slice.value < 0)) {
+        Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+      }
+      this._startAngles = pie.map((slice) => slice.startAngle);
+      this._endAngles = pie.map((slice) => slice.endAngle);
     }
 
     protected _getDataToDraw() {

@@ -6572,8 +6572,6 @@ var Plottable;
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.classed("pie-plot", true);
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
-                this._startAngles = new Plottable.Utils.Map();
-                this._endAngles = new Plottable.Utils.Map();
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -6592,17 +6590,14 @@ var Plottable;
                     Plottable.Utils.Methods.warn("Only one dataset is supported in Pie plots");
                     return this;
                 }
-                this._startAngles.set(dataset, []);
-                this._endAngles.set(dataset, []);
                 this._updatePieAngles();
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
             Pie.prototype.removeDataset = function (dataset) {
                 _super.prototype.removeDataset.call(this, dataset);
-                this._startAngles.delete(dataset);
-                this._endAngles.delete(dataset);
-                this._updatePieAngles();
+                this._startAngles = [];
+                this._endAngles = [];
                 return this;
             };
             Pie.prototype._onDatasetUpdate = function () {
@@ -6653,25 +6648,26 @@ var Plottable;
                 var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
                 var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
                 attrToProjector["d"] = function (datum, index, ds) {
-                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds)).startAngle(_this._startAngles.get(ds)[index]).endAngle(_this._endAngles.get(ds)[index])(datum, index);
+                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds)).startAngle(_this._startAngles[index]).endAngle(_this._endAngles[index])(datum, index);
                 };
                 return attrToProjector;
             };
             Pie.prototype._updatePieAngles = function () {
-                var _this = this;
                 if (this.sectorValue() == null) {
                     return;
                 }
+                if (this.datasets().length === 0) {
+                    return;
+                }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
-                this.datasets().forEach(function (ds) {
-                    var data = ds.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
-                    var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, ds); })(data);
-                    if (pie.some(function (slice) { return slice.value < 0; })) {
-                        Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
-                    }
-                    _this._startAngles.set(ds, pie.map(function (slice) { return slice.startAngle; }));
-                    _this._endAngles.set(ds, pie.map(function (slice) { return slice.endAngle; }));
-                });
+                var dataset = this.datasets()[0];
+                var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)); });
+                var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
+                if (pie.some(function (slice) { return slice.value < 0; })) {
+                    Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+                }
+                this._startAngles = pie.map(function (slice) { return slice.startAngle; });
+                this._endAngles = pie.map(function (slice) { return slice.endAngle; });
             };
             Pie.prototype._getDataToDraw = function () {
                 var _this = this;
