@@ -741,8 +741,8 @@ var Plottable;
              * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
             Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
-                var domainKeys = this.getDomainKeys(datasets, keyAccessor);
-                var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+                var domainKeys = Stacked.getDomainKeys(datasets, keyAccessor);
+                var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Utils.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
@@ -753,7 +753,7 @@ var Plottable;
                         return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
-                var stackOffsets = this._generateStackOffsets(datasets, this._stack(positiveDataMapArray, domainKeys), this._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
+                var stackOffsets = Stacked._generateStackOffsets(datasets, Stacked._stack(positiveDataMapArray, domainKeys), Stacked._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
                 return stackOffsets;
             };
             /**

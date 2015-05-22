@@ -17,9 +17,9 @@ module Plottable {
        * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
       public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
-        var domainKeys = this.getDomainKeys(datasets, keyAccessor);
+        var domainKeys = Stacked.getDomainKeys(datasets, keyAccessor);
 
-        var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+        var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
           return Utils.Methods.populateMap(domainKeys, (domainKey) => {
@@ -33,10 +33,10 @@ module Plottable {
           });
         });
 
-        var stackOffsets = this._generateStackOffsets(
+        var stackOffsets = Stacked._generateStackOffsets(
           datasets,
-          this._stack(positiveDataMapArray, domainKeys),
-          this._stack(negativeDataMapArray, domainKeys),
+          Stacked._stack(positiveDataMapArray, domainKeys),
+          Stacked._stack(negativeDataMapArray, domainKeys),
           keyAccessor,
           valueAccessor);
 
