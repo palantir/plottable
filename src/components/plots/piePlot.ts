@@ -124,13 +124,11 @@ export module Plots {
       var innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
       var outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
-        return d3.svg.arc()
-                     .innerRadius(innerRadiusAccessor(datum, index, ds))
-                     .outerRadius(outerRadiusAccessor(datum, index, ds))
-                     .startAngle(this._startAngles.get(ds)[index])
-                     .endAngle(this._endAngles.get(ds)[index])(datum, index);
+        return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+                           .outerRadius(outerRadiusAccessor(datum, index, ds))
+                           .startAngle(this._startAngles.get(ds)[index])
+                           .endAngle(this._endAngles.get(ds)[index])(datum, index);
       };
-      attrToProjector["sector-value"] = Plot._scaledAccessor(this.sectorValue());
       return attrToProjector;
     }
 

@@ -6655,7 +6655,6 @@ var Plottable;
                 attrToProjector["d"] = function (datum, index, ds) {
                     return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds)).startAngle(_this._startAngles.get(ds)[index]).endAngle(_this._endAngles.get(ds)[index])(datum, index);
                 };
-                attrToProjector["sector-value"] = Plottable.Plot._scaledAccessor(this.sectorValue());
                 return attrToProjector;
             };
             Pie.prototype._updatePieAngles = function () {
