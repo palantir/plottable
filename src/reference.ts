@@ -8,7 +8,7 @@
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
 /// <reference path="utils/callbackSet.ts" />
-/// <reference path="utils/stackedPlotUtils.ts" />
+/// <reference path="utils/stackedUtils.ts" />
 
 /// <reference path="utils/formatters.ts" />
 /// <reference path="utils/symbolFactories.ts" />

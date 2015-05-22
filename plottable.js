@@ -731,8 +731,8 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var StackedPlot = (function () {
-            function StackedPlot() {
+        var Stacked = (function () {
+            function Stacked() {
             }
             /**
              * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
@@ -740,7 +740,7 @@ var Plottable;
              *
              * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
-            StackedPlot.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
+            Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
                 var domainKeys = this.getDomainKeys(datasets, keyAccessor);
                 var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
@@ -762,7 +762,7 @@ var Plottable;
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            StackedPlot.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
+            Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
                 var maxStackExtent = Utils.Methods.max(datasets, function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
@@ -787,7 +787,7 @@ var Plottable;
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
              */
-            StackedPlot.getDomainKeys = function (datasets, keyAccessor) {
+            Stacked.getDomainKeys = function (datasets, keyAccessor) {
                 var domainKeys = d3.set();
                 datasets.forEach(function (dataset) {
                     dataset.data().forEach(function (datum, index) {
@@ -800,14 +800,14 @@ var Plottable;
              * Feeds the data through d3's stack layout function which will calculate
              * the stack offsets and use the the function declared in .out to set the offsets on the data.
              */
-            StackedPlot._stack = function (dataArray, domainKeys) {
+            Stacked._stack = function (dataArray, domainKeys) {
                 var outFunction = function (d, y0, y) {
                     d.offset = y0;
                 };
                 d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
                 return dataArray;
             };
-            StackedPlot._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
+            Stacked._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
                 var dataMapArray = datasets.map(function () {
                     return Utils.Methods.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
@@ -826,7 +826,7 @@ var Plottable;
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            StackedPlot._generateStackOffsets = function (datasets, positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor) {
+            Stacked._generateStackOffsets = function (datasets, positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor) {
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
                     var datasetOffsets = d3.map();
@@ -851,9 +851,9 @@ var Plottable;
                 });
                 return stackOffsets;
             };
-            return StackedPlot;
+            return Stacked;
         })();
-        Utils.StackedPlot = StackedPlot;
+        Utils.Stacked = Stacked;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8199,14 +8199,14 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
                     return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
                 });
-                var domainKeys = Plottable.Utils.StackedPlot.getDomainKeys(datasets, keyAccessor);
+                var domainKeys = Plottable.Utils.Stacked.getDomainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
@@ -8332,8 +8332,8 @@ var Plottable;
                 var keyAccessor = this._keyAccessor();
                 var valueAccessor = this._valueAccessor();
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackOffsets = Plottable.Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             StackedBar.prototype._keyAccessor = function () {
                 return this._isVertical ? this.x().accessor : this.y().accessor;

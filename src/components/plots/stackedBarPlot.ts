@@ -124,8 +124,8 @@ export module Plots {
       var valueAccessor = this._valueAccessor();
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._stackOffsets = Utils.StackedPlot.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.StackedPlot.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
 
     private _keyAccessor() {
