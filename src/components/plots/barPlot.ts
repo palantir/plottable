@@ -238,39 +238,13 @@ export module Plots {
     }
 
     /**
-     * Gets the bar under the given pixel position (if [xValOrExtent]
-     * and [yValOrExtent] are {number}s), under a given line (if only one
-     * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
-     *
-     * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-     * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-     * @returns {D3.Selection} The selected bar, or null if no bar was selected.
-     */
-    public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
-      if (!this._isSetup) {
-        return d3.select();
-      }
-
-      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
-      , []);
-
-      return d3.selectAll(bars);
-    }
-
-    /**
      * Gets the {Plots.PlotData} that correspond to the given pixel position.
      * 
      * @param {Point} p The provided pixel position as a {Point}
-     * @return {Plots.PlotData} The plot data that corresponds to the point.
+     * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
      */
     public plotDataAt(p: Point) {
-  	  var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) => 
-        bars.concat(this._getBarsFromDataset(key, p.x, p.y))
-      , []);
-      return d3.selectAll(bars).data();
+      return this._getPlotData(p.x, p.y);
     }
 
     /**
@@ -281,37 +255,23 @@ export module Plots {
      * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
      */
     public plotDataIn(xRange: Extent, yRange: Extent) {
-  	  var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) => 
-        bars.concat(this._getPlotData(key, xRange, yRange))
-      , []);
-      return bars;
+      return this._getPlotData(xRange, yRange);
     }
 
-    private _getPlotData(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent) {
-      var data: Plots.PlotData[] = [];
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
-      drawer._getRenderArea().selectAll("rect").each(function(d) {
-        if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-          var plotData: Plots.PlotData;
-          plotData.selection = d3.select(this);
-          plotData.pixelPoints
-        }
-      });
-      return data;
-    }
+    private _getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var elements: EventTarget[] = [];
 
-    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
-      var bars: any[] = [];
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
-      drawer._getRenderArea().selectAll("rect").each(function(d) {
+      var plotData = this.getAllPlotData();
+      plotData.selection.each(function(datum, i) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-          var bar = d3.select(this);
-          
-          console.log(bar);
-          bars.push(this);
+          data.push(plotData.data[i]);
+          pixelPoints.push(plotData.pixelPoints[i]);
+          elements.push(this);
         }
       });
-      return bars;
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
     }
 
     protected _updateDomainer(scale: Scale<any, number>) {

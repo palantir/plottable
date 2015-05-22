@@ -2831,23 +2831,19 @@ declare module Plottable {
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
-             * Gets the bar under the given pixel position (if [xValOrExtent]
-             * and [yValOrExtent] are {number}s), under a given line (if only one
-             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
-             *
-             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
-             */
-            getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
-            /**
              * Gets the {Plots.PlotData} that correspond to the given pixel position.
              *
              * @param {Point} p The provided pixel position as a {Point}
-             * @return {Plots.PlotData} The plot data that corresponds to the point.
+             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
              */
-            plotDataAt(p: Point): any[];
+            plotDataAt(p: Point): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             /**
              * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
              *
@@ -2855,7 +2851,14 @@ declare module Plottable {
              * @param {Extent} yRange The specified range of y values
              * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
              */
-            plotDataIn(xRange: Extent, yRange: Extent): any[];
+            plotDataIn(xRange: Extent, yRange: Extent): {
+                data: any[];
+                pixelPoints: {
+                    x: number;
+                    y: number;
+                }[];
+                selection: D3.Selection;
+            };
             protected _updateDomainer(scale: Scale<any, number>): void;
             protected _updateYDomainer(): void;
             protected _updateXDomainer(): void;

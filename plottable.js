@@ -7437,34 +7437,13 @@ var Plottable;
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
-             * Gets the bar under the given pixel position (if [xValOrExtent]
-             * and [yValOrExtent] are {number}s), under a given line (if only one
-             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
-             *
-             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
-             */
-            Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
-                var _this = this;
-                if (!this._isSetup) {
-                    return d3.select();
-                }
-                // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xValOrExtent, yValOrExtent)); }, []);
-                return d3.selectAll(bars);
-            };
-            /**
              * Gets the {Plots.PlotData} that correspond to the given pixel position.
              *
              * @param {Point} p The provided pixel position as a {Point}
-             * @return {Plots.PlotData} The plot data that corresponds to the point.
+             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
              */
             Bar.prototype.plotDataAt = function (p) {
-                var _this = this;
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, p.x, p.y)); }, []);
-                return d3.selectAll(bars).data();
+                return this._getPlotData(p.x, p.y);
             };
             /**
              * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
@@ -7474,33 +7453,21 @@ var Plottable;
              * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
              */
             Bar.prototype.plotDataIn = function (xRange, yRange) {
-                var _this = this;
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getPlotData(key, xRange, yRange)); }, []);
-                return bars;
+                return this._getPlotData(xRange, yRange);
             };
-            Bar.prototype._getPlotData = function (key, xValOrExtent, yValOrExtent) {
+            Bar.prototype._getPlotData = function (xValOrExtent, yValOrExtent) {
                 var data = [];
-                var drawer = this._key2PlotDatasetKey.get(key).drawer;
-                drawer._getRenderArea().selectAll("rect").each(function (d) {
+                var pixelPoints = [];
+                var elements = [];
+                var plotData = this.getAllPlotData();
+                plotData.selection.each(function (datum, i) {
                     if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-                        var plotData;
-                        plotData.selection = d3.select(this);
-                        plotData.pixelPoints;
+                        data.push(plotData.data[i]);
+                        pixelPoints.push(plotData.pixelPoints[i]);
+                        elements.push(this);
                     }
                 });
-                return data;
-            };
-            Bar.prototype._getBarsFromDataset = function (key, xValOrExtent, yValOrExtent) {
-                var bars = [];
-                var drawer = this._key2PlotDatasetKey.get(key).drawer;
-                drawer._getRenderArea().selectAll("rect").each(function (d) {
-                    if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-                        var bar = d3.select(this);
-                        console.log(bar);
-                        bars.push(this);
-                    }
-                });
-                return bars;
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
             };
             Bar.prototype._updateDomainer = function (scale) {
                 if (scale instanceof Plottable.QuantitativeScale) {
