@@ -2895,6 +2895,7 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

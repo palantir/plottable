@@ -22,17 +22,6 @@ export module Drawers {
       super.setup(area);
     }
 
-    private _createLine(xFunction: AppliedProjector, yFunction: AppliedProjector, definedFunction: AppliedProjector) {
-      if (!definedFunction) {
-        definedFunction = (d, i) => true;
-      }
-
-      return d3.svg.line()
-                   .x(xFunction)
-                   .y(yFunction)
-                   .defined(definedFunction);
-    }
-
     protected _numberOfAnimationIterations(data: any[]): number {
       return 1;
     }
@@ -40,17 +29,6 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      var definedFunction = attrToProjector["defined"];
-
-      var xProjector = attrToProjector["x"];
-      var yProjector = attrToProjector["y"];
-      delete attrToProjector["x"];
-      delete attrToProjector["y"];
-      if (attrToProjector["defined"]) {
-        delete attrToProjector["defined"];
-      }
-
-      attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
       if (attrToProjector["fill"]) {
         this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }

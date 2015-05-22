@@ -2610,27 +2610,12 @@ var Plottable;
                 });
                 _super.prototype.setup.call(this, area);
             };
-            Line.prototype._createLine = function (xFunction, yFunction, definedFunction) {
-                if (!definedFunction) {
-                    definedFunction = function (d, i) { return true; };
-                }
-                return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
-            };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                var definedFunction = attrToProjector["defined"];
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                if (attrToProjector["defined"]) {
-                    delete attrToProjector["defined"];
-                }
-                attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -7686,7 +7671,7 @@ var Plottable;
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined"];
+                return ["x", "y", "defined", "d"];
             };
             Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
@@ -7761,6 +7746,20 @@ var Plottable;
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
                 };
+            };
+            Line.prototype._propertyProjectors = function () {
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var definedProjector = function (d, i, dataset) {
+                    var positionX = xProjector(d, i, dataset);
+                    var positionY = yProjector(d, i, dataset);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                propertyToProjectors["d"] = function (datum, index, dataset) {
+                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                };
+                return propertyToProjectors;
             };
             return Line;
         })(Plottable.XYPlot);
