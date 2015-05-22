@@ -17,8 +17,12 @@ function run(svg, data, Plottable) {
   var plot = new Plottable.Plots.Line(xScale, yScale);
   plot.addDataset(ds);
   plot.x(function(d){ return d.y; }, xScale)
-      .y(function(d){ return d.x; }, yScale)
-      .autorange("x");
+      .y(function(d){ return d.x; }, yScale);
+  if (typeof plot.autorange === "function") {
+    plot.autorange("x");
+  } else {
+    plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+  }
 
   var table = new Plottable.Components.Table([[yAxis, plot],
                                              [null, xAxis]]);
