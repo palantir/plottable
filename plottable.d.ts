@@ -2926,8 +2926,6 @@ declare module Plottable {
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
-            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         }
     }
 }

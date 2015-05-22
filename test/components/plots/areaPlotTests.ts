@@ -137,7 +137,6 @@ describe("Plots", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
         areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
         var allAreas = areaPlot.getAllSelections();
-        assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
         assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
 
         svg.remove();
@@ -147,7 +146,7 @@ describe("Plots", () => {
         var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
         areaPlot.addDataset(twoPointDataset);
         var allAreas = areaPlot.getAllSelections([twoPointDataset]);
-        assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
+        assert.strictEqual(allAreas.size(), 1, "area retrieved");
         var selectionData = allAreas.data();
         assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 
@@ -159,7 +158,7 @@ describe("Plots", () => {
         areaPlot.addDataset(twoPointDataset);
         var dummyDataset = new Plottable.Dataset([]);
         var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
-        assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
+        assert.strictEqual(allAreas.size(), 1, "area retrieved");
         var selectionData = allAreas.data();
         assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
 

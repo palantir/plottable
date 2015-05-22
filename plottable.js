@@ -7875,40 +7875,6 @@ var Plottable;
                 attrToProjector["y0"] = Plottable.Plot._scaledAccessor(this.y0());
                 return attrToProjector;
             };
-            Area.prototype.getAllSelections = function (datasets, exclude) {
-                var _this = this;
-                if (datasets === void 0) { datasets = this.datasets(); }
-                if (exclude === void 0) { exclude = false; }
-                var allSelections = _super.prototype.getAllSelections.call(this, datasets, exclude)[0];
-                if (exclude) {
-                    datasets = this.datasets().filter(function (dataset) { return datasets.indexOf(dataset) < 0; });
-                }
-                var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
-                lineDrawers.forEach(function (ld, i) { return allSelections.push(ld._getSelection(i).node()); });
-                return d3.selectAll(allSelections);
-            };
-            Area.prototype.getAllPlotData = function (datasets) {
-                var _this = this;
-                if (datasets === void 0) { datasets = this.datasets(); }
-                var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
-                var allElements = allPlotData.selection[0];
-                this._keysForDatasets(datasets).forEach(function (datasetKey) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var drawer = plotDatasetKey.drawer;
-                    var dataset = plotDatasetKey.dataset;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
-                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-                            return;
-                        }
-                        allElements.splice(index * 2 + 1, 0, drawer._getSelection(index).node());
-                    });
-                });
-                return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
-            };
             Area._Y0_KEY = "y0";
             return Area;
         })(Plots.Line);
