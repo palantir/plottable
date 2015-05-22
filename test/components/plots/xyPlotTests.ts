@@ -39,7 +39,7 @@ describe("Plots", () => {
     it("automatically adjusting Y domain when no points are visible", () => {
       plot.autorange("y");
       xScale.domain([-0.5, 0.5]);
-      assert.deepEqual(yScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+      assert.deepEqual(yScale.domain(), [0, 1], "scale uses default domain");
       svg.remove();
     });
 
@@ -65,7 +65,7 @@ describe("Plots", () => {
     it("automatically adjusting X domain when no points are visible", () => {
       plot.autorange("x");
       yScale.domain([-0.5, 0.5]);
-      assert.deepEqual(xScale.domain(), [-1, 1], "domain equivalent to that with empty dataset");
+      assert.deepEqual(xScale.domain(), [0, 1], "scale uses default domain");
       svg.remove();
     });
 

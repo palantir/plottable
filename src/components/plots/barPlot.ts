@@ -3,6 +3,8 @@
 module Plottable {
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
+    public static ORIENTATION_VERTICAL = "vertical";
+    public static ORIENTATION_HORIZONTAL = "horizontal";
     protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
@@ -16,20 +18,23 @@ export module Plots {
     private _hideBarsIfAnyAreTooWide = true;
 
     /**
-     * Constructs a BarPlot.
+     * Constructs a Bar Plot.
      *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
       this.classed("bar-plot", true);
+      if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+        throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+      }
+      this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("bars-reset", new Animators.Null());
       this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
-      this._isVertical = isVertical;
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
@@ -66,8 +71,7 @@ export module Plots {
         return this._baselineValue;
       }
       this._baselineValue = value;
-      this._updateXDomainer();
-      this._updateYDomainer();
+      this._updateValueScale();
       this.render();
       return this;
     }
@@ -267,39 +271,17 @@ export module Plots {
       return bars;
     }
 
-    protected _updateDomainer(scale: Scale<any, number>) {
-      if (scale instanceof QuantitativeScale) {
-        var qscale = <QuantitativeScale<any>> scale;
-        if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
-            qscale.domainer()
-              .addPaddingException(this, this._baselineValue)
-              .addIncludedValue(this, this._baselineValue);
-          } else {
-            qscale.domainer()
-              .removePaddingException(this)
-              .removeIncludedValue(this);
-          }
-          qscale.domainer().pad().nice();
+    private _updateValueScale() {
+      var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+      if (valueScale instanceof QuantitativeScale) {
+        var qscale = <QuantitativeScale<any>> valueScale;
+        if (this._baselineValue != null) {
+          qscale.addPaddingException(this, this._baselineValue);
+          qscale.addIncludedValue(this, this._baselineValue);
+        } else {
+          qscale.removePaddingException(this);
+          qscale.removeIncludedValue(this);
         }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        qscale._autoDomainIfAutomaticMode();
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this._isVertical) {
-        this._updateDomainer(this.y().scale);
-      } else {
-        super._updateYDomainer();
-      }
-    }
-
-    protected _updateXDomainer() {
-      if (!this._isVertical) {
-        this._updateDomainer(this.x().scale);
-      } else {
-        super._updateXDomainer();
       }
     }
 
@@ -330,8 +312,7 @@ export module Plots {
       this._datasetKeysInOrder.forEach((k, i) =>
         drawers[i].drawText(dataToDraw.get(k),
                             attrToProjector,
-                            this._key2PlotDatasetKey.get(k).dataset,
-                            this._key2PlotDatasetKey.get(k).plotMetadata));
+                            this._key2PlotDatasetKey.get(k).dataset));
       if (this._hideBarsIfAnyAreTooWide && drawers.some((d: Drawers.Rect) => d._getIfLabelsTooWide())) {
         drawers.forEach((d: Drawers.Rect) => d.removeLabels());
       }
@@ -357,32 +338,32 @@ export module Plots {
       // Primary scale/direction: the "length" of the bars
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
-      var primaryScale: Scale<any, number>    = this._isVertical ? this.y().scale : this.x().scale;
-      var secondaryScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
-      var primaryAttr     = this._isVertical ? "y" : "x";
-      var secondaryAttr   = this._isVertical ? "x" : "y";
+      var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+      var secondaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
+      var primaryAttr = this._isVertical ? "y" : "x";
+      var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
       var positionF = attrToProjector[secondaryAttr];
       var widthF = attrToProjector["width"];
       var originalPositionFn = attrToProjector[primaryAttr];
-      var heightF = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
-        return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset, m));
+      var heightF = (d: any, i: number, dataset: Dataset) => {
+        return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
       };
 
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
       if (secondaryScale instanceof Plottable.Scales.Category) {
-        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-          positionF(d, i, dataset, m) - widthF(d, i, dataset, m) / 2;
+        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
+          positionF(d, i, dataset) - widthF(d, i, dataset) / 2;
       } else {
-        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-          positionF(d, i, dataset, m) - widthF(d, i, dataset, m) * this._barAlignmentFactor;
+        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
+          positionF(d, i, dataset) - widthF(d, i, dataset) * this._barAlignmentFactor;
       }
 
-      attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
-        var originalPos = originalPositionFn(d, i, dataset, m);
+      attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset) => {
+        var originalPos = originalPositionFn(d, i, dataset);
         // If it is past the baseline, it should start at the baselin then width/height
         // carries it over. If it's not past the baseline, leave it at original position and
         // then width/height carries it to baseline
@@ -391,11 +372,11 @@ export module Plots {
 
       var primaryAccessor = this._propertyBindings.get(primaryAttr).accessor;
       if (this._labelsEnabled && this._labelFormatter) {
-        attrToProjector["label"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) => {
-          return this._labelFormatter(primaryAccessor(d, i, dataset, m));
+        attrToProjector["label"] = (d: any, i: number, dataset: Dataset) => {
+          return this._labelFormatter(primaryAccessor(d, i, dataset));
         };
-        attrToProjector["positive"] = (d: any, i: number, dataset: Dataset, m: PlotMetadata) =>
-          originalPositionFn(d, i, dataset, m) <= scaledBaseline;
+        attrToProjector["positive"] = (d: any, i: number, dataset: Dataset) =>
+          originalPositionFn(d, i, dataset) <= scaledBaseline;
       }
 
       return attrToProjector;
@@ -412,7 +393,7 @@ export module Plots {
     protected _getBarPixelWidth(): number {
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
-      var barScale: Scale<any, number>  = this._isVertical ? this.x().scale : this.y().scale;
+      var barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
       if (barScale instanceof Plottable.Scales.Category) {
         barPixelWidth = (<Plottable.Scales.Category> barScale).rangeBand();
       } else {
@@ -420,8 +401,9 @@ export module Plots {
 
         var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
           var dataset = this._key2PlotDatasetKey.get(k).dataset;
-          var plotMetadata = this._key2PlotDatasetKey.get(k).plotMetadata;
-          return dataset.data().map((d, i) => barAccessor(d, i, dataset, plotMetadata).valueOf());
+          return dataset.data().map((d, i) => barAccessor(d, i, dataset))
+                               .filter((d) => d != null)
+                               .map((d) => d.valueOf());
         }))).values().map((value) => +value);
 
         numberBarAccessorData.sort((a, b) => a - b);

@@ -4,9 +4,9 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("RectanglePlot", () => {
-    var SVG_WIDTH  = 300;
+    var SVG_WIDTH = 300;
     var SVG_HEIGHT = 300;
-    var DATA       = [
+    var DATA = [
       { x: 0, y: 0, x2: 1, y2: 1 },
       { x: 1, y: 1, x2: 2, y2: 2 },
       { x: 2, y: 2, x2: 3, y2: 3 },
@@ -26,17 +26,17 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      var xScale        = new Plottable.Scales.Linear();
-      var yScale        = new Plottable.Scales.Linear();
-      var svg           = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
-      rectanglePlot.x((d) => d.x, xScale)
-                   .y((d) => d.y, yScale);
-      rectanglePlot.x1((d) => d.x, xScale)
-                   .y1((d) => d.y, yScale)
-                   .x2((d) => d.x2, xScale)
-                   .y2((d) => d.y2, yScale)
+      rectanglePlot.x((d: any) => d.x, xScale)
+                   .y((d: any) => d.y, yScale);
+      rectanglePlot.x1((d: any) => d.x, xScale)
+                   .y1((d: any) => d.y, yScale)
+                   .x2((d: any) => d.x2, xScale)
+                   .y2((d: any) => d.y2, yScale)
                    .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();

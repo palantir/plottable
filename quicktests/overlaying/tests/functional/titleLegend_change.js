@@ -24,10 +24,17 @@ function run(svg, data, Plottable) {
   colorScale1.domain(["series1", "series2", "apples", "oranges", "bananas", "grapes"]);
 
   //Axis
-  var domainer_X = new Plottable.Domainer().addPaddingException(0);
-  var domainer_Y = new Plottable.Domainer().addPaddingException(0);
-  var xScale = new Plottable.Scales.Linear().domainer(domainer_X);
-  var yScale = new Plottable.Scales.Linear().domainer(domainer_Y);
+  var xScale = new Plottable.Scales.Linear();
+  var yScale = new Plottable.Scales.Linear();
+  if (Plottable.Domainer != null) {
+    var domainer_X = new Plottable.Domainer().addPaddingException("overlaying", 0);
+    var domainer_Y = new Plottable.Domainer().addPaddingException("overlaying", 0);
+    xScale.domainer(domainer_X);
+    yScale.domainer(domainer_Y);
+  } else {
+    xScale.padProportion(0).addPaddingException("overlaying", 0);
+    yScale.padProportion(0).addPaddingException("overlaying", 0);
+  }
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 

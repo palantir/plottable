@@ -10,12 +10,7 @@ module Plottable {
     export type PlotDatasetKey = {
       dataset: Dataset;
       drawer: Drawers.AbstractDrawer;
-      plotMetadata: PlotMetadata;
       key: string;
-    }
-
-    export interface PlotMetadata {
-      datasetKey: string;
     }
 
     export type PlotData = {
@@ -108,8 +103,7 @@ module Plottable {
         this.removeDataset(dataset);
       };
       var drawer = this._getDrawer(key);
-      var metadata = this._getPlotMetadataForDataset(key);
-      var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
+      var pdk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
 
@@ -184,41 +178,16 @@ module Plottable {
       this._attrBindings.forEach((attr, binding) => {
         var accessor = binding.accessor;
         var scale = binding.scale;
-        var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
+        var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
         h[attr] = fn;
       });
-      var propertyProjectors = this._generatePropertyToProjectors();
+      var propertyProjectors = this._propertyProjectors();
       Object.keys(propertyProjectors).forEach((key) => {
         if (h[key] == null) {
           h[key] = propertyProjectors[key];
         }
       });
       return h;
-    }
-
-    /**
-     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-     * in accordance with the given datasetKey.
-     *
-     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-     *
-     * @param {Dataset} dataset The dataset to generate the dictionary for
-     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-     */
-    public generateProjectors(dataset: Dataset): AttributeToAppliedProjector {
-      var attrToAppliedProjector: AttributeToAppliedProjector = {};
-      var datasetKey = this._keyForDataset(dataset);
-      if (datasetKey != null) {
-        var attrToProjector = this._generateAttrToProjector();
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        d3.entries(attrToProjector).forEach((keyValue: any) => {
-          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => {
-            return keyValue.value(datum, index, plotDatasetKey.dataset, plotMetadata);
-          };
-        });
-      }
-      return attrToAppliedProjector;
     }
 
     public renderImmediately() {
@@ -273,7 +242,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
+      this._scales().forEach((scale) => scale.addExtentsProvider(this._extentsProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -296,30 +265,26 @@ module Plottable {
       extents.set(key, this._datasetKeysInOrder.map((key) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(key);
         var dataset = plotDatasetKey.dataset;
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accScaleBinding.accessor, plotMetadata, filter);
+        return this._computeExtent(dataset, accScaleBinding, filter);
       }));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, plotMetadata: any, filter: Accessor<boolean>): any[] {
+    private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+      var accessor = accScaleBinding.accessor;
+      var scale = accScaleBinding.scale;
+
+      if (scale == null) {
+        return [];
+      }
+
       var data = dataset.data();
       if (filter != null) {
-        data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        data = data.filter((d, i) => filter(d, i, dataset));
       }
-      var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
+      var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
       var mappedData = data.map(appliedAccessor);
-      if (mappedData.length === 0) {
-        return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return Utils.Methods.uniq(mappedData);
-      } else {
-        var extent = d3.extent(mappedData);
-        if (extent[0] == null || extent[1] == null) {
-          return [];
-        } else {
-          return extent;
-        }
-      }
+
+      return scale.extentOfValues(mappedData);
     }
 
     /**
@@ -442,17 +407,6 @@ module Plottable {
       return datasets;
     }
 
-    /**
-     * Gets the new plot metadata for new dataset with provided key
-     *
-     * @param {string} key The key of new dataset
-     */
-    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
-      return {
-        datasetKey: key
-      };
-    }
-
     private _paint() {
       var drawSteps = this._generateDrawSteps();
       var dataToDraw = this._getDataToDraw();
@@ -462,8 +416,7 @@ module Plottable {
         drawers[i].draw(
           dataToDraw.get(k),
           drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset,
-          this._key2PlotDatasetKey.get(k).plotMetadata
+          this._key2PlotDatasetKey.get(k).dataset
         ));
       var maxTime = Utils.Methods.max(times, 0);
       this._additionalPaint(maxTime);
@@ -574,19 +527,17 @@ module Plottable {
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
       scale.removeExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
       scale.addExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
+    protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector: AttributeToProjector = {};
       this._propertyBindings.forEach((key, binding) => {
-        var scaledAccessor = (d: any, i: number, dataset: Dataset, m: any) => binding.scale.scale(binding.accessor(d, i, dataset, m));
+        var scaledAccessor = (d: any, i: number, dataset: Dataset) => binding.scale.scale(binding.accessor(d, i, dataset));
         attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
       });
       return attrToProjector;

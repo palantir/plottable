@@ -2,8 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    private static _X_KEY = "x";
-    private static _Y_KEY = "y";
+    protected static _X_KEY = "x";
+    protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
     private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
@@ -33,10 +33,7 @@ module Plottable {
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-      this._updateXDomainer();
       xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-
-      this._updateYDomainer();
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
@@ -52,7 +49,6 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      this._updateXDomainer();
       this.renderImmediately();
       return this;
     }
@@ -69,7 +65,6 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      this._updateYDomainer();
       this.renderImmediately();
       return this;
     }
@@ -89,9 +84,9 @@ module Plottable {
         var accessor = binding.accessor;
         var scale = binding.scale;
         if (scale != null) {
-          return (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => {
+          return (datum: any, index: number, dataset: Dataset) => {
             var range = scale.range();
-            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, plotMetadata)), range[0], range[1]);
+            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
           };
         }
       }
@@ -160,13 +155,13 @@ module Plottable {
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
-        var positionX = positionXFn(d, i, dataset, m);
-        var positionY = positionYFn(d, i, dataset, m);
+      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset) => {
+        var positionX = positionXFn(d, i, dataset);
+        var positionY = positionYFn(d, i, dataset);
         return positionX != null && positionX === positionX &&
                positionY != null && positionY === positionY;
       };
@@ -188,24 +183,6 @@ module Plottable {
         }
       }
       return this;
-    }
-
-    protected _updateXDomainer() {
-      if (this.x().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.x().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this.y().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.y().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
     }
 
     private _updateXExtentsAndAutodomain() {
