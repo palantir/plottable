@@ -17,7 +17,7 @@ module Plottable {
        * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
       public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
-        var domainKeys = Stacked.getDomainKeys(datasets, keyAccessor);
+        var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
 
         var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
@@ -85,7 +85,7 @@ module Plottable {
        * Given an array of datasets and the accessor function for the key, computes the
        * set reunion (no duplicates) of the domain of each dataset.
        */
-      public static getDomainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
+      public static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
         var domainKeys = d3.set();
         datasets.forEach((dataset) => {
           dataset.data().forEach((datum, index) => {

@@ -319,7 +319,7 @@ declare module Plottable {
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
              */
-            static getDomainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
         }
     }
 }

@@ -149,7 +149,7 @@ export module Plots {
       var keySets = datasets.map((dataset) => {
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
-      var domainKeys = Utils.Stacked.getDomainKeys(datasets, keyAccessor);
+      var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");

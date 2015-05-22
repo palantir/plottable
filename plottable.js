@@ -741,7 +741,7 @@ var Plottable;
              * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
             Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
-                var domainKeys = Stacked.getDomainKeys(datasets, keyAccessor);
+                var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
                 var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Utils.Methods.populateMap(domainKeys, function (domainKey) {
@@ -787,7 +787,7 @@ var Plottable;
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
              */
-            Stacked.getDomainKeys = function (datasets, keyAccessor) {
+            Stacked.domainKeys = function (datasets, keyAccessor) {
                 var domainKeys = d3.set();
                 datasets.forEach(function (dataset) {
                     dataset.data().forEach(function (datum, index) {
@@ -8206,7 +8206,7 @@ var Plottable;
                 var keySets = datasets.map(function (dataset) {
                     return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
                 });
-                var domainKeys = Plottable.Utils.Stacked.getDomainKeys(datasets, keyAccessor);
+                var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
@@ -8331,7 +8331,6 @@ var Plottable;
                 var datasets = this.datasets();
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-                ;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);

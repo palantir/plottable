@@ -12,7 +12,7 @@ describe("Utils", () => {
     };
     var filter: Plottable.Accessor<boolean>;
 
-    it("getDomainKeys() works as expected with strings as keys", () => {
+    it("domainKeys() works as expected with strings as keys", () => {
       var data1 = [
         {key: "Fred", value: 1},
         {key: "Barney", value: 2},
@@ -25,13 +25,13 @@ describe("Utils", () => {
       ];
 
       var datasets = createDatasets([data1, data2]);
-      var domainKeys = Plottable.Utils.Stacked.getDomainKeys(datasets, keyAccessor);
+      var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
       var expectedDomainKeys = ["Fred", "Barney", "Wilma", "Betty"];
 
       assert.deepEqual(domainKeys, expectedDomainKeys, "the expected domain keys is a set reunion of the datasets keys");
     });
 
-    it("getDomainKeys() works as expected with numbers as keys", () => {
+    it("domainKeys() works as expected with numbers as keys", () => {
       var data1 = [
         {key: 1, value: 1},
         {key: 3, value: 1}
@@ -42,7 +42,7 @@ describe("Utils", () => {
       ];
 
       var datasets = createDatasets([data1, data2]);
-      var domainKeys = Plottable.Utils.Stacked.getDomainKeys(datasets, keyAccessor);
+      var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
       var expectedDomainKeys = ["1", "3", "2", "4"];
 
       assert.deepEqual(domainKeys.sort(), expectedDomainKeys.sort(), "the expected domain keys is a set reunion of the datasets keys");
