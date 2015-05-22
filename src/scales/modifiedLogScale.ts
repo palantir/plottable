@@ -4,6 +4,7 @@ module Plottable {
 export module Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
+    private _d3Scale: D3.Scale.LinearScale;
     private _pivot: number;
     private _untransformedDomain: number[];
     private _showIntermediateTicks = false;
@@ -34,7 +35,8 @@ export module Scales {
      *        For negative values, scale(-x) = -scale(x).
      */
     constructor(base = 10) {
-      super(d3.scale.linear());
+      super();
+      this._d3Scale = d3.scale.linear();
       this._base = base;
       this._pivot = this._base;
       this._setDomain(this._defaultExtent());
@@ -95,6 +97,10 @@ export module Scales {
       this._untransformedDomain = values;
       var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
       super._setDomain(transformedDomain);
+    }
+
+    protected _setBackingScaleDomain(values: number[]) {
+      this._d3Scale.domain(values);
     }
 
     public ticks(): number[] {
@@ -172,7 +178,7 @@ export module Scales {
       return ticks;
     }
 
-    public _niceDomain(domain: number[], count?: number): number[] {
+    protected _niceDomain(domain: number[], count?: number): number[] {
       return domain;
     }
 
@@ -200,10 +206,35 @@ export module Scales {
       }
     }
 
-    public _defaultExtent(): number[] {
+    protected _defaultExtent(): number[] {
       return [0, this._base];
     }
 
+    protected _expandSingleValueDomain(singleValueDomain: number[]): number[] {
+      if (singleValueDomain[0] === singleValueDomain[1]) {
+        var singleValue = singleValueDomain[0];
+        if (singleValue > 0) {
+          return [singleValue / this._base, singleValue * this._base];
+        } else if (singleValue === 0) {
+          return [-this._base, this._base];
+        } else {
+          return [singleValue * this._base, singleValue / this._base];
+        }
+      }
+      return singleValueDomain;
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
+    }
+
+    public getDefaultTicks(): number[] {
+      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    }
   }
 }
 }

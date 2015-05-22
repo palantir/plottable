@@ -13,8 +13,6 @@ module Plottable {
   }
 
   export class Scale<D, R> {
-    protected _d3Scale: D3.Scale.Scale;
-
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
@@ -28,12 +26,14 @@ module Plottable {
      * from domain to range.
      *
      * @constructor
-     * @param {D3.Scale.Scale} scale The D3 scale backing the Scale.
      */
-    constructor(scale: D3.Scale.Scale) {
-      this._d3Scale = scale;
+    constructor() {
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
+    }
+
+    public extentOfValues(values: D[]): D[] {
+      return []; // this should be overwritten
     }
 
     protected _getAllExtents(): D[][] {
@@ -79,7 +79,7 @@ module Plottable {
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
+    protected _autoDomainIfAutomaticMode() {
       if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
@@ -93,7 +93,7 @@ module Plottable {
      * @returns {R} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
-      return this._d3Scale(value);
+      throw new Error("Subclasses should override scale");
     }
 
     /**
@@ -123,16 +123,20 @@ module Plottable {
     }
 
     protected _getDomain() {
-      return this._d3Scale.domain();
+      throw new Error("Subclasses should override _getDomain");
     }
 
     protected _setDomain(values: D[]) {
       if (!this._domainModificationInProgress) {
         this._domainModificationInProgress = true;
-        this._d3Scale.domain(values);
+        this._setBackingScaleDomain(values);
         this._dispatchUpdate();
         this._domainModificationInProgress = false;
       }
+    }
+
+    protected _setBackingScaleDomain(values: D[]) {
+      throw new Error("Subclasses should override _setBackingDomain");
     }
 
     /**
@@ -158,20 +162,30 @@ module Plottable {
     public range(values: R[]): Scale<D, R>;
     public range(values?: R[]): any {
       if (values == null) {
-        return this._d3Scale.range();
+        return this._getRange();
       } else {
-        this._d3Scale.range(values);
+        this._setRange(values);
         return this;
       }
     }
 
+    protected _getRange() {
+      throw new Error("Subclasses should override _getRange");
+    }
+
+    protected _setRange(values: R[]) {
+      throw new Error("Subclasses should override _setRange");
+    }
+
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.add(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
 
     public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.delete(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
   }

@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatchers {
-  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => any;
+  export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
   export class Touch extends Dispatcher {
     /**

@@ -15,8 +15,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
@@ -68,8 +70,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      var yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      var yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10");
 
       var data1: any[] = [
@@ -112,7 +116,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
@@ -324,8 +329,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
@@ -408,9 +415,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) sh1uld have no offset on middle point");
@@ -449,9 +456,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) should have no offset on middle point");

@@ -11,12 +11,18 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar(xScale, yScale);
-      plot.x((d) => d.x, xScale);
-      plot.y((d) => d.y, yScale);
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
+    });
+
+    it("rejects invalid orientations", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      assert.throws(() => new Plottable.Plots.Bar(xScale, yScale, "diagonal"), Error);
     });
 
     function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
@@ -133,7 +139,7 @@ describe("Plots", () => {
 
       it("don't show points from outside of domain", () => {
         xScale.domain(["C"]);
-        var bars =  (<any> barPlot)._renderArea.selectAll("rect");
+        var bars = (<any> barPlot)._renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 0, "no bars have been rendered");
         svg.remove();
       });
@@ -349,6 +355,12 @@ describe("Plots", () => {
         barPlot.renderTo(svg);
       });
 
+      it("calculating width does not crash if handed invalid values", () => {
+        var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+        assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
+        svg.remove();
+      });
+
       it("bar width takes an appropriate value", () => {
         assert.strictEqual((<any> barPlot)._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
         svg.remove();
@@ -443,7 +455,7 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+        barPlot = new Plottable.Plots.Bar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -786,7 +798,7 @@ describe("Plots", () => {
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.autorange("y");
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });

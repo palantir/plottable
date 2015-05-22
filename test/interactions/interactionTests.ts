@@ -79,13 +79,13 @@ describe("Interactions", () => {
 
       assert.doesNotThrow(() => {
         clickInteraction.detachFrom(component);
-      }, "detaching an Interaction which was not attached should not throw an error");
+      }, Error, "detaching an Interaction which was not attached should not throw an error");
 
       clickInteraction.attachTo(component);
       clickInteraction.detachFrom(component);
       assert.doesNotThrow(() => {
         clickInteraction.detachFrom(component);
-      }, "calling detachFrom() twice should not throw an error");
+      }, Error, "calling detachFrom() twice should not throw an error");
 
       component.renderTo(svg);
 
@@ -93,7 +93,7 @@ describe("Interactions", () => {
       clickInteraction.detachFrom(component);
       assert.doesNotThrow(() => {
         clickInteraction.detachFrom(component);
-      }, "calling detachFrom() twice should not throw an error even if the Component is anchored");
+      }, Error, "calling detachFrom() twice should not throw an error even if the Component is anchored");
 
       svg.remove();
 

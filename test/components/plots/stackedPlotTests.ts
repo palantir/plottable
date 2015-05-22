@@ -4,13 +4,13 @@ var assert = chai.assert;
 
 describe("Plots", () => {
 
-  describe("Stacked Plot Stacking", () => {
-    var stackedPlot: Plottable.Stacked<number, number>;
+  describe("StackedBar Plot Stacking", () => {
+    var stackedPlot: Plottable.Plots.StackedBar<number, number>;
 
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Stacked(xScale, yScale);
+      stackedPlot = new Plottable.Plots.StackedBar(xScale, yScale);
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
 
@@ -40,18 +40,21 @@ describe("Plots", () => {
         {x: 3, y: 1}
       ];
 
-      stackedPlot.addDataset(new Plottable.Dataset(data0));
-      stackedPlot.addDataset(new Plottable.Dataset(data1));
-      stackedPlot.addDataset(new Plottable.Dataset(data2));
-      stackedPlot.addDataset(new Plottable.Dataset(data3));
-      stackedPlot.addDataset(new Plottable.Dataset(data4));
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
+      stackedPlot.addDataset(ds4);
 
-      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-      var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-      var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-      assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 1, "positive offset was used");
-      assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 2, "positive offset was used");
+      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
+      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
+      assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
     });
 
     it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
@@ -68,41 +71,19 @@ describe("Plots", () => {
         {x: 1, y: 0}
       ];
 
-      stackedPlot.addDataset(new Plottable.Dataset(data0));
-      stackedPlot.addDataset(new Plottable.Dataset(data1));
-      stackedPlot.addDataset(new Plottable.Dataset(data2));
-      stackedPlot.addDataset(new Plottable.Dataset(data3));
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
 
-      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-      var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-      var ds3PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-      assert.strictEqual(ds1PlotMetadata.offsets.get("1"), -2, "positive offset was used");
-      assert.strictEqual(ds3PlotMetadata.offsets.get("1"), -3, "positive offset was used");
-    });
-
-    it("project can be called after addDataset", () => {
-      var data0 = [
-        { a: 1, b: 2 }
-      ];
-      var data1 = [
-        { a: 1, b: 4 }
-      ];
-
-      stackedPlot.addDataset(new Plottable.Dataset(data0));
-      stackedPlot.addDataset(new Plottable.Dataset(data1));
-
-      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-      var ds0PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[0]).plotMetadata;
-      var ds1PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[1]).plotMetadata;
-
-      assert.isTrue(isNaN(ds0PlotMetadata.offsets.get("1")), "stacking is initially incorrect");
-
-      stackedPlot.x((d) => d.a);
-      stackedPlot.y((d) => d.b);
-
-      assert.strictEqual(ds1PlotMetadata.offsets.get("1"), 2, "stacking was done correctly");
+      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
+      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
+      assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
+      assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
     });
 
     it("strings are coerced to numbers for stacking", () => {
@@ -125,24 +106,28 @@ describe("Plots", () => {
         { x: 1, y: "-1" }
       ];
 
-      stackedPlot.addDataset(new Plottable.Dataset(data0));
-      stackedPlot.addDataset(new Plottable.Dataset(data1));
-      stackedPlot.addDataset(new Plottable.Dataset(data2));
-      stackedPlot.addDataset(new Plottable.Dataset(data3));
-      stackedPlot.addDataset(new Plottable.Dataset(data4));
-      stackedPlot.addDataset(new Plottable.Dataset(data5));
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      var ds5 = new Plottable.Dataset(data5);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
+      stackedPlot.addDataset(ds4);
+      stackedPlot.addDataset(ds5);
 
-      // HACKHACK #1984: Dataset keys are being removed, so these are internal keys
-      var keys = (<any> stackedPlot)._key2PlotDatasetKey.keys();
-      var ds2PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[2]).plotMetadata;
-      var ds3PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[3]).plotMetadata;
-      var ds4PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[4]).plotMetadata;
-      var ds5PlotMetadata = <Plottable.Plots.StackedPlotMetadata>(<any> stackedPlot)._key2PlotDatasetKey.get(keys[5]).plotMetadata;
+      var stackOffset2 = (<any> stackedPlot)._stackOffsets.get(ds2);
+      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
+      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      var stackOffset5 = (<any> stackedPlot)._stackOffsets.get(ds5);
 
-      assert.strictEqual(ds2PlotMetadata.offsets.get("1"), -2, "stacking on data1 numerical y value");
-      assert.strictEqual(ds3PlotMetadata.offsets.get("1"), 3, "stacking on data2 numerical y value");
-      assert.strictEqual(ds4PlotMetadata.offsets.get("1"), 8, "stacking on data1 + data3 numerical y values");
-      assert.strictEqual(ds5PlotMetadata.offsets.get("1"), -3, "stacking on data2 + data4 numerical y values");
+      assert.strictEqual(stackOffset2.get("1"), -2, "stacking on data1 numerical y value");
+      assert.strictEqual(stackOffset3.get("1"), 3, "stacking on data2 numerical y value");
+      assert.strictEqual(stackOffset4.get("1"), 8, "stacking on data1 + data3 numerical y values");
+      assert.strictEqual(stackOffset5.get("1"), -3, "stacking on data2 + data4 numerical y values");
 
       assert.deepEqual((<any> stackedPlot)._stackedExtent, [-4, 9], "stacked extent is as normal");
     });
@@ -165,6 +150,152 @@ describe("Plots", () => {
     });
   });
 
+  describe("StackedArea Plot Stacking", () => {
+    var stackedPlot: Plottable.Plots.StackedArea<number>;
+
+    beforeEach(() => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      stackedPlot = new Plottable.Plots.StackedArea(xScale, yScale);
+      stackedPlot.x((d: any) => d.x, xScale);
+      stackedPlot.y((d: any) => d.y, yScale);
+
+      (<any> stackedPlot)._getDrawer = (key: string) => new Plottable.Drawers.AbstractDrawer(key);
+      (<any> stackedPlot)._isVertical = true;
+    });
+
+    it("uses positive offset on stacking the 0 value", () => {
+      var data0 = [
+        { x: 1, y: 1 },
+        { x: 3, y: 1 }
+      ];
+      var data1 = [
+        { x: 1, y: 0 },
+        { x: 3, y: 1 }
+      ];
+      var data2 = [
+        { x: 1, y: -1 },
+        { x: 3, y: 1 }
+      ];
+      var data3 = [
+        { x: 1, y: 1 },
+        { x: 3, y: 1 }
+      ];
+      var data4 = [
+        { x: 1, y: 0 },
+        { x: 3, y: 1 }
+      ];
+
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
+      stackedPlot.addDataset(ds4);
+
+      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
+      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
+      assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
+    });
+
+    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
+      var data0 = [
+        { x: 1, y: -2 }
+      ];
+      var data1 = [
+        { x: 1, y: 0 }
+      ];
+      var data2 = [
+        { x: 1, y: -1 }
+      ];
+      var data3 = [
+        { x: 1, y: 0 }
+      ];
+
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
+
+      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
+      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
+      assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
+      assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
+    });
+
+    it("strings are coerced to numbers for stacking", () => {
+      var data0 = [
+        { x: 1, y: "-2" }
+      ];
+      var data1 = [
+        { x: 1, y: "3" }
+      ];
+      var data2 = [
+        { x: 1, y: "-1" }
+      ];
+      var data3 = [
+        { x: 1, y: "5" }
+      ];
+      var data4 = [
+        { x: 1, y: "1" }
+      ];
+      var data5 = [
+        { x: 1, y: "-1" }
+      ];
+
+      var ds0 = new Plottable.Dataset(data0);
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      var ds5 = new Plottable.Dataset(data5);
+      stackedPlot.addDataset(ds0);
+      stackedPlot.addDataset(ds1);
+      stackedPlot.addDataset(ds2);
+      stackedPlot.addDataset(ds3);
+      stackedPlot.addDataset(ds4);
+      stackedPlot.addDataset(ds5);
+
+      var stackOffset2 = (<any> stackedPlot)._stackOffsets.get(ds2);
+      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
+      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      var stackOffset5 = (<any> stackedPlot)._stackOffsets.get(ds5);
+
+      assert.strictEqual(stackOffset2.get("1"), -2, "stacking on data1 numerical y value");
+      assert.strictEqual(stackOffset3.get("1"), 3, "stacking on data2 numerical y value");
+      assert.strictEqual(stackOffset4.get("1"), 8, "stacking on data1 + data3 numerical y values");
+      assert.strictEqual(stackOffset5.get("1"), -3, "stacking on data2 + data4 numerical y values");
+
+      assert.deepEqual((<any> stackedPlot)._stackedExtent, [-4, 9], "stacked extent is as normal");
+    });
+
+    it("stacks correctly on empty data", () => {
+      var dataset1 = new Plottable.Dataset([]);
+      var dataset2 = new Plottable.Dataset([]);
+
+      assert.doesNotThrow(() => stackedPlot.addDataset(dataset1), Error);
+      assert.doesNotThrow(() => stackedPlot.addDataset(dataset2), Error);
+    });
+
+    it("does not crash on stacking no datasets", () => {
+      var dataset1 = new Plottable.Dataset([
+        { x: 1, y: -2 }
+      ]);
+
+      stackedPlot.addDataset(dataset1);
+      assert.doesNotThrow(() => stackedPlot.removeDataset(dataset1), Error);
+    });
+  });
+
   describe("auto scale domain on numeric", () => {
     var svg: D3.Selection;
     var SVG_WIDTH = 600;
@@ -176,7 +307,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 2]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 2]);
       yScale = new Plottable.Scales.Linear();
 
       dataset1 = new Plottable.Dataset([
@@ -196,9 +328,9 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedArea(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -208,9 +340,9 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -249,9 +381,9 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedArea(yScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, yScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.x((d: any) => d.x, yScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -261,9 +393,9 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.StackedBar(xScale, yScale);
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();

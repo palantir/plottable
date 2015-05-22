@@ -2,11 +2,9 @@
 
 module Plottable {
 export module Plots {
-  export interface ClusteredPlotMetadata extends PlotMetadata {
-    position: number;
-  }
-
   export class ClusteredBar<X, Y> extends Bar<X, Y> {
+
+    private _clusterOffsets: Utils.Map<Dataset, number>;
 
     /**
      * Creates a ClusteredBarPlot.
@@ -18,10 +16,11 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {boolean} isVertical if the plot if vertical.
+     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, isVertical = true) {
-      super(xScale, yScale, isVertical);
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
+      super(xScale, yScale, orientation);
+      this._clusterOffsets = new Utils.Map<Dataset, number>();
     }
 
     protected _generateAttrToProjector() {
@@ -34,33 +33,32 @@ export module Plots {
 
       var xAttr = attrToProjector["x"];
       var yAttr = attrToProjector["y"];
-      attrToProjector["x"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
-        this._isVertical ? xAttr(d, i, dataset, m) + m.position : xAttr(d, i, dataset, m);
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset, m: ClusteredPlotMetadata) =>
-        this._isVertical ? yAttr(d, i, dataset, m) : yAttr(d, i, dataset, m) + m.position;
+      attrToProjector["x"] = this._isVertical ?
+                               (d: any, i: number, ds: Dataset) => xAttr(d, i, ds) + this._clusterOffsets.get(ds) :
+                               (d: any, i: number, ds: Dataset) => xAttr(d, i, ds);
+      attrToProjector["y"] = this._isVertical ?
+                               (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) :
+                               (d: any, i: number, ds: Dataset) => yAttr(d, i, ds) + this._clusterOffsets.get(ds);
 
       return attrToProjector;
     }
 
     private _updateClusterPosition() {
       var innerScale = this._makeInnerScale();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var plotMetadata = <ClusteredPlotMetadata>this._key2PlotDatasetKey.get(key).plotMetadata;
-        plotMetadata.position = innerScale.scale(key) - innerScale.rangeBand() / 2;
-      });
+      this.datasets().forEach((d, i) => this._clusterOffsets.set(d, innerScale.scale(String(i)) - innerScale.rangeBand() / 2));
     }
 
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
-      innerScale.domain(this._datasetKeysInOrder);
+      innerScale.domain(this.datasets().map((d, i) => String(i)));
       if (!this._attrBindings.get("width")) {
         innerScale.range([0, this._getBarPixelWidth()]);
       } else {
         var projection = this._attrBindings.get("width");
         var accessor = projection.accessor;
         var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, dataset: Dataset, m: PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
-        innerScale.range([0, fn(null, 0, null, null)]);
+        var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
+        innerScale.range([0, fn(null, 0, null)]);
       }
       return innerScale;
     }
@@ -68,12 +66,6 @@ export module Plots {
     protected _getDataToDraw() {
       this._updateClusterPosition();
       return super._getDataToDraw();
-    }
-
-    protected _getPlotMetadataForDataset(key: string): ClusteredPlotMetadata {
-      var metadata = <ClusteredPlotMetadata>super._getPlotMetadataForDataset(key);
-      metadata.position = 0;
-      return metadata;
     }
   }
 }

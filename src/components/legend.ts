@@ -19,7 +19,7 @@ export module Components {
     private _padding = 5;
     private _scale: Scales.Color;
     private _maxEntriesPerRow: number;
-    private _sortFn: (a: string, b: string) => number;
+    private _comparator: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
@@ -29,27 +29,27 @@ export module Components {
     /**
      * Creates a Legend.
      *
-     * The legend consists of a series of legend entries, each with a color and label taken from the `colorScale`.
-     * The entries will be displayed in the order of the `colorScale` domain.
+     * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
+     * The entries will be displayed in the order of the `scale` domain.
      *
      * @constructor
-     * @param {Scale.Color} colorScale
+     * @param {Scale.Color} scale
      */
-    constructor(colorScale: Scales.Color) {
+    constructor(scale: Scales.Color) {
       super();
       this.classed("legend", true);
       this.maxEntriesPerRow(1);
 
-      if (colorScale == null ) {
+      if (scale == null ) {
         throw new Error("Legend requires a colorScale");
       }
 
-      this._scale = colorScale;
+      this._scale = scale;
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
 
       this.xAlignment("right").yAlignment("top");
-      this._sortFn = (a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b);
+      this.comparator((a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
@@ -86,22 +86,22 @@ export module Components {
     }
 
     /**
-     * Gets the current sort function for Legend's entries.
-     * @returns {(a: string, b: string) => number} The current sort function.
+     * Gets the current comparator for the Legend's entries.
+     * @returns {(a: string, b: string) => number} The current comparator.
      */
-    public sortFunction(): (a: string, b: string) => number;
+    public comparator(): (a: string, b: string) => number;
     /**
-     * Sets a new sort function for Legend's entires.
+     * Sets a new comparator for the Legend's entries.
      *
-     * @param {(a: string, b: string) => number} newFn If provided, the new compare function.
+     * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
      * @returns {Legend} The calling Legend.
      */
-    public sortFunction(newFn: (a: string, b: string) => number): Legend;
-    public sortFunction(newFn?: (a: string, b: string) => number): any {
-      if (newFn == null) {
-        return this._sortFn;
+    public comparator(comparator: (a: string, b: string) => number): Legend;
+    public comparator(comparator?: (a: string, b: string) => number): any {
+      if (comparator == null) {
+        return this._comparator;
       } else {
-        this._sortFn = newFn;
+        this._comparator = comparator;
         this.redraw();
         return this;
       }
@@ -143,7 +143,7 @@ export module Components {
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
       var entryNames = this._scale.domain().slice();
-      entryNames.sort(this.sortFunction());
+      entryNames.sort(this.comparator());
 
       var entryLengths: D3.Map<number> = d3.map();
       var untruncatedEntryLengths: D3.Map<number> = d3.map();

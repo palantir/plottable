@@ -2,7 +2,8 @@
 
 module Plottable {
 
-export type PointerCallback = (point: Point) => any;
+export type PointerCallback = (point: Point) => void;
+
 export module Interactions {
   export class Pointer extends Interaction {
     private _mouseDispatcher: Dispatchers.Mouse;
