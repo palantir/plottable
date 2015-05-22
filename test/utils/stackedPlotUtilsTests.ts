@@ -43,9 +43,9 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2]);
       var domainKeys = Plottable.Utils.StackedPlot.getDomainKeys(datasets, keyAccessor);
-      var expectedDomainKeys = ["1", "2", "3", "4"];
+      var expectedDomainKeys = ["1", "3", "2", "4"];
 
-      assert.deepEqual(domainKeys, expectedDomainKeys, "the expected domain keys is a set reunion of the datasets keys");
+      assert.deepEqual(domainKeys.sort(), expectedDomainKeys.sort(), "the expected domain keys is a set reunion of the datasets keys");
     });
 
     it("computeStackOffsets() works as expected with positive values", () => {
