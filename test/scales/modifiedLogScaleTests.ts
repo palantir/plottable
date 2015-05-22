@@ -38,29 +38,115 @@ describe("Scales", () => {
 
     it("domain defaults to [0, base]", () => {
       scale = new Plottable.Scales.ModifiedLog(base);
-      assert.deepEqual(scale.domain(), [0, base]);
+      assert.deepEqual(scale.domain(), [0, base], "default domain is [0, base]");
     });
 
-    it("works with a Domainer", () => {
-      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, base * 2]]);
-      var domain = scale.domain();
-      scale.domainer(new Plottable.Domainer().pad(0.1));
-      assert.operator(scale.domain()[0], "<", domain[0]);
-      assert.operator(domain[1], "<", scale.domain()[1]);
+    it("can be padded", () => {
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[0, base]]);
+      scale.padProportion(0);
+      var unpaddedDomain = scale.domain();
+      scale.padProportion(0.1);
+      assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
+      assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
+    });
 
-      scale.domainer(new Plottable.Domainer().nice());
-      assert.operator(scale.domain()[0], "<=", domain[0]);
-      assert.operator(domain[1], "<=", scale.domain()[1]);
+    it("autoDomain() expands single value correctly", () => {
+      scale.padProportion(0);
+      var singleValue = 15;
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [[singleValue, singleValue]]);
+      assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base],
+        "positive single-value extent was expanded to [value / base, value * base]");
+      singleValue = -15;
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [singleValue * base, singleValue / base],
+        "negative single-value extent was expanded to [value * base, value / base]");
+      singleValue = 0;
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), [-base, base],
+        "zero single-value extent was expanded to [base, -base]");
+    });
 
-      scale = new Plottable.Scales.ModifiedLog(base);
-      scale.domainer(new Plottable.Domainer());
-      assert.deepEqual(scale.domain(), [0, base]);
+    it("domainMin()", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var minBelowBottom = -10;
+      scale.domainMin(minBelowBottom);
+      assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
+
+      var minInMiddle = 0;
+      scale.domainMin(minInMiddle);
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain[1]], "lower end was set even if requested value cuts off some data");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMin()");
+
+      var minEqualTop = scale.domain()[1];
+      scale.domainMin(minEqualTop);
+      assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop * base],
+        "domain is set to [min, min * base] if the requested value is >= autoDomain()-ed max value");
+
+      scale.domainMin(minInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
+    });
+
+    it("domainMax()", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var maxAboveTop = 10;
+      scale.domainMax(maxAboveTop);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
+
+      var maxInMiddle = 0;
+      scale.domainMax(maxInMiddle);
+      assert.deepEqual(scale.domain(), [requestedDomain[0], maxInMiddle], "upper end was set even if requested value cuts off some data");
+
+      scale.autoDomain();
+      assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
+
+      var maxEqualBottom = scale.domain()[0];
+      scale.domainMax(maxEqualBottom);
+      assert.deepEqual(scale.domain(), [maxEqualBottom * base, maxEqualBottom],
+        "domain is set to [max * base, max] if the requested value is <= autoDomain()-ed min value and negative");
+
+      scale.domainMax(maxInMiddle);
+      var requestedDomain2 = [-10, 10];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale._autoDomainIfAutomaticMode();
+      assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
+    });
+
+    it("domainMin() and domainMax() together", () => {
+      var scale = new Plottable.Scales.ModifiedLog(base);
+      scale.padProportion(0);
+      var requestedDomain = [-5, 5];
+      scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+
+      var desiredMin = -10;
+      var desiredMax = 10;
+      scale.domainMin(desiredMin);
+      scale.domainMax(desiredMax);
+      assert.deepEqual(scale.domain(), [desiredMin, desiredMax], "setting domainMin() and domainMax() sets the domain");
+
+      scale.autoDomain();
+      var bigMin = 10;
+      var smallMax = -10;
+      scale.domainMin(bigMin);
+      scale.domainMax(smallMax);
+      assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
     });
 
     it("gives reasonable values for ticks()", () => {
       var providedExtents = [[0, base / 2]];
       scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => providedExtents);
-      scale.autoDomain();
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
 
@@ -76,8 +162,7 @@ describe("Scales", () => {
     });
 
     it("works on inverted domain", () => {
-      scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[200, -100]]);
-      scale.autoDomain();
+      scale.domain([200, -100]);
       var range = scale.range();
       assert.closeTo(scale.scale(-100), range[1], epsilon);
       assert.closeTo(scale.scale(200), range[0], epsilon);

@@ -33,10 +33,7 @@ module Plottable {
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-      this._updateXDomainer();
       xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-
-      this._updateYDomainer();
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
@@ -52,7 +49,6 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      this._updateXDomainer();
       this.renderImmediately();
       return this;
     }
@@ -69,7 +65,6 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      this._updateYDomainer();
       this.renderImmediately();
       return this;
     }
@@ -179,24 +174,6 @@ module Plottable {
         }
       }
       return this;
-    }
-
-    protected _updateXDomainer() {
-      if (this.x().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.x().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this.y().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.y().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
     }
 
     private _updateXExtentsAndAutodomain() {

@@ -81,15 +81,10 @@ export module Plots {
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
+    protected _updateYScale() {
       var scale = <QuantitativeScale<any>> this.y().scale;
-      if (!scale._userSetDomainer) {
-        scale.domainer().addPaddingException(this, 0)
-                        .addIncludedValue(this, 0);
-        // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        scale._autoDomainIfAutomaticMode();
-      }
+      scale.addPaddingException(this, 0);
+      scale.addIncludedValue(this, 0);
     }
 
     protected _onDatasetUpdate() {
