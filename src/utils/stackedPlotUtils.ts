@@ -1,9 +1,7 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-
   export module Utils {
-
     type StackedDatum = {
       key: any;
       value: number;
