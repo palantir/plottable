@@ -8329,11 +8329,12 @@ var Plottable;
                 if (!this._projectorsReady()) {
                     return;
                 }
+                var datasets = this.datasets();
                 var keyAccessor = this._keyAccessor();
                 var valueAccessor = this._valueAccessor();
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(this.datasets(), keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(this.datasets(), keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             StackedBar.prototype._keyAccessor = function () {
                 return this._isVertical ? this.x().accessor : this.y().accessor;

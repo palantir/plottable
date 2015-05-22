@@ -135,10 +135,10 @@ export module Plots {
         return;
       }
 
+      var datasets = this.datasets();
       var keyAccessor = this.x().accessor;
       var valueAccessor = this.y().accessor;
       var filter = this._filterForProperty("y");
-      var datasets = this.datasets();
 
       StackedPlotUtils.checkSameDomainForStacks(datasets, keyAccessor);
       this._stackOffsets = StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
