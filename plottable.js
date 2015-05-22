@@ -7410,7 +7410,7 @@ var Plottable;
              *
              * @param {Extent} xRange The specified range of x values
              * @param {Extent} yRange The specified range of y values
-             * @return {Plots.PlotData} The plot data that corresponds to the {Extent}(s)
+             * @return {Plots.PlotData} The plot data that corresponds to the ranges
              */
             Bar.prototype.plotDataIn = function (xRange, yRange) {
                 return this._getPlotData(xRange, yRange);
