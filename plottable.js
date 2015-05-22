@@ -6670,14 +6670,16 @@ var Plottable;
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
             };
             Pie.prototype._getDataToDraw = function () {
-                var _this = this;
                 var dataToDraw = _super.prototype._getDataToDraw.call(this);
+                if (this.datasets().length === 0) {
+                    return dataToDraw;
+                }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
-                dataToDraw.forEach(function (datasetKey, data) {
-                    var ds = _this._key2PlotDatasetKey.get(datasetKey).dataset;
-                    var filteredData = data.filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
-                    dataToDraw.set(datasetKey, filteredData);
-                });
+                var datasetKey = this._datasetKeysInOrder[0];
+                var data = dataToDraw.get(datasetKey);
+                var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+                var filteredData = data.filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
+                dataToDraw.set(datasetKey, filteredData);
                 return dataToDraw;
             };
             Pie.prototype._pixelPoint = function (datum, index, dataset) {

@@ -143,12 +143,13 @@ export module Plots {
 
     protected _getDataToDraw() {
       var dataToDraw = super._getDataToDraw();
+      if (this.datasets().length === 0) { return dataToDraw; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      dataToDraw.forEach((datasetKey, data) => {
-        var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
-        var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
-        dataToDraw.set(datasetKey, filteredData);
-      });
+      var datasetKey = this._datasetKeysInOrder[0];
+      var data = dataToDraw.get(datasetKey);
+      var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+      var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
+      dataToDraw.set(datasetKey, filteredData);
       return dataToDraw;
     }
 
