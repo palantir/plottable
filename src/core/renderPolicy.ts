@@ -35,7 +35,7 @@ module Plottable {
      * it.
      */
     export class Timeout implements RenderPolicy {
-      public _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+      private _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
         setTimeout(RenderController.flush, this._timeoutMsec);

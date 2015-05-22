@@ -514,7 +514,6 @@ declare module Plottable {
          * it.
          */
         class Timeout implements RenderPolicy {
-            _timeoutMsec: number;
             render(): void;
         }
     }
