@@ -11,6 +11,40 @@ module Plottable {
     export class StackedPlot {
 
       /**
+       *
+       * Calculates the offset of each piece data, in each dataset, relative to the baseline,
+       * for drawing purposes.
+       *
+       * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
+       */
+      public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>) {
+        var domainKeys = this.getDomainKeys(datasets, keyAccessor);
+
+        var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+
+        var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
+            return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+          });
+        });
+
+        var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
+            return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+          });
+        });
+
+        var stackOffsets = this._generateStackOffsets(
+          datasets,
+          this._stack(positiveDataMapArray, domainKeys),
+          this._stack(negativeDataMapArray, domainKeys),
+          keyAccessor,
+          valueAccessor);
+
+        return stackOffsets;
+      }
+
+      /**
        * Calculates an extent across all datasets. The extent is a <number> interval that
        * accounts for the fact that stacked bits have to be added together when calculating the extent
        *
@@ -46,40 +80,6 @@ module Plottable {
         }, 0);
 
         return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
-      }
-
-      /**
-       *
-       * Calculates the offset of each piece data, in each dataset, relative to the baseline,
-       * for drawing purposes.
-       *
-       * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
-       */
-      public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>) {
-        var domainKeys = this.getDomainKeys(datasets, keyAccessor);
-
-        var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
-
-        var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
-          });
-        });
-
-        var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
-          });
-        });
-
-        var stackOffsets = this._generateStackOffsets(
-          datasets,
-          this._stack(positiveDataMapArray, domainKeys),
-          this._stack(negativeDataMapArray, domainKeys),
-          keyAccessor,
-          valueAccessor);
-
-        return stackOffsets;
       }
 
       /**

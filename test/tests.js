@@ -8239,6 +8239,12 @@ describe("Utils", function () {
 var assert = chai.assert;
 describe("Utils", function () {
     describe("StackedPlot", function () {
+        it("getDomainKeys() works as expected", function () {
+        });
+        it("computeStackOffsets() works as expected", function () {
+        });
+        it("computeStackExtents() works as expected", function () {
+        });
     });
 });
 
