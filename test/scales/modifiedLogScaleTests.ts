@@ -91,7 +91,7 @@ describe("Scales", () => {
       scale.domainMin(minInMiddle);
       var requestedDomain2 = [-10, 10];
       scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
-      scale._autoDomainIfAutomaticMode();
+      (<any>scale)._autoDomainIfAutomaticMode();
       assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
     });
 
@@ -120,7 +120,7 @@ describe("Scales", () => {
       scale.domainMax(maxInMiddle);
       var requestedDomain2 = [-10, 10];
       scale.addExtentsProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
-      scale._autoDomainIfAutomaticMode();
+      (<any>scale)._autoDomainIfAutomaticMode();
       assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
     });
 

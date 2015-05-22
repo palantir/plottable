@@ -747,7 +747,7 @@ declare module Plottable {
          */
         constructor();
         autoDomain(): QuantitativeScale<D>;
-        _autoDomainIfAutomaticMode(): void;
+        protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
         addPaddingException(key: any, exception: D): QuantitativeScale<D>;
         removePaddingException(key: any): QuantitativeScale<D>;
