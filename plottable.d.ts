@@ -307,14 +307,14 @@ declare module Plottable {
              *
              * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
-            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>): Map<Dataset, D3.Map<number>>;
+            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, D3.Map<number>>;
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that
              * accounts for the fact that stacked bits have to be added together when calculating the extent
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
+            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.

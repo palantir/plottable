@@ -16,7 +16,7 @@ module Plottable {
        *
        * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
-      public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>) {
+      public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var domainKeys = this.getDomainKeys(datasets, keyAccessor);
 
         var dataMapArray = this._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
@@ -52,7 +52,7 @@ module Plottable {
       public static computeStackExtent(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<any>,
+          valueAccessor: Accessor<number>,
           stackOffsets: Utils.Map<Dataset, D3.Map<number>>,
           filter: Accessor<boolean>) {
 
@@ -117,7 +117,7 @@ module Plottable {
       private static _generateDefaultMapArray(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<any>,
+          valueAccessor: Accessor<number>,
           domainKeys: string[]) {
 
         var dataMapArray = datasets.map(() => {
@@ -146,7 +146,7 @@ module Plottable {
           positiveDataMapArray: D3.Map<StackedDatum>[],
           negativeDataMapArray: D3.Map<StackedDatum>[],
           keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<any>) {
+          valueAccessor: Accessor<number>) {
 
         var stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
         datasets.forEach((dataset, index) => {

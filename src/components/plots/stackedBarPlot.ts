@@ -120,20 +120,12 @@ export module Plots {
       }
 
       var datasets = this.datasets();
-      var keyAccessor = this._keyAccessor();
-      var valueAccessor = this._valueAccessor();
+      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
-    }
-
-    private _keyAccessor() {
-      return this._isVertical ? this.x().accessor : this.y().accessor;
-    }
-
-    private _valueAccessor() {
-      return this._isVertical ? this.y().accessor : this.x().accessor;
     }
   }
 }

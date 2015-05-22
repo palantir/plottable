@@ -8329,17 +8329,12 @@ var Plottable;
                     return;
                 }
                 var datasets = this.datasets();
-                var keyAccessor = this._keyAccessor();
-                var valueAccessor = this._valueAccessor();
+                var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+                var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+                ;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
-            };
-            StackedBar.prototype._keyAccessor = function () {
-                return this._isVertical ? this.x().accessor : this.y().accessor;
-            };
-            StackedBar.prototype._valueAccessor = function () {
-                return this._isVertical ? this.y().accessor : this.x().accessor;
             };
             return StackedBar;
         })(Plots.Bar);
