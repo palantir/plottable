@@ -32,6 +32,10 @@ module Plottable {
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
+    public extentOfValues(values: D[]): D[] {
+      return []; // this should be overwritten
+    }
+
     protected _getAllExtents(): D[][] {
       return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
     }

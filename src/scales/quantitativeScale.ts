@@ -216,6 +216,15 @@ module Plottable {
       return this;
     }
 
+    public extentOfValues(values: D[]) {
+      var extent = d3.extent(values);
+      if (extent[0] == null || extent[1] == null) {
+        return [];
+      } else {
+        return extent;
+      }
+    }
+
     protected _setDomain(values: D[]) {
       var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
       if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
