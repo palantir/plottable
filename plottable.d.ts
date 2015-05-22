@@ -2384,6 +2384,10 @@ declare module Plottable {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
+        class Animator {
+            static MAIN: string;
+            static RESET: string;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;

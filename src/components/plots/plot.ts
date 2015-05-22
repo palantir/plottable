@@ -23,6 +23,11 @@ module Plottable {
       accessor: Accessor<any>;
       scale?: Scale<D, R>;
     }
+
+    export class Animator {
+      static MAIN = "main";
+      static RESET = "reset";
+    }
   }
 
   export class Plot extends Component {
@@ -36,7 +41,10 @@ module Plottable {
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
     protected _animate: boolean = false;
-    private _animators: Animators.PlotAnimatorMap = {};
+    private _animators: Animators.PlotAnimatorMap = {
+      "main": new Animators.Base(),
+      "reset": new Animators.Null()
+    };
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;

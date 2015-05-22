@@ -32,8 +32,6 @@ export module Plots {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
-      this.animator("bars-reset", new Animators.Null());
-      this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -328,9 +326,9 @@ export module Plots {
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
         resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 

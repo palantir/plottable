@@ -27,8 +27,6 @@ export module Plots {
       if (yScale instanceof Scales.Category) {
         (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
       }
-
-      this.animator("cells", new Animators.Null());
     }
 
     public addDataset(dataset: Dataset) {
