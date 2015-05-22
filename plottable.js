@@ -1897,7 +1897,16 @@ var Plottable;
             };
             ModifiedLog.prototype._expandSingleValueDomain = function (singleValueDomain) {
                 if (singleValueDomain[0] === singleValueDomain[1]) {
-                    return [singleValueDomain[0] / this._base, singleValueDomain[1] * this._base];
+                    var singleValue = singleValueDomain[0];
+                    if (singleValue > 0) {
+                        return [singleValue / this._base, singleValue * this._base];
+                    }
+                    else if (singleValue === 0) {
+                        return [-this._base, this._base];
+                    }
+                    else {
+                        return [singleValue * this._base, singleValue / this._base];
+                    }
                 }
                 return singleValueDomain;
             };

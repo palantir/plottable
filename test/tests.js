@@ -7397,11 +7397,17 @@ describe("Scales", function () {
             assert.operator(scale.domain()[0], "<", unpaddedDomain[0], "left side of domain has been padded");
             assert.operator(unpaddedDomain[1], "<", scale.domain()[1], "right side of domain has been padded");
         });
-        it("autoDomain() expands single value to [value / base, value * base]", function () {
+        it("autoDomain() expands single value correctly", function () {
             scale.padProportion(0);
             var singleValue = 15;
             scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
-            assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "single-value extent was expanded");
+            assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "positive single-value extent was expanded to [value / base, value * base]");
+            singleValue = -15;
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [singleValue * base, singleValue / base], "negative single-value extent was expanded to [value * base, value / base]");
+            singleValue = 0;
+            scale.autoDomain();
+            assert.deepEqual(scale.domain(), [-base, base], "zero single-value extent was expanded to [base, -base]");
         });
         it("domainMin()", function () {
             var scale = new Plottable.Scales.ModifiedLog(base);
@@ -7440,7 +7446,7 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), requestedDomain, "calling autoDomain() overrides domainMax()");
             var maxEqualBottom = scale.domain()[0];
             scale.domainMax(maxEqualBottom);
-            assert.deepEqual(scale.domain(), [maxEqualBottom / base, maxEqualBottom], "domain is set to [max / base, max] if the requested value is <= autoDomain()-ed min value");
+            assert.deepEqual(scale.domain(), [maxEqualBottom * base, maxEqualBottom], "domain is set to [max * base, max] if the requested value is <= autoDomain()-ed min value and negative");
             scale.domainMax(maxInMiddle);
             var requestedDomain2 = [-10, 10];
             scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
