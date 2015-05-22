@@ -6,7 +6,6 @@ export module Plots {
     private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
     private _stackedExtent: number[];
 
-    private _isVertical: boolean;
     private _baseline: D3.Selection;
     private _baselineValue = 0;
 
@@ -20,7 +19,6 @@ export module Plots {
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
-      this._isVertical = true;
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
@@ -124,7 +122,7 @@ export module Plots {
     }
 
     protected _extentsForProperty(attr: string) {
-      var primaryAttr = this._isVertical ? "y" : "x";
+      var primaryAttr = "y";
       if (attr === primaryAttr) {
         return [this._stackedExtent];
       } else {
@@ -137,10 +135,9 @@ export module Plots {
         return;
       }
 
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      var keyAccessor = this.x().accessor;
+      var valueAccessor = this.y().accessor;
+      var filter = this._filterForProperty("y");
       var datasets = this.datasets();
 
       StackedPlotUtils.checkSameDomainForStacks(datasets, keyAccessor);

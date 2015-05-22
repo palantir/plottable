@@ -13,6 +13,9 @@ module Plottable {
   export class StackedPlotUtils {
 
     /**
+     * Calculates an extent across all datasets. The extent is a <number> interval that
+     * accounts for the fact that stacked bits have to be added together when calculating the extent
+     *
      * @return {[number]} The extent that spans all the stacked data
      */
     public static computeStackExtents(
@@ -48,7 +51,11 @@ module Plottable {
     }
 
     /**
-     * @return {Utils.Map<Dataset, D3.Map<number>>} A map from datasetKey to stackOffsets
+     *
+     * Calculates the offset of each piece data, in each dataset, relative to the baseline,
+     * for drawing purposes.
+     *
+     * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
      */
     public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>) {
       var domainKeys = StackedPlotUtils.getDomainKeys(datasets, keyAccessor);
@@ -86,14 +93,6 @@ module Plottable {
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
-    }
-
-    public static keyAccessor(plot: XYPlot<any, any>, orientation: string) {
-      return orientation === "vertical" ? plot.x().accessor : plot.y().accessor;
-    }
-
-    public static valueAccessor(plot: XYPlot<any, any>, orientation: string) {
-      return orientation === "vertical" ? plot.y().accessor : plot.x().accessor;
     }
 
     /**
