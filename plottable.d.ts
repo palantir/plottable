@@ -2920,7 +2920,7 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
-            _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
