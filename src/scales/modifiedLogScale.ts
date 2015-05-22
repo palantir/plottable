@@ -178,7 +178,7 @@ export module Scales {
       return ticks;
     }
 
-    public _niceDomain(domain: number[], count?: number): number[] {
+    protected _niceDomain(domain: number[], count?: number): number[] {
       return domain;
     }
 
@@ -206,8 +206,22 @@ export module Scales {
       }
     }
 
-    public _defaultExtent(): number[] {
+    protected _defaultExtent(): number[] {
       return [0, this._base];
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: number[]): number[] {
+      if (singleValueDomain[0] === singleValueDomain[1]) {
+        var singleValue = singleValueDomain[0];
+        if (singleValue > 0) {
+          return [singleValue / this._base, singleValue * this._base];
+        } else if (singleValue === 0) {
+          return [-this._base, this._base];
+        } else {
+          return [singleValue * this._base, singleValue / this._base];
+        }
+      }
+      return singleValueDomain;
     }
 
     protected _getRange() {
@@ -221,7 +235,6 @@ export module Scales {
     public getDefaultTicks(): number[] {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
-
   }
 }
 }
