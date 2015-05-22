@@ -27,7 +27,7 @@ export module Plots {
     }
 
     protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key).drawLine(false);
+      return new Plottable.Drawers.Area(key);
     }
 
     public _getAnimator(key: string): Animators.PlotAnimator {
