@@ -8,6 +8,7 @@
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
 /// <reference path="utils/callbackSet.ts" />
+/// <reference path="utils/stackedPlotUtils.ts" />
 
 /// <reference path="utils/formatters.ts" />
 /// <reference path="utils/symbolFactories.ts" />
@@ -67,7 +68,6 @@
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />
-/// <reference path="components/plots/stackedPlotUtils.ts" />
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
