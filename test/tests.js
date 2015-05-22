@@ -8237,6 +8237,13 @@ describe("Utils", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils", function () {
+    describe("StackedPlot", function () {
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Interactions", function () {
     describe("Interaction", function () {
         var SVG_WIDTH = 400;
