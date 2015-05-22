@@ -299,13 +299,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Plots {
-        type StackedDatum = {
-            key: any;
-            value: number;
-            offset?: number;
-        };
-    }
     module Utils {
         class StackedPlot {
             /**
