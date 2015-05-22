@@ -77,7 +77,6 @@ describe("TimeScale tests", () => {
     scale.domainMin(minInMiddle);
     var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
     scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain2]);
-    (<any>scale)._autoDomainIfAutomaticMode();
     assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMin()");
   });
 
