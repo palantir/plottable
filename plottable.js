@@ -735,8 +735,7 @@ var Plottable;
             function StackedPlot() {
             }
             /**
-             *
-             * Calculates the offset of each piece data, in each dataset, relative to the baseline,
+             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
              * for drawing purposes.
              *
              * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
