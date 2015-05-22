@@ -7424,7 +7424,6 @@ describe("Scales", function () {
             scale.domainMin(minInMiddle);
             var requestedDomain2 = [-10, 10];
             scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-            scale._autoDomainIfAutomaticMode();
             assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
         });
         it("domainMax()", function () {
@@ -7446,7 +7445,6 @@ describe("Scales", function () {
             scale.domainMax(maxInMiddle);
             var requestedDomain2 = [-10, 10];
             scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-            scale._autoDomainIfAutomaticMode();
             assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
         });
         it("domainMin() and domainMax() together", function () {
@@ -7579,7 +7577,6 @@ describe("TimeScale tests", function () {
         scale.domainMin(minInMiddle);
         var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
         scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-        scale._autoDomainIfAutomaticMode();
         assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMin()");
     });
     it("domainMax()", function () {
@@ -7606,7 +7603,6 @@ describe("TimeScale tests", function () {
         scale.domainMax(maxInMiddle);
         var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
         scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
-        scale._autoDomainIfAutomaticMode();
         assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMax()");
     });
     it("domainMin() and domainMax() together", function () {

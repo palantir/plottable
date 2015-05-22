@@ -31,7 +31,7 @@ module Plottable {
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
+    protected _autoDomainIfAutomaticMode() {
       if (this._domainMin != null && this._domainMax != null) {
         this._setDomain([this._domainMin, this._domainMax]);
         return;
@@ -176,13 +176,13 @@ module Plottable {
 
     /**
      * Gets the lower end of the domain.
-     * 
+     *
      * @return {D}
      */
     public domainMin(): D;
     /**
      * Sets the lower end of the domain.
-     * 
+     *
      * @return {QuantitativeScale} The calling QuantitativeScale.
      */
     public domainMin(domainMin: D): QuantitativeScale<D>;
@@ -197,13 +197,13 @@ module Plottable {
 
     /**
      * Gets the upper end of the domain.
-     * 
+     *
      * @return {D}
      */
     public domainMax(): D;
     /**
      * Sets the upper end of the domain.
-     * 
+     *
      * @return {QuantitativeScale} The calling QuantitativeScale.
      */
     public domainMax(domainMax: D): QuantitativeScale<D>;
