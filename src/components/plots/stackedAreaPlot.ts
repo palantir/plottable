@@ -144,13 +144,7 @@ export module Plots {
       var datasets = this.datasets();
 
       StackedPlotUtils.checkSameDomainForStacks(datasets, keyAccessor);
-
-      var stackOffsets = StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-
-      stackOffsets.keys().forEach((dataset) => {
-        this._stackOffsets.set(dataset, stackOffsets.get(dataset));
-      });
-
+      this._stackOffsets = StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       this._stackedExtent = StackedPlotUtils.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
   }

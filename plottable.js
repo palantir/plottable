@@ -8201,7 +8201,6 @@ var Plottable;
                 }
             };
             StackedArea.prototype._updateStackExtentsAndOffsets = function () {
-                var _this = this;
                 if (!this._projectorsReady()) {
                     return;
                 }
@@ -8211,10 +8210,7 @@ var Plottable;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 var datasets = this.datasets();
                 Plottable.StackedPlotUtils.checkSameDomainForStacks(datasets, keyAccessor);
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                stackOffsets.keys().forEach(function (dataset) {
-                    _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
-                });
+                this._stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             return StackedArea;
@@ -8331,7 +8327,6 @@ var Plottable;
                 }
             };
             StackedBar.prototype._updateStackExtentsAndOffsets = function () {
-                var _this = this;
                 if (!this._projectorsReady()) {
                     return;
                 }
@@ -8339,10 +8334,7 @@ var Plottable;
                 var keyAccessor = Plottable.StackedPlotUtils.keyAccessor(this, orientation);
                 var valueAccessor = Plottable.StackedPlotUtils.valueAccessor(this, orientation);
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                var stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(this.datasets(), keyAccessor, valueAccessor);
-                stackOffsets.keys().forEach(function (dataset) {
-                    _this._stackOffsets.set(dataset, stackOffsets.get(dataset));
-                });
+                this._stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(this.datasets(), keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(this.datasets(), keyAccessor, valueAccessor, this._stackOffsets, filter);
             };
             return StackedBar;

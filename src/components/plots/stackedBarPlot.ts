@@ -124,12 +124,7 @@ export module Plots {
       var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      var stackOffsets = StackedPlotUtils.computeStackOffsets(this.datasets(), keyAccessor, valueAccessor);
-
-      stackOffsets.keys().forEach((dataset) => {
-        this._stackOffsets.set(dataset, stackOffsets.get(dataset));
-      });
-
+      this._stackOffsets = StackedPlotUtils.computeStackOffsets(this.datasets(), keyAccessor, valueAccessor);
       this._stackedExtent = StackedPlotUtils.computeStackExtents(this.datasets(), keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
   }
