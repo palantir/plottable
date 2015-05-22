@@ -79,7 +79,7 @@ module Plottable {
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
+    protected _autoDomainIfAutomaticMode() {
       if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
@@ -179,11 +179,13 @@ module Plottable {
 
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.add(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
 
     public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.delete(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
   }
