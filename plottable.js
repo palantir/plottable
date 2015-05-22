@@ -2933,9 +2933,6 @@ var Plottable;
                 _super.call(this, key);
                 this._svgElement = "path";
             }
-            Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
-                return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
-            };
             Arc.prototype.retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
                 d3.entries(attrToProjector).forEach(function (entry) {
@@ -2945,12 +2942,9 @@ var Plottable;
             };
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
+                var dProjector = attrToProjector["d"];
                 attrToProjector = this.retargetProjectors(attrToProjector);
-                var innerRadiusAccessor = attrToProjector["inner-radius"];
-                var outerRadiusAccessor = attrToProjector["outer-radius"];
-                delete attrToProjector["inner-radius"];
-                delete attrToProjector["outer-radius"];
-                attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
+                attrToProjector["d"] = dProjector;
                 return _super.prototype._drawStep.call(this, { attrToProjector: attrToProjector, animator: step.animator });
             };
             Arc.prototype.draw = function (data, drawSteps, dataset) {
@@ -6605,6 +6599,8 @@ var Plottable;
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.classed("pie-plot", true);
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
+                this._startAngles = new Plottable.Utils.Map();
+                this._endAngles = new Plottable.Utils.Map();
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
                 _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
@@ -6623,8 +6619,22 @@ var Plottable;
                     Plottable.Utils.Methods.warn("Only one dataset is supported in Pie plots");
                     return this;
                 }
+                this._startAngles.set(dataset, []);
+                this._endAngles.set(dataset, []);
+                this._updatePieLayout();
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
+            };
+            Pie.prototype.removeDataset = function (dataset) {
+                _super.prototype.removeDataset.call(this, dataset);
+                this._startAngles.delete(dataset);
+                this._endAngles.delete(dataset);
+                this._updatePieLayout();
+                return this;
+            };
+            Pie.prototype._onDatasetUpdate = function () {
+                _super.prototype._onDatasetUpdate.call(this);
+                this._updatePieLayout();
             };
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");
@@ -6644,6 +6654,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
                 }
                 this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
+                this._updatePieLayout();
                 this.renderImmediately();
                 return this;
             };
@@ -6665,10 +6676,32 @@ var Plottable;
             };
             Pie.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
-                attrToProjector[Pie._INNER_RADIUS_KEY] = Plottable.Plot._scaledAccessor(this.innerRadius());
-                attrToProjector[Pie._OUTER_RADIUS_KEY] = Plottable.Plot._scaledAccessor(this.outerRadius());
-                attrToProjector[Pie._SECTOR_VALUE_KEY] = Plottable.Plot._scaledAccessor(this.sectorValue());
+                var innerRadiusAccessor = Plottable.Plot._scaledAccessor(this.innerRadius());
+                var outerRadiusAccessor = Plottable.Plot._scaledAccessor(this.outerRadius());
+                attrToProjector["d"] = function (datum, index, ds) {
+                    return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds)).outerRadius(outerRadiusAccessor(datum, index, ds))(datum, index);
+                };
+                attrToProjector["sector-value"] = Plottable.Plot._scaledAccessor(this.sectorValue());
                 return attrToProjector;
+            };
+            Pie.prototype._updatePieLayout = function () {
+                var _this = this;
+                if (this.sectorValue() == null) {
+                    return;
+                }
+                var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
+                this.datasets().forEach(function (ds) {
+                    var data = ds.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(+sectorValueAccessor(d, i, ds)); });
+                    var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, ds); })(data);
+                    if (pie.some(function (slice) { return slice.value < 0; })) {
+                        Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+                    }
+                    pie.forEach(function (slice) {
+                        var index = slice.index;
+                        _this._startAngles.get(ds)[index] = slice.startAngle;
+                        _this._endAngles.get(ds)[index] = slice.endAngle;
+                    });
+                });
             };
             Pie.prototype._pixelPoint = function (datum, index, dataset) {
                 var innerRadius = Plottable.Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);

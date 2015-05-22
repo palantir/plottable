@@ -2557,6 +2557,8 @@ declare module Plottable {
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
+            removeDataset(dataset: Dataset): Pie;
+            protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             sectorValue<S>(): AccessorScaleBinding<S, number>;

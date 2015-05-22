@@ -9,12 +9,6 @@ export module Drawers {
       this._svgElement = "path";
     }
 
-    private _createArc(innerRadiusF: AppliedProjector, outerRadiusF: AppliedProjector) {
-      return d3.svg.arc()
-                   .innerRadius(innerRadiusF)
-                   .outerRadius(outerRadiusF);
-    }
-
     private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
       var retargetedAttrToProjector: AttributeToAppliedProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
@@ -25,13 +19,9 @@ export module Drawers {
 
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
+      var dProjector = attrToProjector["d"];
       attrToProjector = this.retargetProjectors(attrToProjector);
-      var innerRadiusAccessor = attrToProjector["inner-radius"];
-      var outerRadiusAccessor = attrToProjector["outer-radius"];
-      delete attrToProjector["inner-radius"];
-      delete attrToProjector["outer-radius"];
-
-      attrToProjector["d"] = this._createArc(innerRadiusAccessor, outerRadiusAccessor);
+      attrToProjector["d"] = dProjector;
       return super._drawStep({attrToProjector: attrToProjector, animator: step.animator});
     }
 
