@@ -96,21 +96,21 @@ export module Axes {
       var yAlign: {[s: string]: string};
       switch (this.tickLabelAngle()) {
         case 0:
-          xAlign = {left: "right",  right: "left", top: "center", bottom: "center"};
-          yAlign = {left: "center",  right: "center", top: "bottom", bottom: "top"};
+          xAlign = {left: "right", right: "left", top: "center", bottom: "center"};
+          yAlign = {left: "center", right: "center", top: "bottom", bottom: "top"};
           break;
         case 90:
-          xAlign = {left: "center",  right: "center", top: "right", bottom: "left"};
-          yAlign = {left: "top",  right: "bottom", top: "center", bottom: "center"};
+          xAlign = {left: "center", right: "center", top: "right", bottom: "left"};
+          yAlign = {left: "top", right: "bottom", top: "center", bottom: "center"};
           break;
         case -90:
-          xAlign = {left: "center",  right: "center", top: "left", bottom: "right"};
-          yAlign = {left: "bottom",  right: "top", top: "center", bottom: "center"};
+          xAlign = {left: "center", right: "center", top: "left", bottom: "right"};
+          yAlign = {left: "bottom", right: "top", top: "center", bottom: "center"};
           break;
       }
       ticks.each(function (d: string) {
         var bandWidth = scale.stepWidth();
-        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+        var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),

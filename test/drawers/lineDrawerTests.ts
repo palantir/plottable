@@ -13,8 +13,8 @@ describe("Drawers", () => {
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset(new Plottable.Dataset(data));
-      linePlot.x((d) => d.a, xScale);
-      linePlot.y((d) => d.b, yScale);
+      linePlot.x((d: any) => d.a, xScale);
+      linePlot.y((d: any) => d.b, yScale);
       linePlot.renderTo(svg);
 
       data.forEach((datum: any, index: number) => {
@@ -37,8 +37,8 @@ describe("Drawers", () => {
       (<any> linePlot)._getDrawer = () => drawer;
 
       linePlot.addDataset(new Plottable.Dataset(data));
-      linePlot.x((d) => d.a, xScale);
-      linePlot.y((d) => d.b, yScale);
+      linePlot.x((d: any) => d.a, xScale);
+      linePlot.y((d: any) => d.b, yScale);
       linePlot.renderTo(svg);
 
       var lineSelection = linePlot.getAllSelections();

@@ -4,7 +4,8 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -12,12 +13,15 @@ describe("Scales", () => {
       callbackWasCalled = true;
     };
     scale.onUpdate(testCallback);
+    (<any> scale)._setBackingScaleDomain = () => null;
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
   });
 
   it("Scale update listeners can be turned off", () => {
-    var scale = new Plottable.Scale(d3.scale.identity());
+    var scale = new Plottable.Scale();
+    (<any> scale)._d3Scale = d3.scale.identity();
+    (<any> scale)._setBackingScaleDomain = () => null;
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
@@ -121,12 +125,12 @@ describe("Scales", () => {
       xScale.domainer(new Plottable.Domainer());
       var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD1.addDataset(ds1);
-      renderAreaD1.x((d) => d.x, xScale);
-      renderAreaD1.y((d) => d.y, yScale);
+      renderAreaD1.x((d: any) => d.x, xScale);
+      renderAreaD1.y((d: any) => d.y, yScale);
       var renderAreaD2 = new Plottable.Plots.Line(xScale, yScale);
       renderAreaD2.addDataset(ds2);
-      renderAreaD2.x((d) => d.x, xScale);
-      renderAreaD2.y((d) => d.y, yScale);
+      renderAreaD2.x((d: any) => d.x, xScale);
+      renderAreaD2.y((d: any) => d.y, yScale);
       var renderAreas = new Plottable.Components.Group([renderAreaD1, renderAreaD2]);
       renderAreas.renderTo(svg);
       assert.deepEqual(xScale.domain(), [0, 2]);
@@ -204,8 +208,8 @@ describe("Scales", () => {
     var dataset = new Plottable.Dataset([dA, dB]);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.addDataset(dataset);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     var svg = TestMethods.generateSVG();
     assert.deepEqual(xScale.domain(), [], "before anchoring, the bar plot doesn't proxy data to the scale");
     barPlot.renderTo(svg);
@@ -361,5 +365,53 @@ describe("Scales", () => {
       scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
       assert.strictEqual("#b10026", scale.scale(16));
     });
+  });
+
+  describe("extent calculation", () => {
+    it("categoryScale gives the unique values when domain is stringy", () => {
+      var values = ["1", "3", "2", "1"];
+      var scale = new Plottable.Scales.Category();
+      var computedExtent = scale.extentOfValues(values);
+
+      assert.deepEqual(computedExtent, ["1", "3", "2"], "the extent is made of all the unique values in the domain");
+    });
+
+    it("categoryScale gives the unique values when domain is numeric", () => {
+      var values = [1, 3, 2, 1];
+      var scale = new Plottable.Scales.Category();
+      var computedExtent = scale.extentOfValues(<any>values);
+
+      assert.deepEqual(computedExtent, [1, 3, 2], "the extent is made of all the unique values in the domain");
+    });
+
+    it("quantitaveScale gives the minimum and maxiumum when the domain is stringy", () => {
+      var values = ["1", "3", "2", "1"];
+      var scale = new Plottable.QuantitativeScale();
+      var computedExtent = scale.extentOfValues(values);
+
+      assert.deepEqual(computedExtent, ["1", "3"], "the extent is the miminum and the maximum value in the domain");
+    });
+
+    it("quantitaveScale gives the minimum and maxiumum when the domain is numeric", () => {
+      var values = [1, 3, 2, 1];
+      var scale = new Plottable.QuantitativeScale();
+      var computedExtent = scale.extentOfValues(values);
+
+      assert.deepEqual(computedExtent, [1, 3], "the extent is the miminum and the maximum value in the domain");
+    });
+
+    it("timeScale extent calculation works as expected", () => {
+      var date1 = new Date(2015, 2, 25, 19, 0, 0);
+      var date2 = new Date(2015, 2, 24, 19, 0, 0);
+      var date3 = new Date(2015, 2, 25, 19, 0, 0);
+      var date4 = new Date(2015, 2, 26, 19, 0, 0);
+      var values = [date1, date2, date3, date4];
+
+      var scale = new Plottable.Scales.Time();
+      var computedExtent = scale.extentOfValues(values);
+
+      assert.deepEqual(computedExtent, [date2, date4], "The extent is the miminum and the maximum value in the domain");
+    });
+
   });
 });

@@ -2,8 +2,8 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    private static _X_KEY = "x";
-    private static _Y_KEY = "y";
+    protected static _X_KEY = "x";
+    protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
     private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
@@ -145,14 +145,14 @@ module Plottable {
      * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
+    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
       this._autoAdjustXScaleDomain = autoAdjustment;
       this._adjustXDomainOnChangeFromY();
       return this;
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
       var positionXFn = attrToProjector["x"];
       var positionYFn = attrToProjector["y"];
       attrToProjector["defined"] = (d: any, i: number, dataset: Dataset) => {
