@@ -2772,14 +2772,7 @@ declare module Plottable {
              * @param {Point} p The provided pixel position as a {Point}
              * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
              */
-            plotDataAt(p: Point): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
+            plotDataAt(p: Point): PlotData;
             /**
              * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
              *
@@ -2787,14 +2780,7 @@ declare module Plottable {
              * @param {Extent} yRange The specified range of y values
              * @return {Plots.PlotData} The plot data that corresponds to the ranges
              */
-            plotDataIn(xRange: Extent, yRange: Extent): {
-                data: any[];
-                pixelPoints: {
-                    x: number;
-                    y: number;
-                }[];
-                selection: D3.Selection;
-            };
+            plotDataIn(xRange: Extent, yRange: Extent): PlotData;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];

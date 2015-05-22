@@ -242,7 +242,7 @@ export module Plots {
      * @param {Point} p The provided pixel position as a {Point}
      * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
      */
-    public plotDataAt(p: Point) {
+    public plotDataAt(p: Point): PlotData {
       return this._getPlotData(p.x, p.y);
     }
 
@@ -253,7 +253,7 @@ export module Plots {
      * @param {Extent} yRange The specified range of y values
      * @return {Plots.PlotData} The plot data that corresponds to the ranges
      */
-    public plotDataIn(xRange: Extent, yRange: Extent) {
+    public plotDataIn(xRange: Extent, yRange: Extent): PlotData {
       return this._getPlotData(xRange, yRange);
     }
 

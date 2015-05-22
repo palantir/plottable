@@ -106,7 +106,7 @@ describe("Plots", () => {
       });
 
       it("getBars()", () => {
-        var bar: Plottable.Plots.PlotData = barPlot.plotDataAt({x: 155, y: 150}); // in the middle of bar 0
+        var bar = barPlot.plotDataAt({x: 155, y: 150}); // in the middle of bar 0
 
         assert.lengthOf(bar.data, 1, "getBar returns a bar");
         assert.strictEqual(bar.data[0], dataset.data()[0], "the data in the bar matches the datasource");
