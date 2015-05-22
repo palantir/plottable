@@ -84,17 +84,6 @@ module Plottable {
       return stackOffsets;
     }
 
-    public static checkSameDomainForStacks(datasets: Dataset[], keyAccessor: Accessor<any>) {
-      var keySets = datasets.map((dataset) => {
-        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
-      });
-      var domainKeys = StackedPlotUtils.getDomainKeys(datasets, keyAccessor);
-
-      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
-      }
-    }
-
     /**
      * Given an array of datasets and the accessor function for the key, computes the
      * set reunion (no duplicates) of the domain of each dataset.

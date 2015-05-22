@@ -2971,7 +2971,6 @@ declare module Plottable {
          * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
          */
         static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<any>): Utils.Map<Dataset, D3.Map<number>>;
-        static checkSameDomainForStacks(datasets: Dataset[], keyAccessor: Accessor<any>): void;
         /**
          * Given an array of datasets and the accessor function for the key, computes the
          * set reunion (no duplicates) of the domain of each dataset.

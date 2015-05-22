@@ -8003,15 +8003,6 @@ var Plottable;
             var stackOffsets = StackedPlotUtils._generateStackOffsets(datasets, StackedPlotUtils._stack(positiveDataMapArray, domainKeys), StackedPlotUtils._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
             return stackOffsets;
         };
-        StackedPlotUtils.checkSameDomainForStacks = function (datasets, keyAccessor) {
-            var keySets = datasets.map(function (dataset) {
-                return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
-            });
-            var domainKeys = StackedPlotUtils.getDomainKeys(datasets, keyAccessor);
-            if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
-                Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
-            }
-        };
         /**
          * Given an array of datasets and the accessor function for the key, computes the
          * set reunion (no duplicates) of the domain of each dataset.
@@ -8204,13 +8195,22 @@ var Plottable;
                 if (!this._projectorsReady()) {
                     return;
                 }
+                var datasets = this.datasets();
                 var keyAccessor = this.x().accessor;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
-                var datasets = this.datasets();
-                Plottable.StackedPlotUtils.checkSameDomainForStacks(datasets, keyAccessor);
+                this._checkSameDomain(datasets, keyAccessor);
                 this._stackOffsets = Plottable.StackedPlotUtils.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+            };
+            StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
+                var keySets = datasets.map(function (dataset) {
+                    return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
+                });
+                var domainKeys = Plottable.StackedPlotUtils.getDomainKeys(datasets, keyAccessor);
+                if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
+                    Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+                }
             };
             return StackedArea;
         })(Plots.Area);
