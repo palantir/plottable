@@ -25,9 +25,6 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      if (attrToProjector["fill"]) {
-        this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
 
       if (attrToProjector["class"]) {
         this._pathSelection.attr("class", attrToProjector["class"]);

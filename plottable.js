@@ -2613,9 +2613,6 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                if (attrToProjector["fill"]) {
-                    this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
                 if (attrToProjector["class"]) {
                     this._pathSelection.attr("class", attrToProjector["class"]);
                     this._pathSelection.classed(Line.LINE_CLASS, true);
