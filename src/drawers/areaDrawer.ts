@@ -23,23 +23,13 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      delete attrToProjector["x"];
-      delete attrToProjector["y0"];
-      delete attrToProjector["y"];
-      if (attrToProjector["defined"]) {
-        delete attrToProjector["defined"];
-      }
 
       if (attrToProjector["fill"]) {
         this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
       }
-      if (attrToProjector["class"]) {
-        this._areaSelection.attr("class", attrToProjector["class"]);
-        this._areaSelection.classed(Area.AREA_CLASS, true);
-        delete attrToProjector["class"];
-      }
 
       step.animator.animate(this._areaSelection, attrToProjector);
+      this._areaSelection.classed(Area.AREA_CLASS, true);
     }
 
     public _getSelector(): string {
