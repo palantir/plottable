@@ -290,15 +290,15 @@ var __extends = this.__extends || function (d, b) {
 };
 var MockAnimator = (function () {
     function MockAnimator(time, callback) {
-        this.time = time;
-        this.callback = callback;
+        this._time = time;
+        this._callback = callback;
     }
     MockAnimator.prototype.getTiming = function (selection) {
-        return this.time;
+        return this._time;
     };
     MockAnimator.prototype.animate = function (selection, attrToProjector) {
-        if (this.callback) {
-            this.callback();
+        if (this._callback) {
+            this._callback();
         }
         return selection;
     };
@@ -7080,7 +7080,7 @@ describe("Scales", function () {
             maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
             var affectedScale = new Plottable.Scales.Color();
             maliciousStyle.remove();
-            var maximumColorsFromCss = Plottable.Scales.Color.MAXIMUM_COLORS_FROM_CSS;
+            var maximumColorsFromCss = Plottable.Scales.Color._MAXIMUM_COLORS_FROM_CSS;
             assert.strictEqual(affectedScale.range().length, maximumColorsFromCss, "current malicious CSS countermeasure is to cap maximum number of colors to 256");
         });
     });
