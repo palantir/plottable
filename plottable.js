@@ -7779,6 +7779,7 @@ var Plottable;
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
                 this.attr("stroke", "none");
+                this.attr("class", Area.PLOT_CLASS);
                 this._lineDrawers = new Plottable.Utils.Map();
             }
             Area.prototype._setup = function () {
@@ -7937,6 +7938,7 @@ var Plottable;
                 });
                 return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
             };
+            Area.PLOT_CLASS = "area";
             Area._Y0_KEY = "y0";
             return Area;
         })(Plots.Line);

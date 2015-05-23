@@ -2908,6 +2908,7 @@ declare module Plottable {
          * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
          */
         class Area<X> extends Line<X> {
+            static PLOT_CLASS: string;
             /**
              * Constructs an AreaPlot.
              *
