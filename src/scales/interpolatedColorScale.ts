@@ -88,6 +88,15 @@ export module Scales {
       this._d3Scale = this._D3InterpolatedScale();
     }
 
+    public extentOfValues(values: number[]) {
+      var extent = d3.extent(values);
+      if (extent[0] == null || extent[1] == null) {
+        return [];
+      } else {
+        return extent;
+      }
+    }
+
     /**
      * Generates the converted QuantitativeScale.
      *
@@ -157,7 +166,7 @@ export module Scales {
     }
 
     public autoDomain() {
-      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+      // InterpolatedColorScales do not pad
       var extents = this._getAllExtents();
       if (extents.length > 0) {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);

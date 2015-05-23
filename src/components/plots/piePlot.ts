@@ -70,7 +70,7 @@ export module Plots {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
       this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -82,7 +82,7 @@ export module Plots {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
       this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -94,7 +94,7 @@ export module Plots {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }
       this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
   }

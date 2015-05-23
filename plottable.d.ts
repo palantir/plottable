@@ -541,7 +541,6 @@ declare module Plottable {
          * it.
          */
         class Timeout implements RenderPolicy {
-            _timeoutMsec: number;
             render(): void;
         }
     }
@@ -664,95 +663,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    class Domainer {
-        /**
-         * Constructs a new Domainer.
-         *
-         * @constructor
-         * @param {(extents: any[][]) => any[]} combineExtents
-         *        If present, this function will be used by the Domainer to merge
-         *        all the extents that are present on a scale.
-         *
-         *        A plot may draw multiple things relative to a scale, e.g.
-         *        different stocks over time. The plot computes their extents,
-         *        which are a [min, max] pair. combineExtents is responsible for
-         *        merging them all into one [min, max] pair. It defaults to taking
-         *        the min of the first elements and the max of the second arguments.
-         */
-        constructor(combineExtents?: (extents: any[][]) => any[]);
-        /**
-         * @param {any[][]} extents The list of extents to be reduced to a single
-         *        extent.
-         * @param {QuantitativeScale} scale
-         *        Since nice() must do different things depending on Linear, Log,
-         *        or Time scale, the scale must be passed in for nice() to work.
-         * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
-         *                 pair.
-         */
-        computeDomain(extents: any[][], scale: QuantitativeScale<any>): any[];
-        /**
-         * Sets the Domainer to pad by a given ratio.
-         *
-         * @param {number} padProportion Proportionally how much bigger the
-         *         new domain should be (0.05 = 5% larger).
-         *
-         *         A domainer will pad equal visual amounts on each side.
-         *         On a linear scale, this means both sides are padded the same
-         *         amount: [10, 20] will be padded to [5, 25].
-         *         On a log scale, the top will be padded more than the bottom, so
-         *         [10, 100] will be padded to [1, 1000].
-         *
-         * @returns {Domainer} The calling Domainer.
-         */
-        pad(padProportion?: number): Domainer;
-        /**
-         * Adds a padding exception, a value that will not be padded at either end of the domain.
-         *
-         * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-         * The exception will be registered under the provided with standard map semantics. (Overwrite / remove by key).
-         *
-         * @param {any} exception The padding exception to add.
-         * @param {any} key The key to register the exception under.
-         * @returns {Domainer} The calling domainer
-         */
-        addPaddingException(key: any, exception: any): Domainer;
-        /**
-         * Removes a padding exception, allowing the domain to pad out that value again.
-         *
-         * @param {any} key The key for the value to remove.
-         * @return {Domainer} The calling domainer
-         */
-        removePaddingException(key: any): Domainer;
-        /**
-         * Adds an included value, a value that must be included inside the domain.
-         *
-         * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-         * The value will be registered under that key with standard map semantics. (Overwrite / remove by key).
-         *
-         * @param {any} value The included value to add.
-         * @param {any} key The key to register the value under.
-         * @returns {Domainer} The calling domainer
-         */
-        addIncludedValue(key: any, value: any): Domainer;
-        /**
-         * Remove an included value, allowing the domain to not include that value gain again.
-         *
-         * @param {any} key The key for the value to remove.
-         * @return {Domainer} The calling domainer
-         */
-        removeIncludedValue(key: any): Domainer;
-        /**
-         * Extends the scale's domain so it starts and ends with "nice" values.
-         *
-         * @param {number} count The number of ticks that should fit inside the new domain.
-         * @return {Domainer} The calling Domainer.
-         */
-        nice(count?: number): Domainer;
-    }
-}
-
-
-declare module Plottable {
     interface ScaleCallback<S extends Scale<any, any>> {
         (scale: S): any;
     }
@@ -772,6 +682,7 @@ declare module Plottable {
          * @constructor
          */
         constructor();
+        extentOfValues(values: D[]): D[];
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
         onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
@@ -793,7 +704,7 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
-        _autoDomainIfAutomaticMode(): void;
+        protected _autoDomainIfAutomaticMode(): void;
         /**
          * Computes the range value corresponding to a given domain value. In other
          * words, apply the function to value.
@@ -853,8 +764,25 @@ declare module Plottable {
 declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected static _DEFAULT_NUM_TICKS: number;
-        _userSetDomainer: boolean;
+        /**
+         * Constructs a new QuantitativeScale.
+         *
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
+         * is invertible and continuous.
+         *
+         * @constructor
+         */
+        constructor();
+        autoDomain(): QuantitativeScale<D>;
+        protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
+        addPaddingException(key: any, exception: D): QuantitativeScale<D>;
+        removePaddingException(key: any): QuantitativeScale<D>;
+        addIncludedValue(key: any, value: D): QuantitativeScale<D>;
+        removeIncludedValue(key: any): QuantitativeScale<D>;
+        padProportion(): number;
+        padProportion(padProportion: number): QuantitativeScale<D>;
+        protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Retrieves the domain value corresponding to a supplied range value.
          *
@@ -862,6 +790,33 @@ declare module Plottable {
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         invert(value: number): D;
+        domain(): D[];
+        domain(values: D[]): QuantitativeScale<D>;
+        /**
+         * Gets the lower end of the domain.
+         *
+         * @return {D}
+         */
+        domainMin(): D;
+        /**
+         * Sets the lower end of the domain.
+         *
+         * @return {QuantitativeScale} The calling QuantitativeScale.
+         */
+        domainMin(domainMin: D): QuantitativeScale<D>;
+        /**
+         * Gets the upper end of the domain.
+         *
+         * @return {D}
+         */
+        domainMax(): D;
+        /**
+         * Sets the upper end of the domain.
+         *
+         * @return {QuantitativeScale} The calling QuantitativeScale.
+         */
+        domainMax(domainMax: D): QuantitativeScale<D>;
+        extentOfValues(values: D[]): D[];
         protected _setDomain(values: D[]): void;
         /**
          * Gets ticks generated by the default algorithm.
@@ -877,27 +832,8 @@ declare module Plottable {
          * Given a domain, expands its domain onto "nice" values, e.g. whole
          * numbers.
          */
-        _niceDomain(domain: D[], count?: number): D[];
-        /**
-         * Gets a Domainer of a scale. A Domainer is responsible for combining
-         * multiple extents into a single domain.
-         *
-         * @return {Domainer} The scale's current domainer.
-         */
-        domainer(): Domainer;
-        /**
-         * Sets a Domainer of a scale. A Domainer is responsible for combining
-         * multiple extents into a single domain.
-         *
-         * When you set domainer, we assume that you know what you want the domain
-         * to look like better that we do. Ensuring that the domain is padded,
-         * includes 0, etc., will be the responsability of the new domainer.
-         *
-         * @param {Domainer} domainer If provided, the new domainer.
-         * @return {QuantitativeScale} The calling QuantitativeScale.
-         */
-        domainer(domainer: Domainer): QuantitativeScale<D>;
-        _defaultExtent(): D[];
+        protected _niceDomain(domain: D[], count?: number): D[];
+        protected _defaultExtent(): D[];
         /**
          * Gets the tick generator of the QuantitativeScale.
          *
@@ -928,7 +864,8 @@ declare module Plottable {
              * LinearScale. If not supplied, uses a default scale.
              */
             constructor();
-            _defaultExtent(): number[];
+            protected _defaultExtent(): number[];
+            protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             scale(value: number): number;
             protected _getDomain(): any[];
             protected _setBackingScaleDomain(values: number[]): void;
@@ -936,7 +873,7 @@ declare module Plottable {
             protected _setRange(values: number[]): void;
             invert(value: number): number;
             getDefaultTicks(): number[];
-            _niceDomain(domain: number[], count?: number): number[];
+            protected _niceDomain(domain: number[], count?: number): number[];
         }
     }
 }
@@ -977,7 +914,7 @@ declare module Plottable {
             protected _setDomain(values: number[]): void;
             protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
-            _niceDomain(domain: number[], count?: number): number[];
+            protected _niceDomain(domain: number[], count?: number): number[];
             /**
              * Gets whether or not to return tick values other than powers of base.
              *
@@ -994,7 +931,8 @@ declare module Plottable {
              * @returns {ModifiedLog} The calling ModifiedLog.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
-            _defaultExtent(): number[];
+            protected _defaultExtent(): number[];
+            protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             protected _getRange(): any[];
             protected _setRange(values: number[]): void;
             getDefaultTicks(): number[];
@@ -1015,6 +953,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
             domain(): string[];
             domain(values: string[]): Category;
@@ -1094,6 +1033,7 @@ declare module Plottable {
              * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
              */
             constructor(scaleType?: string);
+            extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
             scale(value: string): string;
             protected _getDomain(): any[];
@@ -1127,7 +1067,8 @@ declare module Plottable {
              */
             tickInterval(interval: string, step?: number): Date[];
             protected _setDomain(values: Date[]): void;
-            _defaultExtent(): Date[];
+            protected _defaultExtent(): Date[];
+            protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
             scale(value: Date): number;
             protected _getDomain(): any[];
             protected _setBackingScaleDomain(values: Date[]): void;
@@ -1135,7 +1076,7 @@ declare module Plottable {
             protected _setRange(values: number[]): void;
             invert(value: number): Date;
             getDefaultTicks(): Date[];
-            _niceDomain(domain: Date[], count?: number): any[];
+            protected _niceDomain(domain: Date[], count?: number): any[];
         }
     }
 }
@@ -1164,6 +1105,7 @@ declare module Plottable {
              * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
              */
             constructor(colorRange?: string[], scaleType?: string);
+            extentOfValues(values: number[]): number[];
             /**
              * Gets the color range.
              *
@@ -2044,13 +1986,13 @@ declare module Plottable {
             /**
              * Creates a Label.
              *
-             * A label is component that renders just text. The most common use of
-             * labels is to create a title or axis labels.
+             * A Label is a Component that draws a single line of text.
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
+             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
              */
-            constructor(displayText?: string);
+            constructor(displayText?: string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -2075,7 +2017,7 @@ declare module Plottable {
             /**
              * Sets the angle of the Label.
              *
-             * @param {number} angle If provided, the desired angle (0/-90/90)
+             * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
              * @returns {Label} The calling Label.
              */
             angle(angle: number): Label;
@@ -2103,7 +2045,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
@@ -2112,7 +2054,7 @@ declare module Plottable {
              *
              * @constructor
              */
-            constructor(text?: string);
+            constructor(text?: string, angle?: number);
         }
     }
 }
@@ -2646,27 +2588,23 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
+         * If 'x' or 'y' is specified the adjustment is immediately performed.
          *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @param {string} scale Must be one of 'x', 'y', or 'none'.
+         *
+         * 'x' will adjust the x scale in relation to changes in the y domain.
+         *
+         * 'y' will adjust the y scale in relation to changes in the x domain.
+         *
+         * 'none' means neither scale will change automatically.
+         *
          * @returns {XYPlot} The calling XYPlot.
          */
-        automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>;
+        autorange(scaleName: string): XYPlot<X, Y>;
         protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
-        protected _updateXDomainer(): void;
-        protected _updateYDomainer(): void;
         /**
          * Adjusts both domains' extents to show all datasets.
          *
@@ -2863,9 +2801,6 @@ declare module Plottable {
              * @returns {D3.Selection} The selected bar, or null if no bar was selected.
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
-            protected _updateDomainer(scale: Scale<any, number>): void;
-            protected _updateYDomainer(): void;
-            protected _updateXDomainer(): void;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2941,7 +2876,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
-            protected _updateYDomainer(): void;
+            protected _updateYScale(): void;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
         }
@@ -2986,12 +2921,12 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
-            _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
             protected _additionalPaint(): void;
-            protected _updateYDomainer(): void;
+            protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;

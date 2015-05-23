@@ -32,6 +32,10 @@ module Plottable {
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
+    public extentOfValues(values: D[]): D[] {
+      return []; // this should be overwritten
+    }
+
     protected _getAllExtents(): D[][] {
       return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
     }
@@ -75,7 +79,7 @@ module Plottable {
       return this;
     }
 
-    public _autoDomainIfAutomaticMode() {
+    protected _autoDomainIfAutomaticMode() {
       if (this._autoDomainAutomatically) {
         this.autoDomain();
       }
@@ -175,11 +179,13 @@ module Plottable {
 
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.add(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
 
     public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.delete(provider);
+      this._autoDomainIfAutomaticMode();
       return this;
     }
   }
