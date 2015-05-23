@@ -251,7 +251,7 @@ export module Plots {
      * 
      * @param {Range} xRange The specified range of x values
      * @param {Range} yRange The specified range of y values
-     * @return {Plots.PlotDataRangeplot data Rangeorresponds to the ranges
+     * @return {Plots.PlotData} The plot data that corresponds to the ranges
      */
     public plotDataIn(xRange: Range, yRange: Range): PlotData {
       return this._getPlotData(xRange, yRange);

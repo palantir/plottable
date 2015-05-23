@@ -154,11 +154,11 @@ declare module Plottable {
              */
             function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
             /**
-             * Create an Extent from a number or an object with "min" and "max" defined.
+             * Create a Range from a number or an object with "min" and "max" defined.
              *
              * @param {any} input The object to parse
              *
-             * @returns {Range} The generated Extent
+             * @returns {Range} The generated Range
              */
             function parseRange(input: any): Range;
         }
@@ -609,11 +609,11 @@ declare module Plottable {
         minHeight: number;
     };
     /**
-     * The range of your current data. For example, [1, 2, 6, -5] has the Extent
+     * The range of your current data. For example, [1, 2, 6, -5] has the Range
      * `{min: -5, max: 6}`.
      *
      * The point of this type is to hopefully replace the less-elegant `[min,
-     * max]` extents produced by d3.
+     * max]` ranges produced by d3.
      */
     type Range = {
         min: number;
@@ -2778,7 +2778,7 @@ declare module Plottable {
              *
              * @param {Range} xRange The specified range of x values
              * @param {Range} yRange The specified range of y values
-             * @return {Plots.PlotDataRangeplot data Rangeorresponds to the ranges
+             * @return {Plots.PlotData} The plot data that corresponds to the ranges
              */
             plotDataIn(xRange: Range, yRange: Range): PlotData;
             protected _additionalPaint(time: number): void;

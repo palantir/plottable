@@ -43,11 +43,11 @@ module Plottable {
   }
 
   /**
-   * The range of your current data. For example, [1, 2, 6, -5] has the Extent
+   * The range of your current data. For example, [1, 2, 6, -5] has the Range
    * `{min: -5, max: 6}`.
    *
    * The point of this type is to hopefully replace the less-elegant `[min,
-   * max]` extents produced by d3.
+   * max]` ranges produced by d3.
    */
   export type Range = {
     min: number;

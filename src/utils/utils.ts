@@ -340,11 +340,11 @@ export module Utils {
     }
 
     /**
-     * Create an Extent from a number or an object with "min" and "max" defined.
+     * Create a Range from a number or an object with "min" and "max" defined.
      *
      * @param {any} input The object to parse
      *
-     * @returns {Range} The generated Extent
+     * @returns {Range} The generated Range
      */
     export function parseRange(input: any): Range {
       if (typeof (input) === "number") {
@@ -352,7 +352,7 @@ export module Utils {
       } else if (input instanceof Object && "min" in input && "max" in input) {
         return <Range> input;
       } else {
-        throw new Error("input '" + input + "' can't be parsed as an Extent");
+        throw new Error("input '" + input + "' can't be parsed as an Range");
       }
     }
   }

@@ -336,11 +336,11 @@ var Plottable;
             }
             Methods.intersectsBBox = intersectsBBox;
             /**
-             * Create an Extent from a number or an object with "min" and "max" defined.
+             * Create a Range from a number or an object with "min" and "max" defined.
              *
              * @param {any} input The object to parse
              *
-             * @returns {Range} The generated Extent
+             * @returns {Range} The generated Range
              */
             function parseRange(input) {
                 if (typeof (input) === "number") {
@@ -7410,7 +7410,7 @@ var Plottable;
              *
              * @param {Range} xRange The specified range of x values
              * @param {Range} yRange The specified range of y values
-             * @return {Plots.PlotDataRangeplot data Rangeorresponds to the ranges
+             * @return {Plots.PlotData} The plot data that corresponds to the ranges
              */
             Bar.prototype.plotDataIn = function (xRange, yRange) {
                 return this._getPlotData(xRange, yRange);
