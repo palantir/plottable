@@ -350,7 +350,7 @@ var Plottable;
                     return input;
                 }
                 else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                    throw new Error("input '" + input + "' can't be parsed as an Range");
                 }
             }
             Methods.parseRange = parseRange;
