@@ -7845,6 +7845,7 @@ var Plottable;
                 lineAttrToProjector["fill"] = function () { return "none"; };
                 lineAttrToProjector["vector-effect"] = function () { return "non-scaling-stroke"; };
                 lineAttrToProjector["stroke-width"] = function () { return "2px"; };
+                lineAttrToProjector["class"] = function () { return Plots.Line.SELECTION_CLASS; };
                 var xProjector = Plottable.Plot._scaledAccessor(this.x());
                 var yProjector = Plottable.Plot._scaledAccessor(this.y());
                 var definedProjector = function (d, i, dataset) {

@@ -113,6 +113,7 @@ export module Plots {
       lineAttrToProjector["fill"] = () => "none";
       lineAttrToProjector["vector-effect"] = () => "non-scaling-stroke";
       lineAttrToProjector["stroke-width"] = () => "2px";
+      lineAttrToProjector["class"] = () => Line.SELECTION_CLASS;
       var xProjector = Plot._scaledAccessor(this.x());
       var yProjector = Plot._scaledAccessor(this.y());
 
