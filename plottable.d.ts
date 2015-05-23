@@ -1287,12 +1287,6 @@ declare module Plottable {
         class Area extends Line {
             static AREA_CLASS: string;
             protected _enterData(data: any[]): void;
-            /**
-             * Sets the value determining if line should be drawn.
-             *
-             * @param{boolean} draw The value determing if line should be drawn.
-             */
-            drawLine(draw: boolean): Area;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
@@ -2921,15 +2915,20 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            protected _setup(): void;
             y0(): Plots.AccessorScaleBinding<number, number>;
             y0(y0: number | Accessor<number>): Area<X>;
             y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
+            addDataset(dataset: Dataset): Area<X>;
+            protected _additionalPaint(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
             protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
             protected _wholeDatumAttributes(): string[];
             protected _propertyProjectors(): AttributeToProjector;
+            getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
+            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
         }
     }
 }

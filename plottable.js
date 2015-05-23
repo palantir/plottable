@@ -2669,35 +2669,15 @@ var Plottable;
             __extends(Area, _super);
             function Area() {
                 _super.apply(this, arguments);
-                this._drawLine = true;
             }
             Area.prototype._enterData = function (data) {
-                if (this._drawLine) {
-                    _super.prototype._enterData.call(this, data);
-                }
-                else {
-                    // HACKHACK Forced to use anycast to access protected var
-                    Drawers.AbstractDrawer.prototype._enterData.call(this, data);
-                }
+                // HACKHACK Forced to use anycast to access protected var
+                Drawers.AbstractDrawer.prototype._enterData.call(this, data);
                 this._areaSelection.datum(data);
-            };
-            /**
-             * Sets the value determining if line should be drawn.
-             *
-             * @param{boolean} draw The value determing if line should be drawn.
-             */
-            Area.prototype.drawLine = function (draw) {
-                this._drawLine = draw;
-                return this;
             };
             Area.prototype.setup = function (area) {
                 this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
-                if (this._drawLine) {
-                    _super.prototype.setup.call(this, area);
-                }
-                else {
-                    Drawers.AbstractDrawer.prototype.setup.call(this, area);
-                }
+                Drawers.AbstractDrawer.prototype.setup.call(this, area);
             };
             Area.prototype._createArea = function (xFunction, y0Function, y1Function, definedFunction) {
                 if (!definedFunction) {
@@ -2706,13 +2686,7 @@ var Plottable;
                 return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
             };
             Area.prototype._drawStep = function (step) {
-                if (this._drawLine) {
-                    _super.prototype._drawStep.call(this, step);
-                }
-                else {
-                    // HACKHACK Forced to use anycast to access protected var
-                    Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
-                }
+                Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 var xFunction = attrToProjector["x"];
                 var y0Function = attrToProjector["y0"];
@@ -7839,7 +7813,13 @@ var Plottable;
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
                 this.attr("stroke", defaultColor);
+                this._lineDrawers = new Plottable.Utils.Map();
             }
+            Area.prototype._setup = function () {
+                var _this = this;
+                _super.prototype._setup.call(this);
+                this._lineDrawers.values().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+            };
             Area.prototype.y0 = function (y0, y0Scale) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
@@ -7854,6 +7834,25 @@ var Plottable;
                 if (this.y().scale != null) {
                     this._updateYDomainer();
                 }
+            };
+            Area.prototype.addDataset = function (dataset) {
+                // HACKHACK Drawers should take in a dataset instead of the key
+                var lineDrawer = new Plottable.Drawers.Line("");
+                if (this._isSetup) {
+                    lineDrawer.setup(this._renderArea.append("g"));
+                }
+                this._lineDrawers.set(dataset, lineDrawer);
+                _super.prototype.addDataset.call(this, dataset);
+                return this;
+            };
+            Area.prototype._additionalPaint = function () {
+                var _this = this;
+                var drawSteps = this._generateDrawSteps();
+                var dataToDraw = this._getDataToDraw();
+                this._datasetKeysInOrder.forEach(function (k, i) {
+                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                    _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
+                });
             };
             Area.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);
@@ -7887,6 +7886,40 @@ var Plottable;
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 attrToProjector["y0"] = Plottable.Plot._scaledAccessor(this.y0());
                 return attrToProjector;
+            };
+            Area.prototype.getAllSelections = function (datasets, exclude) {
+                var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
+                if (exclude === void 0) { exclude = false; }
+                var allSelections = _super.prototype.getAllSelections.call(this, datasets, exclude)[0];
+                if (exclude) {
+                    datasets = this.datasets().filter(function (dataset) { return datasets.indexOf(dataset) < 0; });
+                }
+                var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
+                lineDrawers.forEach(function (ld, i) { return allSelections.push(ld._getSelection(i).node()); });
+                return d3.selectAll(allSelections);
+            };
+            Area.prototype.getAllPlotData = function (datasets) {
+                var _this = this;
+                if (datasets === void 0) { datasets = this.datasets(); }
+                var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
+                var allElements = allPlotData.selection[0];
+                this._keysForDatasets(datasets).forEach(function (datasetKey) {
+                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+                    if (plotDatasetKey == null) {
+                        return;
+                    }
+                    var dataset = plotDatasetKey.dataset;
+                    var drawer = _this._lineDrawers.get(dataset);
+                    dataset.data().forEach(function (datum, index) {
+                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
+                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                            return;
+                        }
+                        allElements.push(drawer._getSelection(index).node());
+                    });
+                });
+                return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
             };
             Area._Y0_KEY = "y0";
             return Area;
@@ -8136,7 +8169,7 @@ var Plottable;
                 this._stackedExtent = [];
             }
             StackedArea.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Area(key).drawLine(false);
+                return new Plottable.Drawers.Area(key);
             };
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();

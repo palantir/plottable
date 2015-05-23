@@ -7,6 +7,7 @@ export module Plots {
    */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
+    private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
 
     /**
      * Constructs an AreaPlot.
@@ -28,6 +29,12 @@ export module Plots {
       this.attr("fill-opacity", 0.25);
       this.attr("fill", defaultColor);
       this.attr("stroke", defaultColor);
+      this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
+    }
+
+    protected _setup() {
+      super._setup();
+      this._lineDrawers.values().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
@@ -48,6 +55,26 @@ export module Plots {
       if (this.y().scale != null) {
         this._updateYDomainer();
       }
+    }
+
+    public addDataset(dataset: Dataset) {
+      // HACKHACK Drawers should take in a dataset instead of the key
+      var lineDrawer = new Drawers.Line("");
+      if (this._isSetup) {
+        lineDrawer.setup(this._renderArea.append("g"));
+      }
+      this._lineDrawers.set(dataset, lineDrawer);
+      super.addDataset(dataset);
+      return this;
+    }
+
+    protected _additionalPaint() {
+      var drawSteps = this._generateDrawSteps();
+      var dataToDraw = this._getDataToDraw();
+      this._datasetKeysInOrder.forEach((k, i) => {
+        var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
+      });
     }
 
     protected _getDrawer(key: string) {
@@ -89,6 +116,37 @@ export module Plots {
       return attrToProjector;
     }
 
+    public getAllSelections(datasets = this.datasets(), exclude = false) {
+      var allSelections = super.getAllSelections(datasets, exclude)[0];
+      if (exclude) {
+        datasets = this.datasets().filter((dataset) => datasets.indexOf(dataset) < 0);
+      }
+      var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
+                                .filter((drawer) => drawer != null);
+      lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
+      return d3.selectAll(allSelections);
+    }
+
+    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
+      var allPlotData = super.getAllPlotData(datasets);
+      var allElements = allPlotData.selection[0];
+
+      this._keysForDatasets(datasets).forEach((datasetKey) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+        if (plotDatasetKey == null) { return; }
+        var dataset = plotDatasetKey.dataset;
+        var drawer = this._lineDrawers.get(dataset);
+        dataset.data().forEach((datum: any, index: number) => {
+          var pixelPoint = this._pixelPoint(datum, index, dataset);
+          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+            return;
+          }
+          allElements.push(drawer._getSelection(index).node());
+        });
+      });
+
+      return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
+    }
   }
 }
 }
