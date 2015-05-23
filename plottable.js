@@ -7650,10 +7650,20 @@ var Plottable;
                 return function (d, i, dataset) { return scaledStartValue; };
             };
             Line.prototype._generateDrawSteps = function () {
+                var _this = this;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var attrToProjector = this._generateAttrToProjector();
-                    attrToProjector["y"] = this._getResetYFunction();
+                    var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                    var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                    var definedProjector = function (d, i, dataset) {
+                        var positionX = xProjector(d, i, dataset);
+                        var positionY = yProjector(d, i, dataset);
+                        return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                    };
+                    attrToProjector["d"] = function (datum, index, dataset) {
+                        return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return _this._getResetYFunction()(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                    };
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });

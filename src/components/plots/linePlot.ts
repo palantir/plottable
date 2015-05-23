@@ -43,7 +43,22 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
+        var xProjector = Plot._scaledAccessor(this.x());
+        var yProjector = Plot._scaledAccessor(this.y());
+
+        var definedProjector = (d: any, i: number, dataset: Dataset) => {
+          var positionX = xProjector(d, i, dataset);
+          var positionY = yProjector(d, i, dataset);
+          return positionX != null && positionX === positionX &&
+                 positionY != null && positionY === positionY;
+        };
+
+        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
+          return d3.svg.line()
+                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
+                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+        };
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
 
