@@ -18,11 +18,6 @@ export module Drawers {
 
     protected _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-
-      if (attrToProjector["fill"]) {
-        this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-      }
-
       step.animator.animate(this._areaSelection, attrToProjector);
       this._areaSelection.classed(Area.AREA_CLASS, true);
     }

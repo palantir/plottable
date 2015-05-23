@@ -2653,9 +2653,6 @@ var Plottable;
             };
             Area.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                if (attrToProjector["fill"]) {
-                    this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
                 step.animator.animate(this._areaSelection, attrToProjector);
                 this._areaSelection.classed(Area.AREA_CLASS, true);
             };
