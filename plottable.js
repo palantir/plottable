@@ -1776,7 +1776,7 @@ var Plottable;
              * (0 to 1) scaling factor is added such that at 0 the value is
              * adjusted to 1, resulting in a returned result of 0.
              */
-            ModifiedLog.prototype.adjustedLog = function (x) {
+            ModifiedLog.prototype._adjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
                 if (x < this._pivot) {
@@ -1786,7 +1786,7 @@ var Plottable;
                 x *= negationFactor;
                 return x;
             };
-            ModifiedLog.prototype.invertedAdjustedLog = function (x) {
+            ModifiedLog.prototype._invertedAdjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
                 x = Math.pow(this._base, x);
@@ -1797,17 +1797,17 @@ var Plottable;
                 return x;
             };
             ModifiedLog.prototype.scale = function (x) {
-                return this._d3Scale(this.adjustedLog(x));
+                return this._d3Scale(this._adjustedLog(x));
             };
             ModifiedLog.prototype.invert = function (x) {
-                return this.invertedAdjustedLog(this._d3Scale.invert(x));
+                return this._invertedAdjustedLog(this._d3Scale.invert(x));
             };
             ModifiedLog.prototype._getDomain = function () {
                 return this._untransformedDomain;
             };
             ModifiedLog.prototype._setDomain = function (values) {
                 this._untransformedDomain = values;
-                var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+                var transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
                 _super.prototype._setDomain.call(this, transformedDomain);
             };
             ModifiedLog.prototype._setBackingScaleDomain = function (values) {
@@ -1824,8 +1824,8 @@ var Plottable;
                 var negativeUpper = middle(min, max, -this._pivot);
                 var positiveLower = middle(min, max, this._pivot);
                 var positiveUpper = max;
-                var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
-                var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+                var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
+                var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
@@ -1847,7 +1847,7 @@ var Plottable;
              * This function will generate clusters as large as it can while not
              * drastically exceeding its number of ticks.
              */
-            ModifiedLog.prototype.logTicks = function (lower, upper) {
+            ModifiedLog.prototype._logTicks = function (lower, upper) {
                 var _this = this;
                 var nTicks = this._howManyTicks(lower, upper);
                 if (nTicks === 0) {
@@ -1873,10 +1873,10 @@ var Plottable;
              * distance when plotted.
              */
             ModifiedLog.prototype._howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
-                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
-                var adjustedLower = this.adjustedLog(lower);
-                var adjustedUpper = this.adjustedLog(upper);
+                var adjustedMin = this._adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
+                var adjustedMax = this._adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
+                var adjustedLower = this._adjustedLog(lower);
+                var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
                 var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
@@ -2117,7 +2117,7 @@ var Plottable;
                 var defaultColorHex = Plottable.Utils.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                while ((colorHex = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this._MAXIMUM_COLORS_FROM_CSS) {
                     if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
                         break;
                     }
@@ -2133,7 +2133,7 @@ var Plottable;
                 var color = this._d3Scale(value);
                 var index = this.domain().indexOf(value);
                 var numLooped = Math.floor(index / this.range().length);
-                var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
+                var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
                 return Plottable.Utils.Methods.lightenColor(color, modifyFactor);
             };
             Color.prototype._getDomain = function () {
@@ -2148,9 +2148,9 @@ var Plottable;
             Color.prototype._setRange = function (values) {
                 this._d3Scale.range(values);
             };
-            Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            Color._LOOP_LIGHTEN_FACTOR = 1.6;
             // The maximum number of colors we are getting from CSS stylesheets
-            Color.MAXIMUM_COLORS_FROM_CSS = 256;
+            Color._MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Plottable.Scale);
         Scales.Color = Color;
@@ -2962,7 +2962,7 @@ var Plottable;
             Arc.prototype._createArc = function (innerRadiusF, outerRadiusF) {
                 return d3.svg.arc().innerRadius(innerRadiusF).outerRadius(outerRadiusF);
             };
-            Arc.prototype.retargetProjectors = function (attrToProjector) {
+            Arc.prototype._retargetProjectors = function (attrToProjector) {
                 var retargetedAttrToProjector = {};
                 d3.entries(attrToProjector).forEach(function (entry) {
                     retargetedAttrToProjector[entry.key] = function (d, i) { return entry.value(d.data, i); };
@@ -2971,8 +2971,8 @@ var Plottable;
             };
             Arc.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                attrToProjector = this.retargetProjectors(attrToProjector);
-                this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+                attrToProjector = this._retargetProjectors(attrToProjector);
+                this._attrToProjector = this._retargetProjectors(this._attrToProjector);
                 var innerRadiusAccessor = attrToProjector["inner-radius"];
                 var outerRadiusAccessor = attrToProjector["outer-radius"];
                 delete attrToProjector["inner-radius"];
@@ -8632,7 +8632,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
+                this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveCallbacks = new Plottable.Utils.CallbackSet();
                 this._downCallbacks = new Plottable.Utils.CallbackSet();
@@ -8790,7 +8790,7 @@ var Plottable;
              * calls all the callbacks in the provided callbackSet.
              */
             Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
-                var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
+                var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
                     callbackSet.callCallbacks(this.getLastMousePosition(), event);
@@ -8833,7 +8833,7 @@ var Plottable;
             function Touch(svg) {
                 var _this = this;
                 _super.call(this);
-                this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
+                this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._startCallbacks = new Plottable.Utils.CallbackSet();
                 this._moveCallbacks = new Plottable.Utils.CallbackSet();
                 this._endCallbacks = new Plottable.Utils.CallbackSet();
@@ -8967,7 +8967,7 @@ var Plottable;
                 for (var i = 0; i < touches.length; i++) {
                     var touch = touches[i];
                     var touchID = touch.identifier;
-                    var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                    var newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
                     if (newTouchPosition != null) {
                         touchPositions[touchID] = newTouchPosition;
                         touchIdentifiers.push(touchID);
@@ -9276,7 +9276,7 @@ var Plottable;
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
-                    if (!(this._clickState === 1 /* SingleClicked */) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                    if (!(this._clickState === 1 /* SingleClicked */) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
                         this._clickState = 0 /* NotClicked */;
                     }
                     this._clickedPoint = translatedP;
@@ -9285,7 +9285,7 @@ var Plottable;
             };
             DoubleClick.prototype._handleClickUp = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
                     this._clickState = this._clickState === 0 /* NotClicked */ ? 1 /* SingleClicked */ : 2 /* DoubleClicked */;
                 }
                 else {
@@ -9303,7 +9303,7 @@ var Plottable;
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
             };
-            DoubleClick.pointsEqual = function (p1, p2) {
+            DoubleClick._pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
             /**
@@ -9596,25 +9596,25 @@ var Plottable;
                 if (this._touchIds.size() < 2) {
                     return;
                 }
-                var oldCenterPoint = this.centerPoint();
-                var oldCornerDistance = this.cornerDistance();
+                var oldCenterPoint = this._centerPoint();
+                var oldCornerDistance = this._cornerDistance();
                 ids.forEach(function (id) {
                     if (_this._touchIds.has(id.toString())) {
                         _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
-                var newCenterPoint = this.centerPoint();
-                var newCornerDistance = this.cornerDistance();
+                var newCenterPoint = this._centerPoint();
+                var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
                 }
             };
-            PanZoom.prototype.centerPoint = function () {
+            PanZoom.prototype._centerPoint = function () {
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
@@ -9624,7 +9624,7 @@ var Plottable;
                 var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
                 return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
             };
-            PanZoom.prototype.cornerDistance = function () {
+            PanZoom.prototype._cornerDistance = function () {
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
@@ -9640,11 +9640,11 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom.magnifyScale = function (scale, magnifyAmount, centerValue) {
+            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
                 scale.domain(scale.range().map(magnifyTransform));
             };
-            PanZoom.translateScale = function (scale, translateAmount) {
+            PanZoom._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
                 scale.domain(scale.range().map(translateTransform));
             };
@@ -9655,10 +9655,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
+                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
                     }
                     if (this._yScale != null) {
-                        PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
+                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
                     }
                 }
             };
@@ -9673,11 +9673,11 @@ var Plottable;
                     }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom.translateScale(_this._xScale, -dragAmountX);
+                        PanZoom._translateScale(_this._xScale, -dragAmountX);
                     }
                     if (_this._yScale != null) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom.translateScale(_this._yScale, -dragAmountY);
+                        PanZoom._translateScale(_this._yScale, -dragAmountY);
                     }
                     lastDragPoint = endPoint;
                 });
