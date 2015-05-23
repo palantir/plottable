@@ -12,10 +12,8 @@ export module Drawers {
     }
 
     public setup(area: D3.Selection) {
-      this._areaSelection = area.append("path")
-                               .classed(Area.AREA_CLASS, true)
-                               .style({ "stroke": "none" });
       AbstractDrawer.prototype.setup.call(this, area);
+      this._areaSelection = area.append("path");
     }
 
     protected _drawStep(step: AppliedDrawStep) {

@@ -156,13 +156,7 @@ export module Plots {
     }
 
     protected _getResetYFunction() {
-      return this._generateAttrToProjector()["y0"];
-    }
-
-    protected _wholeDatumAttributes() {
-      var wholeDatumAttributes = super._wholeDatumAttributes();
-      wholeDatumAttributes.push("y0");
-      return wholeDatumAttributes;
+      return Plot._scaledAccessor(this.y0());
     }
 
     protected _propertyProjectors(): AttributeToProjector {
@@ -170,7 +164,6 @@ export module Plots {
       var xProjector = Plot._scaledAccessor(this.x());
       var yProjector = Plot._scaledAccessor(this.y());
       var y0Projector = Plot._scaledAccessor(this.y0());
-      propertyToProjectors["y0"] = y0Projector;
 
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = xProjector(d, i, dataset);

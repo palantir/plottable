@@ -2926,8 +2926,7 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYDomainer(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
-            protected _wholeDatumAttributes(): string[];
+            protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;

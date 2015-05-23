@@ -2648,8 +2648,8 @@ var Plottable;
                 this._areaSelection.datum(data);
             };
             Area.prototype.setup = function (area) {
-                this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
                 Drawers.AbstractDrawer.prototype.setup.call(this, area);
+                this._areaSelection = area.append("path");
             };
             Area.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
@@ -7881,19 +7881,13 @@ var Plottable;
                 }
             };
             Area.prototype._getResetYFunction = function () {
-                return this._generateAttrToProjector()["y0"];
-            };
-            Area.prototype._wholeDatumAttributes = function () {
-                var wholeDatumAttributes = _super.prototype._wholeDatumAttributes.call(this);
-                wholeDatumAttributes.push("y0");
-                return wholeDatumAttributes;
+                return Plottable.Plot._scaledAccessor(this.y0());
             };
             Area.prototype._propertyProjectors = function () {
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 var xProjector = Plottable.Plot._scaledAccessor(this.x());
                 var yProjector = Plottable.Plot._scaledAccessor(this.y());
                 var y0Projector = Plottable.Plot._scaledAccessor(this.y0());
-                propertyToProjectors["y0"] = y0Projector;
                 var definedProjector = function (d, i, dataset) {
                     var positionX = xProjector(d, i, dataset);
                     var positionY = yProjector(d, i, dataset);
