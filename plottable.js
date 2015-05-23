@@ -2645,8 +2645,6 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Area.prototype._enterData = function (data) {
-                // HACKHACK Forced to use anycast to access protected var
-                Drawers.AbstractDrawer.prototype._enterData.call(this, data);
                 this._areaSelection.datum(data);
             };
             Area.prototype.setup = function (area) {
@@ -2654,7 +2652,6 @@ var Plottable;
                 Drawers.AbstractDrawer.prototype.setup.call(this, area);
             };
             Area.prototype._drawStep = function (step) {
-                Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 if (attrToProjector["fill"]) {
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
@@ -7781,7 +7778,7 @@ var Plottable;
                 var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
-                this.attr("stroke", defaultColor);
+                this.attr("stroke", "none");
                 this._lineDrawers = new Plottable.Utils.Map();
             }
             Area.prototype._setup = function () {
@@ -7816,12 +7813,51 @@ var Plottable;
             };
             Area.prototype._additionalPaint = function () {
                 var _this = this;
-                var drawSteps = this._generateDrawSteps();
+                var drawSteps = this._generateLineDrawSteps();
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
                     _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
                 });
+            };
+            Area.prototype._generateLineDrawSteps = function () {
+                var _this = this;
+                var drawSteps = [];
+                if (this._dataChanged && this._animate) {
+                    var attrToProjector = this._generateLineAttrToProjector();
+                    var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                    var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                    var definedProjector = function (d, i, dataset) {
+                        var positionX = xProjector(d, i, dataset);
+                        var positionY = yProjector(d, i, dataset);
+                        return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                    };
+                    attrToProjector["d"] = function (datum, index, dataset) {
+                        return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return _this._getResetYFunction()(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                    };
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
+                }
+                drawSteps.push({ attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator("main") });
+                return drawSteps;
+            };
+            Area.prototype._generateLineAttrToProjector = function () {
+                var lineAttrToProjector = this._generateAttrToProjector();
+                var fillProjector = lineAttrToProjector["fill"];
+                lineAttrToProjector["stroke"] = fillProjector;
+                lineAttrToProjector["fill"] = function () { return "none"; };
+                lineAttrToProjector["vector-effect"] = function () { return "non-scaling-stroke"; };
+                lineAttrToProjector["stroke-width"] = function () { return "2px"; };
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var definedProjector = function (d, i, dataset) {
+                    var positionX = xProjector(d, i, dataset);
+                    var positionY = yProjector(d, i, dataset);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                lineAttrToProjector["d"] = function (datum, index, dataset) {
+                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                };
+                return lineAttrToProjector;
             };
             Area.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);

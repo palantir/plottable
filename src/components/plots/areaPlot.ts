@@ -28,7 +28,7 @@ export module Plots {
       var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
       this.attr("fill", defaultColor);
-      this.attr("stroke", defaultColor);
+      this.attr("stroke", "none");
       this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
     }
 
@@ -69,12 +69,64 @@ export module Plots {
     }
 
     protected _additionalPaint() {
-      var drawSteps = this._generateDrawSteps();
+      var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
         this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
       });
+    }
+
+    private _generateLineDrawSteps() {
+      var drawSteps: Drawers.DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var attrToProjector = this._generateLineAttrToProjector();
+        var xProjector = Plot._scaledAccessor(this.x());
+        var yProjector = Plot._scaledAccessor(this.y());
+
+        var definedProjector = (d: any, i: number, dataset: Dataset) => {
+          var positionX = xProjector(d, i, dataset);
+          var positionY = yProjector(d, i, dataset);
+          return positionX != null && positionX === positionX &&
+                 positionY != null && positionY === positionY;
+        };
+
+        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
+          return d3.svg.line()
+                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
+                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+        };
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+      drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator("main")});
+      return drawSteps;
+    }
+
+    private _generateLineAttrToProjector() {
+      var lineAttrToProjector = this._generateAttrToProjector();
+      var fillProjector = lineAttrToProjector["fill"];
+      lineAttrToProjector["stroke"] = fillProjector;
+      lineAttrToProjector["fill"] = () => "none";
+      lineAttrToProjector["vector-effect"] = () => "non-scaling-stroke";
+      lineAttrToProjector["stroke-width"] = () => "2px";
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
+
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = xProjector(d, i, dataset);
+        var positionY = yProjector(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+
+      lineAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.line()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+      };
+      return lineAttrToProjector;
     }
 
     protected _getDrawer(key: string) {

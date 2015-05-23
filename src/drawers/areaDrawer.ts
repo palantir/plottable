@@ -8,8 +8,6 @@ export module Drawers {
     private _areaSelection: D3.Selection;
 
     protected _enterData(data: any[]) {
-      // HACKHACK Forced to use anycast to access protected var
-      (<any> AbstractDrawer).prototype._enterData.call(this, data);
       this._areaSelection.datum(data);
     }
 
@@ -21,7 +19,6 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
 
       if (attrToProjector["fill"]) {
