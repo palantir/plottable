@@ -2611,14 +2611,9 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                if (attrToProjector["class"]) {
-                    this._pathSelection.attr("class", attrToProjector["class"]);
-                    this._pathSelection.classed(Line.LINE_CLASS, true);
-                    delete attrToProjector["class"];
-                }
                 step.animator.animate(this._pathSelection, attrToProjector);
+                this._pathSelection.classed(Line.LINE_CLASS, true);
             };
             Line.prototype._getSelector = function () {
                 return "." + Line.LINE_CLASS;
@@ -7630,6 +7625,7 @@ var Plottable;
                 this.attr("stroke-width", "2px");
                 this.attr("vector-effect", "non-scaling-stroke");
                 this.attr("fill", "none");
+                this.attr("class", Line.SELECTION_CLASS);
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
@@ -7767,6 +7763,7 @@ var Plottable;
                 };
                 return propertyToProjectors;
             };
+            Line.SELECTION_CLASS = "line";
             return Line;
         })(Plottable.XYPlot);
         Plots.Line = Line;

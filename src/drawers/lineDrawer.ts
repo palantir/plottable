@@ -23,16 +23,9 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      super._drawStep(step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-
-      if (attrToProjector["class"]) {
-        this._pathSelection.attr("class", attrToProjector["class"]);
-        this._pathSelection.classed(Line.LINE_CLASS, true);
-        delete attrToProjector["class"];
-      }
-
       step.animator.animate(this._pathSelection, attrToProjector);
+      this._pathSelection.classed(Line.LINE_CLASS, true);
     }
 
     public _getSelector() {

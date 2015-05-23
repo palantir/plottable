@@ -4,6 +4,8 @@ module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
+    public static SELECTION_CLASS = "line";
+
     /**
      * Constructs a LinePlot.
      *
@@ -23,6 +25,7 @@ export module Plots {
       this.attr("stroke-width", "2px");
       this.attr("vector-effect", "non-scaling-stroke");
       this.attr("fill", "none");
+      this.attr("class", Line.SELECTION_CLASS);
     }
 
     protected _getDrawer(key: string) {
