@@ -2609,7 +2609,7 @@ describe("Plots", function () {
             piePlot.sectorValue(function (d) { return d.value; });
             svg.remove();
         });
-        it("innerRadius project", function () {
+        it("innerRadius", function () {
             piePlot.innerRadius(5);
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -2625,7 +2625,7 @@ describe("Plots", function () {
             piePlot.innerRadius(0);
             svg.remove();
         });
-        it("outerRadius project", function () {
+        it("outerRadius", function () {
             piePlot.outerRadius(function () { return 150; });
             var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -2650,8 +2650,7 @@ describe("Plots", function () {
             it("retrieves correct selections", function () {
                 var allSectors = piePlot.getAllSelections([simpleDataset]);
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-                var selectionData = allSectors.data();
-                assert.includeMembers(selectionData.map(function (datum) { return datum.data; }), simpleData, "dataset data in selection data");
+                assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
                 svg.remove();
             });
             it("skips invalid Datsets", function () {
@@ -2715,24 +2714,6 @@ describe("Plots", function () {
             plot.renderTo(svg);
             var elementsDrawnSel = plot._element.selectAll(".arc");
             assert.strictEqual(elementsDrawnSel.size(), 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
-            svg.remove();
-        });
-        it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", function () {
-            var svg = TestMethods.generateSVG();
-            var data1 = [
-                { v: 1 },
-                { v: 0 },
-                { v: null },
-                { v: 1 },
-            ];
-            var plot = new Plottable.Plots.Pie();
-            plot.addDataset(new Plottable.Dataset(data1));
-            plot.sectorValue(function (d) { return d.v; });
-            plot.renderTo(svg);
-            var elementsDrawnSel = plot._element.selectAll(".arc");
-            assert.strictEqual(elementsDrawnSel.size(), 4, "All 4 elements of the pie chart should have a DOM node");
-            assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001, "0 as a value should not be visible");
-            assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001, "null as a value should not be visible");
             svg.remove();
         });
     });
