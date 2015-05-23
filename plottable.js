@@ -2604,10 +2604,7 @@ var Plottable;
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true).style({
-                    "fill": "none",
-                    "vector-effect": "non-scaling-stroke"
-                });
+                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true);
                 _super.prototype.setup.call(this, area);
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
@@ -7634,6 +7631,8 @@ var Plottable;
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
+                this.attr("vector-effect", "non-scaling-stroke");
+                this.attr("fill", "none");
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);

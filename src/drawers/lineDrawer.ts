@@ -14,11 +14,7 @@ export module Drawers {
 
     public setup(area: D3.Selection) {
       this._pathSelection = area.append("path")
-                               .classed(Line.LINE_CLASS, true)
-                               .style({
-                                 "fill": "none",
-                                 "vector-effect": "non-scaling-stroke"
-                               });
+                               .classed(Line.LINE_CLASS, true);
       super.setup(area);
     }
 
