@@ -23,10 +23,10 @@ module Plottable {
       accessor: Accessor<any>;
       scale?: Scale<D, R>;
     }
-
-    export class Animator {
-      static MAIN = "main";
-      static RESET = "reset";
+    
+    export module Animator {
+      export var MAIN = "main";
+      export var RESET = "reset";  
     }
   }
 

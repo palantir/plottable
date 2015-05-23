@@ -25,6 +25,5 @@ export module Animators {
   }
 
   export type PlotAnimatorMap = { [animatorKey: string]: PlotAnimator; };
-
 }
 }

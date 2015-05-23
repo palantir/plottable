@@ -6193,14 +6193,11 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        var Animator = (function () {
-            function Animator() {
-            }
+        var Animator;
+        (function (Animator) {
             Animator.MAIN = "main";
             Animator.RESET = "reset";
-            return Animator;
-        })();
-        Plots.Animator = Animator;
+        })(Animator = Plots.Animator || (Plots.Animator = {}));
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
     var Plot = (function (_super) {
         __extends(Plot, _super);
