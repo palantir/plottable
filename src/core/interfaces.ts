@@ -49,7 +49,7 @@ module Plottable {
    * The point of this type is to hopefully replace the less-elegant `[min,
    * max]` extents produced by d3.
    */
-  export type Extent = {
+  export type Range = {
     min: number;
     max: number;
   }

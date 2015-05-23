@@ -249,22 +249,22 @@ export module Plots {
     /**
      * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
      * 
-     * @param {Extent} xRange The specified range of x values
-     * @param {Extent} yRange The specified range of y values
-     * @return {Plots.PlotData} The plot data that corresponds to the ranges
+     * @param {Range} xRange The specified range of x values
+     * @param {Range} yRange The specified range of y values
+     * @return {Plots.PlotDataRangeplot data Rangeorresponds to the ranges
      */
-    public plotDataIn(xRange: Extent, yRange: Extent): PlotData {
+    public plotDataIn(xRange: Range, yRange: Range): PlotData {
       return this._getPlotData(xRange, yRange);
     }
 
-    private _getPlotData(xValOrExtent: number | Extent, yValOrExtent: number | Extent): PlotData {
+    private _getPlotData(xValOrRange: number | Range, yValOrRange: number | Range): PlotData {
       var data: any[] = [];
       var pixelPoints: Point[] = [];
       var elements: EventTarget[] = [];
 
       var plotData = this.getAllPlotData();
       plotData.selection.each(function(datum, i) {
-        if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
+        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
           data.push(plotData.data[i]);
           pixelPoints.push(plotData.pixelPoints[i]);
           elements.push(this);

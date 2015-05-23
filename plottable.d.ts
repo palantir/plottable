@@ -141,26 +141,26 @@ declare module Plottable {
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
             /**
-             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
-             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
-             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
              * @param {SVGRect} bbox The bbox
              * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
              * testing intersection
              *
-             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
              * contained by bbox, false otherwise.
              */
-            function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent, bbox: SVGRect, tolerance?: number): boolean;
+            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
             /**
              * Create an Extent from a number or an object with "min" and "max" defined.
              *
              * @param {any} input The object to parse
              *
-             * @returns {Extent} The generated Extent
+             * @returns {Range} The generated Extent
              */
-            function parseExtent(input: any): Extent;
+            function parseRange(input: any): Range;
         }
     }
 }
@@ -615,7 +615,7 @@ declare module Plottable {
      * The point of this type is to hopefully replace the less-elegant `[min,
      * max]` extents produced by d3.
      */
-    type Extent = {
+    type Range = {
         min: number;
         max: number;
     };
@@ -2776,11 +2776,11 @@ declare module Plottable {
             /**
              * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
              *
-             * @param {Extent} xRange The specified range of x values
-             * @param {Extent} yRange The specified range of y values
-             * @return {Plots.PlotData} The plot data that corresponds to the ranges
+             * @param {Range} xRange The specified range of x values
+             * @param {Range} yRange The specified range of y values
+             * @return {Plots.PlotDataRangeplot data Rangeorresponds to the ranges
              */
-            plotDataIn(xRange: Extent, yRange: Extent): PlotData;
+            plotDataIn(xRange: Range, yRange: Range): PlotData;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
