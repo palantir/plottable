@@ -7897,14 +7897,14 @@ var Plottable;
                     if (plotDatasetKey == null) {
                         return;
                     }
-                    var drawer = plotDatasetKey.drawer;
                     var dataset = plotDatasetKey.dataset;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                    var drawer = _this._lineDrawers.get(dataset);
+                    dataset.data().forEach(function (datum, index) {
                         var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                             return;
                         }
-                        allElements.splice(index * 2 + 1, 0, drawer._getSelection(index).node());
+                        allElements.push(drawer._getSelection(index).node());
                     });
                 });
                 return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };

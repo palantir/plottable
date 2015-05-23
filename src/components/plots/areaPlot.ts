@@ -134,14 +134,14 @@ export module Plots {
       this._keysForDatasets(datasets).forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
         var dataset = plotDatasetKey.dataset;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+        var drawer = this._lineDrawers.get(dataset);
+        dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
-          allElements.splice(index * 2 + 1, 0, drawer._getSelection(index).node());
+          allElements.push(drawer._getSelection(index).node());
         });
       });
 
