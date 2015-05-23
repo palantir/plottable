@@ -3010,6 +3010,7 @@ declare module Plottable {
             protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

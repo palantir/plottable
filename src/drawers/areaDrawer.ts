@@ -20,36 +20,15 @@ export module Drawers {
       AbstractDrawer.prototype.setup.call(this, area);
     }
 
-    private _createArea(xFunction: AppliedProjector,
-                       y0Function: AppliedProjector,
-                       y1Function: AppliedProjector,
-                       definedFunction: AppliedProjector) {
-      if (!definedFunction) {
-        definedFunction = () => true;
-      }
-
-      return d3.svg.area()
-                   .x(xFunction)
-                   .y0(y0Function)
-                   .y1(y1Function)
-                   .defined(definedFunction);
-    }
-
     protected _drawStep(step: AppliedDrawStep) {
       (<any> AbstractDrawer).prototype._drawStep.call(this, step);
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      var xFunction       = attrToProjector["x"];
-      var y0Function      = attrToProjector["y0"];
-      var y1Function      = attrToProjector["y"];
-      var definedFunction = attrToProjector["defined"];
       delete attrToProjector["x"];
       delete attrToProjector["y0"];
       delete attrToProjector["y"];
       if (attrToProjector["defined"]) {
         delete attrToProjector["defined"];
       }
-
-      attrToProjector["d"] = this._createArea(xFunction, y0Function, y1Function, definedFunction);
 
       if (attrToProjector["fill"]) {
         this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate

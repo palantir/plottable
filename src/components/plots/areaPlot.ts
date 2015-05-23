@@ -111,9 +111,27 @@ export module Plots {
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
-      attrToProjector["y0"] = Plot._scaledAccessor(this.y0());
-      return attrToProjector;
+      var propertyToProjectors = super._propertyProjectors();
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
+      var y0Projector = Plot._scaledAccessor(this.y0());
+      propertyToProjectors["y0"] = y0Projector;
+
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = xProjector(d, i, dataset);
+        var positionY = yProjector(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+
+      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.area()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+                     .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+      };
+      return propertyToProjectors;
     }
 
     public getAllSelections(datasets = this.datasets(), exclude = false) {

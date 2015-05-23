@@ -2653,26 +2653,15 @@ var Plottable;
                 this._areaSelection = area.append("path").classed(Area.AREA_CLASS, true).style({ "stroke": "none" });
                 Drawers.AbstractDrawer.prototype.setup.call(this, area);
             };
-            Area.prototype._createArea = function (xFunction, y0Function, y1Function, definedFunction) {
-                if (!definedFunction) {
-                    definedFunction = function () { return true; };
-                }
-                return d3.svg.area().x(xFunction).y0(y0Function).y1(y1Function).defined(definedFunction);
-            };
             Area.prototype._drawStep = function (step) {
                 Drawers.AbstractDrawer.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                var xFunction = attrToProjector["x"];
-                var y0Function = attrToProjector["y0"];
-                var y1Function = attrToProjector["y"];
-                var definedFunction = attrToProjector["defined"];
                 delete attrToProjector["x"];
                 delete attrToProjector["y0"];
                 delete attrToProjector["y"];
                 if (attrToProjector["defined"]) {
                     delete attrToProjector["defined"];
                 }
-                attrToProjector["d"] = this._createArea(xFunction, y0Function, y1Function, definedFunction);
                 if (attrToProjector["fill"]) {
                     this._areaSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
                 }
@@ -7873,9 +7862,20 @@ var Plottable;
                 return wholeDatumAttributes;
             };
             Area.prototype._propertyProjectors = function () {
-                var attrToProjector = _super.prototype._propertyProjectors.call(this);
-                attrToProjector["y0"] = Plottable.Plot._scaledAccessor(this.y0());
-                return attrToProjector;
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var y0Projector = Plottable.Plot._scaledAccessor(this.y0());
+                propertyToProjectors["y0"] = y0Projector;
+                var definedProjector = function (d, i, dataset) {
+                    var positionX = xProjector(d, i, dataset);
+                    var positionY = yProjector(d, i, dataset);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                propertyToProjectors["d"] = function (datum, index, dataset) {
+                    return d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                };
+                return propertyToProjectors;
             };
             Area.prototype.getAllSelections = function (datasets, exclude) {
                 var _this = this;
@@ -8228,7 +8228,7 @@ var Plottable;
                 return attrToProjector;
             };
             StackedArea.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined"];
+                return ["x", "y", "defined", "d"];
             };
             StackedArea.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
@@ -8264,6 +8264,27 @@ var Plottable;
                     this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
                 }
                 this._stackedExtent = Plottable.StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
+            };
+            StackedArea.prototype._propertyProjectors = function () {
+                var _this = this;
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                var y0Projector = Plottable.Plot._scaledAccessor(this.y0());
+                propertyToProjectors["y0"] = y0Projector;
+                var yAccessor = this.y().accessor;
+                var xAccessor = this.x().accessor;
+                var definedProjector = function (d, i, dataset) {
+                    var positionX = xProjector(d, i, dataset);
+                    var positionY = yProjector(d, i, dataset);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                var stackYAccessor = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
+                var stackY0Accessor = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
+                propertyToProjectors["d"] = function (datum, index, dataset) {
+                    return d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return stackY0Accessor(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return stackYAccessor(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                };
+                return propertyToProjectors;
             };
             return StackedArea;
         })(Plots.Area);
