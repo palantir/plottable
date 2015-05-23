@@ -7637,7 +7637,7 @@ var Plottable;
                 this.attr("stroke-width", "2px");
                 this.attr("vector-effect", "non-scaling-stroke");
                 this.attr("fill", "none");
-                this.attr("class", Line.SELECTION_CLASS);
+                this.attr("class", Line.PLOT_CLASS);
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
@@ -7775,7 +7775,7 @@ var Plottable;
                 };
                 return propertyToProjectors;
             };
-            Line.SELECTION_CLASS = "line";
+            Line.PLOT_CLASS = "line";
             return Line;
         })(Plottable.XYPlot);
         Plots.Line = Line;
