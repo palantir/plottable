@@ -2141,7 +2141,6 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([{ value: 0 }, { value: 1 }, { value: 2 }]);
             var dataset2 = new Plottable.Dataset([{ value: 1 }, { value: 2 }, { value: 3 }]);
             // Create mock drawers with already drawn items
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -2149,7 +2148,6 @@ describe("Plots", function () {
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
@@ -2194,7 +2192,6 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -2202,7 +2199,6 @@ describe("Plots", function () {
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
             var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
