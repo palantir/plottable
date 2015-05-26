@@ -41,7 +41,12 @@ function run(svg, data, Plottable) {
   yScale.innerPadding(0.25).outerPadding(0.25);
   var xAxis = new Plottable.Axes.Time(xScale, "bottom");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
+try {
+  var plot = new Plottable.Plots.Grid();
+} catch(err) {
   var plot = new Plottable.Plots.Grid(xScale, yScale);
+}
+
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(timeFormatStart, xScale)
   .y(function(d) { return d.team; }, yScale)

@@ -16,6 +16,18 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+try {
+  var stackedAreaPlot = new Plottable.Plots.StackedArea()
+                                         .x(function(d) { return d.name; }, xScale)
+                                         .y(function(d) { return d.y; }, yScale)
+                                         .attr("fill", function(d) { return d.type; }, colorScale)
+                                         .attr("type", function(d) { return d.type; })
+                                         .attr("yval", function(d) { return d.y; })
+                                         .addDataset(new Plottable.Dataset(data[0]))
+                                         .addDataset(new Plottable.Dataset(data[1]))
+                                         .addDataset(new Plottable.Dataset(data[2]))
+                                         .animate(true);
+} catch(err) {
   var stackedAreaPlot = new Plottable.Plots.StackedArea(xScale, yScale)
                                          .x(function(d) { return d.name; }, xScale)
                                          .y(function(d) { return d.y; }, yScale)
@@ -26,6 +38,8 @@ function run(svg, data, Plottable) {
                                          .addDataset(new Plottable.Dataset(data[1]))
                                          .addDataset(new Plottable.Dataset(data[2]))
                                          .animate(true);
+}
+
 
   var center = new Plottable.Components.Group([stackedAreaPlot, new Plottable.Components.Legend(colorScale)]);
 

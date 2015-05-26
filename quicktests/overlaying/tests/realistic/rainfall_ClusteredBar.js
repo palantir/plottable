@@ -18,6 +18,16 @@ function run(svg, data, Plottable){
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
+try {
+  var clusteredPlot = new Plottable.Plots.ClusteredBar("vertical")
+    .addDataset(new Plottable.Dataset(data[0]))
+    .addDataset(new Plottable.Dataset(data[1]))
+    .addDataset(new Plottable.Dataset(data[2]))
+    .x(function(d) { return d.month; }, xScale)
+    .y(function(d) { return d.avg; }, yScale)
+    .attr("label", function(d) { return d.avg; })
+    .attr("fill", function(d) { return d.city; }, colorScale);
+} catch(err) {
   var clusteredPlot = new Plottable.Plots.ClusteredBar(xScale, yScale, "vertical")
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
@@ -26,6 +36,8 @@ function run(svg, data, Plottable){
     .y(function(d) { return d.avg; }, yScale)
     .attr("label", function(d) { return d.avg; })
     .attr("fill", function(d) { return d.city; }, colorScale);
+}
+
 
   var legend = new Plottable.Components.Legend(colorScale);
   var title = new Plottable.Components.TitleLabel("Average Rainfall in Different Cities between 2013-2014");

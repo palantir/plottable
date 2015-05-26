@@ -15,7 +15,12 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Time();
   var yScale = new Plottable.Scales.Category();
 
+try {
+  var hBarPlot = new Plottable.Plots.Bar("horizontal");
+} catch(err) {
   var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
+}
+
   hBarPlot.addDataset(new Plottable.Dataset(data))
     .x(function (d) { return d3.time.format("%x").parse(d.x); }, xScale)
     .y(function(d) { return d.y; }, yScale);

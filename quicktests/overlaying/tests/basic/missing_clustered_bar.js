@@ -16,6 +16,18 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+try {
+  var clusteredBarRenderer = new Plottable.Plots.ClusteredBar()
+    .addDataset(new Plottable.Dataset(data[0]))
+    .addDataset(new Plottable.Dataset(data[1]))
+    .addDataset(new Plottable.Dataset(data[2]))
+    .x(function(d) { return d.name; }, xScale)
+    .y(function(d) { return d.y; }, yScale)
+    .attr("fill", function(d) { return d.type; }, colorScale)
+    .attr("type", function(d) { return d.type; })
+    .attr("yval", function(d) { return d.y; })
+    .labelsEnabled(true);
+} catch(err) {
   var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale)
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
@@ -26,6 +38,8 @@ function run(svg, data, Plottable) {
     .attr("type", function(d) { return d.type; })
     .attr("yval", function(d) { return d.y; })
     .labelsEnabled(true);
+}
+
 
   var center = new Plottable.Components.Group([clusteredBarRenderer, new Plottable.Components.Legend(colorScale)]);
 

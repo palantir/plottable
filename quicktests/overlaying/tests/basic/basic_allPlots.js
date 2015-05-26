@@ -18,11 +18,36 @@ function run(svg, data, Plottable) {
 
     var dataset = new Plottable.Dataset(data);
     //rendering
+try {
+    var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+} catch(err) {
     var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+}
+
+try {
+    var linePlot = new Plottable.Plots.Line().addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+} catch(err) {
     var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+}
+
+try {
+    var areaPlot = new Plottable.Plots.Area().addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+} catch(err) {
     var areaPlot = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+}
+
+try {
+    var vbarPlot = new Plottable.Plots.Bar("vertical").addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+} catch(err) {
     var vbarPlot = new Plottable.Plots.Bar(xScale, yScale, "vertical").addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+}
+
+try {
+    var hbarPlot = new Plottable.Plots.Bar("horizontal").addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+} catch(err) {
     var hbarPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal").addDataset(dataset).x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+}
+
 
     //title + legend
 

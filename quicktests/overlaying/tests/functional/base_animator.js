@@ -23,6 +23,17 @@ function run(svg, data, Plottable) {
         animator.maxIterativeDelay(100);
 
 
+try {
+    var vbar = new Plottable.Plots.Bar()
+      .x(function(d) { return d.x; }, xScale)
+      .y(function(d) { return d.y; }, yScale)
+      .attr("fill", function(d) { return d.type; }, colorScale)
+      .labelsEnabled(true)
+      .labelFormatter(function(text){return text + "!";})
+      .addDataset(new Plottable.Dataset(data))
+      .animator( "bars", animator)
+      .animate(true);
+} catch(err) {
     var vbar = new Plottable.Plots.Bar(xScale, yScale)
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
@@ -32,6 +43,8 @@ function run(svg, data, Plottable) {
       .addDataset(new Plottable.Dataset(data))
       .animator( "bars", animator)
       .animate(true);
+}
+
 
 
     var chart = new Plottable.Components.Table([

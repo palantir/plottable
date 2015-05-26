@@ -17,7 +17,12 @@ function run(svg, data, Plottable) {
 
   var dataset = new Plottable.Dataset(data);
 
+try {
+  var hBarRenderer = new Plottable.Plots.Bar("horizontal");
+} catch(err) {
   var hBarRenderer = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
+}
+
   hBarRenderer.addDataset(dataset);
   hBarRenderer.attr("opacity", 0.75);
   hBarRenderer.x(function(d) { return d.x; }, xScale);

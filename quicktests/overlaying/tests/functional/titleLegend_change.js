@@ -44,17 +44,47 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
+try {
+  var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
+} catch(err) {
   var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
+}
+
   scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+try {
+  var linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
+} catch(err) {
   var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
+}
+
   linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+try {
+  var renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
+} catch(err) {
   var renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
+}
+
   renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+try {
+  var renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
+} catch(err) {
   var renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
+}
+
   renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+try {
+  var renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
+} catch(err) {
   var renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
+}
+
   renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+try {
+  var renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
+} catch(err) {
   var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
+}
+
   renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
   scatterPlot.attr("fill", colorProjector, colorScale1);
