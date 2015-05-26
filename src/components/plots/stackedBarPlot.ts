@@ -15,8 +15,8 @@ export module Plots {
      * @param {Scale} yScale the y scale of the plot.
      * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale, orientation);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super(orientation);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
     }

@@ -19,8 +19,8 @@ export module Plots {
      * @param {Scale.Scale} xScale The x scale to use.
      * @param {Scale.Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("rectangle-plot", true);
       this.attr("fill", new Scales.Color().range()[0]);
     }

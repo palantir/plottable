@@ -25,8 +25,8 @@ export module Plots {
      * @param {Scale} yScale The y scale to use.
      * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super();
       this.classed("bar-plot", true);
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");

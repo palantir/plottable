@@ -15,10 +15,11 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("area-plot", true);
-      this.y0(0, yScale); // default
+      // TODO: might fail
+      this.y0(0, new Plottable.Scales.Linear()); // default
 
       this.animator("reset", new Animators.Null());
       this.animator("main", new Animators.Base()

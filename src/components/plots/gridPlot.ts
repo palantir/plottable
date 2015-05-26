@@ -16,18 +16,9 @@ export module Plots {
      * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
      * to use for each grid cell.
      */
-    constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("grid-plot", true);
-
-      // The x and y scales should render in bands with no padding for category scales
-      if (xScale instanceof Scales.Category) {
-        (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
-      }
-      if (yScale instanceof Scales.Category) {
-        (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
-      }
-
       this.animator("cells", new Animators.Null());
     }
 
@@ -58,6 +49,7 @@ export module Plots {
         super.x(<X | Accessor<X>> x, scale);
         if (scale instanceof Scales.Category) {
           var catScale = (<Scales.Category> <any> scale);
+          (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
           this.x1((d, i, dataset) => scale.scale(this.x().accessor(d, i, dataset)) - catScale.rangeBand() / 2);
           this.x2((d, i, dataset) => scale.scale(this.x().accessor(d, i, dataset)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {
@@ -77,6 +69,7 @@ export module Plots {
         super.y(<Y | Accessor<Y>> y, scale);
         if (scale instanceof Scales.Category) {
           var catScale = (<Scales.Category> <any> scale);
+          (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
           this.y1((d, i, dataset) => scale.scale(this.y().accessor(d, i, dataset)) - catScale.rangeBand() / 2);
           this.y2((d, i, dataset) => scale.scale(this.y().accessor(d, i, dataset)) + catScale.rangeBand() / 2);
         } else if (scale instanceof QuantitativeScale) {

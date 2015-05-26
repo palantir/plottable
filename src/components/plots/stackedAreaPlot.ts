@@ -17,8 +17,8 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("area-plot", true);
       this._isVertical = true;
       this.attr("fill-opacity", 1);

@@ -13,8 +13,8 @@ export module Plots {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("scatter-plot", true);
 
       this.animator("symbols-reset", new Animators.Null());

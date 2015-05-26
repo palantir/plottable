@@ -11,8 +11,8 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("line-plot", true);
       this.animator("reset", new Animators.Null());
       this.animator("main", new Animators.Base()

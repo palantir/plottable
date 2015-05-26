@@ -6754,21 +6754,14 @@ var Plottable;
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
-        function XYPlot(xScale, yScale) {
+        function XYPlot() {
             var _this = this;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            if (xScale == null || yScale == null) {
-                throw new Error("XYPlots require an xScale and yScale");
-            }
             this.classed("xy-plot", true);
-            this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
-            this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
@@ -6777,6 +6770,10 @@ var Plottable;
             this._bindProperty(XYPlot._X_KEY, x, xScale);
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
+            }
+            // TODO: Extra?
+            if (xScale) {
+                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             this.render();
             return this;
@@ -6788,6 +6785,10 @@ var Plottable;
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
+            }
+            // TODO: extra?
+            if (yScale) {
+                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
             return this;
@@ -6973,8 +6974,8 @@ var Plottable;
              * @param {Scale.Scale} xScale The x scale to use.
              * @param {Scale.Scale} yScale The y scale to use.
              */
-            function Rectangle(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Rectangle() {
+                _super.call(this);
                 this.classed("rectangle-plot", true);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
             }
@@ -7068,8 +7069,8 @@ var Plottable;
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            function Scatter(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Scatter() {
+                _super.call(this);
                 this.classed("scatter-plot", true);
                 this.animator("symbols-reset", new Plottable.Animators.Null());
                 this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
@@ -7166,16 +7167,9 @@ var Plottable;
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            function Grid(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Grid() {
+                _super.call(this);
                 this.classed("grid-plot", true);
-                // The x and y scales should render in bands with no padding for category scales
-                if (xScale instanceof Plottable.Scales.Category) {
-                    xScale.innerPadding(0).outerPadding(0);
-                }
-                if (yScale instanceof Plottable.Scales.Category) {
-                    yScale.innerPadding(0).outerPadding(0);
-                }
                 this.animator("cells", new Plottable.Animators.Null());
             }
             Grid.prototype.addDataset = function (dataset) {
@@ -7204,6 +7198,7 @@ var Plottable;
                     _super.prototype.x.call(this, x, scale);
                     if (scale instanceof Plottable.Scales.Category) {
                         var catScale = scale;
+                        scale.innerPadding(0).outerPadding(0);
                         this.x1(function (d, i, dataset) { return scale.scale(_this.x().accessor(d, i, dataset)) - catScale.rangeBand() / 2; });
                         this.x2(function (d, i, dataset) { return scale.scale(_this.x().accessor(d, i, dataset)) + catScale.rangeBand() / 2; });
                     }
@@ -7225,6 +7220,7 @@ var Plottable;
                     _super.prototype.y.call(this, y, scale);
                     if (scale instanceof Plottable.Scales.Category) {
                         var catScale = scale;
+                        scale.innerPadding(0).outerPadding(0);
                         this.y1(function (d, i, dataset) { return scale.scale(_this.y().accessor(d, i, dataset)) - catScale.rangeBand() / 2; });
                         this.y2(function (d, i, dataset) { return scale.scale(_this.y().accessor(d, i, dataset)) + catScale.rangeBand() / 2; });
                     }
@@ -7261,10 +7257,10 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function Bar(xScale, yScale, orientation) {
+            function Bar(orientation) {
                 var _this = this;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale);
+                _super.call(this);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
@@ -7639,8 +7635,8 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function Line(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Line() {
+                _super.call(this);
                 this.classed("line-plot", true);
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
@@ -7787,10 +7783,11 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function Area(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Area() {
+                _super.call(this);
                 this.classed("area-plot", true);
-                this.y0(0, yScale); // default
+                // TODO: might fail
+                this.y0(0, new Plottable.Scales.Linear()); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 var defaultColor = new Plottable.Scales.Color().range()[0];
@@ -7869,9 +7866,9 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function ClusteredBar(xScale, yScale, orientation) {
+            function ClusteredBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale, orientation);
+                _super.call(this, orientation);
                 this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
@@ -8077,8 +8074,8 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function StackedArea(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedArea() {
+                _super.call(this);
                 this._baselineValue = 0;
                 this.classed("area-plot", true);
                 this._isVertical = true;
@@ -8217,9 +8214,9 @@ var Plottable;
              * @param {Scale} yScale the y scale of the plot.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function StackedBar(xScale, yScale, orientation) {
+            function StackedBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale, orientation);
+                _super.call(this, orientation);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
