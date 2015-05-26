@@ -21,8 +21,6 @@ export module Plots {
 
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
-      this.attr("vector-effect", "non-scaling-stroke");
-      this.attr("fill", "none");
     }
 
     protected _getDrawer(key: string) {

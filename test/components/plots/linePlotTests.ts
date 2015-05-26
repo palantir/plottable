@@ -89,8 +89,7 @@ describe("Plots", () => {
     it("draws a line correctly", () => {
       var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      var lineComputedStyle = window.getComputedStyle(linePath.node());
-      assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+      assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
       svg.remove();
     });
 

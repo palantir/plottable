@@ -12,10 +12,12 @@ export module Drawers {
       this._pathSelection.datum(data);
     }
 
-    public setup(area: D3.Selection) {
-      this._pathSelection = area.append("path")
-                               .classed(Line.PATH_CLASS, true);
-      super.setup(area);
+    public setup(line: D3.Selection) {
+      this._pathSelection = line.append("path")
+                                .classed(Line.PATH_CLASS, true)
+                                .style("fill", "none")
+                                .style("vector-effect", "non-scaling-stroke");
+      super.setup(line);
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {
