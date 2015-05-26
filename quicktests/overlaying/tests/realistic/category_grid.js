@@ -64,7 +64,7 @@ function run(svg, data, Plottable) {
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.hospital; }, xScale)
       .y(function(d) { return d.hour; }, yScale)
-  .attr("fill", function(d) { return d.percent; }, cs)
+  .attr("fill", function(d) { return d.percent; }, cs);
 
   var label = new Plottable.Components.Label("Born in hospital?", "horizontal");
   var legend = new Plottable.Components.InterpolatedColorLegend(cs).xAlignment("center");
