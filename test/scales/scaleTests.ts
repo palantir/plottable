@@ -171,7 +171,7 @@ describe("Scales", () => {
       maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
       var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
-      var maximumColorsFromCss = (<any> Plottable.Scales.Color).MAXIMUM_COLORS_FROM_CSS;
+      var maximumColorsFromCss = (<any> Plottable.Scales.Color)._MAXIMUM_COLORS_FROM_CSS;
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");
     });

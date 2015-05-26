@@ -83,8 +83,8 @@ export module Interactions {
         return;
       }
 
-      var oldCenterPoint = this.centerPoint();
-      var oldCornerDistance = this.cornerDistance();
+      var oldCenterPoint = this._centerPoint();
+      var oldCornerDistance = this._cornerDistance();
 
       ids.forEach((id) => {
         if (this._touchIds.has(id.toString())) {
@@ -92,20 +92,20 @@ export module Interactions {
         }
       });
 
-      var newCenterPoint = this.centerPoint();
-      var newCornerDistance = this.cornerDistance();
+      var newCenterPoint = this._centerPoint();
+      var newCornerDistance = this._cornerDistance();
 
       if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-        PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+        PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+        PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
       }
       if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-        PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+        PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+        PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
       }
     }
 
-    private centerPoint() {
+    private _centerPoint() {
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
       var secondTouchPoint = points[1];
@@ -118,7 +118,7 @@ export module Interactions {
       return {x: (leftX + rightX) / 2, y: (bottomY + topY) / 2};
     }
 
-    private cornerDistance() {
+    private _cornerDistance() {
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
       var secondTouchPoint = points[1];
@@ -137,12 +137,12 @@ export module Interactions {
       });
     }
 
-    private static magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
+    private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       scale.domain(scale.range().map(magnifyTransform));
     }
 
-    private static translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+    private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
     }
@@ -155,10 +155,10 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
-          PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
+          PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
         }
         if (this._yScale != null) {
-          PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
+          PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
         }
       }
     }
@@ -174,11 +174,11 @@ export module Interactions {
         }
         if (this._xScale != null) {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom.translateScale(this._xScale, -dragAmountX);
+          PanZoom._translateScale(this._xScale, -dragAmountX);
         }
         if (this._yScale != null) {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom.translateScale(this._yScale, -dragAmountY);
+          PanZoom._translateScale(this._yScale, -dragAmountY);
         }
         lastDragPoint = endPoint;
       });

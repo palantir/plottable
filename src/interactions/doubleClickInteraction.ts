@@ -50,7 +50,7 @@ export module Interactions {
     private _handleClickDown(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
-        if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+        if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
           this._clickState = ClickState.NotClicked;
         }
         this._clickedPoint = translatedP;
@@ -60,7 +60,7 @@ export module Interactions {
 
     private _handleClickUp(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
-      if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+      if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
         this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
       } else {
         this._clickState = ClickState.NotClicked;
@@ -80,7 +80,7 @@ export module Interactions {
       this._clickedDown = false;
     }
 
-    private static pointsEqual(p1: Point, p2: Point) {
+    private static _pointsEqual(p1: Point, p2: Point) {
       return p1.x === p2.x && p1.y === p2.y;
     }
 
