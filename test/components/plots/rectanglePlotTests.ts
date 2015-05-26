@@ -29,7 +29,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var rectanglePlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      var rectanglePlot = new Plottable.Plots.Rectangle();
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
       rectanglePlot.x((d: any) => d.x, xScale)
                    .y((d: any) => d.y, yScale);
@@ -59,7 +59,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.Grid(xScale, yScale);
+      var plot = new Plottable.Plots.Grid();
       plot
         .x((d: any) => d.x, xScale)
         .y((d: any) => d.y1, yScale)
