@@ -7654,20 +7654,10 @@ var Plottable;
                 return function (d, i, dataset) { return scaledStartValue; };
             };
             Line.prototype._generateDrawSteps = function () {
-                var _this = this;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var attrToProjector = this._generateAttrToProjector();
-                    var xProjector = Plottable.Plot._scaledAccessor(this.x());
-                    var yProjector = Plottable.Plot._scaledAccessor(this.y());
-                    var definedProjector = function (d, i, dataset) {
-                        var positionX = xProjector(d, i, dataset);
-                        var positionY = yProjector(d, i, dataset);
-                        return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
-                    };
-                    attrToProjector["d"] = function (datum, index, dataset) {
-                        return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return _this._getResetYFunction()(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
-                    };
+                    attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
@@ -7763,17 +7753,19 @@ var Plottable;
             };
             Line.prototype._propertyProjectors = function () {
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
-                var xProjector = Plottable.Plot._scaledAccessor(this.x());
-                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                propertyToProjectors["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
+                return propertyToProjectors;
+            };
+            Line.prototype._constructLineProjector = function (xProjector, yProjector) {
+                var _this = this;
                 var definedProjector = function (d, i, dataset) {
-                    var positionX = xProjector(d, i, dataset);
-                    var positionY = yProjector(d, i, dataset);
+                    var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
+                    var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
                     return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
                 };
-                propertyToProjectors["d"] = function (datum, index, dataset) {
+                return function (datum, index, dataset) {
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
                 };
-                return propertyToProjectors;
             };
             Line.PATH_CLASS = "line";
             return Line;
