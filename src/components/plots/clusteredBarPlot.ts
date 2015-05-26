@@ -16,9 +16,10 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
+     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
-      super(xScale, yScale);
+    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
+      super(xScale, yScale, orientation);
       this._clusterOffsets = new Utils.Map<Dataset, number>();
     }
 

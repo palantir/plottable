@@ -29,7 +29,6 @@
 ///<reference path="components/plots/linePlotTests.ts" />
 ///<reference path="components/plots/areaPlotTests.ts" />
 ///<reference path="components/plots/barPlotTests.ts" />
-///<reference path="components/plots/gridPlotTests.ts" />
 ///<reference path="components/plots/rectanglePlotTests.ts" />
 ///<reference path="components/plots/scatterPlotTests.ts" />
 ///<reference path="components/plots/stackedPlotTests.ts" />
@@ -43,9 +42,9 @@
 ///<reference path="core/componentTests.ts" />
 ///<reference path="core/datasetTests.ts" />
 ///<reference path="core/tableTests.ts" />
-///<reference path="core/domainerTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
+///<reference path="scales/linearScaleTests.ts" />
 ///<reference path="scales/modifiedLogScaleTests.ts" />
 ///<reference path="scales/timeScaleTests.ts" />
 ///<reference path="scales/tickGeneratorsTests.ts" />

@@ -3,16 +3,9 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
-
-    // Css class for labels that are made for rendering titles.
-    public static TITLE_LABEL_CLASS = "title-label";
-
-    // Css class for labels that are made for rendering axis titles.
-    public static AXIS_LABEL_CLASS = "axis-label";
-
     private _textContainer: D3.Selection;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
-    private _orientation: string;
+    private _angle: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
@@ -21,26 +14,25 @@ export module Components {
     /**
      * Creates a Label.
      *
-     * A label is component that renders just text. The most common use of
-     * labels is to create a title or axis labels.
+     * A Label is a Component that draws a single line of text.
      *
      * @constructor
      * @param {string} displayText The text of the Label (default = "").
-     * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
+     * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
      */
-    constructor(displayText = "", orientation = "horizontal") {
+    constructor(displayText = "", angle = 0) {
       super();
       this.classed("label", true);
       this.text(displayText);
-      this.orientation(orientation);
+      this.angle(angle);
       this.xAlignment("center").yAlignment("center");
       this._padding = 0;
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         minWidth: desiredWidth,
@@ -81,28 +73,32 @@ export module Components {
     }
 
     /**
-     * Gets the orientation of the Label.
+     * Gets the angle of the Label.
      *
-     * @returns {string} the current orientation.
+     * @returns {number} the current angle.
      */
-    public orientation(): string;
+    public angle(): number;
     /**
-     * Sets the orientation of the Label.
+     * Sets the angle of the Label.
      *
-     * @param {string} newOrientation If provided, the desired orientation
-     * (horizontal/left/right).
+     * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
      * @returns {Label} The calling Label.
      */
-    public orientation(orientation: string): Label;
-    public orientation(orientation?: string): any {
-      if (orientation == null) {
-        return this._orientation;
+    public angle(angle: number): Label;
+    public angle(angle?: number): any {
+      if (angle == null) {
+        return this._angle;
       } else {
-        orientation = orientation.toLowerCase();
-        if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-          this._orientation = orientation;
+        angle %= 360;
+        if (angle > 180) {
+          angle -= 360;
+        } else if (angle < -180) {
+          angle += 360;
+        }
+        if (angle === -90 || angle === 0 || angle === 90) {
+          this._angle = angle;
         } else {
-          throw new Error(orientation + " is not a valid orientation for LabelComponent");
+          throw new Error(angle + " is not a valid angle for Label");
         }
         this.redraw();
         return this;
@@ -128,7 +124,7 @@ export module Components {
       } else {
         padAmount = +padAmount;
         if (padAmount < 0) {
-          throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+          throw new Error(padAmount + " is not a valid padding value. Cannot be less than 0.");
         }
         this._padding = padAmount;
         this.redraw();
@@ -154,15 +150,40 @@ export module Components {
       this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
       var writeWidth = this.width() - 2 * widthPadding;
       var writeHeight = this.height() - 2 * heightPadding;
-      var textRotation: {[s: string]: number} = {horizontal: 0, right: 90, left: -90};
       var writeOptions = {
                         selection: this._textContainer,
                         xAlign: this.xAlignment(),
                         yAlign: this.yAlignment(),
-                        textRotation: textRotation[this.orientation()]
+                        textRotation: this.angle()
                     };
       this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
       return this;
+    }
+  }
+
+  export class TitleLabel extends Label {
+    public static TITLE_LABEL_CLASS = "title-label";
+    /**
+     * Creates a TitleLabel, a type of label made for rendering titles.
+     *
+     * @constructor
+     */
+    constructor(text?: string, angle?: number) {
+      super(text, angle);
+      this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
+    }
+  }
+
+  export class AxisLabel extends Label {
+    public static AXIS_LABEL_CLASS = "axis-label";
+    /**
+     * Creates a AxisLabel, a type of label made for rendering axis labels.
+     *
+     * @constructor
+     */
+    constructor(text?: string, angle?: number) {
+      super(text, angle);
+      this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
     }
   }
 }

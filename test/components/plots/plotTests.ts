@@ -133,7 +133,7 @@ describe("Plots", () => {
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
       var ds1 = new Plottable.Dataset([0, 1, 2]);
       var ds2 = new Plottable.Dataset([1, 2, 3]);
-      var s = new Plottable.Scales.Linear();
+      var s = new Plottable.Scales.Linear().padProportion(0);
       var svg1 = TestMethods.generateSVG(100, 100);
       var svg2 = TestMethods.generateSVG(100, 100);
       new Plottable.Plot()
@@ -414,8 +414,8 @@ describe("Plots", () => {
     });
 
     it("extent registration works as intended", () => {
-      var scale1 = new Plottable.Scales.Linear();
-      var scale2 = new Plottable.Scales.Linear();
+      var scale1 = new Plottable.Scales.Linear().padProportion(0);
+      var scale2 = new Plottable.Scales.Linear().padProportion(0);
 
       var d1 = new Plottable.Dataset([1, 2, 3]);
       var d2 = new Plottable.Dataset([4, 99, 999]);
