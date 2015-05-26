@@ -77,12 +77,11 @@ export module Drawers {
       return data.length;
     }
 
-    private _applyMetadata(attrToProjector: AttributeToProjector,
-                          dataset: Dataset): AttributeToAppliedProjector {
+    private _applyMetadata(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset);
+          (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
       });
 
       return modifiedAttrToProjector;
@@ -106,7 +105,7 @@ export module Drawers {
      */
     public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, this._dataset);
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator

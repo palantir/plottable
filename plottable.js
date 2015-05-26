@@ -2521,10 +2521,11 @@ var Plottable;
             AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
                 return data.length;
             };
-            AbstractDrawer.prototype._applyMetadata = function (attrToProjector, dataset) {
+            AbstractDrawer.prototype._applyMetadata = function (attrToProjector) {
+                var _this = this;
                 var modifiedAttrToProjector = {};
                 d3.keys(attrToProjector).forEach(function (attr) {
-                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
+                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
                 });
                 return modifiedAttrToProjector;
             };
@@ -2545,7 +2546,7 @@ var Plottable;
             AbstractDrawer.prototype.draw = function (data, drawSteps, dataset) {
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
-                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, _this._dataset);
+                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector);
                     return {
                         attrToProjector: appliedAttrToProjector,
                         animator: dr.animator
