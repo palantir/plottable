@@ -2494,6 +2494,9 @@ var Plottable;
             AbstractDrawer.prototype.setup = function (area) {
                 this._renderArea = area;
             };
+            AbstractDrawer.prototype.dataset = function () {
+                return this._dataset;
+            };
             /**
              * Removes the Drawer and its renderArea
              */
@@ -2540,10 +2543,9 @@ var Plottable;
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             * @param{Dataset} dataset The Dataset
              * @param{any} plotMetadata The metadata provided by plot
              */
-            AbstractDrawer.prototype.draw = function (data, drawSteps, dataset) {
+            AbstractDrawer.prototype.draw = function (data, drawSteps) {
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
                     var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector);
@@ -2877,13 +2879,14 @@ var Plottable;
                 });
                 this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
-            Rect.prototype.draw = function (data, drawSteps, userMetadata) {
+            Rect.prototype.draw = function (data, drawSteps) {
+                var _this = this;
                 var attrToProjector = drawSteps[0].attrToProjector;
                 var isValidNumber = Plottable.Utils.Methods.isValidNumber;
                 data = data.filter(function (e, i) {
-                    return isValidNumber(attrToProjector["x"](e, null, userMetadata)) && isValidNumber(attrToProjector["y"](e, null, userMetadata)) && isValidNumber(attrToProjector["width"](e, null, userMetadata)) && isValidNumber(attrToProjector["height"](e, null, userMetadata));
+                    return isValidNumber(attrToProjector["x"](e, null, _this.dataset())) && isValidNumber(attrToProjector["y"](e, null, _this.dataset())) && isValidNumber(attrToProjector["width"](e, null, _this.dataset())) && isValidNumber(attrToProjector["height"](e, null, _this.dataset()));
                 });
-                return _super.prototype.draw.call(this, data, drawSteps, userMetadata);
+                return _super.prototype.draw.call(this, data, drawSteps);
             };
             return Rect;
         })(Drawers.Element);
@@ -6390,11 +6393,10 @@ var Plottable;
             return datasets;
         };
         Plot.prototype._paint = function () {
-            var _this = this;
             var drawSteps = this._generateDrawSteps();
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
-            var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps, _this._key2PlotDatasetKey.get(k).dataset); });
+            var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
             var maxTime = Plottable.Utils.Methods.max(times, 0);
             this._additionalPaint(maxTime);
         };
@@ -7851,7 +7853,7 @@ var Plottable;
                 var dataToDraw = this._getDataToDraw();
                 this._datasetKeysInOrder.forEach(function (k, i) {
                     var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
+                    _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
                 });
             };
             Area.prototype._getDrawer = function (dataset) {

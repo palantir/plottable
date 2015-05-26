@@ -60,7 +60,7 @@ describe("Drawers", () => {
       var ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
       var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var steps = [ds1, ds2];
-      drawer.draw([], steps, null);
+      drawer.draw([], steps);
       assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
     });
 
@@ -85,7 +85,7 @@ describe("Drawers", () => {
       var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
       var steps = [ds1, ds2, ds3];
-      drawer.draw([], steps, null);
+      drawer.draw([], steps);
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
     });
 

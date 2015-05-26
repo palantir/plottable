@@ -84,16 +84,16 @@ export module Drawers {
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any) {
+    public draw(data: any[], drawSteps: DrawStep[]) {
       var attrToProjector = drawSteps[0].attrToProjector;
       var isValidNumber = Plottable.Utils.Methods.isValidNumber;
-      data = data.filter(function(e: any, i: number) {
-        return isValidNumber(attrToProjector["x"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["y"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["width"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["height"](e, null, userMetadata));
+      data = data.filter((e: any, i: number) => {
+        return isValidNumber(attrToProjector["x"](e, null, this.dataset())) &&
+               isValidNumber(attrToProjector["y"](e, null, this.dataset())) &&
+               isValidNumber(attrToProjector["width"](e, null, this.dataset())) &&
+               isValidNumber(attrToProjector["height"](e, null, this.dataset()));
       });
-      return super.draw(data, drawSteps, userMetadata);
+      return super.draw(data, drawSteps);
     }
   }
 }

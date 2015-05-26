@@ -72,7 +72,7 @@ export module Plots {
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
+        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
       });
     }
 

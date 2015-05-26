@@ -46,6 +46,10 @@ export module Drawers {
       this._renderArea = area;
     }
 
+    protected dataset() {
+      return this._dataset;
+    }
+
     /**
      * Removes the Drawer and its renderArea
      */
@@ -100,10 +104,9 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     * @param{Dataset} dataset The Dataset
      * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
+    public draw(data: any[], drawSteps: DrawStep[]) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
         var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector);
         return {

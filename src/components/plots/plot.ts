@@ -418,8 +418,7 @@ module Plottable {
       var times = this._datasetKeysInOrder.map((k, i) =>
         drawers[i].draw(
           dataToDraw.get(k),
-          drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset
+          drawSteps
         ));
       var maxTime = Utils.Methods.max(times, 0);
       this._additionalPaint(maxTime);

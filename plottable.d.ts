@@ -1225,6 +1225,7 @@ declare module Plottable {
              */
             constructor(dataset: Dataset);
             setup(area: D3.Selection): void;
+            protected dataset(): Dataset;
             /**
              * Removes the Drawer and its renderArea
              */
@@ -1249,10 +1250,9 @@ declare module Plottable {
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             * @param{Dataset} dataset The Dataset
              * @param{any} plotMetadata The metadata provided by plot
              */
-            draw(data: any[], drawSteps: DrawStep[], dataset: Dataset): number;
+            draw(data: any[], drawSteps: DrawStep[]): number;
             /**
              * Retrieves the renderArea selection for the drawer
              *
@@ -1322,7 +1322,7 @@ declare module Plottable {
             removeLabels(): void;
             _getIfLabelsTooWide(): boolean;
             drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
-            draw(data: any[], drawSteps: DrawStep[], userMetadata: any): number;
+            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
