@@ -60,13 +60,13 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
-  var plot = new Plottable.Plots.Grid(xScale, yScale);
+  var plot = new Plottable.Plots.Rectangle(xScale, yScale);
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.hospital; }, xScale)
       .y(function(d) { return d.hour; }, yScale)
   .attr("fill", function(d) { return d.percent; }, cs);
 
-  var label = new Plottable.Components.Label("Born in hospital?", "horizontal");
+  var label = new Plottable.Components.Label("Born in hospital?", "00");
   var legend = new Plottable.Components.InterpolatedColorLegend(cs).xAlignment("center");
 
   var table = new Plottable.Components.Table([[null, legend],
