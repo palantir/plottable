@@ -9,7 +9,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Area(xScale, yScale);
+      var plot = new Plottable.Plots.Area();
       plot.x((d: any) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -25,7 +25,7 @@ describe("Plots", () => {
       yScale.padProportion(0.1);
       var constantY0 = 30;
       yScale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[constantY0, constantY0 + 10]]);
-      var plot = new Plottable.Plots.Area(xScale, yScale);
+      var plot = new Plottable.Plots.Area();
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       plot.y0(constantY0, yScale);
@@ -65,7 +65,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plots.Area(xScale, yScale);
+      areaPlot = new Plottable.Plots.Area();
       areaPlot.addDataset(simpleDataset);
       areaPlot.x(xAccessor, xScale)
               .y(yAccessor, yScale);

@@ -156,7 +156,7 @@ describe("Plots", () => {
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Plots.StackedArea(xScale, yScale);
+      stackedPlot = new Plottable.Plots.StackedArea();
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
 
@@ -325,7 +325,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -378,7 +378,7 @@ describe("Plots", () => {
 
     // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
     it.skip("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plots.StackedArea(yScale, yScale);
+      var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, yScale)

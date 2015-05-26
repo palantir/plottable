@@ -3100,7 +3100,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Area(xScale, yScale);
+            var plot = new Plottable.Plots.Area();
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
             assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
@@ -3115,7 +3115,7 @@ describe("Plots", function () {
             yScale.padProportion(0.1);
             var constantY0 = 30;
             yScale.addExtentsProvider(function (scale) { return [[constantY0, constantY0 + 10]]; });
-            var plot = new Plottable.Plots.Area(xScale, yScale);
+            var plot = new Plottable.Plots.Area();
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
             plot.y0(constantY0, yScale);
@@ -3152,7 +3152,7 @@ describe("Plots", function () {
         beforeEach(function () {
             svg = TestMethods.generateSVG(500, 500);
             simpleDataset = new Plottable.Dataset(twoPointData);
-            areaPlot = new Plottable.Plots.Area(xScale, yScale);
+            areaPlot = new Plottable.Plots.Area();
             areaPlot.addDataset(simpleDataset);
             areaPlot.x(xAccessor, xScale).y(yAccessor, yScale);
             areaPlot.y0(y0Accessor, yScale).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
@@ -4540,7 +4540,7 @@ describe("Plots", function () {
         beforeEach(function () {
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            stackedPlot = new Plottable.Plots.StackedArea(xScale, yScale);
+            stackedPlot = new Plottable.Plots.StackedArea();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
             stackedPlot._getDrawer = function (key) { return new Plottable.Drawers.AbstractDrawer(key); };
@@ -4688,7 +4688,7 @@ describe("Plots", function () {
             ]);
         });
         it("auto scales correctly on stacked area", function () {
-            var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+            var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
             plot.renderTo(svg);
@@ -4729,7 +4729,7 @@ describe("Plots", function () {
         });
         // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
         it.skip("auto scales correctly on stacked area", function () {
-            var plot = new Plottable.Plots.StackedArea(yScale, yScale);
+            var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, yScale).y(function (d) { return d.y; }, yScale).autorange("y");
             plot.renderTo(svg);
@@ -4817,7 +4817,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+            renderer = new Plottable.Plots.StackedArea();
             renderer.addDataset(dataset1);
             renderer.addDataset(dataset2);
             renderer.x(function (d) { return d.x; }, xScale);
@@ -4860,7 +4860,7 @@ describe("Plots", function () {
                 { x: 1, y: 3, type: "b" },
                 { x: 3, y: 1, type: "b" }
             ];
-            renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+            renderer = new Plottable.Plots.StackedArea();
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.attr("fill", "type", colorScale);
@@ -4899,7 +4899,7 @@ describe("Plots", function () {
                 { x: 1, y: 5, type: "b" },
                 { x: 3, y: 1, type: "b" }
             ];
-            renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+            renderer = new Plottable.Plots.StackedArea();
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.attr("fill", "type", colorScale);
@@ -5077,7 +5077,7 @@ describe("Plots", function () {
                 { x: 1, yTest: 3, type: "b" },
                 { x: 3, yTest: 1, type: "b" }
             ];
-            renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+            renderer = new Plottable.Plots.StackedArea();
             renderer.y(function (d) { return d.yTest; }, yScale);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
@@ -5130,7 +5130,7 @@ describe("Plots", function () {
             ];
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+            var plot = new Plottable.Plots.StackedArea();
             var dataset0 = new Plottable.Dataset(data0);
             plot.addDataset(dataset0);
             var dataset1 = new Plottable.Dataset(data1);
@@ -5164,7 +5164,7 @@ describe("Plots", function () {
             ];
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+            var plot = new Plottable.Plots.StackedArea();
             var dataset0 = new Plottable.Dataset(data0);
             plot.addDataset(dataset0);
             var dataset1 = new Plottable.Dataset(data1);
@@ -5930,8 +5930,8 @@ describe("Metadata", function () {
             plot.renderTo(svg);
             plot.destroy();
         };
-        checkXYPlot(new Plottable.Plots.Area(xScale, yScale));
-        checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
+        checkXYPlot(new Plottable.Plots.Area());
+        checkXYPlot(new Plottable.Plots.StackedArea());
         checkXYPlot(new Plottable.Plots.Bar());
         checkXYPlot(new Plottable.Plots.StackedBar());
         checkXYPlot(new Plottable.Plots.StackedBar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));

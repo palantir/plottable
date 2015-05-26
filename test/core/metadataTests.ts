@@ -111,8 +111,8 @@ describe("Metadata", () => {
       plot.destroy();
     };
 
-    checkXYPlot(new Plottable.Plots.Area(xScale, yScale));
-    checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.Area());
+    checkXYPlot(new Plottable.Plots.StackedArea());
     checkXYPlot(new Plottable.Plots.Bar());
     checkXYPlot(new Plottable.Plots.StackedBar());
     checkXYPlot(new Plottable.Plots.StackedBar( Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
