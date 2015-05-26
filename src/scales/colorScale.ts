@@ -4,9 +4,9 @@ module Plottable {
 export module Scales {
   export class Color extends Scale<string, string> {
 
-    private static LOOP_LIGHTEN_FACTOR = 1.6;
+    private static _LOOP_LIGHTEN_FACTOR = 1.6;
     // The maximum number of colors we are getting from CSS stylesheets
-    private static MAXIMUM_COLORS_FROM_CSS = 256;
+    private static _MAXIMUM_COLORS_FROM_CSS = 256;
 
     private _d3Scale: D3.Scale.OrdinalScale;
 
@@ -52,6 +52,10 @@ export module Scales {
       this._d3Scale = scale;
     }
 
+    public extentOfValues(values: string[]) {
+      return Utils.Methods.uniq(values);
+    }
+
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
       var extents = this._getAllExtents();
@@ -70,7 +74,7 @@ export module Scales {
       var i = 0;
       var colorHex: string;
       while ((colorHex = Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
-              i < this.MAXIMUM_COLORS_FROM_CSS) {
+              i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
         }
@@ -87,7 +91,7 @@ export module Scales {
       var color = this._d3Scale(value);
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
-      var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
+      var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
       return Utils.Methods.lightenColor(color, modifyFactor);
     }
 

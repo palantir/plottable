@@ -1,5 +1,5 @@
 /*!
-Plottable 1.0.0-rc1 (https://github.com/palantir/plottable)
+Plottable 1.0.0-rc2 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -1072,7 +1072,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.0.0-rc1";
+    Plottable.version = "1.0.0-rc2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1300,185 +1300,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    var Domainer = (function () {
-        /**
-         * Constructs a new Domainer.
-         *
-         * @constructor
-         * @param {(extents: any[][]) => any[]} combineExtents
-         *        If present, this function will be used by the Domainer to merge
-         *        all the extents that are present on a scale.
-         *
-         *        A plot may draw multiple things relative to a scale, e.g.
-         *        different stocks over time. The plot computes their extents,
-         *        which are a [min, max] pair. combineExtents is responsible for
-         *        merging them all into one [min, max] pair. It defaults to taking
-         *        the min of the first elements and the max of the second arguments.
-         */
-        function Domainer(combineExtents) {
-            this._doNice = false;
-            this._padProportion = 0.0;
-            this._combineExtents = combineExtents;
-            this._paddingExceptions = new Plottable.Utils.Map();
-            this._includedValues = new Plottable.Utils.Map();
-        }
-        /**
-         * @param {any[][]} extents The list of extents to be reduced to a single
-         *        extent.
-         * @param {QuantitativeScale} scale
-         *        Since nice() must do different things depending on Linear, Log,
-         *        or Time scale, the scale must be passed in for nice() to work.
-         * @returns {any[]} The domain, as a merging of all exents, as a [min, max]
-         *                 pair.
-         */
-        Domainer.prototype.computeDomain = function (extents, scale) {
-            var domain;
-            if (this._combineExtents != null) {
-                domain = this._combineExtents(extents);
-            }
-            else if (extents.length === 0) {
-                domain = scale._defaultExtent();
-            }
-            else {
-                domain = [Plottable.Utils.Methods.min(extents, function (e) { return e[0]; }, 0), Plottable.Utils.Methods.max(extents, function (e) { return e[1]; }, 0)];
-            }
-            domain = this._includeDomain(domain);
-            domain = this._padDomain(scale, domain);
-            domain = this._niceDomain(scale, domain);
-            return domain;
-        };
-        /**
-         * Sets the Domainer to pad by a given ratio.
-         *
-         * @param {number} padProportion Proportionally how much bigger the
-         *         new domain should be (0.05 = 5% larger).
-         *
-         *         A domainer will pad equal visual amounts on each side.
-         *         On a linear scale, this means both sides are padded the same
-         *         amount: [10, 20] will be padded to [5, 25].
-         *         On a log scale, the top will be padded more than the bottom, so
-         *         [10, 100] will be padded to [1, 1000].
-         *
-         * @returns {Domainer} The calling Domainer.
-         */
-        Domainer.prototype.pad = function (padProportion) {
-            if (padProportion === void 0) { padProportion = 0.05; }
-            this._padProportion = padProportion;
-            return this;
-        };
-        /**
-         * Adds a padding exception, a value that will not be padded at either end of the domain.
-         *
-         * Eg, if a padding exception is added at x=0, then [0, 100] will pad to [0, 105] instead of [-2.5, 102.5].
-         * The exception will be registered under the provided with standard map semantics. (Overwrite / remove by key).
-         *
-         * @param {any} exception The padding exception to add.
-         * @param {any} key The key to register the exception under.
-         * @returns {Domainer} The calling domainer
-         */
-        Domainer.prototype.addPaddingException = function (key, exception) {
-            this._paddingExceptions.set(key, exception);
-            return this;
-        };
-        /**
-         * Removes a padding exception, allowing the domain to pad out that value again.
-         *
-         * @param {any} key The key for the value to remove.
-         * @return {Domainer} The calling domainer
-         */
-        Domainer.prototype.removePaddingException = function (key) {
-            this._paddingExceptions.delete(key);
-            return this;
-        };
-        /**
-         * Adds an included value, a value that must be included inside the domain.
-         *
-         * Eg, if a value exception is added at x=0, then [50, 100] will expand to [0, 100] rather than [50, 100].
-         * The value will be registered under that key with standard map semantics. (Overwrite / remove by key).
-         *
-         * @param {any} value The included value to add.
-         * @param {any} key The key to register the value under.
-         * @returns {Domainer} The calling domainer
-         */
-        Domainer.prototype.addIncludedValue = function (key, value) {
-            this._includedValues.set(key, value);
-            return this;
-        };
-        /**
-         * Remove an included value, allowing the domain to not include that value gain again.
-         *
-         * @param {any} key The key for the value to remove.
-         * @return {Domainer} The calling domainer
-         */
-        Domainer.prototype.removeIncludedValue = function (key) {
-            this._includedValues.delete(key);
-            return this;
-        };
-        /**
-         * Extends the scale's domain so it starts and ends with "nice" values.
-         *
-         * @param {number} count The number of ticks that should fit inside the new domain.
-         * @return {Domainer} The calling Domainer.
-         */
-        Domainer.prototype.nice = function (count) {
-            this._doNice = true;
-            this._niceCount = count;
-            return this;
-        };
-        Domainer.prototype._padDomain = function (scale, domain) {
-            var min = domain[0];
-            var max = domain[1];
-            // valueOf accounts for dates properly
-            if (min.valueOf() === max.valueOf() && this._padProportion > 0.0) {
-                var d = min.valueOf();
-                if (min instanceof Date) {
-                    return [d - Domainer._ONE_DAY, d + Domainer._ONE_DAY];
-                }
-                else {
-                    return [d - Domainer._PADDING_FOR_IDENTICAL_DOMAIN, d + Domainer._PADDING_FOR_IDENTICAL_DOMAIN];
-                }
-            }
-            var scaleDomain = scale.domain();
-            if (scaleDomain[0].valueOf() === scaleDomain[1].valueOf()) {
-                return domain;
-            }
-            var p = this._padProportion / 2;
-            // This scaling is done to account for log scales and other non-linear
-            // scales. A log scale should be padded more on the max than on the min.
-            var newMin = scale.invert(scale.scale(min) - (scale.scale(max) - scale.scale(min)) * p);
-            var newMax = scale.invert(scale.scale(max) + (scale.scale(max) - scale.scale(min)) * p);
-            var exceptionValues = this._paddingExceptions.values();
-            var exceptionSet = d3.set(exceptionValues);
-            if (exceptionSet.has(min)) {
-                newMin = min;
-            }
-            if (exceptionSet.has(max)) {
-                newMax = max;
-            }
-            return [newMin, newMax];
-        };
-        Domainer.prototype._niceDomain = function (scale, domain) {
-            if (this._doNice) {
-                return scale._niceDomain(domain, this._niceCount);
-            }
-            else {
-                return domain;
-            }
-        };
-        Domainer.prototype._includeDomain = function (domain) {
-            var includedValues = this._includedValues.values();
-            return includedValues.reduce(function (domain, value) { return [Math.min(domain[0], value), Math.max(domain[1], value)]; }, domain);
-        };
-        Domainer._PADDING_FOR_IDENTICAL_DOMAIN = 1;
-        Domainer._ONE_DAY = 1000 * 60 * 60 * 24;
-        return Domainer;
-    })();
-    Plottable.Domainer = Domainer;
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var Scale = (function () {
         /**
          * Constructs a new Scale.
@@ -1495,6 +1316,9 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
+        Scale.prototype.extentOfValues = function (values) {
+            return []; // this should be overwritten
+        };
         Scale.prototype._getAllExtents = function () {
             var _this = this;
             return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
@@ -1589,10 +1413,12 @@ var Plottable;
         };
         Scale.prototype.addExtentsProvider = function (provider) {
             this._extentsProviders.add(provider);
+            this._autoDomainIfAutomaticMode();
             return this;
         };
         Scale.prototype.removeExtentsProvider = function (provider) {
             this._extentsProviders.delete(provider);
+            this._autoDomainIfAutomaticMode();
             return this;
         };
         return Scale;
@@ -1611,14 +1437,133 @@ var Plottable;
 (function (Plottable) {
     var QuantitativeScale = (function (_super) {
         __extends(QuantitativeScale, _super);
+        /**
+         * Constructs a new QuantitativeScale.
+         *
+         * A QuantitativeScale is a Scale that maps anys to numbers. It
+         * is invertible and continuous.
+         *
+         * @constructor
+         */
         function QuantitativeScale() {
-            _super.apply(this, arguments);
-            this._userSetDomainer = false;
-            this._domainer = new Plottable.Domainer();
+            _super.call(this);
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
+            this._padProportion = 0.05;
+            this._paddingExceptions = new Plottable.Utils.Map();
+            this._includedValues = new Plottable.Utils.Map();
         }
+        QuantitativeScale.prototype.autoDomain = function () {
+            this._domainMin = null;
+            this._domainMax = null;
+            _super.prototype.autoDomain.call(this);
+            return this;
+        };
+        QuantitativeScale.prototype._autoDomainIfAutomaticMode = function () {
+            if (this._domainMin != null && this._domainMax != null) {
+                this._setDomain([this._domainMin, this._domainMax]);
+                return;
+            }
+            var computedExtent = this._getExtent();
+            if (this._domainMin != null) {
+                var maxValue = computedExtent[1];
+                if (this._domainMin >= maxValue) {
+                    maxValue = this._expandSingleValueDomain([this._domainMin, this._domainMin])[1];
+                }
+                this._setDomain([this._domainMin, maxValue]);
+                return;
+            }
+            if (this._domainMax != null) {
+                var minValue = computedExtent[0];
+                if (this._domainMax <= minValue) {
+                    minValue = this._expandSingleValueDomain([this._domainMax, this._domainMax])[0];
+                }
+                this._setDomain([minValue, this._domainMax]);
+                return;
+            }
+            _super.prototype._autoDomainIfAutomaticMode.call(this);
+        };
         QuantitativeScale.prototype._getExtent = function () {
-            return this._domainer.computeDomain(this._getAllExtents(), this);
+            var extents = this._getAllExtents().filter(function (extent) { return extent.length > 0; });
+            var extent;
+            var defaultExtent = this._defaultExtent();
+            if (extents.length === 0) {
+                extent = defaultExtent;
+            }
+            else {
+                var combinedExtent = [
+                    Plottable.Utils.Methods.min(extents, function (extent) { return extent[0]; }, defaultExtent[0]),
+                    Plottable.Utils.Methods.max(extents, function (extent) { return extent[1]; }, defaultExtent[1])
+                ];
+                var includedDomain = this._includeValues(combinedExtent);
+                extent = this._padDomain(includedDomain);
+            }
+            if (this._domainMin != null) {
+                extent[0] = this._domainMin;
+            }
+            if (this._domainMax != null) {
+                extent[1] = this._domainMax;
+            }
+            return extent;
+        };
+        QuantitativeScale.prototype.addPaddingException = function (key, exception) {
+            this._paddingExceptions.set(key, exception);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.removePaddingException = function (key) {
+            this._paddingExceptions.delete(key);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.addIncludedValue = function (key, value) {
+            this._includedValues.set(key, value);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.removeIncludedValue = function (key) {
+            this._includedValues.delete(key);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.padProportion = function (padProportion) {
+            if (padProportion == null) {
+                return this._padProportion;
+            }
+            if (padProportion < 0) {
+                throw new Error("padProportion must be non-negative");
+            }
+            this._padProportion = padProportion;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype._includeValues = function (domain) {
+            this._includedValues.values().forEach(function (value) {
+                if (value < domain[0]) {
+                    domain[0] = value;
+                }
+                if (value > domain[1]) {
+                    domain[1] = value;
+                }
+            });
+            return domain;
+        };
+        QuantitativeScale.prototype._padDomain = function (domain) {
+            if (domain[0].valueOf() === domain[1].valueOf()) {
+                return this._expandSingleValueDomain(domain);
+            }
+            if (this._padProportion === 0) {
+                return domain;
+            }
+            var p = this._padProportion / 2;
+            var min = domain[0];
+            var max = domain[1];
+            var paddingExceptions = this._paddingExceptions.values();
+            var newMin = paddingExceptions.indexOf(min) === -1 ? this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p) : min;
+            var newMax = paddingExceptions.indexOf(max) === -1 ? this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p) : max;
+            return this._niceDomain([newMin, newMax]);
+        };
+        QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {
+            return singleValueDomain;
         };
         /**
          * Retrieves the domain value corresponding to a supplied range value.
@@ -1628,6 +1573,38 @@ var Plottable;
          */
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
+        };
+        QuantitativeScale.prototype.domain = function (values) {
+            if (values != null) {
+                this._domainMin = values[0];
+                this._domainMax = values[1];
+            }
+            return _super.prototype.domain.call(this, values);
+        };
+        QuantitativeScale.prototype.domainMin = function (domainMin) {
+            if (domainMin == null) {
+                return this.domain()[0];
+            }
+            this._domainMin = domainMin;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.domainMax = function (domainMax) {
+            if (domainMax == null) {
+                return this.domain()[1];
+            }
+            this._domainMax = domainMax;
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.extentOfValues = function (values) {
+            var extent = d3.extent(values);
+            if (extent[0] == null || extent[1] == null) {
+                return [];
+            }
+            else {
+                return extent;
+            }
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
@@ -1657,17 +1634,6 @@ var Plottable;
          */
         QuantitativeScale.prototype._niceDomain = function (domain, count) {
             throw new Error("Subclasses should override _niceDomain");
-        };
-        QuantitativeScale.prototype.domainer = function (domainer) {
-            if (domainer == null) {
-                return this._domainer;
-            }
-            else {
-                this._domainer = domainer;
-                this._userSetDomainer = true;
-                this._autoDomainIfAutomaticMode();
-                return this;
-            }
         };
         QuantitativeScale.prototype._defaultExtent = function () {
             throw new Error("Subclasses should override _defaultExtent");
@@ -1715,6 +1681,12 @@ var Plottable;
             }
             Linear.prototype._defaultExtent = function () {
                 return [0, 1];
+            };
+            Linear.prototype._expandSingleValueDomain = function (singleValueDomain) {
+                if (singleValueDomain[0] === singleValueDomain[1]) {
+                    return [singleValueDomain[0] - 1, singleValueDomain[1] + 1];
+                }
+                return singleValueDomain;
             };
             Linear.prototype.scale = function (value) {
                 return this._d3Scale(value);
@@ -1804,7 +1776,7 @@ var Plottable;
              * (0 to 1) scaling factor is added such that at 0 the value is
              * adjusted to 1, resulting in a returned result of 0.
              */
-            ModifiedLog.prototype.adjustedLog = function (x) {
+            ModifiedLog.prototype._adjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
                 if (x < this._pivot) {
@@ -1814,7 +1786,7 @@ var Plottable;
                 x *= negationFactor;
                 return x;
             };
-            ModifiedLog.prototype.invertedAdjustedLog = function (x) {
+            ModifiedLog.prototype._invertedAdjustedLog = function (x) {
                 var negationFactor = x < 0 ? -1 : 1;
                 x *= negationFactor;
                 x = Math.pow(this._base, x);
@@ -1825,17 +1797,17 @@ var Plottable;
                 return x;
             };
             ModifiedLog.prototype.scale = function (x) {
-                return this._d3Scale(this.adjustedLog(x));
+                return this._d3Scale(this._adjustedLog(x));
             };
             ModifiedLog.prototype.invert = function (x) {
-                return this.invertedAdjustedLog(this._d3Scale.invert(x));
+                return this._invertedAdjustedLog(this._d3Scale.invert(x));
             };
             ModifiedLog.prototype._getDomain = function () {
                 return this._untransformedDomain;
             };
             ModifiedLog.prototype._setDomain = function (values) {
                 this._untransformedDomain = values;
-                var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+                var transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
                 _super.prototype._setDomain.call(this, transformedDomain);
             };
             ModifiedLog.prototype._setBackingScaleDomain = function (values) {
@@ -1852,8 +1824,8 @@ var Plottable;
                 var negativeUpper = middle(min, max, -this._pivot);
                 var positiveLower = middle(min, max, this._pivot);
                 var positiveUpper = max;
-                var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
-                var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+                var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
+                var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
                 var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
@@ -1875,7 +1847,7 @@ var Plottable;
              * This function will generate clusters as large as it can while not
              * drastically exceeding its number of ticks.
              */
-            ModifiedLog.prototype.logTicks = function (lower, upper) {
+            ModifiedLog.prototype._logTicks = function (lower, upper) {
                 var _this = this;
                 var nTicks = this._howManyTicks(lower, upper);
                 if (nTicks === 0) {
@@ -1901,10 +1873,10 @@ var Plottable;
              * distance when plotted.
              */
             ModifiedLog.prototype._howManyTicks = function (lower, upper) {
-                var adjustedMin = this.adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
-                var adjustedMax = this.adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
-                var adjustedLower = this.adjustedLog(lower);
-                var adjustedUpper = this.adjustedLog(upper);
+                var adjustedMin = this._adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
+                var adjustedMax = this._adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
+                var adjustedLower = this._adjustedLog(lower);
+                var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
                 var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
@@ -1922,6 +1894,21 @@ var Plottable;
             };
             ModifiedLog.prototype._defaultExtent = function () {
                 return [0, this._base];
+            };
+            ModifiedLog.prototype._expandSingleValueDomain = function (singleValueDomain) {
+                if (singleValueDomain[0] === singleValueDomain[1]) {
+                    var singleValue = singleValueDomain[0];
+                    if (singleValue > 0) {
+                        return [singleValue / this._base, singleValue * this._base];
+                    }
+                    else if (singleValue === 0) {
+                        return [-this._base, this._base];
+                    }
+                    else {
+                        return [singleValue * this._base, singleValue / this._base];
+                    }
+                }
+                return singleValueDomain;
             };
             ModifiedLog.prototype._getRange = function () {
                 return this._d3Scale.range();
@@ -1967,6 +1954,9 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
+            Category.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
+            };
             Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
@@ -2109,6 +2099,9 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
+            Color.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
+            };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2124,7 +2117,7 @@ var Plottable;
                 var defaultColorHex = Plottable.Utils.Methods.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this.MAXIMUM_COLORS_FROM_CSS) {
+                while ((colorHex = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this._MAXIMUM_COLORS_FROM_CSS) {
                     if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
                         break;
                     }
@@ -2140,7 +2133,7 @@ var Plottable;
                 var color = this._d3Scale(value);
                 var index = this.domain().indexOf(value);
                 var numLooped = Math.floor(index / this.range().length);
-                var modifyFactor = Math.log(numLooped * Color.LOOP_LIGHTEN_FACTOR + 1);
+                var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
                 return Plottable.Utils.Methods.lightenColor(color, modifyFactor);
             };
             Color.prototype._getDomain = function () {
@@ -2155,9 +2148,9 @@ var Plottable;
             Color.prototype._setRange = function (values) {
                 this._d3Scale.range(values);
             };
-            Color.LOOP_LIGHTEN_FACTOR = 1.6;
+            Color._LOOP_LIGHTEN_FACTOR = 1.6;
             // The maximum number of colors we are getting from CSS stylesheets
-            Color.MAXIMUM_COLORS_FROM_CSS = 256;
+            Color._MAXIMUM_COLORS_FROM_CSS = 256;
             return Color;
         })(Plottable.Scale);
         Scales.Color = Color;
@@ -2215,6 +2208,14 @@ var Plottable;
                 var endTimeValue = new Date().valueOf();
                 var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
                 return [new Date(startTimeValue), new Date(endTimeValue)];
+            };
+            Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
+                var startTime = singleValueDomain[0].getTime();
+                var endTime = singleValueDomain[1].getTime();
+                if (startTime === endTime) {
+                    return [new Date(startTime - Plottable.MILLISECONDS_IN_ONE_DAY), new Date(endTime + Plottable.MILLISECONDS_IN_ONE_DAY)];
+                }
+                return singleValueDomain;
             };
             Time.prototype.scale = function (value) {
                 return this._d3Scale(value);
@@ -2299,6 +2300,15 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
+            InterpolatedColor.prototype.extentOfValues = function (values) {
+                var extent = d3.extent(values);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                }
+                else {
+                    return extent;
+                }
+            };
             /**
              * Generates the converted QuantitativeScale.
              *
@@ -2346,7 +2356,7 @@ var Plottable;
                 this._dispatchUpdate();
             };
             InterpolatedColor.prototype.autoDomain = function () {
-                // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+                // InterpolatedColorScales do not pad
                 var extents = this._getAllExtents();
                 if (extents.length > 0) {
                     this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
@@ -4921,27 +4931,26 @@ var Plottable;
             /**
              * Creates a Label.
              *
-             * A label is component that renders just text. The most common use of
-             * labels is to create a title or axis labels.
+             * A Label is a Component that draws a single line of text.
              *
              * @constructor
              * @param {string} displayText The text of the Label (default = "").
-             * @param {string} orientation The orientation of the Label (horizontal/left/right) (default = "horizontal").
+             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
              */
-            function Label(displayText, orientation) {
+            function Label(displayText, angle) {
                 if (displayText === void 0) { displayText = ""; }
-                if (orientation === void 0) { orientation = "horizontal"; }
+                if (angle === void 0) { angle = 0; }
                 _super.call(this);
                 this.classed("label", true);
                 this.text(displayText);
-                this.orientation(orientation);
+                this.angle(angle);
                 this.xAlignment("center").yAlignment("center");
                 this._padding = 0;
             }
             Label.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var desiredWH = this._measurer.measure(this._text);
-                var desiredWidth = (this.orientation() === "horizontal" ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-                var desiredHeight = (this.orientation() === "horizontal" ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+                var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+                var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
                 return {
                     minWidth: desiredWidth,
                     minHeight: desiredHeight
@@ -4965,17 +4974,23 @@ var Plottable;
                     return this;
                 }
             };
-            Label.prototype.orientation = function (orientation) {
-                if (orientation == null) {
-                    return this._orientation;
+            Label.prototype.angle = function (angle) {
+                if (angle == null) {
+                    return this._angle;
                 }
                 else {
-                    orientation = orientation.toLowerCase();
-                    if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
-                        this._orientation = orientation;
+                    angle %= 360;
+                    if (angle > 180) {
+                        angle -= 360;
+                    }
+                    else if (angle < -180) {
+                        angle += 360;
+                    }
+                    if (angle === -90 || angle === 0 || angle === 90) {
+                        this._angle = angle;
                     }
                     else {
-                        throw new Error(orientation + " is not a valid orientation for LabelComponent");
+                        throw new Error(angle + " is not a valid angle for Label");
                     }
                     this.redraw();
                     return this;
@@ -4988,7 +5003,7 @@ var Plottable;
                 else {
                     padAmount = +padAmount;
                     if (padAmount < 0) {
-                        throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+                        throw new Error(padAmount + " is not a valid padding value. Cannot be less than 0.");
                     }
                     this._padding = padAmount;
                     this.redraw();
@@ -5011,23 +5026,48 @@ var Plottable;
                 this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
                 var writeWidth = this.width() - 2 * widthPadding;
                 var writeHeight = this.height() - 2 * heightPadding;
-                var textRotation = { horizontal: 0, right: 90, left: -90 };
                 var writeOptions = {
                     selection: this._textContainer,
                     xAlign: this.xAlignment(),
                     yAlign: this.yAlignment(),
-                    textRotation: textRotation[this.orientation()]
+                    textRotation: this.angle()
                 };
                 this._writer.write(this._text, writeWidth, writeHeight, writeOptions);
                 return this;
             };
-            // Css class for labels that are made for rendering titles.
-            Label.TITLE_LABEL_CLASS = "title-label";
-            // Css class for labels that are made for rendering axis titles.
-            Label.AXIS_LABEL_CLASS = "axis-label";
             return Label;
         })(Plottable.Component);
         Components.Label = Label;
+        var TitleLabel = (function (_super) {
+            __extends(TitleLabel, _super);
+            /**
+             * Creates a TitleLabel, a type of label made for rendering titles.
+             *
+             * @constructor
+             */
+            function TitleLabel(text, angle) {
+                _super.call(this, text, angle);
+                this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
+            }
+            TitleLabel.TITLE_LABEL_CLASS = "title-label";
+            return TitleLabel;
+        })(Label);
+        Components.TitleLabel = TitleLabel;
+        var AxisLabel = (function (_super) {
+            __extends(AxisLabel, _super);
+            /**
+             * Creates a AxisLabel, a type of label made for rendering axis labels.
+             *
+             * @constructor
+             */
+            function AxisLabel(text, angle) {
+                _super.call(this, text, angle);
+                this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
+            }
+            AxisLabel.AXIS_LABEL_CLASS = "axis-label";
+            return AxisLabel;
+        })(Label);
+        Components.AxisLabel = AxisLabel;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6245,7 +6285,7 @@ var Plottable;
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._scales().forEach(function (scale) { return scale._autoDomainIfAutomaticMode(); });
+            this._scales().forEach(function (scale) { return scale.addExtentsProvider(_this._extentsProvider); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             // Filters should never be applied to attributes
@@ -6266,31 +6306,22 @@ var Plottable;
             extents.set(key, this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
-                return _this._computeExtent(dataset, accScaleBinding.accessor, filter);
+                return _this._computeExtent(dataset, accScaleBinding, filter);
             }));
         };
-        Plot.prototype._computeExtent = function (dataset, accessor, filter) {
+        Plot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+            var accessor = accScaleBinding.accessor;
+            var scale = accScaleBinding.scale;
+            if (scale == null) {
+                return [];
+            }
             var data = dataset.data();
             if (filter != null) {
                 data = data.filter(function (d, i) { return filter(d, i, dataset); });
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = data.map(appliedAccessor);
-            if (mappedData.length === 0) {
-                return [];
-            }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
-            }
-            else {
-                var extent = d3.extent(mappedData);
-                if (extent[0] == null || extent[1] == null) {
-                    return [];
-                }
-                else {
-                    return extent;
-                }
-            }
+            return scale.extentOfValues(mappedData);
         };
         /**
          * Override in subclass to add special extents, such as included values
@@ -6496,12 +6527,10 @@ var Plottable;
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
             scale.removeExtentsProvider(this._extentsProvider);
-            scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
             scale.addExtentsProvider(this._extentsProvider);
-            scale._autoDomainIfAutomaticMode();
         };
         Plot.prototype._propertyProjectors = function () {
             return {};
@@ -6597,7 +6626,7 @@ var Plottable;
                 }
                 this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
                 this._updatePieAngles();
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie.prototype.innerRadius = function (innerRadius, scale) {
@@ -6605,7 +6634,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
                 }
                 this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie.prototype.outerRadius = function (outerRadius, scale) {
@@ -6613,7 +6642,7 @@ var Plottable;
                     return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
                 }
                 this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Pie.prototype._propertyProjectors = function () {
@@ -6711,9 +6740,7 @@ var Plottable;
             this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            this._updateXDomainer();
             xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            this._updateYDomainer();
             yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         XYPlot.prototype.x = function (x, xScale) {
@@ -6724,8 +6751,7 @@ var Plottable;
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
-            this._updateXDomainer();
-            this.renderImmediately();
+            this.render();
             return this;
         };
         XYPlot.prototype.y = function (y, yScale) {
@@ -6736,8 +6762,7 @@ var Plottable;
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
             }
-            this._updateYDomainer();
-            this.renderImmediately();
+            this.render();
             return this;
         };
         XYPlot.prototype._filterForProperty = function (property) {
@@ -6784,29 +6809,39 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the automatic domain adjustment over visible points for y scale.
+         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
          *
-         * If autoAdjustment is true adjustment is immediately performend.
+         * If 'x' or 'y' is specified the adjustment is immediately performed.
          *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+         * @param {string} scale Must be one of 'x', 'y', or 'none'.
+         *
+         * 'x' will adjust the x scale in relation to changes in the y domain.
+         *
+         * 'y' will adjust the y scale in relation to changes in the x domain.
+         *
+         * 'none' means neither scale will change automatically.
+         *
          * @returns {XYPlot} The calling XYPlot.
          */
-        XYPlot.prototype.automaticallyAdjustYScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustYScaleDomain = autoAdjustment;
-            this._adjustYDomainOnChangeFromX();
-            return this;
-        };
-        /**
-         * Sets the automatic domain adjustment over visible points for x scale.
-         *
-         * If autoAdjustment is true adjustment is immediately performend.
-         *
-         * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        XYPlot.prototype.automaticallyAdjustXScaleOverVisiblePoints = function (autoAdjustment) {
-            this._autoAdjustXScaleDomain = autoAdjustment;
-            this._adjustXDomainOnChangeFromY();
+        XYPlot.prototype.autorange = function (scaleName) {
+            switch (scaleName) {
+                case "x":
+                    this._autoAdjustXScaleDomain = true;
+                    this._autoAdjustYScaleDomain = false;
+                    this._adjustXDomainOnChangeFromY();
+                    break;
+                case "y":
+                    this._autoAdjustXScaleDomain = false;
+                    this._autoAdjustYScaleDomain = true;
+                    this._adjustYDomainOnChangeFromX();
+                    break;
+                case "none":
+                    this._autoAdjustXScaleDomain = false;
+                    this._autoAdjustYScaleDomain = false;
+                    break;
+                default:
+                    throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+            }
             return this;
         };
         XYPlot.prototype._propertyProjectors = function () {
@@ -6837,22 +6872,6 @@ var Plottable;
                 }
             }
             return this;
-        };
-        XYPlot.prototype._updateXDomainer = function () {
-            if (this.x().scale instanceof Plottable.QuantitativeScale) {
-                var scale = this.x().scale;
-                if (!scale._userSetDomainer) {
-                    scale.domainer().pad().nice();
-                }
-            }
-        };
-        XYPlot.prototype._updateYDomainer = function () {
-            if (this.y().scale instanceof Plottable.QuantitativeScale) {
-                var scale = this.y().scale;
-                if (!scale._userSetDomainer) {
-                    scale.domainer().pad().nice();
-                }
-            }
         };
         XYPlot.prototype._updateXExtentsAndAutodomain = function () {
             this._updateExtentsForProperty("x");
@@ -6925,8 +6944,9 @@ var Plottable;
              * Constructs a RectanglePlot.
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the left and right bounds of the rectangle (x1 and x2 respectively)
-             * as well as the bottom and top bounds (y1 and y2 respectively)
+             * project the left and right bounds of the rectangle (x and x1 respectively)
+             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
+             * not set, the plot will apply auto-centering logic to the extent of x/y
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
@@ -6934,75 +6954,97 @@ var Plottable;
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
+                this.animator("rectangles", new Plottable.Animators.Null());
                 this.classed("rectangle-plot", true);
-                this.attr("fill", new Plottable.Scales.Color().range()[0]);
+                // The x and y scales should render in bands with no padding for category scales
+                if (xScale instanceof Plottable.Scales.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
             }
             Rectangle.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, true);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
+                var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
-                var x1Attr = attrToProjector["x1"];
-                var y1Attr = attrToProjector["y1"];
-                var x2Attr = attrToProjector["x2"];
-                var y2Attr = attrToProjector["y2"];
-                // Generate width based on difference, then adjust for the correct x origin
-                attrToProjector["width"] = function (d, i, dataset) { return Math.abs(x2Attr(d, i, dataset) - x1Attr(d, i, dataset)); };
-                attrToProjector["x"] = function (d, i, dataset) { return Math.min(x1Attr(d, i, dataset), x2Attr(d, i, dataset)); };
-                // Generate height based on difference, then adjust for the correct y origin
-                attrToProjector["height"] = function (d, i, dataset) { return Math.abs(y2Attr(d, i, dataset) - y1Attr(d, i, dataset)); };
-                attrToProjector["y"] = function (d, i, dataset) {
-                    return Math.max(y1Attr(d, i, dataset), y2Attr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
-                };
+                var xAttr = attrToProjector[Rectangle._X_KEY];
+                var x2Attr = attrToProjector[Rectangle._X2_KEY];
+                var yAttr = attrToProjector[Rectangle._Y_KEY];
+                var y2Attr = attrToProjector[Rectangle._Y2_KEY];
+                var xScale = this.x().scale;
+                var yScale = this.y().scale;
+                if (x2Attr != null) {
+                    attrToProjector["width"] = function (d, i, dataset) { return Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset)); };
+                    attrToProjector["x"] = function (d, i, dataset) { return Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset)); };
+                }
+                else {
+                    attrToProjector["width"] = function (d, i, dataset) { return _this._rectangleWidth(xScale); };
+                    attrToProjector["x"] = function (d, i, dataset) { return xAttr(d, i, dataset) - 0.5 * attrToProjector["width"](d, i, dataset); };
+                }
+                if (y2Attr != null) {
+                    attrToProjector["height"] = function (d, i, dataset) { return Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset)); };
+                    attrToProjector["y"] = function (d, i, dataset) {
+                        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
+                    };
+                }
+                else {
+                    attrToProjector["height"] = function (d, i, dataset) { return _this._rectangleWidth(yScale); };
+                    attrToProjector["y"] = function (d, i, dataset) { return yAttr(d, i, dataset) - 0.5 * attrToProjector["height"](d, i, dataset); };
+                }
                 // Clean up the attributes projected onto the SVG elements
-                delete attrToProjector["x1"];
-                delete attrToProjector["y1"];
-                delete attrToProjector["x2"];
-                delete attrToProjector["y2"];
+                delete attrToProjector[Rectangle._X2_KEY];
+                delete attrToProjector[Rectangle._Y2_KEY];
                 return attrToProjector;
             };
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
-            Rectangle.prototype.x1 = function (x1, scale) {
-                if (x1 == null) {
-                    return this._propertyBindings.get(Rectangle._X1_KEY);
+            Rectangle.prototype.x = function (x, scale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
                 }
-                this._bindProperty(Rectangle._X1_KEY, x1, scale);
-                this.renderImmediately();
-                return this;
+                if (scale == null) {
+                    return _super.prototype.x.call(this, x);
+                }
+                return _super.prototype.x.call(this, x, scale);
             };
             Rectangle.prototype.x2 = function (x2, scale) {
                 if (x2 == null) {
                     return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
                 this._bindProperty(Rectangle._X2_KEY, x2, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
-            Rectangle.prototype.y1 = function (y1, scale) {
-                if (y1 == null) {
-                    return this._propertyBindings.get(Rectangle._Y1_KEY);
+            Rectangle.prototype.y = function (y, scale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
                 }
-                this._bindProperty(Rectangle._Y1_KEY, y1, scale);
-                this.renderImmediately();
-                return this;
+                if (scale == null) {
+                    return _super.prototype.y.call(this, y);
+                }
+                return _super.prototype.y.call(this, y, scale);
             };
             Rectangle.prototype.y2 = function (y2, scale) {
                 if (y2 == null) {
                     return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
                 this._bindProperty(Rectangle._Y2_KEY, y2, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
-                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x1());
-                attrToProjector["y2"] = Plottable.Plot._scaledAccessor(this.y2());
-                attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
-                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y1());
+                if (this.x2() != null) {
+                    attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
+                }
+                if (this.y2() != null) {
+                    attrToProjector["y2"] = Plottable.Plot._scaledAccessor(this.y2());
+                }
                 return attrToProjector;
             };
             Rectangle.prototype._pixelPoint = function (datum, index, dataset) {
@@ -7015,9 +7057,26 @@ var Plottable;
                 var y = rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
-            Rectangle._X1_KEY = "x1";
+            Rectangle.prototype._rectangleWidth = function (scale) {
+                var _this = this;
+                if (scale instanceof Plottable.Scales.Category) {
+                    return scale.rangeBand();
+                }
+                else {
+                    var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+                    var accessorData = d3.set(Plottable.Utils.Methods.flatten(this._datasetKeysInOrder.map(function (k) {
+                        var dataset = _this._key2PlotDatasetKey.get(k).dataset;
+                        return dataset.data().map(function (d, i) { return accessor(d, i, dataset).valueOf(); });
+                    }))).values().map(function (value) { return +value; });
+                    // Get the absolute difference between min and max
+                    var min = Plottable.Utils.Methods.min(accessorData, 0);
+                    var max = Plottable.Utils.Methods.max(accessorData, 0);
+                    var scaledMin = scale.scale(min);
+                    var scaledMax = scale.scale(max);
+                    return (scaledMax - scaledMin) / Math.abs(max - min);
+                }
+            };
             Rectangle._X2_KEY = "x2";
-            Rectangle._Y1_KEY = "y1";
             Rectangle._Y2_KEY = "y2";
             return Rectangle;
         })(Plottable.XYPlot);
@@ -7064,7 +7123,7 @@ var Plottable;
                     return this._propertyBindings.get(Scatter._SIZE_KEY);
                 }
                 this._bindProperty(Scatter._SIZE_KEY, size, scale);
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Scatter.prototype.symbol = function (symbol) {
@@ -7072,14 +7131,14 @@ var Plottable;
                     return this._propertyBindings.get(Scatter._SYMBOL_KEY);
                 }
                 this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
-                this.renderImmediately();
+                this.render();
                 return this;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["size"] = function () { return 0; };
+                    resetAttrToProjector["d"] = function () { return ""; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
@@ -7127,134 +7186,32 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        var Grid = (function (_super) {
-            __extends(Grid, _super);
-            /**
-             * Constructs a GridPlot.
-             *
-             * A GridPlot is used to shade a grid of data. Each datum is a cell on the
-             * grid, and the datum can control what color it is.
-             *
-             * @constructor
-             * @param {Scale.Scale} xScale The x scale to use.
-             * @param {Scale.Scale} yScale The y scale to use.
-             * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
-             * to use for each grid cell.
-             */
-            function Grid(xScale, yScale) {
-                _super.call(this, xScale, yScale);
-                this.classed("grid-plot", true);
-                // The x and y scales should render in bands with no padding for category scales
-                if (xScale instanceof Plottable.Scales.Category) {
-                    xScale.innerPadding(0).outerPadding(0);
-                }
-                if (yScale instanceof Plottable.Scales.Category) {
-                    yScale.innerPadding(0).outerPadding(0);
-                }
-                this.animator("cells", new Plottable.Animators.Null());
-            }
-            Grid.prototype.addDataset = function (dataset) {
-                if (this._datasetKeysInOrder.length === 1) {
-                    Plottable.Utils.Methods.warn("Only one dataset is supported in Grid plots");
-                    return this;
-                }
-                _super.prototype.addDataset.call(this, dataset);
-                return this;
-            };
-            Grid.prototype._getDrawer = function (key) {
-                return new Plottable.Drawers.Rect(key, true);
-            };
-            Grid.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("cells") }];
-            };
-            Grid.prototype.x = function (x, scale) {
-                var _this = this;
-                if (x == null) {
-                    return _super.prototype.x.call(this);
-                }
-                if (scale == null) {
-                    _super.prototype.x.call(this, x);
-                }
-                else {
-                    _super.prototype.x.call(this, x, scale);
-                    if (scale instanceof Plottable.Scales.Category) {
-                        var catScale = scale;
-                        this.x1(function (d, i, dataset) { return scale.scale(_this.x().accessor(d, i, dataset)) - catScale.rangeBand() / 2; });
-                        this.x2(function (d, i, dataset) { return scale.scale(_this.x().accessor(d, i, dataset)) + catScale.rangeBand() / 2; });
-                    }
-                    else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.x1(function (d, i, dataset) { return scale.scale(_this.x().accessor(d, i, dataset)); });
-                    }
-                }
-                return this;
-            };
-            Grid.prototype.y = function (y, scale) {
-                var _this = this;
-                if (y == null) {
-                    return _super.prototype.y.call(this);
-                }
-                if (scale == null) {
-                    _super.prototype.y.call(this, y);
-                }
-                else {
-                    _super.prototype.y.call(this, y, scale);
-                    if (scale instanceof Plottable.Scales.Category) {
-                        var catScale = scale;
-                        this.y1(function (d, i, dataset) { return scale.scale(_this.y().accessor(d, i, dataset)) - catScale.rangeBand() / 2; });
-                        this.y2(function (d, i, dataset) { return scale.scale(_this.y().accessor(d, i, dataset)) + catScale.rangeBand() / 2; });
-                    }
-                    else if (scale instanceof Plottable.QuantitativeScale) {
-                        this.y1(function (d, i, dataset) { return scale.scale(_this.y().accessor(d, i, dataset)); });
-                    }
-                }
-                return this;
-            };
-            return Grid;
-        })(Plots.Rectangle);
-        Plots.Grid = Grid;
-    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Orientation = (function () {
-        function Orientation() {
-        }
-        Orientation.VERTICAL = "vertical";
-        Orientation.HORIZONTAL = "horizontal";
-        return Orientation;
-    })();
-    Plottable.Orientation = Orientation;
-    var Plots;
-    (function (Plots) {
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
-             * Constructs a BarPlot.
+             * Constructs a Bar Plot.
              *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function Bar(xScale, yScale) {
+            function Bar(xScale, yScale, orientation) {
                 var _this = this;
+                if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
+                if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+                }
+                this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
-                this._isVertical = true;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
@@ -7271,8 +7228,7 @@ var Plottable;
                     return this._baselineValue;
                 }
                 this._baselineValue = value;
-                this._updateXDomainer();
-                this._updateYDomainer();
+                this._updateValueScale();
                 this.render();
                 return this;
             };
@@ -7422,36 +7378,18 @@ var Plottable;
                 });
                 return bars;
             };
-            Bar.prototype._updateDomainer = function (scale) {
-                if (scale instanceof Plottable.QuantitativeScale) {
-                    var qscale = scale;
-                    if (!qscale._userSetDomainer) {
-                        if (this._baselineValue != null) {
-                            qscale.domainer().addPaddingException(this, this._baselineValue).addIncludedValue(this, this._baselineValue);
-                        }
-                        else {
-                            qscale.domainer().removePaddingException(this).removeIncludedValue(this);
-                        }
-                        qscale.domainer().pad().nice();
+            Bar.prototype._updateValueScale = function () {
+                var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+                if (valueScale instanceof Plottable.QuantitativeScale) {
+                    var qscale = valueScale;
+                    if (this._baselineValue != null) {
+                        qscale.addPaddingException(this, this._baselineValue);
+                        qscale.addIncludedValue(this, this._baselineValue);
                     }
-                    // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    qscale._autoDomainIfAutomaticMode();
-                }
-            };
-            Bar.prototype._updateYDomainer = function () {
-                if (this._isVertical) {
-                    this._updateDomainer(this.y().scale);
-                }
-                else {
-                    _super.prototype._updateYDomainer.call(this);
-                }
-            };
-            Bar.prototype._updateXDomainer = function () {
-                if (!this._isVertical) {
-                    this._updateDomainer(this.x().scale);
-                }
-                else {
-                    _super.prototype._updateXDomainer.call(this);
+                    else {
+                        qscale.removePaddingException(this);
+                        qscale.removeIncludedValue(this);
+                    }
                 }
             };
             Bar.prototype._additionalPaint = function (time) {
@@ -7536,16 +7474,6 @@ var Plottable;
                 }
                 return attrToProjector;
             };
-            Bar.prototype.orientation = function (orientation) {
-                if (orientation == null) {
-                    return this._isVertical ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-                }
-                else {
-                    this._isVertical = orientation === Orientation.VERTICAL;
-                    this.render();
-                    return this;
-                }
-            };
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -7624,6 +7552,8 @@ var Plottable;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
+            Bar.ORIENTATION_VERTICAL = "vertical";
+            Bar.ORIENTATION_HORIZONTAL = "horizontal";
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
@@ -7825,14 +7755,14 @@ var Plottable;
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
                 this._bindProperty(Area._Y0_KEY, y0, y0Scale);
-                this._updateYDomainer();
-                this.renderImmediately();
+                this._updateYScale();
+                this.render();
                 return this;
             };
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
                 if (this.y().scale != null) {
-                    this._updateYDomainer();
+                    this._updateYScale();
                 }
             };
             Area.prototype.addDataset = function (dataset) {
@@ -7857,21 +7787,17 @@ var Plottable;
             Area.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);
             };
-            Area.prototype._updateYDomainer = function () {
-                _super.prototype._updateYDomainer.call(this);
+            Area.prototype._updateYScale = function () {
                 var extents = this._propertyExtents.get("y0");
                 var extent = Plottable.Utils.Methods.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 var yScale = this.y().scale;
-                if (!yScale._userSetDomainer) {
-                    if (constantBaseline != null) {
-                        yScale.domainer().addPaddingException(this, constantBaseline);
-                    }
-                    else {
-                        yScale.domainer().removePaddingException(this);
-                    }
-                    yScale._autoDomainIfAutomaticMode();
+                if (constantBaseline != null) {
+                    yScale.addPaddingException(this, constantBaseline);
+                }
+                else {
+                    yScale.removePaddingException(this);
                 }
             };
             Area.prototype._getResetYFunction = function () {
@@ -7951,9 +7877,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function ClusteredBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function ClusteredBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
@@ -8214,14 +8142,10 @@ var Plottable;
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
-            StackedArea.prototype._updateYDomainer = function () {
-                _super.prototype._updateYDomainer.call(this);
+            StackedArea.prototype._updateYScale = function () {
                 var scale = this.y().scale;
-                if (!scale._userSetDomainer) {
-                    scale.domainer().addPaddingException(this, 0).addIncludedValue(this, 0);
-                    // prepending "AREA_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-                    scale._autoDomainIfAutomaticMode();
-                }
+                scale.addPaddingException(this, 0);
+                scale.addIncludedValue(this, 0);
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 this._updateStackExtentsAndOffsets();
@@ -8301,9 +8225,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function StackedBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
@@ -8716,7 +8642,7 @@ var Plottable;
             function Mouse(svg) {
                 var _this = this;
                 _super.call(this);
-                this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
+                this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._lastMousePosition = { x: -1, y: -1 };
                 this._moveCallbacks = new Plottable.Utils.CallbackSet();
                 this._downCallbacks = new Plottable.Utils.CallbackSet();
@@ -8874,7 +8800,7 @@ var Plottable;
              * calls all the callbacks in the provided callbackSet.
              */
             Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
-                var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
+                var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
                 if (newMousePosition != null) {
                     this._lastMousePosition = newMousePosition;
                     callbackSet.callCallbacks(this.getLastMousePosition(), event);
@@ -8917,7 +8843,7 @@ var Plottable;
             function Touch(svg) {
                 var _this = this;
                 _super.call(this);
-                this.translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
+                this._translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(svg);
                 this._startCallbacks = new Plottable.Utils.CallbackSet();
                 this._moveCallbacks = new Plottable.Utils.CallbackSet();
                 this._endCallbacks = new Plottable.Utils.CallbackSet();
@@ -9051,7 +8977,7 @@ var Plottable;
                 for (var i = 0; i < touches.length; i++) {
                     var touch = touches[i];
                     var touchID = touch.identifier;
-                    var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+                    var newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
                     if (newTouchPosition != null) {
                         touchPositions[touchID] = newTouchPosition;
                         touchIdentifiers.push(touchID);
@@ -9360,7 +9286,7 @@ var Plottable;
             DoubleClick.prototype._handleClickDown = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
-                    if (!(this._clickState === 1 /* SingleClicked */) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                    if (!(this._clickState === 1 /* SingleClicked */) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
                         this._clickState = 0 /* NotClicked */;
                     }
                     this._clickedPoint = translatedP;
@@ -9369,7 +9295,7 @@ var Plottable;
             };
             DoubleClick.prototype._handleClickUp = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+                if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
                     this._clickState = this._clickState === 0 /* NotClicked */ ? 1 /* SingleClicked */ : 2 /* DoubleClicked */;
                 }
                 else {
@@ -9387,7 +9313,7 @@ var Plottable;
                 this._clickState = 0 /* NotClicked */;
                 this._clickedDown = false;
             };
-            DoubleClick.pointsEqual = function (p1, p2) {
+            DoubleClick._pointsEqual = function (p1, p2) {
                 return p1.x === p2.x && p1.y === p2.y;
             };
             /**
@@ -9680,25 +9606,25 @@ var Plottable;
                 if (this._touchIds.size() < 2) {
                     return;
                 }
-                var oldCenterPoint = this.centerPoint();
-                var oldCornerDistance = this.cornerDistance();
+                var oldCenterPoint = this._centerPoint();
+                var oldCornerDistance = this._cornerDistance();
                 ids.forEach(function (id) {
                     if (_this._touchIds.has(id.toString())) {
                         _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
-                var newCenterPoint = this.centerPoint();
-                var newCornerDistance = this.cornerDistance();
+                var newCenterPoint = this._centerPoint();
+                var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom.magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom.translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom.magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom.translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
                 }
             };
-            PanZoom.prototype.centerPoint = function () {
+            PanZoom.prototype._centerPoint = function () {
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
@@ -9708,7 +9634,7 @@ var Plottable;
                 var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
                 return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
             };
-            PanZoom.prototype.cornerDistance = function () {
+            PanZoom.prototype._cornerDistance = function () {
                 var points = this._touchIds.values();
                 var firstTouchPoint = points[0];
                 var secondTouchPoint = points[1];
@@ -9724,11 +9650,11 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom.magnifyScale = function (scale, magnifyAmount, centerValue) {
+            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
                 scale.domain(scale.range().map(magnifyTransform));
             };
-            PanZoom.translateScale = function (scale, translateAmount) {
+            PanZoom._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
                 scale.domain(scale.range().map(translateTransform));
             };
@@ -9739,10 +9665,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        PanZoom.magnifyScale(this._xScale, zoomAmount, translatedP.x);
+                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
                     }
                     if (this._yScale != null) {
-                        PanZoom.magnifyScale(this._yScale, zoomAmount, translatedP.y);
+                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
                     }
                 }
             };
@@ -9757,11 +9683,11 @@ var Plottable;
                     }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom.translateScale(_this._xScale, -dragAmountX);
+                        PanZoom._translateScale(_this._xScale, -dragAmountX);
                     }
                     if (_this._yScale != null) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom.translateScale(_this._yScale, -dragAmountY);
+                        PanZoom._translateScale(_this._yScale, -dragAmountY);
                     }
                     lastDragPoint = endPoint;
                 });

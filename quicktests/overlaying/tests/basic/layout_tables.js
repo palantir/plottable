@@ -55,8 +55,8 @@ function run(svg, data, Plottable) {
 
     var bigtable = new Plottable.Components.Table();
 
-    var line1 = new Plottable.Components.Label("Tables in Tables", "horizontal");
-    var line2 = new Plottable.Components.Label("for Dan", "horizontal");
+    var line1 = new Plottable.Components.Label("Tables in Tables", 0);
+    var line2 = new Plottable.Components.Label("for Dan", 0);
 
     bigtable = new Plottable.Components.Table().add(basicTable0, 0, 0)
                                           .add(basicTable1, 0, 2)
