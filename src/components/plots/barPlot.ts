@@ -38,8 +38,8 @@ export module Plots {
       this.attr("width", () => this._getBarPixelWidth());
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Rect(key, this._isVertical);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Rect(dataset, this._isVertical);
     }
 
     protected _setup() {

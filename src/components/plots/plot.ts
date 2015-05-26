@@ -102,7 +102,7 @@ module Plottable {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(key);
+      var drawer = this._getDrawer(dataset);
       var pdk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
@@ -116,8 +116,8 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(key);
+    protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer {
+      return new Drawers.AbstractDrawer(dataset);
     }
 
     protected _getAnimator(key: string): Animators.PlotAnimator {

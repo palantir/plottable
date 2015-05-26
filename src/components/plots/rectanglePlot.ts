@@ -25,8 +25,8 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
+    protected _getDrawer(dataset: Dataset) {
+      return new Drawers.Rect(dataset, true);
     }
 
     protected _generateAttrToProjector() {

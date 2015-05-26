@@ -28,8 +28,8 @@ export module Plots {
       this.symbol(() => circleSymbolFactory);
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Symbol(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Symbol(dataset);
     }
 
     public size<S>(): AccessorScaleBinding<S, number>;

@@ -58,8 +58,7 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      // HACKHACK Drawers should take in a dataset instead of the key
-      var lineDrawer = new Drawers.Line("");
+      var lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
         lineDrawer.setup(this._renderArea.append("g"));
       }
@@ -77,8 +76,8 @@ export module Plots {
       });
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Area(dataset);
     }
 
     protected _updateYDomainer() {

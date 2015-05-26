@@ -20,7 +20,7 @@ export module Drawers {
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
     protected _className: string;
-    public key: string;
+    private _dataset: Dataset;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -36,10 +36,10 @@ export module Drawers {
      * Constructs a Drawer
      *
      * @constructor
-     * @param{string} key The key associated with this Drawer
+     * @param {Dataset} dataset The dataset associated with this Drawer
      */
-    constructor(key: string) {
-        this.key = key;
+    constructor(dataset: Dataset) {
+        this._dataset = dataset;
     }
 
     public setup(area: D3.Selection) {

@@ -155,9 +155,12 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
+      var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
+      var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
+
       // Create mock drawers with already drawn items
       // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -166,22 +169,20 @@ describe("Plots", () => {
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "_0") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
       plot.addDataset(dataset2);
       plot.renderTo(svg);
 
@@ -208,6 +209,8 @@ describe("Plots", () => {
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
+      var dataset1 = new Plottable.Dataset(data1);
+      var dataset2 = new Plottable.Dataset(data2);
 
       var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
       var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
@@ -217,7 +220,7 @@ describe("Plots", () => {
 
       // Create mock drawers with already drawn items
       // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -226,22 +229,20 @@ describe("Plots", () => {
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "_0") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      var dataset1 = new Plottable.Dataset(data1);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
 
       (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
@@ -282,13 +283,14 @@ describe("Plots", () => {
       var plot = new Plottable.Plot();
 
       var data = [{value: NaN}, {value: 1}, {value: 2}];
+      var dataset = new Plottable.Dataset(data);
 
       var dataPoints = data.map((datum: any) => { return {x: datum.value, y: 10}; });
 
       var dataPointConverter = (datum: any, index: number) => dataPoints[index];
 
       // Create mock drawer with already drawn items
-      var mockDrawer = new Plottable.Drawers.AbstractDrawer("ds");
+      var mockDrawer = new Plottable.Drawers.AbstractDrawer(dataset);
       var renderArea = svg.append("g");
       var circles = renderArea.selectAll("circles").data(data);
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -303,7 +305,6 @@ describe("Plots", () => {
       // Mock _getDrawer to return the mock drawer
       (<any> plot)._getDrawer = () => mockDrawer;
 
-      var dataset = new Plottable.Dataset(data);
       plot.addDataset(dataset);
       plot.renderTo(svg);
 
@@ -326,6 +327,8 @@ describe("Plots", () => {
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
+      var dataset1 = new Plottable.Dataset(data1);
+      var dataset2 = new Plottable.Dataset(data2);
 
       var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
       var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
@@ -334,7 +337,7 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -342,22 +345,20 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "ds1") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      var dataset1 = new Plottable.Dataset(data1);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
 
       (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {

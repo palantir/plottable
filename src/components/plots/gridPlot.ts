@@ -40,8 +40,8 @@ export module Plots {
       return this;
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
+    protected _getDrawer(dataset: Dataset) {
+      return new Drawers.Rect(dataset, true);
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {

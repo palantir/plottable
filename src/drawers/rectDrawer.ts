@@ -11,8 +11,8 @@ export module Drawers {
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _writer: SVGTypewriter.Writers.Writer;
 
-    constructor(key: string, isVertical: boolean) {
-      super(key);
+    constructor(dataset: Dataset, isVertical: boolean) {
+      super(dataset);
       this.svgElement("rect");
       this._isVertical = isVertical;
     }
