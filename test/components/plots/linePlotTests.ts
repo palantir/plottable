@@ -20,7 +20,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 1]);
 
-      var linePlot = new Plottable.Plots.Line(xScale, yScale);
+      var linePlot = new Plottable.Plots.Line();
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
       linePlot.x((d: any) => d.foo, xScale);
       linePlot.y((d: any) => d.bar, yScale);
@@ -42,7 +42,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Line(xScale, yScale);
+      var plot = new Plottable.Plots.Line();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -77,7 +77,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plots.Line(xScale, yScale);
+      linePlot = new Plottable.Plots.Line();
       linePlot.addDataset(simpleDataset);
       linePlot.x(xAccessor, xScale)
               .y(yAccessor, yScale)
@@ -308,7 +308,7 @@ describe("Plots", () => {
       });
 
       it("handles empty plots gracefully", () => {
-        linePlot = new Plottable.Plots.Line(xScale, yScale);
+        linePlot = new Plottable.Plots.Line();
 
         var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
         assert.lengthOf(closest.data, 0);

@@ -114,9 +114,9 @@ describe("Metadata", () => {
     checkXYPlot(new Plottable.Plots.Area(xScale, yScale));
     checkXYPlot(new Plottable.Plots.StackedArea(xScale, yScale));
     checkXYPlot(new Plottable.Plots.Bar());
-    checkXYPlot(new Plottable.Plots.StackedBar(xScale, yScale));
-    checkXYPlot(new Plottable.Plots.StackedBar(yScale, xScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
-    checkXYPlot(new Plottable.Plots.ClusteredBar(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.StackedBar());
+    checkXYPlot(new Plottable.Plots.StackedBar( Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
+    checkXYPlot(new Plottable.Plots.ClusteredBar());
     checkXYPlot(new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
     checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
     checkPiePlot(new Plottable.Plots.Pie());

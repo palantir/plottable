@@ -7,7 +7,7 @@ describe("Drawers", () => {
       var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var linePlot = new Plottable.Plots.Line(xScale, yScale);
+      var linePlot = new Plottable.Plots.Line();
 
       var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;
@@ -31,7 +31,7 @@ describe("Drawers", () => {
       var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var linePlot = new Plottable.Plots.Line(xScale, yScale);
+      var linePlot = new Plottable.Plots.Line();
 
       var drawer = new Plottable.Drawers.Line("_0"); // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
       (<any> linePlot)._getDrawer = () => drawer;

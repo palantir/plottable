@@ -406,7 +406,7 @@ describe("Component behavior", () => {
 
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
-    var plot = new Plottable.Plots.Line(xScale, yScale);
+    var plot = new Plottable.Plots.Line();
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);
 

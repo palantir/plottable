@@ -10,7 +10,7 @@ describe("Plots", () => {
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Plots.StackedBar(xScale, yScale);
+      stackedPlot = new Plottable.Plots.StackedBar();
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
 
@@ -337,7 +337,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      var plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -390,7 +390,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      var plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -414,7 +414,7 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Category();
       yScale = new Plottable.Scales.Linear();
 
-      stackedBarPlot = new Plottable.Plots.StackedBar(xScale, yScale);
+      stackedBarPlot = new Plottable.Plots.StackedBar();
       stackedBarPlot.x((d) => d.key, xScale);
       stackedBarPlot.y((d) => d.value, yScale);
 
