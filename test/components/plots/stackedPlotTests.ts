@@ -391,18 +391,6 @@ describe("Plots", () => {
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
     });
-
-    it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plots.StackedBar();
-      plot.addDataset(dataset1)
-          .addDataset(dataset2);
-      plot.x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale)
-          .autorange("y");
-      plot.renderTo(svg);
-      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-      svg.remove();
-    });
   });
 
   describe("scale extent updates", () => {
