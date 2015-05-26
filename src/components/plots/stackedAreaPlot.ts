@@ -82,6 +82,9 @@ export module Plots {
     }
 
     protected _updateYScale() {
+      if (!this.y()) {
+        return;
+      }
       var scale = <QuantitativeScale<any>> this.y().scale;
       scale.addPaddingException(this, 0);
       scale.addIncludedValue(this, 0);

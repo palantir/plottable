@@ -6885,17 +6885,21 @@ var Plottable;
         };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-            var xScale = this.x().scale;
-            if (xScale != null) {
-                xScale.range([0, this.width()]);
-            }
-            var yScale = this.y().scale;
-            if (yScale != null) {
-                if (this.y().scale instanceof Plottable.Scales.Category) {
-                    this.y().scale.range([0, this.height()]);
+            if (this.x() != null) {
+                var xScale = this.x().scale;
+                if (xScale != null) {
+                    xScale.range([0, this.width()]);
                 }
-                else {
-                    this.y().scale.range([this.height(), 0]);
+            }
+            if (this.y() != null) {
+                var yScale = this.y().scale;
+                if (yScale != null) {
+                    if (this.y().scale instanceof Plottable.Scales.Category) {
+                        this.y().scale.range([0, this.height()]);
+                    }
+                    else {
+                        this.y().scale.range([this.height(), 0]);
+                    }
                 }
             }
             return this;
@@ -6941,6 +6945,9 @@ var Plottable;
             }
         };
         XYPlot.prototype._projectorsReady = function () {
+            if (!this.x() || !this.y()) {
+                return false;
+            }
             return this.x().accessor != null && this.y().accessor != null;
         };
         XYPlot._X_KEY = "x";
@@ -7440,7 +7447,11 @@ var Plottable;
                 return bars;
             };
             Bar.prototype._updateValueScale = function () {
-                var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+                var valueProjector = this._isVertical ? this.y() : this.x();
+                if (!valueProjector) {
+                    return;
+                }
+                var valueScale = valueProjector.scale;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
                     if (this._baselineValue != null) {
@@ -7806,7 +7817,7 @@ var Plottable;
             };
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                if (this.y().scale != null) {
+                if (this.y() != null && this.y().scale != null) {
                     this._updateYScale();
                 }
             };
@@ -7818,6 +7829,9 @@ var Plottable;
                 var extent = Plottable.Utils.Methods.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
+                if (!this.y()) {
+                    return;
+                }
                 var yScale = this.y().scale;
                 if (constantBaseline != null) {
                     yScale.addPaddingException(this, constantBaseline);
@@ -8130,6 +8144,9 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
             StackedArea.prototype._updateYScale = function () {
+                if (!this.y()) {
+                    return;
+                }
                 var scale = this.y().scale;
                 scale.addPaddingException(this, 0);
                 scale.addIncludedValue(this, 0);

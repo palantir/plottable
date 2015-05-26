@@ -46,7 +46,7 @@ export module Plots {
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      if (this.y().scale != null) {
+      if (this.y() != null && this.y().scale != null) {
         this._updateYScale();
       }
     }
@@ -61,6 +61,9 @@ export module Plots {
       var uniqExtentVals = Utils.Methods.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
+      if (!this.y()) {
+        return;
+      }
       var yScale = <QuantitativeScale<number>> this.y().scale;
       if (constantBaseline != null) {
         yScale.addPaddingException(this, constantBaseline);
