@@ -329,8 +329,8 @@ describe("Plots", () => {
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -341,8 +341,8 @@ describe("Plots", () => {
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -382,8 +382,8 @@ describe("Plots", () => {
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, yScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();
@@ -394,8 +394,8 @@ describe("Plots", () => {
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
-          .y((d: any) => d.y, yScale);
-      (<any>plot).automaticallyAdjustYScaleOverVisiblePoints(true);
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();

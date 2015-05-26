@@ -1,19 +1,19 @@
 ///<reference path="../testReference.ts" />
 
 class MockAnimator implements Plottable.Animators.PlotAnimator {
-  private time: number;
-  private callback: Function;
+  private _time: number;
+  private _callback: Function;
   constructor(time: number, callback?: Function) {
-    this.time = time;
-    this.callback = callback;
+    this._time = time;
+    this._callback = callback;
   }
   public getTiming(selection: any) {
-    return this.time;
+    return this._time;
   }
 
   public animate(selection: any, attrToProjector: Plottable.AttributeToProjector): any {
-    if (this.callback) {
-      this.callback();
+    if (this._callback) {
+      this._callback();
     }
     return selection;
   }

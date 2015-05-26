@@ -41,10 +41,19 @@ export module Scales {
       return super._setDomain(values);
     }
 
-    public _defaultExtent(): Date[] {
+    protected _defaultExtent(): Date[] {
       var endTimeValue = new Date().valueOf();
-      var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+      var startTimeValue = endTimeValue - MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
+      var startTime = singleValueDomain[0].getTime();
+      var endTime = singleValueDomain[1].getTime();
+      if (startTime === endTime) {
+        return [new Date(startTime - MILLISECONDS_IN_ONE_DAY), new Date(endTime + MILLISECONDS_IN_ONE_DAY)];
+      }
+      return singleValueDomain;
     }
 
     public scale(value: Date): number {
@@ -75,7 +84,7 @@ export module Scales {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 
-    public _niceDomain(domain: Date[], count?: number) {
+    protected _niceDomain(domain: Date[], count?: number) {
       return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
     }
   }

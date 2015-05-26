@@ -19,8 +19,15 @@ export module Scales {
       this._d3Scale = d3.scale.linear();
     }
 
-    public _defaultExtent(): number[] {
-        return [0, 1];
+    protected _defaultExtent(): number[] {
+      return [0, 1];
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: number[]) {
+      if (singleValueDomain[0] === singleValueDomain[1]) {
+        return [singleValueDomain[0] - 1, singleValueDomain[1] + 1];
+      }
+      return singleValueDomain;
     }
 
     public scale(value: number) {
@@ -51,7 +58,7 @@ export module Scales {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 
-    public _niceDomain(domain: number[], count?: number): number[] {
+    protected _niceDomain(domain: number[], count?: number): number[] {
       return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
     }
   }
