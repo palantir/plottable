@@ -2869,7 +2869,7 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
-            static PLOT_CLASS: string;
+            static PATH_CLASS: string;
             /**
              * Constructs a LinePlot.
              *
