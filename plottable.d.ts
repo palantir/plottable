@@ -1212,7 +1212,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Line extends AbstractDrawer {
-            static LINE_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
@@ -2778,7 +2778,6 @@ declare module Plottable {
 declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
-            static PATH_CLASS: string;
             /**
              * Constructs a LinePlot.
              *

@@ -2614,7 +2614,7 @@ var Plottable;
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true);
+                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true);
                 _super.prototype.setup.call(this, area);
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
@@ -2623,15 +2623,15 @@ var Plottable;
             Line.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 step.animator.animate(this._pathSelection, attrToProjector);
-                this._pathSelection.classed(Line.LINE_CLASS, true);
+                this._pathSelection.classed(Line.PATH_CLASS, true);
             };
             Line.prototype._getSelector = function () {
-                return "." + Line.LINE_CLASS;
+                return "." + Line.PATH_CLASS;
             };
             Line.prototype._getSelection = function (index) {
                 return this._getRenderArea().select(this._getSelector());
             };
-            Line.LINE_CLASS = "line";
+            Line.PATH_CLASS = "line";
             return Line;
         })(Drawers.AbstractDrawer);
         Drawers.Line = Line;
@@ -7567,7 +7567,6 @@ var Plottable;
                 this.attr("stroke-width", "2px");
                 this.attr("vector-effect", "non-scaling-stroke");
                 this.attr("fill", "none");
-                this.attr("class", Line.PATH_CLASS);
             }
             Line.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Line(key);
@@ -7697,7 +7696,6 @@ var Plottable;
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
                 };
             };
-            Line.PATH_CLASS = "line";
             return Line;
         })(Plottable.XYPlot);
         Plots.Line = Line;

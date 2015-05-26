@@ -2794,14 +2794,14 @@ describe("Plots", function () {
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
-            var linePath = renderArea.select("." + Plottable.Plots.Line.PATH_CLASS);
+            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             var lineComputedStyle = window.getComputedStyle(linePath.node());
             assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
             svg.remove();
         });
         it("attributes set appropriately from accessor", function () {
-            var areaPath = renderArea.select("." + Plottable.Plots.Line.PATH_CLASS);
+            var areaPath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
             svg.remove();
         });
@@ -2809,7 +2809,7 @@ describe("Plots", function () {
             var newColorAccessor = function () { return "pink"; };
             linePlot.attr("stroke", newColorAccessor);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Plots.Line.PATH_CLASS);
+            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
             svg.remove();
         });
@@ -2820,7 +2820,7 @@ describe("Plots", function () {
             });
             simpleDataset.data(data);
             linePlot.attr("stroke", function (d) { return d.stroke; });
-            var linePath = renderArea.select("." + Plottable.Plots.Line.PATH_CLASS);
+            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
             simpleDataset.data(data);
@@ -2836,7 +2836,7 @@ describe("Plots", function () {
                 { foo: 0.8, bar: 0.8 }
             ];
             simpleDataset.data(lineData);
-            var linePath = renderArea.select(".line");
+            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             var d_original = TestMethods.normalizePath(linePath.attr("d"));
             function assertCorrectPathSplitting(msgPrefix) {
                 var d = TestMethods.normalizePath(linePath.attr("d"));
@@ -2989,9 +2989,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             linePlot.attr("class", newClassProjector);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
+            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
             assert.isTrue(linePath.classed("pink"));
-            assert.isTrue(linePath.classed(Plottable.Drawers.Line.LINE_CLASS));
+            assert.isTrue(linePath.classed(Plottable.Drawers.Line.PATH_CLASS));
             svg.remove();
         });
     });
