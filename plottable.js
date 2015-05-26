@@ -2538,7 +2538,7 @@ var Plottable;
                 var _this = this;
                 var modifiedAttrToProjector = {};
                 d3.keys(attrToProjector).forEach(function (attr) {
-                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this.__dataset); };
+                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset()); };
                 });
                 return modifiedAttrToProjector;
             };
