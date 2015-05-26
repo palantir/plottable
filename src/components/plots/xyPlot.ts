@@ -33,10 +33,7 @@ module Plottable {
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-      this._updateXDomainer();
       xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-
-      this._updateYDomainer();
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
@@ -51,8 +48,7 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      this._updateXDomainer();
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -68,8 +64,7 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      this._updateYDomainer();
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -122,31 +117,40 @@ module Plottable {
       return this;
     }
 
-    /**
-     * Sets the automatic domain adjustment over visible points for y scale.
-     *
-     * If autoAdjustment is true adjustment is immediately performend.
-     *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
+    /** 
+     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  
+     * 
+     * If 'x' or 'y' is specified the adjustment is immediately performed.
+     * 
+     * @param {string} scale Must be one of 'x', 'y', or 'none'.  
+     * 
+     * 'x' will adjust the x scale in relation to changes in the y domain.  
+     * 
+     * 'y' will adjust the y scale in relation to changes in the x domain.
+     * 
+     * 'none' means neither scale will change automatically.
+     * 
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
-      this._autoAdjustYScaleDomain = autoAdjustment;
-      this._adjustYDomainOnChangeFromX();
-      return this;
-    }
-
-    /**
-     * Sets the automatic domain adjustment over visible points for x scale.
-     *
-     * If autoAdjustment is true adjustment is immediately performend.
-     *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-     * @returns {XYPlot} The calling XYPlot.
-     */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
-      this._autoAdjustXScaleDomain = autoAdjustment;
-      this._adjustXDomainOnChangeFromY();
+    public autorange(scaleName: string) {
+      switch (scaleName) {
+        case "x":
+          this._autoAdjustXScaleDomain = true;
+          this._autoAdjustYScaleDomain = false;
+          this._adjustXDomainOnChangeFromY();
+          break;
+        case "y":
+          this._autoAdjustXScaleDomain = false;
+          this._autoAdjustYScaleDomain = true;
+          this._adjustYDomainOnChangeFromX();
+          break;
+        case "none":
+          this._autoAdjustXScaleDomain = false;
+          this._autoAdjustYScaleDomain = false;
+          break;
+        default:
+          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+      }
       return this;
     }
 
@@ -178,24 +182,6 @@ module Plottable {
         }
       }
       return this;
-    }
-
-    protected _updateXDomainer() {
-      if (this.x().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.x().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this.y().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.y().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
     }
 
     private _updateXExtentsAndAutodomain() {
