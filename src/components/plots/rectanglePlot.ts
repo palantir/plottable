@@ -3,8 +3,8 @@
 module Plottable {
 export module Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
-    private static _X1_KEY = "x1";
-    private static _Y1_KEY = "y1";
+    private static _X2_KEY = "x2";
+    private static _Y2_KEY = "y2";
 
     /**
      * Constructs a RectanglePlot.
@@ -42,9 +42,9 @@ export module Plots {
 
       // Copy each of the different projectors.
       var xAttr = attrToProjector[Rectangle._X_KEY];
-      var x1Attr = attrToProjector[Rectangle._X1_KEY];
+      var x1Attr = attrToProjector[Rectangle._X2_KEY];
       var yAttr = attrToProjector[Rectangle._Y_KEY];
-      var y1Attr = attrToProjector[Rectangle._Y1_KEY];
+      var y1Attr = attrToProjector[Rectangle._Y2_KEY];
 
       var xScale = this.x().scale;
       var yScale = this.y().scale;
@@ -91,14 +91,14 @@ export module Plots {
       return super.x(<X | Accessor<X>> x, scale);
     }
 
-    public x1(): AccessorScaleBinding<X, number>;
-    public x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public x1(x1: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-    public x1(x1?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
-      if (x1 == null) {
-        return this._propertyBindings.get(Rectangle._X1_KEY);
+    public x2(): AccessorScaleBinding<X, number>;
+    public x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    public x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+    public x2(x2?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+      if (x2 == null) {
+        return this._propertyBindings.get(Rectangle._X2_KEY);
       }
-      this._bindProperty(Rectangle._X1_KEY, x1, scale);
+      this._bindProperty(Rectangle._X2_KEY, x2, scale);
       this.renderImmediately();
       return this;
     }
@@ -116,14 +116,14 @@ export module Plots {
       return super.y(<Y | Accessor<Y>> y, scale);
     }
 
-    public y1(): AccessorScaleBinding<Y, number>;
-    public y1(y1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public y1(y1: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-    public y1(y1?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
-      if (y1 == null) {
-        return this._propertyBindings.get(Rectangle._Y1_KEY);
+    public y2(): AccessorScaleBinding<Y, number>;
+    public y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    public y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+    public y2(y2?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
+      if (y2 == null) {
+        return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
-      this._bindProperty(Rectangle._Y1_KEY, y1, scale);
+      this._bindProperty(Rectangle._Y2_KEY, y2, scale);
       this.renderImmediately();
       return this;
     }

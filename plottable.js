@@ -1495,6 +1495,9 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
+        Scale.prototype.extentOfValues = function (values) {
+            return []; // this should be overwritten
+        };
         Scale.prototype._getAllExtents = function () {
             var _this = this;
             return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
@@ -1628,6 +1631,15 @@ var Plottable;
          */
         QuantitativeScale.prototype.invert = function (value) {
             throw new Error("Subclasses should override _invert");
+        };
+        QuantitativeScale.prototype.extentOfValues = function (values) {
+            var extent = d3.extent(values);
+            if (extent[0] == null || extent[1] == null) {
+                return [];
+            }
+            else {
+                return extent;
+            }
         };
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
@@ -1967,6 +1979,9 @@ var Plottable;
                 this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
+            Category.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
+            };
             Category.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
@@ -2109,6 +2124,9 @@ var Plottable;
                 }
                 this._d3Scale = scale;
             }
+            Color.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Methods.uniq(values);
+            };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 var extents = this._getAllExtents();
@@ -2299,6 +2317,15 @@ var Plottable;
                 }
                 this._d3Scale = this._D3InterpolatedScale();
             }
+            InterpolatedColor.prototype.extentOfValues = function (values) {
+                var extent = d3.extent(values);
+                if (extent[0] == null || extent[1] == null) {
+                    return [];
+                }
+                else {
+                    return extent;
+                }
+            };
             /**
              * Generates the converted QuantitativeScale.
              *
@@ -5077,7 +5104,7 @@ var Plottable;
                 else {
                     padAmount = +padAmount;
                     if (padAmount < 0) {
-                        throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+                        throw new Error(padAmount + " is not a valid padding value. Cannot be less than 0.");
                     }
                     this._padding = padAmount;
                     this.redraw();
@@ -6380,31 +6407,22 @@ var Plottable;
             extents.set(key, this._datasetKeysInOrder.map(function (key) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(key);
                 var dataset = plotDatasetKey.dataset;
-                return _this._computeExtent(dataset, accScaleBinding.accessor, filter);
+                return _this._computeExtent(dataset, accScaleBinding, filter);
             }));
         };
-        Plot.prototype._computeExtent = function (dataset, accessor, filter) {
+        Plot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+            var accessor = accScaleBinding.accessor;
+            var scale = accScaleBinding.scale;
+            if (scale == null) {
+                return [];
+            }
             var data = dataset.data();
             if (filter != null) {
                 data = data.filter(function (d, i) { return filter(d, i, dataset); });
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = data.map(appliedAccessor);
-            if (mappedData.length === 0) {
-                return [];
-            }
-            else if (typeof (mappedData[0]) === "string") {
-                return Plottable.Utils.Methods.uniq(mappedData);
-            }
-            else {
-                var extent = d3.extent(mappedData);
-                if (extent[0] == null || extent[1] == null) {
-                    return [];
-                }
-                else {
-                    return extent;
-                }
-            }
+            return scale.extentOfValues(mappedData);
         };
         /**
          * Override in subclass to add special extents, such as included values
@@ -6997,9 +7015,9 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
                 var xAttr = attrToProjector[Rectangle._X_KEY];
-                var x1Attr = attrToProjector[Rectangle._X1_KEY];
+                var x1Attr = attrToProjector[Rectangle._X2_KEY];
                 var yAttr = attrToProjector[Rectangle._Y_KEY];
-                var y1Attr = attrToProjector[Rectangle._Y1_KEY];
+                var y1Attr = attrToProjector[Rectangle._Y2_KEY];
                 var xScale = this.x().scale;
                 var yScale = this.y().scale;
                 if (x1Attr != null) {
@@ -7037,11 +7055,11 @@ var Plottable;
                 }
                 return _super.prototype.x.call(this, x, scale);
             };
-            Rectangle.prototype.x1 = function (x1, scale) {
-                if (x1 == null) {
-                    return this._propertyBindings.get(Rectangle._X1_KEY);
+            Rectangle.prototype.x2 = function (x2, scale) {
+                if (x2 == null) {
+                    return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
-                this._bindProperty(Rectangle._X1_KEY, x1, scale);
+                this._bindProperty(Rectangle._X2_KEY, x2, scale);
                 this.renderImmediately();
                 return this;
             };
@@ -7054,11 +7072,11 @@ var Plottable;
                 }
                 return _super.prototype.y.call(this, y, scale);
             };
-            Rectangle.prototype.y1 = function (y1, scale) {
-                if (y1 == null) {
-                    return this._propertyBindings.get(Rectangle._Y1_KEY);
+            Rectangle.prototype.y2 = function (y2, scale) {
+                if (y2 == null) {
+                    return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
-                this._bindProperty(Rectangle._Y1_KEY, y1, scale);
+                this._bindProperty(Rectangle._Y2_KEY, y2, scale);
                 this.renderImmediately();
                 return this;
             };
@@ -7081,8 +7099,8 @@ var Plottable;
                     return (scaledMax - scaledMin) / Math.abs(max - min);
                 }
             };
-            Rectangle._X1_KEY = "x1";
-            Rectangle._Y1_KEY = "y1";
+            Rectangle._X2_KEY = "x2";
+            Rectangle._Y2_KEY = "y2";
             return Rectangle;
         })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
@@ -7143,7 +7161,7 @@ var Plottable;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
-                    resetAttrToProjector["size"] = function () { return 0; };
+                    resetAttrToProjector["d"] = function () { return ""; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
@@ -7191,37 +7209,34 @@ var __extends = this.__extends || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
-    var Orientation = (function () {
-        function Orientation() {
-        }
-        Orientation.VERTICAL = "vertical";
-        Orientation.HORIZONTAL = "horizontal";
-        return Orientation;
-    })();
-    Plottable.Orientation = Orientation;
     var Plots;
     (function (Plots) {
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
-             * Constructs a BarPlot.
+             * Constructs a Bar Plot.
              *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function Bar(xScale, yScale) {
+            function Bar(xScale, yScale, orientation) {
                 var _this = this;
+                if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, xScale, yScale);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this.classed("bar-plot", true);
+                if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for Plots.Bar");
+                }
+                this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("bars-reset", new Plottable.Animators.Null());
                 this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
-                this._isVertical = true;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
@@ -7503,16 +7518,6 @@ var Plottable;
                 }
                 return attrToProjector;
             };
-            Bar.prototype.orientation = function (orientation) {
-                if (orientation == null) {
-                    return this._isVertical ? Orientation.VERTICAL : Orientation.HORIZONTAL;
-                }
-                else {
-                    this._isVertical = orientation === Orientation.VERTICAL;
-                    this.render();
-                    return this;
-                }
-            };
             /**
              * Computes the barPixelWidth of all the bars in the plot.
              *
@@ -7581,6 +7586,8 @@ var Plottable;
                 });
                 return plotData;
             };
+            Bar.ORIENTATION_VERTICAL = "vertical";
+            Bar.ORIENTATION_HORIZONTAL = "horizontal";
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
@@ -7843,9 +7850,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function ClusteredBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function ClusteredBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
@@ -8193,9 +8202,11 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale the x scale of the plot.
              * @param {Scale} yScale the y scale of the plot.
+             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function StackedBar(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedBar(xScale, yScale, orientation) {
+                if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
+                _super.call(this, xScale, yScale, orientation);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }

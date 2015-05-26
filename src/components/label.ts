@@ -31,7 +31,7 @@ export module Components {
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth  = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
       var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
@@ -118,7 +118,7 @@ export module Components {
       } else {
         padAmount = +padAmount;
         if (padAmount < 0) {
-          throw new Error(padAmount + " is not a valid padding value.  Cannot be less than 0.");
+          throw new Error(padAmount + " is not a valid padding value. Cannot be less than 0.");
         }
         this._padding = padAmount;
         this.redraw();
