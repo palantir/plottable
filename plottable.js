@@ -2545,7 +2545,7 @@ var Plottable;
             AbstractDrawer.prototype.draw = function (data, drawSteps, dataset) {
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
-                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, dataset);
+                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector, _this._dataset);
                     return {
                         attrToProjector: appliedAttrToProjector,
                         animator: dr.animator

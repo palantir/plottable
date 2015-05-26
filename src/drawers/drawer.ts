@@ -106,7 +106,7 @@ export module Drawers {
      */
     public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset);
+        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, this._dataset);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator
