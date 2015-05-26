@@ -11,6 +11,8 @@ export module Plots {
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
+    private _startAngles: number[];
+    private _endAngles: number[];
 
     /**
      * Constructs a PiePlot.
@@ -43,8 +45,21 @@ export module Plots {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
+      this._updatePieAngles();
       super.addDataset(dataset);
       return this;
+    }
+
+    public removeDataset(dataset: Dataset) {
+      super.removeDataset(dataset);
+      this._startAngles = [];
+      this._endAngles = [];
+      return this;
+    }
+
+    protected _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      this._updatePieAngles();
     }
 
     protected _getDrawer(key: string) {
@@ -70,7 +85,8 @@ export module Plots {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
       this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
-      this.renderImmediately();
+      this._updatePieAngles();
+      this.render();
       return this;
     }
 
@@ -82,7 +98,7 @@ export module Plots {
         return this._propertyBindings.get(Pie._INNER_RADIUS_KEY);
       }
       this._bindProperty(Pie._INNER_RADIUS_KEY, innerRadius, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -94,16 +110,47 @@ export module Plots {
         return this._propertyBindings.get(Pie._OUTER_RADIUS_KEY);
       }
       this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
     protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector = super._propertyProjectors();
-      attrToProjector[Pie._INNER_RADIUS_KEY] = Plot._scaledAccessor(this.innerRadius());
-      attrToProjector[Pie._OUTER_RADIUS_KEY] = Plot._scaledAccessor(this.outerRadius());
-      attrToProjector[Pie._SECTOR_VALUE_KEY] = Plot._scaledAccessor(this.sectorValue());
+      var innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
+      var outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
+      attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
+        return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+                           .outerRadius(outerRadiusAccessor(datum, index, ds))
+                           .startAngle(this._startAngles[index])
+                           .endAngle(this._endAngles[index])(datum, index);
+      };
       return attrToProjector;
+    }
+
+    private _updatePieAngles() {
+      if (this.sectorValue() == null) { return; }
+      if (this.datasets().length === 0) { return; }
+      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var dataset = this.datasets()[0];
+      var data = dataset.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)));
+      var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      if (pie.some((slice) => slice.value < 0)) {
+        Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+      }
+      this._startAngles = pie.map((slice) => slice.startAngle);
+      this._endAngles = pie.map((slice) => slice.endAngle);
+    }
+
+    protected _getDataToDraw() {
+      var dataToDraw = super._getDataToDraw();
+      if (this.datasets().length === 0) { return dataToDraw; }
+      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var datasetKey = this._datasetKeysInOrder[0];
+      var data = dataToDraw.get(datasetKey);
+      var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+      var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
+      dataToDraw.set(datasetKey, filteredData);
+      return dataToDraw;
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {

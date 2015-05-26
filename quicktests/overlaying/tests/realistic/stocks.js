@@ -50,11 +50,11 @@ function run(svg, data, Plottable) {
 
           var yScale_aapl = new Plottable.Scales.Linear();
           var yAxis_aapl = new Plottable.Axes.Numeric(yScale_aapl, "right").showEndTickLabels(true);
-          var label_aapl = new Plottable.Components.Label("AAPL", "right").classed("axis-label", true);
+          var label_aapl = new Plottable.Components.AxisLabel("AAPL").angle(90);
 
           var yScale_goog = new Plottable.Scales.Linear();
           var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlignment("right").showEndTickLabels(true);
-          var label_goog = new Plottable.Components.Label("GOOG", "left").classed("axis-label", true);
+          var label_goog = new Plottable.Components.AxisLabel("GOOG").angle(-90);
 
           var colorScale = new Plottable.Scales.Color();
 
@@ -65,14 +65,22 @@ function run(svg, data, Plottable) {
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
-                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
+                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
+          if (typeof line_aapl.autorange === "function") {
+            line_aapl.autorange("y");
+          } else {
+            line_aapl.automaticallyAdjustYScaleOverVisiblePoints(true);
+          }
           var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale)
-                                  .automaticallyAdjustYScaleOverVisiblePoints(true);
+                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
+          if (typeof line_aapl.autorange === "function") {
+            line_goog.autorange("y");
+          } else {
+            line_goog.automaticallyAdjustYScaleOverVisiblePoints(true);
+          }
 
           // should be one line plot, pending #917
 
@@ -85,13 +93,13 @@ function run(svg, data, Plottable) {
           var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, true).animate(true)
+          var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, "vertical").animate(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["net change"]; }, yScale_diff)
                                   .attr("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
                                   .attr("fill", function(d) {
-                                    return d["net change"] > 0 ? Plottable.Core.Colors.FERN : Plottable.Core.Colors.CERISE_RED;
+                                    return d["net change"] > 0 ? colorScale.range()[2] : colorScale.range()[6];
                                   });
 
           var table = new Plottable.Components.Table([

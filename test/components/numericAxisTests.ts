@@ -295,7 +295,7 @@ describe("NumericAxis", () => {
   it("truncates long labels", () => {
     var dataset = new Plottable.Dataset([
       { x: "A", y: 500000000 },
-      { x: "B", y:  400000000 }
+      { x: "B", y: 400000000 }
     ]);
     var SVG_WIDTH = 120;
     var SVG_HEIGHT = 300;
@@ -304,8 +304,9 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scales.Category();
     var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Components.Label("LABEL", "left");
-    yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
+
+    var yLabel = new Plottable.Components.AxisLabel("LABEL");
+    yLabel.angle(-90);
     var barPlot = new Plottable.Plots.Bar(xScale, yScale);
     barPlot.x((d: any) => d.x, xScale);
     barPlot.y((d: any) => d.y, yScale);
@@ -387,7 +388,7 @@ describe("NumericAxis", () => {
     tickMarks.each(function() {
       var tickMark = d3.select(this);
       var tickMarkPosition = Number(tickMark.attr("x"));
-      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <=  SVG_WIDTH, "tick marks are located within the bounding SVG");
+      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
     });
     svg.remove();
   });

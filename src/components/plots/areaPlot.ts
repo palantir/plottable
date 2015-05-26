@@ -48,15 +48,15 @@ export module Plots {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
       this._bindProperty(Area._Y0_KEY, y0, y0Scale);
-      this._updateYDomainer();
-      this.renderImmediately();
+      this._updateYScale();
+      this.render();
       return this;
     }
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
       if (this.y().scale != null) {
-        this._updateYDomainer();
+        this._updateYScale();
       }
     }
 
@@ -137,22 +137,17 @@ export module Plots {
       return new Plottable.Drawers.Area(key);
     }
 
-    protected _updateYDomainer() {
-      super._updateYDomainer();
-
+    protected _updateYScale() {
       var extents = this._propertyExtents.get("y0");
-      var extent = Utils.Methods.flatten(extents);
-      var uniqExtentVals = Utils.Methods.uniq(extent);
+      var extent = Utils.Methods.flatten<number>(extents);
+      var uniqExtentVals = Utils.Methods.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
       var yScale = <QuantitativeScale<number>> this.y().scale;
-      if (!yScale._userSetDomainer) {
-        if (constantBaseline != null) {
-          yScale.domainer().addPaddingException(this, constantBaseline);
-        } else {
-          yScale.domainer().removePaddingException(this);
-        }
-        yScale._autoDomainIfAutomaticMode();
+      if (constantBaseline != null) {
+        yScale.addPaddingException(this, constantBaseline);
+      } else {
+        yScale.removePaddingException(this);
       }
     }
 
@@ -201,14 +196,14 @@ export module Plots {
       this._keysForDatasets(datasets).forEach((datasetKey) => {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
         var dataset = plotDatasetKey.dataset;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+        var drawer = this._lineDrawers.get(dataset);
+        dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
-          allElements.splice(index * 2 + 1, 0, drawer._getSelection(index).node());
+          allElements.push(drawer._getSelection(index).node());
         });
       });
 
