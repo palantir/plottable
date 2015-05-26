@@ -7284,6 +7284,20 @@ var Plottable;
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
             }
+            Bar.prototype.x = function (x, xScale) {
+                var ret = _super.prototype.x.call(this, x, xScale);
+                if (x != null) {
+                    this._updateValueScale();
+                }
+                return ret;
+            };
+            Bar.prototype.y = function (y, yScale) {
+                var ret = _super.prototype.y.call(this, y, yScale);
+                if (y != null) {
+                    this._updateValueScale();
+                }
+                return ret;
+            };
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, this._isVertical);
             };

@@ -40,6 +40,32 @@ export module Plots {
       this.attr("width", () => this._getBarPixelWidth());
     }
 
+    // TODO: remove
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): XYPlot<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      var ret = super.x(x, xScale);
+
+      if (x != null) {
+        this._updateValueScale();
+      }
+      return ret;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): XYPlot<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      var ret = super.y(y, yScale);
+
+      if (y != null) {
+        this._updateValueScale();
+      }
+      return ret;
+
+    }
+
     protected _getDrawer(key: string) {
       return new Plottable.Drawers.Rect(key, this._isVertical);
     }

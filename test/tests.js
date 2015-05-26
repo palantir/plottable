@@ -4704,6 +4704,15 @@ describe("Plots", function () {
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
         });
+        // TODO: Why does this fail?
+        it.skip("failure: TODO: remove", function () {
+            var plot = new Plottable.Plots.StackedBar();
+            plot.addDataset(dataset1);
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
+            plot.renderTo(svg);
+            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+            svg.remove();
+        });
     });
     describe("auto scale domain on Category", function () {
         var svg;
