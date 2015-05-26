@@ -42,25 +42,25 @@ export module Plots {
 
       // Copy each of the different projectors.
       var xAttr = attrToProjector[Rectangle._X_KEY];
-      var x1Attr = attrToProjector[Rectangle._X2_KEY];
+      var x2Attr = attrToProjector[Rectangle._X2_KEY];
       var yAttr = attrToProjector[Rectangle._Y_KEY];
-      var y1Attr = attrToProjector[Rectangle._Y2_KEY];
+      var y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
       var xScale = this.x().scale;
       var yScale = this.y().scale;
 
-      if (x1Attr != null) {
-        attrToProjector["width"] = (d, i, dataset) => Math.abs(x1Attr(d, i, dataset) - xAttr(d, i, dataset));
-        attrToProjector["x"] = (d, i, dataset) => Math.min(x1Attr(d, i, dataset), xAttr(d, i, dataset));
+      if (x2Attr != null) {
+        attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
+        attrToProjector["x"] = (d, i, dataset) => Math.min(x2Attr(d, i, dataset), xAttr(d, i, dataset));
       } else {
         attrToProjector["width"] = (d, i, dataset) => this._rectangleWidth(xScale);
         attrToProjector["x"] = (d, i, dataset) => xAttr(d, i, dataset) - 0.5 * attrToProjector["width"](d, i, dataset);
       }
 
-      if (y1Attr != null) {
-        attrToProjector["height"] = (d, i, dataset) => Math.abs(y1Attr(d, i, dataset) - yAttr(d, i, dataset));
+      if (y2Attr != null) {
+        attrToProjector["height"] = (d, i, dataset) => Math.abs(y2Attr(d, i, dataset) - yAttr(d, i, dataset));
         attrToProjector["y"] = (d, i, dataset) => {
-	        return Math.max(y1Attr(d, i, dataset), yAttr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
+	        return Math.max(y2Attr(d, i, dataset), yAttr(d, i, dataset)) - attrToProjector["height"](d, i, dataset);
         };
       } else {
         attrToProjector["height"] = (d, i, dataset) => this._rectangleWidth(yScale);
@@ -68,8 +68,8 @@ export module Plots {
       }
 
       // Clean up the attributes projected onto the SVG elements
-      delete attrToProjector["x1"];
-      delete attrToProjector["y1"];
+      delete attrToProjector[Rectangle._X2_KEY];
+      delete attrToProjector[Rectangle._Y2_KEY];
 
       return attrToProjector;
     }
