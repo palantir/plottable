@@ -81,7 +81,7 @@ export module Drawers {
       return data.length;
     }
 
-    private _applyMetadata(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
+    private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
@@ -104,11 +104,10 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     * @param{any} plotMetadata The metadata provided by plot
      */
     public draw(data: any[], drawSteps: DrawStep[]) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector);
+        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator

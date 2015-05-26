@@ -1250,7 +1250,6 @@ declare module Plottable {
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             * @param{any} plotMetadata The metadata provided by plot
              */
             draw(data: any[], drawSteps: DrawStep[]): number;
             /**

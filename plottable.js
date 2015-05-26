@@ -2524,7 +2524,7 @@ var Plottable;
             AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
                 return data.length;
             };
-            AbstractDrawer.prototype._applyMetadata = function (attrToProjector) {
+            AbstractDrawer.prototype._appliedProjectors = function (attrToProjector) {
                 var _this = this;
                 var modifiedAttrToProjector = {};
                 d3.keys(attrToProjector).forEach(function (attr) {
@@ -2543,12 +2543,11 @@ var Plottable;
              *
              * @param{any[]} data The data to be drawn
              * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             * @param{any} plotMetadata The metadata provided by plot
              */
             AbstractDrawer.prototype.draw = function (data, drawSteps) {
                 var _this = this;
                 var appliedDrawSteps = drawSteps.map(function (dr) {
-                    var appliedAttrToProjector = _this._applyMetadata(dr.attrToProjector);
+                    var appliedAttrToProjector = _this._appliedProjectors(dr.attrToProjector);
                     return {
                         attrToProjector: appliedAttrToProjector,
                         animator: dr.animator
