@@ -1167,7 +1167,7 @@ declare module Plottable {
              */
             constructor(dataset: Dataset);
             setup(area: D3.Selection): void;
-            protected dataset(): Dataset;
+            protected _dataset(): Dataset;
             /**
              * Removes the Drawer and its renderArea
              */
