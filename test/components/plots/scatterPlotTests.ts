@@ -8,7 +8,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Scatter(xScale, yScale);
+      var plot = new Plottable.Plots.Scatter();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -28,7 +28,7 @@ describe("Plots", () => {
       var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
       var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
       var dataset = new Plottable.Dataset(data, metadata);
-      var plot = new Plottable.Plots.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter()
                                   .x(xAccessor)
                                   .y(yAccessor);
       plot.addDataset(dataset);
@@ -71,7 +71,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
-      var plot = new Plottable.Plots.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter()
                                    .x((d: any) => d.x, xScale)
                                    .y((d: any) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
@@ -100,7 +100,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       var data = [{x: 0, y: 0}, {x: 1, y: 1}];
       var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
-      var plot = new Plottable.Plots.Scatter(xScale, yScale)
+      var plot = new Plottable.Plots.Scatter()
                                    .x((d: any) => d.x, xScale)
                                    .y((d: any) => d.y, yScale)
                                    .addDataset(new Plottable.Dataset(data))
@@ -155,7 +155,7 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset(data);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Scatter(xScale, yScale);
+      var plot = new Plottable.Plots.Scatter();
       plot.addDataset(dataset);
       plot.x((d: any) => d.foo, xScale)
           .y((d: any) => d.bar, yScale);
@@ -221,7 +221,7 @@ describe("Plots", () => {
         xScale.domain([0, 9]);
         yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 81]);
-        circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
+        circlePlot = new Plottable.Plots.Scatter();
         circlePlot.addDataset(quadraticDataset);
         circlePlot.attr("fill", colorAccessor);
         circlePlot.x((d: any) => d.x, xScale);

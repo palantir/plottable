@@ -20,7 +20,7 @@ describe("Metadata", () => {
     var xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.x + i * dataset.metadata().foo;
     var yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => dataset.metadata().bar;
     var dataset = new Plottable.Dataset(data1, metadata);
-    var plot = new Plottable.Plots.Scatter(xScale, yScale)
+    var plot = new Plottable.Plots.Scatter()
                                   .x(xAccessor, xScale)
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset);
@@ -56,7 +56,7 @@ describe("Metadata", () => {
     var yAccessor = () => 0;
     var dataset1 = new Plottable.Dataset(data1, metadata1);
     var dataset2 = new Plottable.Dataset(data2, metadata2);
-    var plot = new Plottable.Plots.Scatter(xScale, yScale)
+    var plot = new Plottable.Plots.Scatter()
                                   .x(xAccessor, xScale)
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset1);
@@ -118,7 +118,7 @@ describe("Metadata", () => {
     checkXYPlot(new Plottable.Plots.StackedBar( Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
     checkXYPlot(new Plottable.Plots.ClusteredBar());
     checkXYPlot(new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
-    checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
+    checkXYPlot(new Plottable.Plots.Scatter());
     checkPiePlot(new Plottable.Plots.Pie());
     svg.remove();
   });

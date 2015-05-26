@@ -4187,7 +4187,7 @@ describe("Plots", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Scatter(xScale, yScale);
+            var plot = new Plottable.Plots.Scatter();
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
             assert.doesNotThrow(function () { return plot.renderTo(svg); }, Error);
@@ -4206,7 +4206,7 @@ describe("Plots", function () {
             var xAccessor = function (d, i, dataset) { return d.x + i * dataset.metadata().foo; };
             var yAccessor = function (d, i, dataset) { return dataset.metadata().bar; };
             var dataset = new Plottable.Dataset(data, metadata);
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor).y(yAccessor);
+            var plot = new Plottable.Plots.Scatter().x(xAccessor).y(yAccessor);
             plot.addDataset(dataset);
             plot.renderTo(svg);
             var symbols = plot.getAllSelections();
@@ -4242,7 +4242,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
+            var plot = new Plottable.Plots.Scatter().x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
             var allCircles = plot.getAllSelections();
             assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
@@ -4263,7 +4263,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             var data = [{ x: 0, y: 0 }, { x: 1, y: 1 }];
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
-            var plot = new Plottable.Plots.Scatter(xScale, yScale).x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
+            var plot = new Plottable.Plots.Scatter().x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
             var points = d3.selectAll(".scatter-plot path");
             var d0 = data[0];
@@ -4305,7 +4305,7 @@ describe("Plots", function () {
             var dataset = new Plottable.Dataset(data);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Scatter(xScale, yScale);
+            var plot = new Plottable.Plots.Scatter();
             plot.addDataset(dataset);
             plot.x(function (d) { return d.foo; }, xScale).y(function (d) { return d.bar; }, yScale);
             plot.renderTo(svg);
@@ -4365,7 +4365,7 @@ describe("Plots", function () {
                 xScale.domain([0, 9]);
                 yScale = new Plottable.Scales.Linear();
                 yScale.domain([0, 81]);
-                circlePlot = new Plottable.Plots.Scatter(xScale, yScale);
+                circlePlot = new Plottable.Plots.Scatter();
                 circlePlot.addDataset(quadraticDataset);
                 circlePlot.attr("fill", colorAccessor);
                 circlePlot.x(function (d) { return d.x; }, xScale);
@@ -5857,7 +5857,7 @@ describe("Metadata", function () {
         var xAccessor = function (d, i, dataset) { return d.x + i * dataset.metadata().foo; };
         var yAccessor = function (d, i, dataset) { return dataset.metadata().bar; };
         var dataset = new Plottable.Dataset(data1, metadata);
-        var plot = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor, xScale).y(yAccessor, yScale);
+        var plot = new Plottable.Plots.Scatter().x(xAccessor, xScale).y(yAccessor, yScale);
         plot.addDataset(dataset);
         plot.renderTo(svg);
         var circles = plot.getAllSelections();
@@ -5887,7 +5887,7 @@ describe("Metadata", function () {
         var yAccessor = function () { return 0; };
         var dataset1 = new Plottable.Dataset(data1, metadata1);
         var dataset2 = new Plottable.Dataset(data2, metadata2);
-        var plot = new Plottable.Plots.Scatter(xScale, yScale).x(xAccessor, xScale).y(yAccessor, yScale);
+        var plot = new Plottable.Plots.Scatter().x(xAccessor, xScale).y(yAccessor, yScale);
         plot.addDataset(dataset1);
         plot.addDataset(dataset2);
         plot.renderTo(svg);
@@ -5937,7 +5937,7 @@ describe("Metadata", function () {
         checkXYPlot(new Plottable.Plots.StackedBar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
         checkXYPlot(new Plottable.Plots.ClusteredBar());
         checkXYPlot(new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL));
-        checkXYPlot(new Plottable.Plots.Scatter(xScale, yScale));
+        checkXYPlot(new Plottable.Plots.Scatter());
         checkPiePlot(new Plottable.Plots.Pie());
         svg.remove();
     });
