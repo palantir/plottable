@@ -166,7 +166,7 @@ export module Scales {
     }
 
     public autoDomain() {
-      // unlike other QuantitativeScales, interpolatedColorScale ignores its domainer
+      // InterpolatedColorScales do not pad
       var extents = this._getAllExtents();
       if (extents.length > 0) {
         this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);

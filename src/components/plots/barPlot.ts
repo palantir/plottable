@@ -71,8 +71,7 @@ export module Plots {
         return this._baselineValue;
       }
       this._baselineValue = value;
-      this._updateXDomainer();
-      this._updateYDomainer();
+      this._updateValueScale();
       this.render();
       return this;
     }
@@ -272,39 +271,17 @@ export module Plots {
       return bars;
     }
 
-    protected _updateDomainer(scale: Scale<any, number>) {
-      if (scale instanceof QuantitativeScale) {
-        var qscale = <QuantitativeScale<any>> scale;
-        if (!qscale._userSetDomainer) {
-          if (this._baselineValue != null) {
-            qscale.domainer()
-              .addPaddingException(this, this._baselineValue)
-              .addIncludedValue(this, this._baselineValue);
-          } else {
-            qscale.domainer()
-              .removePaddingException(this)
-              .removeIncludedValue(this);
-          }
-          qscale.domainer().pad().nice();
+    private _updateValueScale() {
+      var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+      if (valueScale instanceof QuantitativeScale) {
+        var qscale = <QuantitativeScale<any>> valueScale;
+        if (this._baselineValue != null) {
+          qscale.addPaddingException(this, this._baselineValue);
+          qscale.addIncludedValue(this, this._baselineValue);
+        } else {
+          qscale.removePaddingException(this);
+          qscale.removeIncludedValue(this);
         }
-            // prepending "BAR_PLOT" is unnecessary but reduces likely of user accidentally creating collisions
-        qscale._autoDomainIfAutomaticMode();
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this._isVertical) {
-        this._updateDomainer(this.y().scale);
-      } else {
-        super._updateYDomainer();
-      }
-    }
-
-    protected _updateXDomainer() {
-      if (!this._isVertical) {
-        this._updateDomainer(this.x().scale);
-      } else {
-        super._updateXDomainer();
       }
     }
 

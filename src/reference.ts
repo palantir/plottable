@@ -21,7 +21,6 @@
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/interfaces.ts" />
-/// <reference path="core/domainer.ts" />
 
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitativeScale.ts" />

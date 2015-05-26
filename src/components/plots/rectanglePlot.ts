@@ -99,7 +99,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X2_KEY);
       }
       this._bindProperty(Rectangle._X2_KEY, x2, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -124,7 +124,7 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
       this._bindProperty(Rectangle._Y2_KEY, y2, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
