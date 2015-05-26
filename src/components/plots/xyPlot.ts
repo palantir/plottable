@@ -28,7 +28,7 @@ module Plottable {
       this.classed("xy-plot", true);
 
       this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
-      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale});
+      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
@@ -44,7 +44,6 @@ module Plottable {
       if (x == null) {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
-
       this._bindProperty(XYPlot._X_KEY, x, xScale);
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
