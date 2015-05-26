@@ -7806,6 +7806,13 @@ var Plottable;
                 this.attr("fill", defaultColor);
                 this.attr("stroke", defaultColor);
             }
+            Area.prototype.y = function (y, yScale) {
+                var ret = _super.prototype.y.call(this, y, yScale);
+                if (y != null) {
+                    this._updateYScale();
+                }
+                return ret;
+            };
             Area.prototype.y0 = function (y0, y0Scale) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);

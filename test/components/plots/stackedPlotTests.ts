@@ -331,6 +331,9 @@ describe("Plots", () => {
       plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorange("y");
+
+      console.log(1);
+
       plot.renderTo(svg);
       assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
       svg.remove();

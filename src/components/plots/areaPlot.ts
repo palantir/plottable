@@ -31,6 +31,17 @@ export module Plots {
       this.attr("stroke", defaultColor);
     }
 
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): XYPlot<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      var ret = super.y(y, yScale);
+      if (y != null) {
+        this._updateYScale();
+      }
+      return ret;
+    }
+
     public y0(): Plots.AccessorScaleBinding<number, number>;
     public y0(y0: number | Accessor<number>): Area<X>;
     public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
