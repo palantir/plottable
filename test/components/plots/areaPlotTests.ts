@@ -65,7 +65,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plots.Area();
+      areaPlot = new Plottable.Plots.Area<number>();
       areaPlot.addDataset(simpleDataset);
       areaPlot.x(xAccessor, xScale)
               .y(yAccessor, yScale);

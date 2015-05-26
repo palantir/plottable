@@ -10,7 +10,7 @@ describe("Plots", () => {
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Plots.StackedBar();
+      stackedPlot = new Plottable.Plots.StackedBar<number, number>();
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
 
@@ -156,7 +156,7 @@ describe("Plots", () => {
     beforeEach(() => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      stackedPlot = new Plottable.Plots.StackedArea();
+      stackedPlot = new Plottable.Plots.StackedArea<number>();
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
 
@@ -414,7 +414,7 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Category();
       yScale = new Plottable.Scales.Linear();
 
-      stackedBarPlot = new Plottable.Plots.StackedBar();
+      stackedBarPlot = new Plottable.Plots.StackedBar<string, number>();
       stackedBarPlot.x((d) => d.key, xScale);
       stackedBarPlot.y((d) => d.value, yScale);
 

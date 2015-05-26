@@ -2525,7 +2525,7 @@ describe("Plots", function () {
             svg = TestMethods.generateSVG(500, 500);
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
-            plot = new Plottable.XYPlot(xScale, yScale);
+            plot = new Plottable.XYPlot();
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
@@ -3814,7 +3814,7 @@ describe("Plots", function () {
                 xScale = new Plottable.Scales.Category();
                 yScale = new Plottable.Scales.Linear();
                 dataset = new Plottable.Dataset(data);
-                plot = new Plottable.Plots.Bar(xScale, yScale);
+                plot = new Plottable.Plots.Bar();
                 plot.addDataset(dataset);
                 plot.x(function (d) { return d.x; }, xScale);
                 plot.y(function (d) { return d.y; }, yScale);
@@ -3883,7 +3883,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset();
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Linear();
-                verticalBarPlot = new Plottable.Plots.Bar(xScale, yScale);
+                verticalBarPlot = new Plottable.Plots.Bar();
                 verticalBarPlot.x(function (d) { return d.x; }, xScale);
                 verticalBarPlot.y(function (d) { return d.y; }, yScale);
             });
@@ -5636,7 +5636,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale);
+            renderer = new Plottable.Plots.ClusteredBar();
             renderer.addDataset(dataset1);
             renderer.addDataset(dataset2);
             renderer.baseline(0);
@@ -5706,7 +5706,7 @@ describe("Plots", function () {
             ];
             dataset1 = new Plottable.Dataset(data1);
             dataset2 = new Plottable.Dataset(data2);
-            renderer = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+            renderer = new Plottable.Plots.ClusteredBar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
             renderer.baseline(0);
@@ -5760,7 +5760,7 @@ describe("Plots", function () {
             var data1 = [{ x: "A", y: 1 }, { x: "B", y: 2 }, { x: "C", y: 1 }];
             var data2 = [{ x: "A", y: 2 }, { x: "B", y: 4 }];
             var data3 = [{ x: "B", y: 15 }, { x: "C", y: 15 }];
-            plot = new Plottable.Plots.ClusteredBar(xScale, yScale);
+            plot = new Plottable.Plots.ClusteredBar();
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));

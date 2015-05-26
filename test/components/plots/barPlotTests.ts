@@ -10,7 +10,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar();
+      var plot = new Plottable.Plots.Bar<number, number>();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -52,7 +52,7 @@ describe("Plots", () => {
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar();
+        barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -266,7 +266,7 @@ describe("Plots", () => {
         });
 
         it("handles empty plots gracefully", () => {
-          barPlot = new Plottable.Plots.Bar();
+          barPlot = new Plottable.Plots.Bar<string, number>();
 
           var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
           assert.lengthOf(closest.data, 0, "empty plots return empty data");
@@ -297,7 +297,7 @@ describe("Plots", () => {
           {x: 100, y: 1}
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar();
+        barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -346,7 +346,7 @@ describe("Plots", () => {
           {x: 10, y: -1.5},
           {x: 100, y: 1}
         ];
-        barPlot = new Plottable.Plots.Bar();
+        barPlot = new Plottable.Plots.Bar<number, number>();
         dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
@@ -419,7 +419,7 @@ describe("Plots", () => {
           { x: "12/01/97", y: 2, type: "a" }];
         xScale = new Plottable.Scales.Time();
         var yScale = new Plottable.Scales.Linear();
-        barPlot = new Plottable.Plots.Bar();
+        barPlot = new Plottable.Plots.Bar<Date, number>();
         barPlot.addDataset(new Plottable.Dataset(data));
         barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
                .y((d) => d.y, yScale)
@@ -455,7 +455,7 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -661,7 +661,7 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
         dataset = new Plottable.Dataset(data);
-        plot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
+        plot = new Plottable.Plots.Bar<string, number>();
         plot.addDataset(dataset);
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
@@ -737,7 +737,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset();
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
-        verticalBarPlot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
+        verticalBarPlot = new Plottable.Plots.Bar<string, number>();
         verticalBarPlot.x((d) => d.x, xScale);
         verticalBarPlot.y((d) => d.y, yScale);
       });
@@ -791,7 +791,7 @@ describe("Plots", () => {
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar();
+      var plot = new Plottable.Plots.Bar<string, number>();
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)

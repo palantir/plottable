@@ -221,7 +221,7 @@ describe("Plots", () => {
         xScale.domain([0, 9]);
         yScale = new Plottable.Scales.Linear();
         yScale.domain([0, 81]);
-        circlePlot = new Plottable.Plots.Scatter();
+        circlePlot = new Plottable.Plots.Scatter<number, number>();
         circlePlot.addDataset(quadraticDataset);
         circlePlot.attr("fill", colorAccessor);
         circlePlot.x((d: any) => d.x, xScale);

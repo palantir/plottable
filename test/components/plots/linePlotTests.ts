@@ -77,7 +77,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plots.Line();
+      linePlot = new Plottable.Plots.Line<number>();
       linePlot.addDataset(simpleDataset);
       linePlot.x(xAccessor, xScale)
               .y(yAccessor, yScale)
@@ -308,7 +308,7 @@ describe("Plots", () => {
       });
 
       it("handles empty plots gracefully", () => {
-        linePlot = new Plottable.Plots.Line();
+        linePlot = new Plottable.Plots.Line<number>();
 
         var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
         assert.lengthOf(closest.data, 0);
