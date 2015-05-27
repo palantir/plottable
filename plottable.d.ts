@@ -1225,7 +1225,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Area extends Line {
-            static AREA_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
@@ -2815,7 +2815,6 @@ declare module Plottable {
          * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
          */
         class Area<X> extends Line<X> {
-            static PLOT_CLASS: string;
             /**
              * Constructs an AreaPlot.
              *

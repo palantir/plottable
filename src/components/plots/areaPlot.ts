@@ -6,7 +6,6 @@ export module Plots {
    * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
    */
   export class Area<X> extends Line<X> {
-    public static PLOT_CLASS = "area";
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
 
@@ -29,7 +28,6 @@ export module Plots {
       var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
       this.attr("fill", defaultColor);
-      this.attr("class", Area.PLOT_CLASS);
 
       this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
     }

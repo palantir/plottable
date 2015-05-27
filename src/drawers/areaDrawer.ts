@@ -3,7 +3,7 @@
 module Plottable {
 export module Drawers {
   export class Area extends Line {
-    public static AREA_CLASS = "area";
+    public static PATH_CLASS = "area";
 
     private _areaSelection: D3.Selection;
 
@@ -19,7 +19,7 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       step.animator.animate(this._areaSelection, attrToProjector);
-      this._areaSelection.classed(Area.AREA_CLASS, true);
+      this._areaSelection.classed(Area.PATH_CLASS, true);
     }
 
     public _getSelector(): string {

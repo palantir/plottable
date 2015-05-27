@@ -2663,12 +2663,12 @@ var Plottable;
             Area.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
                 step.animator.animate(this._areaSelection, attrToProjector);
-                this._areaSelection.classed(Area.AREA_CLASS, true);
+                this._areaSelection.classed(Area.PATH_CLASS, true);
             };
             Area.prototype._getSelector = function () {
                 return "path";
             };
-            Area.AREA_CLASS = "area";
+            Area.PATH_CLASS = "area";
             return Area;
         })(Drawers.Line);
         Drawers.Area = Area;
@@ -7704,7 +7704,6 @@ var Plottable;
                 var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
-                this.attr("class", Area.PLOT_CLASS);
                 this._lineDrawers = new Plottable.Utils.Map();
             }
             Area.prototype._setup = function () {
@@ -7850,7 +7849,6 @@ var Plottable;
                 });
                 return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
             };
-            Area.PLOT_CLASS = "area";
             Area._Y0_KEY = "y0";
             return Area;
         })(Plots.Line);

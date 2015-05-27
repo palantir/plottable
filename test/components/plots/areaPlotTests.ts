@@ -191,9 +191,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       areaPlot.attr("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
+      var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
+      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
       svg.remove();
     });
   });
