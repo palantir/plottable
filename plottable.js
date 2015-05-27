@@ -7016,21 +7016,19 @@ var Plottable;
         };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-            if (this.x() != null) {
-                var xScale = this.x().scale;
-                if (xScale != null) {
-                    xScale.range([0, this.width()]);
-                }
+            var xBinding = this.x();
+            var xScale = xBinding && xBinding.scale;
+            if (xScale != null) {
+                xScale.range([0, this.width()]);
             }
-            if (this.y() != null) {
-                var yScale = this.y().scale;
-                if (yScale != null) {
-                    if (this.y().scale instanceof Plottable.Scales.Category) {
-                        this.y().scale.range([0, this.height()]);
-                    }
-                    else {
-                        this.y().scale.range([this.height(), 0]);
-                    }
+            var yBinding = this.y();
+            var yScale = yBinding && yBinding.scale;
+            if (yScale != null) {
+                if (this.y().scale instanceof Plottable.Scales.Category) {
+                    this.y().scale.range([0, this.height()]);
+                }
+                else {
+                    this.y().scale.range([this.height(), 0]);
                 }
             }
             return this;
@@ -7076,10 +7074,12 @@ var Plottable;
             }
         };
         XYPlot.prototype._projectorsReady = function () {
-            if (!this.x() || !this.y()) {
+            var xBinding = this.x();
+            var yBinding = this.y();
+            if (xBinding == null || yBinding == null) {
                 return false;
             }
-            return this.x().accessor != null && this.y().accessor != null;
+            return xBinding.accessor != null && yBinding.accessor != null;
         };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
