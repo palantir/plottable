@@ -12,7 +12,7 @@ export module Dispatchers {
      */
 
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
-    private translator: Utils.ClientToSVGTranslator;
+    private _translator: Utils.ClientToSVGTranslator;
     private _startCallbacks: Utils.CallbackSet<TouchCallback>;
     private _moveCallbacks: Utils.CallbackSet<TouchCallback>;
     private _endCallbacks: Utils.CallbackSet<TouchCallback>;
@@ -45,7 +45,7 @@ export module Dispatchers {
     constructor(svg: SVGElement) {
       super();
 
-      this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+      this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
       this._startCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._moveCallbacks = new Utils.CallbackSet<TouchCallback>();
@@ -174,7 +174,7 @@ export module Dispatchers {
       for (var i = 0; i < touches.length; i++) {
         var touch = touches[i];
         var touchID = touch.identifier;
-        var newTouchPosition = this.translator.computePosition(touch.clientX, touch.clientY);
+        var newTouchPosition = this._translator.computePosition(touch.clientX, touch.clientY);
         if (newTouchPosition != null) {
           touchPositions[touchID] = newTouchPosition;
           touchIdentifiers.push(touchID);

@@ -119,24 +119,13 @@ export module Plots {
         return;
       }
 
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      var datasets = this.datasets();
+      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-
-      for (var datasetKey in stackOffsets) {
-        if (!stackOffsets.hasOwnProperty(datasetKey)) {
-          continue;
-        }
-        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
-      }
-
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
+      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
   }
 }

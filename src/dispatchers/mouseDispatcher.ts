@@ -6,7 +6,7 @@ export module Dispatchers {
 
   export class Mouse extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Mouse";
-    private translator: Utils.ClientToSVGTranslator;
+    private _translator: Utils.ClientToSVGTranslator;
     private _lastMousePosition: Point;
 
     private _moveCallbacks: Utils.CallbackSet<MouseCallback>;
@@ -42,7 +42,7 @@ export module Dispatchers {
     constructor(svg: SVGElement) {
       super();
 
-      this.translator = Utils.ClientToSVGTranslator.getTranslator(svg);
+      this._translator = Utils.ClientToSVGTranslator.getTranslator(svg);
 
       this._lastMousePosition = { x: -1, y: -1 };
 
@@ -199,7 +199,7 @@ export module Dispatchers {
      * calls all the callbacks in the provided callbackSet.
      */
     private _measureAndDispatch(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
-      var newMousePosition = this.translator.computePosition(event.clientX, event.clientY);
+      var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
         callbackSet.callCallbacks(this.getLastMousePosition(), event);

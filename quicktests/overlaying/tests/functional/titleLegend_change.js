@@ -109,17 +109,17 @@ function run(svg, data, Plottable) {
   twoPlots();
 
   //title + legend
-  var title1 = new Plottable.Components.Label( "Two Data Series", "horizontal").classed("title-label", true);
+  var title1 = new Plottable.Components.Label( "Two Data Series", 0).classed("title-label", true);
   var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
   var titleTable = new Plottable.Components.Table([[title1, legend1]]);
 
-  var noTitleLabel  = new Plottable.Components.Label("no title", "horizontal");
-  var shortTitleLabel  = new Plottable.Components.Label("tiny title", "horizontal");
-  var longTitleLabel  = new Plottable.Components.Label("long title", "horizontal");
-  var noPlotsLabel  = new Plottable.Components.Label("no plots", "horizontal");
-  var shortLegendLabel  = new Plottable.Components.Label("two plots", "horizontal");
-  var tallLegendLabel  = new Plottable.Components.Label("six plots", "horizontal");
+  var noTitleLabel  = new Plottable.Components.Label("no title", 0);
+  var shortTitleLabel  = new Plottable.Components.Label("tiny title", 0);
+  var longTitleLabel  = new Plottable.Components.Label("long title", 0);
+  var noPlotsLabel  = new Plottable.Components.Label("no plots", 0);
+  var shortLegendLabel  = new Plottable.Components.Label("two plots", 0);
+  var tallLegendLabel  = new Plottable.Components.Label("six plots", 0);
 
   var labelTable = new Plottable.Components.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],

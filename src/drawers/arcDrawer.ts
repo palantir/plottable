@@ -15,7 +15,7 @@ export module Drawers {
                    .outerRadius(outerRadiusF);
     }
 
-    private retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
+    private _retargetProjectors(attrToProjector: AttributeToAppliedProjector): AttributeToAppliedProjector {
       var retargetedAttrToProjector: AttributeToAppliedProjector = {};
       d3.entries(attrToProjector).forEach((entry) => {
         retargetedAttrToProjector[entry.key] = (d: D3.Layout.ArcDescriptor, i: number) => entry.value(d.data, i);
@@ -25,8 +25,8 @@ export module Drawers {
 
     public _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
-      attrToProjector = this.retargetProjectors(attrToProjector);
-      this._attrToProjector = this.retargetProjectors(this._attrToProjector);
+      attrToProjector = this._retargetProjectors(attrToProjector);
+      this._attrToProjector = this._retargetProjectors(this._attrToProjector);
       var innerRadiusAccessor = attrToProjector["inner-radius"];
       var outerRadiusAccessor = attrToProjector["outer-radius"];
       delete attrToProjector["inner-radius"];

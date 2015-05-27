@@ -53,7 +53,7 @@ export module Scales {
      * (0 to 1) scaling factor is added such that at 0 the value is
      * adjusted to 1, resulting in a returned result of 0.
      */
-    private adjustedLog(x: number): number {
+    private _adjustedLog(x: number): number {
       var negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
@@ -67,7 +67,7 @@ export module Scales {
       return x;
     }
 
-    private invertedAdjustedLog(x: number): number {
+    private _invertedAdjustedLog(x: number): number {
       var negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
@@ -82,11 +82,11 @@ export module Scales {
     }
 
     public scale(x: number): number {
-      return this._d3Scale(this.adjustedLog(x));
+      return this._d3Scale(this._adjustedLog(x));
     }
 
     public invert(x: number): number {
-      return this.invertedAdjustedLog(this._d3Scale.invert(x));
+      return this._invertedAdjustedLog(this._d3Scale.invert(x));
     }
 
     protected _getDomain() {
@@ -95,7 +95,7 @@ export module Scales {
 
     protected _setDomain(values: number[]) {
       this._untransformedDomain = values;
-      var transformedDomain = [this.adjustedLog(values[0]), this.adjustedLog(values[1])];
+      var transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
       super._setDomain(transformedDomain);
     }
 
@@ -115,8 +115,8 @@ export module Scales {
       var positiveLower = middle(min, max, this._pivot);
       var positiveUpper = max;
 
-      var negativeLogTicks = this.logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
-      var positiveLogTicks = this.logTicks(positiveLower, positiveUpper);
+      var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
+      var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
       var linearTicks = this._showIntermediateTicks ?
                                 d3.scale.linear().domain([negativeUpper, positiveLower])
                                         .ticks(this._howManyTicks(negativeUpper, positiveLower)) :
@@ -143,7 +143,7 @@ export module Scales {
      * This function will generate clusters as large as it can while not
      * drastically exceeding its number of ticks.
      */
-    private logTicks(lower: number, upper: number): number[] {
+    private _logTicks(lower: number, upper: number): number[] {
       var nTicks = this._howManyTicks(lower, upper);
       if (nTicks === 0) {
         return [];
@@ -169,10 +169,10 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this.adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
-      var adjustedMax = this.adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
-      var adjustedLower = this.adjustedLog(lower);
-      var adjustedUpper = this.adjustedLog(upper);
+      var adjustedMin = this._adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
+      var adjustedMax = this._adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
+      var adjustedLower = this._adjustedLog(lower);
+      var adjustedUpper = this._adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
       var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
       return ticks;
