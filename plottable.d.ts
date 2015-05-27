@@ -2831,6 +2831,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;

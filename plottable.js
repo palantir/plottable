@@ -7784,6 +7784,26 @@ var Plottable;
             Area.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Area(dataset);
             };
+            Area.prototype._generateDrawSteps = function () {
+                var _this = this;
+                var drawSteps = [];
+                if (this._dataChanged && this._animate) {
+                    var attrToProjector = this._generateAttrToProjector();
+                    var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                    var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                    var definedProjector = function (d, i, dataset) {
+                        var positionX = xProjector(d, i, dataset);
+                        var positionY = yProjector(d, i, dataset);
+                        return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                    };
+                    attrToProjector["d"] = function (datum, index, dataset) {
+                        return d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return _this._getResetYFunction()(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return Plottable.Plot._scaledAccessor(_this.y0())(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                    };
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
+                }
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
+                return drawSteps;
+            };
             Area.prototype._updateYScale = function () {
                 var extents = this._propertyExtents.get("y0");
                 var extent = Plottable.Utils.Methods.flatten(extents);

@@ -130,6 +130,35 @@ export module Plots {
       return new Plottable.Drawers.Area(dataset);
     }
 
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      var drawSteps: Drawers.DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var attrToProjector = this._generateAttrToProjector();
+        var xProjector = Plot._scaledAccessor(this.x());
+        var yProjector = Plot._scaledAccessor(this.y());
+
+        var definedProjector = (d: any, i: number, dataset: Dataset) => {
+          var positionX = xProjector(d, i, dataset);
+          var positionY = yProjector(d, i, dataset);
+          return positionX != null && positionX === positionX &&
+                 positionY != null && positionY === positionY;
+        };
+
+        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
+          return d3.svg.area()
+                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
+                       .y0((innerDatum, innerIndex) => Plot._scaledAccessor(this.y0())(innerDatum, innerIndex, dataset))
+                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+        };
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+
+      return drawSteps;
+    }
+
     protected _updateYScale() {
       var extents = this._propertyExtents.get("y0");
       var extent = Utils.Methods.flatten<number>(extents);
