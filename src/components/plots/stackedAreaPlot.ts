@@ -6,7 +6,6 @@ export module Plots {
     private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
     private _stackedExtent: number[];
 
-    private _isVertical: boolean;
     private _baseline: D3.Selection;
     private _baselineValue = 0;
 
@@ -20,7 +19,6 @@ export module Plots {
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("area-plot", true);
-      this._isVertical = true;
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
@@ -119,7 +117,7 @@ export module Plots {
     }
 
     protected _extentsForProperty(attr: string) {
-      var primaryAttr = this._isVertical ? "y" : "x";
+      var primaryAttr = "y";
       if (attr === primaryAttr) {
         return [this._stackedExtent];
       } else {
@@ -132,26 +130,27 @@ export module Plots {
         return;
       }
 
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
-      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
+      var datasets = this.datasets();
+      var keyAccessor = this.x().accessor;
+      var valueAccessor = this.y().accessor;
+      var filter = this._filterForProperty("y");
 
-      StackedPlotUtils.checkSameDomainForStacks(keyAccessor, datasetKeys, keyToPlotDatasetKey);
-
-      var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-
-      for (var datasetKey in stackOffsets) {
-        if (!stackOffsets.hasOwnProperty(datasetKey)) {
-          continue;
-        }
-        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
-      }
-
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
+      this._checkSameDomain(datasets, keyAccessor);
+      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
+
+    private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {
+      var keySets = datasets.map((dataset) => {
+        return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
+      });
+      var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
+
+      if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
+        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+      }
+    }
+
   }
 }
 }

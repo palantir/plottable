@@ -299,6 +299,33 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Utils {
+        class Stacked {
+            /**
+             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
+             * for drawing purposes.
+             *
+             * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
+             */
+            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, D3.Map<number>>;
+            /**
+             * Calculates an extent across all datasets. The extent is a <number> interval that
+             * accounts for the fact that stacked bits have to be added together when calculating the extent
+             *
+             * @return {[number]} The extent that spans all the stacked data
+             */
+            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
+            /**
+             * Given an array of datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each dataset.
+             */
+            static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+        }
+    }
+}
+
+
+declare module Plottable {
     type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
@@ -2853,32 +2880,6 @@ declare module Plottable {
             };
             protected _getDataToDraw(): D3.Map<any[]>;
         }
-    }
-}
-
-
-declare module Plottable {
-    module Plots {
-        type StackedDatum = {
-            key: any;
-            value: number;
-            offset?: number;
-        };
-    }
-    class StackedPlotUtils {
-        /**
-         * @return {[number]} The extent that spans all the stacked data
-         */
-        static computeStackExtents(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasets: Dataset[], stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
-        /**
-         * @return {{ [key: string]: D3.Map<number> }} A map from datasetKey to stackOffsets
-         */
-        static computeStackOffsets(keyAccessor: Accessor<any>, valueAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): {
-            [key: string]: D3.Map<number>;
-        };
-        static checkSameDomainForStacks(keyAccessor: Accessor<any>, datasetKeys: string[], keyToPlotDatasetKey: D3.Map<Plots.PlotDatasetKey>): void;
-        static keyAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
-        static valueAccessor(plot: XYPlot<any, any>, orientation: string): Accessor<any>;
     }
 }
 
