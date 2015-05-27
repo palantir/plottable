@@ -60,6 +60,7 @@ declare module D3 {
         altKey?: boolean;
         ctrlKey?: boolean;
         metaKey?: boolean;
+        shiftKey?: boolean;
         type: string;
     }
 
@@ -303,7 +304,7 @@ declare module D3 {
             * @param url Url to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (url: string, callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
             /**
             * Creates an asynchronous request for specified url
             *
@@ -311,7 +312,7 @@ declare module D3 {
             * @param mime MIME type to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, mime: string, callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (url: string, mime: string, callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
         };
         /**
         * Request a text file
@@ -323,7 +324,7 @@ declare module D3 {
             * @param url Url to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, callback?: (response: string) => void ): Xhr;
+            (url: string, callback?: (error: any, responseText: string) => void ): Xhr;
             /**
             * Request a text file
             *
@@ -331,7 +332,7 @@ declare module D3 {
             * @param mime MIME type to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, mime: string, callback?: (response: string) => void ): Xhr;
+            (url: string, mime: string, callback?: (error: any, responseText: string) => void ): Xhr;
         };
         /**
         * Request a JSON blob
@@ -350,7 +351,7 @@ declare module D3 {
             * @param url Url to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, callback?: (response: Document) => void ): Xhr;
+            (url: string, callback?: (error: any, response: Document) => void ): Xhr;
             /**
             * Request an HTML document fragment.
             *
@@ -358,7 +359,7 @@ declare module D3 {
             * @param mime MIME type to request
             * @param callback Function to invoke when resource is loaded or the request fails
             */
-            (url: string, mime: string, callback?: (response: Document) => void ): Xhr;
+            (url: string, mime: string, callback?: (error: any, response: Document) => void ): Xhr;
         };
         /**
         * Request an XML document fragment.
@@ -366,11 +367,17 @@ declare module D3 {
         * @param url Url to request
         * @param callback Function to invoke when resource is loaded or the request fails
         */
-        html: (url: string, callback?: (response: DocumentFragment) => void ) => Xhr;
+        html: (url: string, callback?: (error: any, response: DocumentFragment) => void ) => Xhr;
         /**
         * Request a comma-separated values (CSV) file.
         */
         csv: Dsv;
+
+        /**
+        * Request an arbitrary char-separated values file parser, like semicolon or what ever
+        */
+        dsv: Dsv; 
+        
         /**
         * Request a tab-separated values (TSV) file
         */
@@ -647,7 +654,7 @@ declare module D3 {
         *
         * @param callback Function to invoke on completion of request
         */
-        get(callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+        get(callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
         /**
         * Issue the request using the POST method
         */
@@ -657,14 +664,14 @@ declare module D3 {
             *
             * @param callback Function to invoke on completion of request
             */
-            (callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
             /**
             * Issue the request using the POST method
             *
             * @param data Data to post back in the request
             * @param callback Function to invoke on completion of request
             */
-            (data: any, callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (data: any, callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
         };
         /**
         * Issues this request using the specified method
@@ -676,7 +683,7 @@ declare module D3 {
             * @param method Method to use to make the request
             * @param callback Function to invoke on completion of request
             */
-            (method: string, callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (method: string, callback?: (eror: any, xhr: XMLHttpRequest) => void ): Xhr;
             /**
             * Issues this request using the specified method
             *
@@ -684,7 +691,7 @@ declare module D3 {
             * @param data Data to post back in the request
             * @param callback Function to invoke on completion of request
             */
-            (method: string, data: any, callback?: (xhr: XMLHttpRequest) => void ): Xhr;
+            (method: string, data: any, callback?: (error: any, xhr: XMLHttpRequest) => void ): Xhr;
         };
         /**
         * Aborts this request, if it is currently in-flight
@@ -707,6 +714,17 @@ declare module D3 {
         * @param callback Function to invoke when resource is loaded or the request fails
         */
         (url: string, callback?: (error: any, response: any[]) => void ): Xhr;
+        /**
+        * Arbitrary Delimiters:
+        * Constructs a new parser for the given delimiter and mime type. For example, to parse values separated by "|", the vertical bar character, use:
+        * var dsv = d3.dsv("|", "text/plain");
+        *
+        * returns the new parser
+        *
+        * @param separator seperator character
+        * @param contentType 
+        */
+        (separator: string, contentType:string): (url: string, callback?: (error: any, response: any[]) => void )=> Xhr;
         /**
         * Parse a delimited string into objects using the header row.
         *
@@ -769,8 +787,18 @@ declare module D3 {
             (valueFunction: (data: T, index: number) => any): _Selection<T>;
         };
 
-        append: (name: string) => _Selection<T>;
-        insert: (name: string, before: string) => _Selection<T>;
+        append: {
+            (name: string): _Selection<T>;
+            (elementFunction: (data: T, index: number) => any): _Selection<T>;
+        }
+
+        insert: {
+            (name: string, before: string): _Selection<T>;
+            (insertElementFunction: (data: T, index: number) => any, before: string): _Selection<T>;
+            (name: string, beforeElementFunction: (data: T, index: number) => any): _Selection<T>;
+            (insertElementFunction: (data: T, index: number) => any, beforeElementFunction: (data: T, index: number) => any): _Selection<T>;
+        }
+
         remove: () => _Selection<T>;
         empty: () => boolean;
 
@@ -856,8 +884,18 @@ declare module D3 {
     export interface Selection extends _Selection<any> { }
 
     export interface _EnterSelection<T> {
-        append: (name: string) => _Selection<T>;
-        insert: (name: string, before?: string) => _Selection<T>;
+        append: {
+            (name: string): _Selection<T>;
+            (elementFunction: (data: T, index: number) => any): _Selection<T>;
+        }
+
+        insert: {
+            (name: string, before?: string): _Selection<T>;
+            (insertElementFunction: (data: T, index: number) => any, before?: string): _Selection<T>;
+            (name: string, beforeElementFunction?: (data: T, index: number) => any): _Selection<T>;
+            (insertElementFunction: (data: T, index: number) => any, beforeElementFunction?: (data: T, index: number) => any): _Selection<T>;
+        }
+
         select: (selector: string) => _Selection<T>;
         empty: () => boolean;
         node: () => Element;
@@ -2653,19 +2691,19 @@ declare module D3 {
 
         export interface Scale extends GenericScale<Scale> { }
 
-        export interface GenericQuantitativeScale<S, D> extends GenericScale<S> {
+        export interface GenericQuantitativeScale<S> extends GenericScale<S> {
             /**
             * Get the range value corresponding to a given domain value.
             *
             * @param value Domain Value
             */
-            (value: D): number;
+            (value: number): number;
             /**
             * Get the domain value corresponding to a given range value.
             *
             * @param value Range Value
             */
-            invert(value: number): D;
+            invert(value: number): number;
             /**
             * Set the scale's output range, and enable rounding.
             *
@@ -2708,9 +2746,9 @@ declare module D3 {
             tickFormat(count: number, format?: string): (n: number) => string;
         }
 
-        export interface QuantitativeScale<D> extends GenericQuantitativeScale<QuantitativeScale<D>, D> { }
+        export interface QuantitativeScale extends GenericQuantitativeScale<QuantitativeScale> { }
 
-        export interface LinearScale extends GenericQuantitativeScale<LinearScale, number> { }
+        export interface LinearScale extends GenericQuantitativeScale<LinearScale> { }
 
         export interface IdentityScale extends GenericScale<IdentityScale> {
             /**
@@ -2739,11 +2777,11 @@ declare module D3 {
             tickFormat(count: number): (n: number) => string;
         }
 
-        export interface SqrtScale extends GenericQuantitativeScale<SqrtScale, number> { }
+        export interface SqrtScale extends GenericQuantitativeScale<SqrtScale> { }
 
-        export interface PowScale extends GenericQuantitativeScale<PowScale, number> { }
+        export interface PowScale extends GenericQuantitativeScale<PowScale> { }
 
-        export interface LogScale extends GenericQuantitativeScale<LogScale, number> { }
+        export interface LogScale extends GenericQuantitativeScale<LogScale> { }
 
         export interface OrdinalScale extends GenericScale<OrdinalScale> {
             rangePoints(interval: any[], padding?: number): OrdinalScale;
@@ -2761,11 +2799,21 @@ declare module D3 {
             quantiles(): any[];
         }
 
-        export interface TimeScale extends QuantitativeScale<Date> {
+        export interface TimeScale extends GenericScale<TimeScale> {
+            (value: Date): number;
+            invert(value: number): Date;
+            rangeRound: (values: any[]) => TimeScale;
+            interpolate: {
+                (): D3.Transition.Interpolate;
+                (factory: D3.Transition.InterpolateFactory): TimeScale;
+            };
+            clamp(clamp: boolean): TimeScale;
             ticks: {
                 (count: number): any[];
                 (range: D3.Time.Range, count: number): any[];
             };
+            tickFormat(count: number): (n: number) => string;
+            nice(count?: number): TimeScale;
         }
     }
 
