@@ -2670,12 +2670,6 @@ var Plottable;
                 });
                 return modifiedAttrToProjector;
             };
-            AbstractDrawer.prototype._prepareDrawSteps = function (drawSteps) {
-                // no-op
-            };
-            AbstractDrawer.prototype._prepareData = function (data, drawSteps) {
-                return data;
-            };
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -2691,10 +2685,8 @@ var Plottable;
                         animator: dr.animator
                     };
                 });
-                var preparedData = this._prepareData(data, appliedDrawSteps);
-                this._prepareDrawSteps(appliedDrawSteps);
-                this._enterData(preparedData);
-                var numberOfIterations = this._numberOfAnimationIterations(preparedData);
+                this._enterData(data);
+                var numberOfIterations = this._numberOfAnimationIterations(data);
                 var delay = 0;
                 appliedDrawSteps.forEach(function (drawStep, i) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
