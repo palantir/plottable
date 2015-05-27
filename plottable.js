@@ -2918,7 +2918,6 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(dataset, isVertical) {
                 _super.call(this, dataset);
-                this._labelsTooWide = false;
                 this.svgElement("rect");
                 this._isVertical = isVertical;
             }
@@ -2928,12 +2927,6 @@ var Plottable;
                 this._textArea = area.append("g").classed("bar-label-text-area", true);
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
-            };
-            Rect.prototype.aremoveLabels = function () {
-                this._textArea.selectAll("g").remove();
-            };
-            Rect.prototype.a_getIfLabelsTooWide = function () {
-                return this._labelsTooWide;
             };
             Rect.prototype.draw = function (data, drawSteps) {
                 var _this = this;

@@ -3,7 +3,6 @@
 module Plottable {
 export module Drawers {
   export class Rect extends Element {
-    private _labelsTooWide = false;
     private _isVertical: boolean;
     private _textArea: D3.Selection;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
@@ -21,14 +20,6 @@ export module Drawers {
       this._textArea = area.append("g").classed("bar-label-text-area", true);
       this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
-    }
-
-    public aremoveLabels() {
-      this._textArea.selectAll("g").remove();
-    }
-
-    public a_getIfLabelsTooWide() {
-      return this._labelsTooWide;
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {
