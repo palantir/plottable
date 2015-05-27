@@ -33,7 +33,12 @@ export module Plots {
       if (y == null) {
         return super.y();
       }
-      super.y(y, yScale);
+
+      if (yScale == null) {
+        super.y(y);
+      } else {
+        super.y(y, yScale);
+      }
 
       if (yScale != null) {
         var y0 = this.y0().accessor;

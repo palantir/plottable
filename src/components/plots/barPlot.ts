@@ -45,7 +45,13 @@ export module Plots {
       if (x == null) {
         return super.x();
       }
-      super.x(<X | Accessor<X>>x, xScale);
+
+      if (xScale == null) {
+        super.x(<number | Accessor<number>>x);
+      } else {
+        super.x(< X | Accessor<X>>x, xScale);
+      }
+
       this._updateValueScale();
       return this;
     }
@@ -57,7 +63,13 @@ export module Plots {
       if (y == null) {
         return super.y();
       }
-      super.y(<Y | Accessor<Y>>y, yScale);
+
+      if (yScale == null) {
+        super.y(<number | Accessor<number>>y);
+      } else {
+        super.y(<Y | Accessor<Y>>y, yScale);
+      }
+
       this._updateValueScale();
       return this;
     }

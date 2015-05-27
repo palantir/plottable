@@ -7376,7 +7376,12 @@ var Plottable;
                 if (x == null) {
                     return _super.prototype.x.call(this);
                 }
-                _super.prototype.x.call(this, x, xScale);
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                }
                 this._updateValueScale();
                 return this;
             };
@@ -7384,7 +7389,12 @@ var Plottable;
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                _super.prototype.y.call(this, y, yScale);
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
                 this._updateValueScale();
                 return this;
             };
@@ -7910,7 +7920,12 @@ var Plottable;
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                _super.prototype.y.call(this, y, yScale);
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
                 if (yScale != null) {
                     var y0 = this.y0().accessor;
                     if (y0 != null) {

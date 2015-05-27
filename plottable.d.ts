@@ -2913,8 +2913,12 @@ declare module Plottable {
             protected _getDrawer(key: string): Drawers.Area;
             protected _getAnimator(key: string): Animators.Plot;
             protected _setup(): void;
-            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any;
-            y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): StackedArea<X>;
+            x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): StackedArea<X>;
+            y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;

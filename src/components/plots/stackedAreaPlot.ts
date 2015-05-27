@@ -37,6 +37,9 @@ export module Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedArea<X>;
+    public x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any {
       if (x == null) {
         return super.x();
@@ -52,6 +55,9 @@ export module Plots {
       return this;
     }
 
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): StackedArea<X>;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       if (y == null) {
         return super.y();
