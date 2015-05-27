@@ -37,7 +37,9 @@ export module Plots {
 
       if (yScale != null) {
         var y0 = this.y0().accessor;
-        this._bindProperty(Area._Y0_KEY, y0, yScale);
+        if (y0 != null) {
+          this._bindProperty(Area._Y0_KEY, y0, yScale);
+        }
         this._updateYScale();
       }
       return this;

@@ -7170,7 +7170,9 @@ var Plottable;
                 if (scale != null) {
                     var x2Binding = this.x2();
                     var x2 = x2Binding && x2Binding.accessor;
-                    this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                    if (x2 != null) {
+                        this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                    }
                 }
                 // The x and y scales should render in bands with no padding for category scales
                 if (scale instanceof Plottable.Scales.Category) {
@@ -7192,7 +7194,9 @@ var Plottable;
                 if (scale != null) {
                     var y2Binding = this.y2();
                     var y2 = y2Binding && y2Binding.accessor;
-                    this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                    if (y2 != null) {
+                        this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                    }
                 }
                 // The x and y scales should render in bands with no padding for category scales
                 if (scale instanceof Plottable.Scales.Category) {
@@ -7909,7 +7913,9 @@ var Plottable;
                 _super.prototype.y.call(this, y, yScale);
                 if (yScale != null) {
                     var y0 = this.y0().accessor;
-                    this._bindProperty(Area._Y0_KEY, y0, yScale);
+                    if (y0 != null) {
+                        this._bindProperty(Area._Y0_KEY, y0, yScale);
+                    }
                     this._updateYScale();
                 }
                 return this;
