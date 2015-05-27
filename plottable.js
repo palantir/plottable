@@ -7894,19 +7894,24 @@ var Plottable;
                 this.attr("stroke", defaultColor);
             }
             Area.prototype.y = function (y, yScale) {
-                var ret = _super.prototype.y.call(this, y, yScale);
-                if (y != null) {
-                    var y0 = this.y0() && this.y0().accessor;
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                _super.prototype.y.call(this, y, yScale);
+                if (yScale != null) {
+                    var y0Binding = this.y0();
+                    var y0 = y0Binding && y0Binding.accessor;
                     this._bindProperty(Area._Y0_KEY, y0, yScale);
                     this._updateYScale();
                 }
-                return ret;
+                return this;
             };
             Area.prototype.y0 = function (y0) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
-                var y0Scale = this.y() && this.y().scale;
+                var y0Binding = this.y();
+                var y0Scale = y0Binding && y0Binding.scale;
                 this._bindProperty(Area._Y0_KEY, y0, y0Scale);
                 this._updateYScale();
                 this.render();
@@ -7914,9 +7919,7 @@ var Plottable;
             };
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                if (this.y() != null && this.y().scale != null) {
-                    this._updateYScale();
-                }
+                this._updateYScale();
             };
             Area.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Area(key);
@@ -7926,11 +7929,11 @@ var Plottable;
                 var extent = Plottable.Utils.Methods.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
-                console.log(1);
-                if (!this.y() || !this.y().scale) {
+                var yBinding = this.y();
+                var yScale = (yBinding && yBinding.scale);
+                if (yScale == null) {
                     return;
                 }
-                var yScale = this.y().scale;
                 if (constantBaseline != null) {
                     yScale.addPaddingException(this, constantBaseline);
                 }

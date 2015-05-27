@@ -34,13 +34,18 @@ export module Plots {
     public y(y: number | Accessor<number>): Area<X>;
     public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
-      var ret = super.y(y, yScale);
-      if (y != null) {
-        var y0 = this.y0() && this.y0().accessor;
+      if (y == null) {
+        return super.y();
+      }
+      super.y(y, yScale);
+
+      if (yScale != null) {
+        var y0Binding = this.y0();
+        var y0 = y0Binding && y0Binding.accessor;
         this._bindProperty(Area._Y0_KEY, y0, yScale);
         this._updateYScale();
       }
-      return ret;
+      return this;
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
@@ -49,7 +54,8 @@ export module Plots {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      var y0Scale = this.y() && this.y().scale;
+      var y0Binding = this.y();
+      var y0Scale = y0Binding && y0Binding.scale;
       this._bindProperty(Area._Y0_KEY, y0, y0Scale);
       this._updateYScale();
       this.render();
@@ -58,9 +64,7 @@ export module Plots {
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      if (this.y() != null && this.y().scale != null) {
-        this._updateYScale();
-      }
+      this._updateYScale();
     }
 
     protected _getDrawer(key: string) {
@@ -73,13 +77,12 @@ export module Plots {
       var uniqExtentVals = Utils.Methods.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
-      console.log(1);
-
-
-      if (!this.y() || !this.y().scale) {
+      var yBinding = this.y();
+      var yScale = <QuantitativeScale<number>> (yBinding && yBinding.scale);
+      if (yScale == null) {
         return;
       }
-      var yScale = <QuantitativeScale<number>> this.y().scale;
+
       if (constantBaseline != null) {
         yScale.addPaddingException(this, constantBaseline);
       } else {
