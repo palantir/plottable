@@ -567,8 +567,13 @@ declare module Plottable {
      * ```
      */
     module RenderController {
+        module Policy {
+            var IMMEDIATE: string;
+            var ANIMATION_FRAME: string;
+            var TIMEOUT: string;
+        }
         var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
+        function setRenderPolicy(policy: string): void;
         /**
          * If the RenderController is enabled, we enqueue the component for
          * render. Otherwise, it is rendered immediately.
@@ -1172,11 +1177,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         type AppliedDrawStep = {
             attrToProjector: AttributeToAppliedProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         class AbstractDrawer {
             protected _className: string;
@@ -2411,6 +2416,10 @@ declare module Plottable {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
+        module Animator {
+            var MAIN: string;
+            var RESET: string;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
@@ -2444,7 +2453,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
-        protected _getAnimator(key: string): Animators.PlotAnimator;
+        protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
@@ -2474,7 +2483,7 @@ declare module Plottable {
          *
          * @return {PlotAnimator} The Animator for the specified key.
          */
-        animator(animatorKey: string): Animators.PlotAnimator;
+        animator(animatorKey: string): Animators.Plot;
         /**
          * Set the animator associated with the specified Animator key.
          *
@@ -2483,7 +2492,7 @@ declare module Plottable {
          * the specified key.
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
+        animator(animatorKey: string, animator: Animators.Plot): Plot;
         /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
@@ -2902,7 +2911,7 @@ declare module Plottable {
              */
             constructor();
             protected _getDrawer(key: string): Drawers.Area;
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             protected _setup(): void;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any;
             y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any;
@@ -2933,7 +2942,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
             constructor(orientation?: string);
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
@@ -2950,7 +2959,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Animators {
-        interface PlotAnimator {
+        interface Plot {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
              *
@@ -2970,7 +2979,7 @@ declare module Plottable {
             getTiming(numberOfIterations: number): number;
         }
         type PlotAnimatorMap = {
-            [animatorKey: string]: PlotAnimator;
+            [animatorKey: string]: Plot;
         };
     }
 }
@@ -2982,7 +2991,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements PlotAnimator {
+        class Null implements Animators.Plot {
             getTiming(selection: any): number;
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
@@ -3004,7 +3013,7 @@ declare module Plottable {
          * min(maxIterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
-        class Base implements PlotAnimator {
+        class Base implements Animators.Plot {
             /**
              * The default duration of the animation in milliseconds
              */

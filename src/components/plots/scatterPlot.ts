@@ -16,11 +16,7 @@ export module Plots {
     constructor() {
       super();
       this.classed("scatter-plot", true);
-
-      this.animator("symbols-reset", new Animators.Null());
-      this.animator("symbols", new Animators.Base()
-                                           .duration(250)
-                                           .delay(5));
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(250).delay(5));
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
@@ -60,10 +56,10 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["d"] = () => "";
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 

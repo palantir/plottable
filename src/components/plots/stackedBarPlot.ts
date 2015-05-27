@@ -21,7 +21,7 @@ export module Plots {
       this._stackedExtent = [];
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getAnimator(key: string): Animators.Plot {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);

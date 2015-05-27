@@ -14,11 +14,7 @@ export module Plots {
     constructor() {
       super();
       this.classed("line-plot", true);
-      this.animator("reset", new Animators.Null());
-      this.animator("main", new Animators.Base()
-                                         .duration(600)
-                                         .easing("exp-in-out"));
-
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }
@@ -44,10 +40,10 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["y"] = this._getResetYFunction();
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
 
       return drawSteps;
     }
