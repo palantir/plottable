@@ -567,8 +567,13 @@ declare module Plottable {
      * ```
      */
     module RenderController {
+        module Policy {
+            var IMMEDIATE: string;
+            var ANIMATION_FRAME: string;
+            var TIMEOUT: string;
+        }
         var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
+        function setRenderPolicy(policy: string): void;
         /**
          * If the RenderController is enabled, we enqueue the component for
          * render. Otherwise, it is rendered immediately.

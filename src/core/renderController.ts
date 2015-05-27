@@ -24,26 +24,27 @@ module Plottable {
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested = false;
     var _isCurrentlyFlushing = false;
+    export module Policy {
+      export var IMMEDIATE = "immediate";
+      export var ANIMATION_FRAME = "animationframe";
+      export var TIMEOUT = "timeout";
+    }
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
-      if (typeof(policy) === "string") {
-        switch ((<string> policy).toLowerCase()) {
-          case "immediate":
-          policy = new RenderPolicies.Immediate();
+    export function setRenderPolicy(policy: string) {
+      switch (policy.toLowerCase()) {
+        case Policy.IMMEDIATE:
+          _renderPolicy = new RenderPolicies.Immediate();
           break;
-          case "animationframe":
-          policy = new RenderPolicies.AnimationFrame();
+        case Policy.ANIMATION_FRAME:
+          _renderPolicy = new RenderPolicies.AnimationFrame();
           break;
-          case "timeout":
-          policy = new RenderPolicies.Timeout();
+        case Policy.TIMEOUT:
+          _renderPolicy = new RenderPolicies.Timeout();
           break;
-          default:
+        default:
           Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-          return;
-        }
       }
-      _renderPolicy = <RenderPolicies.RenderPolicy> policy;
     }
 
     /**
