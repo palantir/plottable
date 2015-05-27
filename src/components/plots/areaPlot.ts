@@ -18,7 +18,7 @@ export module Plots {
     constructor() {
       super();
       this.classed("area-plot", true);
-      this.y0(); // default
+      this.y0(0); // default
       this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
@@ -36,8 +36,7 @@ export module Plots {
       super.y(y, yScale);
 
       if (yScale != null) {
-        var y0Binding = this.y0();
-        var y0 = y0Binding && y0Binding.accessor;
+        var y0 = this.y0().accessor;
         this._bindProperty(Area._Y0_KEY, y0, yScale);
         this._updateYScale();
       }
@@ -50,9 +49,9 @@ export module Plots {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      var y0Binding = this.y();
-      var y0Scale = y0Binding && y0Binding.scale;
-      this._bindProperty(Area._Y0_KEY, y0, y0Scale);
+      var yBinding = this.y();
+      var yScale = yBinding && yBinding.scale;
+      this._bindProperty(Area._Y0_KEY, y0, yScale);
       this._updateYScale();
       this.render();
       return this;

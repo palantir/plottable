@@ -96,9 +96,9 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X2_KEY);
       }
 
-      var x2Binding = this.x();
-      var x2Scale = x2Binding && x2Binding.scale;
-      this._bindProperty(Rectangle._X2_KEY, x2, x2Scale);
+      var xBinding = this.x();
+      var xScale = xBinding && xBinding.scale;
+      this._bindProperty(Rectangle._X2_KEY, x2, xScale);
 
       this.render();
       return this;
@@ -130,9 +130,9 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
 
-      var y2Binding = this.y();
-      var y2Scale = y2Binding && y2Binding.scale;
-      this._bindProperty(Rectangle._Y2_KEY, y2, y2Scale);
+      var yBinding = this.y();
+      var yScale = yBinding && yBinding.scale;
+      this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
 
       this.render();
       return this;

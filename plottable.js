@@ -7182,9 +7182,9 @@ var Plottable;
                 if (x2 == null) {
                     return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
-                var x2Binding = this.x();
-                var x2Scale = x2Binding && x2Binding.scale;
-                this._bindProperty(Rectangle._X2_KEY, x2, x2Scale);
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty(Rectangle._X2_KEY, x2, xScale);
                 this.render();
                 return this;
             };
@@ -7204,9 +7204,9 @@ var Plottable;
                 if (y2 == null) {
                     return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
-                var y2Binding = this.y();
-                var y2Scale = y2Binding && y2Binding.scale;
-                this._bindProperty(Rectangle._Y2_KEY, y2, y2Scale);
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
                 this.render();
                 return this;
             };
@@ -7895,7 +7895,7 @@ var Plottable;
             function Area() {
                 _super.call(this);
                 this.classed("area-plot", true);
-                this.y0(); // default
+                this.y0(0); // default
                 this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
@@ -7908,8 +7908,7 @@ var Plottable;
                 }
                 _super.prototype.y.call(this, y, yScale);
                 if (yScale != null) {
-                    var y0Binding = this.y0();
-                    var y0 = y0Binding && y0Binding.accessor;
+                    var y0 = this.y0().accessor;
                     this._bindProperty(Area._Y0_KEY, y0, yScale);
                     this._updateYScale();
                 }
@@ -7919,9 +7918,9 @@ var Plottable;
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
-                var y0Binding = this.y();
-                var y0Scale = y0Binding && y0Binding.scale;
-                this._bindProperty(Area._Y0_KEY, y0, y0Scale);
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Area._Y0_KEY, y0, yScale);
                 this._updateYScale();
                 this.render();
                 return this;
