@@ -1334,25 +1334,28 @@ var Plottable;
         var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
         var _animationRequested = false;
         var _isCurrentlyFlushing = false;
+        var Policy;
+        (function (Policy) {
+            Policy.IMMEDIATE = "immediate";
+            Policy.ANIMATION_FRAME = "animationframe";
+            Policy.TIMEOUT = "timeout";
+        })(Policy = RenderController.Policy || (RenderController.Policy = {}));
         RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
         function setRenderPolicy(policy) {
-            if (typeof (policy) === "string") {
-                switch (policy.toLowerCase()) {
-                    case "immediate":
-                        policy = new Plottable.RenderPolicies.Immediate();
-                        break;
-                    case "animationframe":
-                        policy = new Plottable.RenderPolicies.AnimationFrame();
-                        break;
-                    case "timeout":
-                        policy = new Plottable.RenderPolicies.Timeout();
-                        break;
-                    default:
-                        Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-                        return;
-                }
+            switch (policy.toLowerCase()) {
+                case Policy.IMMEDIATE:
+                    RenderController._renderPolicy = new Plottable.RenderPolicies.Immediate();
+                    break;
+                case Policy.ANIMATION_FRAME:
+                    RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+                    break;
+                case Policy.TIMEOUT:
+                    RenderController._renderPolicy = new Plottable.RenderPolicies.Timeout();
+                    break;
+                default:
+                    Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+                    return;
             }
-            RenderController._renderPolicy = policy;
         }
         RenderController.setRenderPolicy = setRenderPolicy;
         /**
