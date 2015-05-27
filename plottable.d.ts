@@ -2804,6 +2804,7 @@ declare module Plottable {
              */
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
         }
     }
 }

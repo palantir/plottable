@@ -80,22 +80,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateLineAttrToProjector();
-        var xProjector = Plot._scaledAccessor(this.x());
-        var yProjector = Plot._scaledAccessor(this.y());
-
-        var definedProjector = (d: any, i: number, dataset: Dataset) => {
-          var positionX = xProjector(d, i, dataset);
-          var positionY = yProjector(d, i, dataset);
-          return positionX != null && positionX === positionX &&
-                 positionY != null && positionY === positionY;
-        };
-
-        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
-          return d3.svg.line()
-                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
-                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-        };
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
       drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator("main")});
@@ -107,22 +92,7 @@ export module Plots {
       var fillProjector = lineAttrToProjector["fill"];
       lineAttrToProjector["stroke"] = fillProjector;
       lineAttrToProjector["stroke-width"] = () => "2px";
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
-
-      var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = xProjector(d, i, dataset);
-        var positionY = yProjector(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
-      };
-
-      lineAttrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
-        return d3.svg.line()
-                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                     .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-      };
+      lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
       return lineAttrToProjector;
     }
 
@@ -134,23 +104,9 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        var xProjector = Plot._scaledAccessor(this.x());
-        var yProjector = Plot._scaledAccessor(this.y());
-
-        var definedProjector = (d: any, i: number, dataset: Dataset) => {
-          var positionX = xProjector(d, i, dataset);
-          var positionY = yProjector(d, i, dataset);
-          return positionX != null && positionX === positionX &&
-                 positionY != null && positionY === positionY;
-        };
-
-        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
-          return d3.svg.area()
-                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
-                       .y0((innerDatum, innerIndex) => Plot._scaledAccessor(this.y0())(innerDatum, innerIndex, dataset))
-                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-        };
+        attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+                                                            this._getResetYFunction(),
+                                                            Plot._scaledAccessor(this.y0()));
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
 
@@ -179,24 +135,9 @@ export module Plots {
 
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
-      var y0Projector = Plot._scaledAccessor(this.y0());
-
-      var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = xProjector(d, i, dataset);
-        var positionY = yProjector(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
-      };
-
-      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) => {
-        return d3.svg.area()
-                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                     .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
-                     .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-      };
+      propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+                                                               Plot._scaledAccessor(this.y()),
+                                                               Plot._scaledAccessor(this.y0()));
       return propertyToProjectors;
     }
 
@@ -230,6 +171,22 @@ export module Plots {
       });
 
       return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
+    }
+
+    private _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+      return (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.area()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+      };
     }
   }
 }
