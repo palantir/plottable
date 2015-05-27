@@ -2920,10 +2920,6 @@ var Plottable;
                 _super.call(this, dataset);
                 this.svgElement("rect");
             }
-            Rect.prototype.setup = function (area) {
-                // need to put the bars in a seperate container so we can ensure that they don't cover labels
-                _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
-            };
             Rect.prototype.draw = function (data, drawSteps) {
                 var _this = this;
                 var attrToProjector = drawSteps[0].attrToProjector;

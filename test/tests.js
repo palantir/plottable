@@ -3330,7 +3330,7 @@ describe("Plots", function () {
                 var d0, d1;
                 var d0Px, d1Px;
                 beforeEach(function () {
-                    bars = d3.selectAll(".bar-area rect");
+                    bars = barPlot.getAllSelections();
                     zeroY = yScale.scale(0);
                     d0 = dataset.data()[0];
                     d0Px = {
@@ -3651,7 +3651,7 @@ describe("Plots", function () {
                 var d0, d1;
                 var d0Px, d1Px;
                 beforeEach(function () {
-                    bars = d3.selectAll(".bar-area rect");
+                    bars = barPlot.getAllSelections();
                     zeroX = xScale.scale(0);
                     d0 = dataset.data()[0];
                     d0Px = {
@@ -3894,7 +3894,7 @@ describe("Plots", function () {
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).y2(function (d) { return d.y2; }, yScale);
             plot.addDataset(new Plottable.Dataset(data1));
             plot.renderTo(svg);
-            var rectanglesSelection = plot._element.selectAll(".bar-area rect");
+            var rectanglesSelection = plot.getAllSelections();
             assert.strictEqual(rectanglesSelection.size(), 5, "only 5 rectangles should be displayed");
             rectanglesSelection.each(function (d, i) {
                 var sel = d3.select(this);

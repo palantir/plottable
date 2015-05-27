@@ -9,11 +9,6 @@ export module Drawers {
       this.svgElement("rect");
     }
 
-    public setup(area: D3.Selection) {
-      // need to put the bars in a seperate container so we can ensure that they don't cover labels
-      super.setup(area.append("g").classed("bar-area", true));
-    }
-
     public draw(data: any[], drawSteps: DrawStep[]) {
       var attrToProjector = drawSteps[0].attrToProjector;
       var isValidNumber = Plottable.Utils.Methods.isValidNumber;
