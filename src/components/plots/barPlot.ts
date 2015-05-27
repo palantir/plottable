@@ -40,30 +40,28 @@ export module Plots {
       this.attr("width", () => this._getBarPixelWidth());
     }
 
-    // TODO: remove
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): Bar<X, Y>;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      var ret = super.x(<any>x, <any>xScale);
-
-      if (x != null) {
-        this._updateValueScale();
+      if (x == null) {
+        return super.x();
       }
-      return ret;
+      super.x(<X | Accessor<X>>x, xScale);
+      this._updateValueScale();
+      return this;
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
     public y(y: number | Accessor<number>): Bar<X, Y>;
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-      var ret = super.y(<any>y, <any>yScale);
-
-      if (y != null) {
-        this._updateValueScale();
+      if (y == null) {
+        return super.y();
       }
-      return ret;
-
+      super.y(<Y | Accessor<Y>>y, yScale);
+      this._updateValueScale();
+      return this;
     }
 
     protected _getDrawer(key: string) {

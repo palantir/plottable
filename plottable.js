@@ -7359,18 +7359,20 @@ var Plottable;
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
             }
             Bar.prototype.x = function (x, xScale) {
-                var ret = _super.prototype.x.call(this, x, xScale);
-                if (x != null) {
-                    this._updateValueScale();
+                if (x == null) {
+                    return _super.prototype.x.call(this);
                 }
-                return ret;
+                _super.prototype.x.call(this, x, xScale);
+                this._updateValueScale();
+                return this;
             };
             Bar.prototype.y = function (y, yScale) {
-                var ret = _super.prototype.y.call(this, y, yScale);
-                if (y != null) {
-                    this._updateValueScale();
+                if (y == null) {
+                    return _super.prototype.y.call(this);
                 }
-                return ret;
+                _super.prototype.y.call(this, y, yScale);
+                this._updateValueScale();
+                return this;
             };
             Bar.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Rect(key, this._isVertical);
