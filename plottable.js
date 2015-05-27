@@ -1354,7 +1354,6 @@ var Plottable;
                     break;
                 default:
                     Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-                    return;
             }
         }
         RenderController.setRenderPolicy = setRenderPolicy;

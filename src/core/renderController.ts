@@ -44,7 +44,6 @@ module Plottable {
           break;
         default:
           Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-        return;
       }
     }
 
