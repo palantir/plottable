@@ -2612,51 +2612,25 @@ var Plottable;
                 _super.prototype._enterData.call(this, data);
                 this._pathSelection.datum(data);
             };
-            Line.prototype.setup = function (area) {
-                this._pathSelection = area.append("path").classed(Line.LINE_CLASS, true).style({
-                    "fill": "none",
-                    "vector-effect": "non-scaling-stroke"
-                });
-                _super.prototype.setup.call(this, area);
-            };
-            Line.prototype._createLine = function (xFunction, yFunction, definedFunction) {
-                if (!definedFunction) {
-                    definedFunction = function (d, i) { return true; };
-                }
-                return d3.svg.line().x(xFunction).y(yFunction).defined(definedFunction);
+            Line.prototype.setup = function (line) {
+                this._pathSelection = line.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
+                _super.prototype.setup.call(this, line);
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
-                var definedFunction = attrToProjector["defined"];
-                var xProjector = attrToProjector["x"];
-                var yProjector = attrToProjector["y"];
-                delete attrToProjector["x"];
-                delete attrToProjector["y"];
-                if (attrToProjector["defined"]) {
-                    delete attrToProjector["defined"];
-                }
-                attrToProjector["d"] = this._createLine(xProjector, yProjector, definedFunction);
-                if (attrToProjector["fill"]) {
-                    this._pathSelection.attr("fill", attrToProjector["fill"]); // so colors don't animate
-                }
-                if (attrToProjector["class"]) {
-                    this._pathSelection.attr("class", attrToProjector["class"]);
-                    this._pathSelection.classed(Line.LINE_CLASS, true);
-                    delete attrToProjector["class"];
-                }
                 step.animator.animate(this._pathSelection, attrToProjector);
+                this._pathSelection.classed(Line.PATH_CLASS, true);
             };
             Line.prototype._getSelector = function () {
-                return "." + Line.LINE_CLASS;
+                return "." + Line.PATH_CLASS;
             };
             Line.prototype._getSelection = function (index) {
                 return this._getRenderArea().select(this._getSelector());
             };
-            Line.LINE_CLASS = "line";
+            Line.PATH_CLASS = "line";
             return Line;
         })(Drawers.AbstractDrawer);
         Drawers.Line = Line;
@@ -7609,7 +7583,7 @@ var Plottable;
                 var drawSteps = [];
                 if (this._dataChanged && this._animate) {
                     var attrToProjector = this._generateAttrToProjector();
-                    attrToProjector["y"] = this._getResetYFunction();
+                    attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
                 }
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
@@ -7627,7 +7601,7 @@ var Plottable;
                 return attrToProjector;
             };
             Line.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined"];
+                return ["x", "y", "defined", "d"];
             };
             Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
@@ -7701,6 +7675,22 @@ var Plottable;
                     data: closestData,
                     pixelPoints: closestPixelPoints,
                     selection: d3.selectAll(closestElements)
+                };
+            };
+            Line.prototype._propertyProjectors = function () {
+                var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
+                propertyToProjectors["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
+                return propertyToProjectors;
+            };
+            Line.prototype._constructLineProjector = function (xProjector, yProjector) {
+                var _this = this;
+                var definedProjector = function (d, i, dataset) {
+                    var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
+                    var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
+                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                };
+                return function (datum, index, dataset) {
+                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
                 };
             };
             return Line;

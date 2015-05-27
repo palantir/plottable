@@ -1210,9 +1210,9 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Line extends AbstractDrawer {
-            static LINE_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(area: D3.Selection): void;
+            setup(line: D3.Selection): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
@@ -2803,6 +2803,7 @@ declare module Plottable {
              * @returns {PlotData} The PlotData closest to queryPoint
              */
             getClosestPlotData(queryPoint: Point): PlotData;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

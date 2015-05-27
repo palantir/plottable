@@ -43,7 +43,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
 
@@ -67,7 +67,7 @@ export module Plots {
     }
 
     protected _wholeDatumAttributes() {
-      return ["x", "y", "defined"];
+      return ["x", "y", "defined", "d"];
     }
 
     public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
@@ -149,6 +149,27 @@ export module Plots {
         data: closestData,
         pixelPoints: closestPixelPoints,
         selection: d3.selectAll(closestElements)
+      };
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+      propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
+      return propertyToProjectors;
+    }
+
+    private _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+      return (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.line()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
       };
     }
   }
