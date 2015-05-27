@@ -305,7 +305,7 @@ export module Plots {
       }
     }
 
-    protected _drawLabels() {
+    private _drawLabels() {
       var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
       var attrToProjector = this._generateAttrToProjector();
       var dataToDraw = this._getDataToDraw();

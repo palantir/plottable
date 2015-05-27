@@ -2776,7 +2776,6 @@ declare module Plottable {
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
             protected _additionalPaint(time: number): void;
-            protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
