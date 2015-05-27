@@ -31,19 +31,19 @@ module Plottable {
     }
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string): void {
-      switch ((<string> policy).toLowerCase()) {
+    export function setRenderPolicy(policy: string) {
+      switch (policy.toLowerCase()) {
         case Policy.IMMEDIATE:
-        _renderPolicy = new RenderPolicies.Immediate();
-        break;
+          _renderPolicy = new RenderPolicies.Immediate();
+          break;
         case Policy.ANIMATION_FRAME:
-        _renderPolicy = new RenderPolicies.AnimationFrame();
-        break;
+          _renderPolicy = new RenderPolicies.AnimationFrame();
+          break;
         case Policy.TIMEOUT:
-        _renderPolicy = new RenderPolicies.Timeout();
-        break;
+          _renderPolicy = new RenderPolicies.Timeout();
+          break;
         default:
-        Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+          Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
         return;
       }
     }
