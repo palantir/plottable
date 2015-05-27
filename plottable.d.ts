@@ -2980,7 +2980,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements Plot {
+        class Null implements Animators.Plot {
             getTiming(selection: any): number;
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
@@ -3002,7 +3002,7 @@ declare module Plottable {
          * min(maxIterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
-        class Base implements Plot {
+        class Base implements Animators.Plot {
             /**
              * The default duration of the animation in milliseconds
              */
