@@ -20,7 +20,7 @@ export module Drawers {
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
     protected _className: string;
-    public key: string;
+    protected _dataset: Dataset;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -36,10 +36,10 @@ export module Drawers {
      * Constructs a Drawer
      *
      * @constructor
-     * @param{string} key The key associated with this Drawer
+     * @param {Dataset} dataset The dataset associated with this Drawer
      */
-    constructor(key: string) {
-        this.key = key;
+    constructor(dataset: Dataset) {
+        this._dataset = dataset;
     }
 
     public setup(area: D3.Selection) {
@@ -77,12 +77,11 @@ export module Drawers {
       return data.length;
     }
 
-    private _applyMetadata(attrToProjector: AttributeToProjector,
-                          dataset: Dataset): AttributeToAppliedProjector {
+    private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset);
+          (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
       });
 
       return modifiedAttrToProjector;
@@ -101,12 +100,10 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     * @param{Dataset} dataset The Dataset
-     * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset) {
+    public draw(data: any[], drawSteps: DrawStep[]) {
       var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset);
+        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator

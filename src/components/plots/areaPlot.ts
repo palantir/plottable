@@ -61,8 +61,7 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      // HACKHACK Drawers should take in a dataset instead of the key
-      var lineDrawer = new Drawers.Line("");
+      var lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
         lineDrawer.setup(this._renderArea.append("g"));
       }
@@ -76,7 +75,7 @@ export module Plots {
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps, dataset);
+        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
       });
     }
 
@@ -110,10 +109,7 @@ export module Plots {
       var lineAttrToProjector = this._generateAttrToProjector();
       var fillProjector = lineAttrToProjector["fill"];
       lineAttrToProjector["stroke"] = fillProjector;
-      lineAttrToProjector["fill"] = () => "none";
-      lineAttrToProjector["vector-effect"] = () => "non-scaling-stroke";
       lineAttrToProjector["stroke-width"] = () => "2px";
-      lineAttrToProjector["class"] = () => Line.SELECTION_CLASS;
       var xProjector = Plot._scaledAccessor(this.x());
       var yProjector = Plot._scaledAccessor(this.y());
 
@@ -133,8 +129,8 @@ export module Plots {
       return lineAttrToProjector;
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Area(dataset);
     }
 
     protected _updateYScale() {

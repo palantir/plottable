@@ -4,8 +4,6 @@ module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
-    public static SELECTION_CLASS = "line";
-
     /**
      * Constructs a LinePlot.
      *
@@ -23,13 +21,10 @@ export module Plots {
 
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
-      this.attr("vector-effect", "non-scaling-stroke");
-      this.attr("fill", "none");
-      this.attr("class", Line.SELECTION_CLASS);
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Line(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Line(dataset);
     }
 
     protected _getResetYFunction() {
@@ -48,22 +43,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        var xProjector = Plot._scaledAccessor(this.x());
-        var yProjector = Plot._scaledAccessor(this.y());
-
-        var definedProjector = (d: any, i: number, dataset: Dataset) => {
-          var positionX = xProjector(d, i, dataset);
-          var positionY = yProjector(d, i, dataset);
-          return positionX != null && positionX === positionX &&
-                 positionY != null && positionY === positionY;
-        };
-
-        attrToProjector["d"] = (datum: any, index: number, dataset: Dataset) => {
-          return d3.svg.line()
-                       .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                       .y((innerDatum, innerIndex) => this._getResetYFunction()(innerDatum, innerIndex, dataset))
-                       .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-        };
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
       }
 
@@ -174,24 +154,23 @@ export module Plots {
 
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
+      propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
+      return propertyToProjectors;
+    }
 
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
-
+    private _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = xProjector(d, i, dataset);
-        var positionY = yProjector(d, i, dataset);
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
         return positionX != null && positionX === positionX &&
                positionY != null && positionY === positionY;
       };
-
-      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) => {
+      return (datum: any, index: number, dataset: Dataset) => {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
       };
-      return propertyToProjectors;
     }
   }
 }

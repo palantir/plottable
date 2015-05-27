@@ -3,7 +3,7 @@
 module Plottable {
 export module Drawers {
   export class Line extends AbstractDrawer {
-    public static LINE_CLASS = "line";
+    public static PATH_CLASS = "line";
 
     private _pathSelection: D3.Selection;
 
@@ -12,10 +12,11 @@ export module Drawers {
       this._pathSelection.datum(data);
     }
 
-    public setup(area: D3.Selection) {
-      this._pathSelection = area.append("path")
-                               .classed(Line.LINE_CLASS, true);
-      super.setup(area);
+    public setup(line: D3.Selection) {
+      this._pathSelection = line.append("path")
+                                .classed(Line.PATH_CLASS, true)
+                                .style("fill", "none");
+      super.setup(line);
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {
@@ -25,11 +26,11 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
       step.animator.animate(this._pathSelection, attrToProjector);
-      this._pathSelection.classed(Line.LINE_CLASS, true);
+      this._pathSelection.classed(Line.PATH_CLASS, true);
     }
 
     public _getSelector() {
-      return "." + Line.LINE_CLASS;
+      return "." + Line.PATH_CLASS;
     }
 
     public _getSelection(index: number): D3.Selection {
