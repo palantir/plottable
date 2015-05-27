@@ -249,12 +249,23 @@ export module Plots {
     /**
      * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
      * 
+     */
+    public plotDataIn(bounds: Bounds): PlotData;
+    /**
      * @param {Range} xRange The specified range of x values
      * @param {Range} yRange The specified range of y values
      * @return {Plots.PlotData} The plot data that corresponds to the ranges
      */
-    public plotDataIn(xRange: Range, yRange: Range): PlotData {
-      return this._getPlotData(xRange, yRange);
+    public plotDataIn(xRange: Range, yRange: Range): PlotData;
+    public plotDataIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotData {
+      var dataXRange = (<Range> xRangeOrBounds);
+      var dataYRange: Range = yRange;
+      if (yRange == null) {
+        var bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      }
+      return this._getPlotData(dataXRange, dataYRange);
     }
 
     private _getPlotData(xValOrRange: number | Range, yValOrRange: number | Range): PlotData {

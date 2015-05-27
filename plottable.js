@@ -7405,15 +7405,15 @@ var Plottable;
             Bar.prototype.plotDataAt = function (p) {
                 return this._getPlotData(p.x, p.y);
             };
-            /**
-             * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
-             *
-             * @param {Range} xRange The specified range of x values
-             * @param {Range} yRange The specified range of y values
-             * @return {Plots.PlotData} The plot data that corresponds to the ranges
-             */
-            Bar.prototype.plotDataIn = function (xRange, yRange) {
-                return this._getPlotData(xRange, yRange);
+            Bar.prototype.plotDataIn = function (xRangeOrBounds, yRange) {
+                var dataXRange = xRangeOrBounds;
+                var dataYRange = yRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                return this._getPlotData(dataXRange, dataYRange);
             };
             Bar.prototype._getPlotData = function (xValOrRange, yValOrRange) {
                 var data = [];
