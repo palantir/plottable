@@ -80,10 +80,11 @@ export module Plots {
     }
 
     protected _updateYScale() {
-      if (!this.y()) {
+      var yBinding = this.y();
+      var scale = <QuantitativeScale<any>> (yBinding && yBinding.scale);
+      if (scale == null) {
         return;
       }
-      var scale = <QuantitativeScale<any>> this.y().scale;
       scale.addPaddingException(this, 0);
       scale.addIncludedValue(this, 0);
     }

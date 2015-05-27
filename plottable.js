@@ -8110,10 +8110,11 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
             StackedArea.prototype._updateYScale = function () {
-                if (!this.y()) {
+                var yBinding = this.y();
+                var scale = (yBinding && yBinding.scale);
+                if (scale == null) {
                     return;
                 }
-                var scale = this.y().scale;
                 scale.addPaddingException(this, 0);
                 scale.addIncludedValue(this, 0);
             };
