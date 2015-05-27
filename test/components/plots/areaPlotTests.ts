@@ -92,7 +92,7 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.y0((d) => d.bar / 2);//, yScale);
+      areaPlot.y0((d) => d.bar / 2);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");

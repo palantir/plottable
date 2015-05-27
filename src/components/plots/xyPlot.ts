@@ -232,7 +232,7 @@ module Plottable {
     protected _projectorsReady() {
       var xBinding = this.x();
       var yBinding = this.y();
-      if (xBinding == null|| yBinding == null) {
+      if (xBinding == null || yBinding == null) {
         return false;
       }
       return xBinding.accessor != null && yBinding.accessor != null;

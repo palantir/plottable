@@ -3172,7 +3172,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
-            areaPlot.y0(function (d) { return d.bar / 2; }); //, yScale);
+            areaPlot.y0(function (d) { return d.bar / 2; });
             areaPlot.renderTo(svg);
             renderArea = areaPlot._renderArea;
             var areaPath = renderArea.select(".area");
