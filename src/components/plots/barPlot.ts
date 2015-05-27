@@ -258,12 +258,15 @@ export module Plots {
      */
     public plotDataIn(xRange: Range, yRange: Range): PlotData;
     public plotDataIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotData {
-      var dataXRange = (<Range> xRangeOrBounds);
-      var dataYRange: Range = yRange;
+      var dataXRange: Range;
+      var dataYRange: Range;
       if (yRange == null) {
         var bounds = (<Bounds> xRangeOrBounds);
         dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+        dataXRange = (<Range> xRangeOrBounds)
+        dataYRange = yRange;
       }
       return this._getPlotData(dataXRange, dataYRange);
     }

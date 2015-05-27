@@ -7406,12 +7406,16 @@ var Plottable;
                 return this._getPlotData(p.x, p.y);
             };
             Bar.prototype.plotDataIn = function (xRangeOrBounds, yRange) {
-                var dataXRange = xRangeOrBounds;
-                var dataYRange = yRange;
+                var dataXRange;
+                var dataYRange;
                 if (yRange == null) {
                     var bounds = xRangeOrBounds;
                     dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
                     dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
                 }
                 return this._getPlotData(dataXRange, dataYRange);
             };
