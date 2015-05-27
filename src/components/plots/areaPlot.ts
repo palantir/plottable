@@ -176,11 +176,12 @@ export module Plots {
         return Utils.Methods.isValidNumber(positionX) && Utils.Methods.isValidNumber(positionY);
       };
       return (datum: any, index: number, dataset: Dataset) => {
-        return d3.svg.area()
-                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                     .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+        var areaGenerator = d3.svg.area()
+                                  .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                                  .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                                  .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+                                  .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+        return areaGenerator(datum, index);
       };
     }
   }
