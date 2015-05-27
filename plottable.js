@@ -8139,15 +8139,6 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 return this;
             };
-            StackedArea.prototype._generateAttrToProjector = function () {
-                var _this = this;
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var yAccessor = this.y().accessor;
-                var xAccessor = this.x().accessor;
-                attrToProjector["y"] = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
-                attrToProjector["y0"] = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
-                return attrToProjector;
-            };
             StackedArea.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined", "d"];
             };

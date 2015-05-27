@@ -85,22 +85,8 @@ export module Plots {
 
     protected _onDatasetUpdate() {
       this._updateStackExtentsAndOffsets();
-
       super._onDatasetUpdate();
       return this;
-    }
-
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-
-      var yAccessor = this.y().accessor;
-      var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-
-      return attrToProjector;
     }
 
     protected _wholeDatumAttributes() {
