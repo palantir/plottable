@@ -46,6 +46,7 @@ try {
 } catch(err) {
   var plot = new Plottable.Plots.Rectangle(xScale, yScale);
 }
+
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(timeFormatStart, xScale)
   .y(function(d) { return d.team; }, yScale)

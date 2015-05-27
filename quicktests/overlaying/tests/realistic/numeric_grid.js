@@ -26,6 +26,7 @@ try {
 } catch(err) {
   var plot = new Plottable.Plots.Rectangle(xScale, yScale);
 }
+
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
