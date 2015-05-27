@@ -2800,19 +2800,10 @@ declare module D3 {
         }
 
         export interface TimeScale extends GenericQuantitativeScale<Date, TimeScale> {
-            (value: Date): number;
-            invert(value: number): Date;
-            rangeRound: (values: any[]) => TimeScale;
-            interpolate: {
-                (): D3.Transition.Interpolate;
-                (factory: D3.Transition.InterpolateFactory): TimeScale;
-            };
             ticks: {
                 (count: number): any[];
                 (range: D3.Time.Range, count: number): any[];
             };
-            tickFormat(count: number): (n: number) => string;
-            nice(count?: number): TimeScale;
         }
     }
 
