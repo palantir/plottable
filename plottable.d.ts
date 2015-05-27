@@ -1274,8 +1274,6 @@ declare module Plottable {
             svgElement(tag: string): Element;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
-            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
         }
     }

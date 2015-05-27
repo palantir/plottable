@@ -2851,22 +2851,6 @@ var Plottable;
                 }
                 dataElements.exit().remove();
             };
-            Element.prototype._filterDefinedData = function (data, definedFunction) {
-                return definedFunction ? data.filter(definedFunction) : data;
-            };
-            // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
-            Element.prototype._prepareDrawSteps = function (drawSteps) {
-                _super.prototype._prepareDrawSteps.call(this, drawSteps);
-                drawSteps.forEach(function (d) {
-                    if (d.attrToProjector["defined"]) {
-                        delete d.attrToProjector["defined"];
-                    }
-                });
-            };
-            Element.prototype._prepareData = function (data, drawSteps) {
-                var _this = this;
-                return drawSteps.reduce(function (data, drawStep) { return _this._filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
-            };
             Element.prototype._getSelector = function () {
                 return this._svgElement;
             };
