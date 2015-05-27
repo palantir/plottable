@@ -43,7 +43,7 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Category(yScale, "left");
 try {
   var plot = new Plottable.Plots.Rectangle();
-} catch (err) {
+} catch(err) {
   var plot = new Plottable.Plots.Rectangle(xScale, yScale);
 }
   plot.addDataset(new Plottable.Dataset(data));
