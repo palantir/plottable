@@ -35,7 +35,7 @@ export module Plots {
     public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       var ret = super.y(y, yScale);
-      if (y != null) {
+      if (yScale != null) {
         var y0 = this.y0() && this.y0().accessor;
         this._bindProperty(Area._Y0_KEY, y0, yScale);
         this._updateYScale();
