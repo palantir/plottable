@@ -7158,6 +7158,10 @@ var Plottable;
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
             Rectangle.prototype.x = function (x, scale) {
+                if (scale != null) {
+                    var x2 = this.x2() && this.x2().accessor;
+                    this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                }
                 // The x and y scales should render in bands with no padding for category scales
                 if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);
@@ -7174,6 +7178,10 @@ var Plottable;
                 return this;
             };
             Rectangle.prototype.y = function (y, scale) {
+                if (scale != null) {
+                    var y2 = this.y2() && this.y2().accessor;
+                    this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                }
                 // The x and y scales should render in bands with no padding for category scales
                 if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);

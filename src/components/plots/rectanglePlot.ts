@@ -75,6 +75,11 @@ export module Plots {
     public x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
 
+      if (scale != null) {
+        var x2 = this.x2() && this.x2().accessor;
+        this._bindProperty(Rectangle._X2_KEY, x2, scale);
+      }
+
       // The x and y scales should render in bands with no padding for category scales
       if (scale instanceof Scales.Category) {
         (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
@@ -101,6 +106,11 @@ export module Plots {
     public y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
     public y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
+
+      if (scale != null) {
+        var y2 = this.y2() && this.y2().accessor;
+        this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+      }
 
       // The x and y scales should render in bands with no padding for category scales
       if (scale instanceof Scales.Category) {
