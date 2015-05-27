@@ -76,8 +76,7 @@ describe("Plots", () => {
       renderArea = (<any> areaPlot)._renderArea;
     });
 
-    // Need to deal with repercussions in area plot
-    it.skip("draws area and line correctly", () => {
+    it("draws area and line correctly", () => {
       var areaPath = renderArea.select(".area");
       assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
       assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
@@ -86,7 +85,7 @@ describe("Plots", () => {
 
       var linePath = renderArea.select(".line");
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
+      assert.strictEqual(linePath.attr("stroke"), "steelblue", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
       svg.remove();
@@ -101,8 +100,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    // Need to deal with repercussions in area plot
-    it.skip("area is appended before line", () => {
+    it("area is appended before line", () => {
       var paths = renderArea.selectAll("path")[0];
       var areaSelection = renderArea.select(".area")[0][0];
       var lineSelection = renderArea.select(".line")[0][0];
@@ -152,8 +150,7 @@ describe("Plots", () => {
 
     describe("getAllSelections()", () => {
 
-      // Deal with repercussions in area plot
-      it.skip("retrieves all selections with no args", () => {
+      it("retrieves all selections with no args", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
         areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
         var allAreas = areaPlot.getAllSelections();
