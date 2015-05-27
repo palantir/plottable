@@ -298,11 +298,10 @@ export module Plots {
     }
 
     private _updateValueScale() {
-      var valueProjector = this._isVertical ? this.y() : this.x();
-      if (!valueProjector) {
+      if (!this._projectorsReady()) {
         return;
       }
-      var valueScale = valueProjector.scale;
+      var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
         if (this._baselineValue != null) {

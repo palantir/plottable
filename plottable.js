@@ -7535,11 +7535,10 @@ var Plottable;
                 return bars;
             };
             Bar.prototype._updateValueScale = function () {
-                var valueProjector = this._isVertical ? this.y() : this.x();
-                if (!valueProjector) {
+                if (!this._projectorsReady()) {
                     return;
                 }
-                var valueScale = valueProjector.scale;
+                var valueScale = this._isVertical ? this.y().scale : this.x().scale;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
                     if (this._baselineValue != null) {
