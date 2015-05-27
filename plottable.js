@@ -6902,8 +6902,8 @@ var Plottable;
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
-            // TODO: Extra?
-            if (xScale) {
+            // TODO: is this needed?
+            if (xScale != null) {
                 xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             this.render();
@@ -6917,8 +6917,8 @@ var Plottable;
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
             }
-            // TODO: extra?
-            if (yScale) {
+            // TODO: is this needed?
+            if (yScale != null) {
                 yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
@@ -7895,7 +7895,7 @@ var Plottable;
             }
             Area.prototype.y = function (y, yScale) {
                 var ret = _super.prototype.y.call(this, y, yScale);
-                if (yScale != null) {
+                if (y != null) {
                     var y0 = this.y0() && this.y0().accessor;
                     this._bindProperty(Area._Y0_KEY, y0, yScale);
                     this._updateYScale();

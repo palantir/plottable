@@ -33,8 +33,8 @@ describe("Plots", () => {
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
       rectanglePlot.x((d) => d.x, xScale)
                    .y((d) => d.y, yScale)
-                   .x2((d) => d.x2, xScale)
-                   .y2((d) => d.y2, yScale)
+                   .x2((d) => d.x2)
+                   .y2((d) => d.y2)
                    .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
@@ -61,7 +61,7 @@ describe("Plots", () => {
       plot
         .x((d: any) => d.x, xScale)
         .y((d: any) => d.y, yScale)
-        .y2((d: any) => d.y2, yScale);
+        .y2((d: any) => d.y2)
       plot.addDataset(new Plottable.Dataset(data1));
 
       plot.renderTo(svg);

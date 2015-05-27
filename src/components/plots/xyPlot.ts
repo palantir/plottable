@@ -39,10 +39,12 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      // TODO: Extra?
-      if (xScale) {
+
+      // TODO: is this needed?
+      if (xScale != null) {
         xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
+
       this.render();
       return this;
     }
@@ -59,10 +61,12 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      // TODO: extra?
-      if (yScale) {
+
+      // TODO: is this needed?
+      if (yScale != null) {
         yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
+
       this.render();
       return this;
     }
