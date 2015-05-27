@@ -404,8 +404,6 @@ describe("Component behavior", () => {
     var svg1 = TestMethods.generateSVG(300, SVG_HEIGHT_1);
     var svg2 = TestMethods.generateSVG(300, SVG_HEIGHT_2);
 
-    var xScale = new Plottable.Scales.Linear();
-    var yScale = new Plottable.Scales.Linear();
     var plot = new Plottable.Plots.Line();
     var group = new Plottable.Components.Group;
     group.renderTo(svg1);

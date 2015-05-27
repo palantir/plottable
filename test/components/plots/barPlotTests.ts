@@ -20,8 +20,6 @@ describe("Plots", () => {
     });
 
     it("rejects invalid orientations", () => {
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
       assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
     });
 

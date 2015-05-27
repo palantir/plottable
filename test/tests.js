@@ -3275,8 +3275,6 @@ describe("Plots", function () {
             svg.remove();
         });
         it("rejects invalid orientations", function () {
-            var xScale = new Plottable.Scales.Linear();
-            var yScale = new Plottable.Scales.Linear();
             assert.throws(function () { return new Plottable.Plots.Bar("diagonal"); }, Error);
         });
         function assertPlotDataEqual(expected, actual, msg) {
@@ -4515,7 +4513,6 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
-            console.log(1);
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -6316,8 +6313,6 @@ describe("Component behavior", function () {
         var SVG_HEIGHT_2 = 50;
         var svg1 = TestMethods.generateSVG(300, SVG_HEIGHT_1);
         var svg2 = TestMethods.generateSVG(300, SVG_HEIGHT_2);
-        var xScale = new Plottable.Scales.Linear();
-        var yScale = new Plottable.Scales.Linear();
         var plot = new Plottable.Plots.Line();
         var group = new Plottable.Components.Group;
         group.renderTo(svg1);
