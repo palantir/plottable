@@ -2549,7 +2549,7 @@ declare module Plottable {
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
-        constructor();
+        constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
         x(): Plots.AccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): XYPlot<X, Y>;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
@@ -2596,28 +2596,29 @@ declare module Plottable {
              * Constructs a RectanglePlot.
              *
              * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the left and right bounds of the rectangle (x1 and x2 respectively)
-             * as well as the bottom and top bounds (y1 and y2 respectively)
+             * project the left and right bounds of the rectangle (x and x1 respectively)
+             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
+             * not set, the plot will apply auto-centering logic to the extent of x/y
              *
              * @constructor
              * @param {Scale.Scale} xScale The x scale to use.
              * @param {Scale.Scale} yScale The y scale to use.
              */
-            constructor();
+            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            x1(): AccessorScaleBinding<X, number>;
-            x1(x1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x1(x1: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x(): AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
             x2(): AccessorScaleBinding<X, number>;
             x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
             x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-            y1(): AccessorScaleBinding<Y, number>;
-            y1(y1: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y1(y1: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y(): AccessorScaleBinding<Y, number>;
+            y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
             y2(): AccessorScaleBinding<Y, number>;
             y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
             y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
@@ -2636,7 +2637,7 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor();
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
             protected _getDrawer(key: string): Drawers.Symbol;
             size<S>(): AccessorScaleBinding<S, number>;
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
@@ -2666,7 +2667,7 @@ declare module Plottable {
              * @param {Scale.Color|Scale.InterpolatedColor} colorScale The color scale
              * to use for each grid cell.
              */
-            constructor();
+            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
             addDataset(dataset: Dataset): Grid<X, Y>;
             protected _getDrawer(key: string): Drawers.Rect;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2695,7 +2696,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(orientation?: string);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getDrawer(key: string): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -2805,7 +2806,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor();
+            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2843,7 +2844,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor();
+            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             y0(): Plots.AccessorScaleBinding<number, number>;
             y0(y0: number | Accessor<number>): Area<X>;
             y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
@@ -2872,7 +2873,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(orientation?: string);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -2918,7 +2919,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor();
+            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
             protected _getAnimator(key: string): Animators.PlotAnimator;
             protected _setup(): void;
@@ -2950,7 +2951,7 @@ declare module Plottable {
              * @param {Scale} yScale the y scale of the plot.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(orientation?: string);
+            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getAnimator(key: string): Animators.PlotAnimator;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;

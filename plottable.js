@@ -7824,6 +7824,10 @@ var Plottable;
                 var ret = _super.prototype.y.call(this, y, yScale);
                 if (y != null) {
                     this._updateYScale();
+                    var y0Accessor = this.y0() && this.y0().accessor;
+                    if (y0Accessor) {
+                        this.y0(y0Accessor, yScale);
+                    }
                 }
                 return ret;
             };
