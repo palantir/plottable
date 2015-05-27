@@ -110,10 +110,6 @@ svg.plottable {
   stroke: #999;
 }
 
-.bar-plot .render-area rect.not-hovered {
-  opacity: 0.5;
-}
-
 .plottable .gridlines line {
   stroke: #3C3C3C; /* hackhack: gridlines should be solid; see #820 */
   opacity: 0.25;
