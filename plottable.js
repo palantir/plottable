@@ -6897,18 +6897,6 @@ var Plottable;
             }
             return this;
         };
-        XYPlot.prototype._propertyProjectors = function () {
-            var _this = this;
-            var attrToProjector = _super.prototype._propertyProjectors.call(this);
-            attrToProjector["x"] = Plottable.Plot._scaledAccessor(this.x());
-            attrToProjector["y"] = Plottable.Plot._scaledAccessor(this.y());
-            attrToProjector["defined"] = function (d, i, dataset) {
-                var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
-                var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
-            };
-            return attrToProjector;
-        };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             var xScale = this.x().scale;
@@ -6970,8 +6958,9 @@ var Plottable;
             return this.x().accessor != null && this.y().accessor != null;
         };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
-            var attrToProjector = this._generateAttrToProjector();
-            return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+            var xProjector = Plottable.Plot._scaledAccessor(this.x());
+            var yProjector = Plottable.Plot._scaledAccessor(this.y());
+            return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
         };
         XYPlot.prototype._getDataToDraw = function () {
             var _this = this;
@@ -7038,9 +7027,9 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
-                var xAttr = attrToProjector[Rectangle._X_KEY];
+                var xAttr = Plottable.Plot._scaledAccessor(this.x());
                 var x2Attr = attrToProjector[Rectangle._X2_KEY];
-                var yAttr = attrToProjector[Rectangle._Y_KEY];
+                var yAttr = Plottable.Plot._scaledAccessor(this.y());
                 var y2Attr = attrToProjector[Rectangle._Y2_KEY];
                 var xScale = this.x().scale;
                 var yScale = this.y().scale;
@@ -7511,9 +7500,9 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var positionF = attrToProjector[secondaryAttr];
+                var positionF = this._isVertical ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.y());
                 var widthF = attrToProjector["width"];
-                var originalPositionFn = attrToProjector[primaryAttr];
+                var originalPositionFn = this._isVertical ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.x());
                 var heightF = function (d, i, dataset) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
                 };

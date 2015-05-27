@@ -2592,7 +2592,6 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         autorange(scaleName: string): XYPlot<X, Y>;
-        protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.
