@@ -7896,7 +7896,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("area-plot", true);
                 // TODO: might fail
-                this.y0(0, new Plottable.Scales.Linear()); // default
+                this.y0(0); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 var defaultColor = new Plottable.Scales.Color().range()[0];
@@ -7907,18 +7907,17 @@ var Plottable;
             Area.prototype.y = function (y, yScale) {
                 var ret = _super.prototype.y.call(this, y, yScale);
                 if (y != null) {
+                    var y0 = this.y0() && this.y0().accessor;
+                    this._bindProperty(Area._Y0_KEY, y0, yScale);
                     this._updateYScale();
-                    var y0Accessor = this.y0() && this.y0().accessor;
-                    if (y0Accessor) {
-                        this.y0(y0Accessor, yScale);
-                    }
                 }
                 return ret;
             };
-            Area.prototype.y0 = function (y0, y0Scale) {
+            Area.prototype.y0 = function (y0) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
+                var y0Scale = this.y() && this.y().scale;
                 this._bindProperty(Area._Y0_KEY, y0, y0Scale);
                 this._updateYScale();
                 this.render();
@@ -7938,7 +7937,8 @@ var Plottable;
                 var extent = Plottable.Utils.Methods.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
-                if (!this.y()) {
+                console.log(1);
+                if (!this.y() || !this.y().scale) {
                     return;
                 }
                 var yScale = this.y().scale;

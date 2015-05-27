@@ -3118,7 +3118,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.Area();
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
-            plot.y0(constantY0, yScale);
+            plot.y0(constantY0);
             plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
             plot.renderTo(svg);
             assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
@@ -3155,7 +3155,7 @@ describe("Plots", function () {
             areaPlot = new Plottable.Plots.Area();
             areaPlot.addDataset(simpleDataset);
             areaPlot.x(xAccessor, xScale).y(yAccessor, yScale);
-            areaPlot.y0(y0Accessor, yScale).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
+            areaPlot.y0(y0Accessor).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
         it("draws area and line correctly", function () {
@@ -3172,7 +3172,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", function () {
-            areaPlot.y0(function (d) { return d.bar / 2; }, yScale);
+            areaPlot.y0(function (d) { return d.bar / 2; }); //, yScale);
             areaPlot.renderTo(svg);
             renderArea = areaPlot._renderArea;
             var areaPath = renderArea.select(".area");

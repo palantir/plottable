@@ -2857,7 +2857,6 @@ declare module Plottable {
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
             y0(): Plots.AccessorScaleBinding<number, number>;
             y0(y0: number | Accessor<number>): Area<X>;
-            y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(key: string): Drawers.Area;
             protected _updateYScale(): void;

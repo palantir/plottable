@@ -28,7 +28,7 @@ describe("Plots", () => {
       var plot = new Plottable.Plots.Area();
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
-      plot.y0(constantY0, yScale);
+      plot.y0(constantY0);
       plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
       plot.renderTo(svg);
       assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
@@ -69,7 +69,7 @@ describe("Plots", () => {
       areaPlot.addDataset(simpleDataset);
       areaPlot.x(xAccessor, xScale)
               .y(yAccessor, yScale);
-      areaPlot.y0(y0Accessor, yScale)
+      areaPlot.y0(y0Accessor)
               .attr("fill", fillAccessor)
               .attr("stroke", colorAccessor)
               .renderTo(svg);
@@ -92,7 +92,7 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.y0((d) => d.bar / 2, yScale);
+      areaPlot.y0((d) => d.bar / 2);//, yScale);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");

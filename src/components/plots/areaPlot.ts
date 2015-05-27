@@ -19,7 +19,7 @@ export module Plots {
       super();
       this.classed("area-plot", true);
       // TODO: might fail
-      this.y0(0, new Plottable.Scales.Linear()); // default
+      this.y0(0); // default
 
       this.animator("reset", new Animators.Null());
       this.animator("main", new Animators.Base()
@@ -37,22 +37,20 @@ export module Plots {
     public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       var ret = super.y(y, yScale);
       if (y != null) {
+        var y0 = this.y0() && this.y0().accessor;
+        this._bindProperty(Area._Y0_KEY, y0, yScale);
         this._updateYScale();
-        var y0Accessor = this.y0() && this.y0().accessor;
-        if (y0Accessor) {
-          this.y0(y0Accessor, yScale);
-        }
       }
       return ret;
     }
 
     public y0(): Plots.AccessorScaleBinding<number, number>;
     public y0(y0: number | Accessor<number>): Area<X>;
-    public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
-    public y0(y0?: number | Accessor<number>, y0Scale?: Scale<number, number>): any {
+    public y0(y0?: number | Accessor<number>): any {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
+      var y0Scale = this.y() && this.y().scale;
       this._bindProperty(Area._Y0_KEY, y0, y0Scale);
       this._updateYScale();
       this.render();
@@ -76,7 +74,10 @@ export module Plots {
       var uniqExtentVals = Utils.Methods.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
-      if (!this.y()) {
+      console.log(1);
+
+
+      if (!this.y() || !this.y().scale) {
         return;
       }
       var yScale = <QuantitativeScale<number>> this.y().scale;
