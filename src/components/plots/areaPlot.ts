@@ -175,7 +175,7 @@ export module Plots {
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
         return Utils.Methods.isValidNumber(positionX) && Utils.Methods.isValidNumber(positionY);
       };
-      return (datum: any, index: number, dataset: Dataset) => {
+      return (datum: any[], index: number, dataset: Dataset) => {
         var areaGenerator = d3.svg.area()
                                   .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))

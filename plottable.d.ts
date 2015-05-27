@@ -2865,7 +2865,7 @@ declare module Plottable {
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
-            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
+            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
 }
