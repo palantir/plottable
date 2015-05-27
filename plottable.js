@@ -2658,7 +2658,7 @@ var Plottable;
             };
             Area.prototype.setup = function (area) {
                 Drawers.AbstractDrawer.prototype.setup.call(this, area);
-                this._areaSelection = area.append("path");
+                this._areaSelection = area.append("path").style("stroke", "none");
             };
             Area.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
@@ -7704,7 +7704,6 @@ var Plottable;
                 var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);
-                this.attr("stroke", "none");
                 this.attr("class", Area.PLOT_CLASS);
                 this._lineDrawers = new Plottable.Utils.Map();
             }

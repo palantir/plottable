@@ -13,7 +13,7 @@ export module Drawers {
 
     public setup(area: D3.Selection) {
       AbstractDrawer.prototype.setup.call(this, area);
-      this._areaSelection = area.append("path");
+      this._areaSelection = area.append("path").style("stroke", "none");
     }
 
     protected _drawStep(step: AppliedDrawStep) {

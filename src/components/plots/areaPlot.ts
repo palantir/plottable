@@ -29,7 +29,6 @@ export module Plots {
       var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
       this.attr("fill", defaultColor);
-      this.attr("stroke", "none");
       this.attr("class", Area.PLOT_CLASS);
 
       this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
