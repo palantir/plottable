@@ -84,10 +84,6 @@ svg.plottable {
   font-weight: bold;
 }
 
-.plottable .text-label-vertical {
-  writing-mode: tb;
-}
-
 .plottable .axis line.baseline {
   stroke: #CCC;
   stroke-width: 1px;
