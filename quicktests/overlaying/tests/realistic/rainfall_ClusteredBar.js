@@ -18,8 +18,9 @@ function run(svg, data, Plottable){
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
+var clusteredPlot;
 try {
-  var clusteredPlot = new Plottable.Plots.ClusteredBar("vertical")
+  clusteredPlot = new Plottable.Plots.ClusteredBar("vertical")
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))
@@ -28,7 +29,7 @@ try {
     .attr("label", function(d) { return d.avg; })
     .attr("fill", function(d) { return d.city; }, colorScale);
 } catch(err) {
-  var clusteredPlot = new Plottable.Plots.ClusteredBar(xScale, yScale, "vertical")
+  clusteredPlot = new Plottable.Plots.ClusteredBar(xScale, yScale, "vertical")
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))

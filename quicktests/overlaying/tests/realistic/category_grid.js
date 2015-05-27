@@ -60,10 +60,11 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
+var plot;
 try {
-  var plot = new Plottable.Plots.Rectangle();
+  plot = new Plottable.Plots.Rectangle();
 } catch(err) {
-  var plot = new Plottable.Plots.Rectangle(xScale, yScale);
+  plot = new Plottable.Plots.Rectangle(xScale, yScale);
 }
 
   plot.addDataset(new Plottable.Dataset(data));

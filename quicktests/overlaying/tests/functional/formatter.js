@@ -34,10 +34,11 @@ function run(svg, data, Plottable) {
 
   var custFormatter = function(d) { return "= ' w ' ="; };
 
+var plot;
 try {
-  var plot = new Plottable.Plots.Line().addDataset(dataseries1);
+  plot = new Plottable.Plots.Line().addDataset(dataseries1);
 } catch(err) {
-  var plot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries1);
+  plot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries1);
 }
 
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);

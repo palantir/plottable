@@ -16,8 +16,9 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+var stackedAreaPlot;
 try {
-  var stackedAreaPlot = new Plottable.Plots.StackedArea()
+  stackedAreaPlot = new Plottable.Plots.StackedArea()
                                          .x(function(d) { return d.name; }, xScale)
                                          .y(function(d) { return d.y; }, yScale)
                                          .attr("fill", function(d) { return d.type; }, colorScale)
@@ -28,7 +29,7 @@ try {
                                          .addDataset(new Plottable.Dataset(data[2]))
                                          .animate(true);
 } catch(err) {
-  var stackedAreaPlot = new Plottable.Plots.StackedArea(xScale, yScale)
+  stackedAreaPlot = new Plottable.Plots.StackedArea(xScale, yScale)
                                          .x(function(d) { return d.name; }, xScale)
                                          .y(function(d) { return d.y; }, yScale)
                                          .attr("fill", function(d) { return d.type; }, colorScale)

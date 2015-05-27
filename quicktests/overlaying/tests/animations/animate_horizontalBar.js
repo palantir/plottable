@@ -17,10 +17,11 @@ function run(svg, data, Plottable) {
 
   var dataset = new Plottable.Dataset(data);
 
+var hBarRenderer;
 try {
-  var hBarRenderer = new Plottable.Plots.Bar("horizontal");
+  hBarRenderer = new Plottable.Plots.Bar("horizontal");
 } catch(err) {
-  var hBarRenderer = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
+  hBarRenderer = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
 }
 
   hBarRenderer.addDataset(dataset);

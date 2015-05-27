@@ -17,15 +17,16 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
+var lineRenderer;
 try {
-  var lineRenderer = new Plottable.Plots.Line()
+  lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
               .x(function(d) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)
               .attr("opacity", 0.75)
               .animate(doAnimate);
 } catch(err) {
-  var lineRenderer = new Plottable.Plots.Line(xScale, yScale)
+  lineRenderer = new Plottable.Plots.Line(xScale, yScale)
               .addDataset(dataset)
               .x(function(d) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)

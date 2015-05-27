@@ -16,8 +16,9 @@ function run(svg, data, Plottable) {
   var d1 = new Plottable.Dataset(data[0]);
   var d2 = new Plottable.Dataset(data[1]);
 
+var circleRenderer;
 try {
-  var circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
+  circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
                                                                  .addDataset(d2)
                                                                  .size(16)
                                                                  .x(function(d) { return d.x; }, xScale)
@@ -25,7 +26,7 @@ try {
                                                                  .attr("opacity", 0.75)
                                                                  .animate(true);
 } catch(err) {
-  var circleRenderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(d1)
+  circleRenderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(d1)
                                                                  .addDataset(d2)
                                                                  .size(16)
                                                                  .x(function(d) { return d.x; }, xScale)

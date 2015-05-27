@@ -41,10 +41,11 @@ function run(svg, data, Plottable) {
   yScale.innerPadding(0.25).outerPadding(0.25);
   var xAxis = new Plottable.Axes.Time(xScale, "bottom");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
+var plot;
 try {
-  var plot = new Plottable.Plots.Rectangle();
+  plot = new Plottable.Plots.Rectangle();
 } catch(err) {
-  var plot = new Plottable.Plots.Rectangle(xScale, yScale);
+  plot = new Plottable.Plots.Rectangle(xScale, yScale);
 }
 
   plot.addDataset(new Plottable.Dataset(data));

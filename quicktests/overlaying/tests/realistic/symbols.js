@@ -17,10 +17,11 @@ function run(svg, data, Plottable){
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
+var plot;
 try {
-  var plot = new Plottable.Plots.Scatter();
+  plot = new Plottable.Plots.Scatter();
 } catch(err) {
-  var plot = new Plottable.Plots.Scatter(xScale, yScale);
+  plot = new Plottable.Plots.Scatter(xScale, yScale);
 }
 
   plot.addDataset(dataset);

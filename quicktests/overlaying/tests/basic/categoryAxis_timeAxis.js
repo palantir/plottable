@@ -15,10 +15,11 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Time();
   var yScale = new Plottable.Scales.Category();
 
+var hBarPlot;
 try {
-  var hBarPlot = new Plottable.Plots.Bar("horizontal");
+  hBarPlot = new Plottable.Plots.Bar("horizontal");
 } catch(err) {
-  var hBarPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
+  hBarPlot = new Plottable.Plots.Bar(xScale, yScale, "horizontal");
 }
 
   hBarPlot.addDataset(new Plottable.Dataset(data))

@@ -16,8 +16,9 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+var clusteredBarRenderer;
 try {
-  var clusteredBarRenderer = new Plottable.Plots.ClusteredBar()
+  clusteredBarRenderer = new Plottable.Plots.ClusteredBar()
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))
@@ -28,7 +29,7 @@ try {
     .attr("yval", function(d) { return d.y; })
     .labelsEnabled(true);
 } catch(err) {
-  var clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale)
+  clusteredBarRenderer = new Plottable.Plots.ClusteredBar(xScale, yScale)
     .addDataset(new Plottable.Dataset(data[0]))
     .addDataset(new Plottable.Dataset(data[1]))
     .addDataset(new Plottable.Dataset(data[2]))

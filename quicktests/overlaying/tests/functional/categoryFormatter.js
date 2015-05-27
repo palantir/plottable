@@ -27,10 +27,11 @@ function run(svg, data, Plottable) {
       return Emp[d%7];
   };
 
+var plot;
 try {
-  var plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));
+  plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));
 } catch(err) {
-  var plot = new Plottable.Plots.Bar(xScale, yScale).addDataset(new Plottable.Dataset(data));
+  plot = new Plottable.Plots.Bar(xScale, yScale).addDataset(new Plottable.Dataset(data));
 }
 
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);

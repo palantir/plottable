@@ -35,8 +35,9 @@ function run(svg, data, Plottable) {
   var dataset4 = new Plottable.Dataset(data[3]);
   var dataset5 = new Plottable.Dataset(data[4]);
 
+var verticalPlot;
 try {
-  var verticalPlot = new Plottable.Plots.StackedBar("vertical")
+  verticalPlot = new Plottable.Plots.StackedBar("vertical")
     .x(function(d) { return d.quarter; }, xScale1)
     .y(function(d) { return d.earnings; }, yScale1)
     .attr("fill", function(d) { return d.team; }, colorScale)
@@ -49,7 +50,7 @@ try {
     .labelFormatter(Plottable.Formatters.siSuffix())
     .animate(true);
 } catch(err) {
-  var verticalPlot = new Plottable.Plots.StackedBar(xScale1, yScale1, "vertical")
+  verticalPlot = new Plottable.Plots.StackedBar(xScale1, yScale1, "vertical")
     .x(function(d) { return d.quarter; }, xScale1)
     .y(function(d) { return d.earnings; }, yScale1)
     .attr("fill", function(d) { return d.team; }, colorScale)
@@ -64,10 +65,11 @@ try {
 }
 
 
+var horizontalPlot;
 try {
-  var horizontalPlot = new Plottable.Plots.StackedBar("horizontal");
+  horizontalPlot = new Plottable.Plots.StackedBar("horizontal");
 } catch(err) {
-  var horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, "horizontal");
+  horizontalPlot = new Plottable.Plots.StackedBar(xScale2, yScale2, "horizontal");
 }
 
   horizontalPlot.x(function(d) { return d.earnings; }, xScale2)

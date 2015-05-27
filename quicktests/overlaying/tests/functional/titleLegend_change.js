@@ -44,45 +44,51 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
+var scatterPlot;
 try {
-  var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
+  scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
 } catch(err) {
-  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
+  scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
 }
 
   scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+var linePlot;
 try {
-  var linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
+  linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
 } catch(err) {
-  var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
+  linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
 }
 
   linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+var renderApple;
 try {
-  var renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
+  renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
 } catch(err) {
-  var renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
+  renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
 }
 
   renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+var renderBanana;
 try {
-  var renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
+  renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
 } catch(err) {
-  var renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
+  renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
 }
 
   renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+var renderOrange;
 try {
-  var renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
+  renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
 } catch(err) {
-  var renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
+  renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
 }
 
   renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
+var renderGrape;
 try {
-  var renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
+  renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
 } catch(err) {
-  var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
+  renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
 }
 
   renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);

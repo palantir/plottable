@@ -23,8 +23,9 @@ function run(svg, data, Plottable) {
         animator.maxIterativeDelay(100);
 
 
+var vbar;
 try {
-    var vbar = new Plottable.Plots.Bar()
+    vbar = new Plottable.Plots.Bar()
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
@@ -34,7 +35,7 @@ try {
       .animator( "bars", animator)
       .animate(true);
 } catch(err) {
-    var vbar = new Plottable.Plots.Bar(xScale, yScale)
+    vbar = new Plottable.Plots.Bar(xScale, yScale)
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)

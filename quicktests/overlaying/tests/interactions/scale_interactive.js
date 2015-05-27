@@ -35,10 +35,11 @@ function run(svg, data, Plottable) {
   var yAxisBottom2 = new Plottable.Axes.Numeric(yScale, "right").tickLabelPosition("bottom");
   var yAxisTable2 = new Plottable.Components.Table([[yAxisTop2, yAxisMiddle2, yAxisBottom2]]);
 
+var scatterPlot;
 try {
-  var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries);
+  scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries);
 } catch(err) {
-  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
+  scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries);
 }
 
   scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);

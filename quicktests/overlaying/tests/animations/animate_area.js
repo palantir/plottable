@@ -19,15 +19,16 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
+var areaRenderer;
 try {
-  var areaRenderer = new Plottable.Plots.Area()
+  areaRenderer = new Plottable.Plots.Area()
             .addDataset(dataset)
             .attr("opacity", 0.75)
             .x(function(d) { return d.x; }, xScale)
             .y(function(d) { return d.y; }, yScale)
             .animate(doAnimate);
 } catch(err) {
-  var areaRenderer = new Plottable.Plots.Area(xScale, yScale)
+  areaRenderer = new Plottable.Plots.Area(xScale, yScale)
             .addDataset(dataset)
             .attr("opacity", 0.75)
             .x(function(d) { return d.x; }, xScale)

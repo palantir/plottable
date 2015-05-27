@@ -14,10 +14,11 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
+var plot;
 try {
-  var plot = new Plottable.Plots.Line();
+  plot = new Plottable.Plots.Line();
 } catch(err) {
-  var plot = new Plottable.Plots.Line(xScale, yScale);
+  plot = new Plottable.Plots.Line(xScale, yScale);
 }
 
   plot.addDataset(ds);
