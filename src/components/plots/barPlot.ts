@@ -9,6 +9,7 @@ export module Plots {
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
+    private static _LABEL_AREA_CLASS = "bar-label-text-area";
     private _baseline: D3.Selection;
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
@@ -17,6 +18,8 @@ export module Plots {
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelAreas: Utils.Map<Dataset, D3.Selection>;
+    private _labelMeasurers: Utils.Map<Dataset, SVGTypewriter.Measurers.Measurer>;
+    private _labelWriters: Utils.Map<Dataset, SVGTypewriter.Writers.Writer>;
 
     /**
      * Constructs a Bar Plot.
@@ -40,6 +43,8 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelAreas = new Utils.Map<Dataset, D3.Selection>();
+      this._labelMeasurers = new Utils.Map<Dataset, SVGTypewriter.Measurers.CacheCharacterMeasurer>();
+      this._labelWriters = new Utils.Map<Dataset, SVGTypewriter.Writers.Writer>();
     }
 
     protected _getDrawer(dataset: Dataset) {
@@ -49,7 +54,14 @@ export module Plots {
     protected _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
-      this.datasets().forEach((dataset) => this._labelAreas.set(dataset, this._renderArea.append("g")));
+      this.datasets().forEach((dataset) => {
+        var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+        var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+        var writer = new SVGTypewriter.Writers.Writer(measurer);
+        this._labelAreas.set(dataset, labelArea);
+        this._labelMeasurers.set(dataset, measurer);
+        this._labelWriters.set(dataset, writer);
+      });
     }
 
     /**
@@ -148,7 +160,12 @@ export module Plots {
     public addDataset(dataset: Dataset) {
       super.addDataset(dataset);
       if (this._isSetup) {
-        this._labelAreas.set(dataset, this._renderArea.append("g"));
+        var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+        var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+        var writer = new SVGTypewriter.Writers.Writer(measurer);
+        this._labelAreas.set(dataset, labelArea);
+        this._labelMeasurers.set(dataset, measurer);
+        this._labelWriters.set(dataset, writer);
       }
       return this;
     }

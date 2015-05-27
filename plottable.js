@@ -7320,6 +7320,8 @@ var Plottable;
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelAreas = new Plottable.Utils.Map();
+                this._labelMeasurers = new Plottable.Utils.Map();
+                this._labelWriters = new Plottable.Utils.Map();
             }
             Bar.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rect(dataset, this._isVertical);
@@ -7328,7 +7330,14 @@ var Plottable;
                 var _this = this;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-                this.datasets().forEach(function (dataset) { return _this._labelAreas.set(dataset, _this._renderArea.append("g")); });
+                this.datasets().forEach(function (dataset) {
+                    var labelArea = _this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+                    var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                    var writer = new SVGTypewriter.Writers.Writer(measurer);
+                    _this._labelAreas.set(dataset, labelArea);
+                    _this._labelMeasurers.set(dataset, measurer);
+                    _this._labelWriters.set(dataset, writer);
+                });
             };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
@@ -7380,7 +7389,12 @@ var Plottable;
             Bar.prototype.addDataset = function (dataset) {
                 _super.prototype.addDataset.call(this, dataset);
                 if (this._isSetup) {
-                    this._labelAreas.set(dataset, this._renderArea.append("g"));
+                    var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+                    var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                    var writer = new SVGTypewriter.Writers.Writer(measurer);
+                    this._labelAreas.set(dataset, labelArea);
+                    this._labelMeasurers.set(dataset, measurer);
+                    this._labelWriters.set(dataset, writer);
                 }
                 return this;
             };
@@ -7672,6 +7686,7 @@ var Plottable;
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
+            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             return Bar;
         })(Plottable.XYPlot);
         Plots.Bar = Bar;
