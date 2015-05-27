@@ -2923,7 +2923,6 @@ var Plottable;
             Rect.prototype.setup = function (area) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
                 _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
-                this._textArea = area.append("g").classed("bar-label-text-area", true);
             };
             Rect.prototype.draw = function (data, drawSteps) {
                 var _this = this;

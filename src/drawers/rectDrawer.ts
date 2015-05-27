@@ -3,7 +3,6 @@
 module Plottable {
 export module Drawers {
   export class Rect extends Element {
-    private _textArea: D3.Selection;
 
     constructor(dataset: Dataset) {
       super(dataset);
@@ -13,7 +12,6 @@ export module Drawers {
     public setup(area: D3.Selection) {
       // need to put the bars in a seperate container so we can ensure that they don't cover labels
       super.setup(area.append("g").classed("bar-area", true));
-      this._textArea = area.append("g").classed("bar-label-text-area", true);
     }
 
     public draw(data: any[], drawSteps: DrawStep[]) {
