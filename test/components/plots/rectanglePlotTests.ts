@@ -31,12 +31,10 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var rectanglePlot = new Plottable.Plots.Rectangle();
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
-      rectanglePlot.x((d: any) => d.x, xScale)
-                   .y((d: any) => d.y, yScale);
-      rectanglePlot.x1((d: any) => d.x, xScale)
-                   .y1((d: any) => d.y, yScale)
-                   .x2((d: any) => d.x2, xScale)
-                   .y2((d: any) => d.y2, yScale)
+      rectanglePlot.x((d) => d.x, xScale)
+                   .y((d) => d.y, yScale)
+                   .x2((d) => d.x2, xScale)
+                   .y2((d) => d.y2, yScale)
                    .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
@@ -48,21 +46,21 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG();
 
       var data1 = [
-        { x: "A", y1: 1, y2: 2, v: 1 },
-        { x: "B", y1: 2, y2: 3, v: 2 },
-        { x: "C", y1: 3, y2: NaN, v: 3 },
-        { x: "D", y1: 4, y2: 5, v: 4 },
-        { x: "E", y1: 5, y2: 6, v: 5 },
-        { x: "F", y1: 6, y2: 7, v: 6 }
+        { x: "A", y: 1, y2: 2, v: 1 },
+        { x: "B", y: 2, y2: 3, v: 2 },
+        { x: "C", y: 3, y2: NaN, v: 3 },
+        { x: "D", y: 4, y2: 5, v: 4 },
+        { x: "E", y: 5, y2: 6, v: 5 },
+        { x: "F", y: 6, y2: 7, v: 6 }
       ];
 
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.Grid();
+      var plot = new Plottable.Plots.Rectangle();
       plot
         .x((d: any) => d.x, xScale)
-        .y((d: any) => d.y1, yScale)
+        .y((d: any) => d.y, yScale)
         .y2((d: any) => d.y2, yScale);
       plot.addDataset(new Plottable.Dataset(data1));
 

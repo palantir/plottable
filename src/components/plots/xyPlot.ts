@@ -35,7 +35,6 @@ module Plottable {
       if (x == null) {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
-
       this._bindProperty(XYPlot._X_KEY, x, xScale);
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
