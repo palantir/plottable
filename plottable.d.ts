@@ -1287,9 +1287,9 @@ declare module Plottable {
         class Rect extends Element {
             constructor(dataset: Dataset, isVertical: boolean);
             setup(area: D3.Selection): void;
-            removeLabels(): void;
-            _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
+            aremoveLabels(): void;
+            a_getIfLabelsTooWide(): boolean;
+            adrawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
             draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }

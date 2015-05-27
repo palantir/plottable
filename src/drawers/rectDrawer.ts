@@ -25,15 +25,15 @@ export module Drawers {
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
     }
 
-    public removeLabels() {
+    public aremoveLabels() {
       this._textArea.selectAll("g").remove();
     }
 
-    public _getIfLabelsTooWide() {
+    public a_getIfLabelsTooWide() {
       return this._labelsTooWide;
     }
 
-    public drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any) {
+    public adrawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any) {
       var labelTooWide: boolean[] = data.map((d, i) => {
         var text = attrToProjector["label"](d, i, userMetadata).toString();
         var w = attrToProjector["width"](d, i, userMetadata);

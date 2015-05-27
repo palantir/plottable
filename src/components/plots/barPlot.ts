@@ -10,6 +10,8 @@ export module Plots {
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private static _LABEL_AREA_CLASS = "bar-label-text-area";
+    private static _LABEL_VERTICAL_PADDING = 5;
+    private static _LABEL_HORIZONTAL_PADDING = 5;
     private _baseline: D3.Selection;
     private _baselineValue: number;
     private _barAlignmentFactor = 0.5;
@@ -158,7 +160,6 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      super.addDataset(dataset);
       if (this._isSetup) {
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
         var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
@@ -167,11 +168,16 @@ export module Plots {
         this._labelMeasurers.set(dataset, measurer);
         this._labelWriters.set(dataset, writer);
       }
+      super.addDataset(dataset);
       return this;
     }
 
     public removeDataset(dataset: Dataset) {
       super.removeDataset(dataset);
+      var labelArea = this._labelAreas.get(dataset);
+      if (labelArea != null) {
+        labelArea.remove();
+      }
       this._labelAreas.delete(dataset);
       this._labelMeasurers.delete(dataset);
       this._labelWriters.delete(dataset);
@@ -334,24 +340,75 @@ export module Plots {
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
-      drawers.forEach((d: Drawers.Rect) => d.removeLabels());
+      this.datasets().forEach((dataset) => this._labelAreas.get(dataset).selectAll("g").remove());
       if (this._labelsEnabled) {
         Utils.Methods.setTimeout(() => this._drawLabels(), time);
       }
     }
 
     private _drawLabels() {
-      var drawers: Drawers.Rect[] = <any> this._getDrawersInOrder();
-      var attrToProjector = this._generateAttrToProjector();
       var dataToDraw = this._getDataToDraw();
+      var labelsTooWide = false;
       this._datasetKeysInOrder.forEach((k, i) =>
-        drawers[i].drawText(dataToDraw.get(k),
-                            attrToProjector,
-                            this._key2PlotDatasetKey.get(k).dataset));
-      if (this._hideBarsIfAnyAreTooWide && drawers.some((d: Drawers.Rect) => d._getIfLabelsTooWide())) {
-        drawers.forEach((d: Drawers.Rect) => d.removeLabels());
+        labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(k), this._key2PlotDatasetKey.get(k).dataset));
+      if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
+        this.datasets().forEach((dataset) => this._labelAreas.get(dataset).selectAll("g").remove());
       }
+    }
+
+    private _drawLabel(data: any[], dataset: Dataset) {
+      var attrToProjector = this._generateAttrToProjector();
+      var labelArea = this._labelAreas.get(dataset);
+      var measurer = this._labelMeasurers.get(dataset);
+      var writer = this._labelWriters.get(dataset);
+      var labelTooWide: boolean[] = data.map((d, i) => {
+        var text = attrToProjector["label"](d, i, dataset).toString();
+        var w = attrToProjector["width"](d, i, dataset);
+        var h = attrToProjector["height"](d, i, dataset);
+        var x = attrToProjector["x"](d, i, dataset);
+        var y = attrToProjector["y"](d, i, dataset);
+        var positive = attrToProjector["positive"](d, i, dataset);
+        var measurement = measurer.measure(text);
+        var color = attrToProjector["fill"](d, i, dataset);
+        var dark = Utils.Colors.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
+        var primary = this._isVertical ? h : w;
+        var primarySpace = this._isVertical ? measurement.height : measurement.width;
+
+        var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
+        var secondaryAttrAvailableSpace = this._isVertical ? w : h;
+        var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+        if (measurement.height <= h && measurement.width <= w) {
+          var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+          if (!positive) { offset = offset * -1; }
+          if (this._isVertical) {
+            y += offset;
+          } else {
+            x += offset;
+          }
+
+          var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          var className = dark ? "dark-label" : "light-label";
+          g.classed(className, true);
+          var xAlign: string;
+          var yAlign: string;
+          if (this._isVertical) {
+            xAlign = "center";
+            yAlign = positive ? "top" : "bottom";
+          } else {
+            xAlign = positive ? "left" : "right";
+            yAlign = "center";
+          }
+          var writeOptions = {
+              selection: g,
+              xAlign: xAlign,
+              yAlign: yAlign,
+              textRotation: 0
+          };
+          writer.write(text, w, h, writeOptions);
+        }
+        return tooWide;
+      });
+      return labelTooWide.some((d: boolean) => d);
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {

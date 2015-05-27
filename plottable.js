@@ -2931,13 +2931,13 @@ var Plottable;
                 this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
             };
-            Rect.prototype.removeLabels = function () {
+            Rect.prototype.aremoveLabels = function () {
                 this._textArea.selectAll("g").remove();
             };
-            Rect.prototype._getIfLabelsTooWide = function () {
+            Rect.prototype.a_getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
             };
-            Rect.prototype.drawText = function (data, attrToProjector, userMetadata) {
+            Rect.prototype.adrawText = function (data, attrToProjector, userMetadata) {
                 var _this = this;
                 var labelTooWide = data.map(function (d, i) {
                     var text = attrToProjector["label"](d, i, userMetadata).toString();
@@ -7387,7 +7387,6 @@ var Plottable;
                 }
             };
             Bar.prototype.addDataset = function (dataset) {
-                _super.prototype.addDataset.call(this, dataset);
                 if (this._isSetup) {
                     var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
                     var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
@@ -7396,10 +7395,15 @@ var Plottable;
                     this._labelMeasurers.set(dataset, measurer);
                     this._labelWriters.set(dataset, writer);
                 }
+                _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
                 _super.prototype.removeDataset.call(this, dataset);
+                var labelArea = this._labelAreas.get(dataset);
+                if (labelArea != null) {
+                    labelArea.remove();
+                }
                 this._labelAreas.delete(dataset);
                 this._labelMeasurers.delete(dataset);
                 this._labelWriters.delete(dataset);
@@ -7538,21 +7542,76 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                var drawers = this._getDrawersInOrder();
-                drawers.forEach(function (d) { return d.removeLabels(); });
+                this.datasets().forEach(function (dataset) { return _this._labelAreas.get(dataset).selectAll("g").remove(); });
                 if (this._labelsEnabled) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
             Bar.prototype._drawLabels = function () {
                 var _this = this;
-                var drawers = this._getDrawersInOrder();
-                var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
-                    drawers.forEach(function (d) { return d.removeLabels(); });
+                var labelsTooWide = false;
+                this._datasetKeysInOrder.forEach(function (k, i) { return labelsTooWide = labelsTooWide || _this._drawLabel(dataToDraw.get(k), _this._key2PlotDatasetKey.get(k).dataset); });
+                if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
+                    this.datasets().forEach(function (dataset) { return _this._labelAreas.get(dataset).selectAll("g").remove(); });
                 }
+            };
+            Bar.prototype._drawLabel = function (data, dataset) {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._labelAreas.get(dataset);
+                var measurer = this._labelMeasurers.get(dataset);
+                var writer = this._labelWriters.get(dataset);
+                var labelTooWide = data.map(function (d, i) {
+                    var text = attrToProjector["label"](d, i, dataset).toString();
+                    var w = attrToProjector["width"](d, i, dataset);
+                    var h = attrToProjector["height"](d, i, dataset);
+                    var x = attrToProjector["x"](d, i, dataset);
+                    var y = attrToProjector["y"](d, i, dataset);
+                    var positive = attrToProjector["positive"](d, i, dataset);
+                    var measurement = measurer.measure(text);
+                    var color = attrToProjector["fill"](d, i, dataset);
+                    var dark = Plottable.Utils.Colors.contrast("white", color) * 1.6 < Plottable.Utils.Colors.contrast("black", color);
+                    var primary = _this._isVertical ? h : w;
+                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
+                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
+                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
+                    var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+                    if (measurement.height <= h && measurement.width <= w) {
+                        var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+                        if (!positive) {
+                            offset = offset * -1;
+                        }
+                        if (_this._isVertical) {
+                            y += offset;
+                        }
+                        else {
+                            x += offset;
+                        }
+                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        var xAlign;
+                        var yAlign;
+                        if (_this._isVertical) {
+                            xAlign = "center";
+                            yAlign = positive ? "top" : "bottom";
+                        }
+                        else {
+                            xAlign = positive ? "left" : "right";
+                            yAlign = "center";
+                        }
+                        var writeOptions = {
+                            selection: g,
+                            xAlign: xAlign,
+                            yAlign: yAlign,
+                            textRotation: 0
+                        };
+                        writer.write(text, w, h, writeOptions);
+                    }
+                    return tooWide;
+                });
+                return labelTooWide.some(function (d) { return d; });
             };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
@@ -7694,6 +7753,8 @@ var Plottable;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._LABEL_AREA_CLASS = "bar-label-text-area";
+            Bar._LABEL_VERTICAL_PADDING = 5;
+            Bar._LABEL_HORIZONTAL_PADDING = 5;
             return Bar;
         })(Plottable.XYPlot);
         Plots.Bar = Bar;
