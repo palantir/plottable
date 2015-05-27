@@ -18,7 +18,6 @@ export module Plots {
     constructor() {
       super();
       this.classed("area-plot", true);
-      // TODO: might fail
       this.y0(0); // default
 
       this.animator("reset", new Animators.Null());

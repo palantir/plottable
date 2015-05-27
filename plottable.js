@@ -7158,14 +7158,8 @@ var Plottable;
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
             Rectangle.prototype.x = function (x, scale) {
-                if (x == null) {
-                    return _super.prototype.x.call(this);
-                }
-                if (scale == null) {
-                    return _super.prototype.x.call(this, x);
-                }
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale != null && scale instanceof Plottable.Scales.Category) {
+                if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);
                 }
                 return _super.prototype.x.call(this, x, scale);
@@ -7176,21 +7170,15 @@ var Plottable;
                 }
                 this._bindProperty(Rectangle._X2_KEY, x2, scale);
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale != null && scale instanceof Plottable.Scales.Category) {
+                if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);
                 }
                 this.render();
                 return this;
             };
             Rectangle.prototype.y = function (y, scale) {
-                if (y == null) {
-                    return _super.prototype.y.call(this);
-                }
-                if (scale == null) {
-                    return _super.prototype.y.call(this, y);
-                }
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale != null && scale instanceof Plottable.Scales.Category) {
+                if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);
                 }
                 return _super.prototype.y.call(this, y, scale);
@@ -7201,7 +7189,7 @@ var Plottable;
                 }
                 this._bindProperty(Rectangle._Y2_KEY, y2, scale);
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale != null && scale instanceof Plottable.Scales.Category) {
+                if (scale instanceof Plottable.Scales.Category) {
                     scale.innerPadding(0).outerPadding(0);
                 }
                 this.render();
@@ -7895,7 +7883,6 @@ var Plottable;
             function Area() {
                 _super.call(this);
                 this.classed("area-plot", true);
-                // TODO: might fail
                 this.y0(0); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));

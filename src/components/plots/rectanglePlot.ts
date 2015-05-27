@@ -74,15 +74,9 @@ export module Plots {
     public x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
     public x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
-      if (x == null) {
-        return super.x();
-      }
-      if (scale == null) {
-        return super.x(<number | Accessor<number>> x);
-      }
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale != null && scale instanceof Scales.Category) {
+      if (scale instanceof Scales.Category) {
         (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
       }
 
@@ -99,7 +93,7 @@ export module Plots {
       this._bindProperty(Rectangle._X2_KEY, x2, scale);
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale != null && scale instanceof Scales.Category) {
+      if (scale instanceof Scales.Category) {
         (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
       }
 
@@ -111,15 +105,9 @@ export module Plots {
     public y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
     public y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
-      if (y == null) {
-        return super.y();
-      }
-      if (scale == null) {
-        return super.y(<number | Accessor<number>> y);
-      }
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale != null && scale instanceof Scales.Category) {
+      if (scale instanceof Scales.Category) {
         (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
       }
 
@@ -136,7 +124,7 @@ export module Plots {
       this._bindProperty(Rectangle._Y2_KEY, y2, scale);
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale != null && scale instanceof Scales.Category) {
+      if (scale instanceof Scales.Category) {
         (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
       }
 
