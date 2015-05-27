@@ -1252,7 +1252,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Area extends Line {
-            static AREA_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
@@ -2831,6 +2831,7 @@ declare module Plottable {
              */
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
         }
     }
 }
@@ -2858,12 +2859,13 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
-            protected _wholeDatumAttributes(): string[];
+            protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
 }
@@ -2912,12 +2914,10 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
-            };
             protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
