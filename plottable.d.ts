@@ -2751,6 +2751,7 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
+            addDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *

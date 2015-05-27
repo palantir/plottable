@@ -16,6 +16,7 @@ export module Plots {
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
+    private _labelAreas: Utils.Map<Dataset, D3.Selection>;
 
     /**
      * Constructs a Bar Plot.
@@ -38,6 +39,7 @@ export module Plots {
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
+      this._labelAreas = new Utils.Map<Dataset, D3.Selection>();
     }
 
     protected _getDrawer(dataset: Dataset) {
@@ -47,6 +49,7 @@ export module Plots {
     protected _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
+      this.datasets().forEach((dataset) => this._labelAreas.set(dataset, this._renderArea.append("g")));
     }
 
     /**
@@ -140,6 +143,14 @@ export module Plots {
         this.render();
         return this;
       }
+    }
+
+    public addDataset(dataset: Dataset) {
+      super.addDataset(dataset);
+      if (this._isSetup) {
+        this._labelAreas.set(dataset, this._renderArea.append("g"));
+      }
+      return this;
     }
 
     /**

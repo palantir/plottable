@@ -7319,13 +7319,16 @@ var Plottable;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
+                this._labelAreas = new Plottable.Utils.Map();
             }
             Bar.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rect(dataset, this._isVertical);
             };
             Bar.prototype._setup = function () {
+                var _this = this;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
+                this.datasets().forEach(function (dataset) { return _this._labelAreas.set(dataset, _this._renderArea.append("g")); });
             };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
@@ -7373,6 +7376,13 @@ var Plottable;
                     this.render();
                     return this;
                 }
+            };
+            Bar.prototype.addDataset = function (dataset) {
+                _super.prototype.addDataset.call(this, dataset);
+                if (this._isSetup) {
+                    this._labelAreas.set(dataset, this._renderArea.append("g"));
+                }
+                return this;
             };
             /**
              * Retrieves the closest PlotData to queryPoint.
