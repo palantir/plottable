@@ -6997,6 +6997,20 @@ var Plottable;
             var attrToProjector = this._generateAttrToProjector();
             return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
         };
+        XYPlot.prototype._getDataToDraw = function () {
+            var _this = this;
+            var datasets = _super.prototype._getDataToDraw.call(this);
+            var definedFunction = function (d, i, dataset) {
+                var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
+                var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
+                return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+            };
+            datasets.forEach(function (key, data) {
+                var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                datasets.set(key, data.filter(function (d, i) { return definedFunction(d, i, dataset); }));
+            });
+            return datasets;
+        };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
         return XYPlot;
@@ -7796,6 +7810,14 @@ var Plottable;
                 return function (datum, index, dataset) {
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
                 };
+            };
+            Line.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
+                });
+                return datasets;
             };
             return Line;
         })(Plottable.XYPlot);

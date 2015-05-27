@@ -2606,6 +2606,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _getDataToDraw(): D3.Map<any[]>;
     }
 }
 
@@ -2832,6 +2833,7 @@ declare module Plottable {
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }

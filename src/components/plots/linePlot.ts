@@ -172,6 +172,14 @@ export module Plots {
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
       };
     }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
+    }
   }
 }
 }

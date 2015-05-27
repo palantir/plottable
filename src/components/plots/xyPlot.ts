@@ -232,5 +232,22 @@ module Plottable {
       var attrToProjector = this._generateAttrToProjector();
       return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
     }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = super._getDataToDraw();
+
+      var definedFunction = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+
+      datasets.forEach((key, data) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        datasets.set(key, data.filter((d, i) => definedFunction(d, i, dataset)));
+      });
+      return datasets;
+    }
   }
 }
