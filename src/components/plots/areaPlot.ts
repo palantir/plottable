@@ -90,8 +90,8 @@ export module Plots {
     private _generateLineAttrToProjector() {
       var lineAttrToProjector = this._generateAttrToProjector();
       var fillProjector = lineAttrToProjector["fill"];
-      lineAttrToProjector["stroke"] = fillProjector;
-      lineAttrToProjector["stroke-width"] = () => "2px";
+      lineAttrToProjector["stroke"] = lineAttrToProjector["stroke"] || fillProjector;
+      lineAttrToProjector["stroke-width"] = lineAttrToProjector["stroke-width"] || (() => "2px");
       lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
       return lineAttrToProjector;
     }

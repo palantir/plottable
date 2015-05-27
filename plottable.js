@@ -7757,8 +7757,8 @@ var Plottable;
             Area.prototype._generateLineAttrToProjector = function () {
                 var lineAttrToProjector = this._generateAttrToProjector();
                 var fillProjector = lineAttrToProjector["fill"];
-                lineAttrToProjector["stroke"] = fillProjector;
-                lineAttrToProjector["stroke-width"] = function () { return "2px"; };
+                lineAttrToProjector["stroke"] = lineAttrToProjector["stroke"] || fillProjector;
+                lineAttrToProjector["stroke-width"] = lineAttrToProjector["stroke-width"] || (function () { return "2px"; });
                 lineAttrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
                 return lineAttrToProjector;
             };

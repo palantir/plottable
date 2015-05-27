@@ -85,7 +85,7 @@ describe("Plots", () => {
 
       var linePath = renderArea.select(".line");
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      assert.strictEqual(linePath.attr("stroke"), "steelblue", "line stroke was set correctly");
+      assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
       var lineComputedStyle = window.getComputedStyle(linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
       svg.remove();
