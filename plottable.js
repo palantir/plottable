@@ -7701,9 +7701,8 @@ var Plottable;
                 this.y0(0, yScale); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
-                var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
-                this.attr("fill", defaultColor);
+                this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this._lineDrawers = new Plottable.Utils.Map();
             }
             Area.prototype._setup = function () {
@@ -7756,9 +7755,6 @@ var Plottable;
             };
             Area.prototype._generateLineAttrToProjector = function () {
                 var lineAttrToProjector = this._generateAttrToProjector();
-                var fillProjector = lineAttrToProjector["fill"];
-                lineAttrToProjector["stroke"] = lineAttrToProjector["stroke"] || fillProjector;
-                lineAttrToProjector["stroke-width"] = lineAttrToProjector["stroke-width"] || (function () { return "2px"; });
                 lineAttrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
                 return lineAttrToProjector;
             };
