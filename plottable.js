@@ -7161,19 +7161,28 @@ var Plottable;
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
-            Rectangle.prototype.x = function (x, scale) {
-                if (scale != null) {
+            Rectangle.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                }
+                if (xScale != null) {
                     var x2Binding = this.x2();
                     var x2 = x2Binding && x2Binding.accessor;
                     if (x2 != null) {
-                        this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                        this._bindProperty(Rectangle._X2_KEY, x2, xScale);
                     }
                 }
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale instanceof Plottable.Scales.Category) {
-                    scale.innerPadding(0).outerPadding(0);
+                if (xScale instanceof Plottable.Scales.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
                 }
-                return _super.prototype.x.call(this, x, scale);
+                return this;
             };
             Rectangle.prototype.x2 = function (x2) {
                 if (x2 == null) {
@@ -7185,19 +7194,28 @@ var Plottable;
                 this.render();
                 return this;
             };
-            Rectangle.prototype.y = function (y, scale) {
-                if (scale != null) {
+            Rectangle.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
+                if (yScale != null) {
                     var y2Binding = this.y2();
                     var y2 = y2Binding && y2Binding.accessor;
                     if (y2 != null) {
-                        this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                        this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
                     }
                 }
                 // The x and y scales should render in bands with no padding for category scales
-                if (scale instanceof Plottable.Scales.Category) {
-                    scale.innerPadding(0).outerPadding(0);
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
                 }
-                return _super.prototype.y.call(this, y, scale);
+                return this;
             };
             Rectangle.prototype.y2 = function (y2) {
                 if (y2 == null) {

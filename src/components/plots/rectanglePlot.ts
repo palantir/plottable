@@ -72,23 +72,32 @@ export module Plots {
 
     public x(): AccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-    public x(x?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
 
-      if (scale != null) {
+      if (xScale == null) {
+        super.x(<number | Accessor<number>>x);
+      } else {
+        super.x(<X | Accessor<X>>x, xScale);
+      }
+
+      if (xScale != null) {
         var x2Binding = this.x2();
         var x2 = x2Binding && x2Binding.accessor;
         if (x2 != null) {
-          this._bindProperty(Rectangle._X2_KEY, x2, scale);
+          this._bindProperty(Rectangle._X2_KEY, x2, xScale);
         }
       }
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale instanceof Scales.Category) {
-        (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
+      if (xScale instanceof Scales.Category) {
+        (<Scales.Category> <any> xScale).innerPadding(0).outerPadding(0);
       }
 
-      return super.x(<X | Accessor<X>> x, scale);
+      return this;
     }
 
     public x2(): AccessorScaleBinding<X, number>;
@@ -108,23 +117,32 @@ export module Plots {
 
     public y(): AccessorScaleBinding<Y, number>;
     public y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-    public y(y?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
 
-      if (scale != null) {
+      if (yScale == null) {
+        super.y(<number | Accessor<number>>y);
+      } else {
+        super.y(<Y | Accessor<Y>>y, yScale);
+      }
+
+      if (yScale != null) {
         var y2Binding = this.y2();
         var y2 = y2Binding && y2Binding.accessor;
         if (y2 != null) {
-          this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+          this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
         }
       }
 
       // The x and y scales should render in bands with no padding for category scales
-      if (scale instanceof Scales.Category) {
-        (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
+      if (yScale instanceof Scales.Category) {
+        (<Scales.Category> <any> yScale).innerPadding(0).outerPadding(0);
       }
 
-      return super.y(<Y | Accessor<Y>> y, scale);
+      return this;
     }
 
     public y2(): AccessorScaleBinding<Y, number>;

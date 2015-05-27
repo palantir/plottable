@@ -2648,12 +2648,12 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x(): AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
             x2(): AccessorScaleBinding<X, number>;
             x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
             y(): AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
             y2(): AccessorScaleBinding<Y, number>;
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
         }
