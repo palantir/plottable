@@ -50,7 +50,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Rect(dataset, this._isVertical);
+      return new Plottable.Drawers.Rect(dataset);
     }
 
     protected _setup() {

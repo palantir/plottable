@@ -2916,10 +2916,9 @@ var Plottable;
     (function (Drawers) {
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(dataset, isVertical) {
+            function Rect(dataset) {
                 _super.call(this, dataset);
                 this.svgElement("rect");
-                this._isVertical = isVertical;
             }
             Rect.prototype.setup = function (area) {
                 // need to put the bars in a seperate container so we can ensure that they don't cover labels
@@ -7007,7 +7006,7 @@ var Plottable;
                 }
             }
             Rectangle.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset, true);
+                return new Plottable.Drawers.Rect(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7262,7 +7261,7 @@ var Plottable;
                 this._labelWriters = new Plottable.Utils.Map();
             }
             Bar.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset, this._isVertical);
+                return new Plottable.Drawers.Rect(dataset);
             };
             Bar.prototype._setup = function () {
                 var _this = this;

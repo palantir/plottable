@@ -3,15 +3,13 @@
 module Plottable {
 export module Drawers {
   export class Rect extends Element {
-    private _isVertical: boolean;
     private _textArea: D3.Selection;
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _writer: SVGTypewriter.Writers.Writer;
 
-    constructor(dataset: Dataset, isVertical: boolean) {
+    constructor(dataset: Dataset) {
       super(dataset);
       this.svgElement("rect");
-      this._isVertical = isVertical;
     }
 
     public setup(area: D3.Selection) {

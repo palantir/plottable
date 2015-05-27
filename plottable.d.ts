@@ -1285,7 +1285,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Rect extends Element {
-            constructor(dataset: Dataset, isVertical: boolean);
+            constructor(dataset: Dataset);
             setup(area: D3.Selection): void;
             draw(data: any[], drawSteps: DrawStep[]): number;
         }

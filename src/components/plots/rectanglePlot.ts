@@ -34,7 +34,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Drawers.Rect(dataset, true);
+      return new Drawers.Rect(dataset);
     }
 
     protected _generateAttrToProjector() {
