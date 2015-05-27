@@ -6911,7 +6911,6 @@ var Plottable;
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
-            // TODO: is this needed?
             if (xScale != null) {
                 xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
@@ -6926,7 +6925,6 @@ var Plottable;
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
             }
-            // TODO: is this needed?
             if (yScale != null) {
                 yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
@@ -7085,10 +7083,7 @@ var Plottable;
         XYPlot.prototype._projectorsReady = function () {
             var xBinding = this.x();
             var yBinding = this.y();
-            if (xBinding == null || yBinding == null) {
-                return false;
-            }
-            return xBinding.accessor != null && yBinding.accessor != null;
+            return xBinding != null && xBinding.accessor != null && yBinding != null && yBinding.accessor != null;
         };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";

@@ -40,7 +40,6 @@ module Plottable {
         this._updateYExtentsAndAutodomain();
       }
 
-      // TODO: is this needed?
       if (xScale != null) {
         xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
       }
@@ -62,7 +61,6 @@ module Plottable {
         this._updateXExtentsAndAutodomain();
       }
 
-      // TODO: is this needed?
       if (yScale != null) {
         yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
       }
@@ -232,10 +230,10 @@ module Plottable {
     protected _projectorsReady() {
       var xBinding = this.x();
       var yBinding = this.y();
-      if (xBinding == null || yBinding == null) {
-        return false;
-      }
-      return xBinding.accessor != null && yBinding.accessor != null;
+      return xBinding != null &&
+          xBinding.accessor != null &&
+          yBinding != null &&
+          yBinding.accessor != null;
     }
   }
 }
