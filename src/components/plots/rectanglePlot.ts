@@ -84,18 +84,14 @@ export module Plots {
     }
 
     public x2(): AccessorScaleBinding<X, number>;
-    public x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
-    public x2(x2?: number | Accessor<number> | X | Accessor<X>, scale?: Scale<X, number>): any {
+    public x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
+    public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
       if (x2 == null) {
         return this._propertyBindings.get(Rectangle._X2_KEY);
       }
-      this._bindProperty(Rectangle._X2_KEY, x2, scale);
 
-      // The x and y scales should render in bands with no padding for category scales
-      if (scale instanceof Scales.Category) {
-        (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
-      }
+      var x2Scale = this.x() && this.x().scale;
+      this._bindProperty(Rectangle._X2_KEY, x2, x2Scale);
 
       this.render();
       return this;
@@ -115,18 +111,14 @@ export module Plots {
     }
 
     public y2(): AccessorScaleBinding<Y, number>;
-    public y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-    public y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
-    public y2(y2?: number | Accessor<number> | Y | Accessor<Y>, scale?: Scale<Y, number>): any {
+    public y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+    public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
       if (y2 == null) {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
-      this._bindProperty(Rectangle._Y2_KEY, y2, scale);
 
-      // The x and y scales should render in bands with no padding for category scales
-      if (scale instanceof Scales.Category) {
-        (<Scales.Category> <any> scale).innerPadding(0).outerPadding(0);
-      }
+      var y2Scale = this.y() && this.y().scale;
+      this._bindProperty(Rectangle._Y2_KEY, y2, y2Scale);
 
       this.render();
       return this;

@@ -7164,15 +7164,12 @@ var Plottable;
                 }
                 return _super.prototype.x.call(this, x, scale);
             };
-            Rectangle.prototype.x2 = function (x2, scale) {
+            Rectangle.prototype.x2 = function (x2) {
                 if (x2 == null) {
                     return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
-                this._bindProperty(Rectangle._X2_KEY, x2, scale);
-                // The x and y scales should render in bands with no padding for category scales
-                if (scale instanceof Plottable.Scales.Category) {
-                    scale.innerPadding(0).outerPadding(0);
-                }
+                var x2Scale = this.x() && this.x().scale;
+                this._bindProperty(Rectangle._X2_KEY, x2, x2Scale);
                 this.render();
                 return this;
             };
@@ -7183,15 +7180,12 @@ var Plottable;
                 }
                 return _super.prototype.y.call(this, y, scale);
             };
-            Rectangle.prototype.y2 = function (y2, scale) {
+            Rectangle.prototype.y2 = function (y2) {
                 if (y2 == null) {
                     return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
-                this._bindProperty(Rectangle._Y2_KEY, y2, scale);
-                // The x and y scales should render in bands with no padding for category scales
-                if (scale instanceof Plottable.Scales.Category) {
-                    scale.innerPadding(0).outerPadding(0);
-                }
+                var y2Scale = this.y() && this.y().scale;
+                this._bindProperty(Rectangle._Y2_KEY, y2, y2Scale);
                 this.render();
                 return this;
             };
