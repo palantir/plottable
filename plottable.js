@@ -7674,17 +7674,14 @@ var Plottable;
             };
             Line.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this._wholeDatumAttributes();
-                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-                singleDatumAttributes.forEach(function (attribute) {
+                d3.keys(attrToProjector).forEach(function (attribute) {
+                    if (attribute === "d") {
+                        return;
+                    }
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i, dataset) { return data.length > 0 ? projector(data[0], i, dataset) : null; };
                 });
                 return attrToProjector;
-            };
-            Line.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined", "d"];
             };
             Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;

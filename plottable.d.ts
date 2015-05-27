@@ -2813,7 +2813,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _wholeDatumAttributes(): string[];
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
