@@ -6326,6 +6326,11 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
+        var Animator;
+        (function (Animator) {
+            Animator.MAIN = "main";
+            Animator.RESET = "reset";
+        })(Animator = Plots.Animator || (Plots.Animator = {}));
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
     var Plot = (function (_super) {
         __extends(Plot, _super);
@@ -6359,6 +6364,8 @@ var Plottable;
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
+            this._animators[Plots.Animator.MAIN] = new Plottable.Animators.Base();
+            this._animators[Plots.Animator.RESET] = new Plottable.Animators.Null();
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -7242,8 +7249,7 @@ var Plottable;
             function Scatter(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("scatter-plot", true);
-                this.animator("symbols-reset", new Plottable.Animators.Null());
-                this.animator("symbols", new Plottable.Animators.Base().duration(250).delay(5));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(250).delay(5));
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.size(6);
@@ -7274,9 +7280,9 @@ var Plottable;
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["d"] = function () { return ""; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset") });
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
             Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
@@ -7346,8 +7352,6 @@ var Plottable;
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
                 }
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
-                this.animator("bars-reset", new Plottable.Animators.Null());
-                this.animator("bars", new Plottable.Animators.Base());
                 this.animator("baseline", new Plottable.Animators.Null());
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -7566,9 +7570,9 @@ var Plottable;
                     var dimensionAttr = this._isVertical ? "height" : "width";
                     resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
                     resetAttrToProjector[dimensionAttr] = function () { return 0; };
-                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset") });
+                    drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
             Bar.prototype._generateAttrToProjector = function () {
@@ -7714,8 +7718,7 @@ var Plottable;
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this.classed("line-plot", true);
-                this.animator("reset", new Plottable.Animators.Null());
-                this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
@@ -7738,9 +7741,9 @@ var Plottable;
                 if (this._dataChanged && this._animate) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["y"] = this._getResetYFunction();
-                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator("reset") });
+                    drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
                 }
-                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main") });
+                drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
             Line.prototype._generateAttrToProjector = function () {
@@ -7863,8 +7866,7 @@ var Plottable;
                 _super.call(this, xScale, yScale);
                 this.classed("area-plot", true);
                 this.y0(0, yScale); // default
-                this.animator("reset", new Plottable.Animators.Null());
-                this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 var defaultColor = new Plottable.Scales.Color().range()[0];
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", defaultColor);

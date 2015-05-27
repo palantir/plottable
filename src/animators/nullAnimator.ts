@@ -7,7 +7,7 @@ export module Animators {
    * An animator implementation with no animation. The attributes are
    * immediately set on the selection.
    */
-  export class Null implements PlotAnimator {
+  export class Null implements Animators.Plot {
 
     public getTiming(selection: any) {
       return 0;

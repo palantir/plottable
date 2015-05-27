@@ -2481,7 +2481,7 @@ describe("Plots", function () {
                 recordedTime = Math.max(x, recordedTime);
             };
             plot._additionalPaint = additionalPaint;
-            plot.animator("bars", animator);
+            plot.animator(Plottable.Plots.Animator.MAIN, animator);
             var svg = TestMethods.generateSVG();
             plot.x(function (d) { return d.x; }, x);
             plot.y(function (d) { return d.y; }, y);
