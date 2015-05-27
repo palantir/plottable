@@ -151,33 +151,15 @@ export module Plots {
 
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
-      var xProjector = Plot._scaledAccessor(this.x());
-      var yProjector = Plot._scaledAccessor(this.y());
-      var y0Projector = Plot._scaledAccessor(this.y0());
-      propertyToProjectors["y0"] = y0Projector;
-
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
 
-      var definedProjector = (d: any, i: number, dataset: Dataset) => {
-        var positionX = xProjector(d, i, dataset);
-        var positionY = yProjector(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
-      };
-
-      var stackYAccessor = (d: any, i: number, dataset: Dataset) =>
+      var stackYProjector = (d: any, i: number, dataset: Dataset) =>
         this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-      var stackY0Accessor = (d: any, i: number, dataset: Dataset) =>
+      var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
         this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
 
-      propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) => {
-        return d3.svg.area()
-                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
-                     .y0((innerDatum, innerIndex) => stackY0Accessor(innerDatum, innerIndex, dataset))
-                     .y1((innerDatum, innerIndex) => stackYAccessor(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
-      };
+      propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
       return propertyToProjectors;
     }
   }

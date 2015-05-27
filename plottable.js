@@ -8189,22 +8189,11 @@ var Plottable;
             StackedArea.prototype._propertyProjectors = function () {
                 var _this = this;
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
-                var xProjector = Plottable.Plot._scaledAccessor(this.x());
-                var yProjector = Plottable.Plot._scaledAccessor(this.y());
-                var y0Projector = Plottable.Plot._scaledAccessor(this.y0());
-                propertyToProjectors["y0"] = y0Projector;
                 var yAccessor = this.y().accessor;
                 var xAccessor = this.x().accessor;
-                var definedProjector = function (d, i, dataset) {
-                    var positionX = xProjector(d, i, dataset);
-                    var positionY = yProjector(d, i, dataset);
-                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
-                };
-                var stackYAccessor = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
-                var stackY0Accessor = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
-                propertyToProjectors["d"] = function (datum, index, dataset) {
-                    return d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return stackY0Accessor(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return stackYAccessor(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
-                };
+                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
+                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
+                propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
                 return propertyToProjectors;
             };
             return StackedArea;
