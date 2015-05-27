@@ -155,20 +155,8 @@ svg.plottable {
   line-height: normal;
 }
 
-.plottable .legend .toggled-off circle {
-  fill: #d3d3d3;
-}
-
 .plottable .interpolated-color-legend rect.swatch-bounding-box {
   fill: none;
   stroke: #CCC;
   stroke-width: 1px;
-}
-
-.plottable .plot.toggled-on {
-  visibility:visible;
-}
-
-.plottable .plot.toggled-off {
-  visibility:hidden;
 }
