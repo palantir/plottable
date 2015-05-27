@@ -1289,7 +1289,6 @@ declare module Plottable {
             setup(area: D3.Selection): void;
             aremoveLabels(): void;
             a_getIfLabelsTooWide(): boolean;
-            adrawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
             draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }

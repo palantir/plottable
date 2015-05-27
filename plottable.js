@@ -2914,8 +2914,6 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var LABEL_VERTICAL_PADDING = 5;
-        var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
             __extends(Rect, _super);
             function Rect(dataset, isVertical) {
@@ -2936,59 +2934,6 @@ var Plottable;
             };
             Rect.prototype.a_getIfLabelsTooWide = function () {
                 return this._labelsTooWide;
-            };
-            Rect.prototype.adrawText = function (data, attrToProjector, userMetadata) {
-                var _this = this;
-                var labelTooWide = data.map(function (d, i) {
-                    var text = attrToProjector["label"](d, i, userMetadata).toString();
-                    var w = attrToProjector["width"](d, i, userMetadata);
-                    var h = attrToProjector["height"](d, i, userMetadata);
-                    var x = attrToProjector["x"](d, i, userMetadata);
-                    var y = attrToProjector["y"](d, i, userMetadata);
-                    var positive = attrToProjector["positive"](d, i, userMetadata);
-                    var measurement = _this._measurer.measure(text);
-                    var color = attrToProjector["fill"](d, i, userMetadata);
-                    var dark = Plottable.Utils.Colors.contrast("white", color) * 1.6 < Plottable.Utils.Colors.contrast("black", color);
-                    var primary = _this._isVertical ? h : w;
-                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
-                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
-                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
-                    var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    if (measurement.height <= h && measurement.width <= w) {
-                        var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
-                        if (!positive) {
-                            offset = offset * -1;
-                        }
-                        if (_this._isVertical) {
-                            y += offset;
-                        }
-                        else {
-                            x += offset;
-                        }
-                        var g = _this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var className = dark ? "dark-label" : "light-label";
-                        g.classed(className, true);
-                        var xAlign;
-                        var yAlign;
-                        if (_this._isVertical) {
-                            xAlign = "center";
-                            yAlign = positive ? "top" : "bottom";
-                        }
-                        else {
-                            xAlign = positive ? "left" : "right";
-                            yAlign = "center";
-                        }
-                        var writeOptions = {
-                            selection: g,
-                            xAlign: xAlign,
-                            yAlign: yAlign,
-                            textRotation: 0
-                        };
-                        _this._writer.write(text, w, h, writeOptions);
-                    }
-                    return tooWide;
-                });
-                this._labelsTooWide = labelTooWide.some(function (d) { return d; });
             };
             Rect.prototype.draw = function (data, drawSteps) {
                 var _this = this;
