@@ -173,8 +173,7 @@ export module Plots {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
+        return Utils.Methods.isValidNumber(positionX) && Utils.Methods.isValidNumber(positionY);
       };
       return (datum: any, index: number, dataset: Dataset) => {
         return d3.svg.area()
