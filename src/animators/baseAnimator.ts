@@ -15,7 +15,7 @@ export module Animators {
    * min(maxIterativeDelay(),
    *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
    */
-  export class Base implements PlotAnimator {
+  export class Base implements Plot {
     /**
      * The default duration of the animation in milliseconds
      */

@@ -3,7 +3,7 @@
 module Plottable {
 export module Animators {
 
-  export interface PlotAnimator {
+  export interface Plot {
     /**
      * Applies the supplied attributes to a D3.Selection with some animation.
      *
@@ -24,6 +24,6 @@ export module Animators {
     getTiming(numberOfIterations: number): number;
   }
 
-  export type PlotAnimatorMap = { [animatorKey: string]: PlotAnimator; };
+  export type PlotAnimatorMap = { [animatorKey: string]: Plot; };
 }
 }

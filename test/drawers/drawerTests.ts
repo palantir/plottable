@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animators.PlotAnimator {
+class MockAnimator implements Plottable.Animators.Plot {
   private time: number;
   private callback: Function;
   constructor(time: number, callback?: Function) {

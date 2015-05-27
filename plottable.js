@@ -6217,10 +6217,7 @@ var Plottable;
             _super.call(this);
             this._dataChanged = false;
             this._animate = false;
-            this._animators = {
-                "main": new Plottable.Animators.Base(),
-                "reset": new Plottable.Animators.Null()
-            };
+            this._animators = {};
             this._animateOnNextRender = true;
             this._clipPathEnabled = true;
             this.classed("plot", true);
@@ -6234,6 +6231,8 @@ var Plottable;
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
+            this._animators[Plots.Animator.MAIN] = new Plottable.Animators.Base();
+            this._animators[Plots.Animator.RESET] = new Plottable.Animators.Null();
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);

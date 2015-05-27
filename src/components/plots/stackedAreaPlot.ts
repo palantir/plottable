@@ -30,7 +30,7 @@ export module Plots {
       return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getAnimator(key: string): Animators.Plot {
       return new Animators.Null();
     }
 
