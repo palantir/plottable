@@ -2614,7 +2614,7 @@ var Plottable;
                 this._pathSelection.datum(data);
             };
             Line.prototype.setup = function (line) {
-                this._pathSelection = line.append("path").classed(Line.PATH_CLASS, true).style("fill", "none").style("vector-effect", "non-scaling-stroke");
+                this._pathSelection = line.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
                 _super.prototype.setup.call(this, line);
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
