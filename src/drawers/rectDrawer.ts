@@ -11,8 +11,8 @@ export module Drawers {
     private _measurer: SVGTypewriter.Measurers.CacheCharacterMeasurer;
     private _writer: SVGTypewriter.Writers.Writer;
 
-    constructor(key: string, isVertical: boolean) {
-      super(key);
+    constructor(dataset: Dataset, isVertical: boolean) {
+      super(dataset);
       this.svgElement("rect");
       this._isVertical = isVertical;
     }
@@ -84,16 +84,16 @@ export module Drawers {
       this._labelsTooWide = labelTooWide.some((d: boolean) => d);
     }
 
-    public draw(data: any[], drawSteps: DrawStep[], userMetadata: any) {
+    public draw(data: any[], drawSteps: DrawStep[]) {
       var attrToProjector = drawSteps[0].attrToProjector;
       var isValidNumber = Plottable.Utils.Methods.isValidNumber;
-      data = data.filter(function(e: any, i: number) {
-        return isValidNumber(attrToProjector["x"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["y"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["width"](e, null, userMetadata)) &&
-               isValidNumber(attrToProjector["height"](e, null, userMetadata));
+      data = data.filter((e: any, i: number) => {
+        return isValidNumber(attrToProjector["x"](e, null, this._dataset)) &&
+               isValidNumber(attrToProjector["y"](e, null, this._dataset)) &&
+               isValidNumber(attrToProjector["width"](e, null, this._dataset)) &&
+               isValidNumber(attrToProjector["height"](e, null, this._dataset));
       });
-      return super.draw(data, drawSteps, userMetadata);
+      return super.draw(data, drawSteps);
     }
   }
 }

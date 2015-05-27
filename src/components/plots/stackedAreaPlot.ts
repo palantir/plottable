@@ -26,10 +26,6 @@ export module Plots {
       this._stackedExtent = [];
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key);
-    }
-
     protected _getAnimator(key: string): Animators.PlotAnimator {
       return new Animators.Null();
     }

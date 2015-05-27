@@ -4,8 +4,8 @@ module Plottable {
 export module Drawers {
   export class Symbol extends Element {
 
-    constructor(key: string) {
-      super(key);
+    constructor(dataset: Dataset) {
+      super(dataset);
       this._svgElement = "path";
       this._className = "symbol";
     }

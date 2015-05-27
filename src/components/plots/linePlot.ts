@@ -23,8 +23,8 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Line(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Line(dataset);
     }
 
     protected _getResetYFunction() {
