@@ -2490,7 +2490,7 @@ var Plottable;
              * @param {Dataset} dataset The dataset associated with this Drawer
              */
             function AbstractDrawer(dataset) {
-                this.__dataset = dataset;
+                this._dataset = dataset;
             }
             /**
              * Sets the class, which needs to be applied to bound elements.
@@ -2503,9 +2503,6 @@ var Plottable;
             };
             AbstractDrawer.prototype.setup = function (area) {
                 this._renderArea = area;
-            };
-            AbstractDrawer.prototype._dataset = function () {
-                return this.__dataset;
             };
             /**
              * Removes the Drawer and its renderArea
@@ -2538,7 +2535,7 @@ var Plottable;
                 var _this = this;
                 var modifiedAttrToProjector = {};
                 d3.keys(attrToProjector).forEach(function (attr) {
-                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset()); };
+                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
                 });
                 return modifiedAttrToProjector;
             };
@@ -2893,7 +2890,7 @@ var Plottable;
                 var attrToProjector = drawSteps[0].attrToProjector;
                 var isValidNumber = Plottable.Utils.Methods.isValidNumber;
                 data = data.filter(function (e, i) {
-                    return isValidNumber(attrToProjector["x"](e, null, _this._dataset())) && isValidNumber(attrToProjector["y"](e, null, _this._dataset())) && isValidNumber(attrToProjector["width"](e, null, _this._dataset())) && isValidNumber(attrToProjector["height"](e, null, _this._dataset()));
+                    return isValidNumber(attrToProjector["x"](e, null, _this._dataset)) && isValidNumber(attrToProjector["y"](e, null, _this._dataset)) && isValidNumber(attrToProjector["width"](e, null, _this._dataset)) && isValidNumber(attrToProjector["height"](e, null, _this._dataset));
                 });
                 return _super.prototype.draw.call(this, data, drawSteps);
             };

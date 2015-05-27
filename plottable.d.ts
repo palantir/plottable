@@ -1153,6 +1153,7 @@ declare module Plottable {
         };
         class AbstractDrawer {
             protected _className: string;
+            protected _dataset: Dataset;
             /**
              * Sets the class, which needs to be applied to bound elements.
              *
@@ -1167,7 +1168,6 @@ declare module Plottable {
              */
             constructor(dataset: Dataset);
             setup(area: D3.Selection): void;
-            protected _dataset(): Dataset;
             /**
              * Removes the Drawer and its renderArea
              */

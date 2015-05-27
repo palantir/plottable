@@ -20,7 +20,7 @@ export module Drawers {
   export class AbstractDrawer {
     private _renderArea: D3.Selection;
     protected _className: string;
-    private __dataset: Dataset;
+    protected _dataset: Dataset;
 
     /**
      * Sets the class, which needs to be applied to bound elements.
@@ -39,15 +39,11 @@ export module Drawers {
      * @param {Dataset} dataset The dataset associated with this Drawer
      */
     constructor(dataset: Dataset) {
-        this.__dataset = dataset;
+        this._dataset = dataset;
     }
 
     public setup(area: D3.Selection) {
       this._renderArea = area;
-    }
-
-    protected _dataset() {
-      return this.__dataset;
     }
 
     /**
@@ -85,7 +81,7 @@ export module Drawers {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       d3.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset());
+          (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
       });
 
       return modifiedAttrToProjector;
