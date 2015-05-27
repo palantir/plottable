@@ -2947,8 +2947,12 @@ declare module Plottable {
              */
             constructor(orientation?: string);
             protected _getAnimator(key: string): Animators.Plot;
-            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
-            y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): StackedBar<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
+            y(): Plots.AccessorScaleBinding<Y, number>;
+            y(y: number | Accessor<number>): StackedBar<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };

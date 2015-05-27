@@ -35,6 +35,9 @@ export module Plots {
       return new Animators.Null();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedBar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -49,6 +52,9 @@ export module Plots {
       return this;
     }
 
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): StackedBar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
