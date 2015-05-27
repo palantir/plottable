@@ -168,6 +168,20 @@ export module Plots {
       }
     }
 
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      var attrToProjector = this._generateAttrToProjector();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
+        datasets.set(key, data);
+      });
+      return datasets;
+    }
+
   }
 }
 }

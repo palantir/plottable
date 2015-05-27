@@ -2920,15 +2920,6 @@ var Plottable;
                 _super.call(this, dataset);
                 this.svgElement("rect");
             }
-            Rect.prototype.draw = function (data, drawSteps) {
-                var _this = this;
-                var attrToProjector = drawSteps[0].attrToProjector;
-                var isValidNumber = Plottable.Utils.Methods.isValidNumber;
-                data = data.filter(function (e, i) {
-                    return isValidNumber(attrToProjector["x"](e, null, _this._dataset)) && isValidNumber(attrToProjector["y"](e, null, _this._dataset)) && isValidNumber(attrToProjector["width"](e, null, _this._dataset)) && isValidNumber(attrToProjector["height"](e, null, _this._dataset));
-                });
-                return _super.prototype.draw.call(this, data, drawSteps);
-            };
             return Rect;
         })(Drawers.Element);
         Drawers.Rect = Rect;
@@ -7110,6 +7101,17 @@ var Plottable;
                     return (scaledMax - scaledMin) / Math.abs(max - min);
                 }
             };
+            Rectangle.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                var attrToProjector = this._generateAttrToProjector();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    datasets.set(key, data);
+                });
+                return datasets;
+            };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
             return Rectangle;
@@ -7675,6 +7677,17 @@ var Plottable;
                 var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
+            };
+            Bar.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                var attrToProjector = this._generateAttrToProjector();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    datasets.set(key, data);
+                });
+                return datasets;
             };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";

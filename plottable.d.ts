@@ -1286,7 +1286,6 @@ declare module Plottable {
     module Drawers {
         class Rect extends Element {
             constructor(dataset: Dataset);
-            draw(data: any[], drawSteps: DrawStep[]): number;
         }
     }
 }
@@ -2644,6 +2643,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2792,6 +2792,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
