@@ -42,10 +42,10 @@ export module Plots {
 
     // TODO: remove
     public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor<number>): XYPlot<X, Y>;
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+    public x(x: number | Accessor<number>): Bar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      var ret = super.x(x, xScale);
+      var ret = super.x(<any>x, <any>xScale);
 
       if (x != null) {
         this._updateValueScale();
@@ -54,10 +54,10 @@ export module Plots {
     }
 
     public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | Accessor<number>): XYPlot<X, Y>;
-    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
+    public y(y: number | Accessor<number>): Bar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-      var ret = super.y(y, yScale);
+      var ret = super.y(<any>y, <any>yScale);
 
       if (y != null) {
         this._updateValueScale();
