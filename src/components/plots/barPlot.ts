@@ -170,6 +170,14 @@ export module Plots {
       return this;
     }
 
+    public removeDataset(dataset: Dataset) {
+      super.removeDataset(dataset);
+      this._labelAreas.delete(dataset);
+      this._labelMeasurers.delete(dataset);
+      this._labelWriters.delete(dataset);
+      return this;
+    }
+
     /**
      * Retrieves the closest PlotData to queryPoint.
      *

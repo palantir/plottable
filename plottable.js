@@ -7398,6 +7398,13 @@ var Plottable;
                 }
                 return this;
             };
+            Bar.prototype.removeDataset = function (dataset) {
+                _super.prototype.removeDataset.call(this, dataset);
+                this._labelAreas.delete(dataset);
+                this._labelMeasurers.delete(dataset);
+                this._labelWriters.delete(dataset);
+                return this;
+            };
             /**
              * Retrieves the closest PlotData to queryPoint.
              *

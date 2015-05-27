@@ -2752,6 +2752,7 @@ declare module Plottable {
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
             addDataset(dataset: Dataset): Bar<X, Y>;
+            removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
