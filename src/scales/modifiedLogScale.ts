@@ -7,7 +7,6 @@ export module Scales {
     private _d3Scale: D3.Scale.LinearScale;
     private _pivot: number;
     private _untransformedDomain: number[];
-    private _showIntermediateTicks = false;
 
     /**
      * Creates a new Scale.ModifiedLog.
@@ -117,10 +116,7 @@ export module Scales {
 
       var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
       var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-      var linearTicks = this._showIntermediateTicks ?
-                                d3.scale.linear().domain([negativeUpper, positiveLower])
-                                        .ticks(this._howManyTicks(negativeUpper, positiveLower)) :
-                                [-this._pivot, 0, this._pivot].filter((x) => min <= x && x <= max);
+      var linearTicks = [-this._pivot, 0, this._pivot].filter((x) => min <= x && x <= max);
 
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
@@ -151,8 +147,7 @@ export module Scales {
       var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
       var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-      var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-      var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
+      var multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
       var uniqMultiples = Utils.Methods.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
       var flattened = Utils.Methods.flatten(clusters);
@@ -180,30 +175,6 @@ export module Scales {
 
     protected _niceDomain(domain: number[], count?: number): number[] {
       return domain;
-    }
-
-    /**
-     * Gets whether or not to return tick values other than powers of base.
-     *
-     * This defaults to false, so you'll normally only see ticks like
-     * [10, 100, 1000]. If you turn it on, you might see ticks values
-     * like [10, 50, 100, 500, 1000].
-     * @returns {boolean} the current setting.
-     */
-    public showIntermediateTicks(): boolean;
-    /**
-     * Sets whether or not to return ticks values other than powers or base.
-     *
-     * @param {boolean} show If provided, the desired setting.
-     * @returns {ModifiedLog} The calling ModifiedLog.
-     */
-    public showIntermediateTicks(show: boolean): ModifiedLog;
-    public showIntermediateTicks(show?: boolean): any {
-      if (show == null) {
-        return this._showIntermediateTicks;
-      } else {
-        this._showIntermediateTicks = show;
-      }
     }
 
     protected _defaultExtent(): number[] {

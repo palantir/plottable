@@ -920,22 +920,6 @@ declare module Plottable {
             protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
-            /**
-             * Gets whether or not to return tick values other than powers of base.
-             *
-             * This defaults to false, so you'll normally only see ticks like
-             * [10, 100, 1000]. If you turn it on, you might see ticks values
-             * like [10, 50, 100, 500, 1000].
-             * @returns {boolean} the current setting.
-             */
-            showIntermediateTicks(): boolean;
-            /**
-             * Sets whether or not to return ticks values other than powers or base.
-             *
-             * @param {boolean} show If provided, the desired setting.
-             * @returns {ModifiedLog} The calling ModifiedLog.
-             */
-            showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             protected _getRange(): any[];
