@@ -6968,7 +6968,7 @@ var Plottable;
             var definedFunction = function (d, i, dataset) {
                 var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                 var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                return Plottable.Utils.Methods.isValidNumber(positionX) && Plottable.Utils.Methods.isValidNumber(positionY);
             };
             datasets.forEach(function (key, data) {
                 var dataset = _this._key2PlotDatasetKey.get(key).dataset;

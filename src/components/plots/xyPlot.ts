@@ -227,8 +227,8 @@ module Plottable {
       var definedFunction = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
+        return Utils.Methods.isValidNumber(positionX) &&
+               Utils.Methods.isValidNumber(positionY);
       };
 
       datasets.forEach((key, data) => {
