@@ -2436,8 +2436,7 @@ describe("Plots", function () {
             var scale = new Plottable.Scales.Linear();
             plot2.attr("attr", function (d) { return d.a; }, scale);
             plot2.destroy();
-            var scaleCallbacks = scale._callbacks.values();
-            assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
+            assert.strictEqual(scale._callbacks.size, 0, "the plot is no longer attached to the scale");
         });
         it("extent registration works as intended", function () {
             var scale1 = new Plottable.Scales.Linear().padProportion(0);
@@ -2595,10 +2594,8 @@ describe("Plots", function () {
         it("listeners are deregistered after removal", function () {
             plot.autorange("y");
             plot.destroy();
-            var xScaleCallbacks = xScale._callbacks.values();
-            assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
-            var yScaleCallbacks = yScale._callbacks.values();
-            assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
+            assert.strictEqual(xScale._callbacks.size, 0, "the plot is no longer attached to xScale");
+            assert.strictEqual(yScale._callbacks.size, 0, "the plot is no longer attached to yScale");
             svg.remove();
         });
     });
