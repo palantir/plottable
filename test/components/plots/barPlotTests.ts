@@ -156,7 +156,7 @@ describe("Plots", () => {
           });
 
          describe("barAlignment", () => {
-           it("getAllPlotData() pixel points corrected for barAlignment left", () => {
+           it("entities() positions corrected for barAlignment left", () => {
              barPlot.barAlignment("left");
              var entities = barPlot.entities();
              entities.forEach((entity) => {
@@ -167,7 +167,7 @@ describe("Plots", () => {
              svg.remove();
            });
 
-           it("getAllPlotData() pixel points corrected for barAlignment right", () => {
+           it("entities() positions corrected for barAlignment right", () => {
              barPlot.barAlignment("right");
              var entities = barPlot.entities();
              entities.forEach((entity) => {

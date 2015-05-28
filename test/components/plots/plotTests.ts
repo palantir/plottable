@@ -274,7 +274,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllPlotData() with NaN pixel points", () => {
+    it("entities() with NaN values", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 

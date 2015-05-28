@@ -7844,28 +7844,6 @@ var Plottable;
                 lineDrawers.forEach(function (ld, i) { return allSelections.push(ld._getSelection(i).node()); });
                 return d3.selectAll(allSelections);
             };
-            Area.prototype.getAllPlotData = function (datasets) {
-                var _this = this;
-                if (datasets === void 0) { datasets = this.datasets(); }
-                var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
-                var allElements = allPlotData.selection[0];
-                this._keysForDatasets(datasets).forEach(function (datasetKey) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var dataset = plotDatasetKey.dataset;
-                    var drawer = _this._lineDrawers.get(dataset);
-                    dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = _this._pixelPoint(datum, index, dataset);
-                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-                            return;
-                        }
-                        allElements.push(drawer._getSelection(index).node());
-                    });
-                });
-                return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
-            };
             Area.prototype._constructAreaProjector = function (xProjector, yProjector, y0Projector) {
                 var _this = this;
                 var definedProjector = function (d, i, dataset) {

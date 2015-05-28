@@ -144,27 +144,6 @@ export module Plots {
       return d3.selectAll(allSelections);
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var allPlotData = super.getAllPlotData(datasets);
-      var allElements = allPlotData.selection[0];
-
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var dataset = plotDatasetKey.dataset;
-        var drawer = this._lineDrawers.get(dataset);
-        dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = this._pixelPoint(datum, index, dataset);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-            return;
-          }
-          allElements.push(drawer._getSelection(index).node());
-        });
-      });
-
-      return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
-    }
-
     protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);

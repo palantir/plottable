@@ -2234,7 +2234,7 @@ describe("Plots", function () {
             assert.includeMembers(entities.map(function (entity) { return entity.position; }), data2.map(data2PointConverter), "includes data2 points");
             svg.remove();
         });
-        it("getAllPlotData() with NaN pixel points", function () {
+        it("entities() with NaN values", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var plot = new Plottable.Plot();
             var data = [{ value: NaN }, { value: 1 }, { value: 2 }];
@@ -3289,7 +3289,7 @@ describe("Plots", function () {
                         svg.remove();
                     });
                     describe("barAlignment", function () {
-                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
+                        it("entities() positions corrected for barAlignment left", function () {
                             barPlot.barAlignment("left");
                             var entities = barPlot.entities();
                             entities.forEach(function (entity) {
@@ -3299,7 +3299,7 @@ describe("Plots", function () {
                             });
                             svg.remove();
                         });
-                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
+                        it("entities() positions corrected for barAlignment right", function () {
                             barPlot.barAlignment("right");
                             var entities = barPlot.entities();
                             entities.forEach(function (entity) {
