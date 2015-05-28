@@ -376,12 +376,24 @@ describe("Plots", () => {
       ]);
     });
 
+    it("auto scales correctly on stacked bar", () => {
+      var plot = new Plottable.Plots.StackedBar();
+      plot.addDataset(dataset1)
+          .addDataset(dataset2);
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      svg.remove();
+    });
+
     // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
-    it.skip("auto scales correctly on stacked area", () => {
+    it("auto scales correctly on stacked area", () => {
       var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d: any) => d.x, yScale)
+      plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorange("y");
       plot.renderTo(svg);

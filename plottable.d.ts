@@ -2990,7 +2990,7 @@ declare module Plottable {
             protected _setup(): void;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedArea<X>;
-            x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): StackedArea<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
