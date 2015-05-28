@@ -69,7 +69,7 @@ export module Plots {
         var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
+        dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
@@ -78,7 +78,7 @@ export module Plots {
           pixelPoints.push(pixelPoint);
         });
 
-        if (plotDatasetKey.dataset.data().length > 0) {
+        if (dataset.data().length > 0) {
           allElements.push(drawer._getSelection(0).node());
         }
       });

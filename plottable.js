@@ -6352,9 +6352,8 @@ var Plottable;
         Plot.prototype.removeDataset = function (dataset) {
             var key = this._keyForDataset(dataset);
             if (this.datasets().indexOf(dataset) > -1) {
-                var pdk = this._key2PlotDatasetKey.get(dataset);
                 this._removeDatasetNodes(dataset);
-                pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
+                dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.delete(dataset);
                 this._onDatasetUpdate();
@@ -6459,7 +6458,7 @@ var Plottable;
                     return;
                 }
                 var drawer = plotDatasetKey.drawer;
-                plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                dataset.data().forEach(function (datum, index) {
                     var pixelPoint = _this._pixelPoint(datum, index, dataset);
                     if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                         return;
@@ -7702,7 +7701,7 @@ var Plottable;
                         return;
                     }
                     var drawer = plotDatasetKey.drawer;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
+                    dataset.data().forEach(function (datum, index) {
                         var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
                             return;
@@ -7710,7 +7709,7 @@ var Plottable;
                         data.push(datum);
                         pixelPoints.push(pixelPoint);
                     });
-                    if (plotDatasetKey.dataset.data().length > 0) {
+                    if (dataset.data().length > 0) {
                         allElements.push(drawer._getSelection(0).node());
                     }
                 });

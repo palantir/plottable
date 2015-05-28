@@ -2377,7 +2377,6 @@ declare module Plottable {
          * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
          */
         type PlotDatasetKey = {
-            dataset: Dataset;
             drawer: Drawers.AbstractDrawer;
         };
         type PlotData = {
