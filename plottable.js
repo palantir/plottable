@@ -7209,9 +7209,7 @@ var Plottable;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
-                this._labelAreas = new Plottable.Utils.Map();
-                this._labelMeasurers = new Plottable.Utils.Map();
-                this._labelWriters = new Plottable.Utils.Map();
+                this._labelConfig = new Plottable.Utils.Map();
             }
             Bar.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rect(dataset);
@@ -7224,9 +7222,7 @@ var Plottable;
                     var labelArea = _this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
                     var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
                     var writer = new SVGTypewriter.Writers.Writer(measurer);
-                    _this._labelAreas.set(dataset, labelArea);
-                    _this._labelMeasurers.set(dataset, measurer);
-                    _this._labelWriters.set(dataset, writer);
+                    _this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
                 });
             };
             Bar.prototype.baseline = function (value) {
@@ -7281,22 +7277,18 @@ var Plottable;
                     var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
                     var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
                     var writer = new SVGTypewriter.Writers.Writer(measurer);
-                    this._labelAreas.set(dataset, labelArea);
-                    this._labelMeasurers.set(dataset, measurer);
-                    this._labelWriters.set(dataset, writer);
+                    this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
                 }
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
                 _super.prototype.removeDataset.call(this, dataset);
-                var labelArea = this._labelAreas.get(dataset);
-                if (labelArea != null) {
-                    labelArea.remove();
+                var labelConfig = this._labelConfig.get(dataset);
+                if (labelConfig != null) {
+                    labelConfig.labelArea.remove();
+                    this._labelConfig.delete(dataset);
                 }
-                this._labelAreas.delete(dataset);
-                this._labelMeasurers.delete(dataset);
-                this._labelWriters.delete(dataset);
                 return this;
             };
             /**
@@ -7432,7 +7424,7 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                this.datasets().forEach(function (dataset) { return _this._labelAreas.get(dataset).selectAll("g").remove(); });
+                this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 if (this._labelsEnabled) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
@@ -7443,15 +7435,16 @@ var Plottable;
                 var labelsTooWide = false;
                 this._datasetKeysInOrder.forEach(function (k, i) { return labelsTooWide = labelsTooWide || _this._drawLabel(dataToDraw.get(k), _this._key2PlotDatasetKey.get(k).dataset); });
                 if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
-                    this.datasets().forEach(function (dataset) { return _this._labelAreas.get(dataset).selectAll("g").remove(); });
+                    this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 }
             };
             Bar.prototype._drawLabel = function (data, dataset) {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var labelArea = this._labelAreas.get(dataset);
-                var measurer = this._labelMeasurers.get(dataset);
-                var writer = this._labelWriters.get(dataset);
+                var labelConfig = this._labelConfig.get(dataset);
+                var labelArea = labelConfig.labelArea;
+                var measurer = labelConfig.measurer;
+                var writer = labelConfig.writer;
                 var labelTooWide = data.map(function (d, i) {
                     var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
                     var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());

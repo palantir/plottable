@@ -1,6 +1,13 @@
 ///<reference path="../../reference.ts" />
 
 module Plottable {
+
+type LabelConfig = {
+  labelArea: D3.Selection;
+  measurer: SVGTypewriter.Measurers.Measurer;
+  writer: SVGTypewriter.Writers.Writer;
+};
+
 export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
     public static ORIENTATION_VERTICAL = "vertical";
@@ -19,9 +26,7 @@ export module Plots {
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
-    private _labelAreas: Utils.Map<Dataset, D3.Selection>;
-    private _labelMeasurers: Utils.Map<Dataset, SVGTypewriter.Measurers.Measurer>;
-    private _labelWriters: Utils.Map<Dataset, SVGTypewriter.Writers.Writer>;
+    private _labelConfig: Utils.Map<Dataset, LabelConfig>;
 
     /**
      * Constructs a Bar Plot.
@@ -42,9 +47,7 @@ export module Plots {
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
-      this._labelAreas = new Utils.Map<Dataset, D3.Selection>();
-      this._labelMeasurers = new Utils.Map<Dataset, SVGTypewriter.Measurers.CacheCharacterMeasurer>();
-      this._labelWriters = new Utils.Map<Dataset, SVGTypewriter.Writers.Writer>();
+      this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     }
 
     protected _getDrawer(dataset: Dataset) {
@@ -58,9 +61,7 @@ export module Plots {
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
         var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
         var writer = new SVGTypewriter.Writers.Writer(measurer);
-        this._labelAreas.set(dataset, labelArea);
-        this._labelMeasurers.set(dataset, measurer);
-        this._labelWriters.set(dataset, writer);
+        this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
       });
     }
 
@@ -162,9 +163,7 @@ export module Plots {
         var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
         var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
         var writer = new SVGTypewriter.Writers.Writer(measurer);
-        this._labelAreas.set(dataset, labelArea);
-        this._labelMeasurers.set(dataset, measurer);
-        this._labelWriters.set(dataset, writer);
+        this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
       }
       super.addDataset(dataset);
       return this;
@@ -172,13 +171,11 @@ export module Plots {
 
     public removeDataset(dataset: Dataset) {
       super.removeDataset(dataset);
-      var labelArea = this._labelAreas.get(dataset);
-      if (labelArea != null) {
-        labelArea.remove();
+      var labelConfig = this._labelConfig.get(dataset);
+      if (labelConfig != null) {
+        labelConfig.labelArea.remove();
+        this._labelConfig.delete(dataset);
       }
-      this._labelAreas.delete(dataset);
-      this._labelMeasurers.delete(dataset);
-      this._labelWriters.delete(dataset);
       return this;
     }
 
@@ -338,7 +335,7 @@ export module Plots {
 
       this._getAnimator("baseline").animate(this._baseline, baselineAttr);
 
-      this.datasets().forEach((dataset) => this._labelAreas.get(dataset).selectAll("g").remove());
+      this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       if (this._labelsEnabled) {
         Utils.Methods.setTimeout(() => this._drawLabels(), time);
       }
@@ -350,15 +347,16 @@ export module Plots {
       this._datasetKeysInOrder.forEach((k, i) =>
         labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(k), this._key2PlotDatasetKey.get(k).dataset));
       if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
-        this.datasets().forEach((dataset) => this._labelAreas.get(dataset).selectAll("g").remove());
+        this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       }
     }
 
     private _drawLabel(data: any[], dataset: Dataset) {
       var attrToProjector = this._generateAttrToProjector();
-      var labelArea = this._labelAreas.get(dataset);
-      var measurer = this._labelMeasurers.get(dataset);
-      var writer = this._labelWriters.get(dataset);
+      var labelConfig = this._labelConfig.get(dataset);
+      var labelArea = labelConfig.labelArea;
+      var measurer = labelConfig.measurer;
+      var writer = labelConfig.writer;
       var labelTooWide: boolean[] = data.map((d, i) => {
         var primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
         var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
