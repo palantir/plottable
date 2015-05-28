@@ -1051,27 +1051,6 @@ describe("NumericAxis", function () {
         });
         svg.remove();
     });
-    it("can hide tick labels that don't fit", function () {
-        var SVG_WIDTH = 500;
-        var SVG_HEIGHT = 100;
-        var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var scale = new Plottable.Scales.Linear();
-        scale.range([0, SVG_WIDTH]);
-        var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabel("left", false);
-        assert.isFalse(numericAxis.showEndTickLabel("left"), "retrieve showEndTickLabel setting");
-        numericAxis.showEndTickLabel("right", true);
-        assert.isTrue(numericAxis.showEndTickLabel("right"), "retrieve showEndTickLabel setting");
-        assert.throws(function () { return numericAxis.showEndTickLabel("top", true); }, Error);
-        assert.throws(function () { return numericAxis.showEndTickLabel("bottom", true); }, Error);
-        numericAxis.renderTo(svg);
-        var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
-        var firstLabel = d3.select(tickLabels[0][0]);
-        assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
-        var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
-        assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
-        svg.remove();
-    });
     it("tick labels don't overlap in a constrained space", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 100;
@@ -1079,7 +1058,6 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.range([0, SVG_WIDTH]);
         var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
-        numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
         numericAxis.renderTo(svg);
         var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
