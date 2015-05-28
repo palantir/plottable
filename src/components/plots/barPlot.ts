@@ -342,9 +342,9 @@ export module Plots {
       var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
-      var positionF = attrToProjector[secondaryAttr];
+      var positionF = this._isVertical ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.y());
       var widthF = attrToProjector["width"];
-      var originalPositionFn = attrToProjector[primaryAttr];
+      var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
       };

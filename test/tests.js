@@ -3060,8 +3060,7 @@ describe("Plots", function () {
             areaPlot.y0(y0Accessor, yScale).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
-        // Need to deal with repercussions in area plot
-        it.skip("draws area and line correctly", function () {
+        it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
             assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
             assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
@@ -3082,8 +3081,7 @@ describe("Plots", function () {
             assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             svg.remove();
         });
-        // Need to deal with repercussions in area plot
-        it.skip("area is appended before line", function () {
+        it("area is appended before line", function () {
             var paths = renderArea.selectAll("path")[0];
             var areaSelection = renderArea.select(".area")[0][0];
             var lineSelection = renderArea.select(".line")[0][0];
@@ -3121,8 +3119,7 @@ describe("Plots", function () {
             svg.remove();
         });
         describe("getAllSelections()", function () {
-            // Deal with repercussions in area plot
-            it.skip("retrieves all selections with no args", function () {
+            it("retrieves all selections with no args", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
@@ -3154,9 +3151,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             areaPlot.attr("class", newClassProjector);
             areaPlot.renderTo(svg);
-            var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
+            var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
             assert.isTrue(areaPath.classed("pink"));
-            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
+            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
             svg.remove();
         });
     });

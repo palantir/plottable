@@ -87,14 +87,6 @@ export module Drawers {
       return modifiedAttrToProjector;
     }
 
-    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
-      // no-op
-    }
-
-    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
-      return data;
-    }
-
     /**
      * Draws the data into the renderArea using the spefic steps and metadata
      *
@@ -110,12 +102,8 @@ export module Drawers {
         };
       });
 
-      var preparedData = this._prepareData(data, appliedDrawSteps);
-
-      this._prepareDrawSteps(appliedDrawSteps);
-
-      this._enterData(preparedData);
-      var numberOfIterations = this._numberOfAnimationIterations(preparedData);
+      this._enterData(data);
+      var numberOfIterations = this._numberOfAnimationIterations(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {

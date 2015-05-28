@@ -21,10 +21,9 @@ export module Plots {
       this.classed("area-plot", true);
       this.y0(0, yScale); // default
       this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
-      var defaultColor = new Scales.Color().range()[0];
       this.attr("fill-opacity", 0.25);
-      this.attr("fill", defaultColor);
-      this.attr("stroke", defaultColor);
+      this.attr("fill", new Scales.Color().range()[0]);
+
       this._lineDrawers = new Utils.Map<Dataset, Drawers.Line>();
     }
 
@@ -64,7 +63,7 @@ export module Plots {
     }
 
     protected _additionalPaint() {
-      var drawSteps = this._generateDrawSteps();
+      var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();
       this._datasetKeysInOrder.forEach((k, i) => {
         var dataset = this._key2PlotDatasetKey.get(k).dataset;
@@ -72,8 +71,40 @@ export module Plots {
       });
     }
 
+    private _generateLineDrawSteps() {
+      var drawSteps: Drawers.DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var attrToProjector = this._generateLineAttrToProjector();
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+      drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator("main")});
+      return drawSteps;
+    }
+
+    private _generateLineAttrToProjector() {
+      var lineAttrToProjector = this._generateAttrToProjector();
+      lineAttrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
+      return lineAttrToProjector;
+    }
+
     protected _getDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Area(dataset);
+    }
+
+    protected _generateDrawSteps(): Drawers.DrawStep[] {
+      var drawSteps: Drawers.DrawStep[] = [];
+      if (this._dataChanged && this._animate) {
+        var attrToProjector = this._generateAttrToProjector();
+        attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+                                                            this._getResetYFunction(),
+                                                            Plot._scaledAccessor(this.y0()));
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+      }
+
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+
+      return drawSteps;
     }
 
     protected _updateYScale() {
@@ -91,19 +122,15 @@ export module Plots {
     }
 
     protected _getResetYFunction() {
-      return this._generateAttrToProjector()["y0"];
-    }
-
-    protected _wholeDatumAttributes() {
-      var wholeDatumAttributes = super._wholeDatumAttributes();
-      wholeDatumAttributes.push("y0");
-      return wholeDatumAttributes;
+      return Plot._scaledAccessor(this.y0());
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
-      attrToProjector["y0"] = Plot._scaledAccessor(this.y0());
-      return attrToProjector;
+      var propertyToProjectors = super._propertyProjectors();
+      propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
+                                                               Plot._scaledAccessor(this.y()),
+                                                               Plot._scaledAccessor(this.y0()));
+      return propertyToProjectors;
     }
 
     public getAllSelections(datasets = this.datasets(), exclude = false) {
@@ -136,6 +163,22 @@ export module Plots {
       });
 
       return { data: allPlotData.data, pixelPoints: allPlotData.pixelPoints, selection: d3.selectAll(allElements) };
+    }
+
+    protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return Utils.Methods.isValidNumber(positionX) && Utils.Methods.isValidNumber(positionY);
+      };
+      return (datum: any[], index: number, dataset: Dataset) => {
+        var areaGenerator = d3.svg.area()
+                                  .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                                  .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                                  .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+                                  .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
+        return areaGenerator(datum, index);
+      };
     }
   }
 }

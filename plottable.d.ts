@@ -1217,8 +1217,6 @@ declare module Plottable {
              */
             protected _drawStep(step: AppliedDrawStep): void;
             protected _numberOfAnimationIterations(data: any[]): number;
-            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1257,7 +1255,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Area extends Line {
-            static AREA_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
@@ -1279,8 +1277,6 @@ declare module Plottable {
             svgElement(tag: string): Element;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
-            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
         }
     }
@@ -2605,7 +2601,6 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         autorange(scaleName: string): XYPlot<X, Y>;
-        protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.
@@ -2615,6 +2610,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _getDataToDraw(): D3.Map<any[]>;
     }
 }
 
@@ -2826,7 +2822,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _wholeDatumAttributes(): string[];
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
@@ -2840,6 +2835,8 @@ declare module Plottable {
              */
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2867,12 +2864,13 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
-            protected _wholeDatumAttributes(): string[];
+            protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
 }
@@ -2921,12 +2919,10 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
-            };
             protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
