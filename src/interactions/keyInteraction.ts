@@ -6,7 +6,7 @@ export type KeyCallback = (keyCode: number) => void;
 export module Interactions {
   export class Key extends Interaction {
     /**
-     * KeyInteraction listens to key events that occur while the Component is
+     * A Key Interaction listens to key events that occur while the Component is
      * moused over.
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
@@ -47,9 +47,9 @@ export module Interactions {
      * Sets a callback to be called when the key with the given keyCode is
      * pressed and the user is moused over the Component.
      *
-     * @param {number} keyCode The key code associated with the key.
-     * @param {KeyCallback} callback Callback to be set.
-     * @returns The calling Interaction.Key.
+     * @param {number} keyCode
+     * @param {KeyCallback} callback
+     * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKey(keyCode: number, callback: KeyCallback) {
       if (!this._keyCodeCallbacks[keyCode]) {
@@ -60,12 +60,12 @@ export module Interactions {
     }
 
     /**
-     * Removes the callback to be called when the key with the given keyCode is
+     * Removes a callback that would be called when the key with the given keyCode is
      * pressed and the user is moused over the Component.
      *
-     * @param {number} keyCode The key code associated with the key.
-     * @param {KeyCallback} callback Callback to be removed.
-     * @returns The calling Interaction.Key.
+     * @param {number} keyCode
+     * @param {KeyCallback} callback
+     * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKey(keyCode: number, callback: KeyCallback) {
       this._keyCodeCallbacks[keyCode].delete(callback);

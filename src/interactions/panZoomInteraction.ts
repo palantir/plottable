@@ -3,7 +3,6 @@
 module Plottable {
 export module Interactions {
   export class PanZoom extends Interaction {
-
     /**
      * The number of pixels occupied in a line.
      */
@@ -24,10 +23,10 @@ export module Interactions {
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
     /**
-     * Creates a PanZoomInteraction.
+     * Creates a PanZoom Interaction.
      *
-     * The allows you to move around and zoom in on a plot, interactively. It
-     * does so by changing the xScale and yScales' domains repeatedly.
+     * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
+     * in response to the user panning or zooming.
      *
      * @constructor
      * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.

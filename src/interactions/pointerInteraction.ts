@@ -50,10 +50,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback called when the pointer enters the Component.
+     * Sets a callback to be called when the pointer enters the Component.
      *
-     * @param {PointerCallback} callback The callback to set.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public onPointerEnter(callback: PointerCallback) {
       this._pointerEnterCallbacks.add(callback);
@@ -61,10 +61,10 @@ export module Interactions {
     }
 
     /**
-     * Removes a callback called when the pointer enters the Component.
+     * Removes a callback that would be called when the pointer enters the Component.
      *
-     * @param {PointerCallback} callback The callback to remove.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public offPointerEnter(callback: PointerCallback) {
       this._pointerEnterCallbacks.delete(callback);
@@ -72,10 +72,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback called when the pointer moves.
+     * Sets a callback to be called when the pointer moves within the Component.
      *
-     * @param {PointerCallback} callback The callback to set.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public onPointerMove(callback: PointerCallback) {
       this._pointerMoveCallbacks.add(callback);
@@ -83,10 +83,10 @@ export module Interactions {
     }
 
     /**
-     * Removes a callback called when the pointer moves.
+     * Removes a callback that would be called when the pointer moves within the Component.
      *
-     * @param {PointerCallback} callback The callback to remove.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public offPointerMove(callback: PointerCallback) {
       this._pointerMoveCallbacks.delete(callback);
@@ -94,10 +94,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback called when the pointer exits the Component.
+     * Sets a callback to be called when the pointer exits the Component.
      *
-     * @param {PointerCallback} callback The callback to set.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public onPointerExit(callback: PointerCallback) {
       this._pointerExitCallbacks.add(callback);
@@ -105,10 +105,10 @@ export module Interactions {
     }
 
     /**
-     * Removes a callback called when the pointer exits the Component.
+     * Removes a callback that would be called when the pointer exits the Component.
      *
-     * @param {PointerCallback} callback The callback to remove.
-     * @return {Interaction.Pointer} The calling Interaction.Pointer.
+     * @param {PointerCallback} callback
+     * @return {Interactions.Pointer} The calling Pointer Interaction.
      */
     public offPointerExit(callback: PointerCallback) {
       this._pointerExitCallbacks.delete(callback);

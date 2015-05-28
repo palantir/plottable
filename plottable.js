@@ -8991,12 +8991,11 @@ var Plottable;
             this._isAnchored = false;
         };
         /**
-         * Attaches this interaction to a Component.
-         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+         * Attaches this Interaction to a Component.
+         * If the Interaction was already attached to a Component, it first detaches itself from the old Component.
          *
-         * @param {Component} component The component to which to attach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.attachTo = function (component) {
             if (this._componentAttachedTo) {
@@ -9007,12 +9006,11 @@ var Plottable;
             return this;
         };
         /**
-         * Detaches this interaction from the Component.
-         * This interaction can be reused.
+         * Detaches this Interaction from the Component.
+         * This Interaction can be reused.
          *
-         * @param {Component} component The component from which to detach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.detachFrom = function (component) {
             if (this._isAnchored) {
@@ -9026,7 +9024,6 @@ var Plottable;
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
          * @param {Point} p A Point in <svg>-space coordinates.
-         *
          * @return {Point} The same location in Component-space coordinates.
          */
         Interaction.prototype._translateToComponentSpace = function (p) {
@@ -9039,8 +9036,7 @@ var Plottable;
         /**
          * Checks whether a Component-coordinate-space Point is inside the Component.
          *
-         * @param {Point} p A Point in Coordinate-space coordinates.
-         *
+         * @param {Point} p A Point in Compoennt-space coordinates.
          * @return {boolean} Whether or not the point is inside the Component.
          */
         Interaction.prototype._isInsideComponent = function (p) {
@@ -9109,20 +9105,20 @@ var Plottable;
                 this._clickedDown = false;
             };
             /**
-             * Sets the callback called when the Component is clicked.
+             * Adds a callback to be called called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             Click.prototype.onClick = function (callback) {
                 this._onClickCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes the callback from click.
+             * Removes a callback that would be called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             Click.prototype.offClick = function (callback) {
                 this._onClickCallbacks.delete(callback);
@@ -9223,20 +9219,20 @@ var Plottable;
                 return p1.x === p2.x && p1.y === p2.y;
             };
             /**
-             * Sets the callback called when the Component is double-clicked.
+             * Adds a callback to be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             DoubleClick.prototype.onDoubleClick = function (callback) {
                 this._onDoubleClickCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes the callback called when the Component is double-clicked.
+             * Removes a callback that would be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             DoubleClick.prototype.offDoubleClick = function (callback) {
                 this._onDoubleClickCallbacks.delete(callback);
@@ -9292,9 +9288,9 @@ var Plottable;
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be set.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.onKey = function (keyCode, callback) {
                 if (!this._keyCodeCallbacks[keyCode]) {
@@ -9304,12 +9300,12 @@ var Plottable;
                 return this;
             };
             /**
-             * Removes the callback to be called when the key with the given keyCode is
+             * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be removed.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.offKey = function (keyCode, callback) {
                 this._keyCodeCallbacks[keyCode].delete(callback);
@@ -9377,60 +9373,60 @@ var Plottable;
                 }
             };
             /**
-             * Sets the callback called when the pointer enters the Component.
+             * Sets a callback to be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.onPointerEnter = function (callback) {
                 this._pointerEnterCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes a callback called when the pointer enters the Component.
+             * Removes a callback that would be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.offPointerEnter = function (callback) {
                 this._pointerEnterCallbacks.delete(callback);
                 return this;
             };
             /**
-             * Sets the callback called when the pointer moves.
+             * Sets a callback to be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.onPointerMove = function (callback) {
                 this._pointerMoveCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes a callback called when the pointer moves.
+             * Removes a callback that would be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.offPointerMove = function (callback) {
                 this._pointerMoveCallbacks.delete(callback);
                 return this;
             };
             /**
-             * Sets the callback called when the pointer exits the Component.
+             * Sets a callback to be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.onPointerExit = function (callback) {
                 this._pointerExitCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes a callback called when the pointer exits the Component.
+             * Removes a callback that would be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             Pointer.prototype.offPointerExit = function (callback) {
                 this._pointerExitCallbacks.delete(callback);
@@ -9456,10 +9452,10 @@ var Plottable;
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
-             * Creates a PanZoomInteraction.
+             * Creates a PanZoom Interaction.
              *
-             * The allows you to move around and zoom in on a plot, interactively. It
-             * does so by changing the xScale and yScales' domains repeatedly.
+             * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
+             * in response to the user panning or zooming.
              *
              * @constructor
              * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
@@ -9702,20 +9698,20 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets the callback to be called when dragging starts.
+             * Adds a callback to be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.onDragStart = function (callback) {
                 this._dragStartCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes the callback to be called when dragging starts.
+             * Removes a callback that would be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.offDragStart = function (callback) {
                 this._dragStartCallbacks.delete(callback);
@@ -9724,38 +9720,38 @@ var Plottable;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.onDrag = function (callback) {
                 this._dragCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes a callback to be called during dragging.
+             * Removes a callback that would be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.offDrag = function (callback) {
                 this._dragCallbacks.delete(callback);
                 return this;
             };
             /**
-             * Adds a callback to be called when the dragging ends.
+             * Adds a callback to be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.onDragEnd = function (callback) {
                 this._dragEndCallbacks.add(callback);
                 return this;
             };
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback that would be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be removed
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             Drag.prototype.offDragEnd = function (callback) {
                 this._dragEndCallbacks.delete(callback);

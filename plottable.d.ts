@@ -3500,36 +3500,32 @@ declare module Plottable {
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         /**
-         * Attaches this interaction to a Component.
-         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+         * Attaches this Interaction to a Component.
+         * If the Interaction was already attached to a Component, it first detaches itself from the old Component.
          *
-         * @param {Component} component The component to which to attach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         attachTo(component: Component): Interaction;
         /**
-         * Detaches this interaction from the Component.
-         * This interaction can be reused.
+         * Detaches this Interaction from the Component.
+         * This Interaction can be reused.
          *
-         * @param {Component} component The component from which to detach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         detachFrom(component: Component): Interaction;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
          * @param {Point} p A Point in <svg>-space coordinates.
-         *
          * @return {Point} The same location in Component-space coordinates.
          */
         protected _translateToComponentSpace(p: Point): Point;
         /**
          * Checks whether a Component-coordinate-space Point is inside the Component.
          *
-         * @param {Point} p A Point in Coordinate-space coordinates.
-         *
+         * @param {Point} p A Point in Compoennt-space coordinates.
          * @return {boolean} Whether or not the point is inside the Component.
          */
         protected _isInsideComponent(p: Point): boolean;
@@ -3544,17 +3540,17 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the Component is clicked.
+             * Adds a callback to be called called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             onClick(callback: ClickCallback): Click;
             /**
-             * Removes the callback from click.
+             * Removes a callback that would be called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             offClick(callback: ClickCallback): Click;
         }
@@ -3568,17 +3564,17 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the Component is double-clicked.
+             * Adds a callback to be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             onDoubleClick(callback: ClickCallback): DoubleClick;
             /**
-             * Removes the callback called when the Component is double-clicked.
+             * Removes a callback that would be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             offDoubleClick(callback: ClickCallback): DoubleClick;
         }
@@ -3596,18 +3592,18 @@ declare module Plottable {
              * Sets a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be set.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             onKey(keyCode: number, callback: KeyCallback): Key;
             /**
-             * Removes the callback to be called when the key with the given keyCode is
+             * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be removed.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             offKey(keyCode: number, callback: KeyCallback): Key;
         }
@@ -3622,45 +3618,45 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the pointer enters the Component.
+             * Sets a callback to be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer enters the Component.
+             * Removes a callback that would be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Sets the callback called when the pointer moves.
+             * Sets a callback to be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer moves.
+             * Removes a callback that would be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Sets the callback called when the pointer exits the Component.
+             * Sets a callback to be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerExit(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer exits the Component.
+             * Removes a callback that would be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerExit(callback: PointerCallback): Pointer;
         }
@@ -3676,10 +3672,10 @@ declare module Plottable {
              */
             static PIXELS_PER_LINE: number;
             /**
-             * Creates a PanZoomInteraction.
+             * Creates a PanZoom Interaction.
              *
-             * The allows you to move around and zoom in on a plot, interactively. It
-             * does so by changing the xScale and yScales' domains repeatedly.
+             * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
+             * in response to the user panning or zooming.
              *
              * @constructor
              * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
@@ -3707,7 +3703,7 @@ declare module Plottable {
              * inside the Component will be passed to the callback instead of the actual
              * cursor position.
              *
-             * @return {boolean} Whether or not the Interactions.Drag constrains.
+             * @return {boolean}
              */
             constrainToComponent(): boolean;
             /**
@@ -3718,50 +3714,50 @@ declare module Plottable {
              * inside the Component will be passed to the callback instead of the actual
              * cursor position.
              *
-             * @param {boolean} constrain Whether or not to constrain Points.
-             * @return {Interactions.Drag} The calling Interactions.Drag.
+             * @param {boolean}
+             * @return {Interactions.Drag} The calling Drag Interaction.
              */
             constrainToComponent(constrain: boolean): Drag;
             /**
-             * Sets the callback to be called when dragging starts.
+             * Adds a callback to be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDragStart(callback: DragCallback): Drag;
             /**
-             * Removes the callback to be called when dragging starts.
+             * Removes a callback that would be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDragStart(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDrag(callback: DragCallback): Drag;
             /**
-             * Removes a callback to be called during dragging.
+             * Removes a callback that would be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDrag(callback: DragCallback): Drag;
             /**
-             * Adds a callback to be called when the dragging ends.
+             * Adds a callback to be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDragEnd(callback: DragCallback): Drag;
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback that would be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be removed
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDragEnd(callback: DragCallback): Drag;
         }
