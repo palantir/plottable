@@ -387,7 +387,7 @@ var Plottable;
              *
              * @param {K} key Key to set in the Map
              * @param {V} value Value to set in the Map
-             * @return {boolean} True if key already in Map, false otherwise
+             * @return {Map} The Map object
              */
             Map.prototype.set = function (key, value) {
                 if (key !== key) {
@@ -396,11 +396,11 @@ var Plottable;
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs[i].value = value;
-                        return true;
+                        return this;
                     }
                 }
                 this._keyValuePairs.push({ key: key, value: value });
-                return false;
+                return this;
             };
             /**
              * Get a value from the store, given a key.
@@ -432,6 +432,28 @@ var Plottable;
                     }
                 }
                 return false;
+            };
+            /**
+             * The forEach method executes the provided callback once for each key of the map which
+             * actually exist. It is not invoked for keys which have been deleted.
+             * However, it is executed for values which are present but have the value undefined.
+             *
+             * Callback is invoked with three arguments:
+             *   - the element value
+             *   - the element key
+             *   - the Map object being traversed
+             *
+             * @param {Function} callbackFn The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            Map.prototype.forEach = function (callbackFn, thisArg) {
+                var _this = this;
+                if (thisArg == null) {
+                    thisArg = this;
+                }
+                this._keyValuePairs.forEach(function (keyValuePair) {
+                    callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
+                });
             };
             /**
              * Return an array of the values in the Map

@@ -183,9 +183,9 @@ declare module Plottable {
              *
              * @param {K} key Key to set in the Map
              * @param {V} value Value to set in the Map
-             * @return {boolean} True if key already in Map, false otherwise
+             * @return {Map} The Map object
              */
-            set(key: K, value: V): boolean;
+            set(key: K, value: V): Map<K, V>;
             /**
              * Get a value from the store, given a key.
              *
@@ -203,6 +203,20 @@ declare module Plottable {
              * @return {boolean} Whether there was a matching entry for that key
              */
             has(key: K): boolean;
+            /**
+             * The forEach method executes the provided callback once for each key of the map which
+             * actually exist. It is not invoked for keys which have been deleted.
+             * However, it is executed for values which are present but have the value undefined.
+             *
+             * Callback is invoked with three arguments:
+             *   - the element value
+             *   - the element key
+             *   - the Map object being traversed
+             *
+             * @param {Function} callbackFn The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            forEach(callbackFn: any, thisArg: any): void;
             /**
              * Return an array of the values in the Map
              *
