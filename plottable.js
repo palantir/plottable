@@ -5136,11 +5136,11 @@ var Plottable;
             /**
              * Creates a Label.
              *
-             * A Label is a Component that draws a single line of text.
+             * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {string} displayText The text of the Label (default = "").
-             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
+             * @param {string} [displayText=""] The text of the Label.
+             * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
             function Label(displayText, angle) {
                 if (displayText === void 0) { displayText = ""; }
@@ -5246,9 +5246,11 @@ var Plottable;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
             /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
+             * Creates a TitleLabel.
              *
              * @constructor
+             * @param {string} [displayText] The text of the TitleLabel.
+             * @param {number} [angle] The angle of the TitleLabel in degrees (-90/0/90). 0 is horizontal.
              */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
@@ -5261,9 +5263,11 @@ var Plottable;
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
             /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
+             * Creates a AxisLabel.
              *
              * @constructor
+             * @param {string} [displayText] The text of the AxisLabel.
+             * @param {number} [angle] The angle of the AxisLabel in degrees (-90/0/90). 0 is horizontal.
              */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
@@ -5292,8 +5296,8 @@ var Plottable;
             /**
              * Creates a Legend.
              *
-             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
-             * The entries will be displayed in the order of the `scale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
+             * By defaul, the entries will be in the same order as the Scale's domain.
              *
              * @constructor
              * @param {Scale.Color} scale
@@ -5418,10 +5422,11 @@ var Plottable;
                 return rows;
             };
             /**
-             * Gets the legend entry under the given pixel position.
+             * Gets the Legend entry under at given pixel position.
+             * Returns an empty Selection if no entry exists under at given pixel position.
              *
-             * @param {Point} position The pixel position.
-             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             * @param {Point} position
+             * @returns {D3.Selection}
              */
             Legend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
@@ -5539,13 +5544,13 @@ var Plottable;
              * Creates an InterpolatedColorLegend.
              *
              * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-             * associated Scale.InterpolatedColor sampled at various points. Two labels
-             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             * associated Scales.InterpolatedColor sampled at various points. Two labels
+             * show the maximum and minimum values of the Scales.InterpolatedColor.
              *
              * @constructor
-             * @param {Scale.InterpolatedColor} interpolatedColorScale
-             * @param {string} orientation (horizontal/left/right).
-             * @param {Formatter} The labels are formatted using this function.
+             * @param {Scales.InterpolatedColor} interpolatedColorScale
+             * @param {string} [orientation="horizontal"] ("horizontal"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
             function InterpolatedColorLegend(interpolatedColorScale, orientation, formatter) {
                 var _this = this;
@@ -5765,7 +5770,8 @@ var Plottable;
         var Gridlines = (function (_super) {
             __extends(Gridlines, _super);
             /**
-             * Creates a set of Gridlines.
+             * Creates Gridlines.
+             *
              * @constructor
              *
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.

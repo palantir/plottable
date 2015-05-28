@@ -1948,51 +1948,45 @@ declare module Plottable {
             /**
              * Creates a Label.
              *
-             * A Label is a Component that draws a single line of text.
+             * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {string} displayText The text of the Label (default = "").
-             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
+             * @param {string} [displayText=""] The text of the Label.
+             * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
             constructor(displayText?: string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
              * Gets the current text on the Label.
-             *
-             * @returns {string} the text on the label.
              */
             text(): string;
             /**
-             * Sets the current text on the Label.
+             * Sets the text on the Label.
              *
-             * @param {string} displayText If provided, the new text for the Label.
+             * @param {string} displayText
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
             /**
-             * Gets the angle of the Label.
-             *
-             * @returns {number} the current angle.
+             * Gets the angle of the Label in degrees.
              */
             angle(): number;
             /**
-             * Sets the angle of the Label.
+             * Sets the angle of the Label in degrees.
              *
              * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
              * @returns {Label} The calling Label.
              */
             angle(angle: number): Label;
             /**
-             * Gets the amount of padding in pixels around the Label.
-             *
-             * @returns {number} the current padding amount.
+             * Gets the amount of padding around the Label, in pixels.
              */
             padding(): number;
             /**
-             * Sets the amount of padding in pixels around the Label.
+             * Sets the amount of padding around the Label, in pixels.
              *
-             * @param {number} padAmount The desired padding amount in pixel values
+             * @param {number} padAmount
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
@@ -2003,18 +1997,22 @@ declare module Plottable {
         class TitleLabel extends Label {
             static TITLE_LABEL_CLASS: string;
             /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
+             * Creates a TitleLabel.
              *
              * @constructor
+             * @param {string} [displayText] The text of the TitleLabel.
+             * @param {number} [angle] The angle of the TitleLabel in degrees (-90/0/90). 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
             /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
+             * Creates a AxisLabel.
              *
              * @constructor
+             * @param {string} [displayText] The text of the AxisLabel.
+             * @param {number} [angle] The angle of the AxisLabel in degrees (-90/0/90). 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
@@ -2040,8 +2038,8 @@ declare module Plottable {
             /**
              * Creates a Legend.
              *
-             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
-             * The entries will be displayed in the order of the `scale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
+             * By defaul, the entries will be in the same order as the Scale's domain.
              *
              * @constructor
              * @param {Scale.Color} scale
@@ -2049,63 +2047,66 @@ declare module Plottable {
             constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
-             * Gets the current max number of entries in Legend row.
-             * @returns {number} The current max number of entries in row.
+             * Gets the maximum number of entries in each row.
+             *
+             * @returns {number}
              */
             maxEntriesPerRow(): number;
             /**
-             * Sets a new max number of entries in Legend row.
+             * Gets the maximum number of entries in each row.
              *
-             * @param {number} numEntries If provided, the new max number of entries in row.
+             * @param {number} numEntries
              * @returns {Legend} The calling Legend.
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
              * Gets the current comparator for the Legend's entries.
-             * @returns {(a: string, b: string) => number} The current comparator.
+             *
+             * @returns {(a: string, b: string) => number}
              */
             comparator(): (a: string, b: string) => number;
             /**
              * Sets a new comparator for the Legend's entries.
+             * The comparator is used to set the display order of the entries.
              *
-             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
+             * @param {(a: string, b: string) => number} comparator
              * @returns {Legend} The calling Legend.
              */
             comparator(comparator: (a: string, b: string) => number): Legend;
             /**
-             * Gets the current color scale from the Legend.
+             * Gets the current Color Scale backing the Legend.
              *
-             * @returns {ColorScale} The current color scale.
+             * @returns {Scales.Color}
              */
             scale(): Scales.Color;
             /**
-             * Assigns a new color scale to the Legend.
+             * Assigns a new Color Scale to the Legend.
              *
-             * @param {Scale.Color} scale If provided, the new scale.
+             * @param {Scales.Color} scale
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scales.Color): Legend;
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the legend entry under the given pixel position.
+             * Gets the Legend entry under at given pixel position.
+             * Returns an empty Selection if no entry exists under at given pixel position.
              *
-             * @param {Point} position The pixel position.
-             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             * @param {Point} position
+             * @returns {D3.Selection}
              */
             getEntry(position: Point): D3.Selection;
             renderImmediately(): Legend;
             /**
-             * Gets the symbolFactoryAccessor of the legend, which dictates how
-             * the symbol in each entry is drawn.
+             * Gets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
              *
-             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
+             * @returns {(datum: any, index: number) => symbolFactory}
              */
             symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the symbolFactoryAccessor of the legend
+             * Sets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
              *
-             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
+             * @param {(datum: any, index: number) => symbolFactory}
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
@@ -2127,40 +2128,35 @@ declare module Plottable {
              * Creates an InterpolatedColorLegend.
              *
              * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-             * associated Scale.InterpolatedColor sampled at various points. Two labels
-             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             * associated Scales.InterpolatedColor sampled at various points. Two labels
+             * show the maximum and minimum values of the Scales.InterpolatedColor.
              *
              * @constructor
-             * @param {Scale.InterpolatedColor} interpolatedColorScale
-             * @param {string} orientation (horizontal/left/right).
-             * @param {Formatter} The labels are formatted using this function.
+             * @param {Scales.InterpolatedColor} interpolatedColorScale
+             * @param {string} [orientation="horizontal"] ("horizontal"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
             destroy(): void;
             /**
-             * Gets the current formatter on the InterpolatedColorLegend.
-             *
-             * @returns {Formatter} The current Formatter.
+             * Gets the current Formatter for the labels.
              */
             formatter(): Formatter;
             /**
-             * Sets the current formatter on the InterpolatedColorLegend.
+             * Sets the Formatter for the labels.
              *
-             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+             * @param {Formatter} formatter
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
             /**
-             * Gets the orientation of the InterpolatedColorLegend.
-             *
-             * @returns {string} The current orientation.
+             * Gets the current orientation.
              */
             orientation(): string;
             /**
-             * Sets the orientation of the InterpolatedColorLegend.
+             * Sets the orientation.
              *
-             * @param {string} newOrientation The desired orientation (horizontal/left/right).
-             *
+             * @param {string} newOrientation The desired orientation ("horizontal"/"left"/"right").
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
@@ -2178,7 +2174,8 @@ declare module Plottable {
     module Components {
         class Gridlines extends Component {
             /**
-             * Creates a set of Gridlines.
+             * Creates Gridlines.
+             *
              * @constructor
              *
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.

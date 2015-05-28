@@ -11,7 +11,8 @@ export module Components {
     private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
 
     /**
-     * Creates a set of Gridlines.
+     * Creates Gridlines.
+     * 
      * @constructor
      *
      * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.

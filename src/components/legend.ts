@@ -29,8 +29,8 @@ export module Components {
     /**
      * Creates a Legend.
      *
-     * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
-     * The entries will be displayed in the order of the `scale` domain.
+     * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
+     * By defaul, the entries will be in the same order as the Scale's domain.
      *
      * @constructor
      * @param {Scale.Color} scale
@@ -64,14 +64,15 @@ export module Components {
     }
 
     /**
-     * Gets the current max number of entries in Legend row.
-     * @returns {number} The current max number of entries in row.
+     * Gets the maximum number of entries in each row.
+     * 
+     * @returns {number}
      */
     public maxEntriesPerRow(): number;
     /**
-     * Sets a new max number of entries in Legend row.
+     * Gets the maximum number of entries in each row.
      *
-     * @param {number} numEntries If provided, the new max number of entries in row.
+     * @param {number} numEntries
      * @returns {Legend} The calling Legend.
      */
     public maxEntriesPerRow(numEntries: number): Legend;
@@ -87,13 +88,15 @@ export module Components {
 
     /**
      * Gets the current comparator for the Legend's entries.
-     * @returns {(a: string, b: string) => number} The current comparator.
+     * 
+     * @returns {(a: string, b: string) => number}
      */
     public comparator(): (a: string, b: string) => number;
     /**
      * Sets a new comparator for the Legend's entries.
+     * The comparator is used to set the display order of the entries.
      *
-     * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
+     * @param {(a: string, b: string) => number} comparator
      * @returns {Legend} The calling Legend.
      */
     public comparator(comparator: (a: string, b: string) => number): Legend;
@@ -108,15 +111,15 @@ export module Components {
     }
 
     /**
-     * Gets the current color scale from the Legend.
+     * Gets the current Color Scale backing the Legend.
      *
-     * @returns {ColorScale} The current color scale.
+     * @returns {Scales.Color}
      */
     public scale(): Scales.Color;
     /**
-     * Assigns a new color scale to the Legend.
+     * Assigns a new Color Scale to the Legend.
      *
-     * @param {Scale.Color} scale If provided, the new scale.
+     * @param {Scales.Color} scale
      * @returns {Legend} The calling Legend.
      */
     public scale(scale: Scales.Color): Legend;
@@ -206,10 +209,11 @@ export module Components {
     }
 
     /**
-     * Gets the legend entry under the given pixel position.
+     * Gets the Legend entry under at given pixel position.
+     * Returns an empty Selection if no entry exists under at given pixel position.
      *
-     * @param {Point} position The pixel position.
-     * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+     * @param {Point} position
+     * @returns {D3.Selection}
      */
     public getEntry(position: Point): D3.Selection {
       if (!this._isSetup) {
@@ -293,16 +297,15 @@ export module Components {
     }
 
     /**
-     * Gets the symbolFactoryAccessor of the legend, which dictates how
-     * the symbol in each entry is drawn.
+     * Gets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
      *
-     * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
+     * @returns {(datum: any, index: number) => symbolFactory}
      */
     public symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
     /**
-     * Sets the symbolFactoryAccessor of the legend
+     * Sets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
      *
-     * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
+     * @param {(datum: any, index: number) => symbolFactory}
      * @returns {Legend} The calling Legend
      */
     public symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
