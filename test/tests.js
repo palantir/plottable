@@ -2403,7 +2403,7 @@ describe("Plots", function () {
                 recordedTime = Math.max(x, recordedTime);
             };
             plot._additionalPaint = additionalPaint;
-            plot.animator("bars", animator);
+            plot.animator(Plottable.Plots.Animator.MAIN, animator);
             var svg = TestMethods.generateSVG();
             plot.x(function (d) { return d.x; }, x);
             plot.y(function (d) { return d.y; }, y);
@@ -3060,8 +3060,7 @@ describe("Plots", function () {
             areaPlot.y0(y0Accessor, yScale).attr("fill", fillAccessor).attr("stroke", colorAccessor).renderTo(svg);
             renderArea = areaPlot._renderArea;
         });
-        // Need to deal with repercussions in area plot
-        it.skip("draws area and line correctly", function () {
+        it("draws area and line correctly", function () {
             var areaPath = renderArea.select(".area");
             assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
             assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
@@ -3082,8 +3081,7 @@ describe("Plots", function () {
             assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,250L0,500Z");
             svg.remove();
         });
-        // Need to deal with repercussions in area plot
-        it.skip("area is appended before line", function () {
+        it("area is appended before line", function () {
             var paths = renderArea.selectAll("path")[0];
             var areaSelection = renderArea.select(".area")[0][0];
             var lineSelection = renderArea.select(".line")[0][0];
@@ -3121,8 +3119,7 @@ describe("Plots", function () {
             svg.remove();
         });
         describe("getAllSelections()", function () {
-            // Deal with repercussions in area plot
-            it.skip("retrieves all selections with no args", function () {
+            it("retrieves all selections with no args", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
                 var allAreas = areaPlot.getAllSelections();
@@ -3154,9 +3151,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             areaPlot.attr("class", newClassProjector);
             areaPlot.renderTo(svg);
-            var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
+            var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
             assert.isTrue(areaPath.classed("pink"));
-            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
+            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
             svg.remove();
         });
     });
@@ -3904,6 +3901,176 @@ describe("Plots", function () {
                 assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("width")), "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
             });
             svg.remove();
+        });
+    });
+    describe("RectanglePlot - Grids", function () {
+        var SVG_WIDTH = 400;
+        var SVG_HEIGHT = 200;
+        var DATA = [
+            { x: "A", y: "U", magnitude: 0 },
+            { x: "B", y: "U", magnitude: 2 },
+            { x: "A", y: "V", magnitude: 16 },
+            { x: "B", y: "V", magnitude: 8 },
+        ];
+        var VERIFY_CELLS = function (cells) {
+            assert.strictEqual(cells.length, 4);
+            var cellAU = d3.select(cells[0]);
+            var cellBU = d3.select(cells[1]);
+            var cellAV = d3.select(cells[2]);
+            var cellBV = d3.select(cells[3]);
+            assert.strictEqual(cellAU.attr("height"), "100", "cell 'AU' height is correct");
+            assert.strictEqual(cellAU.attr("width"), "200", "cell 'AU' width is correct");
+            assert.strictEqual(cellAU.attr("x"), "0", "cell 'AU' x coord is correct");
+            assert.strictEqual(cellAU.attr("y"), "0", "cell 'AU' y coord is correct");
+            assert.strictEqual(cellAU.attr("fill"), "#000000", "cell 'AU' color is correct");
+            assert.strictEqual(cellBU.attr("height"), "100", "cell 'BU' height is correct");
+            assert.strictEqual(cellBU.attr("width"), "200", "cell 'BU' width is correct");
+            assert.strictEqual(cellBU.attr("x"), "200", "cell 'BU' x coord is correct");
+            assert.strictEqual(cellBU.attr("y"), "0", "cell 'BU' y coord is correct");
+            assert.strictEqual(cellBU.attr("fill"), "#212121", "cell 'BU' color is correct");
+            assert.strictEqual(cellAV.attr("height"), "100", "cell 'AV' height is correct");
+            assert.strictEqual(cellAV.attr("width"), "200", "cell 'AV' width is correct");
+            assert.strictEqual(cellAV.attr("x"), "0", "cell 'AV' x coord is correct");
+            assert.strictEqual(cellAV.attr("y"), "100", "cell 'AV' y coord is correct");
+            assert.strictEqual(cellAV.attr("fill"), "#ffffff", "cell 'AV' color is correct");
+            assert.strictEqual(cellBV.attr("height"), "100", "cell 'BV' height is correct");
+            assert.strictEqual(cellBV.attr("width"), "200", "cell 'BV' width is correct");
+            assert.strictEqual(cellBV.attr("x"), "200", "cell 'BV' x coord is correct");
+            assert.strictEqual(cellBV.attr("y"), "100", "cell 'BV' y coord is correct");
+            assert.strictEqual(cellBV.attr("fill"), "#777777", "cell 'BV' color is correct");
+        };
+        it("renders correctly", function () {
+            var xScale = new Plottable.Scales.Category();
+            var yScale = new Plottable.Scales.Category();
+            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
+            gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
+            gridPlot.renderTo(svg);
+            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            svg.remove();
+        });
+        it("renders correctly when data is set after construction", function () {
+            var xScale = new Plottable.Scales.Category();
+            var yScale = new Plottable.Scales.Category();
+            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dataset = new Plottable.Dataset();
+            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
+            gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
+            dataset.data(DATA);
+            VERIFY_CELLS(gridPlot._renderArea.selectAll("rect")[0]);
+            svg.remove();
+        });
+        it("renders correctly when there isn't data for every spot", function () {
+            var CELL_HEIGHT = 50;
+            var CELL_WIDTH = 100;
+            var xScale = new Plottable.Scales.Category();
+            var yScale = new Plottable.Scales.Category();
+            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var dataset = new Plottable.Dataset();
+            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
+            gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
+            var data = [
+                { x: "A", y: "W", magnitude: 0 },
+                { x: "B", y: "X", magnitude: 8 },
+                { x: "C", y: "Y", magnitude: 16 },
+                { x: "D", y: "Z", magnitude: 24 }
+            ];
+            dataset.data(data);
+            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            assert.strictEqual(cells.length, data.length);
+            for (var i = 0; i < cells.length; i++) {
+                var cell = d3.select(cells[i]);
+                assert.strictEqual(cell.attr("x"), String(i * CELL_WIDTH), "Cell x coord is correct");
+                assert.strictEqual(cell.attr("y"), String(i * CELL_HEIGHT), "Cell y coord is correct");
+                assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
+                assert.strictEqual(cell.attr("height"), String(CELL_HEIGHT), "Cell height is correct");
+            }
+            svg.remove();
+        });
+        it("can invert y axis correctly", function () {
+            var xScale = new Plottable.Scales.Category();
+            var yScale = new Plottable.Scales.Category();
+            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
+            gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
+            yScale.domain(["U", "V"]);
+            var cells = gridPlot._renderArea.selectAll("rect")[0];
+            var cellAU = d3.select(cells[0]);
+            var cellAV = d3.select(cells[2]);
+            cellAU.attr("fill", "#000000");
+            cellAU.attr("x", "0");
+            cellAU.attr("y", "100");
+            cellAV.attr("fill", "#ffffff");
+            cellAV.attr("x", "0");
+            cellAV.attr("y", "0");
+            yScale.domain(["V", "U"]);
+            cells = gridPlot._renderArea.selectAll("rect")[0];
+            cellAU = d3.select(cells[0]);
+            cellAV = d3.select(cells[2]);
+            cellAU.attr("fill", "#000000");
+            cellAU.attr("x", "0");
+            cellAU.attr("y", "0");
+            cellAV.attr("fill", "#ffffff");
+            cellAV.attr("x", "0");
+            cellAV.attr("y", "100");
+            svg.remove();
+        });
+        describe("getAllSelections()", function () {
+            it("retrieves all selections with no args", function () {
+                var xScale = new Plottable.Scales.Category();
+                var yScale = new Plottable.Scales.Category();
+                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
+                gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections();
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                svg.remove();
+            });
+            it("retrieves correct selections", function () {
+                var xScale = new Plottable.Scales.Category();
+                var yScale = new Plottable.Scales.Category();
+                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
+                gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
+                gridPlot.renderTo(svg);
+                var allCells = gridPlot.getAllSelections([dataset]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
+            it("skips invalid Datasets", function () {
+                var xScale = new Plottable.Scales.Category();
+                var yScale = new Plottable.Scales.Category();
+                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var dataset = new Plottable.Dataset(DATA);
+                gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
+                gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
+                gridPlot.renderTo(svg);
+                var dummyDataset = new Plottable.Dataset([]);
+                var allCells = gridPlot.getAllSelections([dataset, dummyDataset]);
+                assert.strictEqual(allCells.size(), 4, "all cells retrieved");
+                var selectionData = allCells.data();
+                assert.includeMembers(selectionData, DATA, "data in selection data");
+                svg.remove();
+            });
         });
     });
 });

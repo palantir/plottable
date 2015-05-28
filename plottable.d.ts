@@ -567,8 +567,13 @@ declare module Plottable {
      * ```
      */
     module RenderController {
+        module Policy {
+            var IMMEDIATE: string;
+            var ANIMATION_FRAME: string;
+            var TIMEOUT: string;
+        }
         var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
+        function setRenderPolicy(policy: string): void;
         /**
          * If the RenderController is enabled, we enqueue the component for
          * render. Otherwise, it is rendered immediately.
@@ -1172,11 +1177,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         type AppliedDrawStep = {
             attrToProjector: AttributeToAppliedProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         class AbstractDrawer {
             protected _className: string;
@@ -1212,8 +1217,6 @@ declare module Plottable {
              */
             protected _drawStep(step: AppliedDrawStep): void;
             protected _numberOfAnimationIterations(data: any[]): number;
-            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -1252,7 +1255,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Area extends Line {
-            static AREA_CLASS: string;
+            static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(area: D3.Selection): void;
             protected _drawStep(step: AppliedDrawStep): void;
@@ -1274,8 +1277,6 @@ declare module Plottable {
             svgElement(tag: string): Element;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
-            protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]): void;
-            protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]): any[];
             _getSelector(): string;
         }
     }
@@ -2389,6 +2390,10 @@ declare module Plottable {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
+        module Animator {
+            var MAIN: string;
+            var RESET: string;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
@@ -2422,7 +2427,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
-        protected _getAnimator(key: string): Animators.PlotAnimator;
+        protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
@@ -2452,7 +2457,7 @@ declare module Plottable {
          *
          * @return {PlotAnimator} The Animator for the specified key.
          */
-        animator(animatorKey: string): Animators.PlotAnimator;
+        animator(animatorKey: string): Animators.Plot;
         /**
          * Set the animator associated with the specified Animator key.
          *
@@ -2461,7 +2466,7 @@ declare module Plottable {
          * the specified key.
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
+        animator(animatorKey: string, animator: Animators.Plot): Plot;
         /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
@@ -2591,7 +2596,6 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         autorange(scaleName: string): XYPlot<X, Y>;
-        protected _propertyProjectors(): AttributeToProjector;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.
@@ -2601,6 +2605,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _getDataToDraw(): D3.Map<any[]>;
     }
 }
 
@@ -2815,7 +2820,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _wholeDatumAttributes(): string[];
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             /**
              * Retrieves the closest PlotData to queryPoint.
@@ -2829,6 +2833,8 @@ declare module Plottable {
              */
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2856,12 +2862,13 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
-            protected _getResetYFunction(): (datum: any, index: number, dataset: Dataset) => any;
-            protected _wholeDatumAttributes(): string[];
+            protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
 }
@@ -2903,19 +2910,17 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale The y scale to use.
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             protected _setup(): void;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
-            };
             protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
@@ -2934,7 +2939,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
@@ -2951,7 +2956,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Animators {
-        interface PlotAnimator {
+        interface Plot {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
              *
@@ -2971,7 +2976,7 @@ declare module Plottable {
             getTiming(numberOfIterations: number): number;
         }
         type PlotAnimatorMap = {
-            [animatorKey: string]: PlotAnimator;
+            [animatorKey: string]: Plot;
         };
     }
 }
@@ -2983,7 +2988,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements PlotAnimator {
+        class Null implements Animators.Plot {
             getTiming(selection: any): number;
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
@@ -3005,7 +3010,7 @@ declare module Plottable {
          * min(maxIterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
-        class Base implements PlotAnimator {
+        class Base implements Animators.Plot {
             /**
              * The default duration of the animation in milliseconds
              */

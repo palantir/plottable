@@ -14,11 +14,7 @@ export module Plots {
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
       this.classed("line-plot", true);
-      this.animator("reset", new Animators.Null());
-      this.animator("main", new Animators.Base()
-                                         .duration(600)
-                                         .easing("exp-in-out"));
-
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }
@@ -44,30 +40,24 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
 
       return drawSteps;
     }
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
-      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-      singleDatumAttributes.forEach((attribute: string) => {
+      Object.keys(attrToProjector).forEach((attribute: string) => {
+        if (attribute === "d") { return; }
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
           data.length > 0 ? projector(data[0], i, dataset) : null;
       });
 
       return attrToProjector;
-    }
-
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined", "d"];
     }
 
     public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
@@ -158,7 +148,7 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    private _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+    protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
@@ -171,6 +161,14 @@ export module Plots {
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
       };
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
     }
   }
 }

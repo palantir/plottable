@@ -38,8 +38,6 @@ export module Plots {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
-      this.animator("bars-reset", new Animators.Null());
-      this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -421,9 +419,9 @@ export module Plots {
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
         resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 
@@ -437,9 +435,9 @@ export module Plots {
       var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
 
-      var positionF = attrToProjector[secondaryAttr];
+      var positionF = this._isVertical ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.y());
       var widthF = attrToProjector["width"];
-      var originalPositionFn = attrToProjector[primaryAttr];
+      var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
       };
