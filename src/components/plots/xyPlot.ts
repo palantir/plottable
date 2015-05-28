@@ -12,11 +12,9 @@ module Plottable {
     /**
      * Constructs an XYPlot.
      *
-     * An XYPlot is a plot from drawing 2-dimensional data. Common examples
-     * include Scale.Line and Scale.Bar.
+     * An XYPlot is a Plot that displays data along two primary directions, X and Y.
      *
      * @constructor
-     * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
@@ -37,8 +35,25 @@ module Plottable {
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
+    /**
+     * Gets the AccessorScaleBinding for X.
+     */
     public x(): Plots.AccessorScaleBinding<X, number>;
+    /**
+     * Sets X to a constant number, or to the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} x
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public x(x: number | Accessor<number>): XYPlot<X, Y>;
+    /**
+     * Sets X to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {X|Accessor<X>} x
+     * @param {Scale<X, number} xScale
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
@@ -52,8 +67,25 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y.
+     */
     public y(): Plots.AccessorScaleBinding<Y, number>;
+    /**
+     * Sets Y to a constant number, or to the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} y
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public y(y: number | Accessor<number>): XYPlot<X, Y>;
+    /**
+     * Sets Y to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {Y|Accessor<Y>} y
+     * @param {Scale<Y, number} yScale
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
@@ -117,19 +149,15 @@ module Plottable {
       return this;
     }
 
-    /** 
-     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  
-     * 
-     * If 'x' or 'y' is specified the adjustment is immediately performed.
-     * 
-     * @param {string} scale Must be one of 'x', 'y', or 'none'.  
-     * 
-     * 'x' will adjust the x scale in relation to changes in the y domain.  
-     * 
-     * 'y' will adjust the y scale in relation to changes in the x domain.
-     * 
-     * 'none' means neither scale will change automatically.
-     * 
+    /**
+     * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+     * If "x" or "y" is specified the adjustment is immediately performed.
+     *
+     * @param {string} scaleName Must be one of "x", "y", or "none".
+     *   "x" will adjust the x Scale in relation to changes in the y domain.
+     *   "y" will adjust the y Scale in relation to changes in the x domain.
+     *   "none" means neither Scale will change automatically.
+     *
      * @returns {XYPlot} The calling XYPlot.
      */
     public autorange(scaleName: string) {
@@ -201,9 +229,10 @@ module Plottable {
     }
 
     /**
-     * Adjusts both domains' extents to show all datasets.
-     *
-     * This call does not override auto domain adjustment behavior over visible points.
+     * Adjusts the domains of both X and Y scales to show all data.
+     * This call does not override the autorange() behavior.
+     * 
+     * @returns {XYPlot} The calling XYPlot.
      */
     public showAllData() {
       this._updateXExtentsAndAutodomain();

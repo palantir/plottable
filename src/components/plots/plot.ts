@@ -156,7 +156,7 @@ module Plottable {
      */
     public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
     /**
-     * Sets a particular attribute to a scaled constant value or result of an Accessor.
+     * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the attribute values when autoDomain()-ing.
      * 
      * @param {string} attr
