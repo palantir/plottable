@@ -26,6 +26,11 @@ module Plottable {
       accessor: Accessor<any>;
       scale?: Scale<D, R>;
     }
+
+    export module Animator {
+      export var MAIN = "main";
+      export var RESET = "reset";
+    }
   }
 
   export class Plot extends Component {
@@ -39,7 +44,8 @@ module Plottable {
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
     protected _animate: boolean = false;
-    private _animators: Animators.PlotAnimatorMap = {};
+    private _animators: {[animator: string]: Animators.Plot} = {};
+
     protected _animateOnNextRender = true;
     private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
@@ -73,6 +79,8 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map();
       this._propertyExtents = d3.map();
+      this._animators[Plots.Animator.MAIN] = new Animators.Base();
+      this._animators[Plots.Animator.RESET] = new Animators.Null();
     }
 
     public anchor(selection: D3.Selection) {
@@ -123,7 +131,7 @@ module Plottable {
       return new Drawers.AbstractDrawer(key);
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getAnimator(key: string): Animators.Plot {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animators.Null();
       } else {
@@ -328,7 +336,7 @@ module Plottable {
      *
      * @return {PlotAnimator} The Animator for the specified key.
      */
-    public animator(animatorKey: string): Animators.PlotAnimator;
+    public animator(animatorKey: string): Animators.Plot;
     /**
      * Set the animator associated with the specified Animator key.
      *
@@ -337,8 +345,8 @@ module Plottable {
      * the specified key.
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
+    public animator(animatorKey: string, animator: Animators.Plot): Plot;
+    public animator(animatorKey: string, animator?: Animators.Plot): any {
       if (animator === undefined) {
         return this._animators[animatorKey];
       } else {

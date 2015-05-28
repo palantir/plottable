@@ -141,26 +141,26 @@ declare module Plottable {
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
             /**
-             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
-             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
-             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
              * @param {SVGRect} bbox The bbox
              * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
              * testing intersection
              *
-             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
              * contained by bbox, false otherwise.
              */
-            function intersectsBBox(xValOrExtent: number | Extent, yValOrExtent: number | Extent, bbox: SVGRect, tolerance?: number): boolean;
+            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
             /**
-             * Create an Extent from a number or an object with "min" and "max" defined.
+             * Create a Range from a number or an object with "min" and "max" defined.
              *
              * @param {any} input The object to parse
              *
-             * @returns {Extent} The generated Extent
+             * @returns {Range} The generated Range
              */
-            function parseExtent(input: any): Extent;
+            function parseRange(input: any): Range;
         }
     }
 }
@@ -567,8 +567,13 @@ declare module Plottable {
      * ```
      */
     module RenderController {
+        module Policy {
+            var IMMEDIATE: string;
+            var ANIMATION_FRAME: string;
+            var TIMEOUT: string;
+        }
         var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void;
+        function setRenderPolicy(policy: string): void;
         /**
          * If the RenderController is enabled, we enqueue the component for
          * render. Otherwise, it is rendered immediately.
@@ -635,13 +640,13 @@ declare module Plottable {
         minHeight: number;
     };
     /**
-     * The range of your current data. For example, [1, 2, 6, -5] has the Extent
+     * The range of your current data. For example, [1, 2, 6, -5] has the Range
      * `{min: -5, max: 6}`.
      *
      * The point of this type is to hopefully replace the less-elegant `[min,
-     * max]` extents produced by d3.
+     * max]` ranges produced by d3.
      */
-    type Extent = {
+    type Range = {
         min: number;
         max: number;
     };
@@ -1172,11 +1177,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         type AppliedDrawStep = {
             attrToProjector: AttributeToAppliedProjector;
-            animator: Animators.PlotAnimator;
+            animator: Animators.Plot;
         };
         class AbstractDrawer {
             protected _className: string;
@@ -2414,6 +2419,10 @@ declare module Plottable {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
         }
+        module Animator {
+            var MAIN: string;
+            var RESET: string;
+        }
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
@@ -2447,7 +2456,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
-        protected _getAnimator(key: string): Animators.PlotAnimator;
+        protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
@@ -2477,7 +2486,7 @@ declare module Plottable {
          *
          * @return {PlotAnimator} The Animator for the specified key.
          */
-        animator(animatorKey: string): Animators.PlotAnimator;
+        animator(animatorKey: string): Animators.Plot;
         /**
          * Set the animator associated with the specified Animator key.
          *
@@ -2486,7 +2495,7 @@ declare module Plottable {
          * the specified key.
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
+        animator(animatorKey: string, animator: Animators.Plot): Plot;
         /**
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
@@ -2766,16 +2775,23 @@ declare module Plottable {
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
-             * Gets the bar under the given pixel position (if [xValOrExtent]
-             * and [yValOrExtent] are {number}s), under a given line (if only one
-             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             * Gets the {Plots.PlotData} that correspond to the given pixel position.
              *
-             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+             * @param {Point} p The provided pixel position as a {Point}
+             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
              */
-            getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
+            plotDataAt(p: Point): PlotData;
+            /**
+             * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+             *
+             */
+            plotDataIn(bounds: Bounds): PlotData;
+            /**
+             * @param {Range} xRange The specified range of x values
+             * @param {Range} yRange The specified range of y values
+             * @return {Plots.PlotData} The plot data that corresponds to the ranges
+             */
+            plotDataIn(xRange: Range, yRange: Range): PlotData;
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2891,7 +2907,7 @@ declare module Plottable {
              */
             constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
             protected _getDrawer(key: string): Drawers.Area;
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             protected _setup(): void;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
@@ -2922,7 +2938,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
-            protected _getAnimator(key: string): Animators.PlotAnimator;
+            protected _getAnimator(key: string): Animators.Plot;
             x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
             y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
             protected _generateAttrToProjector(): {
@@ -2939,7 +2955,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Animators {
-        interface PlotAnimator {
+        interface Plot {
             /**
              * Applies the supplied attributes to a D3.Selection with some animation.
              *
@@ -2959,7 +2975,7 @@ declare module Plottable {
             getTiming(numberOfIterations: number): number;
         }
         type PlotAnimatorMap = {
-            [animatorKey: string]: PlotAnimator;
+            [animatorKey: string]: Plot;
         };
     }
 }
@@ -2971,7 +2987,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements PlotAnimator {
+        class Null implements Animators.Plot {
             getTiming(selection: any): number;
             animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
         }
@@ -2993,7 +3009,7 @@ declare module Plottable {
          * min(maxIterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
-        class Base implements PlotAnimator {
+        class Base implements Animators.Plot {
             /**
              * The default duration of the animation in milliseconds
              */
@@ -3755,6 +3771,10 @@ declare module Plottable {
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragEnd(callback: DragBoxCallback): DragBoxLayer;
+            /**
+             * Gets the internal Interactions.Drag of the DragBoxLayer.
+             */
+            dragInteraction(): Interactions.Drag;
         }
     }
 }

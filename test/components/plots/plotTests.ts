@@ -444,7 +444,7 @@ describe("Plots", () => {
         recordedTime = Math.max(x, recordedTime);
       };
       (<any> plot)._additionalPaint = additionalPaint;
-      plot.animator("bars", animator);
+      plot.animator(Plottable.Plots.Animator.MAIN, animator);
       var svg = TestMethods.generateSVG();
       plot.x((d: any) => d.x, x);
       plot.y((d: any) => d.y, y);

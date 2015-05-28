@@ -32,8 +32,6 @@ export module Plots {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
-      this.animator("bars-reset", new Animators.Null());
-      this.animator("bars", new Animators.Base());
       this.animator("baseline", new Animators.Null());
       this.baseline(0);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -211,38 +209,54 @@ export module Plots {
     }
 
     /**
-     * Gets the bar under the given pixel position (if [xValOrExtent]
-     * and [yValOrExtent] are {number}s), under a given line (if only one
-     * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-     * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
-     *
-     * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-     * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-     * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+     * Gets the {Plots.PlotData} that correspond to the given pixel position.
+     * 
+     * @param {Point} p The provided pixel position as a {Point}
+     * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
      */
-    public getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection {
-      if (!this._isSetup) {
-        return d3.select();
-      }
-
-      // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
-      , []);
-
-      return d3.selectAll(bars);
+    public plotDataAt(p: Point): PlotData {
+      return this._getPlotData(p.x, p.y);
     }
 
-    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
-      var bars: any[] = [];
+    /**
+     * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+     * 
+     */
+    public plotDataIn(bounds: Bounds): PlotData;
+    /**
+     * @param {Range} xRange The specified range of x values
+     * @param {Range} yRange The specified range of y values
+     * @return {Plots.PlotData} The plot data that corresponds to the ranges
+     */
+    public plotDataIn(xRange: Range, yRange: Range): PlotData;
+    public plotDataIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotData {
+      var dataXRange: Range;
+      var dataYRange: Range;
+      if (yRange == null) {
+        var bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+          dataXRange = (<Range> xRangeOrBounds);
+        dataYRange = yRange;
+      }
+      return this._getPlotData(dataXRange, dataYRange);
+    }
 
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
-      drawer._getRenderArea().selectAll("rect").each(function(d) {
-        if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-          bars.push(this);
+    private _getPlotData(xValOrRange: number | Range, yValOrRange: number | Range): PlotData {
+      var data: any[] = [];
+      var pixelPoints: Point[] = [];
+      var elements: EventTarget[] = [];
+
+      var plotData = this.getAllPlotData();
+      plotData.selection.each(function(datum, i) {
+        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
+          data.push(plotData.data[i]);
+          pixelPoints.push(plotData.pixelPoints[i]);
+          elements.push(this);
         }
       });
-      return bars;
+      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
     }
 
     private _updateValueScale() {
@@ -302,9 +316,9 @@ export module Plots {
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
         resetAttrToProjector[dimensionAttr] = () => 0;
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("bars-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("bars")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 
