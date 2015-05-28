@@ -69,10 +69,10 @@ export module Utils {
      *   - the element key
      *   - the Map object being traversed
      *
-     * @param {Function} callbackFn The callback to be invoked
+     * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
      * @param {any} thisArg The `this` context
      */
-    public forEach(callbackFn: Function, thisArg?: any) {
+    public forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
       if (thisArg == null) {
         thisArg = this;
       }

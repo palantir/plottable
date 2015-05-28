@@ -443,7 +443,7 @@ var Plottable;
              *   - the element key
              *   - the Map object being traversed
              *
-             * @param {Function} callbackFn The callback to be invoked
+             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
              */
             Map.prototype.forEach = function (callbackFn, thisArg) {
@@ -519,7 +519,7 @@ var Plottable;
              *   - the element value
              *   - the Set object being traversed
              *
-             * @param {Function} callback The callback to be invoked
+             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
              * @param {any} thisArg The `this` context
              */
             Set.prototype.forEach = function (callback, thisArg) {

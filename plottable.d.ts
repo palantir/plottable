@@ -213,10 +213,10 @@ declare module Plottable {
              *   - the element key
              *   - the Map object being traversed
              *
-             * @param {Function} callbackFn The callback to be invoked
+             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
              */
-            forEach(callbackFn: Function, thisArg?: any): void;
+            forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
             /**
              * Delete a key from the Map. Return whether the key was present.
              *
@@ -251,10 +251,10 @@ declare module Plottable {
              *   - the element value
              *   - the Set object being traversed
              *
-             * @param {Function} callback The callback to be invoked
+             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
              * @param {any} thisArg The `this` context
              */
-            forEach(callback: Function, thisArg?: any): void;
+            forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
         }
     }
 }

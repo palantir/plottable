@@ -61,7 +61,7 @@ describe("Map", () => {
     var map = new Plottable.Utils.Map<number, number>();
     map.set(1, 2);
     var thisArg = {"foo": "bar"};
-    map.forEach(function(value: number, key: string, mp: Plottable.Utils.Map<string, number>) {
+    map.forEach(function(value: number, key: number, mp: Plottable.Utils.Map<number, number>) {
       assert.strictEqual(this, thisArg, "The correct this context is forced");
       assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");
     }, thisArg);

@@ -123,7 +123,7 @@ module Plottable {
     }
 
     private _includeValues(domain: D[]) {
-      this._includedValues.forEach((value: D) => {
+      this._includedValues.forEach((value) => {
         if (value < domain[0]) {
           domain[0] = value;
         }

@@ -11,7 +11,7 @@ module Plottable {
       public callCallbacks(...args: any[]) {
         this.forEach((callback: CB) => {
           callback.apply(this, args);
-        })
+        });
         return this;
       }
     }
