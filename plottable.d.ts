@@ -212,11 +212,6 @@ declare module Plottable {
              * actually exist. It is not invoked for keys which have been deleted.
              * However, it is executed for values which are present but have the value undefined.
              *
-             * Callback is invoked with three arguments:
-             *   - the element value
-             *   - the element key
-             *   - the Map object being traversed
-             *
              * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
              */
@@ -249,11 +244,6 @@ declare module Plottable {
              * The forEach method executes the provided callback once for each value which actually exists
              * in the Set object. It is not invoked for values which have been deleted. However, it is executed
              * for values which are present but have the value undefined.
-             *
-             * Callback is invoked with three arguments:
-             *   - the element value
-             *   - the element value
-             *   - the Set object being traversed
              *
              * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
              * @param {any} thisArg The `this` context

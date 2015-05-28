@@ -42,11 +42,6 @@ module Plottable {
        * in the Set object. It is not invoked for values which have been deleted. However, it is executed
        * for values which are present but have the value undefined.
        *
-       * Callback is invoked with three arguments:
-       *   - the element value
-       *   - the element value
-       *   - the Set object being traversed
-       *
        * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
        * @param {any} thisArg The `this` context
        */
