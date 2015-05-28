@@ -41,13 +41,7 @@ function run(svg, data, Plottable) {
   yScale.innerPadding(0.25).outerPadding(0.25);
   var xAxis = new Plottable.Axes.Time(xScale, "bottom");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
-var plot;
-try {
-  plot = new Plottable.Plots.Rectangle();
-} catch(err) {
-  plot = new Plottable.Plots.Rectangle(xScale, yScale);
-}
-
+  var plot = new Plottable.Plots.Rectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(timeFormatStart, xScale)
   .y(function(d) { return d.team; }, yScale)

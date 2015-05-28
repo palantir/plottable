@@ -21,13 +21,7 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
-var plot;
-try {
-  plot = new Plottable.Plots.Rectangle();
-} catch(err) {
-  plot = new Plottable.Plots.Rectangle(xScale, yScale);
-}
-
+  var plot = new Plottable.Plots.Rectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)

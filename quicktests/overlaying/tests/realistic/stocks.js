@@ -61,41 +61,21 @@ function run(svg, data, Plottable) {
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-var line_aapl;
-try {
-          line_aapl = new Plottable.Plots.Line().animate(true)
+          var line_aapl = new Plottable.Plots.Line().animate(true)
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-} catch(err) {
-          line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
-                                  .addDataset(aaplSource)
-                                  .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-}
-
           if (typeof line_aapl.autorange === "function") {
             line_aapl.autorange("y");
           } else {
             line_aapl.automaticallyAdjustYScaleOverVisiblePoints(true);
           }
-var line_goog;
-try {
-          line_goog = new Plottable.Plots.Line().animate(true)
+          var line_goog = new Plottable.Plots.Line().animate(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
                                   .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-} catch(err) {
-          line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
-                                  .addDataset(googSource)
-                                  .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["Adj Close"]; }, yScale_goog)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-}
-
           if (typeof line_aapl.autorange === "function") {
             line_goog.autorange("y");
           } else {
@@ -113,9 +93,7 @@ try {
           var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-var bar_diff;
-try {
-          bar_diff = new Plottable.Plots.Bar("vertical").animate(true)
+          var bar_diff = new Plottable.Plots.Bar("vertical").animate(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["net change"]; }, yScale_diff)
@@ -123,17 +101,6 @@ try {
                                   .attr("fill", function(d) {
                                     return d["net change"] > 0 ? colorScale.range()[2] : colorScale.range()[6];
                                   });
-} catch(err) {
-          bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, "vertical").animate(true)
-                                  .addDataset(new Plottable.Dataset(diffData))
-                                  .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["net change"]; }, yScale_diff)
-                                  .attr("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
-                                  .attr("fill", function(d) {
-                                    return d["net change"] > 0 ? colorScale.range()[2] : colorScale.range()[6];
-                                  });
-}
-
 
           var table = new Plottable.Components.Table([
                             [null      , null      , xAxisTop, null      , null      ],

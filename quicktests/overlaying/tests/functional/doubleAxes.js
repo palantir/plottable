@@ -14,23 +14,11 @@ function run(svg, data, Plottable) {
   var xScale2 = new Plottable.Scales.Category();
   var yScale = new Plottable.Scales.Linear();
 
-var plot1;
-try {
-  plot1 = new Plottable.Plots.Area();
-} catch(err) {
-  plot1 = new Plottable.Plots.Area(xScale1, yScale);
-}
-
+  var plot1 = new Plottable.Plots.Area();
   plot1.addDataset(ds1);
   plot1.x(function(d) { return d.x; }, xScale1).y(function(d) { return d.y; }, yScale);
 
-var plot2;
-try {
-  plot2 = new Plottable.Plots.Line();
-} catch(err) {
-  plot2 = new Plottable.Plots.Line(xScale2, yScale);
-}
-
+  var plot2 = new Plottable.Plots.Line();
   plot2.addDataset(ds2);
   plot2.x(function(d) { return d.x; }, xScale2).y(function(d) { return d.y; }, yScale);
   var plots = new Plottable.Components.Group([plot1, plot2]);

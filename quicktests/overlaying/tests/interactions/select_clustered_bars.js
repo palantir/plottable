@@ -17,23 +17,12 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-var barPlot;
-try {
-  barPlot = new Plottable.Plots.ClusteredBar()
+  var barPlot = new Plottable.Plots.ClusteredBar()
                                   .addDataset(new Plottable.Dataset(data[0]))
                                   .addDataset(new Plottable.Dataset(data[1]))
                                   .addDataset(new Plottable.Dataset(data[2]))
                                   .x(function(d) { return d.name; }, xScale)
                                   .y(function(d) { return d.y; }, yScale);
-} catch(err) {
-  barPlot = new Plottable.Plots.ClusteredBar(xScale, yScale)
-                                  .addDataset(new Plottable.Dataset(data[0]))
-                                  .addDataset(new Plottable.Dataset(data[1]))
-                                  .addDataset(new Plottable.Dataset(data[2]))
-                                  .x(function(d) { return d.name; }, xScale)
-                                  .y(function(d) { return d.y; }, yScale);
-}
-
 
   var chart = new Plottable.Components.Table([
                                             [yAxis, barPlot],

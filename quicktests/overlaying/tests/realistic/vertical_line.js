@@ -14,13 +14,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-var plot;
-try {
-  plot = new Plottable.Plots.Line();
-} catch(err) {
-  plot = new Plottable.Plots.Line(xScale, yScale);
-}
-
+  var plot = new Plottable.Plots.Line();
   plot.addDataset(ds);
   plot.x(function(d){ return d.y; }, xScale)
       .y(function(d){ return d.x; }, yScale);

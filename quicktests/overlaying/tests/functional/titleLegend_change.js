@@ -44,53 +44,17 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
-var scatterPlot;
-try {
-  scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
-} catch(err) {
-  scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
-}
-
+  var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
   scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-var linePlot;
-try {
-  linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
-} catch(err) {
-  linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
-}
-
+  var linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
   linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-var renderApple;
-try {
-  renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
-} catch(err) {
-  renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
-}
-
+  var renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
   renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-var renderBanana;
-try {
-  renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
-} catch(err) {
-  renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
-}
-
+  var renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
   renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-var renderOrange;
-try {
-  renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
-} catch(err) {
-  renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
-}
-
+  var renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
   renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-var renderGrape;
-try {
-  renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
-} catch(err) {
-  renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
-}
-
+  var renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
   renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
   scatterPlot.attr("fill", colorProjector, colorScale1);

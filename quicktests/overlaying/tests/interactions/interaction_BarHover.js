@@ -15,21 +15,11 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data, { foo: "!" });
 
-var plot;
-try {
-  plot = new Plottable.Plots.Bar("vertical")
+  var plot = new Plottable.Plots.Bar("vertical")
     .addDataset(ds)
     .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
     .y(function(d) { return d.y; }, yScale)
     .attr("fill", function(d) { return d.name; }, colorScale);
-} catch(err) {
-  plot = new Plottable.Plots.Bar(xScale, yScale, "vertical")
-    .addDataset(ds)
-    .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
-    .y(function(d) { return d.y; }, yScale)
-    .attr("fill", function(d) { return d.name; }, colorScale);
-}
-
 
   var chart = new Plottable.Components.Table([
       [null, title],

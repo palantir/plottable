@@ -27,13 +27,7 @@ function run(svg, data, Plottable) {
       return Emp[d%7];
   };
 
-var plot;
-try {
-  plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));
-} catch(err) {
-  plot = new Plottable.Plots.Bar(xScale, yScale).addDataset(new Plottable.Dataset(data));
-}
-
+  var plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
   var formatChoices = new Plottable.Components.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);

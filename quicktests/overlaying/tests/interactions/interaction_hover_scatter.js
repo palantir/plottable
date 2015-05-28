@@ -18,13 +18,7 @@ function run(svg, data, Plottable) {
   var ds1 = new Plottable.Dataset(data[0], { color: "blue", size: 20 });
   var ds2 = new Plottable.Dataset(data[1], { color: "red", size: 30 });
 
-var plot;
-try {
-  plot = new Plottable.Plots.Scatter();
-} catch(err) {
-  plot = new Plottable.Plots.Scatter(xScale, yScale);
-}
-
+  var plot = new Plottable.Plots.Scatter();
   plot.addDataset(ds1);
   plot.addDataset(ds2);
   plot.size(function(d, i, dataset) { return dataset.metadata().size; });

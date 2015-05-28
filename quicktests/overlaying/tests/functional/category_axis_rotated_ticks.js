@@ -28,53 +28,23 @@ function run(svg, data, Plottable) {
 
     var dataset = new Plottable.Dataset(data);
 
-var plot1;
-try {
-    plot1 = new Plottable.Plots.Scatter()
+    var plot1 = new Plottable.Plots.Scatter()
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
       .addDataset(dataset);
-} catch(err) {
-    plot1 = new Plottable.Plots.Scatter( xScale, yScale)
-      .x(function(d) { return d.x; }, xScale)
-      .y(function(d) { return d.y; }, yScale)
-      .attr("fill", function(d) { return d.type; }, colorScale)
-      .addDataset(dataset);
-}
 
-
-var plot2;
-try {
-    plot2 = new Plottable.Plots.Scatter()
+    var plot2 = new Plottable.Plots.Scatter()
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
     .addDataset(dataset);
-} catch(err) {
-    plot2 = new Plottable.Plots.Scatter( xScale, yScale)
+
+    var plot3 = new Plottable.Plots.Scatter()
       .x(function(d) { return d.x; }, xScale)
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
     .addDataset(dataset);
-}
-
-
-var plot3;
-try {
-    plot3 = new Plottable.Plots.Scatter()
-      .x(function(d) { return d.x; }, xScale)
-      .y(function(d) { return d.y; }, yScale)
-      .attr("fill", function(d) { return d.type; }, colorScale)
-    .addDataset(dataset);
-} catch(err) {
-    plot3 = new Plottable.Plots.Scatter( xScale, yScale)
-      .x(function(d) { return d.x; }, xScale)
-      .y(function(d) { return d.y; }, yScale)
-      .attr("fill", function(d) { return d.type; }, colorScale)
-    .addDataset(dataset);
-}
-
 
     var chart1 = new Plottable.Components.Table([
                     [yAxis1, plot1],

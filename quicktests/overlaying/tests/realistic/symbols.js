@@ -17,13 +17,7 @@ function run(svg, data, Plottable){
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-var plot;
-try {
-  plot = new Plottable.Plots.Scatter();
-} catch(err) {
-  plot = new Plottable.Plots.Scatter(xScale, yScale);
-}
-
+  var plot = new Plottable.Plots.Scatter();
   plot.addDataset(dataset);
 
   var triangleUpFactory = Plottable.SymbolFactories.triangleUp();

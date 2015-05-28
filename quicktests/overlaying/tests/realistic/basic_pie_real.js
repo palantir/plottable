@@ -32,44 +32,17 @@ function run(svg, data, Plottable) {
   var Blabel = new Plottable.Components.Label("Product B");
   var ABlabel = new Plottable.Components.Label("Combined");
 
-var Aplot;
-try {
-  Aplot = new Plottable.Plots.Pie();
-} catch(err) {
-  Aplot = new Plottable.Plots.Pie();
-}
-
-  Aplot.addDataset(new Plottable.Dataset(data[0]));
-  Aplot.sectorValue(function(d) { return d.percent; });
-  Aplot.attr("fill", function(d) { return d.region; }, colorScale);
+  var Aplot = new Plottable.Plots.Pie() { return d.region; }, colorScale);
   Aplot.innerRadius(40);
   Aplot.outerRadius(80);
   var AGroup = new Plottable.Components.Group([Aplot, Alabel]);
 
-var Bplot;
-try {
-  Bplot = new Plottable.Plots.Pie();
-} catch(err) {
-  Bplot = new Plottable.Plots.Pie();
-}
-
-  Bplot.addDataset(new Plottable.Dataset(data[1]));
-  Bplot.sectorValue(function(d) { return d.percent; });
-  Bplot.attr("fill", function(d) { return d.region; }, colorScale);
+  var Bplot = new Plottable.Plots.Pie() { return d.region; }, colorScale);
   Bplot.innerRadius(40);
   Bplot.outerRadius(80);
   var BGroup = new Plottable.Components.Group([Bplot, Blabel]);
 
-var ABplot;
-try {
-  ABplot = new Plottable.Plots.Pie();
-} catch(err) {
-  ABplot = new Plottable.Plots.Pie();
-}
-
-  ABplot.addDataset(new Plottable.Dataset(data[2]));
-  ABplot.sectorValue(function(d) { return d.percent; });
-  ABplot.attr("fill", function(d) { return d.region; }, colorScale);
+  var ABplot = new Plottable.Plots.Pie() { return d.region; }, colorScale);
   ABplot.innerRadius(50);
   ABplot.outerRadius(100);
   var ABGroup = new Plottable.Components.Group([ABplot, ABlabel]);

@@ -16,25 +16,13 @@ function run(svg, data, Plottable) {
   var d1 = new Plottable.Dataset(data[0]);
   var d2 = new Plottable.Dataset(data[1]);
 
-var circleRenderer;
-try {
-  circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
+  var circleRenderer = new Plottable.Plots.Scatter().addDataset(d1)
                                                                  .addDataset(d2)
                                                                  .size(16)
                                                                  .x(function(d) { return d.x; }, xScale)
                                                                  .y(function(d) { return d.y; }, yScale)
                                                                  .attr("opacity", 0.75)
                                                                  .animate(true);
-} catch(err) {
-  circleRenderer = new Plottable.Plots.Scatter(xScale, yScale).addDataset(d1)
-                                                                 .addDataset(d2)
-                                                                 .size(16)
-                                                                 .x(function(d) { return d.x; }, xScale)
-                                                                 .y(function(d) { return d.y; }, yScale)
-                                                                 .attr("opacity", 0.75)
-                                                                 .animate(true);
-}
-
 
   var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],
    [null,  xAxis]]);
