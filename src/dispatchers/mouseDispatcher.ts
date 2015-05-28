@@ -16,11 +16,11 @@ export module Dispatchers {
     private _dblClickCallbacks: Utils.CallbackSet<MouseCallback>;
 
     /**
-     * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
-     * on that <svg>, it will be returned; otherwise, a new one will be created.
+     * Get a Dispatcher.Mouse for the <svg> containing elem.
+     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
      * @param {SVGElement} elem A svg DOM element.
-     * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+     * @return {Dispatchers.Mouse}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
       var svg = Utils.DOM.getBoundingSVG(elem);
@@ -34,10 +34,10 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatcher.Mouse.
-     * This constructor not be invoked directly under most circumstances.
+     * Creates a Dispatchers.Mouse.
+     * This constructor not be invoked directly.
      *
-     * @param {SVGElement} svg The root <svg> element to attach to.
+     * @param {SVGElement} svg The root <svg> to attach to.
      */
     constructor(svg: SVGElement) {
       super();
@@ -65,12 +65,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever the mouse position changes,
+     * Registers a callback to be called whenever the mouse position changes.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseMove(callback: MouseCallback): Dispatchers.Mouse {
       this.setCallback(this._moveCallbacks, callback);
@@ -78,12 +76,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers the callback to be called whenever the mouse position changes,
+     * Removes a callback to be called whenever the mouse position changes.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseMove(callback: MouseCallback): Dispatchers.Mouse {
       this.unsetCallback(this._moveCallbacks, callback);
@@ -93,10 +89,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a mousedown occurs.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseDown(callback: MouseCallback): Dispatchers.Mouse {
       this.setCallback(this._downCallbacks, callback);
@@ -104,12 +98,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers the callback to be called whenever a mousedown occurs.
+     * Removes a callback to be called whenever a mousedown occurs.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseDown(callback: MouseCallback): Dispatchers.Mouse {
       this.unsetCallback(this._downCallbacks, callback);
@@ -119,10 +111,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a mouseup occurs.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onMouseUp(callback: MouseCallback): Dispatchers.Mouse {
       this.setCallback(this._upCallbacks, callback);
@@ -130,12 +120,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers the callback to be called whenever a mouseup occurs.
+     * Removes a callback to be called whenever a mouseup occurs.
      *
-     * @param {(p: Point) => any} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offMouseUp(callback: MouseCallback): Dispatchers.Mouse {
       this.unsetCallback(this._upCallbacks, callback);
@@ -143,12 +131,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a wheel occurs.
+     * Registers a callback to be called whenever a wheel event occurs.
      *
-     * @param {MouseCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space.
-     *                                     Pass `null` to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onWheel(callback: MouseCallback): Dispatchers.Mouse {
       this.setCallback(this._wheelCallbacks, callback);
@@ -156,12 +142,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers the callback to be called whenever a wheel occurs.
+     * Removes a callback to be called whenever a wheel event occurs.
      *
-     * @param {MouseCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space.
-     *                                     Pass `null` to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offWheel(callback: MouseCallback): Dispatchers.Mouse {
       this.unsetCallback(this._wheelCallbacks, callback);
@@ -171,10 +155,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a dblClick occurs.
      *
-     * @param {MouseCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space.
-     *                                     Pass `null` to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public onDblClick(callback: MouseCallback): Dispatchers.Mouse {
       this.setCallback(this._dblClickCallbacks, callback);
@@ -182,12 +164,10 @@ export module Dispatchers {
     }
 
     /**
-     * Registers the callback to be called whenever a dblClick occurs.
+     * Removes a callback to be called whenever a dblClick occurs.
      *
-     * @param {MouseCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space.
-     *                                     Pass `null` to remove a callback.
-     * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+     * @param {MouseCallback} callback
+     * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
      */
     public offDblClick(callback: MouseCallback): Dispatchers.Mouse {
       this.unsetCallback(this._dblClickCallbacks, callback);

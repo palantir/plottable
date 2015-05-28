@@ -5,12 +5,6 @@ export module Dispatchers {
   export type TouchCallback = (ids: number[], idToPoint: { [id: number]: Point; }, event: TouchEvent) => void;
 
   export class Touch extends Dispatcher {
-    /**
-     * Dispatcher.Touch calls callbacks when touch events occur.
-     * It reports the (x, y) position of the first Touch relative to the
-     * <svg> it is attached to.
-     */
-
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Touch";
     private _translator: Utils.ClientToSVGTranslator;
     private _startCallbacks: Utils.CallbackSet<TouchCallback>;
@@ -19,11 +13,11 @@ export module Dispatchers {
     private _cancelCallbacks: Utils.CallbackSet<TouchCallback>;
 
     /**
-     * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
-     * on that <svg>, it will be returned; otherwise, a new one will be created.
+     * Gets a Dispatchers.Touch for the <svg> containing elem.
+     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
      * @param {SVGElement} elem A svg DOM element.
-     * @return {Dispatcher.Touch} A Dispatcher.Touch
+     * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
       var svg = Utils.DOM.getBoundingSVG(elem);
@@ -37,10 +31,10 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatcher.Touch.
-     * This constructor should not be invoked directly under most circumstances.
+     * Creates a Dispatchers.Touch.
+     * This constructor should not be invoked directly.
      *
-     * @param {SVGElement} svg The root <svg> element to attach to.
+     * @param {SVGElement} svg The root <svg> to attach to.
      */
     constructor(svg: SVGElement) {
       super();
@@ -62,10 +56,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a touch starts.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchStart(callback: TouchCallback): Dispatchers.Touch {
       this.setCallback(this._startCallbacks, callback);
@@ -73,12 +65,10 @@ export module Dispatchers {
     }
 
     /**
-     * Removes the callback to be called whenever a touch starts.
+     * Removes a callback to be called whenever a touch starts.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchStart(callback: TouchCallback): Dispatchers.Touch {
       this.unsetCallback(this._startCallbacks, callback);
@@ -88,10 +78,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever the touch position changes.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchMove(callback: TouchCallback): Dispatchers.Touch {
       this.setCallback(this._moveCallbacks, callback);
@@ -99,12 +87,10 @@ export module Dispatchers {
     }
 
     /**
-     * Removes the callback to be called whenever the touch position changes.
+     * Removes a callback to be called whenever the touch position changes.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchMove(callback: TouchCallback): Dispatchers.Touch {
       this.unsetCallback(this._moveCallbacks, callback);
@@ -114,10 +100,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a touch ends.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchEnd(callback: TouchCallback): Dispatchers.Touch {
       this.setCallback(this._endCallbacks, callback);
@@ -125,12 +109,10 @@ export module Dispatchers {
     }
 
     /**
-     * Removes the callback to be called whenever a touch ends.
+     * Removes a callback to be called whenever a touch ends.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchEnd(callback: TouchCallback): Dispatchers.Touch {
       this.unsetCallback(this._endCallbacks, callback);
@@ -140,10 +122,8 @@ export module Dispatchers {
     /**
      * Registers a callback to be called whenever a touch is cancelled.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchCancel(callback: TouchCallback): Dispatchers.Touch {
       this.setCallback(this._cancelCallbacks, callback);
@@ -151,12 +131,10 @@ export module Dispatchers {
     }
 
     /**
-     * Removes the callback to be called whenever a touch is cancelled.
+     * Removes a callback to be called whenever a touch is cancelled.
      *
-     * @param {TouchCallback} callback A callback that takes the pixel position
-     *                                     in svg-coordinate-space. Pass `null`
-     *                                     to remove a callback.
-     * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+     * @param {TouchCallback} callback
+     * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchCancel(callback: TouchCallback): Dispatchers.Touch {
       this.unsetCallback(this._cancelCallbacks, callback);

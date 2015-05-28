@@ -3279,108 +3279,88 @@ declare module Plottable {
         type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
             /**
-             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             * Get a Dispatcher.Mouse for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
              *
              * @param {SVGElement} elem A svg DOM element.
-             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             * @return {Dispatchers.Mouse}
              */
             static getDispatcher(elem: SVGElement): Dispatchers.Mouse;
             /**
-             * Creates a Dispatcher.Mouse.
-             * This constructor not be invoked directly under most circumstances.
+             * Creates a Dispatchers.Mouse.
+             * This constructor not be invoked directly.
              *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * @param {SVGElement} svg The root <svg> to attach to.
              */
             constructor(svg: SVGElement);
             /**
-             * Registers a callback to be called whenever the mouse position changes,
+             * Registers a callback to be called whenever the mouse position changes.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever the mouse position changes,
+             * Removes a callback to be called whenever the mouse position changes.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mousedown occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mousedown occurs.
+             * Removes a callback to be called whenever a mousedown occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a mouseup occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mouseup occurs.
+             * Removes a callback to be called whenever a mouseup occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a wheel occurs.
+             * Registers a callback to be called whenever a wheel event occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a wheel occurs.
+             * Removes a callback to be called whenever a wheel event occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
              * Registers a callback to be called whenever a dblClick occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a dblClick occurs.
+             * Removes a callback to be called whenever a dblClick occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
@@ -3404,90 +3384,74 @@ declare module Plottable {
         }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
             /**
-             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             * Gets a Dispatchers.Touch for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
              *
              * @param {SVGElement} elem A svg DOM element.
-             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             * @return {Dispatchers.Touch}
              */
             static getDispatcher(elem: SVGElement): Dispatchers.Touch;
             /**
-             * Creates a Dispatcher.Touch.
-             * This constructor should not be invoked directly under most circumstances.
+             * Creates a Dispatchers.Touch.
+             * This constructor should not be invoked directly.
              *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * @param {SVGElement} svg The root <svg> to attach to.
              */
             constructor(svg: SVGElement);
             /**
              * Registers a callback to be called whenever a touch starts.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch starts.
+             * Removes a callback to be called whenever a touch starts.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever the touch position changes.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever the touch position changes.
+             * Removes a callback to be called whenever the touch position changes.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever a touch ends.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch ends.
+             * Removes a callback to be called whenever a touch ends.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
              * Registers a callback to be called whenever a touch is cancelled.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch is cancelled.
+             * Removes a callback to be called whenever a touch is cancelled.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
         }
@@ -3500,31 +3464,29 @@ declare module Plottable {
         type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
-             * Get a Dispatcher.Key. If one already exists it will be returned;
+             * Gets a Dispatchers.Key. If one already exists it will be returned;
              * otherwise, a new one will be created.
              *
-             * @return {Dispatcher.Key} A Dispatcher.Key
+             * @return {Dispatchers.Key}
              */
             static getDispatcher(): Dispatchers.Key;
             /**
-             * Creates a Dispatcher.Key.
-             * This constructor not be invoked directly under most circumstances.
-             *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * Creates a Dispatchers.Key.
+             * This constructor not be invoked directly.
              */
             constructor();
             /**
              * Registers a callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
-             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             onKeyDown(callback: KeyCallback): Key;
             /**
              * Removes the callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
-             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyDown(callback: KeyCallback): Key;
         }
