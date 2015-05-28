@@ -313,36 +313,36 @@ var Plottable;
             }
             Methods.isIE = isIE;
             /**
-             * Returns true if the supplied coordinates or Extents intersect or are contained by bbox.
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
-             * @param {number | Extent} xValOrExtent The x coordinate or Extent to test
-             * @param {number | Extent} yValOrExtent The y coordinate or Extent to test
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
              * @param {SVGRect} bbox The bbox
              * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
              * testing intersection
              *
-             * @returns {boolean} True if the supplied coordinates or Extents intersect or are
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
              * contained by bbox, false otherwise.
              */
-            function intersectsBBox(xValOrExtent, yValOrExtent, bbox, tolerance) {
+            function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
                 if (tolerance === void 0) { tolerance = 0.5; }
-                var xExtent = parseExtent(xValOrExtent);
-                var yExtent = parseExtent(yValOrExtent);
+                var xRange = parseRange(xValOrRange);
+                var yRange = parseRange(yValOrRange);
                 // SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
                 // seems appropriate.
-                return bbox.x + bbox.width >= xExtent.min - tolerance && bbox.x <= xExtent.max + tolerance && bbox.y + bbox.height >= yExtent.min - tolerance && bbox.y <= yExtent.max + tolerance;
+                return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance && bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
             }
             Methods.intersectsBBox = intersectsBBox;
             /**
-             * Create an Extent from a number or an object with "min" and "max" defined.
+             * Create a Range from a number or an object with "min" and "max" defined.
              *
              * @param {any} input The object to parse
              *
-             * @returns {Extent} The generated Extent
+             * @returns {Range} The generated Range
              */
-            function parseExtent(input) {
+            function parseRange(input) {
                 if (typeof (input) === "number") {
                     return { min: input, max: input };
                 }
@@ -350,10 +350,10 @@ var Plottable;
                     return input;
                 }
                 else {
-                    throw new Error("input '" + input + "' can't be parsed as an Extent");
+                    throw new Error("input '" + input + "' can't be parsed as an Range");
                 }
             }
-            Methods.parseExtent = parseExtent;
+            Methods.parseRange = parseRange;
         })(Methods = Utils.Methods || (Utils.Methods = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -7545,33 +7545,41 @@ var Plottable;
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
-             * Gets the bar under the given pixel position (if [xValOrExtent]
-             * and [yValOrExtent] are {number}s), under a given line (if only one
-             * of [xValOrExtent] or [yValOrExtent] are {Extent}s) or are under a
-             * 2D area (if [xValOrExtent] and [yValOrExtent] are both {Extent}s).
+             * Gets the {Plots.PlotData} that correspond to the given pixel position.
              *
-             * @param {number | Extent} xValOrExtent The pixel x position, or range of x values.
-             * @param {number | Extent} yValOrExtent The pixel y position, or range of y values.
-             * @returns {D3.Selection} The selected bar, or null if no bar was selected.
+             * @param {Point} p The provided pixel position as a {Point}
+             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
              */
-            Bar.prototype.getBars = function (xValOrExtent, yValOrExtent) {
-                var _this = this;
-                if (!this._isSetup) {
-                    return d3.select();
-                }
-                // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-                var bars = this._datasetKeysInOrder.reduce(function (bars, key) { return bars.concat(_this._getBarsFromDataset(key, xValOrExtent, yValOrExtent)); }, []);
-                return d3.selectAll(bars);
+            Bar.prototype.plotDataAt = function (p) {
+                return this._getPlotData(p.x, p.y);
             };
-            Bar.prototype._getBarsFromDataset = function (key, xValOrExtent, yValOrExtent) {
-                var bars = [];
-                var drawer = this._key2PlotDatasetKey.get(key).drawer;
-                drawer._getRenderArea().selectAll("rect").each(function (d) {
-                    if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
-                        bars.push(this);
+            Bar.prototype.plotDataIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._getPlotData(dataXRange, dataYRange);
+            };
+            Bar.prototype._getPlotData = function (xValOrRange, yValOrRange) {
+                var data = [];
+                var pixelPoints = [];
+                var elements = [];
+                var plotData = this.getAllPlotData();
+                plotData.selection.each(function (datum, i) {
+                    if (Plottable.Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
+                        data.push(plotData.data[i]);
+                        pixelPoints.push(plotData.pixelPoints[i]);
+                        elements.push(this);
                     }
                 });
-                return bars;
+                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
             };
             Bar.prototype._updateValueScale = function () {
                 if (!this._projectorsReady()) {
