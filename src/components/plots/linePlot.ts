@@ -54,7 +54,7 @@ export module Plots {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      d3.keys(attrToProjector).forEach((attribute: string) => {
+      Object.keys(attrToProjector).forEach((attribute: string) => {
         if (attribute === "d") { return; }
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>

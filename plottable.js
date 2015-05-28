@@ -7674,7 +7674,7 @@ var Plottable;
             };
             Line.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                d3.keys(attrToProjector).forEach(function (attribute) {
+                Object.keys(attrToProjector).forEach(function (attribute) {
                     if (attribute === "d") {
                         return;
                     }
