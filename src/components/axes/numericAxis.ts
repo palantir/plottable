@@ -5,10 +5,6 @@ export module Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
-    // Whether or not first/last tick label will still be displayed even if
-    // the label is cut off.
-    private _showFirstTickLabel = false;
-    private _showLastTickLabel = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
@@ -274,56 +270,6 @@ export module Axes {
         this._tickLabelPositioning = positionLC;
         this.redraw();
         return this;
-      }
-    }
-
-    /**
-     * Gets whether or not the tick labels at the end of the graph are
-     * displayed when partially cut off.
-     *
-     * @param {string} orientation Where on the scale to change tick labels.
-     *                 On a "top" or "bottom" axis, this can be "left" or
-     *                 "right". On a "left" or "right" axis, this can be "top"
-     *                 or "bottom".
-     * @returns {boolean} The current setting.
-     */
-    public showEndTickLabel(orientation: string): boolean;
-    /**
-     * Sets whether or not the tick labels at the end of the graph are
-     * displayed when partially cut off.
-     *
-     * @param {string} orientation If provided, where on the scale to change tick labels.
-     *                 On a "top" or "bottom" axis, this can be "left" or
-     *                 "right". On a "left" or "right" axis, this can be "top"
-     *                 or "bottom".
-     * @param {boolean} show Whether or not the given tick should be
-     * displayed.
-     * @returns {Numeric} The calling NumericAxis.
-     */
-    public showEndTickLabel(orientation: string, show: boolean): Numeric;
-    public showEndTickLabel(orientation: string, show?: boolean): any {
-      if ((this._isHorizontal() && orientation === "left") ||
-          (!this._isHorizontal() && orientation === "bottom")) {
-        if (show === undefined) {
-          return this._showFirstTickLabel;
-        } else {
-          this._showFirstTickLabel = show;
-          this.render();
-          return this;
-        }
-      } else if ((this._isHorizontal() && orientation === "right") ||
-                 (!this._isHorizontal() && orientation === "top")) {
-        if (show === undefined) {
-          return this._showLastTickLabel;
-        } else {
-          this._showLastTickLabel = show;
-          this.render();
-          return this;
-        }
-      } else {
-        throw new Error("Attempt to show " + orientation + " tick label on a " +
-                        (this._isHorizontal() ? "horizontal" : "vertical") +
-                        " axis");
       }
     }
 

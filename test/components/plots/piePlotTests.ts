@@ -100,7 +100,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("innerRadius project", () => {
+    it("innerRadius", () => {
       piePlot.innerRadius(5);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -121,7 +121,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("outerRadius project", () => {
+    it("outerRadius", () => {
       piePlot.outerRadius(() => 150);
       var arcPaths = renderArea.selectAll(".arc");
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
@@ -153,8 +153,7 @@ describe("Plots", () => {
       it("retrieves correct selections", () => {
         var allSectors = piePlot.getAllSelections([simpleDataset]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
-        var selectionData = allSectors.data();
-        assert.includeMembers(selectionData.map((datum) => datum.data), simpleData, "dataset data in selection data");
+        assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
 
         svg.remove();
       });
@@ -246,36 +245,6 @@ describe("Plots", () => {
 
       svg.remove();
 
-    });
-
-    it("nulls and 0s should be represented in a Pie Chart as DOM elements, but have radius 0", () => {
-      var svg = TestMethods.generateSVG();
-
-      var data1 = [
-        { v: 1 },
-        { v: 0 },
-        { v: null },
-        { v: 1 },
-      ];
-
-      var plot = new Plottable.Plots.Pie();
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.sectorValue((d) => d.v);
-
-      plot.renderTo(svg);
-
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
-
-      assert.strictEqual(elementsDrawnSel.size(), 4,
-        "All 4 elements of the pie chart should have a DOM node");
-
-      assert.closeTo(elementsDrawnSel[0][1].getBBox().width, 0, 0.001,
-        "0 as a value should not be visible");
-
-      assert.closeTo(elementsDrawnSel[0][2].getBBox().width, 0, 0.001,
-        "null as a value should not be visible");
-
-      svg.remove();
     });
   });
 });

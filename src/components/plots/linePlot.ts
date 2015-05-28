@@ -19,8 +19,8 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Line(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Line(dataset);
     }
 
     protected _getResetYFunction() {
@@ -39,7 +39,7 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
@@ -50,10 +50,8 @@ export module Plots {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
-      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
-      var singleDatumAttributes = Object.keys(attrToProjector).filter(isSingleDatumAttr);
-      singleDatumAttributes.forEach((attribute: string) => {
+      Object.keys(attrToProjector).forEach((attribute: string) => {
+        if (attribute === "d") { return; }
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
           data.length > 0 ? projector(data[0], i, dataset) : null;
@@ -62,13 +60,9 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined"];
-    }
-
     /**
      * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
-     * 
+     *
      * @param {Point} queryPoint
      * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
@@ -91,6 +85,35 @@ export module Plots {
       });
 
       return closest;
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+      propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
+      return propertyToProjectors;
+    }
+
+    protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
+      };
+      return (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.line()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+      };
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
     }
   }
 }
