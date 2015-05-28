@@ -2390,7 +2390,6 @@ declare module Plottable {
     class Plot extends Component {
         protected _dataChanged: boolean;
         protected _datasetToDrawer: Utils.Map<Dataset, Drawers.AbstractDrawer>;
-        protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;
         protected _attrExtents: D3.Map<any[]>;
@@ -2466,10 +2465,6 @@ declare module Plottable {
          */
         removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
-        /**
-         * Returns an array of internal keys corresponding to those Datasets actually on the plot
-         */
-        protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];

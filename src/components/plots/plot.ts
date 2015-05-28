@@ -24,7 +24,6 @@ module Plottable {
   export class Plot extends Component {
     protected _dataChanged = false;
     protected _datasetToDrawer: Utils.Map<Dataset, Drawers.AbstractDrawer>;
-    protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
@@ -35,7 +34,6 @@ module Plottable {
     private _animators: {[animator: string]: Animators.Plot} = {};
 
     protected _animateOnNextRender = true;
-    private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -61,8 +59,6 @@ module Plottable {
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
-      this._datasetKeysInOrder = [];
-      this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map();
@@ -96,12 +92,10 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public addDataset(dataset: Dataset) {
-      var key = "_" + this._nextSeriesIndex++;
       if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
       var drawer = this._getDrawer(dataset);
-      this._datasetKeysInOrder.push(key);
       this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
@@ -347,11 +341,9 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public removeDataset(dataset: Dataset): Plot {
-      var key = this._keyForDataset(dataset);
       if (this.datasets().indexOf(dataset) > -1) {
         this._removeDatasetNodes(dataset);
         dataset.offUpdate(this._onDatasetUpdateCallback);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._datasetToDrawer.delete(dataset);
         this._onDatasetUpdate();
       }
@@ -361,20 +353,6 @@ module Plottable {
     protected _removeDatasetNodes(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
       drawer.remove();
-    }
-
-    /**
-     * Returns the internal key for the Dataset, or undefined if not found
-     */
-    private _keyForDataset(dataset: Dataset) {
-      return this._datasetKeysInOrder[this.datasets().indexOf(dataset)];
-    }
-
-    /**
-     * Returns an array of internal keys corresponding to those Datasets actually on the plot
-     */
-    protected _keysForDatasets(datasets: Dataset[]) {
-      return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
     }
 
     public datasets(): Dataset[];
