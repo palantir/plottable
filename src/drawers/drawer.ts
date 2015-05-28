@@ -79,7 +79,7 @@ export module Drawers {
 
     private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
-      d3.keys(attrToProjector).forEach((attr: string) => {
+      Object.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
           (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
       });

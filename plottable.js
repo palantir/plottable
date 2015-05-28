@@ -240,7 +240,7 @@ var Plottable;
              */
             function copyMap(oldMap) {
                 var newMap = {};
-                d3.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
+                Object.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
                 return newMap;
             }
             Methods.copyMap = copyMap;
@@ -2667,7 +2667,7 @@ var Plottable;
             AbstractDrawer.prototype._appliedProjectors = function (attrToProjector) {
                 var _this = this;
                 var modifiedAttrToProjector = {};
-                d3.keys(attrToProjector).forEach(function (attr) {
+                Object.keys(attrToProjector).forEach(function (attr) {
                     modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
                 });
                 return modifiedAttrToProjector;
@@ -8083,7 +8083,7 @@ var Plottable;
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
-                this.classed("area-plot", true);
+                this.classed("stacked-area-plot", true);
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
@@ -8221,6 +8221,7 @@ var Plottable;
             function StackedBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, xScale, yScale, orientation);
+                this.classed("stacked-bar-plot", true);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
