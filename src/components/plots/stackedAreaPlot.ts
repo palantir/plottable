@@ -18,7 +18,7 @@ export module Plots {
      */
     constructor() {
       super();
-      this.classed("area-plot", true);
+      this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];

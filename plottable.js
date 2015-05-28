@@ -240,7 +240,7 @@ var Plottable;
              */
             function copyMap(oldMap) {
                 var newMap = {};
-                d3.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
+                Object.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
                 return newMap;
             }
             Methods.copyMap = copyMap;
@@ -2666,7 +2666,7 @@ var Plottable;
             };
             AbstractDrawer.prototype._applyMetadata = function (attrToProjector, dataset) {
                 var modifiedAttrToProjector = {};
-                d3.keys(attrToProjector).forEach(function (attr) {
+                Object.keys(attrToProjector).forEach(function (attr) {
                     modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
                 });
                 return modifiedAttrToProjector;
@@ -7807,7 +7807,7 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+                var singleDatumAttributes = Object.keys(attrToProjector).filter(isSingleDatumAttr);
                 singleDatumAttributes.forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i, dataset) { return data.length > 0 ? projector(data[0], i, dataset) : null; };
@@ -8095,7 +8095,7 @@ var Plottable;
             function StackedArea() {
                 _super.call(this);
                 this._baselineValue = 0;
-                this.classed("area-plot", true);
+                this.classed("stacked-area-plot", true);
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
@@ -8239,6 +8239,7 @@ var Plottable;
             function StackedBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, orientation);
+                this.classed("stacked-bar-plot", true);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
@@ -10128,6 +10129,12 @@ var Plottable;
             DragBoxLayer.prototype.offDragEnd = function (callback) {
                 this._dragEndCallbacks.delete(callback);
                 return this;
+            };
+            /**
+             * Gets the internal Interactions.Drag of the DragBoxLayer.
+             */
+            DragBoxLayer.prototype.dragInteraction = function () {
+                return this._dragInteraction;
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);

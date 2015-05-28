@@ -17,6 +17,7 @@ export module Plots {
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
+      this.classed("stacked-bar-plot", true);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
     }
