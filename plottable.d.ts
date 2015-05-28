@@ -2476,8 +2476,8 @@ declare module Plottable {
          *
          * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
          * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-         * in the previous datasetKeys argument (default = false).
+         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the Datasets referenced
+         * in the previous argument (default = false).
          * @returns {D3.Selection} The retrieved Selections.
          */
         getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
