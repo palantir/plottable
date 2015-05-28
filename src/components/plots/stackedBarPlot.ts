@@ -7,13 +7,15 @@ export module Plots {
     private _stackedExtent: number[];
 
     /**
-     * Constructs a StackedBar plot.
-     * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
-     * other.
+     * Constructs a StackedBar Plot.
+     * A ClusteredBar Plot stacks bars across Datasets based on the primary value of the bars.
+     *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
+     *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
+     *
      * @constructor
-     * @param {Scale} xScale the x scale of the plot.
-     * @param {Scale} yScale the y scale of the plot.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {Scale} xScale
+     * @param {Scale} yScal
+     * @param {string} [orientation="vertical"] The orientation of the Stackedbar Plot ("vertical"/"horizontal").
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale, orientation);

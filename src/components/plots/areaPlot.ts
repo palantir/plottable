@@ -2,18 +2,16 @@
 
 module Plottable {
 export module Plots {
-  /**
-   * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
-   */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
 
     /**
-     * Constructs an AreaPlot.
-     *
+     * Constructs an Area Plot.
+     * An Area Plot draws a filled region (area) between the"y" and "y0".
+     * 
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale
+     * @param {QuantitativeScale} yScale
      */
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
@@ -26,8 +24,25 @@ export module Plots {
       this.attr("stroke", defaultColor);
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y0.
+     */
     public y0(): Plots.AccessorScaleBinding<number, number>;
+    /**
+     * Sets Y0 to a constant number, or to the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} y0
+     * @returns {Area} The calling Area Plot.
+     */
     public y0(y0: number | Accessor<number>): Area<X>;
+    /**
+     * Sets Y0 to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {number|Accessor<number>} y0
+     * @param {Scale<number, number>} y0Scale
+     * @returns {Area} The calling Area Plot.
+     */
     public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
     public y0(y0?: number | Accessor<number>, y0Scale?: Scale<number, number>): any {
       if (y0 == null) {

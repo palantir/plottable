@@ -6771,14 +6771,11 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        /*
-         * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
-         * One usecase is to show how much funding departments are given out of a total budget.
-         */
         var Pie = (function (_super) {
             __extends(Pie, _super);
             /**
-             * Constructs a PiePlot.
+             * Constructs a Pie Plot.
+             * Pie Plots only support a single Dataset.
              *
              * @constructor
              */
@@ -6870,11 +6867,9 @@ var Plottable;
         /**
          * Constructs an XYPlot.
          *
-         * An XYPlot is a plot from drawing 2-dimensional data. Common examples
-         * include Scale.Line and Scale.Bar.
+         * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
          * @constructor
-         * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
@@ -6960,17 +6955,13 @@ var Plottable;
             return this;
         };
         /**
-         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
+         * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+         * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * If 'x' or 'y' is specified the adjustment is immediately performed.
-         *
-         * @param {string} scale Must be one of 'x', 'y', or 'none'.
-         *
-         * 'x' will adjust the x scale in relation to changes in the y domain.
-         *
-         * 'y' will adjust the y scale in relation to changes in the x domain.
-         *
-         * 'none' means neither scale will change automatically.
+         * @param {string} scaleName Must be one of "x", "y", or "none".
+         *   "x" will adjust the x Scale in relation to changes in the y domain.
+         *   "y" will adjust the y Scale in relation to changes in the x domain.
+         *   "none" means neither Scale will change automatically.
          *
          * @returns {XYPlot} The calling XYPlot.
          */
@@ -7038,9 +7029,10 @@ var Plottable;
             }
         };
         /**
-         * Adjusts both domains' extents to show all datasets.
+         * Adjusts the domains of both X and Y scales to show all data.
+         * This call does not override the autorange() behavior.
          *
-         * This call does not override auto domain adjustment behavior over visible points.
+         * @returns {XYPlot} The calling XYPlot.
          */
         XYPlot.prototype.showAllData = function () {
             this._updateXExtentsAndAutodomain();
@@ -7087,16 +7079,17 @@ var Plottable;
         var Rectangle = (function (_super) {
             __extends(Rectangle, _super);
             /**
-             * Constructs a RectanglePlot.
+             * Constructs a Rectangle Plot.
              *
-             * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the left and right bounds of the rectangle (x and x1 respectively)
-             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
-             * not set, the plot will apply auto-centering logic to the extent of x/y
+             * A Rectangle Plot displays rectangles based on the data.
+             * The left and right edges of each rectangle can be set with x() and x2().
+             *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
+             * The top and bottom edges of each rectangle can be set with y() and y2().
+             *   If only y() is set the Rectangle Plot will attempt to compute the correct top and bottom edge positions.
              *
              * @constructor
-             * @param {Scale.Scale} xScale The x scale to use.
-             * @param {Scale.Scale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale
+             * @param {Scale.Scale} yScale
              */
             function Rectangle(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -7321,7 +7314,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] The orientation of the Bar Plot ("vertical"/"horizontal").
              */
             function Bar(xScale, yScale, orientation) {
                 var _this = this;
@@ -7693,11 +7686,11 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
-             * Constructs a LinePlot.
+             * Constructs a Line Plot.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             function Line(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -7834,17 +7827,15 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
-        /**
-         * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
-         */
         var Area = (function (_super) {
             __extends(Area, _super);
             /**
-             * Constructs an AreaPlot.
+             * Constructs an Area Plot.
+             * An Area Plot draws a filled region (area) between the"y" and "y0".
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -7916,16 +7907,16 @@ var Plottable;
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
             /**
-             * Creates a ClusteredBarPlot.
+             * Creates a ClusteredBar Plot.
              *
-             * A ClusteredBarPlot is a plot that plots several bar plots next to each
-             * other. For example, when plotting life expectancy across each country,
-             * you would want each country to have a "male" and "female" bar.
+             * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
+             *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
+             *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {Scale} xScale
+             * @param {Scale} yScale
+             * @param {string} [orientation="vertical"] The orientation of the ClusteredBar Plot ("vertical"/"horizontal").
              */
             function ClusteredBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
@@ -7990,11 +7981,11 @@ var Plottable;
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
             /**
-             * Constructs a StackedArea plot.
+             * Constructs a StackedArea Plot.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
@@ -8128,13 +8119,15 @@ var Plottable;
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
             /**
-             * Constructs a StackedBar plot.
-             * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
-             * other.
+             * Constructs a StackedBar Plot.
+             * A ClusteredBar Plot stacks bars across Datasets based on the primary value of the bars.
+             *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
+             *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
+             *
              * @constructor
-             * @param {Scale} xScale the x scale of the plot.
-             * @param {Scale} yScale the y scale of the plot.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {Scale} xScale
+             * @param {Scale} yScal
+             * @param {string} [orientation="vertical"] The orientation of the Stackedbar Plot ("vertical"/"horizontal").
              */
             function StackedBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }

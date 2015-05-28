@@ -7,16 +7,16 @@ export module Plots {
     private _clusterOffsets: Utils.Map<Dataset, number>;
 
     /**
-     * Creates a ClusteredBarPlot.
+     * Creates a ClusteredBar Plot.
      *
-     * A ClusteredBarPlot is a plot that plots several bar plots next to each
-     * other. For example, when plotting life expectancy across each country,
-     * you would want each country to have a "male" and "female" bar.
+     * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
+     *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
+     *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
      *
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {Scale} xScale
+     * @param {Scale} yScale
+     * @param {string} [orientation="vertical"] The orientation of the ClusteredBar Plot ("vertical"/"horizontal").
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale, orientation);

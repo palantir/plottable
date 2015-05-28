@@ -51,7 +51,7 @@ module Plottable {
      * The provided Scale will account for the values when autoDomain()-ing.
      *
      * @param {X|Accessor<X>} x
-     * @param {Scale<X, number} xScale
+     * @param {Scale<X, number>} xScale
      * @returns {XYPlot} The calling XYPlot.
      */
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
@@ -83,7 +83,7 @@ module Plottable {
      * The provided Scale will account for the values when autoDomain()-ing.
      *
      * @param {Y|Accessor<Y>} y
-     * @param {Scale<Y, number} yScale
+     * @param {Scale<Y, number>} yScale
      * @returns {XYPlot} The calling XYPlot.
      */
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;

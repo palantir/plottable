@@ -23,7 +23,7 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {string} [orientation="vertical"] The orientation of the Bar Plot ("vertical"/"horizontal").
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
@@ -48,20 +48,18 @@ export module Plots {
     }
 
     /**
-     * Gets the baseline value for the bars
+     * Gets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @returns {number} The baseline value.
+     * @returns {number}
      */
     public baseline(): number;
     /**
-     * Sets the baseline for the bars to the specified value.
+     * Sets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @param {number} value The value to position the baseline at.
-     * @returns {Bar} The calling Bar.
+     * @param {number} value
+     * @returns {Bar} The calling Bar Plot.
      */
     public baseline(value: number): Bar<X, Y>;
     public baseline(value?: number): any {
@@ -95,16 +93,14 @@ export module Plots {
     }
 
     /**
-     * Get whether bar labels are enabled.
-     *
-     * @returns {boolean} Whether bars should display labels or not.
+     * Gets whether bar labels are enabled.
      */
     public labelsEnabled(): boolean;
     /**
-     * Set whether bar labels are enabled.
-     * @param {boolean} Whether bars should display labels or not.
+     * Sets whether bar labels are enabled.
      *
-     * @returns {Bar} The calling plot.
+     * @param {boolean} labelsEnabled
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelsEnabled(enabled: boolean): Bar<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
@@ -118,16 +114,14 @@ export module Plots {
     }
 
     /**
-     * Get the formatter for bar labels.
-     *
-     * @returns {Formatter} The formatting function for bar labels.
+     * Gets the Formatter for bar labels.
      */
     public labelFormatter(): Formatter;
     /**
-     * Change the formatting function for bar labels.
-     * @param {Formatter} The formatting function for bar labels.
+     * Sets the Formatter for bar labels.
      *
-     * @returns {Bar} The calling plot.
+     * @param {Formatter} formatter
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelFormatter(formatter: Formatter): Bar<X, Y>;
     public labelFormatter(formatter?: Formatter): any {
