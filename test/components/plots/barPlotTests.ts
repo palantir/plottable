@@ -106,33 +106,33 @@ describe("Plots", () => {
       });
 
       it("getBars()", () => {
-        var bar: D3.Selection = barPlot.getBars(155, 150); // in the middle of bar 0
+        var bar = barPlot.plotDataAt({x: 155, y: 150}); // in the middle of bar 0
 
-        assert.lengthOf(bar[0], 1, "getBar returns a bar");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
+        assert.lengthOf(bar.data, 1, "getBar returns a bar");
+        assert.strictEqual(bar.data[0], dataset.data()[0], "the data in the bar matches the datasource");
 
-        bar = barPlot.getBars(-1, -1); // no bars here
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
+        bar = barPlot.plotDataAt({x: -1, y: -1}); // no bars here
+        assert.isTrue(bar.selection.empty(), "returns empty selection if no bar was selected");
 
-        bar = barPlot.getBars(200, 50); // between the two bars
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
+        bar = barPlot.plotDataAt({x: 200, y: 50}); // between the two bars
+        assert.isTrue(bar.selection.empty(), "returns empty selection if no bar was selected");
 
-        bar = barPlot.getBars(155, 10); // above bar 0
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
+        bar = barPlot.plotDataAt({x: 155, y: 10}); // above bar 0
+        assert.isTrue(bar.selection.empty(), "returns empty selection if no bar was selected");
 
         // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
         // origin is at the top left!
 
-        bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 150});
-        assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
+        bar = barPlot.plotDataIn({min: 155, max: 455}, {min: 150, max: 150});
+        assert.lengthOf(bar.data, 2, "selected 2 bars (not the negative one)");
+        assert.strictEqual(bar.data[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bar.data[1], dataset.data()[2], "the data in bar 1 matches the datasource");
 
-        bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 350});
-        assert.lengthOf(bar.data(), 3, "selected all the bars");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-        assert.strictEqual(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
+        bar = barPlot.plotDataIn({min: 155, max: 455}, {min: 150, max: 350});
+        assert.lengthOf(bar.data, 3, "selected all the bars");
+        assert.strictEqual(bar.data[0], dataset.data()[0], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bar.data[1], dataset.data()[1], "the data in bar 1 matches the datasource");
+        assert.strictEqual(bar.data[2], dataset.data()[2], "the data in bar 2 matches the datasource");
 
         svg.remove();
       });
