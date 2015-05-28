@@ -1211,14 +1211,13 @@ var Plottable;
 (function (Plottable) {
     var Dataset = (function () {
         /**
-         * Constructs a new set.
-         *
-         * A Dataset is mostly just a wrapper around an any[], Dataset is the
-         * data you're going to plot.
+         * Constructs a new Dataset.
+         * A Dataset contains an array of data and some metadata.
+         * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
          *
          * @constructor
-         * @param {any[]} data The data for this DataSource (default = []).
-         * @param {any} metadata An object containing additional information (default = {}).
+         * @param {any[]} [data=[]] The data for this Dataset.
+         * @param {any} [metadata={}] An object containing additional information.
          */
         function Dataset(data, metadata) {
             if (data === void 0) { data = []; }
@@ -1227,11 +1226,25 @@ var Plottable;
             this._metadata = metadata;
             this._callbacks = new Plottable.Utils.CallbackSet();
         }
+        /**
+         * Adds a callback to be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback.
+         * @returns {Dataset} The calling Dataset.
+         */
         Dataset.prototype.onUpdate = function (callback) {
             this._callbacks.add(callback);
+            return this;
         };
+        /**
+         * Removes a callback that would be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback
+         * @returns {Dataset} The calling Dataset.
+         */
         Dataset.prototype.offUpdate = function (callback) {
             this._callbacks.delete(callback);
+            return this;
         };
         Dataset.prototype.data = function (data) {
             if (data == null) {

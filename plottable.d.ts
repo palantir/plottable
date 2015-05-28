@@ -470,42 +470,52 @@ declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
-         * Constructs a new set.
-         *
-         * A Dataset is mostly just a wrapper around an any[], Dataset is the
-         * data you're going to plot.
+         * Constructs a new Dataset.
+         * A Dataset contains an array of data and some metadata.
+         * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
          *
          * @constructor
-         * @param {any[]} data The data for this DataSource (default = []).
-         * @param {any} metadata An object containing additional information (default = {}).
+         * @param {any[]} [data=[]] The data for this Dataset.
+         * @param {any} [metadata={}] An object containing additional information.
          */
         constructor(data?: any[], metadata?: any);
-        onUpdate(callback: DatasetCallback): void;
-        offUpdate(callback: DatasetCallback): void;
+        /**
+         * Adds a callback to be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback.
+         * @returns {Dataset} The calling Dataset.
+         */
+        onUpdate(callback: DatasetCallback): Dataset;
+        /**
+         * Removes a callback that would be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback
+         * @returns {Dataset} The calling Dataset.
+         */
+        offUpdate(callback: DatasetCallback): Dataset;
         /**
          * Gets the data.
          *
-         * @returns {DataSource|any[]} The calling DataSource, or the current data.
+         * @returns {any[]}
          */
         data(): any[];
         /**
          * Sets the data.
          *
-         * @param {any[]} data The new data.
+         * @param {any[]} data
          * @returns {Dataset} The calling Dataset.
          */
         data(data: any[]): Dataset;
         /**
-         * Get the metadata.
+         * Gets the metadata.
          *
-         * @returns {any} the current
-         * metadata.
+         * @returns {any}
          */
         metadata(): any;
         /**
-         * Set the metadata.
+         * Sets the metadata.
          *
-         * @param {any} metadata The new metadata.
+         * @param {any} metadata
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
