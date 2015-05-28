@@ -135,7 +135,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -151,7 +151,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
-      var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -170,7 +170,7 @@ describe("Plots", () => {
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
-      var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -200,7 +200,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+      var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -242,7 +242,7 @@ describe("Plots", () => {
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+        var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
@@ -261,7 +261,7 @@ describe("Plots", () => {
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+        var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
@@ -282,7 +282,7 @@ describe("Plots", () => {
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+        var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
           .attr("fill", (d) => d.magnitude, colorScale);

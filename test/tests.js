@@ -4040,7 +4040,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Category();
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
             gridPlot.renderTo(svg);
@@ -4053,7 +4053,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
-            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             dataset.data(DATA);
@@ -4068,7 +4068,7 @@ describe("Plots", function () {
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
-            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             var data = [
@@ -4094,7 +4094,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Category();
             var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-            var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+            var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
             gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).renderTo(svg);
             yScale.domain(["U", "V"]);
@@ -4125,7 +4125,7 @@ describe("Plots", function () {
                 var yScale = new Plottable.Scales.Category();
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
                 gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
@@ -4139,7 +4139,7 @@ describe("Plots", function () {
                 var yScale = new Plottable.Scales.Category();
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
                 gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
@@ -4155,7 +4155,7 @@ describe("Plots", function () {
                 var yScale = new Plottable.Scales.Category();
                 var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-                var gridPlot = new Plottable.Plots.Rectangle(xScale, yScale);
+                var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
                 gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
@@ -4690,15 +4690,6 @@ describe("Plots", function () {
         it("auto scales correctly on stacked bar", function () {
             var plot = new Plottable.Plots.StackedBar();
             plot.addDataset(dataset1).addDataset(dataset2);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
-            plot.renderTo(svg);
-            assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
-            svg.remove();
-        });
-        // TODO: Why does this fail?
-        it.skip("failure: TODO: remove", function () {
-            var plot = new Plottable.Plots.StackedBar();
-            plot.addDataset(dataset1);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
