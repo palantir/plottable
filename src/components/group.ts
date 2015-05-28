@@ -6,13 +6,13 @@ export module Components {
     private _components: Component[] = [];
 
     /**
-     * Constructs a Component.Group.
+     * Constructs a Component Group.
      *
-     * A Component.Group is a set of Components that will be rendered on top of
-     * each other. Components added later will be rendered on top of existing Components.
+     * A Group contains Components that will be rendered on top of each other.
+     * Components added later will be rendered on top of Components already in the Group.
      *
      * @constructor
-     * @param {Component[]} components The Components in the resultant Component.Group (default = []).
+     * @param {Component[]=[]} components Components to be added to the Group.
      */
     constructor(components: Component[] = []) {
       super();

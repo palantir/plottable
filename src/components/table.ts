@@ -35,7 +35,7 @@ export module Components {
     /**
      * Constructs a Table.
      *
-     * A Table is used to combine multiple Components in the form of a grid. A
+     * A Table combines Components in the form of a grid. A
      * common case is combining a y-axis, x-axis, and the plotted data via
      * ```typescript
      * new Table([[yAxis, plot],
@@ -43,8 +43,8 @@ export module Components {
      * ```
      *
      * @constructor
-     * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
-     * null can be used if a cell is empty. (default = [])
+     * @param {Component[][]=[]} [rows] A 2-D array of Components to be added to the Table.
+     *   null can be used if a cell is empty.
      */
     constructor(rows: Component[][] = []) {
       super();
@@ -95,8 +95,8 @@ export module Components {
      * ```
      *
      * @param {Component} component The Component to be added.
-     * @param {number} row The row in which to add the Component.
-     * @param {number} col The column in which to add the Component.
+     * @param {number} row
+     * @param {number} col
      * @returns {Table} The calling Table.
      */
     public add(component: Component, row: number, col: number) {
@@ -312,15 +312,13 @@ export module Components {
     }
 
     /**
-     * Gets the row padding on the Table.
-     *
-     * @returns {number} the row padding.
+     * Gets the padding above and below each row, in pixels.
      */
     public rowPadding(): number;
     /**
-     * Sets the row padding on the Table.
+     * Sets the padding above and below each row, in pixels.
      *
-     * @param {number} rowPadding The padding above and below each row, in pixels.
+     * @param {number} rowPadding 
      * @returns {Table} The calling Table.
      */
     public rowPadding(rowPadding: number): Table;
@@ -334,15 +332,13 @@ export module Components {
     }
 
     /**
-     * Gets the column padding on the Table.
-     *
-     * @returns {number} the column padding.
+     * Gets the padding to the left and right of each column, in pixels.
      */
     public columnPadding(): number;
     /**
-     * Sets the column padding on the Table.
+     * Sets the padding to the left and right of each column, in pixels.
      *
-     * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+     * @param {number} columnPadding
      * @returns {Table} The calling Table.
      */
     public columnPadding(columnPadding: number): Table;
@@ -355,6 +351,11 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the weight of a particular row in the Table.
+     * 
+     * @param {number} index
+     */
     public rowWeight(index: number): number;
     /**
      * Sets the layout weight of a particular row.
@@ -377,8 +378,8 @@ export module Components {
      *  .rowWeight(1, 1)
      * ```
      *
-     * @param {number} index The index of the row.
-     * @param {number} weight The weight to be set on the row.
+     * @param {number} index
+     * @param {number} weight
      * @returns {Table} The calling Table.
      */
     public rowWeight(index: number, weight: number): Table;
@@ -391,6 +392,11 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the weight of a particular column in the Table.
+     * 
+     * @param {number} index
+     */
     public columnWeight(index: number): number;
     /**
      * Sets the layout weight of a particular column.
@@ -398,8 +404,8 @@ export module Components {
      *
      * Please see `rowWeight` docs for an example.
      *
-     * @param {number} index The index of the column.
-     * @param {number} weight The weight to be set on the column.
+     * @param {number} index
+     * @param {number} weight
      * @returns {Table} The calling Table.
      */
     public columnWeight(index: number, weight: number): Table;

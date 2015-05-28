@@ -1337,7 +1337,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ComponentCallback = (component: Component) => void;
+    type ComponentCallback = (Component: Component) => void;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1357,25 +1357,23 @@ declare module Plottable {
         /**
          * Attaches the Component as a child of a given D3 Selection.
          *
-         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @param {D3.Selection} selection.
          * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
         /**
          * Adds a callback to be called on anchoring the Component to the DOM.
-         * If the component is already anchored, the callback is called immediately.
+         * If the Component is already anchored, the callback is called immediately.
          *
-         * @param {ComponentCallback} callback The callback to be added.
-         *
+         * @param {ComponentCallback} callback
          * @return {Component}
          */
         onAnchor(callback: ComponentCallback): Component;
         /**
-         * Removes a callback to be called on anchoring the Component to the DOM.
+         * Removes a callback that would be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {ComponentCallback} callback The callback to be removed.
-         *
+         * @param {ComponentCallback} callback
          * @return {Component}
          */
         offAnchor(callback: ComponentCallback): Component;
@@ -1387,13 +1385,13 @@ declare module Plottable {
         protected _setup(): void;
         requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
-         * Computes the size, position, and alignment from the specified values.
+         * Computes and sets the size, position, and alignment of the Component from the specified values.
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {Point} origin Origin of the space offered to the Component.
-         * @param {number} availableWidth
-         * @param {number} availableHeight
+         * @param {Point} [origin] Origin of the space offered to the Component.
+         * @param {number} [availableWidth] Available width in pixels.
+         * @param {number} [availableHeight] Available height in pixels.
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
@@ -1402,52 +1400,47 @@ declare module Plottable {
             height: number;
         };
         /**
-         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
-         * immediately as opposed to queued to the RenderController.
+         * Queues the Component for rendering.
          *
-         * @returns {Component} The calling Component
+         * @returns {Component} The calling Component.
          */
         render(): Component;
         renderImmediately(): Component;
         /**
-         * Causes the Component to recompute layout and redraw.
+         * Causes the Component to re-layout and render.
          *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
+         * This function should be called when a CSS change has occured that could
+         * influence the layout of the Component, such as changing the font size.
          *
          * @returns {Component} The calling Component.
          */
         redraw(): Component;
         /**
-         * Renders the Component into a given DOM element. The element must be as <svg>.
+         * Renders the Component to a given DOM element. The element must be an <svg>.
          *
-         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-         * @returns {Component} The calling component.
+         * @param {String|D3.Selection} element A selector for getting the element to render to, or a D3 selection containing an <svg>.
+         * @returns {Component} The calling Component.
          */
         renderTo(element: String | D3.Selection): Component;
         /**
          * Gets the x alignment of the Component.
-         *
-         * @returns {string} The current x alignment.
          */
         xAlignment(): string;
         /**
          * Sets the x alignment of the Component.
          *
-         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+         * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
          * @returns {Component} The calling Component.
          */
         xAlignment(xAlignment: string): Component;
         /**
          * Gets the y alignment of the Component.
-         *
-         * @returns {string} The current y alignment.
          */
         yAlignment(): string;
         /**
          * Sets the y alignment of the Component.
          *
-         * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
+         * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
          * @returns {Component} The calling Component.
          */
         yAlignment(yAlignment: string): Component;
@@ -1455,7 +1448,6 @@ declare module Plottable {
          * Checks if the Component has a given CSS class.
          *
          * @param {string} cssClass The CSS class to check for.
-         * @returns {boolean} Whether the Component has the given CSS class.
          */
         classed(cssClass: string): boolean;
         /**
@@ -1467,86 +1459,74 @@ declare module Plottable {
          */
         classed(cssClass: string, addClass: boolean): Component;
         /**
-         * Checks if the Component has a fixed width or false if it grows to fill available space.
+         * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
-         *
-         * @returns {boolean} Whether the component has a fixed width.
          */
         fixedWidth(): boolean;
         /**
-         * Checks if the Component has a fixed height or false if it grows to fill available space.
+         * Checks if the Component has a fixed height or if it grows to fill available space.
          * Returns false by default on the base Component class.
-         *
-         * @returns {boolean} Whether the component has a fixed height.
          */
         fixedHeight(): boolean;
         /**
-         * Detaches a Component from the DOM. The component can be reused.
+         * Detaches a Component from the DOM. The Component can be reused.
          *
-         * This should only be used if you plan on reusing the calling
-         * Components. Otherwise, use remove().
+         * This should only be used if you plan on reusing the calling Component. Otherwise, use destroy().
          *
          * @returns The calling Component.
          */
         detach(): Component;
         /**
-         * Adds a callback to be called when th Component is detach()-ed.
+         * Adds a callback to be called when the Component is detach()-ed.
          *
-         * @param {ComponentCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
         onDetach(callback: ComponentCallback): Component;
         /**
-         * Removes a callback to be called when th Component is detach()-ed.
+         * Removes a callback to be called when the Component is detach()-ed.
          * The callback is identified by reference equality.
          *
-         * @param {ComponentCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
         parent(): ComponentContainer;
         parent(parent: ComponentContainer): Component;
         /**
-         * Removes a Component from the DOM and disconnects it from everything it's
-         * listening to (effectively destroying it).
+         * Removes a Component from the DOM and disconnects all listeners.
          */
         destroy(): void;
         /**
-         * Return the width of the component
-         *
-         * @return {number} width of the component
+         * Gets the width of the Component in pixels.
          */
         width(): number;
         /**
-         * Return the height of the component
-         *
-         * @return {number} height of the component
+         * Gets the height of the Component in pixels.
          */
         height(): number;
         /**
          * Gets the origin of the Component relative to its parent.
          *
-         * @return {Point} The x-y position of the Component relative to its parent.
+         * @return {Point}
          */
         origin(): Point;
         /**
          * Gets the origin of the Component relative to the root <svg>.
          *
-         * @return {Point} The x-y position of the Component relative to the root <svg>
+         * @return {Point}
          */
         originToSVG(): Point;
         /**
-         * Returns the foreground selection for the Component
-         * (A selection covering the front of the Component)
+         * Gets the Selection containing the <g> in front of the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} foreground selection for the Component
+         * @return {D3.Selection}
          */
         foreground(): D3.Selection;
         /**
-         * Returns the content selection for the Component
-         * (A selection containing the visual elements of the Component)
+         * Gets a Selection containing a <g> that holds the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
@@ -1554,8 +1534,7 @@ declare module Plottable {
          */
         content(): D3.Selection;
         /**
-         * Returns the background selection for the Component
-         * (A selection appearing behind of the Component)
+         * Gets the Selection containing the <g> behind the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
@@ -1603,13 +1582,13 @@ declare module Plottable {
     module Components {
         class Group extends ComponentContainer {
             /**
-             * Constructs a Component.Group.
+             * Constructs a Component Group.
              *
-             * A Component.Group is a set of Components that will be rendered on top of
-             * each other. Components added later will be rendered on top of existing Components.
+             * A Group contains Components that will be rendered on top of each other.
+             * Components added later will be rendered on top of Components already in the Group.
              *
              * @constructor
-             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
+             * @param {Component[]=[]} components Components to be added to the Group.
              */
             constructor(components?: Component[]);
             protected _forEach(callback: (component: Component) => any): void;
@@ -2220,7 +2199,7 @@ declare module Plottable {
             /**
              * Constructs a Table.
              *
-             * A Table is used to combine multiple Components in the form of a grid. A
+             * A Table combines Components in the form of a grid. A
              * common case is combining a y-axis, x-axis, and the plotted data via
              * ```typescript
              * new Table([[yAxis, plot],
@@ -2228,8 +2207,8 @@ declare module Plottable {
              * ```
              *
              * @constructor
-             * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
-             * null can be used if a cell is empty. (default = [])
+             * @param {Component[][]=[]} [rows] A 2-D array of Components to be added to the Table.
+             *   null can be used if a cell is empty.
              */
             constructor(rows?: Component[][]);
             protected _forEach(callback: (component: Component) => any): void;
@@ -2250,8 +2229,8 @@ declare module Plottable {
              * ```
              *
              * @param {Component} component The Component to be added.
-             * @param {number} row The row in which to add the Component.
-             * @param {number} col The column in which to add the Component.
+             * @param {number} row
+             * @param {number} col
              * @returns {Table} The calling Table.
              */
             add(component: Component, row: number, col: number): Table;
@@ -2259,31 +2238,32 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
-             * Gets the row padding on the Table.
-             *
-             * @returns {number} the row padding.
+             * Gets the padding above and below each row, in pixels.
              */
             rowPadding(): number;
             /**
-             * Sets the row padding on the Table.
+             * Sets the padding above and below each row, in pixels.
              *
-             * @param {number} rowPadding The padding above and below each row, in pixels.
+             * @param {number} rowPadding
              * @returns {Table} The calling Table.
              */
             rowPadding(rowPadding: number): Table;
             /**
-             * Gets the column padding on the Table.
-             *
-             * @returns {number} the column padding.
+             * Gets the padding to the left and right of each column, in pixels.
              */
             columnPadding(): number;
             /**
-             * Sets the column padding on the Table.
+             * Sets the padding to the left and right of each column, in pixels.
              *
-             * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+             * @param {number} columnPadding
              * @returns {Table} The calling Table.
              */
             columnPadding(columnPadding: number): Table;
+            /**
+             * Gets the weight of a particular row in the Table.
+             *
+             * @param {number} index
+             */
             rowWeight(index: number): number;
             /**
              * Sets the layout weight of a particular row.
@@ -2306,11 +2286,16 @@ declare module Plottable {
              *  .rowWeight(1, 1)
              * ```
              *
-             * @param {number} index The index of the row.
-             * @param {number} weight The weight to be set on the row.
+             * @param {number} index
+             * @param {number} weight
              * @returns {Table} The calling Table.
              */
             rowWeight(index: number, weight: number): Table;
+            /**
+             * Gets the weight of a particular column in the Table.
+             *
+             * @param {number} index
+             */
             columnWeight(index: number): number;
             /**
              * Sets the layout weight of a particular column.
@@ -2318,8 +2303,8 @@ declare module Plottable {
              *
              * Please see `rowWeight` docs for an example.
              *
-             * @param {number} index The index of the column.
-             * @param {number} weight The weight to be set on the column.
+             * @param {number} index
+             * @param {number} weight
              * @returns {Table} The calling Table.
              */
             columnWeight(index: number, weight: number): Table;
