@@ -20,7 +20,7 @@ export module Axes {
      * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
      * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
      */
-    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation: string, formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }

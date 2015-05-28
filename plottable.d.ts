@@ -1909,7 +1909,7 @@ declare module Plottable {
              * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
              * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
              */
-            constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
