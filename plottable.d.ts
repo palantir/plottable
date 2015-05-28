@@ -2326,15 +2326,13 @@ declare module Plottable {
                 height: number;
             };
             /**
-             * Gets the bounds of the box.
-             *
-             * @return {Bounds} The current bounds of the box.
+             * Gets the Bounds of the box.
              */
             bounds(): Bounds;
             /**
-             * Sets the bounds of the box, and draws the box.
+             * Sets the Bounds of the box.
              *
-             * @param {Bounds} newBounds The desired bounds of the box.
+             * @param {Bounds} newBounds
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
@@ -2342,8 +2340,6 @@ declare module Plottable {
             renderImmediately(): SelectionBoxLayer;
             /**
              * Gets whether the box is being shown.
-             *
-             * @return {boolean} Whether the box is showing.
              */
             boxVisible(): boolean;
             /**
@@ -3660,32 +3656,37 @@ declare module Plottable {
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
+            /**
+             * Constructs a DragBoxLayer.
+             *
+             * A DragBoxLayer is a SelectionBoxLayer with a built-in Interactions.Drag.
+             * A drag gesture will set the Bounds of the box.
+             * If resizing is enabled using resizable(true), the edges of box can be repositioned.
+             *
+             * @constructor
+             */
             constructor();
             protected _setup(): void;
             renderImmediately(): DragBoxLayer;
             /**
-             * Gets the detection radius of the drag box.
-             *
-             * @return {number} The detection radius of the drag box.
+             * Gets the detection radius of the drag box, in pixels.
              */
             detectionRadius(): number;
             /**
-             * Sets the detection radius of the drag box.
+             * Sets the detection radius of the drag box, in pixels.
              *
-             * @param {number} r The desired detection radius.
+             * @param {number} r
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             detectionRadius(r: number): DragBoxLayer;
             /**
              * Gets whether or not the drag box is resizable.
-             *
-             * @return {boolean} Whether or not the drag box is resizable.
              */
             resizable(): boolean;
             /**
              * Sets whether or not the drag box is resizable.
              *
-             * @param {boolean} canResize Whether or not the drag box should be resizable.
+             * @param {boolean} canResize
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             resizable(canResize: boolean): DragBoxLayer;
@@ -3693,42 +3694,42 @@ declare module Plottable {
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragEnd(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragEnd(callback: DragBoxCallback): DragBoxLayer;
@@ -3740,6 +3741,14 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
+            /**
+             * Constructs an XDragBoxLayer.
+             *
+             * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
+             * The y-values of the bounds() are always set to 0 and the height() of the XDragBoxLayer.
+             *
+             * @constructor
+             */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
@@ -3752,6 +3761,14 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
+            /**
+             * Constructs a YDragBoxLayer.
+             *
+             * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
+             * The x-values of the bounds() are always set to 0 and the width() of the YDragBoxLayer.
+             *
+             * @constructor
+             */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;

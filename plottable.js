@@ -9772,6 +9772,15 @@ var Plottable;
     (function (Components) {
         var DragBoxLayer = (function (_super) {
             __extends(DragBoxLayer, _super);
+            /**
+             * Constructs a DragBoxLayer.
+             *
+             * A DragBoxLayer is a SelectionBoxLayer with a built-in Interactions.Drag.
+             * A drag gesture will set the Bounds of the box.
+             * If resizing is enabled using resizable(true), the edges of box can be repositioned.
+             *
+             * @constructor
+             */
             function DragBoxLayer() {
                 _super.call(this);
                 this._detectionRadius = 3;
@@ -9969,7 +9978,7 @@ var Plottable;
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDragStart = function (callback) {
@@ -9979,7 +9988,7 @@ var Plottable;
             /**
              * Removes a callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDragStart = function (callback) {
@@ -9989,7 +9998,7 @@ var Plottable;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDrag = function (callback) {
@@ -9999,7 +10008,7 @@ var Plottable;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDrag = function (callback) {
@@ -10009,7 +10018,7 @@ var Plottable;
             /**
              * Sets a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.onDragEnd = function (callback) {
@@ -10019,7 +10028,7 @@ var Plottable;
             /**
              * Removes a callback to be called when the dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             DragBoxLayer.prototype.offDragEnd = function (callback) {
@@ -10045,6 +10054,14 @@ var Plottable;
     (function (Components) {
         var XDragBoxLayer = (function (_super) {
             __extends(XDragBoxLayer, _super);
+            /**
+             * Constructs an XDragBoxLayer.
+             *
+             * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
+             * The y-values of the bounds() are always set to 0 and the height() of the XDragBoxLayer.
+             *
+             * @constructor
+             */
             function XDragBoxLayer() {
                 _super.call(this);
                 this.classed("x-drag-box-layer", true);
@@ -10083,6 +10100,14 @@ var Plottable;
     (function (Components) {
         var YDragBoxLayer = (function (_super) {
             __extends(YDragBoxLayer, _super);
+            /**
+             * Constructs a YDragBoxLayer.
+             *
+             * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
+             * The x-values of the bounds() are always set to 0 and the width() of the YDragBoxLayer.
+             *
+             * @constructor
+             */
             function YDragBoxLayer() {
                 _super.call(this);
                 this.classed("y-drag-box-layer", true);

@@ -3,6 +3,14 @@
 module Plottable {
 export module Components {
   export class YDragBoxLayer extends DragBoxLayer {
+    /**
+     * Constructs a YDragBoxLayer.
+     * 
+     * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
+     * The x-values of the bounds() are always set to 0 and the width() of the YDragBoxLayer.
+     * 
+     * @constructor
+     */
     constructor() {
       super();
       this.classed("y-drag-box-layer", true);
