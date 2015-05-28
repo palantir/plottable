@@ -6699,10 +6699,10 @@ var Plottable;
             this.classed("xy-plot", true);
             this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
             this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
-            this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
-            this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+            this._adjustYDomainCallback = function (scale) { return _this._adjustYDomain(); };
+            this._adjustXDomainCallback = function (scale) { return _this._adjustXDomain(); };
+            xScale.onUpdate(this._adjustYDomainCallback);
+            yScale.onUpdate(this._adjustXDomainCallback);
         }
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
@@ -6751,21 +6751,21 @@ var Plottable;
         };
         XYPlot.prototype._uninstallScaleForKey = function (scale, key) {
             _super.prototype._uninstallScaleForKey.call(this, scale, key);
-            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
+            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback : this._adjustXDomainCallback;
             scale.offUpdate(adjustCallback);
         };
         XYPlot.prototype._installScaleForKey = function (scale, key) {
             _super.prototype._installScaleForKey.call(this, scale, key);
-            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
+            var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback : this._adjustXDomainCallback;
             scale.onUpdate(adjustCallback);
         };
         XYPlot.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
             if (this.x().scale) {
-                this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+                this.x().scale.offUpdate(this._adjustYDomainCallback);
             }
             if (this.y().scale) {
-                this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+                this.y().scale.offUpdate(this._adjustXDomainCallback);
             }
             return this;
         };
@@ -6789,12 +6789,12 @@ var Plottable;
                 case "x":
                     this._autoAdjustXScaleDomain = true;
                     this._autoAdjustYScaleDomain = false;
-                    this._adjustXDomainOnChangeFromY();
+                    this._adjustXDomain();
                     break;
                 case "y":
                     this._autoAdjustXScaleDomain = false;
                     this._autoAdjustYScaleDomain = true;
-                    this._adjustYDomainOnChangeFromX();
+                    this._adjustYDomain();
                     break;
                 case "none":
                     this._autoAdjustXScaleDomain = false;
@@ -6846,7 +6846,7 @@ var Plottable;
             this._updateYExtentsAndAutodomain();
             return this;
         };
-        XYPlot.prototype._adjustYDomainOnChangeFromX = function () {
+        XYPlot.prototype._adjustYDomain = function () {
             if (!this._projectorsReady()) {
                 return;
             }
@@ -6854,7 +6854,7 @@ var Plottable;
                 this._updateYExtentsAndAutodomain();
             }
         };
-        XYPlot.prototype._adjustXDomainOnChangeFromY = function () {
+        XYPlot.prototype._adjustXDomain = function () {
             if (!this._projectorsReady()) {
                 return;
             }

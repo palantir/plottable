@@ -6,8 +6,8 @@ module Plottable {
     protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
-    private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
-    private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustYDomainCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustXDomainCallback: ScaleCallback<Scale<any, any>>;
 
     /**
      * Constructs an XYPlot.
@@ -30,11 +30,11 @@ module Plottable {
       this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
       this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
 
-      this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
-      this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
+      this._adjustYDomainCallback = (scale) => this._adjustYDomain();
+      this._adjustXDomainCallback = (scale) => this._adjustXDomain();
 
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+      xScale.onUpdate(this._adjustYDomainCallback);
+      yScale.onUpdate(this._adjustXDomainCallback);
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -94,25 +94,25 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       super._uninstallScaleForKey(scale, key);
-      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                                 : this._adjustXDomainOnChangeFromYCallback;
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback
+                                                 : this._adjustXDomainCallback;
       scale.offUpdate(adjustCallback);
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       super._installScaleForKey(scale, key);
-      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                                 : this._adjustXDomainOnChangeFromYCallback;
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback
+                                                 : this._adjustXDomainCallback;
       scale.onUpdate(adjustCallback);
     }
 
     public destroy() {
       super.destroy();
       if (this.x().scale) {
-        this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+        this.x().scale.offUpdate(this._adjustYDomainCallback);
       }
       if (this.y().scale) {
-        this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+        this.y().scale.offUpdate(this._adjustXDomainCallback);
       }
       return this;
     }
@@ -137,12 +137,12 @@ module Plottable {
         case "x":
           this._autoAdjustXScaleDomain = true;
           this._autoAdjustYScaleDomain = false;
-          this._adjustXDomainOnChangeFromY();
+          this._adjustXDomain();
           break;
         case "y":
           this._autoAdjustXScaleDomain = false;
           this._autoAdjustYScaleDomain = true;
-          this._adjustYDomainOnChangeFromX();
+          this._adjustYDomain();
           break;
         case "none":
           this._autoAdjustXScaleDomain = false;
@@ -198,13 +198,13 @@ module Plottable {
       return this;
     }
 
-    private _adjustYDomainOnChangeFromX() {
+    private _adjustYDomain() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
     }
-    private _adjustXDomainOnChangeFromY() {
+    private _adjustXDomain() {
       if (!this._projectorsReady()) { return; }
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
