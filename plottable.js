@@ -4385,10 +4385,6 @@ var Plottable;
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelPositioning = "center";
-                // Whether or not first/last tick label will still be displayed even if
-                // the label is cut off.
-                this._showFirstTickLabel = false;
-                this._showLastTickLabel = false;
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4586,31 +4582,6 @@ var Plottable;
                     this._tickLabelPositioning = positionLC;
                     this.redraw();
                     return this;
-                }
-            };
-            Numeric.prototype.showEndTickLabel = function (orientation, show) {
-                if ((this._isHorizontal() && orientation === "left") || (!this._isHorizontal() && orientation === "bottom")) {
-                    if (show === undefined) {
-                        return this._showFirstTickLabel;
-                    }
-                    else {
-                        this._showFirstTickLabel = show;
-                        this.render();
-                        return this;
-                    }
-                }
-                else if ((this._isHorizontal() && orientation === "right") || (!this._isHorizontal() && orientation === "top")) {
-                    if (show === undefined) {
-                        return this._showLastTickLabel;
-                    }
-                    else {
-                        this._showLastTickLabel = show;
-                        this.render();
-                        return this;
-                    }
-                }
-                else {
-                    throw new Error("Attempt to show " + orientation + " tick label on a " + (this._isHorizontal() ? "horizontal" : "vertical") + " axis");
                 }
             };
             Numeric.prototype._hideEndTickLabels = function () {
