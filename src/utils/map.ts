@@ -72,7 +72,7 @@ export module Utils {
      * @param {Function} callbackFn The callback to be invoked
      * @param {any} thisArg The `this` context
      */
-    public forEach(callbackFn: any, thisArg: any) {
+    public forEach(callbackFn: Function, thisArg: any) {
       if (thisArg == null) {
         thisArg = this;
       }

@@ -216,7 +216,7 @@ declare module Plottable {
              * @param {Function} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
              */
-            forEach(callbackFn: any, thisArg: any): void;
+            forEach(callbackFn: Function, thisArg: any): void;
             /**
              * Return an array of the values in the Map
              *
