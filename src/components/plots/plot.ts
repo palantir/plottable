@@ -54,13 +54,9 @@ module Plottable {
     /**
      * Constructs a Plot.
      *
-     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-     *
-     * A bare Plot has a DataSource and any number of projectors, which take
-     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+     * Plots display data.
      *
      * @constructor
-     * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
      */
     constructor() {
       super();
@@ -102,6 +98,8 @@ module Plottable {
     }
 
     /**
+     * Adds a Dataset to the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -143,8 +141,29 @@ module Plottable {
       this.render();
     }
 
+    /**
+     * Gets the AccessorScaleBinding for a particular attribute.
+     * 
+     * @param {string} attr
+     */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+    /**
+     * Sets a particular attribute to a constant value, or to the result of an Accessor.
+     * 
+     * @param {string} attr
+     * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+     * @returns {Plot} The calling Plot.
+     */
     public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+    /**
+     * Sets a particular attribute to a scaled constant value or result of an Accessor.
+     * The provided Scale will account for the attribute values when autoDomain()-ing.
+     * 
+     * @param {string} attr
+     * @param {A|Accessor<A>} attrValue
+     * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+     * @returns {Plot} The calling Plot.
+     */
     public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
     public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
                    scale?: Scale<A, number | string>): any {
@@ -209,8 +228,6 @@ module Plottable {
 
     /**
      * Enables or disables animation.
-     *
-     * @param {boolean} enabled Whether or not to animate.
      */
     public animate(enabled: boolean) {
       this._animate = enabled;
@@ -329,17 +346,16 @@ module Plottable {
     }
 
     /**
-     * Get the animator associated with the specified Animator key.
+     * Get the Animator associated with the specified Animator key.
      *
-     * @return {PlotAnimator} The Animator for the specified key.
+     * @return {Animators.Plot}
      */
     public animator(animatorKey: string): Animators.Plot;
     /**
-     * Set the animator associated with the specified Animator key.
+     * Set the Animator associated with the specified Animator key.
      *
-     * @param {string} animatorKey The key for the Animator.
-     * @param {PlotAnimator} animator An Animator to be assigned to
-     * the specified key.
+     * @param {string} animatorKey
+     * @param {Animators.Plot} animator
      * @returns {Plot} The calling Plot.
      */
     public animator(animatorKey: string, animator: Animators.Plot): Plot;
@@ -353,6 +369,8 @@ module Plottable {
     }
 
     /**
+     * Removes a Dataset from the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -433,11 +451,11 @@ module Plottable {
     /**
      * Retrieves all of the Selections of this Plot for the specified Datasets.
      *
-     * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-     * If not provided, all selections will be retrieved.
-     * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-     * in the previous datasetKeys argument (default = false).
-     * @returns {D3.Selection} The retrieved Selections.
+     * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+     *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+     * @param {boolean} exclude If set to true, returns the Selections for all Datasets except
+     *   those specified in the datsets parameter.
+     * @returns {D3.Selection}
      */
     public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
       var datasetKeyArray = this._keysForDatasets(datasets);

@@ -6323,13 +6323,9 @@ var Plottable;
         /**
          * Constructs a Plot.
          *
-         * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-         *
-         * A bare Plot has a DataSource and any number of projectors, which take
-         * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+         * Plots display data.
          *
          * @constructor
-         * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         function Plot() {
             var _this = this;
@@ -6374,6 +6370,8 @@ var Plottable;
             this.datasets().forEach(function (dataset) { return _this.removeDataset(dataset); });
         };
         /**
+         * Adds a Dataset to the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -6464,8 +6462,6 @@ var Plottable;
         };
         /**
          * Enables or disables animation.
-         *
-         * @param {boolean} enabled Whether or not to animate.
          */
         Plot.prototype.animate = function (enabled) {
             this._animate = enabled;
@@ -6581,6 +6577,8 @@ var Plottable;
             }
         };
         /**
+         * Removes a Dataset from the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -6649,11 +6647,11 @@ var Plottable;
         /**
          * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
-         * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-         * in the previous datasetKeys argument (default = false).
-         * @returns {D3.Selection} The retrieved Selections.
+         * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+         *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+         * @param {boolean} exclude If set to true, returns the Selections for all Datasets except
+         *   those specified in the datsets parameter.
+         * @returns {D3.Selection}
          */
         Plot.prototype.getAllSelections = function (datasets, exclude) {
             var _this = this;

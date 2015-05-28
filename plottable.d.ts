@@ -2391,19 +2391,17 @@ declare module Plottable {
         /**
          * Constructs a Plot.
          *
-         * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-         *
-         * A bare Plot has a DataSource and any number of projectors, which take
-         * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
+         * Plots display data.
          *
          * @constructor
-         * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
         anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
         destroy(): void;
         /**
+         * Adds a Dataset to the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -2411,16 +2409,35 @@ declare module Plottable {
         protected _getDrawer(key: string): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
+        /**
+         * Gets the AccessorScaleBinding for a particular attribute.
+         *
+         * @param {string} attr
+         */
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+        /**
+         * Sets a particular attribute to a constant value, or to the result of an Accessor.
+         *
+         * @param {string} attr
+         * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+         * @returns {Plot} The calling Plot.
+         */
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        /**
+         * Sets a particular attribute to a scaled constant value or result of an Accessor.
+         * The provided Scale will account for the attribute values when autoDomain()-ing.
+         *
+         * @param {string} attr
+         * @param {A|Accessor<A>} attrValue
+         * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+         * @returns {Plot} The calling Plot.
+         */
         attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         renderImmediately(): Plot;
         /**
          * Enables or disables animation.
-         *
-         * @param {boolean} enabled Whether or not to animate.
          */
         animate(enabled: boolean): Plot;
         detach(): Plot;
@@ -2435,21 +2452,22 @@ declare module Plottable {
          */
         protected _extentsForProperty(property: string): any[];
         /**
-         * Get the animator associated with the specified Animator key.
+         * Get the Animator associated with the specified Animator key.
          *
-         * @return {PlotAnimator} The Animator for the specified key.
+         * @return {Animators.Plot}
          */
         animator(animatorKey: string): Animators.Plot;
         /**
-         * Set the animator associated with the specified Animator key.
+         * Set the Animator associated with the specified Animator key.
          *
-         * @param {string} animatorKey The key for the Animator.
-         * @param {PlotAnimator} animator An Animator to be assigned to
-         * the specified key.
+         * @param {string} animatorKey
+         * @param {Animators.Plot} animator
          * @returns {Plot} The calling Plot.
          */
         animator(animatorKey: string, animator: Animators.Plot): Plot;
         /**
+         * Removes a Dataset from the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -2467,11 +2485,11 @@ declare module Plottable {
         /**
          * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
-         * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-         * in the previous datasetKeys argument (default = false).
-         * @returns {D3.Selection} The retrieved Selections.
+         * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+         *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+         * @param {boolean} exclude If set to true, returns the Selections for all Datasets except
+         *   those specified in the datsets parameter.
+         * @returns {D3.Selection}
          */
         getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
         /**
