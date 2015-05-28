@@ -265,7 +265,7 @@ export module Plots {
         dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
       } else {
-        dataXRange = (<Range> xRangeOrBounds)
+          dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
       return this._getPlotData(dataXRange, dataYRange);
