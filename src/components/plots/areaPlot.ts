@@ -17,7 +17,7 @@ export module Plots {
      */
     constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
       super(xScale, yScale);
-      this.classed("stacked-area-plot", true);
+      this.classed("area-plot", true);
       this.y0(0, yScale); // default
 
       this.animator("reset", new Animators.Null());
