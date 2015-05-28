@@ -91,8 +91,7 @@ module Plottable {
     protected _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
-      // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
+      this.datasets().forEach((dataset) => this._setupDatasetNodes(dataset));
     }
 
     public destroy() {
@@ -116,12 +115,17 @@ module Plottable {
       this._key2PlotDatasetKey.set(key, pdk);
 
       if (this._isSetup) {
-        drawer.setup(this._renderArea.append("g"));
+        this._setupDatasetNodes(dataset);
       }
 
       dataset.onUpdate(this._onDatasetUpdateCallback);
       this._onDatasetUpdate();
       return this;
+    }
+
+    protected _setupDatasetNodes(dataset: Dataset) {
+      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      drawer.setup(this._renderArea.append("g"));
     }
 
     protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer {

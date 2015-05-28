@@ -57,12 +57,6 @@ export module Plots {
     protected _setup() {
       super._setup();
       this._baseline = this._renderArea.append("line").classed("baseline", true);
-      this.datasets().forEach((dataset) => {
-        var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-        var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writers.Writer(measurer);
-        this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
-      });
     }
 
     /**
@@ -158,15 +152,12 @@ export module Plots {
       }
     }
 
-    public addDataset(dataset: Dataset) {
-      if (this._isSetup) {
-        var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-        var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-        var writer = new SVGTypewriter.Writers.Writer(measurer);
-        this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
-      }
-      super.addDataset(dataset);
-      return this;
+    protected _setupDatasetNodes(dataset: Dataset) {
+      super._setupDatasetNodes(dataset);
+      var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+      var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+      var writer = new SVGTypewriter.Writers.Writer(measurer);
+      this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
     }
 
     public removeDataset(dataset: Dataset) {

@@ -6130,8 +6130,7 @@ var Plottable;
             var _this = this;
             _super.prototype._setup.call(this);
             this._renderArea = this._content.append("g").classed("render-area", true);
-            // HACKHACK on 591
-            this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+            this.datasets().forEach(function (dataset) { return _this._setupDatasetNodes(dataset); });
         };
         Plot.prototype.destroy = function () {
             var _this = this;
@@ -6154,11 +6153,15 @@ var Plottable;
             this._datasetKeysInOrder.push(key);
             this._key2PlotDatasetKey.set(key, pdk);
             if (this._isSetup) {
-                drawer.setup(this._renderArea.append("g"));
+                this._setupDatasetNodes(dataset);
             }
             dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
             return this;
+        };
+        Plot.prototype._setupDatasetNodes = function (dataset) {
+            var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+            drawer.setup(this._renderArea.append("g"));
         };
         Plot.prototype._getDrawer = function (dataset) {
             return new Plottable.Drawers.AbstractDrawer(dataset);
@@ -7215,15 +7218,8 @@ var Plottable;
                 return new Plottable.Drawers.Rect(dataset);
             };
             Bar.prototype._setup = function () {
-                var _this = this;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
-                this.datasets().forEach(function (dataset) {
-                    var labelArea = _this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-                    var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-                    var writer = new SVGTypewriter.Writers.Writer(measurer);
-                    _this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
-                });
             };
             Bar.prototype.baseline = function (value) {
                 if (value == null) {
@@ -7272,15 +7268,12 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.addDataset = function (dataset) {
-                if (this._isSetup) {
-                    var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-                    var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
-                    var writer = new SVGTypewriter.Writers.Writer(measurer);
-                    this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
-                }
-                _super.prototype.addDataset.call(this, dataset);
-                return this;
+            Bar.prototype._setupDatasetNodes = function (dataset) {
+                _super.prototype._setupDatasetNodes.call(this, dataset);
+                var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+                var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
             };
             Bar.prototype.removeDataset = function (dataset) {
                 _super.prototype.removeDataset.call(this, dataset);

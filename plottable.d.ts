@@ -2426,6 +2426,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
+        protected _setupDatasetNodes(dataset: Dataset): void;
         protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
@@ -2752,7 +2753,7 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
-            addDataset(dataset: Dataset): Bar<X, Y>;
+            protected _setupDatasetNodes(dataset: Dataset): void;
             removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Retrieves the closest PlotData to queryPoint.
