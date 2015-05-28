@@ -57,8 +57,8 @@ describe("Utils", () => {
 
     it("forEach()", () => {
       var set = new Plottable.Utils.Set<any>();
-      var values = [1, '2'];
-      set.add(values[0])
+      var values = [1, "2"];
+      set.add(values[0]);
       set.add(values[1]);
       var index = 0;
       set.forEach((value1: any, value2: any, passedSet: Plottable.Utils.Set<any>) => {

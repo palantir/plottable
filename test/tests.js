@@ -8114,7 +8114,7 @@ describe("Utils", function () {
         });
         it("forEach()", function () {
             var set = new Plottable.Utils.Set();
-            var values = [1, '2'];
+            var values = [1, "2"];
             set.add(values[0]);
             set.add(values[1]);
             var index = 0;
