@@ -24,7 +24,7 @@ export module Plots {
       this._stackedExtent = [];
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getAnimator(key: string): Animators.Plot {
       return new Animators.Null();
     }
 
