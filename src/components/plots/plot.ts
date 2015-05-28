@@ -364,13 +364,18 @@ module Plottable {
       var key = this._keyForDataset(dataset);
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
-        pdk.drawer.remove();
+        this._removeDatasetNodes(dataset);
         pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
         this._onDatasetUpdate();
       }
       return this;
+    }
+
+    protected _removeDatasetNodes(dataset: Dataset) {
+      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      drawer.remove();
     }
 
     /**

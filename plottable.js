@@ -6357,13 +6357,17 @@ var Plottable;
             var key = this._keyForDataset(dataset);
             if (key != null && this._key2PlotDatasetKey.has(key)) {
                 var pdk = this._key2PlotDatasetKey.get(key);
-                pdk.drawer.remove();
+                this._removeDatasetNodes(dataset);
                 pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
                 this._onDatasetUpdate();
             }
             return this;
+        };
+        Plot.prototype._removeDatasetNodes = function (dataset) {
+            var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+            drawer.remove();
         };
         /**
          * Returns the internal key for the Dataset, or undefined if not found
@@ -7275,14 +7279,13 @@ var Plottable;
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
             };
-            Bar.prototype.removeDataset = function (dataset) {
-                _super.prototype.removeDataset.call(this, dataset);
+            Bar.prototype._removeDatasetNodes = function (dataset) {
+                _super.prototype._removeDatasetNodes.call(this, dataset);
                 var labelConfig = this._labelConfig.get(dataset);
                 if (labelConfig != null) {
                     labelConfig.labelArea.remove();
                     this._labelConfig.delete(dataset);
                 }
-                return this;
             };
             /**
              * Retrieves the closest PlotData to queryPoint.

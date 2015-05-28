@@ -160,14 +160,13 @@ export module Plots {
       this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
     }
 
-    public removeDataset(dataset: Dataset) {
-      super.removeDataset(dataset);
+    protected _removeDatasetNodes(dataset: Dataset) {
+      super._removeDatasetNodes(dataset);
       var labelConfig = this._labelConfig.get(dataset);
       if (labelConfig != null) {
         labelConfig.labelArea.remove();
         this._labelConfig.delete(dataset);
       }
-      return this;
     }
 
     /**

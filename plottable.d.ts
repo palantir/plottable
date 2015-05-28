@@ -2473,6 +2473,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDatasetNodes(dataset: Dataset): void;
         /**
          * Returns an array of internal keys corresponding to those Datasets actually on the plot
          */
@@ -2754,7 +2755,7 @@ declare module Plottable {
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _setupDatasetNodes(dataset: Dataset): void;
-            removeDataset(dataset: Dataset): Bar<X, Y>;
+            protected _removeDatasetNodes(dataset: Dataset): void;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
