@@ -51,9 +51,6 @@ module Plottable {
        * @param {any} thisArg The `this` context
        */
       public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
-        if (thisArg == null) {
-          thisArg = this;
-        }
         this._values.forEach((value: T) => {
           callback.call(thisArg, value, value, this);
         });

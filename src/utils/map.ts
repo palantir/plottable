@@ -77,9 +77,6 @@ export module Utils {
      * @param {any} thisArg The `this` context
      */
     public forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
-      if (thisArg == null) {
-        thisArg = this;
-      }
       this._keyValuePairs.forEach((keyValuePair) => {
         callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, this);
       });

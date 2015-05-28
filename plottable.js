@@ -452,9 +452,6 @@ var Plottable;
              */
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
-                if (thisArg == null) {
-                    thisArg = this;
-                }
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
@@ -528,9 +525,6 @@ var Plottable;
              */
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
-                if (thisArg == null) {
-                    thisArg = this;
-                }
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
                 });
