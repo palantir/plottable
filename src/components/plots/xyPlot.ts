@@ -154,19 +154,6 @@ module Plottable {
       return this;
     }
 
-    protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
-      attrToProjector["x"] = Plot._scaledAccessor(this.x());
-      attrToProjector["y"] = Plot._scaledAccessor(this.y());
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset) => {
-        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
-      };
-      return attrToProjector;
-    }
-
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
       var xScale = this.x().scale;
@@ -229,8 +216,26 @@ module Plottable {
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
-      var attrToProjector = this._generateAttrToProjector();
-      return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
+      return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = super._getDataToDraw();
+
+      var definedFunction = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return Utils.Methods.isValidNumber(positionX) &&
+               Utils.Methods.isValidNumber(positionY);
+      };
+
+      datasets.forEach((key, data) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        datasets.set(key, data.filter((d, i) => definedFunction(d, i, dataset)));
+      });
+      return datasets;
     }
   }
 }

@@ -54,20 +54,14 @@ export module Plots {
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
-      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-      singleDatumAttributes.forEach((attribute: string) => {
+      Object.keys(attrToProjector).forEach((attribute: string) => {
+        if (attribute === "d") { return; }
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
           data.length > 0 ? projector(data[0], i, dataset) : null;
       });
 
       return attrToProjector;
-    }
-
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined", "d"];
     }
 
     public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
@@ -171,6 +165,14 @@ export module Plots {
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
       };
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
     }
   }
 }

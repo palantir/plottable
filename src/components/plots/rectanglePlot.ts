@@ -41,9 +41,9 @@ export module Plots {
       var attrToProjector = super._generateAttrToProjector();
 
       // Copy each of the different projectors.
-      var xAttr = attrToProjector[Rectangle._X_KEY];
+      var xAttr = Plot._scaledAccessor(this.x());
       var x2Attr = attrToProjector[Rectangle._X2_KEY];
-      var yAttr = attrToProjector[Rectangle._Y_KEY];
+      var yAttr = Plot._scaledAccessor(this.y());
       var y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
       var xScale = this.x().scale;

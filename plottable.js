@@ -2670,12 +2670,6 @@ var Plottable;
                 });
                 return modifiedAttrToProjector;
             };
-            AbstractDrawer.prototype._prepareDrawSteps = function (drawSteps) {
-                // no-op
-            };
-            AbstractDrawer.prototype._prepareData = function (data, drawSteps) {
-                return data;
-            };
             /**
              * Draws the data into the renderArea using the spefic steps and metadata
              *
@@ -2691,10 +2685,8 @@ var Plottable;
                         animator: dr.animator
                     };
                 });
-                var preparedData = this._prepareData(data, appliedDrawSteps);
-                this._prepareDrawSteps(appliedDrawSteps);
-                this._enterData(preparedData);
-                var numberOfIterations = this._numberOfAnimationIterations(preparedData);
+                this._enterData(data);
+                var numberOfIterations = this._numberOfAnimationIterations(data);
                 var delay = 0;
                 appliedDrawSteps.forEach(function (drawStep, i) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
@@ -2850,22 +2842,6 @@ var Plottable;
                     dataElements.classed(this._className, true);
                 }
                 dataElements.exit().remove();
-            };
-            Element.prototype._filterDefinedData = function (data, definedFunction) {
-                return definedFunction ? data.filter(definedFunction) : data;
-            };
-            // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
-            Element.prototype._prepareDrawSteps = function (drawSteps) {
-                _super.prototype._prepareDrawSteps.call(this, drawSteps);
-                drawSteps.forEach(function (d) {
-                    if (d.attrToProjector["defined"]) {
-                        delete d.attrToProjector["defined"];
-                    }
-                });
-            };
-            Element.prototype._prepareData = function (data, drawSteps) {
-                var _this = this;
-                return drawSteps.reduce(function (data, drawStep) { return _this._filterDefinedData(data, drawStep.attrToProjector["defined"]); }, _super.prototype._prepareData.call(this, data, drawSteps));
             };
             Element.prototype._getSelector = function () {
                 return this._svgElement;
@@ -6921,18 +6897,6 @@ var Plottable;
             }
             return this;
         };
-        XYPlot.prototype._propertyProjectors = function () {
-            var _this = this;
-            var attrToProjector = _super.prototype._propertyProjectors.call(this);
-            attrToProjector["x"] = Plottable.Plot._scaledAccessor(this.x());
-            attrToProjector["y"] = Plottable.Plot._scaledAccessor(this.y());
-            attrToProjector["defined"] = function (d, i, dataset) {
-                var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
-                var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
-            };
-            return attrToProjector;
-        };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
             var xScale = this.x().scale;
@@ -6994,8 +6958,23 @@ var Plottable;
             return this.x().accessor != null && this.y().accessor != null;
         };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
-            var attrToProjector = this._generateAttrToProjector();
-            return { x: attrToProjector["x"](datum, index, dataset), y: attrToProjector["y"](datum, index, dataset) };
+            var xProjector = Plottable.Plot._scaledAccessor(this.x());
+            var yProjector = Plottable.Plot._scaledAccessor(this.y());
+            return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+        };
+        XYPlot.prototype._getDataToDraw = function () {
+            var _this = this;
+            var datasets = _super.prototype._getDataToDraw.call(this);
+            var definedFunction = function (d, i, dataset) {
+                var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
+                var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
+                return Plottable.Utils.Methods.isValidNumber(positionX) && Plottable.Utils.Methods.isValidNumber(positionY);
+            };
+            datasets.forEach(function (key, data) {
+                var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                datasets.set(key, data.filter(function (d, i) { return definedFunction(d, i, dataset); }));
+            });
+            return datasets;
         };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
@@ -7048,9 +7027,9 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 // Copy each of the different projectors.
-                var xAttr = attrToProjector[Rectangle._X_KEY];
+                var xAttr = Plottable.Plot._scaledAccessor(this.x());
                 var x2Attr = attrToProjector[Rectangle._X2_KEY];
-                var yAttr = attrToProjector[Rectangle._Y_KEY];
+                var yAttr = Plottable.Plot._scaledAccessor(this.y());
                 var y2Attr = attrToProjector[Rectangle._Y2_KEY];
                 var xScale = this.x().scale;
                 var yScale = this.y().scale;
@@ -7521,9 +7500,9 @@ var Plottable;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
-                var positionF = attrToProjector[secondaryAttr];
+                var positionF = this._isVertical ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.y());
                 var widthF = attrToProjector["width"];
-                var originalPositionFn = attrToProjector[primaryAttr];
+                var originalPositionFn = this._isVertical ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.x());
                 var heightF = function (d, i, dataset) {
                     return Math.abs(scaledBaseline - originalPositionFn(d, i, dataset));
                 };
@@ -7695,17 +7674,14 @@ var Plottable;
             };
             Line.prototype._generateAttrToProjector = function () {
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var wholeDatumAttributes = this._wholeDatumAttributes();
-                var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-                singleDatumAttributes.forEach(function (attribute) {
+                Object.keys(attrToProjector).forEach(function (attribute) {
+                    if (attribute === "d") {
+                        return;
+                    }
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i, dataset) { return data.length > 0 ? projector(data[0], i, dataset) : null; };
                 });
                 return attrToProjector;
-            };
-            Line.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined", "d"];
             };
             Line.prototype.getAllPlotData = function (datasets) {
                 var _this = this;
@@ -7796,6 +7772,14 @@ var Plottable;
                 return function (datum, index, dataset) {
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
                 };
+            };
+            Line.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
+                });
+                return datasets;
             };
             return Line;
         })(Plottable.XYPlot);
