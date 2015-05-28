@@ -8112,6 +8112,35 @@ describe("Utils", function () {
             set.delete(value1);
             assert.isFalse(set.has(value1), "correctly checks that value is no longer in the set");
         });
+        it("forEach()", function () {
+            var set = new Plottable.Utils.Set();
+            var values = [1, '2'];
+            set.add(values[0]);
+            set.add(values[1]);
+            var index = 0;
+            set.forEach(function (value1, value2, passedSet) {
+                assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
+                assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
+                index++;
+            });
+            assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");
+        });
+        it("forEach() not called on empty set", function () {
+            var set = new Plottable.Utils.Set();
+            set.forEach(function (value, value2, mp) {
+                assert.notOk(true, "forEach should not be called because the set is empty");
+            });
+        });
+        it("forEach() can force the this context", function () {
+            var set = new Plottable.Utils.Set();
+            set.add(1);
+            var thisArg = { "foo": "bar" };
+            set.forEach(function (value, value2, mp) {
+                assert.strictEqual(this, thisArg, "The correct this context is forced");
+                assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");
+            }, thisArg);
+        });
     });
 });
 
