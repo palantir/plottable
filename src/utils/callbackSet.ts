@@ -9,9 +9,9 @@ module Plottable {
      */
     export class CallbackSet<CB extends Function> extends Set<CB> {
       public callCallbacks(...args: any[]) {
-        this.values().forEach((callback) => {
+        this.forEach((callback: CB) => {
           callback.apply(this, args);
-        });
+        })
         return this;
       }
     }

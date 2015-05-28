@@ -743,7 +743,7 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this.values().forEach(function (callback) {
+                this.forEach(function (callback) {
                     callback.apply(_this, args);
                 });
                 return this;
