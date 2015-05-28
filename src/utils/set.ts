@@ -7,9 +7,8 @@ module Plottable {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
      */
     export class Set<T> {
-
-
       public size = 0;
+
       private _values: T[];
 
       constructor() {

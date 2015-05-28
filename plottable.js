@@ -378,6 +378,10 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
+        /**
+         * Shim for ES6 map.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+         */
         var Map = (function () {
             function Map() {
                 this._keyValuePairs = [];

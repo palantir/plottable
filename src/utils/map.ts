@@ -2,6 +2,10 @@
 
 module Plottable {
 export module Utils {
+  /**
+   * Shim for ES6 map.
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+   */
   export class Map<K, V> {
     private _keyValuePairs: { key: K; value: V; }[] = [];
 

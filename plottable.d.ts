@@ -177,6 +177,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
+        /**
+         * Shim for ES6 map.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+         */
         class Map<K, V> {
             /**
              * Set a new key/value pair in the Map.
