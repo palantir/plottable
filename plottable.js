@@ -8011,6 +8011,7 @@ var Plottable;
             function StackedArea(xScale, yScale) {
                 _super.call(this, xScale, yScale);
                 this._baselineValue = 0;
+                this.classed("area-plot", true);
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
