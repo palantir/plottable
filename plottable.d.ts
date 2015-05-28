@@ -2373,12 +2373,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        /**
-         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-         */
-        type PlotDatasetKey = {
-            drawer: Drawers.AbstractDrawer;
-        };
         type PlotData = {
             data: any[];
             pixelPoints: Point[];
@@ -2395,7 +2389,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: Utils.Map<Dataset, Plots.PlotDatasetKey>;
+        protected _key2PlotDatasetKey: Utils.Map<Dataset, Drawers.AbstractDrawer>;
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;

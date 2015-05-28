@@ -6149,9 +6149,8 @@ var Plottable;
             }
             ;
             var drawer = this._getDrawer(dataset);
-            var pdk = { drawer: drawer, dataset: dataset, key: key };
             this._datasetKeysInOrder.push(key);
-            this._key2PlotDatasetKey.set(dataset, pdk);
+            this._key2PlotDatasetKey.set(dataset, drawer);
             if (this._isSetup) {
                 this._setupDatasetNodes(dataset);
             }
@@ -6160,7 +6159,7 @@ var Plottable;
             return this;
         };
         Plot.prototype._setupDatasetNodes = function (dataset) {
-            var drawer = this._key2PlotDatasetKey.get(dataset).drawer;
+            var drawer = this._key2PlotDatasetKey.get(dataset);
             drawer.setup(this._renderArea.append("g"));
         };
         Plot.prototype._getDrawer = function (dataset) {
@@ -6361,7 +6360,7 @@ var Plottable;
             return this;
         };
         Plot.prototype._removeDatasetNodes = function (dataset) {
-            var drawer = this._key2PlotDatasetKey.get(dataset).drawer;
+            var drawer = this._key2PlotDatasetKey.get(dataset);
             drawer.remove();
         };
         /**
@@ -6389,7 +6388,7 @@ var Plottable;
         };
         Plot.prototype._getDrawersInOrder = function () {
             var _this = this;
-            return this.datasets().map(function (dataset) { return _this._key2PlotDatasetKey.get(dataset).drawer; });
+            return this.datasets().map(function (dataset) { return _this._key2PlotDatasetKey.get(dataset); });
         };
         Plot.prototype._generateDrawSteps = function () {
             return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
@@ -6428,11 +6427,10 @@ var Plottable;
             }
             var allSelections = [];
             datasets.forEach(function (dataset) {
-                var plotDatasetKey = _this._key2PlotDatasetKey.get(dataset);
-                if (plotDatasetKey == null) {
+                var drawer = _this._key2PlotDatasetKey.get(dataset);
+                if (drawer == null) {
                     return;
                 }
-                var drawer = plotDatasetKey.drawer;
                 drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
                     allSelections.push(this);
                 });
@@ -6453,11 +6451,10 @@ var Plottable;
             var pixelPoints = [];
             var allElements = [];
             datasets.forEach(function (dataset) {
-                var plotDatasetKey = _this._key2PlotDatasetKey.get(dataset);
-                if (plotDatasetKey == null) {
+                var drawer = _this._key2PlotDatasetKey.get(dataset);
+                if (drawer == null) {
                     return;
                 }
-                var drawer = plotDatasetKey.drawer;
                 dataset.data().forEach(function (datum, index) {
                     var pixelPoint = _this._pixelPoint(datum, index, dataset);
                     if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
@@ -7370,7 +7367,7 @@ var Plottable;
             };
             Bar.prototype._getBarsFromDataset = function (dataset, xValOrExtent, yValOrExtent) {
                 var bars = [];
-                var drawer = this._key2PlotDatasetKey.get(dataset).drawer;
+                var drawer = this._key2PlotDatasetKey.get(dataset);
                 drawer._getRenderArea().selectAll("rect").each(function (d) {
                     if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
                         bars.push(this);
@@ -7696,11 +7693,10 @@ var Plottable;
                 var pixelPoints = [];
                 var allElements = [];
                 datasets.forEach(function (dataset) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(dataset);
-                    if (plotDatasetKey == null) {
+                    var drawer = _this._key2PlotDatasetKey.get(dataset);
+                    if (drawer == null) {
                         return;
                     }
-                    var drawer = plotDatasetKey.drawer;
                     dataset.data().forEach(function (datum, index) {
                         var pixelPoint = _this._pixelPoint(datum, index, dataset);
                         if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
