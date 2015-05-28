@@ -10046,6 +10046,12 @@ var Plottable;
                 this._dragEndCallbacks.delete(callback);
                 return this;
             };
+            /**
+             * Gets the internal Interactions.Drag of the DragBoxLayer.
+             */
+            DragBoxLayer.prototype.dragInteraction = function () {
+                return this._dragInteraction;
+            };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
         Components.DragBoxLayer = DragBoxLayer;
