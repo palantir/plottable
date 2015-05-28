@@ -72,31 +72,13 @@ export module Utils {
      * @param {Function} callbackFn The callback to be invoked
      * @param {any} thisArg The `this` context
      */
-    public forEach(callbackFn: Function, thisArg: any) {
+    public forEach(callbackFn: Function, thisArg?: any) {
       if (thisArg == null) {
         thisArg = this;
       }
       this._keyValuePairs.forEach((keyValuePair) => {
         callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, this);
       });
-    }
-
-    /**
-     * Return an array of the values in the Map
-     *
-     * @return {V[]} The values in the store
-     */
-    public values() {
-      return this._keyValuePairs.map((keyValuePair) => keyValuePair.value);
-    }
-
-    /**
-     * Return an array of keys in the Map.
-     *
-     * @return {K[]} The keys in the store
-     */
-    public keys() {
-      return this._keyValuePairs.map((keyValuePair) => keyValuePair.key);
     }
 
     /**

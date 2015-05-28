@@ -123,7 +123,7 @@ module Plottable {
     }
 
     private _includeValues(domain: D[]) {
-      this._includedValues.values().forEach((value) => {
+      this._includedValues.forEach((value: D) => {
         if (value < domain[0]) {
           domain[0] = value;
         }
@@ -144,9 +144,18 @@ module Plottable {
       var p = this._padProportion / 2;
       var min = domain[0];
       var max = domain[1];
-      var paddingExceptions = this._paddingExceptions.values();
-      var newMin = paddingExceptions.indexOf(min) === -1 ? this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p) : min;
-      var newMax = paddingExceptions.indexOf(max) === -1 ? this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p) : max;
+      var minExistsInExceptions = false;
+      var maxExistsInExceptions = false;
+      this._paddingExceptions.forEach((value: D) => {
+        if (value === min) {
+          minExistsInExceptions = true;
+        }
+        if (value === max) {
+          maxExistsInExceptions = true;
+        }
+      });
+      var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
+      var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
       return this._niceDomain([newMin, newMax]);
     }
 

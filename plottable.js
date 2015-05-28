@@ -456,22 +456,6 @@ var Plottable;
                 });
             };
             /**
-             * Return an array of the values in the Map
-             *
-             * @return {V[]} The values in the store
-             */
-            Map.prototype.values = function () {
-                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.value; });
-            };
-            /**
-             * Return an array of keys in the Map.
-             *
-             * @return {K[]} The keys in the store
-             */
-            Map.prototype.keys = function () {
-                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.key; });
-            };
-            /**
              * Delete a key from the Map. Return whether the key was present.
              *
              * @param {K} The key to remove
@@ -1692,7 +1676,7 @@ var Plottable;
             return this;
         };
         QuantitativeScale.prototype._includeValues = function (domain) {
-            this._includedValues.values().forEach(function (value) {
+            this._includedValues.forEach(function (value) {
                 if (value < domain[0]) {
                     domain[0] = value;
                 }
@@ -1712,9 +1696,18 @@ var Plottable;
             var p = this._padProportion / 2;
             var min = domain[0];
             var max = domain[1];
-            var paddingExceptions = this._paddingExceptions.values();
-            var newMin = paddingExceptions.indexOf(min) === -1 ? this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p) : min;
-            var newMax = paddingExceptions.indexOf(max) === -1 ? this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p) : max;
+            var minExistsInExceptions = false;
+            var maxExistsInExceptions = false;
+            this._paddingExceptions.forEach(function (value) {
+                if (value === min) {
+                    minExistsInExceptions = true;
+                }
+                if (value === max) {
+                    maxExistsInExceptions = true;
+                }
+            });
+            var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
+            var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
             return this._niceDomain([newMin, newMax]);
         };
         QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {

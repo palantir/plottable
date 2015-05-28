@@ -216,19 +216,7 @@ declare module Plottable {
              * @param {Function} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
              */
-            forEach(callbackFn: Function, thisArg: any): void;
-            /**
-             * Return an array of the values in the Map
-             *
-             * @return {V[]} The values in the store
-             */
-            values(): V[];
-            /**
-             * Return an array of keys in the Map.
-             *
-             * @return {K[]} The keys in the store
-             */
-            keys(): K[];
+            forEach(callbackFn: Function, thisArg?: any): void;
             /**
              * Delete a key from the Map. Return whether the key was present.
              *
