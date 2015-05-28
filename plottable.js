@@ -487,11 +487,13 @@ var Plottable;
          */
         var Set = (function () {
             function Set() {
+                this.size = 0;
                 this._values = [];
             }
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
+                    this.size++;
                 }
                 return this;
             };
@@ -499,6 +501,7 @@ var Plottable;
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
+                    this.size--;
                     return true;
                 }
                 return false;
@@ -527,9 +530,6 @@ var Plottable;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
                 });
-            };
-            Set.prototype.values = function () {
-                return this._values;
             };
             return Set;
         })();
@@ -1427,12 +1427,12 @@ var Plottable;
         function flush() {
             if (_animationRequested) {
                 // Layout
-                _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                _componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
                 // Top level render; Containers will put their children in the toRender queue
-                _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
+                _componentsNeedingRender.forEach(function (component) { return component.render(); });
                 _isCurrentlyFlushing = true;
                 var failed = new Plottable.Utils.Set();
-                _componentsNeedingRender.values().forEach(function (component) {
+                _componentsNeedingRender.forEach(function (component) {
                     try {
                         component.renderImmediately();
                     }
@@ -1482,7 +1482,11 @@ var Plottable;
         };
         Scale.prototype._getAllExtents = function () {
             var _this = this;
-            return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
+            var providerArray = [];
+            this._extentsProviders.forEach(function (provider) {
+                providerArray.push(provider(_this));
+            });
+            return d3.merge(providerArray);
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
@@ -8539,7 +8543,7 @@ var Plottable;
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            return this._callbacks.every(function (cbs) { return cbs.values().length === 0; });
+            return this._callbacks.every(function (cbs) { return cbs.size === 0; });
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
@@ -9362,7 +9366,7 @@ var Plottable;
              */
             Key.prototype.offKey = function (keyCode, callback) {
                 this._keyCodeCallbacks[keyCode].delete(callback);
-                if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+                if (this._keyCodeCallbacks[keyCode].size === 0) {
                     delete this._keyCodeCallbacks[keyCode];
                 }
                 return this;

@@ -236,6 +236,7 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
          */
         class Set<T> {
+            size: number;
             constructor();
             add(value: T): Set<T>;
             delete(value: T): boolean;
@@ -254,7 +255,6 @@ declare module Plottable {
              * @param {any} thisArg The `this` context
              */
             forEach(callback: Function, thisArg?: any): void;
-            values(): T[];
         }
     }
 }

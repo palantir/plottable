@@ -7,6 +7,7 @@ module Plottable {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
      */
     export class Set<T> {
+      public size = 0;
       private _values: T[];
 
       constructor() {
@@ -16,6 +17,7 @@ module Plottable {
       public add(value: T) {
         if (!this.has(value)) {
           this._values.push(value);
+          this.size++;
         }
         return this;
       }
@@ -24,6 +26,7 @@ module Plottable {
         var index = this._values.indexOf(value);
         if (index !== -1) {
           this._values.splice(index, 1);
+          this.size--;
           return true;
         }
         return false;
@@ -53,10 +56,6 @@ module Plottable {
         this._values.forEach((value: T) => {
           callback.call(thisArg, value, value, this);
         });
-      }
-
-      public values() {
-        return this._values;
       }
     }
   }

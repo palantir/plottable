@@ -69,7 +69,7 @@ export module Interactions {
      */
     public offKey(keyCode: number, callback: KeyCallback) {
       this._keyCodeCallbacks[keyCode].delete(callback);
-      if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+      if (this._keyCodeCallbacks[keyCode].size === 0) {
         delete this._keyCodeCallbacks[keyCode];
       }
       return this;
