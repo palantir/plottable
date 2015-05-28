@@ -2693,9 +2693,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _BarAlignmentToFactor: {
-                [alignment: string]: number;
-            };
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
@@ -2726,15 +2723,6 @@ declare module Plottable {
              * @returns {Bar} The calling Bar.
              */
             baseline(value: number): Bar<X, Y>;
-            /**
-             * Sets the bar alignment relative to the independent axis.
-             * VerticalBarPlot supports "left", "center", "right"
-             * HorizontalBarPlot supports "top", "center", "bottom"
-             *
-             * @param {string} alignment The desired alignment.
-             * @returns {Bar} The calling Bar.
-             */
-            barAlignment(alignment: string): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *

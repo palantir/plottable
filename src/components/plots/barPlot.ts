@@ -5,13 +5,11 @@ export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
     public static ORIENTATION_VERTICAL = "vertical";
     public static ORIENTATION_HORIZONTAL = "horizontal";
-    protected static _BarAlignmentToFactor: {[alignment: string]: number} = {"left": 0, "center": 0.5, "right": 1};
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private _baseline: D3.Selection;
     private _baselineValue: number;
-    private _barAlignmentFactor = 0.5;
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
@@ -70,26 +68,6 @@ export module Plots {
       }
       this._baselineValue = value;
       this._updateValueScale();
-      this.render();
-      return this;
-    }
-
-    /**
-     * Sets the bar alignment relative to the independent axis.
-     * VerticalBarPlot supports "left", "center", "right"
-     * HorizontalBarPlot supports "top", "center", "bottom"
-     *
-     * @param {string} alignment The desired alignment.
-     * @returns {Bar} The calling Bar.
-     */
-    public barAlignment(alignment: string) {
-      var alignmentLC = alignment.toLowerCase();
-      var align2factor = (<typeof Bar> this.constructor)._BarAlignmentToFactor;
-      if (align2factor[alignmentLC] === undefined) {
-        throw new Error("unsupported bar alignment");
-      }
-      this._barAlignmentFactor = align2factor[alignmentLC];
-
       this.render();
       return this;
     }
@@ -337,7 +315,6 @@ export module Plots {
       // Secondary scale/direction: the "width" of the bars
       var attrToProjector = super._generateAttrToProjector();
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      var secondaryScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
       var primaryAttr = this._isVertical ? "y" : "x";
       var secondaryAttr = this._isVertical ? "x" : "y";
       var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -352,13 +329,8 @@ export module Plots {
       attrToProjector["width"] = this._isVertical ? widthF : heightF;
       attrToProjector["height"] = this._isVertical ? heightF : widthF;
 
-      if (secondaryScale instanceof Plottable.Scales.Category) {
-        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
-          positionF(d, i, dataset) - widthF(d, i, dataset) / 2;
-      } else {
-        attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
-          positionF(d, i, dataset) - widthF(d, i, dataset) * this._barAlignmentFactor;
-      }
+      attrToProjector[secondaryAttr] = (d: any, i: number, dataset: Dataset) =>
+        positionF(d, i, dataset) - widthF(d, i, dataset) / 2;
 
       attrToProjector[primaryAttr] = (d: any, i: number, dataset: Dataset) => {
         var originalPos = originalPositionFn(d, i, dataset);
@@ -415,13 +387,13 @@ export module Plots {
 
         var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
         var minScaledDatum = Utils.Methods.min(scaledData, 0);
-        if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
-          barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this._barAlignmentFactor);
+        if (minScaledDatum > 0) {
+          barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
         }
         var maxScaledDatum = Utils.Methods.max(scaledData, 0);
-        if (this._barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
+        if ( maxScaledDatum < barWidthDimension) {
           var margin = barWidthDimension - maxScaledDatum;
-          barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
+          barPixelWidth = Math.min(barPixelWidth, margin * 2);
         }
 
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
@@ -434,7 +406,6 @@ export module Plots {
 
       var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
       var isVertical = this._isVertical;
-      var barAlignmentFactor = this._barAlignmentFactor;
 
       plotData.selection.each(function (datum, index) {
         var bar = d3.select(this);
@@ -447,9 +418,9 @@ export module Plots {
         }
 
         if (isVertical) {
-          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") / 2;
         } else {
-          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") / 2;
         }
       });
 

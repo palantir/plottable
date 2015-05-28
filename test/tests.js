@@ -3395,28 +3395,6 @@ describe("Plots", function () {
                         });
                         svg.remove();
                     });
-                    describe("barAlignment", function () {
-                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                            barPlot.barAlignment("left");
-                            var plotData = barPlot.getAllPlotData();
-                            plotData.data.forEach(function (datum, i) {
-                                var barSelection = d3.select(plotData.selection[0][i]);
-                                var pixelPointX = plotData.pixelPoints[i].x;
-                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-                            });
-                            svg.remove();
-                        });
-                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                            barPlot.barAlignment("right");
-                            var plotData = barPlot.getAllPlotData();
-                            plotData.data.forEach(function (datum, i) {
-                                var barSelection = d3.select(plotData.selection[0][i]);
-                                var pixelPointX = plotData.pixelPoints[i].x;
-                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-                            });
-                            svg.remove();
-                        });
-                    });
                 });
             });
             describe("getClosestPlotData()", function () {
@@ -3715,28 +3693,6 @@ describe("Plots", function () {
                             }
                         });
                         svg.remove();
-                    });
-                    describe("accounting for barAlignment", function () {
-                        it("getAllPlotData() pixel points corrected for barAlignment left", function () {
-                            barPlot.barAlignment("left");
-                            var plotData = barPlot.getAllPlotData();
-                            plotData.data.forEach(function (datum, i) {
-                                var barSelection = d3.select(plotData.selection[0][i]);
-                                var pixelPointY = plotData.pixelPoints[i].y;
-                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-                            });
-                            svg.remove();
-                        });
-                        it("getAllPlotData() pixel points corrected for barAlignment right", function () {
-                            barPlot.barAlignment("right");
-                            var plotData = barPlot.getAllPlotData();
-                            plotData.data.forEach(function (datum, i) {
-                                var barSelection = d3.select(plotData.selection[0][i]);
-                                var pixelPointY = plotData.pixelPoints[i].y;
-                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-                            });
-                            svg.remove();
-                        });
                     });
                 });
             });
