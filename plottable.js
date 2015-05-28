@@ -8151,6 +8151,7 @@ var Plottable;
             function StackedBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, xScale, yScale, orientation);
+                this.classed("stacked-bar-plot", true);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
