@@ -1286,12 +1286,7 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Rect extends Element {
-            constructor(dataset: Dataset, isVertical: boolean);
-            setup(area: D3.Selection): void;
-            removeLabels(): void;
-            _getIfLabelsTooWide(): boolean;
-            drawText(data: any[], attrToProjector: AttributeToProjector, userMetadata: any): void;
-            draw(data: any[], drawSteps: DrawStep[]): number;
+            constructor(dataset: Dataset);
         }
     }
 }
@@ -2431,6 +2426,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
+        protected _setupDatasetNodes(dataset: Dataset): void;
         protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
@@ -2477,6 +2473,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         removeDataset(dataset: Dataset): Plot;
+        protected _removeDatasetNodes(dataset: Dataset): void;
         /**
          * Returns an array of internal keys corresponding to those Datasets actually on the plot
          */
@@ -2653,6 +2650,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }
@@ -2756,6 +2754,8 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
+            protected _setupDatasetNodes(dataset: Dataset): void;
+            protected _removeDatasetNodes(dataset: Dataset): void;
             /**
              * Retrieves the closest PlotData to queryPoint.
              *
@@ -2781,7 +2781,6 @@ declare module Plottable {
              */
             getBars(xValOrExtent: number | Extent, yValOrExtent: number | Extent): D3.Selection;
             protected _additionalPaint(time: number): void;
-            protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -2800,6 +2799,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _getDataToDraw(): D3.Map<any[]>;
         }
     }
 }

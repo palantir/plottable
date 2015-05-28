@@ -2865,91 +2865,12 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var LABEL_VERTICAL_PADDING = 5;
-        var LABEL_HORIZONTAL_PADDING = 5;
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(dataset, isVertical) {
+            function Rect(dataset) {
                 _super.call(this, dataset);
-                this._labelsTooWide = false;
                 this.svgElement("rect");
-                this._isVertical = isVertical;
             }
-            Rect.prototype.setup = function (area) {
-                // need to put the bars in a seperate container so we can ensure that they don't cover labels
-                _super.prototype.setup.call(this, area.append("g").classed("bar-area", true));
-                this._textArea = area.append("g").classed("bar-label-text-area", true);
-                this._measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(this._textArea);
-                this._writer = new SVGTypewriter.Writers.Writer(this._measurer);
-            };
-            Rect.prototype.removeLabels = function () {
-                this._textArea.selectAll("g").remove();
-            };
-            Rect.prototype._getIfLabelsTooWide = function () {
-                return this._labelsTooWide;
-            };
-            Rect.prototype.drawText = function (data, attrToProjector, userMetadata) {
-                var _this = this;
-                var labelTooWide = data.map(function (d, i) {
-                    var text = attrToProjector["label"](d, i, userMetadata).toString();
-                    var w = attrToProjector["width"](d, i, userMetadata);
-                    var h = attrToProjector["height"](d, i, userMetadata);
-                    var x = attrToProjector["x"](d, i, userMetadata);
-                    var y = attrToProjector["y"](d, i, userMetadata);
-                    var positive = attrToProjector["positive"](d, i, userMetadata);
-                    var measurement = _this._measurer.measure(text);
-                    var color = attrToProjector["fill"](d, i, userMetadata);
-                    var dark = Plottable.Utils.Colors.contrast("white", color) * 1.6 < Plottable.Utils.Colors.contrast("black", color);
-                    var primary = _this._isVertical ? h : w;
-                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
-                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
-                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
-                    var tooWide = secondaryAttrTextSpace + 2 * LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
-                    if (measurement.height <= h && measurement.width <= w) {
-                        var offset = Math.min((primary - primarySpace) / 2, LABEL_VERTICAL_PADDING);
-                        if (!positive) {
-                            offset = offset * -1;
-                        }
-                        if (_this._isVertical) {
-                            y += offset;
-                        }
-                        else {
-                            x += offset;
-                        }
-                        var g = _this._textArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var className = dark ? "dark-label" : "light-label";
-                        g.classed(className, true);
-                        var xAlign;
-                        var yAlign;
-                        if (_this._isVertical) {
-                            xAlign = "center";
-                            yAlign = positive ? "top" : "bottom";
-                        }
-                        else {
-                            xAlign = positive ? "left" : "right";
-                            yAlign = "center";
-                        }
-                        var writeOptions = {
-                            selection: g,
-                            xAlign: xAlign,
-                            yAlign: yAlign,
-                            textRotation: 0
-                        };
-                        _this._writer.write(text, w, h, writeOptions);
-                    }
-                    return tooWide;
-                });
-                this._labelsTooWide = labelTooWide.some(function (d) { return d; });
-            };
-            Rect.prototype.draw = function (data, drawSteps) {
-                var _this = this;
-                var attrToProjector = drawSteps[0].attrToProjector;
-                var isValidNumber = Plottable.Utils.Methods.isValidNumber;
-                data = data.filter(function (e, i) {
-                    return isValidNumber(attrToProjector["x"](e, null, _this._dataset)) && isValidNumber(attrToProjector["y"](e, null, _this._dataset)) && isValidNumber(attrToProjector["width"](e, null, _this._dataset)) && isValidNumber(attrToProjector["height"](e, null, _this._dataset));
-                });
-                return _super.prototype.draw.call(this, data, drawSteps);
-            };
             return Rect;
         })(Drawers.Element);
         Drawers.Rect = Rect;
@@ -6209,8 +6130,7 @@ var Plottable;
             var _this = this;
             _super.prototype._setup.call(this);
             this._renderArea = this._content.append("g").classed("render-area", true);
-            // HACKHACK on 591
-            this._getDrawersInOrder().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+            this.datasets().forEach(function (dataset) { return _this._setupDatasetNodes(dataset); });
         };
         Plot.prototype.destroy = function () {
             var _this = this;
@@ -6233,11 +6153,15 @@ var Plottable;
             this._datasetKeysInOrder.push(key);
             this._key2PlotDatasetKey.set(key, pdk);
             if (this._isSetup) {
-                drawer.setup(this._renderArea.append("g"));
+                this._setupDatasetNodes(dataset);
             }
             dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
             return this;
+        };
+        Plot.prototype._setupDatasetNodes = function (dataset) {
+            var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+            drawer.setup(this._renderArea.append("g"));
         };
         Plot.prototype._getDrawer = function (dataset) {
             return new Plottable.Drawers.AbstractDrawer(dataset);
@@ -6433,13 +6357,17 @@ var Plottable;
             var key = this._keyForDataset(dataset);
             if (key != null && this._key2PlotDatasetKey.has(key)) {
                 var pdk = this._key2PlotDatasetKey.get(key);
-                pdk.drawer.remove();
+                this._removeDatasetNodes(dataset);
                 pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
                 this._key2PlotDatasetKey.remove(key);
                 this._onDatasetUpdate();
             }
             return this;
+        };
+        Plot.prototype._removeDatasetNodes = function (dataset) {
+            var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+            drawer.remove();
         };
         /**
          * Returns the internal key for the Dataset, or undefined if not found
@@ -7030,7 +6958,7 @@ var Plottable;
                 }
             }
             Rectangle.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset, true);
+                return new Plottable.Drawers.Rect(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7140,6 +7068,17 @@ var Plottable;
                     var scaledMax = scale.scale(max);
                     return (scaledMax - scaledMin) / Math.abs(max - min);
                 }
+            };
+            Rectangle.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                var attrToProjector = this._generateAttrToProjector();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    datasets.set(key, data);
+                });
+                return datasets;
             };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
@@ -7277,9 +7216,10 @@ var Plottable;
                 this.baseline(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
+                this._labelConfig = new Plottable.Utils.Map();
             }
             Bar.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset, this._isVertical);
+                return new Plottable.Drawers.Rect(dataset);
             };
             Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -7330,6 +7270,21 @@ var Plottable;
                     this._labelFormatter = formatter;
                     this.render();
                     return this;
+                }
+            };
+            Bar.prototype._setupDatasetNodes = function (dataset) {
+                _super.prototype._setupDatasetNodes.call(this, dataset);
+                var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
+                var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+            };
+            Bar.prototype._removeDatasetNodes = function (dataset) {
+                _super.prototype._removeDatasetNodes.call(this, dataset);
+                var labelConfig = this._labelConfig.get(dataset);
+                if (labelConfig != null) {
+                    labelConfig.labelArea.remove();
+                    this._labelConfig.delete(dataset);
                 }
             };
             /**
@@ -7465,21 +7420,81 @@ var Plottable;
                     "y2": this._isVertical ? scaledBaseline : this.height()
                 };
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
-                var drawers = this._getDrawersInOrder();
-                drawers.forEach(function (d) { return d.removeLabels(); });
+                this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 if (this._labelsEnabled) {
                     Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
             Bar.prototype._drawLabels = function () {
                 var _this = this;
-                var drawers = this._getDrawersInOrder();
-                var attrToProjector = this._generateAttrToProjector();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) { return drawers[i].drawText(dataToDraw.get(k), attrToProjector, _this._key2PlotDatasetKey.get(k).dataset); });
-                if (this._hideBarsIfAnyAreTooWide && drawers.some(function (d) { return d._getIfLabelsTooWide(); })) {
-                    drawers.forEach(function (d) { return d.removeLabels(); });
+                var labelsTooWide = false;
+                this._datasetKeysInOrder.forEach(function (k, i) { return labelsTooWide = labelsTooWide || _this._drawLabel(dataToDraw.get(k), _this._key2PlotDatasetKey.get(k).dataset); });
+                if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
+                    this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 }
+            };
+            Bar.prototype._drawLabel = function (data, dataset) {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelConfig = this._labelConfig.get(dataset);
+                var labelArea = labelConfig.labelArea;
+                var measurer = labelConfig.measurer;
+                var writer = labelConfig.writer;
+                var labelTooWide = data.map(function (d, i) {
+                    var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
+                    var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());
+                    var primaryScale = _this._isVertical ? _this.y().scale : _this.x().scale;
+                    var scaledBaseline = primaryScale.scale(_this._baselineValue);
+                    var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
+                    var w = attrToProjector["width"](d, i, dataset);
+                    var h = attrToProjector["height"](d, i, dataset);
+                    var x = attrToProjector["x"](d, i, dataset);
+                    var y = attrToProjector["y"](d, i, dataset);
+                    var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
+                    var measurement = measurer.measure(text);
+                    var color = attrToProjector["fill"](d, i, dataset);
+                    var dark = Plottable.Utils.Colors.contrast("white", color) * 1.6 < Plottable.Utils.Colors.contrast("black", color);
+                    var primary = _this._isVertical ? h : w;
+                    var primarySpace = _this._isVertical ? measurement.height : measurement.width;
+                    var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
+                    var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
+                    var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+                    if (measurement.height <= h && measurement.width <= w) {
+                        var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
+                        if (!positive) {
+                            offset = offset * -1;
+                        }
+                        if (_this._isVertical) {
+                            y += offset;
+                        }
+                        else {
+                            x += offset;
+                        }
+                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        var xAlign;
+                        var yAlign;
+                        if (_this._isVertical) {
+                            xAlign = "center";
+                            yAlign = positive ? "top" : "bottom";
+                        }
+                        else {
+                            xAlign = positive ? "left" : "right";
+                            yAlign = "center";
+                        }
+                        var writeOptions = {
+                            selection: g,
+                            xAlign: xAlign,
+                            yAlign: yAlign,
+                            textRotation: 0
+                        };
+                        writer.write(text, w, h, writeOptions);
+                    }
+                    return tooWide;
+                });
+                return labelTooWide.some(function (d) { return d; });
             };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
@@ -7527,13 +7542,6 @@ var Plottable;
                     // then width/height carries it to baseline
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
-                var primaryAccessor = this._propertyBindings.get(primaryAttr).accessor;
-                if (this._labelsEnabled && this._labelFormatter) {
-                    attrToProjector["label"] = function (d, i, dataset) {
-                        return _this._labelFormatter(primaryAccessor(d, i, dataset));
-                    };
-                    attrToProjector["positive"] = function (d, i, dataset) { return originalPositionFn(d, i, dataset) <= scaledBaseline; };
-                }
                 return attrToProjector;
             };
             /**
@@ -7614,12 +7622,26 @@ var Plottable;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
             };
+            Bar.prototype._getDataToDraw = function () {
+                var _this = this;
+                var datasets = d3.map();
+                var attrToProjector = this._generateAttrToProjector();
+                this._datasetKeysInOrder.forEach(function (key) {
+                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    datasets.set(key, data);
+                });
+                return datasets;
+            };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";
             Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
+            Bar._LABEL_AREA_CLASS = "bar-label-text-area";
+            Bar._LABEL_VERTICAL_PADDING = 5;
+            Bar._LABEL_HORIZONTAL_PADDING = 5;
             return Bar;
         })(Plottable.XYPlot);
         Plots.Bar = Bar;
