@@ -33,6 +33,28 @@ module Plottable {
         return this._values.indexOf(value) !== -1;
       }
 
+      /**
+       * The forEach method executes the provided callback once for each value which actually exists
+       * in the Set object. It is not invoked for values which have been deleted. However, it is executed
+       * for values which are present but have the value undefined.
+       *
+       * Callback is invoked with three arguments:
+       *   - the element value
+       *   - the element value
+       *   - the Set object being traversed
+       *
+       * @param {Function} callback The callback to be invoked
+       * @param {any} thisArg The `this` context
+       */
+      public forEach(callback: Function, thisArg?: any) {
+        if (thisArg == null) {
+          thisArg = this;
+        }
+        this._values.forEach((value: T) => {
+          callback.call(thisArg, value, value, this);
+        });
+      }
+
       public values() {
         return this._values;
       }

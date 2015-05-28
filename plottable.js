@@ -506,6 +506,28 @@ var Plottable;
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
+            /**
+             * The forEach method executes the provided callback once for each value which actually exists
+             * in the Set object. It is not invoked for values which have been deleted. However, it is executed
+             * for values which are present but have the value undefined.
+             *
+             * Callback is invoked with three arguments:
+             *   - the element value
+             *   - the element value
+             *   - the Set object being traversed
+             *
+             * @param {Function} callback The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            Set.prototype.forEach = function (callback, thisArg) {
+                var _this = this;
+                if (thisArg == null) {
+                    thisArg = this;
+                }
+                this._values.forEach(function (value) {
+                    callback.call(thisArg, value, value, _this);
+                });
+            };
             Set.prototype.values = function () {
                 return this._values;
             };

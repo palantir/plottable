@@ -240,6 +240,20 @@ declare module Plottable {
             add(value: T): Set<T>;
             delete(value: T): boolean;
             has(value: T): boolean;
+            /**
+             * The forEach method executes the provided callback once for each value which actually exists
+             * in the Set object. It is not invoked for values which have been deleted. However, it is executed
+             * for values which are present but have the value undefined.
+             *
+             * Callback is invoked with three arguments:
+             *   - the element value
+             *   - the element value
+             *   - the Set object being traversed
+             *
+             * @param {Function} callback The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            forEach(callback: Function, thisArg?: any): void;
             values(): T[];
         }
     }
