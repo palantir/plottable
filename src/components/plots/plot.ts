@@ -443,17 +443,10 @@ module Plottable {
      *
      * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
      * If not provided, all selections will be retrieved.
-     * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-     * in the previous datasetKeys argument (default = false).
      * @returns {D3.Selection} The retrieved Selections.
      */
-    public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
+    public getAllSelections(datasets = this.datasets()): D3.Selection {
       var datasetKeyArray = this._keysForDatasets(datasets);
-
-      if (exclude) {
-        var excludedDatasetKeys = d3.set(datasetKeyArray);
-        datasetKeyArray = this._datasetKeysInOrder.filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
-      }
 
       var allSelections: EventTarget[] = [];
 

@@ -194,10 +194,6 @@ describe("Plots", () => {
       var oneElementSelection = plot.getAllSelections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
-
-      var nonExcludedSelection = plot.getAllSelections([dataset1], true);
-      assert.strictEqual(nonExcludedSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 

@@ -6394,19 +6394,12 @@ var Plottable;
          *
          * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
          * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-         * in the previous datasetKeys argument (default = false).
          * @returns {D3.Selection} The retrieved Selections.
          */
-        Plot.prototype.getAllSelections = function (datasets, exclude) {
+        Plot.prototype.getAllSelections = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            if (exclude === void 0) { exclude = false; }
             var datasetKeyArray = this._keysForDatasets(datasets);
-            if (exclude) {
-                var excludedDatasetKeys = d3.set(datasetKeyArray);
-                datasetKeyArray = this._datasetKeysInOrder.filter(function (datasetKey) { return !excludedDatasetKeys.has(datasetKey); });
-            }
             var allSelections = [];
             datasetKeyArray.forEach(function (datasetKey) {
                 var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
@@ -7912,14 +7905,10 @@ var Plottable;
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()), Plottable.Plot._scaledAccessor(this.y0()));
                 return propertyToProjectors;
             };
-            Area.prototype.getAllSelections = function (datasets, exclude) {
+            Area.prototype.getAllSelections = function (datasets) {
                 var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
-                if (exclude === void 0) { exclude = false; }
-                var allSelections = _super.prototype.getAllSelections.call(this, datasets, exclude)[0];
-                if (exclude) {
-                    datasets = this.datasets().filter(function (dataset) { return datasets.indexOf(dataset) < 0; });
-                }
+                var allSelections = _super.prototype.getAllSelections.call(this, datasets)[0];
                 var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
                 lineDrawers.forEach(function (ld, i) { return allSelections.push(ld._getSelection(i).node()); });
                 return d3.selectAll(allSelections);
