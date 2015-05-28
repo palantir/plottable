@@ -222,7 +222,7 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = super._getDataToDraw();
+      var dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
       var definedFunction = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
@@ -231,11 +231,10 @@ module Plottable {
                Utils.Methods.isValidNumber(positionY);
       };
 
-      datasets.forEach((key, data) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        datasets.set(key, data.filter((d, i) => definedFunction(d, i, dataset)));
+      this.datasets().forEach((dataset) => {
+        dataToDraw.set(dataset, dataToDraw.get(dataset).filter((d, i) => definedFunction(d, i, dataset)));
       });
-      return datasets;
+      return dataToDraw;
     }
   }
 }

@@ -164,11 +164,9 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
-      });
-      return datasets;
+      var dataToDraw = new Utils.Map<Dataset, any[]> ();
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      return dataToDraw;
     }
   }
 }

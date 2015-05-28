@@ -6403,18 +6403,15 @@ var Plottable;
             // no-op
         };
         Plot.prototype._getDataToDraw = function () {
-            var _this = this;
-            var datasets = d3.map();
-            this._datasetKeysInOrder.forEach(function (key) {
-                datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
-            });
+            var datasets = new Plottable.Utils.Map();
+            this.datasets().forEach(function (dataset) { return datasets.set(dataset, dataset.data()); });
             return datasets;
         };
         Plot.prototype._paint = function () {
             var drawSteps = this._generateDrawSteps();
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
-            var times = this._datasetKeysInOrder.map(function (k, i) { return drawers[i].draw(dataToDraw.get(k), drawSteps); });
+            var times = this.datasets().map(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
             var maxTime = Plottable.Utils.Methods.max(times, 0);
             this._additionalPaint(maxTime);
         };
@@ -6668,11 +6665,10 @@ var Plottable;
                     return dataToDraw;
                 }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
-                var datasetKey = this._datasetKeysInOrder[0];
-                var data = dataToDraw.get(datasetKey);
-                var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+                var ds = this.datasets()[0];
+                var data = dataToDraw.get(ds);
                 var filteredData = data.filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
-                dataToDraw.set(datasetKey, filteredData);
+                dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
             Pie.prototype._pixelPoint = function (datum, index, dataset) {
@@ -6901,17 +6897,16 @@ var Plottable;
         };
         XYPlot.prototype._getDataToDraw = function () {
             var _this = this;
-            var datasets = _super.prototype._getDataToDraw.call(this);
+            var dataToDraw = _super.prototype._getDataToDraw.call(this);
             var definedFunction = function (d, i, dataset) {
                 var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                 var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
                 return Plottable.Utils.Methods.isValidNumber(positionX) && Plottable.Utils.Methods.isValidNumber(positionY);
             };
-            datasets.forEach(function (key, data) {
-                var dataset = _this._key2PlotDatasetKey.get(key).dataset;
-                datasets.set(key, data.filter(function (d, i) { return definedFunction(d, i, dataset); }));
+            this.datasets().forEach(function (dataset) {
+                dataToDraw.set(dataset, dataToDraw.get(dataset).filter(function (d, i) { return definedFunction(d, i, dataset); }));
             });
-            return datasets;
+            return dataToDraw;
         };
         XYPlot._X_KEY = "x";
         XYPlot._Y_KEY = "y";
@@ -7070,15 +7065,13 @@ var Plottable;
                 }
             };
             Rectangle.prototype._getDataToDraw = function () {
-                var _this = this;
-                var datasets = d3.map();
+                var dataToDraw = new Plottable.Utils.Map();
                 var attrToProjector = this._generateAttrToProjector();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                this.datasets().forEach(function (dataset) {
                     var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
-                    datasets.set(key, data);
+                    dataToDraw.set(dataset, data);
                 });
-                return datasets;
+                return dataToDraw;
             };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
@@ -7429,7 +7422,7 @@ var Plottable;
                 var _this = this;
                 var dataToDraw = this._getDataToDraw();
                 var labelsTooWide = false;
-                this._datasetKeysInOrder.forEach(function (k, i) { return labelsTooWide = labelsTooWide || _this._drawLabel(dataToDraw.get(k), _this._key2PlotDatasetKey.get(k).dataset); });
+                this.datasets().forEach(function (dataset) { return labelsTooWide = labelsTooWide || _this._drawLabel(dataToDraw.get(dataset), dataset); });
                 if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
                     this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 }
@@ -7623,15 +7616,13 @@ var Plottable;
                 return { x: x, y: y };
             };
             Bar.prototype._getDataToDraw = function () {
-                var _this = this;
-                var datasets = d3.map();
+                var dataToDraw = new Plottable.Utils.Map();
                 var attrToProjector = this._generateAttrToProjector();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    var dataset = _this._key2PlotDatasetKey.get(key).dataset;
+                this.datasets().forEach(function (dataset) {
                     var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
-                    datasets.set(key, data);
+                    dataToDraw.set(dataset, data);
                 });
-                return datasets;
+                return dataToDraw;
             };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";
@@ -7801,12 +7792,9 @@ var Plottable;
                 };
             };
             Line.prototype._getDataToDraw = function () {
-                var _this = this;
-                var datasets = d3.map();
-                this._datasetKeysInOrder.forEach(function (key) {
-                    datasets.set(key, _this._key2PlotDatasetKey.get(key).dataset.data());
-                });
-                return datasets;
+                var dataToDraw = new Plottable.Utils.Map();
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+                return dataToDraw;
             };
             return Line;
         })(Plottable.XYPlot);
@@ -7879,10 +7867,7 @@ var Plottable;
                 var _this = this;
                 var drawSteps = this._generateLineDrawSteps();
                 var dataToDraw = this._getDataToDraw();
-                this._datasetKeysInOrder.forEach(function (k, i) {
-                    var dataset = _this._key2PlotDatasetKey.get(k).dataset;
-                    _this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
-                });
+                this.datasets().forEach(function (dataset) { return _this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps); });
             };
             Area.prototype._generateLineDrawSteps = function () {
                 var drawSteps = [];

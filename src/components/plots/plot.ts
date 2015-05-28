@@ -417,10 +417,8 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
-      });
+      var datasets: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+      this.datasets().forEach((dataset) => datasets.set(dataset, dataset.data()));
       return datasets;
     }
 
@@ -429,9 +427,9 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      var times = this._datasetKeysInOrder.map((k, i) =>
+      var times = this.datasets().map((ds, i) =>
         drawers[i].draw(
-          dataToDraw.get(k),
+          dataToDraw.get(ds),
           drawSteps
         ));
       var maxTime = Utils.Methods.max(times, 0);

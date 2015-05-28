@@ -145,11 +145,10 @@ export module Plots {
       var dataToDraw = super._getDataToDraw();
       if (this.datasets().length === 0) { return dataToDraw; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      var datasetKey = this._datasetKeysInOrder[0];
-      var data = dataToDraw.get(datasetKey);
-      var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+      var ds = this.datasets()[0];
+      var data = dataToDraw.get(ds);
       var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
-      dataToDraw.set(datasetKey, filteredData);
+      dataToDraw.set(ds, filteredData);
       return dataToDraw;
     }
 

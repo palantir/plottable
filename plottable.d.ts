@@ -2483,7 +2483,7 @@ declare module Plottable {
         protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         /**
          * Retrieves all of the Selections of this Plot for the specified Datasets.
          *
@@ -2546,7 +2546,7 @@ declare module Plottable {
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
@@ -2607,7 +2607,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
 }
 
@@ -2650,7 +2650,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2799,7 +2799,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2836,7 +2836,7 @@ declare module Plottable {
             getClosestPlotData(queryPoint: Point): PlotData;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2895,7 +2895,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
