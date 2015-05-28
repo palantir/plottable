@@ -240,7 +240,7 @@ var Plottable;
              */
             function copyMap(oldMap) {
                 var newMap = {};
-                d3.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
+                Object.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
                 return newMap;
             }
             Methods.copyMap = copyMap;
@@ -2666,7 +2666,7 @@ var Plottable;
             };
             AbstractDrawer.prototype._applyMetadata = function (attrToProjector, dataset) {
                 var modifiedAttrToProjector = {};
-                d3.keys(attrToProjector).forEach(function (attr) {
+                Object.keys(attrToProjector).forEach(function (attr) {
                     modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, dataset); };
                 });
                 return modifiedAttrToProjector;
@@ -7750,7 +7750,7 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var wholeDatumAttributes = this._wholeDatumAttributes();
                 var isSingleDatumAttr = function (attr) { return wholeDatumAttributes.indexOf(attr) === -1; };
-                var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+                var singleDatumAttributes = Object.keys(attrToProjector).filter(isSingleDatumAttr);
                 singleDatumAttributes.forEach(function (attribute) {
                     var projector = attrToProjector[attribute];
                     attrToProjector[attribute] = function (data, i, dataset) { return data.length > 0 ? projector(data[0], i, dataset) : null; };

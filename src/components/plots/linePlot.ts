@@ -52,7 +52,7 @@ export module Plots {
       var attrToProjector = super._generateAttrToProjector();
       var wholeDatumAttributes = this._wholeDatumAttributes();
       var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
+      var singleDatumAttributes = Object.keys(attrToProjector).filter(isSingleDatumAttr);
       singleDatumAttributes.forEach((attribute: string) => {
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
