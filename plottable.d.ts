@@ -3769,6 +3769,10 @@ declare module Plottable {
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragEnd(callback: DragBoxCallback): DragBoxLayer;
+            /**
+             * Gets the internal Interactions.Drag of the DragBoxLayer.
+             */
+            dragInteraction(): Interactions.Drag;
         }
     }
 }

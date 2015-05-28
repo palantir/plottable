@@ -328,6 +328,12 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the internal Interactions.Drag of the DragBoxLayer.
+     */
+    public dragInteraction() {
+      return this._dragInteraction;
+    }
   }
 }
 }
