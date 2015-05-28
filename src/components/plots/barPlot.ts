@@ -142,6 +142,16 @@ export module Plots {
       }
     }
 
+    /**
+     * Returns the Entity nearest to the query point according to the following algorithm:
+     *   - If the query point is inside a bar, returns the Entity for that bar.
+     *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+     *     breaking ties with the secondary direction.
+     * Returns undefined if no Entity can be found.
+     * 
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     */
     public entityNearest(queryPoint: Point): Plots.Entity {
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
@@ -155,8 +165,7 @@ export module Plots {
       var tolerance = 0.5;
 
       var closest: Plots.Entity;
-      var entities = this.entities();
-      entities.forEach((entity) => {
+      this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }

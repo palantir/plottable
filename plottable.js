@@ -6682,6 +6682,13 @@ var Plottable;
             });
             return d3.selectAll(allSelections);
         };
+        /**
+         * Gets the Entities associated with the specified Datasets.
+         *
+         * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+         *   If not provided, returns defaults to all Datasets on the Plot.
+         * @return {Plots.Entity[]}
+         */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
@@ -6710,7 +6717,7 @@ var Plottable;
             return entities;
         };
         /**
-         * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
+         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
          *
          * @param {Point} queryPoint
          * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
@@ -6719,8 +6726,7 @@ var Plottable;
             var _this = this;
             var closestDistanceSquared = Infinity;
             var closest;
-            var entities = this.entities();
-            entities.forEach(function (entity) {
+            this.entities().forEach(function (entity) {
                 if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
@@ -7394,6 +7400,16 @@ var Plottable;
                     return this;
                 }
             };
+            /**
+             * Returns the Entity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the Entity for that bar.
+             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             *     breaking ties with the secondary direction.
+             * Returns undefined if no Entity can be found.
+             *
+             * @param {Point} queryPoint
+             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             */
             Bar.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
                 var minPrimaryDist = Infinity;
@@ -7405,8 +7421,7 @@ var Plottable;
                 // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
                 var tolerance = 0.5;
                 var closest;
-                var entities = this.entities();
-                entities.forEach(function (entity) {
+                this.entities().forEach(function (entity) {
                     if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
@@ -7715,13 +7730,18 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
+            /**
+             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             *
+             * @param {Point} queryPoint
+             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             */
             Line.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
                 var closest;
-                var entities = this.entities();
-                entities.forEach(function (entity) {
+                this.entities().forEach(function (entity) {
                     if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }

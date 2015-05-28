@@ -2512,9 +2512,16 @@ declare module Plottable {
          * @returns {D3.Selection} The retrieved Selections.
          */
         getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
+        /**
+         * Gets the Entities associated with the specified Datasets.
+         *
+         * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+         *   If not provided, returns defaults to all Datasets on the Plot.
+         * @return {Plots.Entity[]}
+         */
         entities(datasets?: Dataset[]): Plots.Entity[];
         /**
-         * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
+         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
          *
          * @param {Point} queryPoint
          * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
@@ -2746,6 +2753,16 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
+            /**
+             * Returns the Entity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the Entity for that bar.
+             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             *     breaking ties with the secondary direction.
+             * Returns undefined if no Entity can be found.
+             *
+             * @param {Point} queryPoint
+             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             */
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
@@ -2798,6 +2815,12 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
+            /**
+             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             *
+             * @param {Point} queryPoint
+             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             */
             entityNearest(queryPoint: Point): Plots.Entity;
         }
     }

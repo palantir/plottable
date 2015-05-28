@@ -456,6 +456,13 @@ module Plottable {
       return d3.selectAll(allSelections);
     }
 
+    /**
+     * Gets the Entities associated with the specified Datasets.
+     *
+     * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+     *   If not provided, returns defaults to all Datasets on the Plot.
+     * @return {Plots.Entity[]}
+     */
     public entities(datasets = this.datasets()): Plots.Entity[] {
       var entities: Plots.Entity[] = [];
       datasets.forEach((dataset) => {
@@ -483,7 +490,7 @@ module Plottable {
     }
 
     /**
-     * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
+     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
      * 
      * @param {Point} queryPoint
      * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
@@ -491,8 +498,7 @@ module Plottable {
     public entityNearest(queryPoint: Point): Plots.Entity {
       var closestDistanceSquared = Infinity;
       var closest: Plots.Entity;
-      var entities = this.entities();
-      entities.forEach((entity) => {
+      this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
