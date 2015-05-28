@@ -3,16 +3,14 @@
 module Plottable {
   /**
    * The RenderController is responsible for enqueueing and synchronizing
-   * layout and render calls for Plottable components.
+   * layout and render calls for Components.
    *
-   * Layouts and renders occur inside an animation callback
+   * Layout and render calls occur inside an animation callback
    * (window.requestAnimationFrame if available).
    *
-   * If you require immediate rendering, call RenderController.flush() to
-   * perform enqueued layout and rendering serially.
+   * RenderController.flush() immediately lays out and renders all Components currently enqueued.
    *
-   * If you want to always have immediate rendering (useful for debugging),
-   * call
+   * To always have immediate rendering (useful for debugging), call
    * ```typescript
    * Plottable.RenderController.setRenderPolicy(
    *   new Plottable.RenderPolicies.Immediate()
@@ -48,10 +46,9 @@ module Plottable {
     }
 
     /**
-     * If the RenderController is enabled, we enqueue the component for
-     * render. Otherwise, it is rendered immediately.
-     *
-     * @param {Component} component Any Plottable component.
+     * Enqueues the Component for rendering.
+     * 
+     * @param {Component} component
      */
     export function registerToRender(component: Component) {
       if (_isCurrentlyFlushing) {
@@ -62,10 +59,9 @@ module Plottable {
     }
 
     /**
-     * If the RenderController is enabled, we enqueue the component for
-     * layout and render. Otherwise, it is rendered immediately.
-     *
-     * @param {Component} component Any Plottable component.
+     * Enqueus the Component for layout and rendering.
+     * 
+     * @param {Component} component
      */
     export function registerToComputeLayout(component: Component) {
       _componentsNeedingComputeLayout.add(component);
@@ -82,8 +78,8 @@ module Plottable {
     }
 
     /**
-     * Render everything that is waiting to be rendered right now, instead of
-     * waiting until the next frame.
+     * Renders all Components waiting to be rendered immediately,
+     * instead of waiting until the next frame.
      *
      * Useful to call when debugging.
      */

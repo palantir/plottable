@@ -526,14 +526,14 @@ declare module Plottable {
 declare module Plottable {
     module RenderPolicies {
         /**
-         * A policy to render components.
+         * A policy for rendering Components.
          */
         interface RenderPolicy {
             render(): any;
         }
         /**
-         * Never queue anything, render everything immediately. Useful for
-         * debugging, horrible for performance.
+         * Never queue anything, render everything immediately.
+         * Useful for debugging, horrible for performance.
          */
         class Immediate implements RenderPolicy {
             render(): void;
@@ -546,9 +546,9 @@ declare module Plottable {
             render(): void;
         }
         /**
-         * Renders with `setTimeout`. This is generally an inferior way to render
-         * compared to `requestAnimationFrame`, but it's still there if you want
-         * it.
+         * Renders with `setTimeout()`.
+         * Generally an inferior way to render compared to `requestAnimationFrame`,
+         * but useful for browsers that don't suppoort `requestAnimationFrame`.
          */
         class Timeout implements RenderPolicy {
             render(): void;
@@ -560,16 +560,14 @@ declare module Plottable {
 declare module Plottable {
     /**
      * The RenderController is responsible for enqueueing and synchronizing
-     * layout and render calls for Plottable components.
+     * layout and render calls for Components.
      *
-     * Layouts and renders occur inside an animation callback
+     * Layout and render calls occur inside an animation callback
      * (window.requestAnimationFrame if available).
      *
-     * If you require immediate rendering, call RenderController.flush() to
-     * perform enqueued layout and rendering serially.
+     * RenderController.flush() immediately lays out and renders all Components currently enqueued.
      *
-     * If you want to always have immediate rendering (useful for debugging),
-     * call
+     * To always have immediate rendering (useful for debugging), call
      * ```typescript
      * Plottable.RenderController.setRenderPolicy(
      *   new Plottable.RenderPolicies.Immediate()
@@ -585,22 +583,20 @@ declare module Plottable {
         var _renderPolicy: RenderPolicies.RenderPolicy;
         function setRenderPolicy(policy: string): void;
         /**
-         * If the RenderController is enabled, we enqueue the component for
-         * render. Otherwise, it is rendered immediately.
+         * Enqueues the Component for rendering.
          *
-         * @param {Component} component Any Plottable component.
+         * @param {Component} component
          */
         function registerToRender(component: Component): void;
         /**
-         * If the RenderController is enabled, we enqueue the component for
-         * layout and render. Otherwise, it is rendered immediately.
+         * Enqueus the Component for layout and rendering.
          *
-         * @param {Component} component Any Plottable component.
+         * @param {Component} component
          */
         function registerToComputeLayout(component: Component): void;
         /**
-         * Render everything that is waiting to be rendered right now, instead of
-         * waiting until the next frame.
+         * Renders all Components waiting to be rendered immediately,
+         * instead of waiting until the next frame.
          *
          * Useful to call when debugging.
          */
