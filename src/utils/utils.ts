@@ -244,7 +244,7 @@ export module Utils {
      */
     export function copyMap<T>(oldMap: { [key: string]: T }): { [key: string]: T } {
       var newMap: { [key: string]: any } = {};
-      d3.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
+      Object.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
       return newMap;
     }
 
