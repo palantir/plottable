@@ -7859,7 +7859,7 @@ var Plottable;
              */
             function Area(xScale, yScale) {
                 _super.call(this, xScale, yScale);
-                this.classed("area-plot", true);
+                this.classed("stacked-area-plot", true);
                 this.y0(0, yScale); // default
                 this.animator("reset", new Plottable.Animators.Null());
                 this.animator("main", new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
