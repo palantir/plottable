@@ -70,85 +70,26 @@ export module Plots {
       return ["x", "y", "defined"];
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
+    public entityNearest(queryPoint: Point): Plots.Entity {
+      var minXDist = Infinity;
+      var minYDist = Infinity;
+      var closest: Plots.Entity;
+      var entities = this.entities();
+      entities.forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+          return;
+        }
+        var xDist = Math.abs(queryPoint.x - entity.position.x);
+        var yDist = Math.abs(queryPoint.y - entity.position.y);
 
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-            return;
-          }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-        });
-
-        if (plotDatasetKey.dataset.data().length > 0) {
-          allElements.push(drawer._getSelection(0).node());
+        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+          closest = entity;
+          minXDist = xDist;
+          minYDist = yDist;
         }
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
-    }
-
-    /**
-     * Retrieves the closest PlotData to queryPoint.
-     *
-     * Lines implement an x-dominant notion of distance; points closest in x are
-     * tie-broken by y distance.
-     *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
-     */
-    public getClosestPlotData(queryPoint: Point): PlotData {
-      var minXDist = Infinity;
-      var minYDist = Infinity;
-
-      var closestData: any[] = [];
-      var closestPixelPoints: Point[] = [];
-      var closestElements: Element[] = [];
-
-      this.datasets().forEach((dataset) => {
-        var plotData = this.getAllPlotData([dataset]);
-        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-          var datum = plotData.data[index];
-          var line = plotData.selection[0][0];
-
-          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
-            return;
-          }
-
-          var xDist = Math.abs(queryPoint.x - pixelPoint.x);
-          var yDist = Math.abs(queryPoint.y - pixelPoint.y);
-
-          if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-            closestData = [];
-            closestPixelPoints = [];
-            closestElements = [];
-
-            minXDist = xDist;
-            minYDist = yDist;
-          }
-
-          if (xDist === minXDist && yDist === minYDist) {
-            closestData.push(datum);
-            closestPixelPoints.push(pixelPoint);
-            closestElements.push(line);
-          }
-        });
-      });
-
-      return {
-        data: closestData,
-        pixelPoints: closestPixelPoints,
-        selection: d3.selectAll(closestElements)
-      };
+      return closest;
     }
   }
 }

@@ -93,14 +93,6 @@ describe("Plots", () => {
     });
 
     it("considers lying within a bar's y-range to mean it is closest", () => {
-      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
-        msg: string) {
-        assert.deepEqual(expected.data, actual.data, msg);
-        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(expected.selection, actual.selection, msg);
-      }
-
       var bars = (<any> renderer)._renderArea.selectAll("rect");
 
       var d0 = dataset1.data()[0];
@@ -116,22 +108,27 @@ describe("Plots", () => {
       };
 
       var expected = {
-        data: [d0],
-        pixelPoints: [d0Px],
-        selection: d3.selectAll([bars[0][0]])
+        datum: d0,
+        index: 0,
+        dataset: dataset1,
+        position: d0Px,
+        selection: d3.selectAll([bars[0][0]]),
+        plot: renderer
       };
 
-      var closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y + 1 });
-      assertPlotDataEqual(expected, closest, "bottom bar is closest when within its range");
+      var closest = renderer.entityNearest({ x: 0, y: d0Px.y + 1 });
+      TestMethods.assertEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
 
       expected = {
-        data: [d1],
-        pixelPoints: [d1Px],
-        selection: d3.selectAll([bars[0][2]])
+        datum: d1,
+        index: 0,
+        dataset: dataset2,
+        position: d1Px,
+        selection: d3.selectAll([bars[0][2]]),
+        plot: renderer
       };
-
-      closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y - 1 });
-      assertPlotDataEqual(expected, closest, "top bar is closest when within its range");
+      closest = renderer.entityNearest({ x: 0, y: d0Px.y - 1 });
+      TestMethods.assertEntitiesEqual(closest, expected, "top bar is closest when within its range");
 
       svg.remove();
     });

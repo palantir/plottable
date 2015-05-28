@@ -2402,10 +2402,13 @@ declare module Plottable {
             drawer: Drawers.AbstractDrawer;
             key: string;
         };
-        type PlotData = {
-            data: any[];
-            pixelPoints: Point[];
+        type Entity = {
+            datum: any;
+            index: number;
+            dataset: Dataset;
+            position: Point;
             selection: D3.Selection;
+            plot: Plot;
         };
         interface AccessorScaleBinding<D, R> {
             accessor: Accessor<any>;
@@ -2509,23 +2512,14 @@ declare module Plottable {
          * @returns {D3.Selection} The retrieved Selections.
          */
         getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
+        entities(datasets?: Dataset[]): Plots.Entity[];
         /**
-         * Retrieves all of the PlotData of this plot for the specified dataset(s)
+         * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
          *
-         * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
-         * If not provided, all PlotData will be retrieved.
-         * @returns {PlotData} The retrieved PlotData.
+         * @param {Point} queryPoint
+         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
          */
-        getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
-        /**
-         * Retrieves PlotData with the lowest distance, where distance is defined
-         * to be the Euclidiean norm.
-         *
-         * @param {Point} queryPoint The point to which plot data should be compared
-         *
-         * @returns {PlotData} The PlotData closest to queryPoint
-         */
-        getClosestPlotData(queryPoint: Point): Plots.PlotData;
+        entityNearest(queryPoint: Point): Plots.Entity;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2546,7 +2540,7 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
             protected _getDrawer(key: string): Drawers.AbstractDrawer;
-            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            entities(datasets?: Dataset[]): Plots.Entity[];
             sectorValue<S>(): AccessorScaleBinding<S, number>;
             sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
             sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
@@ -2752,18 +2746,7 @@ declare module Plottable {
              * @returns {Bar} The calling plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
-            /**
-             * Retrieves the closest PlotData to queryPoint.
-             *
-             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-             * of all bars, we return the closest in the dominant axis (x for horizontal
-             * charts, y for vertical) and break ties using the secondary axis.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            getClosestPlotData(queryPoint: Point): PlotData;
+            entityNearest(queryPoint: Point): Plots.Entity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
              * Gets the bar under the given pixel position (if [xValOrExtent]
@@ -2791,7 +2774,7 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            entities(datasets?: Dataset[]): Plots.Entity[];
         }
     }
 }
@@ -2815,18 +2798,7 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _wholeDatumAttributes(): string[];
-            getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
-            /**
-             * Retrieves the closest PlotData to queryPoint.
-             *
-             * Lines implement an x-dominant notion of distance; points closest in x are
-             * tie-broken by y distance.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            getClosestPlotData(queryPoint: Point): PlotData;
+            entityNearest(queryPoint: Point): Plots.Entity;
         }
     }
 }

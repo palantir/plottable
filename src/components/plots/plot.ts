@@ -13,10 +13,13 @@ module Plottable {
       key: string;
     }
 
-    export type PlotData = {
-      data: any[];
-      pixelPoints: Point[];
+    export type Entity = {
+      datum: any;
+      index: number;
+      dataset: Dataset;
+      position: Point;
       selection: D3.Selection;
+      plot: Plot;
     }
 
     export interface AccessorScaleBinding<D, R> {
@@ -453,70 +456,55 @@ module Plottable {
       return d3.selectAll(allSelections);
     }
 
-    /**
-     * Retrieves all of the PlotData of this plot for the specified dataset(s)
-     *
-     * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
-     * If not provided, all PlotData will be retrieved.
-     * @returns {PlotData} The retrieved PlotData.
-     */
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
-
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities: Plots.Entity[] = [];
+      datasets.forEach((dataset) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(this._keyForDataset(dataset));
+        if (plotDatasetKey == null) {
+          return;
+        }
         var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+        dataset.data().forEach((datum: any, index: number) => {
+          var position = drawer._getPixelPoint(datum, index);
+          if (position.x !== position.x || position.y !== position.y) {
             return;
           }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-          allElements.push(drawer._getSelection(index).node());
+          entities.push({
+            datum: datum,
+            index: index,
+            dataset: dataset,
+            position: position,
+            selection: drawer._getSelection(index),
+            plot: this
+          });
         });
       });
-
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return entities;
     }
 
     /**
-     * Retrieves PlotData with the lowest distance, where distance is defined
-     * to be the Euclidiean norm.
-     *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
+     * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
+     * 
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
-    public getClosestPlotData(queryPoint: Point): Plots.PlotData {
+    public entityNearest(queryPoint: Point): Plots.Entity {
       var closestDistanceSquared = Infinity;
-      var closestIndex: number;
-      var plotData = this.getAllPlotData();
-      plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-        var datum = plotData.data[index];
-        var selection = d3.select(plotData.selection[0][index]);
-
-        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+      var closest: Plots.Entity;
+      var entities = this.entities();
+      entities.forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
-        var distance = Utils.Methods.distanceSquared(pixelPoint, queryPoint);
-        if (distance < closestDistanceSquared) {
-          closestDistanceSquared = distance;
-          closestIndex = index;
+        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        if (distanceSquared < closestDistanceSquared) {
+          closestDistanceSquared = distanceSquared;
+          closest = entity;
         }
       });
 
-      if (closestIndex == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
-      }
-
-      return {data: [plotData.data[closestIndex]],
-              pixelPoints: [plotData.pixelPoints[closestIndex]],
-              selection: d3.select(plotData.selection[0][closestIndex])};
+      return closest;
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {

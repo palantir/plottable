@@ -142,24 +142,9 @@ export module Plots {
       }
     }
 
-    /**
-     * Retrieves the closest PlotData to queryPoint.
-     *
-     * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-     * of all bars, we return the closest in the dominant axis (x for horizontal
-     * charts, y for vertical) and break ties using the secondary axis.
-     *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
-     */
-    public getClosestPlotData(queryPoint: Point): PlotData {
+    public entityNearest(queryPoint: Point): Plots.Entity {
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
-
-      var closestData: any[] = [];
-      var closestPixelPoints: Point[] = [];
-      var closestElements: Element[] = [];
 
       var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
       var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
@@ -169,63 +154,43 @@ export module Plots {
       // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
       var tolerance = 0.5;
 
-      this.datasets().forEach((dataset) => {
-        var plotData = this.getAllPlotData([dataset]);
-        plotData.pixelPoints.forEach((plotPt, index) => {
-          var datum = plotData.data[index];
-          var bar = plotData.selection[0][index];
+      var closest: Plots.Entity;
+      var entities = this.entities();
+      entities.forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+          return;
+        }
+        var primaryDist = 0;
+        var secondaryDist = 0;
+        var plotPt = entity.position;
+        // if we're inside a bar, distance in both directions should stay 0
+        var barBBox = Utils.DOM.getBBox(entity.selection);
+        if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+          var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
+          primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
-          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
-            return;
+          // compute this bar's min and max along the secondary axis
+          var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+          var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+          if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+            // if we're within a bar's secondary axis span, it is closest in that direction
+            secondaryDist = 0;
+          } else {
+            var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
           }
-
-          var primaryDist = 0;
-          var secondaryDist = 0;
-
-          // if we're inside a bar, distance in both directions should stay 0
-          var barBBox = bar.getBBox();
-          if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
-            var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
-            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-
-            // compute this bar's min and max along the secondary axis
-            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
-            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
-
-            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
-              // if we're within a bar's secondary axis span, it is closest in that direction
-              secondaryDist = 0;
-            } else {
-              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
-              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
-            }
-          }
-
-          // if we find a closer bar, record its distance and start new closest lists
-          if (primaryDist < minPrimaryDist
-              || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
-            closestData = [];
-            closestPixelPoints = [];
-            closestElements = [];
-
-            minPrimaryDist = primaryDist;
-            minSecondaryDist = secondaryDist;
-          }
-
-          // bars minPrimaryDist away are part of the closest set
-          if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-            closestData.push(datum);
-            closestPixelPoints.push(plotPt);
-            closestElements.push(bar);
-          }
-        });
+        }
+        // if we find a closer bar, record its distance and start new closest lists
+        if (primaryDist < minPrimaryDist
+            || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+          closest = entity;
+          minPrimaryDist = primaryDist;
+          minSecondaryDist = secondaryDist;
+        }
       });
 
-      return {
-        data: closestData,
-        pixelPoints: closestPixelPoints,
-        selection: d3.selectAll(closestElements)
-      };
+      return closest;
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
@@ -431,31 +396,25 @@ export module Plots {
       return barPixelWidth;
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var plotData = super.getAllPlotData(datasets);
-
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities = super.entities(datasets);
       var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
-      var isVertical = this._isVertical;
-      var barAlignmentFactor = this._barAlignmentFactor;
-
-      plotData.selection.each(function (datum, index) {
-        var bar = d3.select(this);
-
+      entities.forEach((entity) => {
+        var bar = entity.selection;
         // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
-        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
-          plotData.pixelPoints[index].y += +bar.attr("height");
-        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
-          plotData.pixelPoints[index].x -= +bar.attr("width");
+        if (this._isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+          entity.position.y += +bar.attr("height");
+        } else if (!this._isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+          entity.position.x -= +bar.attr("width");
         }
 
-        if (isVertical) {
-          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+        if (this._isVertical) {
+          entity.position.x = +bar.attr("x") + +bar.attr("width") * this._barAlignmentFactor;
         } else {
-          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+          entity.position.y = +bar.attr("y") + +bar.attr("height") * this._barAlignmentFactor;
         }
       });
-
-      return plotData;
+      return entities;
     }
   }
 }

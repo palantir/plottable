@@ -86,59 +86,57 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getClosestPlotData()", () => {
-      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
-        msg: string) {
-        assert.deepEqual(expected.data, actual.data, msg);
-        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(expected.selection, actual.selection, msg);
-      }
-
+    it("entityNearest()", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var data = [{x: 0, y: 0}, {x: 1, y: 1}];
-      var data2 = [{x: 1, y: 2}, {x: 3, y: 4}];
+      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
       var plot = new Plottable.Plots.Scatter(xScale, yScale)
                                    .x((d: any) => d.x, xScale)
                                    .y((d: any) => d.y, yScale)
-                                   .addDataset(new Plottable.Dataset(data))
-                                   .addDataset(new Plottable.Dataset(data2));
+                                   .addDataset(dataset)
+                                   .addDataset(dataset2);
       plot.renderTo(svg);
 
       var points = d3.selectAll(".scatter-plot path");
-      var d0 = data[0];
+      var d0 = dataset.data()[0];
       var d0Px = {
         x: xScale.scale(d0.x),
         y: yScale.scale(d0.y)
       };
 
       var expected = {
-        data: [d0],
-        pixelPoints: [d0Px],
-        selection: d3.select(points[0][0])
+        datum: d0,
+        index: 0,
+        dataset: dataset,
+        position: d0Px,
+        selection: d3.selectAll([points[0][0]]),
+        plot: plot
       };
 
-      var closest = plot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y + 1 });
-      assertPlotDataEqual(expected, closest, "it selects the closest data point");
+      var closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
+      TestMethods.assertEntitiesEqual(closest, expected, "it selects the closest data point");
 
       yScale.domain([0, 1.9]);
 
-      var d1 = data[1];
+      var d1 = dataset.data()[1];
       var d1Px = {
         x: xScale.scale(d1.x),
         y: yScale.scale(d1.y)
       };
 
       expected = {
-        data: [d1],
-        pixelPoints: [d1Px],
-        selection: d3.select(points[0][1])
+        datum: d1,
+        index: 1,
+        dataset: dataset,
+        position: d1Px,
+        selection: d3.selectAll([points[0][1]]),
+        plot: plot
       };
 
-      closest = plot.getClosestPlotData({ x: d1Px.x, y: 0 });
-      assertPlotDataEqual(expected, closest, "it ignores off-plot data points");
+      closest = plot.entityNearest({ x: d1Px.x, y: 0 });
+      TestMethods.assertEntitiesEqual(closest, expected, "it ignores off-plot data points");
 
       svg.remove();
     });

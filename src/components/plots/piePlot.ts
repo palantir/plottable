@@ -51,15 +51,13 @@ export module Plots {
       return new Plottable.Drawers.Arc(key).setClass("arc");
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var allPlotData = super.getAllPlotData(datasets);
-
-      allPlotData.pixelPoints.forEach((pixelPoint: Point) => {
-        pixelPoint.x = pixelPoint.x + this.width() / 2;
-        pixelPoint.y = pixelPoint.y + this.height() / 2;
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities = super.entities(datasets);
+      entities.forEach((entity) => {
+        entity.position.x += this.width() / 2;
+        entity.position.y += this.height() / 2;
       });
-
-      return allPlotData;
+      return entities;
     }
 
     public sectorValue<S>(): AccessorScaleBinding<S, number>;

@@ -6682,66 +6682,55 @@ var Plottable;
             });
             return d3.selectAll(allSelections);
         };
-        /**
-         * Retrieves all of the PlotData of this plot for the specified dataset(s)
-         *
-         * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
-         * If not provided, all PlotData will be retrieved.
-         * @returns {PlotData} The retrieved PlotData.
-         */
-        Plot.prototype.getAllPlotData = function (datasets) {
+        Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var data = [];
-            var pixelPoints = [];
-            var allElements = [];
-            this._keysForDatasets(datasets).forEach(function (datasetKey) {
-                var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
+            var entities = [];
+            datasets.forEach(function (dataset) {
+                var plotDatasetKey = _this._key2PlotDatasetKey.get(_this._keyForDataset(dataset));
                 if (plotDatasetKey == null) {
                     return;
                 }
                 var drawer = plotDatasetKey.drawer;
-                plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                    var pixelPoint = drawer._getPixelPoint(datum, index);
-                    if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+                dataset.data().forEach(function (datum, index) {
+                    var position = drawer._getPixelPoint(datum, index);
+                    if (position.x !== position.x || position.y !== position.y) {
                         return;
                     }
-                    data.push(datum);
-                    pixelPoints.push(pixelPoint);
-                    allElements.push(drawer._getSelection(index).node());
+                    entities.push({
+                        datum: datum,
+                        index: index,
+                        dataset: dataset,
+                        position: position,
+                        selection: drawer._getSelection(index),
+                        plot: _this
+                    });
                 });
             });
-            return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+            return entities;
         };
         /**
-         * Retrieves PlotData with the lowest distance, where distance is defined
-         * to be the Euclidiean norm.
+         * Returns the Entity nearest to the query point, or undefined if no Entity can be found.
          *
-         * @param {Point} queryPoint The point to which plot data should be compared
-         *
-         * @returns {PlotData} The PlotData closest to queryPoint
+         * @param {Point} queryPoint
+         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
          */
-        Plot.prototype.getClosestPlotData = function (queryPoint) {
+        Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
             var closestDistanceSquared = Infinity;
-            var closestIndex;
-            var plotData = this.getAllPlotData();
-            plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                var datum = plotData.data[index];
-                var selection = d3.select(plotData.selection[0][index]);
-                if (!_this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+            var closest;
+            var entities = this.entities();
+            entities.forEach(function (entity) {
+                if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
-                var distance = Plottable.Utils.Methods.distanceSquared(pixelPoint, queryPoint);
-                if (distance < closestDistanceSquared) {
-                    closestDistanceSquared = distance;
-                    closestIndex = index;
+                var distanceSquared = Plottable.Utils.Methods.distanceSquared(entity.position, queryPoint);
+                if (distanceSquared < closestDistanceSquared) {
+                    closestDistanceSquared = distanceSquared;
+                    closest = entity;
                 }
             });
-            if (closestIndex == null) {
-                return { data: [], pixelPoints: [], selection: d3.select() };
-            }
-            return { data: [plotData.data[closestIndex]], pixelPoints: [plotData.pixelPoints[closestIndex]], selection: d3.select(plotData.selection[0][closestIndex]) };
+            return closest;
         };
         Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
@@ -6820,15 +6809,15 @@ var Plottable;
             Pie.prototype._getDrawer = function (key) {
                 return new Plottable.Drawers.Arc(key).setClass("arc");
             };
-            Pie.prototype.getAllPlotData = function (datasets) {
+            Pie.prototype.entities = function (datasets) {
                 var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
-                var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
-                allPlotData.pixelPoints.forEach(function (pixelPoint) {
-                    pixelPoint.x = pixelPoint.x + _this.width() / 2;
-                    pixelPoint.y = pixelPoint.y + _this.height() / 2;
+                var entities = _super.prototype.entities.call(this, datasets);
+                entities.forEach(function (entity) {
+                    entity.position.x += _this.width() / 2;
+                    entity.position.y += _this.height() / 2;
                 });
-                return allPlotData;
+                return entities;
             };
             Pie.prototype.sectorValue = function (sectorValue, scale) {
                 if (sectorValue == null) {
@@ -7405,78 +7394,50 @@ var Plottable;
                     return this;
                 }
             };
-            /**
-             * Retrieves the closest PlotData to queryPoint.
-             *
-             * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-             * of all bars, we return the closest in the dominant axis (x for horizontal
-             * charts, y for vertical) and break ties using the secondary axis.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            Bar.prototype.getClosestPlotData = function (queryPoint) {
+            Bar.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
                 var minPrimaryDist = Infinity;
                 var minSecondaryDist = Infinity;
-                var closestData = [];
-                var closestPixelPoints = [];
-                var closestElements = [];
                 var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
                 var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
                 // SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
                 var tolerance = 0.5;
-                this.datasets().forEach(function (dataset) {
-                    var plotData = _this.getAllPlotData([dataset]);
-                    plotData.pixelPoints.forEach(function (plotPt, index) {
-                        var datum = plotData.data[index];
-                        var bar = plotData.selection[0][index];
-                        if (!_this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
-                            return;
+                var closest;
+                var entities = this.entities();
+                entities.forEach(function (entity) {
+                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                        return;
+                    }
+                    var primaryDist = 0;
+                    var secondaryDist = 0;
+                    var plotPt = entity.position;
+                    // if we're inside a bar, distance in both directions should stay 0
+                    var barBBox = Plottable.Utils.DOM.getBBox(entity.selection);
+                    if (!Plottable.Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+                        var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
+                        primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
+                        // compute this bar's min and max along the secondary axis
+                        var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
+                        var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
+                        if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+                            // if we're within a bar's secondary axis span, it is closest in that direction
+                            secondaryDist = 0;
                         }
-                        var primaryDist = 0;
-                        var secondaryDist = 0;
-                        // if we're inside a bar, distance in both directions should stay 0
-                        var barBBox = bar.getBBox();
-                        if (!Plottable.Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
-                            var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
-                            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-                            // compute this bar's min and max along the secondary axis
-                            var barMinSecondary = _this._isVertical ? barBBox.y : barBBox.x;
-                            var barMaxSecondary = barMinSecondary + (_this._isVertical ? barBBox.height : barBBox.width);
-                            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
-                                // if we're within a bar's secondary axis span, it is closest in that direction
-                                secondaryDist = 0;
-                            }
-                            else {
-                                var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
-                                secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
-                            }
+                        else {
+                            var plotPtSecondary = _this._isVertical ? plotPt.y : plotPt.x;
+                            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
                         }
-                        // if we find a closer bar, record its distance and start new closest lists
-                        if (primaryDist < minPrimaryDist || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
-                            closestData = [];
-                            closestPixelPoints = [];
-                            closestElements = [];
-                            minPrimaryDist = primaryDist;
-                            minSecondaryDist = secondaryDist;
-                        }
-                        // bars minPrimaryDist away are part of the closest set
-                        if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-                            closestData.push(datum);
-                            closestPixelPoints.push(plotPt);
-                            closestElements.push(bar);
-                        }
-                    });
+                    }
+                    // if we find a closer bar, record its distance and start new closest lists
+                    if (primaryDist < minPrimaryDist || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+                        closest = entity;
+                        minPrimaryDist = primaryDist;
+                        minSecondaryDist = secondaryDist;
+                    }
                 });
-                return {
-                    data: closestData,
-                    pixelPoints: closestPixelPoints,
-                    selection: d3.selectAll(closestElements)
-                };
+                return closest;
             };
             Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
@@ -7653,29 +7614,28 @@ var Plottable;
                 }
                 return barPixelWidth;
             };
-            Bar.prototype.getAllPlotData = function (datasets) {
+            Bar.prototype.entities = function (datasets) {
+                var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
-                var plotData = _super.prototype.getAllPlotData.call(this, datasets);
+                var entities = _super.prototype.entities.call(this, datasets);
                 var scaledBaseline = (this._isVertical ? this.y().scale : this.x().scale).scale(this.baseline());
-                var isVertical = this._isVertical;
-                var barAlignmentFactor = this._barAlignmentFactor;
-                plotData.selection.each(function (datum, index) {
-                    var bar = d3.select(this);
+                entities.forEach(function (entity) {
+                    var bar = entity.selection;
                     // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
-                    if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
-                        plotData.pixelPoints[index].y += +bar.attr("height");
+                    if (_this._isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+                        entity.position.y += +bar.attr("height");
                     }
-                    else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
-                        plotData.pixelPoints[index].x -= +bar.attr("width");
+                    else if (!_this._isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+                        entity.position.x -= +bar.attr("width");
                     }
-                    if (isVertical) {
-                        plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+                    if (_this._isVertical) {
+                        entity.position.x = +bar.attr("x") + +bar.attr("width") * _this._barAlignmentFactor;
                     }
                     else {
-                        plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+                        entity.position.y = +bar.attr("y") + +bar.attr("height") * _this._barAlignmentFactor;
                     }
                 });
-                return plotData;
+                return entities;
             };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";
@@ -7755,78 +7715,25 @@ var Plottable;
             Line.prototype._wholeDatumAttributes = function () {
                 return ["x", "y", "defined"];
             };
-            Line.prototype.getAllPlotData = function (datasets) {
-                var _this = this;
-                if (datasets === void 0) { datasets = this.datasets(); }
-                var data = [];
-                var pixelPoints = [];
-                var allElements = [];
-                this._keysForDatasets(datasets).forEach(function (datasetKey) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(datasetKey);
-                    if (plotDatasetKey == null) {
-                        return;
-                    }
-                    var drawer = plotDatasetKey.drawer;
-                    plotDatasetKey.dataset.data().forEach(function (datum, index) {
-                        var pixelPoint = drawer._getPixelPoint(datum, index);
-                        if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-                            return;
-                        }
-                        data.push(datum);
-                        pixelPoints.push(pixelPoint);
-                    });
-                    if (plotDatasetKey.dataset.data().length > 0) {
-                        allElements.push(drawer._getSelection(0).node());
-                    }
-                });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
-            };
-            /**
-             * Retrieves the closest PlotData to queryPoint.
-             *
-             * Lines implement an x-dominant notion of distance; points closest in x are
-             * tie-broken by y distance.
-             *
-             * @param {Point} queryPoint The point to which plot data should be compared
-             *
-             * @returns {PlotData} The PlotData closest to queryPoint
-             */
-            Line.prototype.getClosestPlotData = function (queryPoint) {
+            Line.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
                 var minXDist = Infinity;
                 var minYDist = Infinity;
-                var closestData = [];
-                var closestPixelPoints = [];
-                var closestElements = [];
-                this.datasets().forEach(function (dataset) {
-                    var plotData = _this.getAllPlotData([dataset]);
-                    plotData.pixelPoints.forEach(function (pixelPoint, index) {
-                        var datum = plotData.data[index];
-                        var line = plotData.selection[0][0];
-                        if (!_this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
-                            return;
-                        }
-                        var xDist = Math.abs(queryPoint.x - pixelPoint.x);
-                        var yDist = Math.abs(queryPoint.y - pixelPoint.y);
-                        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-                            closestData = [];
-                            closestPixelPoints = [];
-                            closestElements = [];
-                            minXDist = xDist;
-                            minYDist = yDist;
-                        }
-                        if (xDist === minXDist && yDist === minYDist) {
-                            closestData.push(datum);
-                            closestPixelPoints.push(pixelPoint);
-                            closestElements.push(line);
-                        }
-                    });
+                var closest;
+                var entities = this.entities();
+                entities.forEach(function (entity) {
+                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                        return;
+                    }
+                    var xDist = Math.abs(queryPoint.x - entity.position.x);
+                    var yDist = Math.abs(queryPoint.y - entity.position.y);
+                    if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+                        closest = entity;
+                        minXDist = xDist;
+                        minYDist = yDist;
+                    }
                 });
-                return {
-                    data: closestData,
-                    pixelPoints: closestPixelPoints,
-                    selection: d3.selectAll(closestElements)
-                };
+                return closest;
             };
             return Line;
         })(Plottable.XYPlot);
