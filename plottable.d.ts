@@ -2775,23 +2775,27 @@ declare module Plottable {
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
             /**
-             * Gets the {Plots.PlotData} that correspond to the given pixel position.
+             * Gets the Entities at a particular Point.
              *
-             * @param {Point} p The provided pixel position as a {Point}
-             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
+             * @param {Point} p
+             * @returns {Entity[]}
              */
-            plotDataAt(p: Point): PlotData;
+            entitiesAt(p: Point): Entity[];
             /**
-             * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+             * Gets the Entities that intersect the Bounds.
              *
+             * @param {Bounds} bounds
+             * @returns {Entity[]}
              */
-            plotDataIn(bounds: Bounds): PlotData;
+            entitiesIn(bounds: Bounds): Entity[];
             /**
-             * @param {Range} xRange The specified range of x values
-             * @param {Range} yRange The specified range of y values
-             * @return {Plots.PlotData} The plot data that corresponds to the ranges
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {Entity[]}
              */
-            plotDataIn(xRange: Range, yRange: Range): PlotData;
+            entitiesIn(xRange: Range, yRange: Range): Entity[];
             protected _additionalPaint(time: number): void;
             protected _drawLabels(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];

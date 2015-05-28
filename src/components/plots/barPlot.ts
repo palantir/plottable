@@ -209,27 +209,31 @@ export module Plots {
     }
 
     /**
-     * Gets the {Plots.PlotData} that correspond to the given pixel position.
+     * Gets the Entities at a particular Point.
      * 
-     * @param {Point} p The provided pixel position as a {Point}
-     * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
+     * @param {Point} p
+     * @returns {Entity[]}
      */
-    public plotDataAt(p: Point): PlotData {
-      return this._getPlotData(p.x, p.y);
+    public entitiesAt(p: Point): Entity[] {
+      return this._entitiesIntersecting(p.x, p.y);
     }
 
     /**
-     * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
+     * Gets the Entities that intersect the Bounds.
      * 
+     * @param {Bounds} bounds
+     * @returns {Entity[]}
      */
-    public plotDataIn(bounds: Bounds): PlotData;
+    public entitiesIn(bounds: Bounds): Entity[];
     /**
-     * @param {Range} xRange The specified range of x values
-     * @param {Range} yRange The specified range of y values
-     * @return {Plots.PlotData} The plot data that corresponds to the ranges
+     * Gets the Entities that intersect the area defined by the ranges.
+     * 
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {Entity[]}
      */
-    public plotDataIn(xRange: Range, yRange: Range): PlotData;
-    public plotDataIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotData {
+    public entitiesIn(xRange: Range, yRange: Range): Entity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): Entity[] {
       var dataXRange: Range;
       var dataYRange: Range;
       if (yRange == null) {
@@ -237,26 +241,20 @@ export module Plots {
         dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
       } else {
-          dataXRange = (<Range> xRangeOrBounds);
+        dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
-      return this._getPlotData(dataXRange, dataYRange);
+      return this._entitiesIntersecting(dataXRange, dataYRange);
     }
 
-    private _getPlotData(xValOrRange: number | Range, yValOrRange: number | Range): PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var elements: EventTarget[] = [];
-
-      var plotData = this.getAllPlotData();
-      plotData.selection.each(function(datum, i) {
-        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
-          data.push(plotData.data[i]);
-          pixelPoints.push(plotData.pixelPoints[i]);
-          elements.push(this);
+    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
+      var intersected: Entity[] = [];
+      this.entities().forEach((entity) => {
+        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+          intersected.push(entity);
         }
       });
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
+      return intersected;
     }
 
     private _updateValueScale() {

@@ -7467,15 +7467,15 @@ var Plottable;
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
-             * Gets the {Plots.PlotData} that correspond to the given pixel position.
+             * Gets the Entities at a particular Point.
              *
-             * @param {Point} p The provided pixel position as a {Point}
-             * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
+             * @param {Point} p
+             * @returns {Entity[]}
              */
-            Bar.prototype.plotDataAt = function (p) {
-                return this._getPlotData(p.x, p.y);
+            Bar.prototype.entitiesAt = function (p) {
+                return this._entitiesIntersecting(p.x, p.y);
             };
-            Bar.prototype.plotDataIn = function (xRangeOrBounds, yRange) {
+            Bar.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
                 var dataXRange;
                 var dataYRange;
                 if (yRange == null) {
@@ -7487,21 +7487,16 @@ var Plottable;
                     dataXRange = xRangeOrBounds;
                     dataYRange = yRange;
                 }
-                return this._getPlotData(dataXRange, dataYRange);
+                return this._entitiesIntersecting(dataXRange, dataYRange);
             };
-            Bar.prototype._getPlotData = function (xValOrRange, yValOrRange) {
-                var data = [];
-                var pixelPoints = [];
-                var elements = [];
-                var plotData = this.getAllPlotData();
-                plotData.selection.each(function (datum, i) {
-                    if (Plottable.Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
-                        data.push(plotData.data[i]);
-                        pixelPoints.push(plotData.pixelPoints[i]);
-                        elements.push(this);
+            Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+                var intersected = [];
+                this.entities().forEach(function (entity) {
+                    if (Plottable.Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
+                        intersected.push(entity);
                     }
                 });
-                return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
+                return intersected;
             };
             Bar.prototype._updateValueScale = function () {
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
