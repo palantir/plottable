@@ -145,10 +145,9 @@ export module Plots {
       var allPlotData = super.getAllPlotData(datasets);
       var allElements = allPlotData.selection[0];
 
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      datasets.forEach((dataset) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
         if (plotDatasetKey == null) { return; }
-        var dataset = plotDatasetKey.dataset;
         var drawer = this._lineDrawers.get(dataset);
         dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);

@@ -10,7 +10,6 @@ module Plottable {
     export type PlotDatasetKey = {
       dataset: Dataset;
       drawer: Drawers.AbstractDrawer;
-      key: string;
     }
 
     export type PlotData = {
@@ -32,7 +31,7 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
+    protected _key2PlotDatasetKey: Utils.Map<Dataset, Plots.PlotDatasetKey>;
     protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
@@ -66,7 +65,7 @@ module Plottable {
       super();
       this._clipPathEnabled = true;
       this.classed("plot", true);
-      this._key2PlotDatasetKey = d3.map();
+      this._key2PlotDatasetKey = new Utils.Map<Dataset, Plots.PlotDatasetKey>();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
@@ -106,13 +105,13 @@ module Plottable {
      */
     public addDataset(dataset: Dataset) {
       var key = "_" + this._nextSeriesIndex++;
-      if (this._key2PlotDatasetKey.has(key)) {
+      if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
       var drawer = this._getDrawer(dataset);
       var pdk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(key, pdk);
+      this._key2PlotDatasetKey.set(dataset, pdk);
 
       if (this._isSetup) {
         this._setupDatasetNodes(dataset);
@@ -124,7 +123,7 @@ module Plottable {
     }
 
     protected _setupDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      var drawer = this._key2PlotDatasetKey.get(dataset).drawer;
       drawer.setup(this._renderArea.append("g"));
     }
 
@@ -274,11 +273,7 @@ module Plottable {
         extents: D3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
-      extents.set(key, this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        return this._computeExtent(dataset, accScaleBinding, filter);
-      }));
+      extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
     }
 
     private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
@@ -362,19 +357,19 @@ module Plottable {
      */
     public removeDataset(dataset: Dataset): Plot {
       var key = this._keyForDataset(dataset);
-      if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var pdk = this._key2PlotDatasetKey.get(key);
+      if (this.datasets().indexOf(dataset) > -1) {
+        var pdk = this._key2PlotDatasetKey.get(dataset);
         this._removeDatasetNodes(dataset);
         pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.remove(key);
+        this._key2PlotDatasetKey.delete(dataset);
         this._onDatasetUpdate();
       }
       return this;
     }
 
     protected _removeDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      var drawer = this._key2PlotDatasetKey.get(dataset).drawer;
       drawer.remove();
     }
 
@@ -395,7 +390,7 @@ module Plottable {
     public datasets(): Dataset[];
     public datasets(datasets: Dataset[]): Plot;
     public datasets(datasets?: Dataset[]): any {
-      var currentDatasets = this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
+      var currentDatasets = this._key2PlotDatasetKey.keys().map((dataset) => dataset);
       if (datasets == null) {
         return currentDatasets;
       }
@@ -405,7 +400,7 @@ module Plottable {
     }
 
     protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
+      return this.datasets().map((dataset) => this._key2PlotDatasetKey.get(dataset).drawer);
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -446,17 +441,15 @@ module Plottable {
      * @returns {D3.Selection} The retrieved Selections.
      */
     public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
-      var datasetKeyArray = this._keysForDatasets(datasets);
 
       if (exclude) {
-        var excludedDatasetKeys = d3.set(datasetKeyArray);
-        datasetKeyArray = this._datasetKeysInOrder.filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
+        datasets = this.datasets().filter((dataset) => datasets.indexOf(dataset) === -1);
       }
 
       var allSelections: EventTarget[] = [];
 
-      datasetKeyArray.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      datasets.forEach((dataset) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
@@ -479,11 +472,10 @@ module Plottable {
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
 
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      datasets.forEach((dataset) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
-        var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {

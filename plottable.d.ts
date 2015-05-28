@@ -2379,7 +2379,6 @@ declare module Plottable {
         type PlotDatasetKey = {
             dataset: Dataset;
             drawer: Drawers.AbstractDrawer;
-            key: string;
         };
         type PlotData = {
             data: any[];
@@ -2397,7 +2396,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
+        protected _key2PlotDatasetKey: Utils.Map<Dataset, Plots.PlotDatasetKey>;
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;

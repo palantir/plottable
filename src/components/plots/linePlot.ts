@@ -65,11 +65,10 @@ export module Plots {
       var pixelPoints: Point[] = [];
       var allElements: EventTarget[] = [];
 
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
+      datasets.forEach((dataset) => {
+        var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
-        var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {

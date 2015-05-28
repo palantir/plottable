@@ -279,17 +279,17 @@ export module Plots {
       }
 
       // currently, linear scan the bars. If inversion is implemented on non-numeric scales we might be able to do better.
-      var bars = this._datasetKeysInOrder.reduce((bars: any[], key: string) =>
-        bars.concat(this._getBarsFromDataset(key, xValOrExtent, yValOrExtent))
+      var bars = this.datasets().reduce((bars: any[], dataset: Dataset) =>
+        bars.concat(this._getBarsFromDataset(dataset, xValOrExtent, yValOrExtent))
       , []);
 
       return d3.selectAll(bars);
     }
 
-    private _getBarsFromDataset(key: string, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
+    private _getBarsFromDataset(dataset: Dataset, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(key).drawer;
+      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(dataset).drawer;
       drawer._getRenderArea().selectAll("rect").each(function(d) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);
@@ -472,8 +472,7 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
-        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i, dataset))
                                .filter((d) => d != null)
                                .map((d) => d.valueOf());

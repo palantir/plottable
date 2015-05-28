@@ -155,8 +155,7 @@ export module Plots {
         return (<Plottable.Scales.Category> scale).rangeBand();
       } else {
         var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-        var accessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var accessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
         }))).values().map((value) => +value);
         // Get the absolute difference between min and max
