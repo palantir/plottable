@@ -2389,7 +2389,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: Utils.Map<Dataset, Drawers.AbstractDrawer>;
+        protected _datasetToDrawer: Utils.Map<Dataset, Drawers.AbstractDrawer>;
         protected _datasetKeysInOrder: string[];
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;

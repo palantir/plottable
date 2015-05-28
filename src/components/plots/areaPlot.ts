@@ -146,7 +146,7 @@ export module Plots {
       var allElements = allPlotData.selection[0];
 
       datasets.forEach((dataset) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(dataset);
+        var plotDatasetKey = this._datasetToDrawer.get(dataset);
         if (plotDatasetKey == null) { return; }
         var drawer = this._lineDrawers.get(dataset);
         dataset.data().forEach((datum: any, index: number) => {

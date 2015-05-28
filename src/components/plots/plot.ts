@@ -23,7 +23,7 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _key2PlotDatasetKey: Utils.Map<Dataset, Drawers.AbstractDrawer>;
+    protected _datasetToDrawer: Utils.Map<Dataset, Drawers.AbstractDrawer>;
     protected _datasetKeysInOrder: string[];
 
     protected _renderArea: D3.Selection;
@@ -57,7 +57,7 @@ module Plottable {
       super();
       this._clipPathEnabled = true;
       this.classed("plot", true);
-      this._key2PlotDatasetKey = new Utils.Map<Dataset, Drawers.AbstractDrawer>();
+      this._datasetToDrawer = new Utils.Map<Dataset, Drawers.AbstractDrawer>();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
@@ -102,7 +102,7 @@ module Plottable {
       };
       var drawer = this._getDrawer(dataset);
       this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(dataset, drawer);
+      this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
         this._setupDatasetNodes(dataset);
@@ -114,7 +114,7 @@ module Plottable {
     }
 
     protected _setupDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(dataset);
+      var drawer = this._datasetToDrawer.get(dataset);
       drawer.setup(this._renderArea.append("g"));
     }
 
@@ -352,14 +352,14 @@ module Plottable {
         this._removeDatasetNodes(dataset);
         dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.delete(dataset);
+        this._datasetToDrawer.delete(dataset);
         this._onDatasetUpdate();
       }
       return this;
     }
 
     protected _removeDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(dataset);
+      var drawer = this._datasetToDrawer.get(dataset);
       drawer.remove();
     }
 
@@ -380,7 +380,7 @@ module Plottable {
     public datasets(): Dataset[];
     public datasets(datasets: Dataset[]): Plot;
     public datasets(datasets?: Dataset[]): any {
-      var currentDatasets = this._key2PlotDatasetKey.keys().map((dataset) => dataset);
+      var currentDatasets = this._datasetToDrawer.keys().map((dataset) => dataset);
       if (datasets == null) {
         return currentDatasets;
       }
@@ -390,7 +390,7 @@ module Plottable {
     }
 
     protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
-      return this.datasets().map((dataset) => this._key2PlotDatasetKey.get(dataset));
+      return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -439,7 +439,7 @@ module Plottable {
       var allSelections: EventTarget[] = [];
 
       datasets.forEach((dataset) => {
-        var drawer = this._key2PlotDatasetKey.get(dataset);
+        var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
           allSelections.push(this);
@@ -462,7 +462,7 @@ module Plottable {
       var allElements: EventTarget[] = [];
 
       datasets.forEach((dataset) => {
-        var drawer = this._key2PlotDatasetKey.get(dataset);
+        var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
         dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);

@@ -66,7 +66,7 @@ export module Plots {
       var allElements: EventTarget[] = [];
 
       datasets.forEach((dataset) => {
-        var drawer = this._key2PlotDatasetKey.get(dataset);
+        var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
         dataset.data().forEach((datum: any, index: number) => {
           var pixelPoint = this._pixelPoint(datum, index, dataset);

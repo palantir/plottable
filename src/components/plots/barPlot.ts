@@ -289,7 +289,7 @@ export module Plots {
     private _getBarsFromDataset(dataset: Dataset, xValOrExtent: number | Extent, yValOrExtent: number | Extent): any[] {
       var bars: any[] = [];
 
-      var drawer = <Drawers.Element>this._key2PlotDatasetKey.get(dataset);
+      var drawer = <Drawers.Element>this._datasetToDrawer.get(dataset);
       drawer._getRenderArea().selectAll("rect").each(function(d) {
         if (Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
           bars.push(this);

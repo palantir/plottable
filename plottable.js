@@ -6106,7 +6106,7 @@ var Plottable;
             this._animateOnNextRender = true;
             this._clipPathEnabled = true;
             this.classed("plot", true);
-            this._key2PlotDatasetKey = new Plottable.Utils.Map();
+            this._datasetToDrawer = new Plottable.Utils.Map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
             this._extentsProvider = function (scale) { return _this._extentsForScale(scale); };
@@ -6150,7 +6150,7 @@ var Plottable;
             ;
             var drawer = this._getDrawer(dataset);
             this._datasetKeysInOrder.push(key);
-            this._key2PlotDatasetKey.set(dataset, drawer);
+            this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
                 this._setupDatasetNodes(dataset);
             }
@@ -6159,7 +6159,7 @@ var Plottable;
             return this;
         };
         Plot.prototype._setupDatasetNodes = function (dataset) {
-            var drawer = this._key2PlotDatasetKey.get(dataset);
+            var drawer = this._datasetToDrawer.get(dataset);
             drawer.setup(this._renderArea.append("g"));
         };
         Plot.prototype._getDrawer = function (dataset) {
@@ -6354,13 +6354,13 @@ var Plottable;
                 this._removeDatasetNodes(dataset);
                 dataset.offUpdate(this._onDatasetUpdateCallback);
                 this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-                this._key2PlotDatasetKey.delete(dataset);
+                this._datasetToDrawer.delete(dataset);
                 this._onDatasetUpdate();
             }
             return this;
         };
         Plot.prototype._removeDatasetNodes = function (dataset) {
-            var drawer = this._key2PlotDatasetKey.get(dataset);
+            var drawer = this._datasetToDrawer.get(dataset);
             drawer.remove();
         };
         /**
@@ -6378,7 +6378,7 @@ var Plottable;
         };
         Plot.prototype.datasets = function (datasets) {
             var _this = this;
-            var currentDatasets = this._key2PlotDatasetKey.keys().map(function (dataset) { return dataset; });
+            var currentDatasets = this._datasetToDrawer.keys().map(function (dataset) { return dataset; });
             if (datasets == null) {
                 return currentDatasets;
             }
@@ -6388,7 +6388,7 @@ var Plottable;
         };
         Plot.prototype._getDrawersInOrder = function () {
             var _this = this;
-            return this.datasets().map(function (dataset) { return _this._key2PlotDatasetKey.get(dataset); });
+            return this.datasets().map(function (dataset) { return _this._datasetToDrawer.get(dataset); });
         };
         Plot.prototype._generateDrawSteps = function () {
             return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
@@ -6427,7 +6427,7 @@ var Plottable;
             }
             var allSelections = [];
             datasets.forEach(function (dataset) {
-                var drawer = _this._key2PlotDatasetKey.get(dataset);
+                var drawer = _this._datasetToDrawer.get(dataset);
                 if (drawer == null) {
                     return;
                 }
@@ -6451,7 +6451,7 @@ var Plottable;
             var pixelPoints = [];
             var allElements = [];
             datasets.forEach(function (dataset) {
-                var drawer = _this._key2PlotDatasetKey.get(dataset);
+                var drawer = _this._datasetToDrawer.get(dataset);
                 if (drawer == null) {
                     return;
                 }
@@ -7367,7 +7367,7 @@ var Plottable;
             };
             Bar.prototype._getBarsFromDataset = function (dataset, xValOrExtent, yValOrExtent) {
                 var bars = [];
-                var drawer = this._key2PlotDatasetKey.get(dataset);
+                var drawer = this._datasetToDrawer.get(dataset);
                 drawer._getRenderArea().selectAll("rect").each(function (d) {
                     if (Plottable.Utils.Methods.intersectsBBox(xValOrExtent, yValOrExtent, this.getBBox())) {
                         bars.push(this);
@@ -7693,7 +7693,7 @@ var Plottable;
                 var pixelPoints = [];
                 var allElements = [];
                 datasets.forEach(function (dataset) {
-                    var drawer = _this._key2PlotDatasetKey.get(dataset);
+                    var drawer = _this._datasetToDrawer.get(dataset);
                     if (drawer == null) {
                         return;
                     }
@@ -7919,7 +7919,7 @@ var Plottable;
                 var allPlotData = _super.prototype.getAllPlotData.call(this, datasets);
                 var allElements = allPlotData.selection[0];
                 datasets.forEach(function (dataset) {
-                    var plotDatasetKey = _this._key2PlotDatasetKey.get(dataset);
+                    var plotDatasetKey = _this._datasetToDrawer.get(dataset);
                     if (plotDatasetKey == null) {
                         return;
                     }
