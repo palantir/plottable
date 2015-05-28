@@ -3854,15 +3854,14 @@ var Plottable;
     var Axis = (function (_super) {
         __extends(Axis, _super);
         /**
-         * Constructs an axis. An axis is a wrapper around a scale for rendering.
+         * Constructs an Axis.
+         * An Axis is a visual representation of a Scale.
          *
          * @constructor
-         * @param {Scale} scale The scale for this axis to render.
-         * @param {string} orientation One of ["top", "left", "bottom", "right"];
-         * on which side the axis will appear. On most axes, this is either "left"
-         * or "bottom".
-         * @param {Formatter} Data is passed through this formatter before being
-         * displayed.
+         * @param {Scale} scale The Scale for this Axis to render.
+         * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+         * on which side the Axis will appear.
+         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         function Axis(scale, orientation, formatter) {
             var _this = this;
@@ -4188,13 +4187,13 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-             * Constructs a TimeAxis.
+             * Constructs a Time Axis.
              *
-             * A TimeAxis is used for rendering a TimeScale.
+             * A Time Axis is a visual representation of a Scales.Time.
              *
              * @constructor
-             * @param {TimeScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom)
+             * @param {Scales.Time} scale
+             * @param {string} orientation The orientation of the Axis ("top"/"bottom")
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
@@ -4483,11 +4482,11 @@ var Plottable;
                 });
             };
             /**
-             * The css class applied to each time axis tier
+             * The CSS class applied to each Time Axis tier
              */
             Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
             /*
-             * Default possible axis configurations.
+             * Default TimeAxisConfigurations.
              */
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
@@ -4619,15 +4618,14 @@ var Plottable;
         var Numeric = (function (_super) {
             __extends(Numeric, _super);
             /**
-             * Constructs a NumericAxis.
+             * Constructs a Numeric Axis.
              *
-             * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScale.
+             * A Numeric Axis is a visual representation of a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
+             * @param {QuantitativeScale} scale
+             * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             function Numeric(scale, orientation, formatter) {
                 if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
@@ -4957,16 +4955,14 @@ var Plottable;
         var Category = (function (_super) {
             __extends(Category, _super);
             /**
-             * Constructs a CategoryAxis.
+             * Constructs a Category Axis.
              *
-             * A CategoryAxis takes a CategoryScale and includes word-wrapping
-             * algorithms and advanced layout logic to try to display the scale as
-             * efficiently as possible.
+             * A Category Axis is a visual representation of a Scales.Category.
              *
              * @constructor
-             * @param {CategoryScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
-             * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
+             * @param {Scales.Category} scale The Scale to base the Axis on.
+             * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
              */
             function Category(scale, orientation, formatter) {
                 if (orientation === void 0) { orientation = "bottom"; }

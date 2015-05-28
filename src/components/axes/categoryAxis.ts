@@ -9,16 +9,14 @@ export module Axes {
     private _writer: SVGTypewriter.Writers.Writer;
 
     /**
-     * Constructs a CategoryAxis.
-     *
-     * A CategoryAxis takes a CategoryScale and includes word-wrapping
-     * algorithms and advanced layout logic to try to display the scale as
-     * efficiently as possible.
+     * Constructs a Category Axis.
+     * 
+     * A Category Axis is a visual representation of a Scales.Category.
      *
      * @constructor
-     * @param {CategoryScale} scale The scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
-     * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
+     * @param {Scales.Category} scale The Scale to base the Axis on.
+     * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
+     * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
      */
     constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
@@ -61,17 +59,15 @@ export module Axes {
     }
 
     /**
-     * Gets the tick label angle
-     * @returns {number} the tick label angle
+     * Gets the tick label angle in degrees.
      */
     public tickLabelAngle(): number;
     /**
-     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
-     * @param {number} angle The angle for the ticks
-     * @returns {Category} The calling Category Axis.
+     * Sets the tick label angle in degrees.
+     * Right now only vertical-left (-90), horizontal (0), and vertical-right (90) are supported.
      *
-     * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
-     * See tracking at https://github.com/palantir/plottable/issues/504
+     * @param {number} angle
+     * @returns {Category} The calling Category Axis.
      */
     public tickLabelAngle(angle: number): Category;
     public tickLabelAngle(angle?: number): any {

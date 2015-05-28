@@ -14,7 +14,7 @@ export module TimeInterval {
 
 export module Axes {
   /**
-   * Defines a configuration for a time axis tier.
+   * Defines a configuration for a Time Axis tier.
    * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
    * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
    * step - number of intervals between each tick.
@@ -35,12 +35,12 @@ export module Axes {
 
   export class Time extends Axis<Date> {
     /**
-     * The css class applied to each time axis tier
+     * The CSS class applied to each Time Axis tier
      */
     public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
 
     /*
-     * Default possible axis configurations.
+     * Default TimeAxisConfigurations.
      */
     private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
@@ -167,13 +167,13 @@ export module Axes {
     private static _LONG_DATE = new Date(9999, 8, 29, 12, 59, 9999);
 
     /**
-     * Constructs a TimeAxis.
+     * Constructs a Time Axis.
      *
-     * A TimeAxis is used for rendering a TimeScale.
+     * A Time Axis is a visual representation of a Scales.Time.
      *
      * @constructor
-     * @param {TimeScale} scale The scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom)
+     * @param {Scales.Time} scale
+     * @param {string} orientation The orientation of the Axis ("top"/"bottom")
      */
     constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
@@ -182,7 +182,16 @@ export module Axes {
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
 
+    /**
+     * Gets the label positions for each tier.
+     */
     public tierLabelPositions(): string[];
+    /**
+     * Sets the label positions for each tier.
+     * 
+     * @param {string[]} newPositions The posititons for each tier. "bottom" and "center" are the only supported values.
+     * @returns {Axes.Time} The calling Time Axis.
+     */
     public tierLabelPositions(newPositions: string[]): Time;
     public tierLabelPositions(newPositions?: string[]): any {
       if (newPositions == null) {
@@ -198,18 +207,15 @@ export module Axes {
     }
 
     /**
-     * Gets the possible Axis configurations.
-     *
-     * @returns {TimeAxisConfiguration[]} The possible tier configurations.
+     * Gets the possible TimeAxisConfigurations.
      */
     public axisConfigurations(): TimeAxisConfiguration[];
     /**
-     * Sets possible Axis configurations.
-     * The axis will choose the most precise configuration that will display in
-     * its current width.
+     * Sets the possible TimeAxisConfigurations.
+     * The Time Axis will choose the most precise configuration that will display in the available space.
      *
-     * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
-     * @returns {Axis.Time} The calling Axis.Time.
+     * @param {TimeAxisConfiguration[]} configurations
+     * @returns {Axes.Time} The calling Time Axis.
      */
     public axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
     public axisConfigurations(configurations?: any): any {

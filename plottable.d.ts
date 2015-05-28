@@ -1657,15 +1657,14 @@ declare module Plottable {
         protected _computedWidth: number;
         protected _computedHeight: number;
         /**
-         * Constructs an axis. An axis is a wrapper around a scale for rendering.
+         * Constructs an Axis.
+         * An Axis is a visual representation of a Scale.
          *
          * @constructor
-         * @param {Scale} scale The scale for this axis to render.
-         * @param {string} orientation One of ["top", "left", "bottom", "right"];
-         * on which side the axis will appear. On most axes, this is either "left"
-         * or "bottom".
-         * @param {Formatter} Data is passed through this formatter before being
-         * displayed.
+         * @param {Scale} scale The Scale for this Axis to render.
+         * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+         * on which side the Axis will appear.
+         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
         destroy(): void;
@@ -1695,106 +1694,84 @@ declare module Plottable {
         redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
-         * Gets the current formatter on the axis. Data is passed through the
-         * formatter before being displayed.
-         *
-         * @returns {Formatter} The calling Axis, or the current
-         * Formatter.
+         * Gets the Formatter on the Axis. Tick values are passed through the
+         * Formatter before being displayed.
          */
         formatter(): Formatter;
         /**
-         * Sets the current formatter on the axis. Data is passed through the
-         * formatter before being displayed.
+         * Sets the Formatter on the Axis. Tick values are passed through the
+         * Formatter before being displayed.
          *
-         * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+         * @param {Formatter} formatter
          * @returns {Axis} The calling Axis.
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
-         * Gets the current tick mark length.
-         *
-         * @returns {number} the current tick mark length.
+         * Gets the current tick mark length in pixels.
          */
         tickLength(): number;
         /**
-         * Sets the current tick mark length.
+         * Sets the current tick mark length in pixels.
          *
-         * @param {number} length If provided, length of each tick.
+         * @param {number} length
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis<D>;
         /**
-         * Gets the current end tick mark length.
-         *
-         * @returns {number} The current end tick mark length.
+         * Gets the current end tick mark length in pixels.
          */
         endTickLength(): number;
         /**
-         * Sets the end tick mark length.
+         * Sets the end tick mark length in pixels.
          *
-         * @param {number} length If provided, the length of the end ticks.
-         * @returns {BaseAxis} The calling Axis.
+         * @param {number} length
+         * @returns {Axis} The calling Axis.
          */
         endTickLength(length: number): Axis<D>;
         protected _maxLabelTickLength(): number;
         /**
-         * Gets the padding between each tick mark and its associated label.
-         *
-         * @returns {number} the current padding.
-         * length.
+         * Gets the padding between each tick mark and its associated label in pixels.
          */
         tickLabelPadding(): number;
         /**
-         * Sets the padding between each tick mark and its associated label.
+         * Sets the padding between each tick mark and its associated label in pixels.
          *
-         * @param {number} padding If provided, the desired padding.
+         * @param {number} padding
          * @returns {Axis} The calling Axis.
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the gutter (the extra space between the tick
-         * labels and the outer edge of the axis).
-         *
-         * @returns {number} the current gutter.
-         * length.
+         * Gets the size of the gutter in pixels.
+         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
          */
         gutter(): number;
         /**
-         * Sets the size of the gutter (the extra space between the tick
-         * labels and the outer edge of the axis).
+         * Sets the size of the gutter in pixels.
+         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
          *
-         * @param {number} size If provided, the desired gutter.
+         * @param {number} size
          * @returns {Axis} The calling Axis.
          */
         gutter(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
-         *
-         * @returns {number} the current orientation.
          */
         orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
-         * @param {number} newOrientation If provided, the desired orientation
-         * (top/bottom/left/right).
+         * @param {number} newOrientation The desired orientation (top/bottom/left/right).
          * @returns {Axis} The calling Axis.
          */
         orientation(orientation: string): Axis<D>;
         /**
-         * Gets whether the Axis is currently set to show the first and last
-         * tick labels.
-         *
-         * @returns {boolean} whether or not the last
-         * tick labels are showing.
+         * Gets whether the Axis is currently set to show the first and last tick labels.
          */
         showEndTickLabels(): boolean;
         /**
-         * Sets whether the Axis is currently set to show the first and last tick
-         * labels.
+         * Sets whether the Axis is currently set to show the first and last tick labels.
          *
-         * @param {boolean} show Whether or not to show the first and last
-         * labels.
+         * @param {boolean} show
          * @returns {Axis} The calling Axis.
          */
         showEndTickLabels(show: boolean): Axis<D>;
@@ -1814,7 +1791,7 @@ declare module Plottable {
     }
     module Axes {
         /**
-         * Defines a configuration for a time axis tier.
+         * Defines a configuration for a Time Axis tier.
          * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
          * step - number of intervals between each tick.
@@ -1833,34 +1810,40 @@ declare module Plottable {
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends Axis<Date> {
             /**
-             * The css class applied to each time axis tier
+             * The CSS class applied to each Time Axis tier
              */
             static TIME_AXIS_TIER_CLASS: string;
             /**
-             * Constructs a TimeAxis.
+             * Constructs a Time Axis.
              *
-             * A TimeAxis is used for rendering a TimeScale.
+             * A Time Axis is a visual representation of a Scales.Time.
              *
              * @constructor
-             * @param {TimeScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom)
+             * @param {Scales.Time} scale
+             * @param {string} orientation The orientation of the Axis ("top"/"bottom")
              */
             constructor(scale: Scales.Time, orientation: string);
+            /**
+             * Gets the label positions for each tier.
+             */
             tierLabelPositions(): string[];
+            /**
+             * Sets the label positions for each tier.
+             *
+             * @param {string[]} newPositions The posititons for each tier. "bottom" and "center" are the only supported values.
+             * @returns {Axes.Time} The calling Time Axis.
+             */
             tierLabelPositions(newPositions: string[]): Time;
             /**
-             * Gets the possible Axis configurations.
-             *
-             * @returns {TimeAxisConfiguration[]} The possible tier configurations.
+             * Gets the possible TimeAxisConfigurations.
              */
             axisConfigurations(): TimeAxisConfiguration[];
             /**
-             * Sets possible Axis configurations.
-             * The axis will choose the most precise configuration that will display in
-             * its current width.
+             * Sets the possible TimeAxisConfigurations.
+             * The Time Axis will choose the most precise configuration that will display in the available space.
              *
-             * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
-             * @returns {Axis.Time} The calling Axis.Time.
+             * @param {TimeAxisConfiguration[]} configurations
+             * @returns {Axes.Time} The calling Time Axis.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orientation(): string;
@@ -1882,15 +1865,14 @@ declare module Plottable {
     module Axes {
         class Numeric extends Axis<number> {
             /**
-             * Constructs a NumericAxis.
+             * Constructs a Numeric Axis.
              *
-             * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScale.
+             * A Numeric Axis is a visual representation of a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
+             * @param {QuantitativeScale} scale
+             * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
@@ -1908,11 +1890,11 @@ declare module Plottable {
             /**
              * Sets the tick label position relative to the tick marks.
              *
-             * @param {string} position If provided, the relative position of the tick label.
-             *                          [top/center/bottom] for a vertical NumericAxis,
-             *                          [left/center/right] for a horizontal NumericAxis.
+             * @param {string} position The relative position of the tick label.
+             *                          [top/center/bottom] for a vertical Numeric Axis,
+             *                          [left/center/right] for a horizontal Numeric Axis.
              *                          Defaults to center.
-             * @returns {Numeric} The calling Axis.Numeric.
+             * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
             /**
@@ -1948,16 +1930,14 @@ declare module Plottable {
     module Axes {
         class Category extends Axis<string> {
             /**
-             * Constructs a CategoryAxis.
+             * Constructs a Category Axis.
              *
-             * A CategoryAxis takes a CategoryScale and includes word-wrapping
-             * algorithms and advanced layout logic to try to display the scale as
-             * efficiently as possible.
+             * A Category Axis is a visual representation of a Scales.Category.
              *
              * @constructor
-             * @param {CategoryScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
-             * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
+             * @param {Scales.Category} scale The Scale to base the Axis on.
+             * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
@@ -1965,17 +1945,15 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
-             * Gets the tick label angle
-             * @returns {number} the tick label angle
+             * Gets the tick label angle in degrees.
              */
             tickLabelAngle(): number;
             /**
-             * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
-             * @param {number} angle The angle for the ticks
-             * @returns {Category} The calling Category Axis.
+             * Sets the tick label angle in degrees.
+             * Right now only vertical-left (-90), horizontal (0), and vertical-right (90) are supported.
              *
-             * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
-             * See tracking at https://github.com/palantir/plottable/issues/504
+             * @param {number} angle
+             * @returns {Category} The calling Category Axis.
              */
             tickLabelAngle(angle: number): Category;
             renderImmediately(): Category;
