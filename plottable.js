@@ -7453,12 +7453,16 @@ var Plottable;
                 var measurer = this._labelMeasurers.get(dataset);
                 var writer = this._labelWriters.get(dataset);
                 var labelTooWide = data.map(function (d, i) {
-                    var text = attrToProjector["label"](d, i, dataset).toString();
+                    var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
+                    var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());
+                    var primaryScale = _this._isVertical ? _this.y().scale : _this.x().scale;
+                    var scaledBaseline = primaryScale.scale(_this._baselineValue);
+                    var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
                     var x = attrToProjector["x"](d, i, dataset);
                     var y = attrToProjector["y"](d, i, dataset);
-                    var positive = attrToProjector["positive"](d, i, dataset);
+                    var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
                     var measurement = measurer.measure(text);
                     var color = attrToProjector["fill"](d, i, dataset);
                     var dark = Plottable.Utils.Colors.contrast("white", color) * 1.6 < Plottable.Utils.Colors.contrast("black", color);
@@ -7549,13 +7553,6 @@ var Plottable;
                     // then width/height carries it to baseline
                     return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
                 };
-                var primaryAccessor = this._propertyBindings.get(primaryAttr).accessor;
-                if (this._labelsEnabled && this._labelFormatter) {
-                    attrToProjector["label"] = function (d, i, dataset) {
-                        return _this._labelFormatter(primaryAccessor(d, i, dataset));
-                    };
-                    attrToProjector["positive"] = function (d, i, dataset) { return originalPositionFn(d, i, dataset) <= scaledBaseline; };
-                }
                 return attrToProjector;
             };
             /**

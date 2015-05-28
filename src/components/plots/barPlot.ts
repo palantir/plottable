@@ -360,12 +360,16 @@ export module Plots {
       var measurer = this._labelMeasurers.get(dataset);
       var writer = this._labelWriters.get(dataset);
       var labelTooWide: boolean[] = data.map((d, i) => {
-        var text = attrToProjector["label"](d, i, dataset).toString();
+        var primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
+        var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
+        var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
+        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         var w = attrToProjector["width"](d, i, dataset);
         var h = attrToProjector["height"](d, i, dataset);
         var x = attrToProjector["x"](d, i, dataset);
         var y = attrToProjector["y"](d, i, dataset);
-        var positive = attrToProjector["positive"](d, i, dataset);
+        var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         var measurement = measurer.measure(text);
         var color = attrToProjector["fill"](d, i, dataset);
         var dark = Utils.Colors.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
@@ -460,15 +464,6 @@ export module Plots {
         // then width/height carries it to baseline
         return (originalPos > scaledBaseline) ? scaledBaseline : originalPos;
       };
-
-      var primaryAccessor = this._propertyBindings.get(primaryAttr).accessor;
-      if (this._labelsEnabled && this._labelFormatter) {
-        attrToProjector["label"] = (d: any, i: number, dataset: Dataset) => {
-          return this._labelFormatter(primaryAccessor(d, i, dataset));
-        };
-        attrToProjector["positive"] = (d: any, i: number, dataset: Dataset) =>
-          originalPositionFn(d, i, dataset) <= scaledBaseline;
-      }
 
       return attrToProjector;
     }
