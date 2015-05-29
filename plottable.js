@@ -6347,7 +6347,8 @@ var Plottable;
         };
         Plot.prototype.datasets = function (datasets) {
             var _this = this;
-            var currentDatasets = this._datasetToDrawer.keys().map(function (dataset) { return dataset; });
+            var currentDatasets = [];
+            this._datasetToDrawer.forEach(function (drawer, dataset) { return currentDatasets.push(dataset); });
             if (datasets == null) {
                 return currentDatasets;
             }

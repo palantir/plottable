@@ -375,7 +375,8 @@ module Plottable {
     public datasets(): Dataset[];
     public datasets(datasets: Dataset[]): Plot;
     public datasets(datasets?: Dataset[]): any {
-      var currentDatasets = this._datasetToDrawer.keys().map((dataset) => dataset);
+      var currentDatasets: Dataset[] = [];
+      this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
       if (datasets == null) {
         return currentDatasets;
       }
