@@ -271,6 +271,10 @@ before(function () {
     var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
     if (window.PHANTOMJS) {
         window.Pixel_CloseTo_Requirement = 2;
+        // HACKHACK https://github.com/ariya/phantomjs/issues/13280
+        Plottable.Utils.Set.prototype._updateSize = function () {
+            this.size = this._values.length;
+        };
     }
     else if (isFirefox) {
         // HACKHACK #2122
@@ -2343,8 +2347,7 @@ describe("Plots", function () {
             var scale = new Plottable.Scales.Linear();
             plot2.attr("attr", function (d) { return d.a; }, scale);
             plot2.destroy();
-            var scaleCallbacks = scale._callbacks.values();
-            assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
+            assert.strictEqual(scale._callbacks.size, 0, "the plot is no longer attached to the scale");
         });
         it("extent registration works as intended", function () {
             var scale1 = new Plottable.Scales.Linear().padProportion(0);
@@ -2502,10 +2505,8 @@ describe("Plots", function () {
         it("listeners are deregistered after removal", function () {
             plot.autorange("y");
             plot.destroy();
-            var xScaleCallbacks = xScale._callbacks.values();
-            assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
-            var yScaleCallbacks = yScale._callbacks.values();
-            assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
+            assert.strictEqual(xScale._callbacks.size, 0, "the plot is no longer attached to xScale");
+            assert.strictEqual(yScale._callbacks.size, 0, "the plot is no longer attached to yScale");
             svg.remove();
         });
     });
@@ -7917,6 +7918,12 @@ describe("Map", function () {
         var key2 = "key2";
         assert.isUndefined(map.get(key2), "returns undefined if key is not present in the Map");
     });
+    it("chained set() works", function () {
+        var map = new Plottable.Utils.Map();
+        map.set(1, 1).set(2, 3);
+        assert.strictEqual(map.get(1), 1, "First value was set");
+        assert.strictEqual(map.get(2), 3, "Second value was set");
+    });
     it("has()", function () {
         var map = new Plottable.Utils.Map();
         var key1 = "key1";
@@ -7927,6 +7934,36 @@ describe("Map", function () {
         map.set(key1, undefined);
         assert.isTrue(map.has(key1), "returns true if the value is explicitly set to undefined");
     });
+    it("forEach()", function () {
+        var map = new Plottable.Utils.Map();
+        var keys = ["Tom", "Jerry"];
+        var values = [1, 2];
+        map.set(keys[0], values[0]);
+        map.set(keys[1], values[1]);
+        var index = 0;
+        map.forEach(function (value, key, mp) {
+            assert.strictEqual(value, values[index], "Value " + index + " is the expected one");
+            assert.strictEqual(key, keys[index], "Key " + index + " is the expected one");
+            assert.strictEqual(mp, map, "The correct map is passed as the third argument");
+            index++;
+        });
+        assert.strictEqual(index, keys.length, "The expected number of iterations executed in the forEach");
+    });
+    it("forEach() not called on empty map", function () {
+        var map = new Plottable.Utils.Map();
+        map.forEach(function (value, key, mp) {
+            assert.notOk(true, "forEach should not be called because the map is empty");
+        });
+    });
+    it("forEach() can force the this context", function () {
+        var map = new Plottable.Utils.Map();
+        map.set(1, 2);
+        var thisArg = { "foo": "bar" };
+        map.forEach(function (value, key, mp) {
+            assert.strictEqual(this, thisArg, "The correct this context is forced");
+            assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");
+        }, thisArg);
+    });
     it("delete()", function () {
         var map = new Plottable.Utils.Map();
         var key1 = "key1";
@@ -7935,36 +7972,6 @@ describe("Map", function () {
         assert.isTrue(map.delete(key1), "returns true if the key was present in the Map");
         assert.isFalse(map.has(key1), "key is no longer present in the Map");
         assert.isFalse(map.delete(key1), "returns false if the key was not present in the Map");
-    });
-    it("keys()", function () {
-        var map = new Plottable.Utils.Map();
-        var key1 = "key1";
-        var value1 = "1";
-        map.set(key1, value1);
-        var key2 = "key2";
-        var value2 = "2";
-        map.set(key2, value2);
-        assert.deepEqual(map.keys(), [key1, key2], "retrieved all keys");
-    });
-    it("keys()", function () {
-        var map = new Plottable.Utils.Map();
-        var key1 = "key1";
-        var value1 = "1";
-        map.set(key1, value1);
-        var key2 = "key2";
-        var value2 = "2";
-        map.set(key2, value2);
-        assert.deepEqual(map.keys(), [key1, key2], "retrieved all keys");
-    });
-    it("values()", function () {
-        var map = new Plottable.Utils.Map();
-        var key1 = "key1";
-        var value1 = "1";
-        map.set(key1, value1);
-        var key2 = "key2";
-        var value2 = "2";
-        map.set(key2, value2);
-        assert.deepEqual(map.values(), [value1, value2], "retrieved all values");
     });
 });
 
@@ -7976,31 +7983,28 @@ describe("Utils", function () {
             var set = new Plottable.Utils.Set();
             var value1 = { value: "one" };
             set.add(value1);
-            var setValues = set.values();
-            assert.lengthOf(setValues, 1, "set contains one value");
-            assert.strictEqual(setValues[0], value1, "the value was added to the set");
+            assert.strictEqual(set.size, 1, "set contains one value");
+            assert.strictEqual(set._values[0], value1, "the value was added to the set");
             set.add(value1);
-            setValues = set.values();
-            assert.lengthOf(setValues, 1, "same value is not added twice");
-            assert.strictEqual(setValues[0], value1, "list still contains the value");
+            assert.strictEqual(set.size, 1, "same value is not added twice");
+            assert.strictEqual(set._values[0], value1, "list still contains the value");
             var value2 = { value: "two" };
             set.add(value2);
-            setValues = set.values();
-            assert.lengthOf(setValues, 2, "set now contains two values");
-            assert.strictEqual(setValues[0], value1, "set contains value 1");
-            assert.strictEqual(setValues[1], value2, "set contains value 2");
+            assert.strictEqual(set.size, 2, "set now contains two values");
+            assert.strictEqual(set._values[0], value1, "set contains value 1");
+            assert.strictEqual(set._values[1], value2, "set contains value 2");
         });
         it("delete()", function () {
             var set = new Plottable.Utils.Set();
             var value1 = { value: "one" };
             set.add(value1);
-            assert.lengthOf(set.values(), 1, "set contains one value after adding");
+            assert.strictEqual(set.size, 1, "set contains one value after adding");
             set.delete(value1);
-            assert.lengthOf(set.values(), 0, "value was delete");
+            assert.strictEqual(set.size, 0, "value was delete");
             set.add(value1);
             var value2 = { value: "two" };
             set.delete(value2);
-            assert.lengthOf(set.values(), 1, "removing a non-existent value does nothing");
+            assert.strictEqual(set.size, 1, "removing a non-existent value does nothing");
         });
         it("has()", function () {
             var set = new Plottable.Utils.Set();
@@ -8011,6 +8015,35 @@ describe("Utils", function () {
             assert.isFalse(set.has(similarValue1), "correctly determines that similar object is not in the set");
             set.delete(value1);
             assert.isFalse(set.has(value1), "correctly checks that value is no longer in the set");
+        });
+        it("forEach()", function () {
+            var set = new Plottable.Utils.Set();
+            var values = [1, "2"];
+            set.add(values[0]);
+            set.add(values[1]);
+            var index = 0;
+            set.forEach(function (value1, value2, passedSet) {
+                assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
+                assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
+                index++;
+            });
+            assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");
+        });
+        it("forEach() not called on empty set", function () {
+            var set = new Plottable.Utils.Set();
+            set.forEach(function (value, value2, mp) {
+                assert.notOk(true, "forEach should not be called because the set is empty");
+            });
+        });
+        it("forEach() can force the this context", function () {
+            var set = new Plottable.Utils.Set();
+            set.add(1);
+            var thisArg = { "foo": "bar" };
+            set.forEach(function (value, value2, mp) {
+                assert.strictEqual(this, thisArg, "The correct this context is forced");
+                assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");
+            }, thisArg);
         });
     });
 });

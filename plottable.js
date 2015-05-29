@@ -378,6 +378,10 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
+        /**
+         * Shim for ES6 map.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+         */
         var Map = (function () {
             function Map() {
                 this._keyValuePairs = [];
@@ -387,7 +391,7 @@ var Plottable;
              *
              * @param {K} key Key to set in the Map
              * @param {V} value Value to set in the Map
-             * @return {boolean} True if key already in Map, false otherwise
+             * @return {Map} The Map object
              */
             Map.prototype.set = function (key, value) {
                 if (key !== key) {
@@ -396,11 +400,11 @@ var Plottable;
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs[i].value = value;
-                        return true;
+                        return this;
                     }
                 }
                 this._keyValuePairs.push({ key: key, value: value });
-                return false;
+                return this;
             };
             /**
              * Get a value from the store, given a key.
@@ -434,20 +438,17 @@ var Plottable;
                 return false;
             };
             /**
-             * Return an array of the values in the Map
+             * The forEach method executes the provided callback once for each key of the map which
+             * actually exist. It is not invoked for keys which have been deleted.
              *
-             * @return {V[]} The values in the store
+             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
+             * @param {any} thisArg The `this` context
              */
-            Map.prototype.values = function () {
-                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.value; });
-            };
-            /**
-             * Return an array of keys in the Map.
-             *
-             * @return {K[]} The keys in the store
-             */
-            Map.prototype.keys = function () {
-                return this._keyValuePairs.map(function (keyValuePair) { return keyValuePair.key; });
+            Map.prototype.forEach = function (callbackFn, thisArg) {
+                var _this = this;
+                this._keyValuePairs.forEach(function (keyValuePair) {
+                    callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
+                });
             };
             /**
              * Delete a key from the Map. Return whether the key was present.
@@ -482,10 +483,12 @@ var Plottable;
         var Set = (function () {
             function Set() {
                 this._values = [];
+                this._updateSize();
             }
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
+                    this._updateSize();
                 }
                 return this;
             };
@@ -493,15 +496,32 @@ var Plottable;
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
+                    this._updateSize();
                     return true;
                 }
                 return false;
             };
+            Set.prototype._updateSize = function () {
+                Object.defineProperty(this, "size", {
+                    value: this._values.length,
+                    configurable: true
+                });
+            };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
-            Set.prototype.values = function () {
-                return this._values;
+            /**
+             * The forEach method executes the provided callback once for each value which actually exists
+             * in the Set object. It is not invoked for values which have been deleted.
+             *
+             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            Set.prototype.forEach = function (callback, thisArg) {
+                var _this = this;
+                this._values.forEach(function (value) {
+                    callback.call(thisArg, value, value, _this);
+                });
             };
             return Set;
         })();
@@ -715,7 +735,7 @@ var Plottable;
                 for (var _i = 0; _i < arguments.length; _i++) {
                     args[_i - 0] = arguments[_i];
                 }
-                this.values().forEach(function (callback) {
+                this.forEach(function (callback) {
                     callback.apply(_this, args);
                 });
                 return this;
@@ -1407,12 +1427,12 @@ var Plottable;
         function flush() {
             if (_animationRequested) {
                 // Layout
-                _componentsNeedingComputeLayout.values().forEach(function (component) { return component.computeLayout(); });
+                _componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
                 // Top level render; Containers will put their children in the toRender queue
-                _componentsNeedingRender.values().forEach(function (component) { return component.render(); });
+                _componentsNeedingRender.forEach(function (component) { return component.render(); });
                 _isCurrentlyFlushing = true;
                 var failed = new Plottable.Utils.Set();
-                _componentsNeedingRender.values().forEach(function (component) {
+                _componentsNeedingRender.forEach(function (component) {
                     try {
                         component.renderImmediately();
                     }
@@ -1464,7 +1484,11 @@ var Plottable;
         };
         Scale.prototype._getAllExtents = function () {
             var _this = this;
-            return d3.merge(this._extentsProviders.values().map(function (provider) { return provider(_this); }));
+            var providerArray = [];
+            this._extentsProviders.forEach(function (provider) {
+                providerArray.push(provider(_this));
+            });
+            return d3.merge(providerArray);
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
@@ -1720,7 +1744,7 @@ var Plottable;
             return this;
         };
         QuantitativeScale.prototype._includeValues = function (domain) {
-            this._includedValues.values().forEach(function (value) {
+            this._includedValues.forEach(function (value) {
                 if (value < domain[0]) {
                     domain[0] = value;
                 }
@@ -1740,9 +1764,18 @@ var Plottable;
             var p = this._padProportion / 2;
             var min = domain[0];
             var max = domain[1];
-            var paddingExceptions = this._paddingExceptions.values();
-            var newMin = paddingExceptions.indexOf(min) === -1 ? this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p) : min;
-            var newMax = paddingExceptions.indexOf(max) === -1 ? this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p) : max;
+            var minExistsInExceptions = false;
+            var maxExistsInExceptions = false;
+            this._paddingExceptions.forEach(function (value) {
+                if (value === min) {
+                    minExistsInExceptions = true;
+                }
+                if (value === max) {
+                    maxExistsInExceptions = true;
+                }
+            });
+            var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
+            var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
             return this._niceDomain([newMin, newMax]);
         };
         QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {
@@ -7764,7 +7797,7 @@ var Plottable;
             Area.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                this._lineDrawers.values().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+                this._lineDrawers.forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
             };
             Area.prototype.y = function (y, yScale) {
                 if (y == null) {
@@ -8488,7 +8521,7 @@ var Plottable;
             this._connected = false;
         }
         Dispatcher.prototype._hasNoListeners = function () {
-            return this._callbacks.every(function (cbs) { return cbs.values().length === 0; });
+            return this._callbacks.every(function (cbs) { return cbs.size === 0; });
         };
         Dispatcher.prototype._connect = function () {
             var _this = this;
@@ -9265,7 +9298,7 @@ var Plottable;
              */
             Key.prototype.offKey = function (keyCode, callback) {
                 this._keyCodeCallbacks[keyCode].delete(callback);
-                if (this._keyCodeCallbacks[keyCode].values().length === 0) {
+                if (this._keyCodeCallbacks[keyCode].size === 0) {
                     delete this._keyCodeCallbacks[keyCode];
                 }
                 return this;

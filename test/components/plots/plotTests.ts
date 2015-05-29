@@ -399,8 +399,7 @@ describe("Plots", () => {
       var scale = new Plottable.Scales.Linear();
       plot2.attr("attr", (d) => d.a, scale);
       plot2.destroy();
-      var scaleCallbacks = (<any> scale)._callbacks.values();
-      assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
+      assert.strictEqual((<any> scale)._callbacks.size, 0, "the plot is no longer attached to the scale");
     });
 
     it("extent registration works as intended", () => {

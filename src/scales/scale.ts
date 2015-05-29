@@ -45,7 +45,11 @@ module Plottable {
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
+      var providerArray: D[][][] = [];
+      this._extentsProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
+        providerArray.push(provider(this));
+      });
+      return d3.merge(providerArray);
     }
 
     protected _getExtent(): D[] {
