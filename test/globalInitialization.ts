@@ -13,8 +13,8 @@ before(() => {
   if (window.PHANTOMJS) {
     window.Pixel_CloseTo_Requirement = 2;
     // HACKHACK https://github.com/ariya/phantomjs/issues/13280
-    (<any>Plottable.Utils.Set.prototype)._setSize = function(size: number) {
-      this.size = size;
+    (<any>Plottable.Utils.Set.prototype)._updateSize = function() {
+      this.size = (<any>this)._values.length;
     };
   } else if (isFirefox) {
     // HACKHACK #2122

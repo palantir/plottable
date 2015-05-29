@@ -483,12 +483,12 @@ var Plottable;
         var Set = (function () {
             function Set() {
                 this._values = [];
-                this._setSize(0);
+                this._updateSize();
             }
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
-                    this._setSize(this._values.length);
+                    this._updateSize();
                 }
                 return this;
             };
@@ -496,12 +496,12 @@ var Plottable;
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
-                    this._setSize(this._values.length);
+                    this._updateSize();
                     return true;
                 }
                 return false;
             };
-            Set.prototype._setSize = function (size) {
+            Set.prototype._updateSize = function () {
                 Object.defineProperty(this, "size", {
                     value: this._values.length,
                     configurable: true

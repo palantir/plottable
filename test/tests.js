@@ -272,8 +272,8 @@ before(function () {
     if (window.PHANTOMJS) {
         window.Pixel_CloseTo_Requirement = 2;
         // HACKHACK https://github.com/ariya/phantomjs/issues/13280
-        Plottable.Utils.Set.prototype._setSize = function (size) {
-            this.size = size;
+        Plottable.Utils.Set.prototype._updateSize = function () {
+            this.size = this._values.length;
         };
     }
     else if (isFirefox) {
