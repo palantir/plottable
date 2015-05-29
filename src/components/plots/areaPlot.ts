@@ -8,7 +8,7 @@ export module Plots {
 
     /**
      * An Area Plot draws a filled region (area) between Y and Y0.
-     * 
+     *
      * @constructor
      * @param {QuantitativeScale} xScale
      * @param {QuantitativeScale} yScale
@@ -26,7 +26,7 @@ export module Plots {
 
     protected _setup() {
       super._setup();
-      this._lineDrawers.values().forEach((d) => d.setup(this._renderArea.append("g")));
+      this._lineDrawers.forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -60,7 +60,7 @@ export module Plots {
     /**
      * Sets Y0 to a constant number or the result of an Accessor<number>.
      * If a Scale has been set for Y, it will also be used to scale Y0.
-     * 
+     *
      * @param {number|Accessor<number>} y0
      * @returns {Area} The calling Area Plot.
      */

@@ -177,15 +177,19 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
+        /**
+         * Shim for ES6 map.
+         * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+         */
         class Map<K, V> {
             /**
              * Set a new key/value pair in the Map.
              *
              * @param {K} key Key to set in the Map
              * @param {V} value Value to set in the Map
-             * @return {boolean} True if key already in Map, false otherwise
+             * @return {Map} The Map object
              */
-            set(key: K, value: V): boolean;
+            set(key: K, value: V): Map<K, V>;
             /**
              * Get a value from the store, given a key.
              *
@@ -204,17 +208,13 @@ declare module Plottable {
              */
             has(key: K): boolean;
             /**
-             * Return an array of the values in the Map
+             * The forEach method executes the provided callback once for each key of the map which
+             * actually exist. It is not invoked for keys which have been deleted.
              *
-             * @return {V[]} The values in the store
+             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
+             * @param {any} thisArg The `this` context
              */
-            values(): V[];
-            /**
-             * Return an array of keys in the Map.
-             *
-             * @return {K[]} The keys in the store
-             */
-            keys(): K[];
+            forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
             /**
              * Delete a key from the Map. Return whether the key was present.
              *
@@ -234,11 +234,19 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
          */
         class Set<T> {
+            size: number;
             constructor();
             add(value: T): Set<T>;
             delete(value: T): boolean;
             has(value: T): boolean;
-            values(): T[];
+            /**
+             * The forEach method executes the provided callback once for each value which actually exists
+             * in the Set object. It is not invoked for values which have been deleted.
+             *
+             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
+             * @param {any} thisArg The `this` context
+             */
+            forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
         }
     }
 }
@@ -2977,7 +2985,7 @@ declare module Plottable {
             protected _setup(): void;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedArea<X>;
-            x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): StackedArea<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;

@@ -33,8 +33,8 @@ export module Plots {
 
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): StackedArea<X>;
-    public x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
-    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any {
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
