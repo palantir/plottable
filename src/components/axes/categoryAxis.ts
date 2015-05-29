@@ -18,7 +18,7 @@ export module Axes {
      * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.identity()]
      */
-    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation: string, formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }

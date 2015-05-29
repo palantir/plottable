@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Drawers {
-  export class Element extends AbstractDrawer {
+  export class Element extends Drawer {
     protected _svgElement: string;
 
     /**

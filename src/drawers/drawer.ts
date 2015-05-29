@@ -17,7 +17,9 @@ export module Drawers {
     animator: Animators.Plot;
   }
 
-  export class AbstractDrawer {
+}
+
+  export class Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
     protected _dataset: Dataset;
@@ -59,7 +61,7 @@ export module Drawers {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    protected _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: Drawers.AppliedDrawStep) {
       // no-op
     }
 
@@ -83,8 +85,8 @@ export module Drawers {
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
      */
-    public draw(data: any[], drawSteps: DrawStep[]) {
-      var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
+    public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
+      var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
         var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
@@ -123,5 +125,4 @@ export module Drawers {
     }
 
   }
-}
 }

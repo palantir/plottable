@@ -1195,57 +1195,57 @@ declare module Plottable {
             attrToProjector: AttributeToAppliedProjector;
             animator: Animators.Plot;
         };
-        class AbstractDrawer {
-            protected _className: string;
-            protected _dataset: Dataset;
-            /**
-             * Constructs a Drawer
-             *
-             * @constructor
-             * @param {Dataset} dataset The dataset associated with this Drawer
-             */
-            constructor(dataset: Dataset);
-            setup(area: D3.Selection): void;
-            /**
-             * Removes the Drawer and its renderArea
-             */
-            remove(): void;
-            /**
-             * Enter new data to render area and creates binding
-             *
-             * @param{any[]} data The data to be drawn
-             */
-            protected _enterData(data: any[]): void;
-            /**
-             * Draws data using one step
-             *
-             * @param{AppliedDrawStep} step The step, how data should be drawn.
-             */
-            protected _drawStep(step: AppliedDrawStep): void;
-            protected _numberOfAnimationIterations(data: any[]): number;
-            /**
-             * Draws the data into the renderArea using the spefic steps and metadata
-             *
-             * @param{any[]} data The data to be drawn
-             * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             */
-            draw(data: any[], drawSteps: DrawStep[]): number;
-            /**
-             * Retrieves the renderArea selection for the drawer
-             *
-             * @returns {D3.Selection} the renderArea selection
-             */
-            _getRenderArea(): D3.Selection;
-            _getSelector(): string;
-            _getSelection(index: number): D3.Selection;
-        }
+    }
+    class Drawer {
+        protected _className: string;
+        protected _dataset: Dataset;
+        /**
+         * Constructs a Drawer
+         *
+         * @constructor
+         * @param {Dataset} dataset The dataset associated with this Drawer
+         */
+        constructor(dataset: Dataset);
+        setup(area: D3.Selection): void;
+        /**
+         * Removes the Drawer and its renderArea
+         */
+        remove(): void;
+        /**
+         * Enter new data to render area and creates binding
+         *
+         * @param{any[]} data The data to be drawn
+         */
+        protected _enterData(data: any[]): void;
+        /**
+         * Draws data using one step
+         *
+         * @param{AppliedDrawStep} step The step, how data should be drawn.
+         */
+        protected _drawStep(step: Drawers.AppliedDrawStep): void;
+        protected _numberOfAnimationIterations(data: any[]): number;
+        /**
+         * Draws the data into the renderArea using the spefic steps and metadata
+         *
+         * @param{any[]} data The data to be drawn
+         * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+         */
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
+        /**
+         * Retrieves the renderArea selection for the drawer
+         *
+         * @returns {D3.Selection} the renderArea selection
+         */
+        _getRenderArea(): D3.Selection;
+        _getSelector(): string;
+        _getSelection(index: number): D3.Selection;
     }
 }
 
 
 declare module Plottable {
     module Drawers {
-        class Line extends AbstractDrawer {
+        class Line extends Drawer {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
             setup(line: D3.Selection): void;
@@ -1273,7 +1273,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Element extends AbstractDrawer {
+        class Element extends Drawer {
             protected _svgElement: string;
             /**
              * Sets the svg element, which needs to be bind to data
@@ -1871,7 +1871,7 @@ declare module Plottable {
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.identity()]
              */
-            constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -2301,7 +2301,7 @@ declare module Plottable {
          */
         type PlotDatasetKey = {
             dataset: Dataset;
-            drawer: Drawers.AbstractDrawer;
+            drawer: Drawer;
             key: string;
         };
         type Entity = {
@@ -2347,7 +2347,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _setupDatasetNodes(dataset: Dataset): void;
-        protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
+        protected _getDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
         /**
@@ -2420,7 +2420,7 @@ declare module Plottable {
         protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
-        protected _getDrawersInOrder(): Drawers.AbstractDrawer[];
+        protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;

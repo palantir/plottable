@@ -326,7 +326,7 @@ var MockDrawer = (function (_super) {
         step.animator.animate(this._getRenderArea(), step.attrToProjector);
     };
     return MockDrawer;
-})(Plottable.Drawers.AbstractDrawer);
+})(Plottable.Drawer);
 describe("Drawers", function () {
     describe("Abstract Drawer", function () {
         var oldTimeout;
@@ -391,7 +391,7 @@ describe("Drawers", function () {
         });
         it("_getSelection", function () {
             var svg = TestMethods.generateSVG(300, 300);
-            var drawer = new Plottable.Drawers.AbstractDrawer(null);
+            var drawer = new Plottable.Drawer(null);
             drawer.setup(svg.append("g"));
             drawer._getSelector = function () { return "circle"; };
             var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
@@ -1211,7 +1211,7 @@ describe("Category Axes", function () {
     it("requests appropriate space when the scale has no domain", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var scale = new Plottable.Scales.Category();
-        var ca = new Plottable.Axes.Category(scale);
+        var ca = new Plottable.Axes.Category(scale, "bottom");
         ca.anchor(svg);
         var s = ca.requestedSpace(400, 400);
         assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
@@ -1222,7 +1222,7 @@ describe("Category Axes", function () {
         var svg = TestMethods.generateSVG(1000, 400);
         var domain = [null, undefined, true, 2, "foo"];
         var scale = new Plottable.Scales.Category().domain(domain);
-        var axis = new Plottable.Axes.Category(scale);
+        var axis = new Plottable.Axes.Category(scale, "bottom");
         axis.renderTo(svg);
         var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
         assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
@@ -2133,14 +2133,14 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([{ value: 0 }, { value: 1 }, { value: 2 }]);
             var dataset2 = new Plottable.Dataset([{ value: 1 }, { value: 2 }, { value: 3 }]);
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
+            var mockDrawer1 = new Plottable.Drawer(dataset1);
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
+            var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
@@ -2181,14 +2181,14 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
+            var mockDrawer1 = new Plottable.Drawer(dataset1);
             var renderArea1 = svg.append("g");
             var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
+            var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
@@ -2241,7 +2241,7 @@ describe("Plots", function () {
             });
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
-            var mockDrawer = new Plottable.Drawers.AbstractDrawer(dataset);
+            var mockDrawer = new Plottable.Drawer(dataset);
             var renderArea = svg.append("g");
             var circles = renderArea.selectAll("circles").data(data);
             circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
@@ -2279,14 +2279,14 @@ describe("Plots", function () {
             var data1PointConverter = function (datum, index) { return data1Points[index]; };
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with already drawn items
-            var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
+            var mockDrawer1 = new Plottable.Drawer(dataset1);
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
             mockDrawer1._getSelector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-            var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
+            var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._getSelector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
@@ -4316,7 +4316,7 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedBar();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawers.AbstractDrawer(dataset); };
+            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
             stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
@@ -4444,7 +4444,7 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedArea();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawers.AbstractDrawer(dataset); };
+            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
             stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {

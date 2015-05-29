@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Drawers {
-  export class Line extends AbstractDrawer {
+  export class Line extends Drawer {
     public static PATH_CLASS = "line";
 
     private _pathSelection: D3.Selection;
