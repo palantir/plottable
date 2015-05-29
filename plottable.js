@@ -6367,9 +6367,9 @@ var Plottable;
             // no-op
         };
         Plot.prototype._getDataToDraw = function () {
-            var datasets = new Plottable.Utils.Map();
-            this.datasets().forEach(function (dataset) { return datasets.set(dataset, dataset.data()); });
-            return datasets;
+            var dataToDraw = new Plottable.Utils.Map();
+            this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+            return dataToDraw;
         };
         Plot.prototype._paint = function () {
             var drawSteps = this._generateDrawSteps();

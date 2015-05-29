@@ -398,9 +398,9 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
-      this.datasets().forEach((dataset) => datasets.set(dataset, dataset.data()));
-      return datasets;
+      var dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      return dataToDraw;
     }
 
     private _paint() {
