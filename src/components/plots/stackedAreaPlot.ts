@@ -147,6 +147,14 @@ export module Plots {
       return propertyToProjectors;
     }
 
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      var pixelPoint = super._pixelPoint(datum, index, dataset);
+      var xValue = this.x().accessor(datum, index, dataset);
+      var yValue = this.y().accessor(datum, index, dataset);
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue));
+      return { x: pixelPoint.x, y: scaledYValue };
+    }
+
   }
 }
 }

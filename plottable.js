@@ -8169,6 +8169,13 @@ var Plottable;
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
                 return propertyToProjectors;
             };
+            StackedArea.prototype._pixelPoint = function (datum, index, dataset) {
+                var pixelPoint = _super.prototype._pixelPoint.call(this, datum, index, dataset);
+                var xValue = this.x().accessor(datum, index, dataset);
+                var yValue = this.y().accessor(datum, index, dataset);
+                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue));
+                return { x: pixelPoint.x, y: scaledYValue };
+            };
             return StackedArea;
         })(Plots.Area);
         Plots.StackedArea = StackedArea;
