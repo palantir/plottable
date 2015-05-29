@@ -798,7 +798,7 @@ describe("Plots", () => {
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.autorange("y");
+      plot.adjustingScaleType("y");
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });

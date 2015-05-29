@@ -6701,14 +6701,14 @@ var Plottable;
             this._adjustXDomainCallback = function (scale) { return _this._adjustXDomain(); };
             xScale.onUpdate(this._adjustYDomainCallback);
             yScale.onUpdate(this._adjustXDomainCallback);
-            this._adjustingDomain = "none";
+            this._adjustingScaleType = "none";
         }
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
                 return this._propertyBindings.get(XYPlot._X_KEY);
             }
             this._bindProperty(XYPlot._X_KEY, x, xScale);
-            if (this._adjustingDomain === "y") {
+            if (this._adjustingScaleType === "y") {
                 this._updateYExtentsAndAutodomain();
             }
             this.render();
@@ -6719,17 +6719,17 @@ var Plottable;
                 return this._propertyBindings.get(XYPlot._Y_KEY);
             }
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
-            if (this._adjustingDomain === "x") {
+            if (this._adjustingScaleType === "x") {
                 this._updateXExtentsAndAutodomain();
             }
             this.render();
             return this;
         };
         XYPlot.prototype._filterForProperty = function (property) {
-            if (property === "x" && this._adjustingDomain === "x") {
+            if (property === "x" && this._adjustingScaleType === "x") {
                 return this._makeFilterByProperty("y");
             }
-            else if (property === "y" && this._adjustingDomain === "y") {
+            else if (property === "y" && this._adjustingScaleType === "y") {
                 return this._makeFilterByProperty("x");
             }
             return null;
@@ -6768,36 +6768,24 @@ var Plottable;
             }
             return this;
         };
-        /**
-         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
-         *
-         * If 'x' or 'y' is specified the adjustment is immediately performed.
-         *
-         * @param {string} scale Must be one of 'x', 'y', or 'none'.
-         *
-         * 'x' will adjust the x scale in relation to changes in the y domain.
-         *
-         * 'y' will adjust the y scale in relation to changes in the x domain.
-         *
-         * 'none' means neither scale will change automatically.
-         *
-         * @returns {XYPlot} The calling XYPlot.
-         */
-        XYPlot.prototype.autorange = function (scaleName) {
-            switch (scaleName) {
+        XYPlot.prototype.adjustingScaleType = function (adjustingScaleType) {
+            if (adjustingScaleType == null) {
+                return this._adjustingScaleType;
+            }
+            switch (adjustingScaleType) {
                 case "x":
-                    this._adjustingDomain = scaleName;
+                    this._adjustingScaleType = adjustingScaleType;
                     this._adjustXDomain();
                     break;
                 case "y":
-                    this._adjustingDomain = scaleName;
+                    this._adjustingScaleType = adjustingScaleType;
                     this._adjustYDomain();
                     break;
                 case "none":
-                    this._adjustingDomain = scaleName;
+                    this._adjustingScaleType = adjustingScaleType;
                     break;
                 default:
-                    throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+                    throw new Error("Invalid scale name '" + adjustingScaleType + "', must be 'x', 'y' or 'none'");
             }
             return this;
         };
@@ -6846,7 +6834,7 @@ var Plottable;
             if (!this._projectorsReady()) {
                 return;
             }
-            if (this._adjustingDomain === "y") {
+            if (this._adjustingScaleType === "y") {
                 this._updateYExtentsAndAutodomain();
             }
         };
@@ -6854,7 +6842,7 @@ var Plottable;
             if (!this._projectorsReady()) {
                 return;
             }
-            if (this._adjustingDomain === "x") {
+            if (this._adjustingScaleType === "x") {
                 this._updateXExtentsAndAutodomain();
             }
         };

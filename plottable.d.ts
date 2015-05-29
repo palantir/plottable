@@ -2573,7 +2573,8 @@ declare module Plottable {
          *
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorange(scaleName: string): XYPlot<X, Y>;
+        adjustingScaleType(): string;
+        adjustingScaleType(adjustingScaleType: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts both domains' extents to show all datasets.

@@ -6,7 +6,7 @@ module Plottable {
     protected static _Y_KEY = "y";
     private _adjustYDomainCallback: ScaleCallback<Scale<any, any>>;
     private _adjustXDomainCallback: ScaleCallback<Scale<any, any>>;
-    private _adjustingDomain: string;
+    private _adjustingScaleType: string;
 
     /**
      * Constructs an XYPlot.
@@ -35,7 +35,7 @@ module Plottable {
       xScale.onUpdate(this._adjustYDomainCallback);
       yScale.onUpdate(this._adjustXDomainCallback);
 
-      this._adjustingDomain = "none";
+      this._adjustingScaleType = "none";
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -46,7 +46,7 @@ module Plottable {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
       this._bindProperty(XYPlot._X_KEY, x, xScale);
-      if (this._adjustingDomain === "y") {
+      if (this._adjustingScaleType === "y") {
         this._updateYExtentsAndAutodomain();
       }
       this.render();
@@ -62,7 +62,7 @@ module Plottable {
       }
 
       this._bindProperty(XYPlot._Y_KEY, y, yScale);
-      if (this._adjustingDomain === "x") {
+      if (this._adjustingScaleType === "x") {
         this._updateXExtentsAndAutodomain();
       }
       this.render();
@@ -70,9 +70,9 @@ module Plottable {
     }
 
     protected _filterForProperty(property: string) {
-      if (property === "x" && this._adjustingDomain === "x") {
+      if (property === "x" && this._adjustingScaleType === "x") {
         return this._makeFilterByProperty("y");
-      } else if (property === "y" && this._adjustingDomain === "y") {
+      } else if (property === "y" && this._adjustingScaleType === "y") {
         return this._makeFilterByProperty("x");
       }
       return null;
@@ -133,21 +133,26 @@ module Plottable {
      * 
      * @returns {XYPlot} The calling XYPlot.
      */
-    public autorange(scaleName: string) {
-      switch (scaleName) {
+    public adjustingScaleType(): string;
+    public adjustingScaleType(adjustingScaleType: string): XYPlot<X, Y>;
+    public adjustingScaleType(adjustingScaleType?: string): any {
+      if (adjustingScaleType == null) {
+        return this._adjustingScaleType;
+      }
+      switch (adjustingScaleType) {
         case "x":
-          this._adjustingDomain = scaleName;
+          this._adjustingScaleType = adjustingScaleType;
           this._adjustXDomain();
           break;
         case "y":
-          this._adjustingDomain = scaleName;
+          this._adjustingScaleType = adjustingScaleType;
           this._adjustYDomain();
           break;
         case "none":
-          this._adjustingDomain = scaleName;
+          this._adjustingScaleType = adjustingScaleType;
           break;
         default:
-          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+          throw new Error("Invalid scale name '" + adjustingScaleType + "', must be 'x', 'y' or 'none'");
       }
       return this;
     }
@@ -198,13 +203,13 @@ module Plottable {
 
     private _adjustYDomain() {
       if (!this._projectorsReady()) { return; }
-      if (this._adjustingDomain === "y") {
+      if (this._adjustingScaleType === "y") {
         this._updateYExtentsAndAutodomain();
       }
     }
     private _adjustXDomain() {
       if (!this._projectorsReady()) { return; }
-      if (this._adjustingDomain === "x") {
+      if (this._adjustingScaleType === "x") {
         this._updateXExtentsAndAutodomain();
       }
     }
