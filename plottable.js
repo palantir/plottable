@@ -488,7 +488,7 @@ var Plottable;
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
-                    this.size++;
+                    this.size = this._values.length;
                 }
                 return this;
             };
@@ -496,7 +496,7 @@ var Plottable;
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
-                    this.size--;
+                    this.size = this._values.length;
                     return true;
                 }
                 return false;
