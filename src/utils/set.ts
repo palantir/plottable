@@ -7,18 +7,19 @@ module Plottable {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
      */
     export class Set<T> {
-      public size = 0;
+      public size: number;
 
       private _values: T[];
 
       constructor() {
         this._values = [];
+        Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
       }
 
       public add(value: T) {
         if (!this.has(value)) {
           this._values.push(value);
-          this.size = this._values.length;
+          Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
         }
         return this;
       }
@@ -27,7 +28,7 @@ module Plottable {
         var index = this._values.indexOf(value);
         if (index !== -1) {
           this._values.splice(index, 1);
-          this.size = this._values.length;
+          Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
           return true;
         }
         return false;

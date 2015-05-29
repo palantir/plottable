@@ -482,13 +482,13 @@ var Plottable;
          */
         var Set = (function () {
             function Set() {
-                this.size = 0;
                 this._values = [];
+                Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
             }
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
-                    this.size = this._values.length;
+                    Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
                 }
                 return this;
             };
@@ -496,7 +496,7 @@ var Plottable;
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
-                    this.size = this._values.length;
+                    Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
                     return true;
                 }
                 return false;
