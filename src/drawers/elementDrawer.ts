@@ -5,16 +5,6 @@ export module Drawers {
   export class Element extends Drawer {
     protected _svgElement: string;
 
-    /**
-     * Sets the svg element, which needs to be bind to data
-     *
-     * @param{string} tag The svg element to be bind
-     */
-    public svgElement(tag: string): Element {
-      this._svgElement = tag;
-      return this;
-    }
-
     private _getDrawSelection() {
       return this._getRenderArea().selectAll(this._svgElement);
     }

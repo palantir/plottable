@@ -6,7 +6,7 @@ export module Drawers {
 
     constructor(dataset: Dataset) {
       super(dataset);
-      this.svgElement("rect");
+      this._svgElement = "rect";
     }
 
   }
