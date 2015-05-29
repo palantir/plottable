@@ -271,6 +271,10 @@ before(function () {
     var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
     if (window.PHANTOMJS) {
         window.Pixel_CloseTo_Requirement = 2;
+        // HACKHACK #2179
+        Plottable.Utils.Set.prototype._setSize = function (size) {
+            this.size = size;
+        };
     }
     else if (isFirefox) {
         // HACKHACK #2122

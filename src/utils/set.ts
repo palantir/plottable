@@ -13,13 +13,13 @@ module Plottable {
 
       constructor() {
         this._values = [];
-        Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
+        this._setSize(0);
       }
 
       public add(value: T) {
         if (!this.has(value)) {
           this._values.push(value);
-          Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
+          this._setSize(this._values.length);
         }
         return this;
       }
@@ -28,10 +28,21 @@ module Plottable {
         var index = this._values.indexOf(value);
         if (index !== -1) {
           this._values.splice(index, 1);
-          Object.defineProperty(this, "size", { value: this._values.length, writable: false, configurable: true });
+          this._setSize(this._values.length);
           return true;
         }
         return false;
+      }
+
+      private _setSize(size: number) {
+        Object.defineProperty(this, "size", {
+          value: this._values.length,
+          configurable: true,
+          writable: false
+        });
+        if (this.size !== size) {
+          this.size = size;
+        }
       }
 
       public has(value: T) {
