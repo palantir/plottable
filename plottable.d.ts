@@ -664,6 +664,13 @@ declare module Plottable {
         (scale: S): any;
     }
     module Scales {
+        /**
+         * A function that supplies Extents to a Scale.
+         * An Extent is a request for a set of domain values to be included.
+         *
+         * @param {Scale} scale
+         * @returns {D[][]} An array of extents.
+         */
         interface ExtentsProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
@@ -672,41 +679,46 @@ declare module Plottable {
         /**
          * Constructs a new Scale.
          *
-         * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-         * function. Scales have a domain (input), a range (output), and a function
-         * from domain to range.
+         * A Scale is a function (in the mathematical sense) that maps values from a domain (input) to a range (output).
          *
          * @constructor
          */
         constructor();
+        /**
+         * Given an array of potential domain values, computes the extent of those values.
+         *
+         * @param {D[]} values
+         * @returns {D[]} The extent of the input values.
+         */
         extentOfValues(values: D[]): D[];
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
+        /**
+         * Adds a callback to be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        /**
+         * Remvoes a callback that would be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
-         * Modifies the domain on the scale so that it includes the extent of all
-         * perspectives it depends on. This will normally happen automatically, but
-         * if you set domain explicitly with `plot.domain(x)`, you will need to
-         * call this function if you want the domain to neccessarily include all
-         * the data.
-         *
-         * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
-         * strings for a Scale.Category.
-         *
-         * Perspective: A combination of a Dataset and an Accessor that
-         * represents a view in to the data.
+         * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
          *
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
         protected _autoDomainIfAutomaticMode(): void;
         /**
-         * Computes the range value corresponding to a given domain value. In other
-         * words, apply the function to value.
+         * Computes the range value corresponding to a given domain value.
          *
-         * @param {R} value A domain value to be scaled.
+         * @param {D} value
          * @returns {R} The range value corresponding to the supplied domain value.
          */
         scale(value: D): R;
@@ -719,10 +731,7 @@ declare module Plottable {
         /**
          * Sets the domain.
          *
-         * @param {D[]} values If provided, the new value for the domain. On
-         * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
-         * make the function decreasing. On Scale.Ordinal, this is an array of all
-         * input values.
+         * @param {D[]} values
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
@@ -732,27 +741,31 @@ declare module Plottable {
         /**
          * Gets the range.
          *
-         * In the case of having a numeric range, it will be a [min, max] pair. In
-         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-         * list of all possible outputs.
-         *
          * @returns {R[]} The current range.
          */
         range(): R[];
         /**
          * Sets the range.
          *
-         * In the case of having a numeric range, it will be a [min, max] pair. In
-         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-         * list of all possible outputs.
-         *
-         * @param {R[]} values If provided, the new values for the range.
+         * @param {R[]} values
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
         protected _getRange(): void;
         protected _setRange(values: R[]): void;
+        /**
+         * Adds an ExtentsProvider to the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        /**
+         * Removes an ExtentsProvider from the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
@@ -764,8 +777,8 @@ declare module Plottable {
         /**
          * Constructs a new QuantitativeScale.
          *
-         * A QuantitativeScale is a Scale that maps anys to numbers. It
-         * is invertible and continuous.
+         * A QuantitativeScale is a Scale that maps number-like values to numbers.
+         * It is invertible and continuous.
          *
          * @constructor
          */
@@ -773,15 +786,55 @@ declare module Plottable {
         autoDomain(): QuantitativeScale<D>;
         protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
+        /**
+         * Adds a padding exception.
+         * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+         * that end of the domain will not be padded.
+         *
+         * @param {any} key A key that identifies the padding exception.
+         * @param {D} exception
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         addPaddingException(key: any, exception: D): QuantitativeScale<D>;
+        /**
+         * Removes the padding exception associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         removePaddingException(key: any): QuantitativeScale<D>;
+        /**
+         * Adds an included value.
+         * The supplied value will always be included in the domain when autoDomain()-ing.
+         *
+         * @param {any} key A key that identifies the included value.
+         * @param {D} value
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         addIncludedValue(key: any, value: D): QuantitativeScale<D>;
+        /**
+         * Removes the included value associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         removeIncludedValue(key: any): QuantitativeScale<D>;
+        /**
+         * Gets the padding proportion.
+         */
         padProportion(): number;
+        /**
+         * Sets the padding porportion.
+         * When autoDomain()-ing, the computed domain will be expanded by this proportion,
+         * then rounded to human-readable values.
+         *
+         * @param {number} padProportion The padding proportion. Passing 0 disables padding.
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         padProportion(padProportion: number): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
-         * Retrieves the domain value corresponding to a supplied range value.
+         * Computes the domain value corresponding to a supplied range value.
          *
          * @param {number} value: A value from the Scale's range.
          * @returns {D} The domain value corresponding to the supplied range value.
@@ -816,13 +869,13 @@ declare module Plottable {
         extentOfValues(values: D[]): D[];
         protected _setDomain(values: D[]): void;
         /**
-         * Gets ticks generated by the default algorithm.
+         * Gets the array of tick values s generated by the default algorithm.
          */
         getDefaultTicks(): D[];
         /**
-         * Gets a set of tick values spanning the domain.
+         * Gets an array of tick values spanning the domain.
          *
-         * @returns {D[]} The generated ticks.
+         * @returns {D[]}
          */
         ticks(): D[];
         /**
@@ -832,15 +885,13 @@ declare module Plottable {
         protected _niceDomain(domain: D[], count?: number): D[];
         protected _defaultExtent(): D[];
         /**
-         * Gets the tick generator of the QuantitativeScale.
-         *
-         * @returns {TickGenerator} The current tick generator.
+         * Gets the TickGenerator.
          */
         tickGenerator(): Scales.TickGenerators.TickGenerator<D>;
         /**
-         * Sets a tick generator
+         * Sets the TickGenerator
          *
-         * @param {TickGenerator} generator, the new tick generator.
+         * @param {TickGenerator} generator
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
@@ -852,13 +903,9 @@ declare module Plottable {
     module Scales {
         class Linear extends QuantitativeScale<number> {
             /**
-             * Constructs a new LinearScale.
-             *
-             * This scale maps from domain to range with a simple `mx + b` formula.
+             * Constructs a new Linear Scale.
              *
              * @constructor
-             * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
-             * LinearScale. If not supplied, uses a default scale.
              */
             constructor();
             protected _defaultExtent(): number[];
@@ -880,22 +927,17 @@ declare module Plottable {
     module Scales {
         class ModifiedLog extends QuantitativeScale<number> {
             /**
-             * Creates a new Scale.ModifiedLog.
+             * Creates a ModifiedLog Scale
              *
-             * A ModifiedLog scale acts as a regular log scale for large numbers.
-             * As it approaches 0, it gradually becomes linear. This means that the
-             * scale won't freak out if you give it 0 or a negative number, where an
-             * ordinary Log scale would.
-             *
-             * However, it does mean that scale will be effectively linear as values
-             * approach 0. If you want very small values on a log scale, you should use
-             * an ordinary Scale.Log instead.
+             * A ModifiedLog Scale acts as a regular log scale for large numbers.
+             * As it approaches 0, it gradually becomes linear.
+             * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
              *
              * @constructor
-             * @param {number} [base]
-             *        The base of the log. Defaults to 10, and must be > 1.
+             * @param {number} [base=10]
+             *        The base of the log. Must be > 1.
              *
-             *        For base <= x, scale(x) = log(x).
+             *        For x <= base, scale(x) = log(x).
              *
              *        For 0 < x < base, scale(x) will become more and more
              *        linear as it approaches 0.
@@ -913,19 +955,16 @@ declare module Plottable {
             ticks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
             /**
-             * Gets whether or not to return tick values other than powers of base.
+             * Gets whether or not to return tick values other than powers of the base.
              *
-             * This defaults to false, so you'll normally only see ticks like
-             * [10, 100, 1000]. If you turn it on, you might see ticks values
-             * like [10, 50, 100, 500, 1000].
-             * @returns {boolean} the current setting.
+             * @returns {boolean}
              */
             showIntermediateTicks(): boolean;
             /**
-             * Sets whether or not to return ticks values other than powers or base.
+             * Sets whether or not to return ticks values other than powers of the base.
              *
-             * @param {boolean} show If provided, the desired setting.
-             * @returns {ModifiedLog} The calling ModifiedLog.
+             * @param {boolean} show
+             * @returns {ModifiedLog} The calling ModifiedLog Scale.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
@@ -942,10 +981,9 @@ declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
             /**
-             * Creates a CategoryScale.
+             * Creates a Category Scale.
              *
-             * A CategoryScale maps strings to numbers. A common use is to map the
-             * labels of a bar plot (strings) to their pixel locations (numbers).
+             * A Category Scale maps strings to numbers.
              *
              * @constructor
              */
@@ -966,46 +1004,45 @@ declare module Plottable {
             /**
              * Returns the step width of the scale.
              *
-             * The step width is defined as the entire space for a band to occupy,
-             * including the padding in between the bands.
+             * The step width is the pixel distance between adjacent values in the domain.
              *
-             * @returns {number} the full band width of the scale
+             * @returns {number}
              */
             stepWidth(): number;
             /**
-             * Returns the inner padding of the scale.
+             * Gets the inner padding.
              *
-             * The inner padding is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The inner padding is defined as the padding in between bands on the scale,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {number} The inner padding of the scale
+             * @returns {number}
              */
             innerPadding(): number;
             /**
-             * Sets the inner padding of the scale.
+             * Sets the inner padding.
              *
-             * The inner padding of the scale is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The inner padding is defined as the padding in between bands on the scale,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {Ordinal} The calling Scale.Ordinal
+             * @returns {Category} The calling Category Scale.
              */
             innerPadding(innerPadding: number): Category;
             /**
-             * Returns the outer padding of the scale.
+             * Gets the outer padding.
              *
-             * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The outer padding is the padding in between the outer bands and the edges of the range,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {number} The outer padding of the scale
+             * @returns {number}
              */
             outerPadding(): number;
             /**
-             * Sets the outer padding of the scale.
+             * Sets the outer padding.
              *
-             * The inner padding of the scale is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The outer padding is the padding in between the outer bands and the edges of the range,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {Ordinal} The calling Scale.Ordinal
+             * @returns {Category} The calling Category Scale.
              */
             outerPadding(outerPadding: number): Category;
             scale(value: string): number;
@@ -1022,16 +1059,22 @@ declare module Plottable {
     module Scales {
         class Color extends Scale<string, string> {
             /**
-             * Constructs a ColorScale.
+             * Constructs a Color Scale.
+             *
+             * A Color Scale maps string values to color hex values expressed as a string.
              *
              * @constructor
              * @param {string} [scaleType] the type of color scale to create
-             *     (Category10/Category20/Category20b/Category20c).
-             * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+             *   (Category10/Category20/Category20b/Category20c; see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
+             *   If not supplied, reads the colors defined using CSS -- see plottable.css for an example.
              */
             constructor(scaleType?: string);
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
+            /**
+             * Returns the color-string corresponding to a given string.
+             * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+             */
             scale(value: string): string;
             protected _getDomain(): any[];
             protected _setBackingScaleDomain(values: string[]): void;
@@ -1046,20 +1089,18 @@ declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<Date> {
             /**
-             * Constructs a TimeScale.
+             * Constructs a Time Scale.
              *
-             * A TimeScale maps Date objects to numbers.
+             * A Time Scale maps Date objects to numbers.
              *
              * @constructor
-             * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
              */
             constructor();
             /**
-             * Specifies the interval between ticks
+             * Returns an array of ticks values separated by the specified interval that span the domain.
              *
-             * @param {string} interval TimeInterval string specifying the interval unit measure
-             * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
-             *
+             * @param {string} interval A string specifying the interval unit.
+             * @param {number?} step? The number of multiples of the interval between consecutive ticks.
              * @return {Date[]}
              */
             tickInterval(interval: string, step?: number): Date[];
@@ -1081,25 +1122,17 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        /**
-         * This class implements a color scale that takes quantitive input and
-         * interpolates between a list of color values. It returns a hex string
-         * representing the interpolated color.
-         *
-         * By default it generates a linear scale internally.
-         */
         class InterpolatedColor extends Scale<number, string> {
             static REDS: string[];
             static BLUES: string[];
             static POSNEG: string[];
             /**
-             * An InterpolatedColorScale maps numbers to color strings.
+             * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @param {string[]} colors an array of strings representing color values in hex
-             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
-             * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
-             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
+             * @constructor
+             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
+             *   ("#FFFFFF") or keywords ("white").
+             * @param {string} [scaleType="linear"] The underlying scale type ("linear"/"log"/"sqrt"/"pow").
              */
             constructor(colorRange?: string[], scaleType?: string);
             extentOfValues(values: number[]): number[];
@@ -1112,12 +1145,8 @@ declare module Plottable {
             /**
              * Sets the color range.
              *
-             * @param {string[]} [colorRange]. If provided and if colorRange is one of
-             * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
-             * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
-             * "dodgerblue"], the resulting scale will interpolate between the color
-             * values across the domain.
-             * @returns {InterpolatedColor} The calling InterpolatedColor.
+             * @param {string[]} colorRange
+             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
              */
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
@@ -1134,25 +1163,28 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         module TickGenerators {
+            /**
+             * Generates an array of tick values for the specified scale.
+             *
+             * @param {QuantitativeScale} scale
+             * @returns {D[]}
+             */
             interface TickGenerator<D> {
                 (scale: Plottable.QuantitativeScale<D>): D[];
             }
             /**
-             * Creates a tick generator using the specified interval.
+             * Creates a TickGenerator using the specified interval.
              *
              * Generates ticks at multiples of the interval while also including the domain boundaries.
              *
-             * @param {number} interval The interval between two ticks (not including the end ticks).
-             *
-             * @returns {TickGenerator} A tick generator using the specified interval.
+             * @param {number} interval
+             * @returns {TickGenerator}
              */
             function intervalTickGenerator(interval: number): TickGenerator<number>;
             /**
-             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             * Creates a TickGenerator returns only integer tick values.
              *
-             * Will also include the end ticks.
-             *
-             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             * @returns {TickGenerator}
              */
             function integerTickGenerator(): TickGenerator<number>;
         }

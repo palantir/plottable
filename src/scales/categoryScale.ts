@@ -10,10 +10,9 @@ export module Scales {
     private _outerPadding: number;
 
     /**
-     * Creates a CategoryScale.
+     * Creates a Category Scale.
      *
-     * A CategoryScale maps strings to numbers. A common use is to map the
-     * labels of a bar plot (strings) to their pixel locations (numbers).
+     * A Category Scale maps strings to numbers.
      *
      * @constructor
      */
@@ -79,31 +78,30 @@ export module Scales {
     /**
      * Returns the step width of the scale.
      *
-     * The step width is defined as the entire space for a band to occupy,
-     * including the padding in between the bands.
+     * The step width is the pixel distance between adjacent values in the domain.
      *
-     * @returns {number} the full band width of the scale
+     * @returns {number}
      */
     public stepWidth(): number {
       return this.rangeBand() * (1 + this.innerPadding());
     }
 
     /**
-     * Returns the inner padding of the scale.
+     * Gets the inner padding.
      *
-     * The inner padding is defined as the padding in between bands on the scale.
-     * Units are a proportion of the band width (value returned by rangeBand()).
+     * The inner padding is defined as the padding in between bands on the scale,
+     * expressed as a multiple of the rangeBand().
      *
-     * @returns {number} The inner padding of the scale
+     * @returns {number}
      */
     public innerPadding(): number;
     /**
-     * Sets the inner padding of the scale.
+     * Sets the inner padding.
      *
-     * The inner padding of the scale is defined as the padding in between bands on the scale.
-     * Units are a proportion of the band width (value returned by rangeBand()).
+     * The inner padding is defined as the padding in between bands on the scale,
+     * expressed as a multiple of the rangeBand().
      *
-     * @returns {Ordinal} The calling Scale.Ordinal
+     * @returns {Category} The calling Category Scale.
      */
     public innerPadding(innerPadding: number): Category;
     public innerPadding(innerPadding?: number): any {
@@ -117,21 +115,21 @@ export module Scales {
     }
 
     /**
-     * Returns the outer padding of the scale.
+     * Gets the outer padding.
      *
-     * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
-     * Units are a proportion of the band width (value returned by rangeBand()).
+     * The outer padding is the padding in between the outer bands and the edges of the range,
+     * expressed as a multiple of the rangeBand().
      *
-     * @returns {number} The outer padding of the scale
+     * @returns {number}
      */
     public outerPadding(): number;
     /**
-     * Sets the outer padding of the scale.
+     * Sets the outer padding.
      *
-     * The inner padding of the scale is defined as the padding in between bands on the scale.
-     * Units are a proportion of the band width (value returned by rangeBand()).
+     * The outer padding is the padding in between the outer bands and the edges of the range,
+     * expressed as a multiple of the rangeBand().
      *
-     * @returns {Ordinal} The calling Scale.Ordinal
+     * @returns {Category} The calling Category Scale.
      */
     public outerPadding(outerPadding: number): Category;
     public outerPadding(outerPadding?: number): any {

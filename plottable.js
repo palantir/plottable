@@ -1446,9 +1446,7 @@ var Plottable;
         /**
          * Constructs a new Scale.
          *
-         * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-         * function. Scales have a domain (input), a range (output), and a function
-         * from domain to range.
+         * A Scale is a function (in the mathematical sense) that maps values from a domain (input) to a range (output).
          *
          * @constructor
          */
@@ -1458,6 +1456,12 @@ var Plottable;
             this._callbacks = new Plottable.Utils.CallbackSet();
             this._extentsProviders = new Plottable.Utils.Set();
         }
+        /**
+         * Given an array of potential domain values, computes the extent of those values.
+         *
+         * @param {D[]} values
+         * @returns {D[]} The extent of the input values.
+         */
         Scale.prototype.extentOfValues = function (values) {
             return []; // this should be overwritten
         };
@@ -1468,10 +1472,22 @@ var Plottable;
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
         };
+        /**
+         * Adds a callback to be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         Scale.prototype.onUpdate = function (callback) {
             this._callbacks.add(callback);
             return this;
         };
+        /**
+         * Remvoes a callback that would be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         Scale.prototype.offUpdate = function (callback) {
             this._callbacks.delete(callback);
             return this;
@@ -1480,17 +1496,7 @@ var Plottable;
             this._callbacks.callCallbacks(this);
         };
         /**
-         * Modifies the domain on the scale so that it includes the extent of all
-         * perspectives it depends on. This will normally happen automatically, but
-         * if you set domain explicitly with `plot.domain(x)`, you will need to
-         * call this function if you want the domain to neccessarily include all
-         * the data.
-         *
-         * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
-         * strings for a Scale.Category.
-         *
-         * Perspective: A combination of a Dataset and an Accessor that
-         * represents a view in to the data.
+         * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
          *
          * @returns {Scale} The calling Scale.
          */
@@ -1505,10 +1511,9 @@ var Plottable;
             }
         };
         /**
-         * Computes the range value corresponding to a given domain value. In other
-         * words, apply the function to value.
+         * Computes the range value corresponding to a given domain value.
          *
-         * @param {R} value A domain value to be scaled.
+         * @param {D} value
          * @returns {R} The range value corresponding to the supplied domain value.
          */
         Scale.prototype.scale = function (value) {
@@ -1553,11 +1558,23 @@ var Plottable;
         Scale.prototype._setRange = function (values) {
             throw new Error("Subclasses should override _setRange");
         };
+        /**
+         * Adds an ExtentsProvider to the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         Scale.prototype.addExtentsProvider = function (provider) {
             this._extentsProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        /**
+         * Removes an ExtentsProvider from the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         Scale.prototype.removeExtentsProvider = function (provider) {
             this._extentsProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
@@ -1582,8 +1599,8 @@ var Plottable;
         /**
          * Constructs a new QuantitativeScale.
          *
-         * A QuantitativeScale is a Scale that maps anys to numbers. It
-         * is invertible and continuous.
+         * A QuantitativeScale is a Scale that maps number-like values to numbers.
+         * It is invertible and continuous.
          *
          * @constructor
          */
@@ -1647,21 +1664,50 @@ var Plottable;
             }
             return extent;
         };
+        /**
+         * Adds a padding exception.
+         * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+         * that end of the domain will not be padded.
+         *
+         * @param {any} key A key that identifies the padding exception.
+         * @param {D} exception
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         QuantitativeScale.prototype.addPaddingException = function (key, exception) {
             this._paddingExceptions.set(key, exception);
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        /**
+         * Removes the padding exception associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         QuantitativeScale.prototype.removePaddingException = function (key) {
             this._paddingExceptions.delete(key);
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        /**
+         * Adds an included value.
+         * The supplied value will always be included in the domain when autoDomain()-ing.
+         *
+         * @param {any} key A key that identifies the included value.
+         * @param {D} value
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         QuantitativeScale.prototype.addIncludedValue = function (key, value) {
             this._includedValues.set(key, value);
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        /**
+         * Removes the included value associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         QuantitativeScale.prototype.removeIncludedValue = function (key) {
             this._includedValues.delete(key);
             this._autoDomainIfAutomaticMode();
@@ -1708,7 +1754,7 @@ var Plottable;
             return singleValueDomain;
         };
         /**
-         * Retrieves the domain value corresponding to a supplied range value.
+         * Computes the domain value corresponding to a supplied range value.
          *
          * @param {number} value: A value from the Scale's range.
          * @returns {D} The domain value corresponding to the supplied range value.
@@ -1757,15 +1803,15 @@ var Plottable;
             _super.prototype._setDomain.call(this, values);
         };
         /**
-         * Gets ticks generated by the default algorithm.
+         * Gets the array of tick values s generated by the default algorithm.
          */
         QuantitativeScale.prototype.getDefaultTicks = function () {
             throw new Error("Subclasses should override _getDefaultTicks");
         };
         /**
-         * Gets a set of tick values spanning the domain.
+         * Gets an array of tick values spanning the domain.
          *
-         * @returns {D[]} The generated ticks.
+         * @returns {D[]}
          */
         QuantitativeScale.prototype.ticks = function () {
             return this._tickGenerator(this);
@@ -1809,13 +1855,9 @@ var Plottable;
         var Linear = (function (_super) {
             __extends(Linear, _super);
             /**
-             * Constructs a new LinearScale.
-             *
-             * This scale maps from domain to range with a simple `mx + b` formula.
+             * Constructs a new Linear Scale.
              *
              * @constructor
-             * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
-             * LinearScale. If not supplied, uses a default scale.
              */
             function Linear() {
                 _super.call(this);
@@ -1874,22 +1916,17 @@ var Plottable;
         var ModifiedLog = (function (_super) {
             __extends(ModifiedLog, _super);
             /**
-             * Creates a new Scale.ModifiedLog.
+             * Creates a ModifiedLog Scale
              *
-             * A ModifiedLog scale acts as a regular log scale for large numbers.
-             * As it approaches 0, it gradually becomes linear. This means that the
-             * scale won't freak out if you give it 0 or a negative number, where an
-             * ordinary Log scale would.
-             *
-             * However, it does mean that scale will be effectively linear as values
-             * approach 0. If you want very small values on a log scale, you should use
-             * an ordinary Scale.Log instead.
+             * A ModifiedLog Scale acts as a regular log scale for large numbers.
+             * As it approaches 0, it gradually becomes linear.
+             * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
              *
              * @constructor
-             * @param {number} [base]
-             *        The base of the log. Defaults to 10, and must be > 1.
+             * @param {number} [base=10]
+             *        The base of the log. Must be > 1.
              *
-             *        For base <= x, scale(x) = log(x).
+             *        For x <= base, scale(x) = log(x).
              *
              *        For 0 < x < base, scale(x) will become more and more
              *        linear as it approaches 0.
@@ -2081,10 +2118,9 @@ var Plottable;
         var Category = (function (_super) {
             __extends(Category, _super);
             /**
-             * Creates a CategoryScale.
+             * Creates a Category Scale.
              *
-             * A CategoryScale maps strings to numbers. A common use is to map the
-             * labels of a bar plot (strings) to their pixel locations (numbers).
+             * A Category Scale maps strings to numbers.
              *
              * @constructor
              */
@@ -2139,10 +2175,9 @@ var Plottable;
             /**
              * Returns the step width of the scale.
              *
-             * The step width is defined as the entire space for a band to occupy,
-             * including the padding in between the bands.
+             * The step width is the pixel distance between adjacent values in the domain.
              *
-             * @returns {number} the full band width of the scale
+             * @returns {number}
              */
             Category.prototype.stepWidth = function () {
                 return this.rangeBand() * (1 + this.innerPadding());
@@ -2201,12 +2236,14 @@ var Plottable;
         var Color = (function (_super) {
             __extends(Color, _super);
             /**
-             * Constructs a ColorScale.
+             * Constructs a Color Scale.
+             *
+             * A Color Scale maps string values to color hex values expressed as a string.
              *
              * @constructor
              * @param {string} [scaleType] the type of color scale to create
-             *     (Category10/Category20/Category20b/Category20c).
-             * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+             *   (Category10/Category20/Category20b/Category20c; see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
+             *   If not supplied, reads the colors defined using CSS -- see plottable.css for an example.
              */
             function Color(scaleType) {
                 _super.call(this);
@@ -2269,8 +2306,10 @@ var Plottable;
                 colorTester.remove();
                 return plottableDefaultColors;
             };
-            // Modifying the original scale method so that colors that are looped are lightened according
-            // to how many times they are looped.
+            /**
+             * Returns the color-string corresponding to a given string.
+             * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+             */
             Color.prototype.scale = function (value) {
                 var color = this._d3Scale(value);
                 var index = this.domain().indexOf(value);
@@ -2313,23 +2352,21 @@ var Plottable;
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
-             * Constructs a TimeScale.
+             * Constructs a Time Scale.
              *
-             * A TimeScale maps Date objects to numbers.
+             * A Time Scale maps Date objects to numbers.
              *
              * @constructor
-             * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
              */
             function Time() {
                 _super.call(this);
                 this._d3Scale = d3.time.scale();
             }
             /**
-             * Specifies the interval between ticks
+             * Returns an array of ticks values separated by the specified interval that span the domain.
              *
-             * @param {string} interval TimeInterval string specifying the interval unit measure
-             * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
-             *
+             * @param {string} interval A string specifying the interval unit.
+             * @param {number?} step? The number of multiples of the interval between consecutive ticks.
              * @return {Date[]}
              */
             Time.prototype.tickInterval = function (interval, step) {
@@ -2400,23 +2437,15 @@ var Plottable;
 (function (Plottable) {
     var Scales;
     (function (Scales) {
-        /**
-         * This class implements a color scale that takes quantitive input and
-         * interpolates between a list of color values. It returns a hex string
-         * representing the interpolated color.
-         *
-         * By default it generates a linear scale internally.
-         */
         var InterpolatedColor = (function (_super) {
             __extends(InterpolatedColor, _super);
             /**
-             * An InterpolatedColorScale maps numbers to color strings.
+             * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @param {string[]} colors an array of strings representing color values in hex
-             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
-             * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
-             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
+             * @constructor
+             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
+             *   ("#FFFFFF") or keywords ("white").
+             * @param {string} [scaleType="linear"] The underlying scale type ("linear"/"log"/"sqrt"/"pow").
              */
             function InterpolatedColor(colorRange, scaleType) {
                 if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
@@ -2576,13 +2605,12 @@ var Plottable;
         var TickGenerators;
         (function (TickGenerators) {
             /**
-             * Creates a tick generator using the specified interval.
+             * Creates a TickGenerator using the specified interval.
              *
              * Generates ticks at multiples of the interval while also including the domain boundaries.
              *
-             * @param {number} interval The interval between two ticks (not including the end ticks).
-             *
-             * @returns {TickGenerator} A tick generator using the specified interval.
+             * @param {number} interval
+             * @returns {TickGenerator}
              */
             function intervalTickGenerator(interval) {
                 if (interval <= 0) {
@@ -2602,11 +2630,9 @@ var Plottable;
             }
             TickGenerators.intervalTickGenerator = intervalTickGenerator;
             /**
-             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             * Creates a TickGenerator returns only integer tick values.
              *
-             * Will also include the end ticks.
-             *
-             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             * @returns {TickGenerator}
              */
             function integerTickGenerator() {
                 return function (s) {

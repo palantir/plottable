@@ -5,17 +5,22 @@ module Plottable {
     export module TickGenerators {
       // HACKHACK: Generic types in type definition fails compilation
       // https://github.com/Microsoft/TypeScript/issues/1616
+      /**
+       * Generates an array of tick values for the specified scale.
+       * 
+       * @param {QuantitativeScale} scale
+       * @returns {D[]}
+       */
       export interface TickGenerator<D> {
         (scale: Plottable.QuantitativeScale<D>): D[];
       }
       /**
-       * Creates a tick generator using the specified interval.
+       * Creates a TickGenerator using the specified interval.
        *
        * Generates ticks at multiples of the interval while also including the domain boundaries.
        *
-       * @param {number} interval The interval between two ticks (not including the end ticks).
-       *
-       * @returns {TickGenerator} A tick generator using the specified interval.
+       * @param {number} interval
+       * @returns {TickGenerator}
        */
       export function intervalTickGenerator(interval: number): TickGenerator<number> {
         if (interval <= 0) {
@@ -38,11 +43,9 @@ module Plottable {
       }
 
       /**
-       * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+       * Creates a TickGenerator returns only integer tick values.
        *
-       * Will also include the end ticks.
-       *
-       * @returns {TickGenerator} A tick generator returning only integer ticks.
+       * @returns {TickGenerator}
        */
       export function integerTickGenerator(): TickGenerator<number> {
         return function(s: QuantitativeScale<number>) {
