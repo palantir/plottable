@@ -60,6 +60,15 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("pixel positions account for stack offsets", () => {
+      var dataYs = renderer.getAllPlotData().pixelPoints.map((d) => yScale.invert(d.y));
+      var dataset1Ys = dataset1.data().map((d) => d.y);
+      var dataset2Ys = dataset2.data().map((d, i) => d.y + dataset1.data()[i].y);
+      assert.includeMembers(dataYs, dataset1Ys, "all dataset1 points found");
+      assert.includeMembers(dataYs, dataset2Ys, "all dataset2 points found");
+      svg.remove();
+    });
+
   });
 
   describe("Stacked Area Plot no data", () => {
