@@ -1199,12 +1199,6 @@ declare module Plottable {
             protected _className: string;
             protected _dataset: Dataset;
             /**
-             * Sets the class, which needs to be applied to bound elements.
-             *
-             * @param{string} className The class name to be applied.
-             */
-            setClass(className: string): AbstractDrawer;
-            /**
              * Constructs a Drawer
              *
              * @constructor
@@ -2474,7 +2468,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
-            protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
+            protected _getDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): Plots.Entity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.

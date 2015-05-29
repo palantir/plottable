@@ -2648,15 +2648,6 @@ var Plottable;
             function AbstractDrawer(dataset) {
                 this._dataset = dataset;
             }
-            /**
-             * Sets the class, which needs to be applied to bound elements.
-             *
-             * @param{string} className The class name to be applied.
-             */
-            AbstractDrawer.prototype.setClass = function (className) {
-                this._className = className;
-                return this;
-            };
             AbstractDrawer.prototype.setup = function (area) {
                 this._renderArea = area;
             };
@@ -2915,6 +2906,7 @@ var Plottable;
             __extends(Arc, _super);
             function Arc(dataset) {
                 _super.call(this, dataset);
+                this._className = "arc";
                 this._svgElement = "path";
             }
             return Arc;
@@ -6535,7 +6527,7 @@ var Plottable;
                 this._updatePieAngles();
             };
             Pie.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Arc(dataset).setClass("arc");
+                return new Plottable.Drawers.Arc(dataset);
             };
             Pie.prototype.entities = function (datasets) {
                 var _this = this;

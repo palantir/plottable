@@ -23,16 +23,6 @@ export module Drawers {
     protected _dataset: Dataset;
 
     /**
-     * Sets the class, which needs to be applied to bound elements.
-     *
-     * @param{string} className The class name to be applied.
-     */
-    public setClass(className: string): AbstractDrawer {
-      this._className = className;
-      return this;
-    }
-
-    /**
      * Constructs a Drawer
      *
      * @constructor
