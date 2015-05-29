@@ -525,6 +525,9 @@ export module Plots {
     }
 
     public entities(datasets = this.datasets()): Plots.Entity[] {
+      if (!this._projectorsReady()) {
+        return [];
+      }
       var entities = super.entities(datasets);
       var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
       entities.forEach((entity) => {

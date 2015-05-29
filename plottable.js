@@ -7559,6 +7559,9 @@ var Plottable;
             Bar.prototype.entities = function (datasets) {
                 var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
+                if (!this._projectorsReady()) {
+                    return [];
+                }
                 var entities = _super.prototype.entities.call(this, datasets);
                 var scaledBaseline = (this._isVertical ? this.y().scale : this.x().scale).scale(this.baseline());
                 entities.forEach(function (entity) {
