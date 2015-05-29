@@ -27,10 +27,7 @@ export module Components {
     private _redrawCallback: ScaleCallback<Scales.Color>;
 
     /**
-     * Creates a Legend.
-     *
-     * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
-     * By defaul, the entries will be in the same order as the Scale's domain.
+     * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
      *
      * @constructor
      * @param {Scale.Color} scale
@@ -64,13 +61,13 @@ export module Components {
     }
 
     /**
-     * Gets the maximum number of entries in each row.
+     * Gets the maximum number of entries per row.
      * 
      * @returns {number}
      */
     public maxEntriesPerRow(): number;
     /**
-     * Gets the maximum number of entries in each row.
+     * Sets the maximum number of entries perrow.
      *
      * @param {number} numEntries
      * @returns {Legend} The calling Legend.
@@ -111,13 +108,13 @@ export module Components {
     }
 
     /**
-     * Gets the current Color Scale backing the Legend.
+     * Gets the Color Scale.
      *
      * @returns {Scales.Color}
      */
     public scale(): Scales.Color;
     /**
-     * Assigns a new Color Scale to the Legend.
+     * Sets the Color Scale.
      *
      * @param {Scales.Color} scale
      * @returns {Legend} The calling Legend.
@@ -209,8 +206,8 @@ export module Components {
     }
 
     /**
-     * Gets the Legend entry under at given pixel position.
-     * Returns an empty Selection if no entry exists under at given pixel position.
+     * Gets the entry under at given pixel position.
+     * Returns an empty Selection if no entry exists at that pixel position.
      *
      * @param {Point} position
      * @returns {D3.Selection}
@@ -297,15 +294,17 @@ export module Components {
     }
 
     /**
-     * Gets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
+     * Gets the SymbolFactory accessor of the Legend.
+     * The accessor determines the symbol for each entry.
      *
      * @returns {(datum: any, index: number) => symbolFactory}
      */
     public symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
     /**
-     * Sets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
+     * Sets the SymbolFactory accessor of the Legend.
+     * The accessor determines the symbol for each entry.
      *
-     * @param {(datum: any, index: number) => symbolFactory}
+     * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
      * @returns {Legend} The calling Legend
      */
     public symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;

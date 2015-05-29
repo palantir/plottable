@@ -2986,7 +2986,7 @@ var Plottable;
             this._isAnchored = false;
             this._boxes = [];
             this._isTopLevelComponent = false;
-            this._cssClasses = ["Component"];
+            this._cssClasses = ["component"];
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
@@ -3173,9 +3173,9 @@ var Plottable;
             return this;
         };
         /**
-         * Renders the Component to a given DOM element. The element must be an <svg>.
+         * Renders the Component to a given <svg>.
          *
-         * @param {String|D3.Selection} element A selector for getting the element to render to, or a D3 selection containing an <svg>.
+         * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
         Component.prototype.renderTo = function (element) {
@@ -3532,13 +3532,13 @@ var Plottable;
         var Group = (function (_super) {
             __extends(Group, _super);
             /**
-             * Constructs a Component Group.
+             * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
              * Components added later will be rendered on top of Components already in the Group.
              *
              * @constructor
-             * @param {Component[]=[]} components Components to be added to the Group.
+             * @param {Component[]} [components=[]] Components to be added to the Group.
              */
             function Group(components) {
                 var _this = this;
@@ -4888,8 +4888,6 @@ var Plottable;
         var Label = (function (_super) {
             __extends(Label, _super);
             /**
-             * Creates a Label.
-             *
              * A Label is a Component that displays a single line of text.
              *
              * @constructor
@@ -5000,11 +4998,9 @@ var Plottable;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
             /**
-             * Creates a TitleLabel.
-             *
              * @constructor
-             * @param {string} [displayText] The text of the TitleLabel.
-             * @param {number} [angle] The angle of the TitleLabel in degrees (-90/0/90). 0 is horizontal.
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
@@ -5017,11 +5013,9 @@ var Plottable;
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
             /**
-             * Creates a AxisLabel.
-             *
              * @constructor
-             * @param {string} [displayText] The text of the AxisLabel.
-             * @param {number} [angle] The angle of the AxisLabel in degrees (-90/0/90). 0 is horizontal.
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
@@ -5048,10 +5042,7 @@ var Plottable;
         var Legend = (function (_super) {
             __extends(Legend, _super);
             /**
-             * Creates a Legend.
-             *
-             * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
-             * By defaul, the entries will be in the same order as the Scale's domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
              *
              * @constructor
              * @param {Scale.Color} scale
@@ -5176,8 +5167,8 @@ var Plottable;
                 return rows;
             };
             /**
-             * Gets the Legend entry under at given pixel position.
-             * Returns an empty Selection if no entry exists under at given pixel position.
+             * Gets the entry under at given pixel position.
+             * Returns an empty Selection if no entry exists at that pixel position.
              *
              * @param {Point} position
              * @returns {D3.Selection}
@@ -5297,13 +5288,13 @@ var Plottable;
             /**
              * Creates an InterpolatedColorLegend.
              *
-             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-             * associated Scales.InterpolatedColor sampled at various points. Two labels
-             * show the maximum and minimum values of the Scales.InterpolatedColor.
+             * The InterpolatedColorLegend consists of a sequence of swatches that show the
+             * associated InterpolatedColor Scale sampled at various points.
+             * Two labels show the maximum and minimum values of the InterpolatedColor Scale.
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] ("horizontal"/"left"/"right").
+             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
             function InterpolatedColorLegend(interpolatedColorScale, orientation, formatter) {
@@ -5524,10 +5515,7 @@ var Plottable;
         var Gridlines = (function (_super) {
             __extends(Gridlines, _super);
             /**
-             * Creates Gridlines.
-             *
              * @constructor
-             *
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
@@ -9790,7 +9778,7 @@ var Plottable;
             /**
              * Constructs a DragBoxLayer.
              *
-             * A DragBoxLayer is a SelectionBoxLayer with a built-in Interactions.Drag.
+             * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
              * A drag gesture will set the Bounds of the box.
              * If resizing is enabled using resizable(true), the edges of box can be repositioned.
              *
@@ -10031,7 +10019,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets a callback to be called when the dragging ends.
+             * Sets a callback to be called when dragging ends.
              *
              * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
@@ -10041,7 +10029,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback to be called when dragging ends.
              *
              * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.

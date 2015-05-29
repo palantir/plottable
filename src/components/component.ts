@@ -2,7 +2,7 @@
 
 module Plottable {
 
-  export type ComponentCallback = (Component: Component) => void;
+  export type ComponentCallback = (component: Component) => void;
 
   export module Components {
     export class Alignment {
@@ -44,7 +44,7 @@ module Plottable {
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _cssClasses: string[] = ["Component"];
+    private _cssClasses: string[] = ["component"];
     private _destroyed = false;
     private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
@@ -243,9 +243,9 @@ module Plottable {
     }
 
     /**
-     * Renders the Component to a given DOM element. The element must be an <svg>.
+     * Renders the Component to a given <svg>.
      *
-     * @param {String|D3.Selection} element A selector for getting the element to render to, or a D3 selection containing an <svg>.
+     * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
      * @returns {Component} The calling Component.
      */
     public renderTo(element: String | D3.Selection): Component {

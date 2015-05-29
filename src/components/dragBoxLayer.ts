@@ -34,7 +34,7 @@ export module Components {
     /**
      * Constructs a DragBoxLayer.
      * 
-     * A DragBoxLayer is a SelectionBoxLayer with a built-in Interactions.Drag.
+     * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
      * A drag gesture will set the Bounds of the box.
      * If resizing is enabled using resizable(true), the edges of box can be repositioned.
      * 
@@ -219,11 +219,11 @@ export module Components {
     }
 
     /**
-     * Gets the detection radius of the drag box, in pixels.
+     * Gets the detection radius of the drag box in pixels.
      */
     public detectionRadius(): number;
     /**
-     * Sets the detection radius of the drag box, in pixels.
+     * Sets the detection radius of the drag box in pixels.
      *
      * @param {number} r
      * @return {DragBoxLayer} The calling DragBoxLayer.
@@ -312,7 +312,7 @@ export module Components {
     }
 
     /**
-     * Sets a callback to be called when the dragging ends.
+     * Sets a callback to be called when dragging ends.
      *
      * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
@@ -323,7 +323,7 @@ export module Components {
     }
 
     /**
-     * Removes a callback to be called when the dragging ends.
+     * Removes a callback to be called when dragging ends.
      *
      * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.

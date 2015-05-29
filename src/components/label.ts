@@ -12,8 +12,6 @@ export module Components {
     private _padding: number;
 
     /**
-     * Creates a Label.
-     *
      * A Label is a Component that displays a single line of text.
      *
      * @constructor
@@ -50,11 +48,11 @@ export module Components {
     }
 
     /**
-     * Gets the current text on the Label.
+     * Gets the Label's text.
      */
     public text(): string;
     /**
-     * Sets the text on the Label.
+     * Sets the Label's text.
      *
      * @param {string} displayText
      * @returns {Label} The calling Label.
@@ -77,7 +75,7 @@ export module Components {
     /**
      * Sets the angle of the Label in degrees.
      *
-     * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
+     * @param {number} angle One of -90/0/90. 0 is horizontal.
      * @returns {Label} The calling Label.
      */
     public angle(angle: number): Label;
@@ -102,11 +100,11 @@ export module Components {
     }
 
     /**
-     * Gets the amount of padding around the Label, in pixels.
+     * Gets the amount of padding around the Label in pixels.
      */
     public padding(): number;
     /**
-     * Sets the amount of padding around the Label, in pixels.
+     * Sets the amount of padding around the Label in pixels.
      *
      * @param {number} padAmount
      * @returns {Label} The calling Label.
@@ -158,11 +156,9 @@ export module Components {
   export class TitleLabel extends Label {
     public static TITLE_LABEL_CLASS = "title-label";
     /**
-     * Creates a TitleLabel.
-     *
      * @constructor
-     * @param {string} [displayText] The text of the TitleLabel.
-     * @param {number} [angle] The angle of the TitleLabel in degrees (-90/0/90). 0 is horizontal.
+     * @param {string} [text]
+     * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);
@@ -173,11 +169,9 @@ export module Components {
   export class AxisLabel extends Label {
     public static AXIS_LABEL_CLASS = "axis-label";
     /**
-     * Creates a AxisLabel.
-     *
      * @constructor
-     * @param {string} [displayText] The text of the AxisLabel.
-     * @param {number} [angle] The angle of the AxisLabel in degrees (-90/0/90). 0 is horizontal.
+     * @param {string} [text]
+     * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);

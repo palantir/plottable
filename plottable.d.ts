@@ -1335,7 +1335,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type ComponentCallback = (Component: Component) => void;
+    type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
             static TOP: string;
@@ -1414,9 +1414,9 @@ declare module Plottable {
          */
         redraw(): Component;
         /**
-         * Renders the Component to a given DOM element. The element must be an <svg>.
+         * Renders the Component to a given <svg>.
          *
-         * @param {String|D3.Selection} element A selector for getting the element to render to, or a D3 selection containing an <svg>.
+         * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
         renderTo(element: String | D3.Selection): Component;
@@ -1580,13 +1580,13 @@ declare module Plottable {
     module Components {
         class Group extends ComponentContainer {
             /**
-             * Constructs a Component Group.
+             * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
              * Components added later will be rendered on top of Components already in the Group.
              *
              * @constructor
-             * @param {Component[]=[]} components Components to be added to the Group.
+             * @param {Component[]} [components=[]] Components to be added to the Group.
              */
             constructor(components?: Component[]);
             protected _forEach(callback: (component: Component) => any): void;
@@ -1917,8 +1917,6 @@ declare module Plottable {
     module Components {
         class Label extends Component {
             /**
-             * Creates a Label.
-             *
              * A Label is a Component that displays a single line of text.
              *
              * @constructor
@@ -1929,11 +1927,11 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
-             * Gets the current text on the Label.
+             * Gets the Label's text.
              */
             text(): string;
             /**
-             * Sets the text on the Label.
+             * Sets the Label's text.
              *
              * @param {string} displayText
              * @returns {Label} The calling Label.
@@ -1946,16 +1944,16 @@ declare module Plottable {
             /**
              * Sets the angle of the Label in degrees.
              *
-             * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
+             * @param {number} angle One of -90/0/90. 0 is horizontal.
              * @returns {Label} The calling Label.
              */
             angle(angle: number): Label;
             /**
-             * Gets the amount of padding around the Label, in pixels.
+             * Gets the amount of padding around the Label in pixels.
              */
             padding(): number;
             /**
-             * Sets the amount of padding around the Label, in pixels.
+             * Sets the amount of padding around the Label in pixels.
              *
              * @param {number} padAmount
              * @returns {Label} The calling Label.
@@ -1968,22 +1966,18 @@ declare module Plottable {
         class TitleLabel extends Label {
             static TITLE_LABEL_CLASS: string;
             /**
-             * Creates a TitleLabel.
-             *
              * @constructor
-             * @param {string} [displayText] The text of the TitleLabel.
-             * @param {number} [angle] The angle of the TitleLabel in degrees (-90/0/90). 0 is horizontal.
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
             /**
-             * Creates a AxisLabel.
-             *
              * @constructor
-             * @param {string} [displayText] The text of the AxisLabel.
-             * @param {number} [angle] The angle of the AxisLabel in degrees (-90/0/90). 0 is horizontal.
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
@@ -2007,10 +2001,7 @@ declare module Plottable {
              */
             static LEGEND_SYMBOL_CLASS: string;
             /**
-             * Creates a Legend.
-             *
-             * The Legend consists of a series of entries, each with a color and label taken from the Scales.Color.
-             * By defaul, the entries will be in the same order as the Scale's domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
              *
              * @constructor
              * @param {Scale.Color} scale
@@ -2018,13 +2009,13 @@ declare module Plottable {
             constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
-             * Gets the maximum number of entries in each row.
+             * Gets the maximum number of entries per row.
              *
              * @returns {number}
              */
             maxEntriesPerRow(): number;
             /**
-             * Gets the maximum number of entries in each row.
+             * Sets the maximum number of entries perrow.
              *
              * @param {number} numEntries
              * @returns {Legend} The calling Legend.
@@ -2045,13 +2036,13 @@ declare module Plottable {
              */
             comparator(comparator: (a: string, b: string) => number): Legend;
             /**
-             * Gets the current Color Scale backing the Legend.
+             * Gets the Color Scale.
              *
              * @returns {Scales.Color}
              */
             scale(): Scales.Color;
             /**
-             * Assigns a new Color Scale to the Legend.
+             * Sets the Color Scale.
              *
              * @param {Scales.Color} scale
              * @returns {Legend} The calling Legend.
@@ -2060,8 +2051,8 @@ declare module Plottable {
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the Legend entry under at given pixel position.
-             * Returns an empty Selection if no entry exists under at given pixel position.
+             * Gets the entry under at given pixel position.
+             * Returns an empty Selection if no entry exists at that pixel position.
              *
              * @param {Point} position
              * @returns {D3.Selection}
@@ -2069,15 +2060,17 @@ declare module Plottable {
             getEntry(position: Point): D3.Selection;
             renderImmediately(): Legend;
             /**
-             * Gets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
+             * Gets the SymbolFactory accessor of the Legend.
+             * The accessor determines the symbol for each entry.
              *
              * @returns {(datum: any, index: number) => symbolFactory}
              */
             symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolFactory accessor of the Legend, which determines the symbol for each entry.
+             * Sets the SymbolFactory accessor of the Legend.
+             * The accessor determines the symbol for each entry.
              *
-             * @param {(datum: any, index: number) => symbolFactory}
+             * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
@@ -2098,19 +2091,19 @@ declare module Plottable {
             /**
              * Creates an InterpolatedColorLegend.
              *
-             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-             * associated Scales.InterpolatedColor sampled at various points. Two labels
-             * show the maximum and minimum values of the Scales.InterpolatedColor.
+             * The InterpolatedColorLegend consists of a sequence of swatches that show the
+             * associated InterpolatedColor Scale sampled at various points.
+             * Two labels show the maximum and minimum values of the InterpolatedColor Scale.
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] ("horizontal"/"left"/"right").
+             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
             destroy(): void;
             /**
-             * Gets the current Formatter for the labels.
+             * Gets the Formatter for the labels.
              */
             formatter(): Formatter;
             /**
@@ -2121,13 +2114,13 @@ declare module Plottable {
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
             /**
-             * Gets the current orientation.
+             * Gets the orientation.
              */
             orientation(): string;
             /**
              * Sets the orientation.
              *
-             * @param {string} newOrientation The desired orientation ("horizontal"/"left"/"right").
+             * @param {string} orientation One of "horizontal"/"left"/"right".
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
@@ -2145,10 +2138,7 @@ declare module Plottable {
     module Components {
         class Gridlines extends Component {
             /**
-             * Creates Gridlines.
-             *
              * @constructor
-             *
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
@@ -3800,7 +3790,7 @@ declare module Plottable {
             /**
              * Constructs a DragBoxLayer.
              *
-             * A DragBoxLayer is a SelectionBoxLayer with a built-in Interactions.Drag.
+             * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
              * A drag gesture will set the Bounds of the box.
              * If resizing is enabled using resizable(true), the edges of box can be repositioned.
              *
@@ -3810,11 +3800,11 @@ declare module Plottable {
             protected _setup(): void;
             renderImmediately(): DragBoxLayer;
             /**
-             * Gets the detection radius of the drag box, in pixels.
+             * Gets the detection radius of the drag box in pixels.
              */
             detectionRadius(): number;
             /**
-             * Sets the detection radius of the drag box, in pixels.
+             * Sets the detection radius of the drag box in pixels.
              *
              * @param {number} r
              * @return {DragBoxLayer} The calling DragBoxLayer.
@@ -3861,14 +3851,14 @@ declare module Plottable {
              */
             offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Sets a callback to be called when the dragging ends.
+             * Sets a callback to be called when dragging ends.
              *
              * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragEnd(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback to be called when dragging ends.
              *
              * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
