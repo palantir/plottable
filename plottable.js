@@ -2872,15 +2872,6 @@ var Plottable;
             function Element() {
                 _super.apply(this, arguments);
             }
-            /**
-             * Sets the svg element, which needs to be bind to data
-             *
-             * @param{string} tag The svg element to be bind
-             */
-            Element.prototype.svgElement = function (tag) {
-                this._svgElement = tag;
-                return this;
-            };
             Element.prototype._getDrawSelection = function () {
                 return this._getRenderArea().selectAll(this._svgElement);
             };
@@ -2925,7 +2916,7 @@ var Plottable;
             __extends(Rect, _super);
             function Rect(dataset) {
                 _super.call(this, dataset);
-                this.svgElement("rect");
+                this._svgElement = "rect";
             }
             return Rect;
         })(Drawers.Element);

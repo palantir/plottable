@@ -1289,12 +1289,6 @@ declare module Plottable {
     module Drawers {
         class Element extends Drawer {
             protected _svgElement: string;
-            /**
-             * Sets the svg element, which needs to be bind to data
-             *
-             * @param{string} tag The svg element to be bind
-             */
-            svgElement(tag: string): Element;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
             _getSelector(): string;
