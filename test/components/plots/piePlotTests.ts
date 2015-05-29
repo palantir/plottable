@@ -35,7 +35,7 @@ describe("Plots", () => {
     });
 
     it("sectors divided evenly", () => {
-      var arcPaths = renderArea.selectAll(".arc");
+      var arcPaths = piePlot.getAllSelections();
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
       var arcPath0 = d3.select(arcPaths[0][0]);
       var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -72,7 +72,7 @@ describe("Plots", () => {
     it("project value onto different attribute", () => {
       piePlot.sectorValue((d) => d.value2);
 
-      var arcPaths = renderArea.selectAll(".arc");
+      var arcPaths = piePlot.getAllSelections();
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
       var arcPath0 = d3.select(arcPaths[0][0]);
       var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -102,7 +102,7 @@ describe("Plots", () => {
 
     it("innerRadius", () => {
       piePlot.innerRadius(5);
-      var arcPaths = renderArea.selectAll(".arc");
+      var arcPaths = piePlot.getAllSelections();
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
       var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -123,7 +123,7 @@ describe("Plots", () => {
 
     it("outerRadius", () => {
       piePlot.outerRadius(() => 150);
-      var arcPaths = renderArea.selectAll(".arc");
+      var arcPaths = piePlot.getAllSelections();
       assert.lengthOf(arcPaths[0], 2, "only has two sectors");
 
       var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
@@ -170,7 +170,7 @@ describe("Plots", () => {
     describe("Fill", () => {
 
       it("sectors are filled in according to defaults", () => {
-        var arcPaths = renderArea.selectAll(".arc");
+        var arcPaths = piePlot.getAllSelections();
 
         var arcPath0 = d3.select(arcPaths[0][0]);
         assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
@@ -183,7 +183,7 @@ describe("Plots", () => {
       it("project fill", () => {
         piePlot.attr("fill", (d: any, i: number) => String(i), new Plottable.Scales.Color("10"));
 
-        var arcPaths = renderArea.selectAll(".arc");
+        var arcPaths = piePlot.getAllSelections();
 
         var arcPath0 = d3.select(arcPaths[0][0]);
         assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
@@ -193,7 +193,7 @@ describe("Plots", () => {
 
         piePlot.attr("fill", (d) => d.type, new Plottable.Scales.Color("20"));
 
-        arcPaths = renderArea.selectAll(".arc");
+        arcPaths = piePlot.getAllSelections();
 
         arcPath0 = d3.select(arcPaths[0][0]);
         assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
@@ -238,7 +238,7 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var elementsDrawnSel = (<any> plot)._element.selectAll(".arc");
+      var elementsDrawnSel = plot.getAllSelections();
 
       assert.strictEqual(elementsDrawnSel.size(), 4,
         "There should be exactly 4 slices in the pie chart, representing the valid values");

@@ -6,7 +6,6 @@ export module Drawers {
 
     constructor(dataset: Dataset) {
       super(dataset);
-      this._className = "arc";
       this._svgElement = "path";
     }
 

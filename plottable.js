@@ -2906,7 +2906,6 @@ var Plottable;
             __extends(Arc, _super);
             function Arc(dataset) {
                 _super.call(this, dataset);
-                this._className = "arc";
                 this._svgElement = "path";
             }
             return Arc;
