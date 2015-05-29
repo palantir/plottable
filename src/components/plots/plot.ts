@@ -9,7 +9,7 @@ module Plottable {
      */
     export type PlotDatasetKey = {
       dataset: Dataset;
-      drawer: Drawers.AbstractDrawer;
+      drawer: Drawer;
       key: string;
     }
 
@@ -125,8 +125,8 @@ module Plottable {
       drawer.setup(this._renderArea.append("g"));
     }
 
-    protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(dataset);
+    protected _getDrawer(dataset: Dataset): Drawer {
+      return new Drawer(dataset);
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -421,7 +421,7 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
+    protected _getDrawersInOrder(): Drawer[] {
       return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
     }
 

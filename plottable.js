@@ -2638,106 +2638,106 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var AbstractDrawer = (function () {
-            /**
-             * Constructs a Drawer
-             *
-             * @constructor
-             * @param {Dataset} dataset The dataset associated with this Drawer
-             */
-            function AbstractDrawer(dataset) {
-                this._dataset = dataset;
-            }
-            /**
-             * Sets the class, which needs to be applied to bound elements.
-             *
-             * @param{string} className The class name to be applied.
-             */
-            AbstractDrawer.prototype.setClass = function (className) {
-                this._className = className;
-                return this;
-            };
-            AbstractDrawer.prototype.setup = function (area) {
-                this._renderArea = area;
-            };
-            /**
-             * Removes the Drawer and its renderArea
-             */
-            AbstractDrawer.prototype.remove = function () {
-                if (this._getRenderArea() != null) {
-                    this._getRenderArea().remove();
-                }
-            };
-            /**
-             * Enter new data to render area and creates binding
-             *
-             * @param{any[]} data The data to be drawn
-             */
-            AbstractDrawer.prototype._enterData = function (data) {
-                // no-op
-            };
-            /**
-             * Draws data using one step
-             *
-             * @param{AppliedDrawStep} step The step, how data should be drawn.
-             */
-            AbstractDrawer.prototype._drawStep = function (step) {
-                // no-op
-            };
-            AbstractDrawer.prototype._numberOfAnimationIterations = function (data) {
-                return data.length;
-            };
-            AbstractDrawer.prototype._appliedProjectors = function (attrToProjector) {
-                var _this = this;
-                var modifiedAttrToProjector = {};
-                Object.keys(attrToProjector).forEach(function (attr) {
-                    modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
-                });
-                return modifiedAttrToProjector;
-            };
-            /**
-             * Draws the data into the renderArea using the spefic steps and metadata
-             *
-             * @param{any[]} data The data to be drawn
-             * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-             */
-            AbstractDrawer.prototype.draw = function (data, drawSteps) {
-                var _this = this;
-                var appliedDrawSteps = drawSteps.map(function (dr) {
-                    var appliedAttrToProjector = _this._appliedProjectors(dr.attrToProjector);
-                    return {
-                        attrToProjector: appliedAttrToProjector,
-                        animator: dr.animator
-                    };
-                });
-                this._enterData(data);
-                var numberOfIterations = this._numberOfAnimationIterations(data);
-                var delay = 0;
-                appliedDrawSteps.forEach(function (drawStep, i) {
-                    Plottable.Utils.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                    delay += drawStep.animator.getTiming(numberOfIterations);
-                });
-                return delay;
-            };
-            /**
-             * Retrieves the renderArea selection for the drawer
-             *
-             * @returns {D3.Selection} the renderArea selection
-             */
-            AbstractDrawer.prototype._getRenderArea = function () {
-                return this._renderArea;
-            };
-            AbstractDrawer.prototype._getSelector = function () {
-                return "";
-            };
-            AbstractDrawer.prototype._getSelection = function (index) {
-                var allSelections = this._getRenderArea().selectAll(this._getSelector());
-                return d3.select(allSelections[0][index]);
-            };
-            return AbstractDrawer;
-        })();
-        Drawers.AbstractDrawer = AbstractDrawer;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+    var Drawer = (function () {
+        /**
+         * Constructs a Drawer
+         *
+         * @constructor
+         * @param {Dataset} dataset The dataset associated with this Drawer
+         */
+        function Drawer(dataset) {
+            this._dataset = dataset;
+        }
+        /**
+         * Sets the class, which needs to be applied to bound elements.
+         *
+         * @param{string} className The class name to be applied.
+         */
+        Drawer.prototype.setClass = function (className) {
+            this._className = className;
+            return this;
+        };
+        Drawer.prototype.setup = function (area) {
+            this._renderArea = area;
+        };
+        /**
+         * Removes the Drawer and its renderArea
+         */
+        Drawer.prototype.remove = function () {
+            if (this._getRenderArea() != null) {
+                this._getRenderArea().remove();
+            }
+        };
+        /**
+         * Enter new data to render area and creates binding
+         *
+         * @param{any[]} data The data to be drawn
+         */
+        Drawer.prototype._enterData = function (data) {
+            // no-op
+        };
+        /**
+         * Draws data using one step
+         *
+         * @param{AppliedDrawStep} step The step, how data should be drawn.
+         */
+        Drawer.prototype._drawStep = function (step) {
+            // no-op
+        };
+        Drawer.prototype._numberOfAnimationIterations = function (data) {
+            return data.length;
+        };
+        Drawer.prototype._appliedProjectors = function (attrToProjector) {
+            var _this = this;
+            var modifiedAttrToProjector = {};
+            Object.keys(attrToProjector).forEach(function (attr) {
+                modifiedAttrToProjector[attr] = function (datum, index) { return attrToProjector[attr](datum, index, _this._dataset); };
+            });
+            return modifiedAttrToProjector;
+        };
+        /**
+         * Draws the data into the renderArea using the spefic steps and metadata
+         *
+         * @param{any[]} data The data to be drawn
+         * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
+         */
+        Drawer.prototype.draw = function (data, drawSteps) {
+            var _this = this;
+            var appliedDrawSteps = drawSteps.map(function (dr) {
+                var appliedAttrToProjector = _this._appliedProjectors(dr.attrToProjector);
+                return {
+                    attrToProjector: appliedAttrToProjector,
+                    animator: dr.animator
+                };
+            });
+            this._enterData(data);
+            var numberOfIterations = this._numberOfAnimationIterations(data);
+            var delay = 0;
+            appliedDrawSteps.forEach(function (drawStep, i) {
+                Plottable.Utils.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                delay += drawStep.animator.getTiming(numberOfIterations);
+            });
+            return delay;
+        };
+        /**
+         * Retrieves the renderArea selection for the drawer
+         *
+         * @returns {D3.Selection} the renderArea selection
+         */
+        Drawer.prototype._getRenderArea = function () {
+            return this._renderArea;
+        };
+        Drawer.prototype._getSelector = function () {
+            return "";
+        };
+        Drawer.prototype._getSelection = function (index) {
+            var allSelections = this._getRenderArea().selectAll(this._getSelector());
+            return d3.select(allSelections[0][index]);
+        };
+        return Drawer;
+    })();
+    Plottable.Drawer = Drawer;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2780,7 +2780,7 @@ var Plottable;
             };
             Line.PATH_CLASS = "line";
             return Line;
-        })(Drawers.AbstractDrawer);
+        })(Plottable.Drawer);
         Drawers.Line = Line;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2805,7 +2805,7 @@ var Plottable;
                 this._areaSelection.datum(data);
             };
             Area.prototype.setup = function (area) {
-                Drawers.AbstractDrawer.prototype.setup.call(this, area);
+                Plottable.Drawer.prototype.setup.call(this, area);
                 this._areaSelection = area.append("path").style("stroke", "none");
             };
             Area.prototype._drawStep = function (step) {
@@ -2872,7 +2872,7 @@ var Plottable;
                 return this._svgElement;
             };
             return Element;
-        })(Drawers.AbstractDrawer);
+        })(Plottable.Drawer);
         Drawers.Element = Element;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -6120,7 +6120,7 @@ var Plottable;
             drawer.setup(this._renderArea.append("g"));
         };
         Plot.prototype._getDrawer = function (dataset) {
-            return new Plottable.Drawers.AbstractDrawer(dataset);
+            return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
             if (this._animate && this._animateOnNextRender) {
