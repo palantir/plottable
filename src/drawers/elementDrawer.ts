@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Drawers {
-  export class Element extends AbstractDrawer {
+  export class Element extends Drawer {
     protected _svgElement: string;
 
     /**
@@ -36,25 +36,6 @@ export module Drawers {
         dataElements.classed(this._className, true);
       }
       dataElements.exit().remove();
-    }
-
-    private _filterDefinedData(data: any[], definedFunction: (d: any, i: number) => boolean): any[] {
-      return definedFunction ? data.filter(definedFunction) : data;
-    }
-
-    // HACKHACK To prevent populating undesired attribute to d3, we delete them here.
-    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
-      super._prepareDrawSteps(drawSteps);
-      drawSteps.forEach((d: DrawStep) => {
-        if (d.attrToProjector["defined"]) {
-          delete d.attrToProjector["defined"];
-        }
-      });
-    }
-
-    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
-      return drawSteps.reduce((data: any[], drawStep: AppliedDrawStep) =>
-              this._filterDefinedData(data, drawStep.attrToProjector["defined"]), super._prepareData(data, drawSteps));
     }
 
     public _getSelector(): string {

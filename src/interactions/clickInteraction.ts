@@ -60,10 +60,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback called when the Component is clicked.
+     * Adds a callback to be called when the Component is clicked.
      *
-     * @param {ClickCallback} callback The callback to set.
-     * @return {Interaction.Click} The calling Interaction.Click.
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
      */
     public onClick(callback: ClickCallback) {
       this._onClickCallbacks.add(callback);
@@ -71,10 +71,10 @@ export module Interactions {
     }
 
     /**
-     * Removes the callback from click.
+     * Removes a callback that would be called when the Component is clicked.
      *
-     * @param {ClickCallback} callback The callback to remove.
-     * @return {Interaction.Click} The calling Interaction.Click.
+     * @param {ClickCallback} callback
+     * @return {Interactions.Click} The calling Click Interaction.
      */
     public offClick(callback: ClickCallback) {
       this._onClickCallbacks.delete(callback);

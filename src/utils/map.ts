@@ -2,6 +2,10 @@
 
 module Plottable {
 export module Utils {
+  /**
+   * Shim for ES6 map.
+   * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
+   */
   export class Map<K, V> {
     private _keyValuePairs: { key: K; value: V; }[] = [];
 
@@ -10,7 +14,7 @@ export module Utils {
      *
      * @param {K} key Key to set in the Map
      * @param {V} value Value to set in the Map
-     * @return {boolean} True if key already in Map, false otherwise
+     * @return {Map} The Map object
      */
     public set(key: K, value: V) {
       if (key !== key) {
@@ -19,11 +23,11 @@ export module Utils {
       for (var i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i].key === key) {
           this._keyValuePairs[i].value = value;
-          return true;
+          return this;
         }
       }
       this._keyValuePairs.push({ key: key, value: value });
-      return false;
+      return this;
     }
 
     /**
@@ -60,21 +64,16 @@ export module Utils {
     }
 
     /**
-     * Return an array of the values in the Map
+     * The forEach method executes the provided callback once for each key of the map which
+     * actually exist. It is not invoked for keys which have been deleted.
      *
-     * @return {V[]} The values in the store
+     * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
+     * @param {any} thisArg The `this` context
      */
-    public values() {
-      return this._keyValuePairs.map((keyValuePair) => keyValuePair.value);
-    }
-
-    /**
-     * Return an array of keys in the Map.
-     *
-     * @return {K[]} The keys in the store
-     */
-    public keys() {
-      return this._keyValuePairs.map((keyValuePair) => keyValuePair.key);
+    public forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
+      this._keyValuePairs.forEach((keyValuePair) => {
+        callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, this);
+      });
     }
 
     /**

@@ -1,12 +1,18 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-
   export interface ScaleCallback<S extends Scale<any, any>> {
     (scale: S): any;
   }
 
   export module Scales {
+    /**
+     * A function that supplies Extents to a Scale.
+     * An Extent is a request for a set of domain values to be included.
+     * 
+     * @param {Scale} scale
+     * @returns {D[][]} An array of extents.
+     */
     export interface ExtentsProvider<D> {
       (scale: Scale<D, any>): D[][];
     }
@@ -19,12 +25,8 @@ module Plottable {
     private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
 
     /**
-     * Constructs a new Scale.
-     *
-     * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-     * function. Scales have a domain (input), a range (output), and a function
-     * from domain to range.
-     *
+     * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
+     * 
      * @constructor
      */
     constructor() {
@@ -32,23 +34,45 @@ module Plottable {
       this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
+    /**
+     * Given an array of potential domain values, computes the extent of those values.
+     * 
+     * @param {D[]} values
+     * @returns {D[]} The extent of the input values.
+     */
     public extentOfValues(values: D[]): D[] {
       return []; // this should be overwritten
     }
 
     protected _getAllExtents(): D[][] {
-      return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
+      var providerArray: D[][][] = [];
+      this._extentsProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
+        providerArray.push(provider(this));
+      });
+      return d3.merge(providerArray);
     }
 
     protected _getExtent(): D[] {
       return []; // this should be overwritten
     }
 
+    /**
+     * Adds a callback to be called when the Scale updates.
+     * 
+     * @param {ScaleCallback} callback.
+     * @returns {Scale} The calling Scale.
+     */
     public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.add(callback);
       return this;
     }
 
+    /**
+     * Removes a callback that would be called when the Scale updates.
+     * 
+     * @param {ScaleCallback} callback.
+     * @returns {Scale} The calling Scale.
+     */
     public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
       this._callbacks.delete(callback);
       return this;
@@ -59,17 +83,7 @@ module Plottable {
     }
 
     /**
-     * Modifies the domain on the scale so that it includes the extent of all
-     * perspectives it depends on. This will normally happen automatically, but
-     * if you set domain explicitly with `plot.domain(x)`, you will need to
-     * call this function if you want the domain to neccessarily include all
-     * the data.
-     *
-     * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
-     * strings for a Scale.Category.
-     *
-     * Perspective: A combination of a Dataset and an Accessor that
-     * represents a view in to the data.
+     * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
      *
      * @returns {Scale} The calling Scale.
      */
@@ -86,10 +100,9 @@ module Plottable {
     }
 
     /**
-     * Computes the range value corresponding to a given domain value. In other
-     * words, apply the function to value.
+     * Computes the range value corresponding to a given domain value.
      *
-     * @param {R} value A domain value to be scaled.
+     * @param {D} value
      * @returns {R} The range value corresponding to the supplied domain value.
      */
     public scale(value: D): R {
@@ -105,10 +118,7 @@ module Plottable {
     /**
      * Sets the domain.
      *
-     * @param {D[]} values If provided, the new value for the domain. On
-     * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
-     * make the function decreasing. On Scale.Ordinal, this is an array of all
-     * input values.
+     * @param {D[]} values
      * @returns {Scale} The calling Scale.
      */
     public domain(values: D[]): Scale<D, R>;
@@ -141,22 +151,14 @@ module Plottable {
 
     /**
      * Gets the range.
-     *
-     * In the case of having a numeric range, it will be a [min, max] pair. In
-     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-     * list of all possible outputs.
-     *
+     * 
      * @returns {R[]} The current range.
      */
     public range(): R[];
     /**
      * Sets the range.
-     *
-     * In the case of having a numeric range, it will be a [min, max] pair. In
-     * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-     * list of all possible outputs.
-     *
-     * @param {R[]} values If provided, the new values for the range.
+     * 
+     * @param {R[]} values
      * @returns {Scale} The calling Scale.
      */
     public range(values: R[]): Scale<D, R>;
@@ -177,12 +179,24 @@ module Plottable {
       throw new Error("Subclasses should override _setRange");
     }
 
+    /**
+     * Adds an ExtentsProvider to the Scale.
+     * 
+     * @param {Scales.ExtentsProvider} provider
+     * @returns {Sclae} The calling Scale.
+     */
     public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.add(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
+    /**
+     * Removes an ExtentsProvider from the Scale.
+     * 
+     * @param {Scales.ExtentsProvider} provider
+     * @returns {Sclae} The calling Scale.
+     */
     public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
       this._extentsProviders.delete(provider);
       this._autoDomainIfAutomaticMode();

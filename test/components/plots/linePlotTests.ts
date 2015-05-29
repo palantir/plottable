@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
-    it("getAllPlotData with NaNs", () => {
+    it("entities() with NaN in data", () => {
       var svg = TestMethods.generateSVG(500, 500);
       var dataWithNaN = [
         { foo: 0.0, bar: 0.0 },
@@ -20,17 +20,16 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 1]);
 
-      var linePlot = new Plottable.Plots.Line(xScale, yScale);
+      var linePlot = new Plottable.Plots.Line();
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
       linePlot.x((d: any) => d.foo, xScale);
       linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
-      var apd = linePlot.getAllPlotData();
+      var entities = linePlot.entities();
 
       var expectedLength = dataWithNaN.length - 1;
-      assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
-      assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+      assert.lengthOf(entities, expectedLength, "NaN data was not returned");
 
       svg.remove();
     });
@@ -42,7 +41,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Line(xScale, yScale);
+      var plot = new Plottable.Plots.Line();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -77,7 +76,7 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      linePlot = new Plottable.Plots.Line(xScale, yScale);
+      linePlot = new Plottable.Plots.Line<number>();
       linePlot.addDataset(simpleDataset);
       linePlot.x(xAccessor, xScale)
               .y(yAccessor, yScale)
@@ -87,15 +86,14 @@ describe("Plots", () => {
     });
 
     it("draws a line correctly", () => {
-      var linePath = renderArea.select(".line");
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
-      var lineComputedStyle = window.getComputedStyle(linePath.node());
-      assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
+      assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
       svg.remove();
     });
 
     it("attributes set appropriately from accessor", () => {
-      var areaPath = renderArea.select(".line");
+      var areaPath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
       svg.remove();
     });
@@ -104,7 +102,7 @@ describe("Plots", () => {
       var newColorAccessor = () => "pink";
       linePlot.attr("stroke", newColorAccessor);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
       svg.remove();
     });
@@ -114,12 +112,12 @@ describe("Plots", () => {
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
       linePlot.attr("stroke", (d) => d.stroke);
-      var areaPath = renderArea.select(".line");
-      assert.strictEqual(areaPath.attr("stroke"), "pink", "stroke set to uniform stroke color");
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+      assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
       data[0].stroke = "green";
       simpleDataset.data(data);
-      assert.strictEqual(areaPath.attr("stroke"), "green", "stroke set to first datum stroke color");
+      assert.strictEqual(linePath.attr("stroke"), "green", "stroke set to first datum stroke color");
       svg.remove();
     });
 
@@ -132,7 +130,7 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
       simpleDataset.data(lineData);
-      var linePath = renderArea.select(".line");
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       var d_original = TestMethods.normalizePath(linePath.attr("d"));
 
       function assertCorrectPathSplitting(msgPrefix: string) {
@@ -211,8 +209,7 @@ describe("Plots", () => {
 
     });
 
-    describe("getAllPlotData()", () => {
-
+    describe("entities()", () => {
       it("retrieves correct data", () => {
         var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
@@ -220,24 +217,23 @@ describe("Plots", () => {
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.getAllPlotData().selection;
-        assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+        var nodes = linePlot.entities().map((entity) => entity.selection.node());
+        var uniqueNodes: Element[] = [];
+        nodes.forEach((node) => {
+          if (uniqueNodes.indexOf(node) === -1) {
+            uniqueNodes.push(node);
+          }
+        });
+        assert.lengthOf(uniqueNodes, linePlot.datasets().length, "one Element per Dataset");
         svg.remove();
       });
     });
 
-    describe("getClosestPlotData()", () => {
+    describe("entityNearest()", () => {
       var lines: D3.Selection;
       var d0: any, d1: any;
       var d0Px: Plottable.Point, d1Px: Plottable.Point;
       var dataset2: Plottable.Dataset;
-
-      function assertPlotDataEqual(actual: Plottable.Plots.PlotData, expected: Plottable.Plots.PlotData, msg: string) {
-        assert.deepEqual(actual.data, expected.data, msg);
-        assert.closeTo(actual.pixelPoints[0].x, expected.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(actual.pixelPoints[0].y, expected.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(actual.selection, expected.selection, msg);
-      }
 
       beforeEach(() => {
         dataset2 = new Plottable.Dataset([
@@ -261,30 +257,36 @@ describe("Plots", () => {
         };
       });
 
-      it("returns correct closest plot data", () => {
+      it("returns nearest Entity", () => {
         var expected = {
-          data: [d0],
-          pixelPoints: [d0Px],
-          selection: d3.selectAll([lines[0][1]])
+          datum: d0,
+          index: 0,
+          dataset: dataset2,
+          position: d0Px,
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        var closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y - 1});
-        assertPlotDataEqual(closest, expected, "if above a point, it is closest");
+        var closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if above a point, it is closest");
 
-        closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y + 1});
-        assertPlotDataEqual(closest, expected, "if below a point, it is closest");
+        closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if below a point, it is closest");
 
-        closest = linePlot.getClosestPlotData({x: d0Px.x + 1, y: d0Px.y + 1});
-        assertPlotDataEqual(closest, expected, "if right of a point, it is closest");
+        closest = linePlot.entityNearest({x: d0Px.x + 1, y: d0Px.y + 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if right of a point, it is closest");
 
         expected = {
-          data: [d1],
-          pixelPoints: [d1Px],
-          selection: d3.selectAll([lines[0][1]])
+          datum: d1,
+          index: 1,
+          dataset: dataset2,
+          position: d1Px,
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        closest = linePlot.getClosestPlotData({x: d1Px.x - 1, y: d1Px.y});
-        assertPlotDataEqual(closest, expected, "if left of a point, it is closest");
+        closest = linePlot.entityNearest({x: d1Px.x - 1, y: d1Px.y});
+        TestMethods.assertEntitiesEqual(closest, expected, "if left of a point, it is closest");
 
         svg.remove();
       });
@@ -293,28 +295,27 @@ describe("Plots", () => {
         xScale.domain([0.25, 1]);
 
         var expected = {
-          data: [d1],
-          pixelPoints: [{
+          datum: d1,
+          index: 1,
+          dataset: dataset2,
+          position: {
             x: xScale.scale(xAccessor(d1)),
             y: yScale.scale(yAccessor(d1))
-          }],
-          selection: d3.selectAll([lines[0][1]])
+          },
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
-        assertPlotDataEqual(closest, expected, "only in-view points are considered");
+        var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
+        TestMethods.assertEntitiesEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
       });
 
-      it("handles empty plots gracefully", () => {
-        linePlot = new Plottable.Plots.Line(xScale, yScale);
-
-        var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
-        assert.lengthOf(closest.data, 0);
-        assert.lengthOf(closest.pixelPoints, 0);
-        assert.isTrue(closest.selection.empty());
-
+      it("returns undefined if no Entities are visible", () => {
+        linePlot = new Plottable.Plots.Line<number>();
+        var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+        assert.isUndefined(closest, "returns undefined if no Entity can be found");
         svg.remove();
       });
     });
@@ -323,9 +324,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       linePlot.attr("class", newClassProjector);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select("." + Plottable.Drawers.Line.LINE_CLASS);
+      var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
       assert.isTrue(linePath.classed("pink"));
-      assert.isTrue(linePath.classed(Plottable.Drawers.Line.LINE_CLASS));
+      assert.isTrue(linePath.classed(Plottable.Drawers.Line.PATH_CLASS));
       svg.remove();
     });
   });

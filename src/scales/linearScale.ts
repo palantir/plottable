@@ -6,13 +6,7 @@ export module Scales {
     private _d3Scale: D3.Scale.LinearScale;
 
     /**
-     * Constructs a new LinearScale.
-     *
-     * This scale maps from domain to range with a simple `mx + b` formula.
-     *
      * @constructor
-     * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
-     * LinearScale. If not supplied, uses a default scale.
      */
     constructor() {
       super();

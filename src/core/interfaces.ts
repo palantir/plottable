@@ -1,6 +1,6 @@
 module Plottable {
   /**
-   * Access specific datum property.
+   * Accesses a specific datum property.
    */
   export interface Accessor<T> {
     (datum: any, index: number, dataset: Dataset): T;
@@ -11,9 +11,6 @@ module Plottable {
    */
   export type _Projector = (datum: any, index: number, dataset: Dataset) => any;
 
-  /**
-   * Projector with dataset and plot metadata
-   */
   export type AppliedProjector = (datum: any, index: number) => any;
 
   /**
@@ -28,10 +25,6 @@ module Plottable {
   /**
    * A mapping from attributes ("x", "fill", etc.) to the functions that get
    * that information out of the data.
-   *
-   * So if my data looks like `{foo: 5, bar: 6}` and I want the radius to scale
-   * with both `foo` and `bar`, an entry in this type might be `{"r":
-   * function(d) { return foo + bar; }`.
    */
   export type AttributeToProjector = { [attrToSet: string]: _Projector; };
 
@@ -42,20 +35,13 @@ module Plottable {
     minHeight: number;
   }
 
-  /**
-   * The range of your current data. For example, [1, 2, 6, -5] has the Extent
-   * `{min: -5, max: 6}`.
-   *
-   * The point of this type is to hopefully replace the less-elegant `[min,
-   * max]` extents produced by d3.
-   */
-  export type Extent = {
+  export type Range = {
     min: number;
     max: number;
   }
 
   /**
-   * A simple location on the screen.
+   * A location in pixel-space.
    */
   export type Point = {
     x: number;

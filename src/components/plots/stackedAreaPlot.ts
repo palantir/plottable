@@ -10,22 +10,16 @@ export module Plots {
     private _baselineValue = 0;
 
     /**
-     * Constructs a StackedArea plot.
-     *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale
+     * @param {QuantitativeScale} yScale
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
-    }
-
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key).drawLine(false);
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -37,6 +31,9 @@ export module Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedArea<X>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -52,7 +49,10 @@ export module Plots {
       return this;
     }
 
-    public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): StackedArea<X>;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+    public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       if (y == null) {
         return super.y();
       }
@@ -80,33 +80,23 @@ export module Plots {
     }
 
     protected _updateYScale() {
-      var scale = <QuantitativeScale<any>> this.y().scale;
+      var yBinding = this.y();
+      var scale = <QuantitativeScale<any>> (yBinding && yBinding.scale);
+      if (scale == null) {
+        return;
+      }
       scale.addPaddingException(this, 0);
       scale.addIncludedValue(this, 0);
     }
 
     protected _onDatasetUpdate() {
       this._updateStackExtentsAndOffsets();
-
       super._onDatasetUpdate();
       return this;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-
-      var yAccessor = this.y().accessor;
-      var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-
-      return attrToProjector;
-    }
-
     protected _wholeDatumAttributes() {
-      return ["x", "y", "defined"];
+      return ["x", "y", "defined", "d"];
     }
 
     protected _updateExtentsForProperty(property: string) {
@@ -149,6 +139,28 @@ export module Plots {
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+      var yAccessor = this.y().accessor;
+      var xAccessor = this.x().accessor;
+
+      var stackYProjector = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+      var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+
+      propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
+      return propertyToProjectors;
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      var pixelPoint = super._pixelPoint(datum, index, dataset);
+      var xValue = this.x().accessor(datum, index, dataset);
+      var yValue = this.y().accessor(datum, index, dataset);
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue));
+      return { x: pixelPoint.x, y: scaledYValue };
     }
 
   }

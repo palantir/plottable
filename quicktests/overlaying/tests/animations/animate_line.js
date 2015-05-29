@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var lineRenderer = new Plottable.Plots.Line(xScale, yScale)
+  var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
               .x(function(d) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)
