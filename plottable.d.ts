@@ -1638,9 +1638,8 @@ declare module Plottable {
          * An Axis is a visual representation of a Scale.
          *
          * @constructor
-         * @param {Scale} scale The Scale for this Axis to render.
-         * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
-         * on which side the Axis will appear.
+         * @param {Scale} scale
+         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
          * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
@@ -1684,18 +1683,18 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
-         * Gets the current tick mark length in pixels.
+         * Gets the tick mark length in pixels.
          */
         tickLength(): number;
         /**
-         * Sets the current tick mark length in pixels.
+         * Sets the tick mark length in pixels.
          *
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis<D>;
         /**
-         * Gets the current end tick mark length in pixels.
+         * Gets the end tick mark length in pixels.
          */
         endTickLength(): number;
         /**
@@ -1737,16 +1736,16 @@ declare module Plottable {
         /**
          * Sets the orientation of the Axis.
          *
-         * @param {number} newOrientation The desired orientation (top/bottom/left/right).
+         * @param {number} orientation One of "top"/"bottom"/"left"/"right".
          * @returns {Axis} The calling Axis.
          */
         orientation(orientation: string): Axis<D>;
         /**
-         * Gets whether the Axis is currently set to show the first and last tick labels.
+         * Gets whether the Axis shows the end tick labels.
          */
         showEndTickLabels(): boolean;
         /**
-         * Sets whether the Axis is currently set to show the first and last tick labels.
+         * Sets whether the Axis shows the end tick labels.
          *
          * @param {boolean} show
          * @returns {Axis} The calling Axis.
@@ -1793,11 +1792,11 @@ declare module Plottable {
             /**
              * Constructs a Time Axis.
              *
-             * A Time Axis is a visual representation of a Scales.Time.
+             * A Time Axis is a visual representation of a Time Scale.
              *
              * @constructor
              * @param {Scales.Time} scale
-             * @param {string} orientation The orientation of the Axis ("top"/"bottom")
+             * @param {string} orientation One of "top"/"bottom".
              */
             constructor(scale: Scales.Time, orientation: string);
             /**
@@ -1807,7 +1806,7 @@ declare module Plottable {
             /**
              * Sets the label positions for each tier.
              *
-             * @param {string[]} newPositions The posititons for each tier. "bottom" and "center" are the only supported values.
+             * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
              * @returns {Axes.Time} The calling Time Axis.
              */
             tierLabelPositions(newPositions: string[]): Time;
@@ -1848,7 +1847,7 @@ declare module Plottable {
              *
              * @constructor
              * @param {QuantitativeScale} scale
-             * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {string} orientation One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
@@ -1867,10 +1866,8 @@ declare module Plottable {
             /**
              * Sets the tick label position relative to the tick marks.
              *
-             * @param {string} position The relative position of the tick label.
-             *                          [top/center/bottom] for a vertical Numeric Axis,
-             *                          [left/center/right] for a horizontal Numeric Axis.
-             *                          Defaults to center.
+             * @param {string} position "top"/"center"/"bottom" for a vertical Numeric Axis,
+             *                          "left"/"center"/"right" for a horizontal Numeric Axis.
              * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
@@ -1885,12 +1882,12 @@ declare module Plottable {
             /**
              * Constructs a Category Axis.
              *
-             * A Category Axis is a visual representation of a Scales.Category.
+             * A Category Axis is a visual representation of a Category Scale.
              *
              * @constructor
-             * @param {Scales.Category} scale The Scale to base the Axis on.
-             * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
-             * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
+             * @param {Scales.Category} scale
+             * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+             * @param {Formatter} [formatter=Formatters.identity()]
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
@@ -1903,7 +1900,7 @@ declare module Plottable {
             tickLabelAngle(): number;
             /**
              * Sets the tick label angle in degrees.
-             * Right now only vertical-left (-90), horizontal (0), and vertical-right (90) are supported.
+             * Right now only -90/0/90 are supported. 0 is horizontal.
              *
              * @param {number} angle
              * @returns {Category} The calling Category Axis.

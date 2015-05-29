@@ -3629,9 +3629,8 @@ var Plottable;
          * An Axis is a visual representation of a Scale.
          *
          * @constructor
-         * @param {Scale} scale The Scale for this Axis to render.
-         * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
-         * on which side the Axis will appear.
+         * @param {Scale} scale
+         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
          * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         function Axis(scale, orientation, formatter) {
@@ -3960,11 +3959,11 @@ var Plottable;
             /**
              * Constructs a Time Axis.
              *
-             * A Time Axis is a visual representation of a Scales.Time.
+             * A Time Axis is a visual representation of a Time Scale.
              *
              * @constructor
              * @param {Scales.Time} scale
-             * @param {string} orientation The orientation of the Axis ("top"/"bottom")
+             * @param {string} orientation One of "top"/"bottom".
              */
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
@@ -4256,9 +4255,6 @@ var Plottable;
              * The CSS class applied to each Time Axis tier
              */
             Time.TIME_AXIS_TIER_CLASS = "time-axis-tier";
-            /*
-             * Default TimeAxisConfigurations.
-             */
             Time._DEFAULT_TIME_AXIS_CONFIGURATIONS = [
                 [
                     { interval: TimeInterval.second, step: 1, formatter: Plottable.Formatters.time("%I:%M:%S %p") },
@@ -4395,7 +4391,7 @@ var Plottable;
              *
              * @constructor
              * @param {QuantitativeScale} scale
-             * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+             * @param {string} orientation One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             function Numeric(scale, orientation, formatter) {
@@ -4699,12 +4695,12 @@ var Plottable;
             /**
              * Constructs a Category Axis.
              *
-             * A Category Axis is a visual representation of a Scales.Category.
+             * A Category Axis is a visual representation of a Category Scale.
              *
              * @constructor
-             * @param {Scales.Category} scale The Scale to base the Axis on.
-             * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
-             * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
+             * @param {Scales.Category} scale
+             * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+             * @param {Formatter} [formatter=Formatters.identity()]
              */
             function Category(scale, orientation, formatter) {
                 if (orientation === void 0) { orientation = "bottom"; }

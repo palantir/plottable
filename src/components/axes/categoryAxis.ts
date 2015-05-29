@@ -11,12 +11,12 @@ export module Axes {
     /**
      * Constructs a Category Axis.
      * 
-     * A Category Axis is a visual representation of a Scales.Category.
+     * A Category Axis is a visual representation of a Category Scale.
      *
      * @constructor
-     * @param {Scales.Category} scale The Scale to base the Axis on.
-     * @param {string} [orientation="bottom"] The orientation of the Axis ("top"/"bottom"/"left"/"right").
-     * @param {Formatter} [formatter=Formatters.identity()] The Formatter for the Axis
+     * @param {Scales.Category} scale
+     * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.identity()]
      */
     constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
@@ -64,7 +64,7 @@ export module Axes {
     public tickLabelAngle(): number;
     /**
      * Sets the tick label angle in degrees.
-     * Right now only vertical-left (-90), horizontal (0), and vertical-right (90) are supported.
+     * Right now only -90/0/90 are supported. 0 is horizontal.
      *
      * @param {number} angle
      * @returns {Category} The calling Category Axis.

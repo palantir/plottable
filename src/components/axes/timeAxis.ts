@@ -39,9 +39,6 @@ export module Axes {
      */
     public static TIME_AXIS_TIER_CLASS = "time-axis-tier";
 
-    /*
-     * Default TimeAxisConfigurations.
-     */
     private static _DEFAULT_TIME_AXIS_CONFIGURATIONS: TimeAxisConfiguration[] = [
       [
         {interval: TimeInterval.second, step: 1, formatter: Formatters.time("%I:%M:%S %p")},
@@ -169,11 +166,11 @@ export module Axes {
     /**
      * Constructs a Time Axis.
      *
-     * A Time Axis is a visual representation of a Scales.Time.
+     * A Time Axis is a visual representation of a Time Scale.
      *
      * @constructor
      * @param {Scales.Time} scale
-     * @param {string} orientation The orientation of the Axis ("top"/"bottom")
+     * @param {string} orientation One of "top"/"bottom".
      */
     constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
@@ -189,7 +186,7 @@ export module Axes {
     /**
      * Sets the label positions for each tier.
      * 
-     * @param {string[]} newPositions The posititons for each tier. "bottom" and "center" are the only supported values.
+     * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
      * @returns {Axes.Time} The calling Time Axis.
      */
     public tierLabelPositions(newPositions: string[]): Time;

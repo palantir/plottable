@@ -15,7 +15,7 @@ export module Axes {
      *
      * @constructor
      * @param {QuantitativeScale} scale
-     * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
+     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
@@ -245,10 +245,8 @@ export module Axes {
     /**
      * Sets the tick label position relative to the tick marks.
      *
-     * @param {string} position The relative position of the tick label.
-     *                          [top/center/bottom] for a vertical Numeric Axis,
-     *                          [left/center/right] for a horizontal Numeric Axis.
-     *                          Defaults to center.
+     * @param {string} position "top"/"center"/"bottom" for a vertical Numeric Axis,
+     *                          "left"/"center"/"right" for a horizontal Numeric Axis.
      * @returns {Numeric} The calling Numeric Axis.
      */
     public tickLabelPosition(position: string): Numeric;

@@ -34,9 +34,8 @@ module Plottable {
      * An Axis is a visual representation of a Scale.
      *
      * @constructor
-     * @param {Scale} scale The Scale for this Axis to render.
-     * @param {string} orientation The orientation of the Axis ("top"/"bottom"/"left"/"right").
-     * on which side the Axis will appear.
+     * @param {Scale} scale
+     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
@@ -279,11 +278,11 @@ module Plottable {
     }
 
     /**
-     * Gets the current tick mark length in pixels.
+     * Gets the tick mark length in pixels.
      */
     public tickLength(): number;
     /**
-     * Sets the current tick mark length in pixels.
+     * Sets the tick mark length in pixels.
      *
      * @param {number} length
      * @returns {Axis} The calling Axis.
@@ -303,7 +302,7 @@ module Plottable {
     }
 
     /**
-     * Gets the current end tick mark length in pixels.
+     * Gets the end tick mark length in pixels.
      */
     public endTickLength(): number;
     /**
@@ -391,7 +390,7 @@ module Plottable {
     /**
      * Sets the orientation of the Axis.
      *
-     * @param {number} newOrientation The desired orientation (top/bottom/left/right).
+     * @param {number} orientation One of "top"/"bottom"/"left"/"right".
      * @returns {Axis} The calling Axis.
      */
     public orientation(orientation: string): Axis<D>;
@@ -413,11 +412,11 @@ module Plottable {
     }
 
     /**
-     * Gets whether the Axis is currently set to show the first and last tick labels.
+     * Gets whether the Axis shows the end tick labels.
      */
     public showEndTickLabels(): boolean;
     /**
-     * Sets whether the Axis is currently set to show the first and last tick labels.
+     * Sets whether the Axis shows the end tick labels.
      *
      * @param {boolean} show
      * @returns {Axis} The calling Axis.
