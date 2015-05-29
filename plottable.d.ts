@@ -2904,6 +2904,7 @@ declare module Plottable {
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
             protected _propertyProjectors(): AttributeToProjector;
+            protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         }
     }
 }

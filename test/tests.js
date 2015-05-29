@@ -4712,6 +4712,14 @@ describe("Plots", function () {
             assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
             svg.remove();
         });
+        it("pixel positions account for stack offsets", function () {
+            var dataYs = renderer.getAllPlotData().pixelPoints.map(function (d) { return yScale.invert(d.y); });
+            var dataset1Ys = dataset1.data().map(function (d) { return d.y; });
+            var dataset2Ys = dataset2.data().map(function (d, i) { return d.y + dataset1.data()[i].y; });
+            assert.includeMembers(dataYs, dataset1Ys, "all dataset1 points found");
+            assert.includeMembers(dataYs, dataset2Ys, "all dataset2 points found");
+            svg.remove();
+        });
     });
     describe("Stacked Area Plot no data", function () {
         var svg;
