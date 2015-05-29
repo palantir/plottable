@@ -39,8 +39,7 @@ module Plottable {
 
       /**
        * The forEach method executes the provided callback once for each value which actually exists
-       * in the Set object. It is not invoked for values which have been deleted. However, it is executed
-       * for values which are present but have the value undefined.
+       * in the Set object. It is not invoked for values which have been deleted.
        *
        * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
        * @param {any} thisArg The `this` context

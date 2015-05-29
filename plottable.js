@@ -440,7 +440,6 @@ var Plottable;
             /**
              * The forEach method executes the provided callback once for each key of the map which
              * actually exist. It is not invoked for keys which have been deleted.
-             * However, it is executed for values which are present but have the value undefined.
              *
              * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
              * @param {any} thisArg The `this` context
@@ -507,8 +506,7 @@ var Plottable;
             };
             /**
              * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted. However, it is executed
-             * for values which are present but have the value undefined.
+             * in the Set object. It is not invoked for values which have been deleted.
              *
              * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
              * @param {any} thisArg The `this` context
