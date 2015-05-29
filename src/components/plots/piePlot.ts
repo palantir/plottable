@@ -57,7 +57,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Arc(dataset).setClass("arc");
+      return new Plottable.Drawers.Arc(dataset);
     }
 
     public entities(datasets = this.datasets()): Plots.Entity[] {
