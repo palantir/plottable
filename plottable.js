@@ -5602,8 +5602,6 @@ var Plottable;
         var Table = (function (_super) {
             __extends(Table, _super);
             /**
-             * Constructs a Table.
-             *
              * A Table combines Components in the form of a grid. A
              * common case is combining a y-axis, x-axis, and the plotted data via
              * ```typescript
@@ -5612,7 +5610,7 @@ var Plottable;
              * ```
              *
              * @constructor
-             * @param {Component[][]=[]} [rows] A 2-D array of Components to be added to the Table.
+             * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
              *   null can be used if a cell is empty.
              */
             function Table(rows) {
@@ -10043,8 +10041,6 @@ var Plottable;
         var XDragBoxLayer = (function (_super) {
             __extends(XDragBoxLayer, _super);
             /**
-             * Constructs an XDragBoxLayer.
-             *
              * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
              * The y-values of the bounds() are always set to 0 and the height() of the XDragBoxLayer.
              *

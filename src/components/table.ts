@@ -33,8 +33,6 @@ export module Components {
     private _calculatedLayout: _IterateLayoutResult = null;
 
     /**
-     * Constructs a Table.
-     *
      * A Table combines Components in the form of a grid. A
      * common case is combining a y-axis, x-axis, and the plotted data via
      * ```typescript
@@ -43,7 +41,7 @@ export module Components {
      * ```
      *
      * @constructor
-     * @param {Component[][]=[]} [rows] A 2-D array of Components to be added to the Table.
+     * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
      *   null can be used if a cell is empty.
      */
     constructor(rows: Component[][] = []) {
@@ -312,11 +310,11 @@ export module Components {
     }
 
     /**
-     * Gets the padding above and below each row, in pixels.
+     * Gets the padding above and below each row in pixels.
      */
     public rowPadding(): number;
     /**
-     * Sets the padding above and below each row, in pixels.
+     * Sets the padding above and below each row in pixels.
      *
      * @param {number} rowPadding 
      * @returns {Table} The calling Table.
@@ -332,11 +330,11 @@ export module Components {
     }
 
     /**
-     * Gets the padding to the left and right of each column, in pixels.
+     * Gets the padding to the left and right of each column in pixels.
      */
     public columnPadding(): number;
     /**
-     * Sets the padding to the left and right of each column, in pixels.
+     * Sets the padding to the left and right of each column in pixels.
      *
      * @param {number} columnPadding
      * @returns {Table} The calling Table.
@@ -352,13 +350,13 @@ export module Components {
     }
 
     /**
-     * Gets the weight of a particular row in the Table.
+     * Gets the weight of the specified row.
      * 
      * @param {number} index
      */
     public rowWeight(index: number): number;
     /**
-     * Sets the layout weight of a particular row.
+     * Sets the weight of the specified row.
      * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
      *
      * A common case would be to have one row take up 2/3rds of the space,
@@ -393,13 +391,13 @@ export module Components {
     }
 
     /**
-     * Gets the weight of a particular column in the Table.
+     * Gets the weight of the specified column.
      * 
      * @param {number} index
      */
     public columnWeight(index: number): number;
     /**
-     * Sets the layout weight of a particular column.
+     * Sets the weight of the specified column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
      *
      * Please see `rowWeight` docs for an example.
