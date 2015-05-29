@@ -24,10 +24,6 @@ export module Plots {
       this._stackedExtent = [];
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Area(key).drawLine(false);
-    }
-
     protected _getAnimator(key: string): Animators.Plot {
       return new Animators.Null();
     }
@@ -97,26 +93,12 @@ export module Plots {
 
     protected _onDatasetUpdate() {
       this._updateStackExtentsAndOffsets();
-
       super._onDatasetUpdate();
       return this;
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-
-      var yAccessor = this.y().accessor;
-      var xAccessor = this.x().accessor;
-      attrToProjector["y"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-      attrToProjector["y0"] = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
-
-      return attrToProjector;
-    }
-
     protected _wholeDatumAttributes() {
-      return ["x", "y", "defined"];
+      return ["x", "y", "defined", "d"];
     }
 
     protected _updateExtentsForProperty(property: string) {
@@ -159,6 +141,20 @@ export module Plots {
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+      var yAccessor = this.y().accessor;
+      var xAccessor = this.x().accessor;
+
+      var stackYProjector = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+      var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+
+      propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
+      return propertyToProjectors;
     }
 
   }

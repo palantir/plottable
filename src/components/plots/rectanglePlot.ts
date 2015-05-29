@@ -25,17 +25,17 @@ export module Plots {
       this.classed("rectangle-plot", true);
     }
 
-    protected _getDrawer(key: string) {
-      return new Drawers.Rect(key, true);
+    protected _getDrawer(dataset: Dataset) {
+      return new Drawers.Rect(dataset);
     }
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
       // Copy each of the different projectors.
-      var xAttr = attrToProjector[Rectangle._X_KEY];
+      var xAttr = Plot._scaledAccessor(this.x());
       var x2Attr = attrToProjector[Rectangle._X2_KEY];
-      var yAttr = attrToProjector[Rectangle._Y_KEY];
+      var yAttr = Plot._scaledAccessor(this.y());
       var y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
       var xScale = this.x().scale;
@@ -160,6 +160,28 @@ export module Plots {
       return this;
     }
 
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
+      if (this.x2() != null) {
+        attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
+      }
+      if (this.y2() != null) {
+        attrToProjector["y2"] = Plot._scaledAccessor(this.y2());
+      }
+      return attrToProjector;
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+      var attrToProjector = this._generateAttrToProjector();
+      var rectX = attrToProjector["x"](datum, index, dataset);
+      var rectY = attrToProjector["y"](datum, index, dataset);
+      var rectWidth = attrToProjector["width"](datum, index, dataset);
+      var rectHeight = attrToProjector["height"](datum, index, dataset);
+      var x = rectX + rectWidth / 2;
+      var y = rectY + rectHeight / 2;
+      return { x: x, y: y };
+    }
+
     private _rectangleWidth(scale: Scale<any, number>) {
       if (scale instanceof Plottable.Scales.Category) {
         return (<Plottable.Scales.Category> scale).rangeBand();
@@ -176,6 +198,20 @@ export module Plots {
         var scaledMax = scale.scale(max);
         return (scaledMax - scaledMin) / Math.abs(max - min);
       }
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      var attrToProjector = this._generateAttrToProjector();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+        var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+                                                   Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
+        datasets.set(key, data);
+      });
+      return datasets;
     }
 
   }

@@ -195,7 +195,7 @@ describe("Plots", () => {
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = d3.selectAll(".bar-area rect");
+          bars = barPlot.getAllSelections();
           zeroY = yScale.scale(0);
 
           d0 = dataset.data()[0];
@@ -574,7 +574,7 @@ describe("Plots", () => {
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = d3.selectAll(".bar-area rect");
+          bars = barPlot.getAllSelections();
           zeroX = xScale.scale(0);
 
           d0 = dataset.data()[0];

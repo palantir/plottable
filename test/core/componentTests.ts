@@ -406,6 +406,7 @@ describe("Component behavior", () => {
 
     var plot = new Plottable.Plots.Line();
     var group = new Plottable.Components.Group;
+    plot.x(0).y(0);
     group.renderTo(svg1);
 
     group.append(plot);

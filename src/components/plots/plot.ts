@@ -91,8 +91,7 @@ module Plottable {
     protected _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
-      // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
+      this.datasets().forEach((dataset) => this._setupDatasetNodes(dataset));
     }
 
     public destroy() {
@@ -110,13 +109,13 @@ module Plottable {
       if (this._key2PlotDatasetKey.has(key)) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(key);
+      var drawer = this._getDrawer(dataset);
       var pdk = {drawer: drawer, dataset: dataset, key: key};
       this._datasetKeysInOrder.push(key);
       this._key2PlotDatasetKey.set(key, pdk);
 
       if (this._isSetup) {
-        drawer.setup(this._renderArea.append("g"));
+        this._setupDatasetNodes(dataset);
       }
 
       dataset.onUpdate(this._onDatasetUpdateCallback);
@@ -124,8 +123,13 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(key);
+    protected _setupDatasetNodes(dataset: Dataset) {
+      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      drawer.setup(this._renderArea.append("g"));
+    }
+
+    protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer {
+      return new Drawers.AbstractDrawer(dataset);
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -360,13 +364,18 @@ module Plottable {
       var key = this._keyForDataset(dataset);
       if (key != null && this._key2PlotDatasetKey.has(key)) {
         var pdk = this._key2PlotDatasetKey.get(key);
-        pdk.drawer.remove();
+        this._removeDatasetNodes(dataset);
         pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
         this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
         this._key2PlotDatasetKey.remove(key);
         this._onDatasetUpdate();
       }
       return this;
+    }
+
+    protected _removeDatasetNodes(dataset: Dataset) {
+      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      drawer.remove();
     }
 
     /**
@@ -423,8 +432,7 @@ module Plottable {
       var times = this._datasetKeysInOrder.map((k, i) =>
         drawers[i].draw(
           dataToDraw.get(k),
-          drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset
+          drawSteps
         ));
       var maxTime = Utils.Methods.max(times, 0);
       this._additionalPaint(maxTime);
@@ -477,8 +485,9 @@ module Plottable {
         var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
         if (plotDatasetKey == null) { return; }
         var drawer = plotDatasetKey.drawer;
+        var dataset = plotDatasetKey.dataset;
         plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
+          var pixelPoint = this._pixelPoint(datum, index, dataset);
           if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
             return;
           }
@@ -543,12 +552,17 @@ module Plottable {
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => {
-        var scaledAccessor = (d: any, i: number, dataset: Dataset) => binding.scale.scale(binding.accessor(d, i, dataset));
-        attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
-      });
-      return attrToProjector;
+      return {};
+    }
+
+    protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
+      return binding.scale == null ?
+               binding.accessor :
+               (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      return { x: 0, y: 0 };
     }
   }
 }

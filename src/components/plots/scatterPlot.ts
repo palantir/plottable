@@ -24,8 +24,8 @@ export module Plots {
       this.symbol(() => circleSymbolFactory);
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Symbol(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Symbol(dataset);
     }
 
     public size<S>(): AccessorScaleBinding<S, number>;
@@ -82,17 +82,15 @@ export module Plots {
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
 
-      var xProjector = propertyToProjectors[XYPlot._X_KEY];
-      var yProjector = propertyToProjectors[XYPlot._Y_KEY];
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
 
-      var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
-      delete propertyToProjectors[Scatter._SIZE_KEY];
+      var sizeProjector = Plot._scaledAccessor(this.size());
 
       propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
         "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
 
-      var symbolProjector = propertyToProjectors[Scatter._SYMBOL_KEY];
-      delete propertyToProjectors[Scatter._SYMBOL_KEY];
+      var symbolProjector = Plot._scaledAccessor(this.symbol());
 
       propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
         symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
