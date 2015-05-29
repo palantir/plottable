@@ -44,7 +44,7 @@ export module Interactions {
     }
 
     /**
-     * Sets a callback to be called when the key with the given keyCode is
+     * Adds a callback to be called when the key with the given keyCode is
      * pressed and the user is moused over the Component.
      *
      * @param {number} keyCode

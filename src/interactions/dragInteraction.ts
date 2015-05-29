@@ -90,7 +90,7 @@ export module Interactions {
     }
 
     /**
-     * Returns whether or not this Interactions constrains Points passed to its
+     * Gets whether the Drag Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point
@@ -101,7 +101,7 @@ export module Interactions {
      */
     public constrainToComponent(): boolean;
     /**
-     * Sets whether or not this Interactions constrains Points passed to its
+     * Sets whether the Drag Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point

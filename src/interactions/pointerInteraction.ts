@@ -50,7 +50,7 @@ export module Interactions {
     }
 
     /**
-     * Sets a callback to be called when the pointer enters the Component.
+     * Adds a callback to be called when the pointer enters the Component.
      *
      * @param {PointerCallback} callback
      * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -72,7 +72,7 @@ export module Interactions {
     }
 
     /**
-     * Sets a callback to be called when the pointer moves within the Component.
+     * Adds a callback to be called when the pointer moves within the Component.
      *
      * @param {PointerCallback} callback
      * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -94,7 +94,7 @@ export module Interactions {
     }
 
     /**
-     * Sets a callback to be called when the pointer exits the Component.
+     * Adds a callback to be called when the pointer exits the Component.
      *
      * @param {PointerCallback} callback
      * @return {Interactions.Pointer} The calling Pointer Interaction.

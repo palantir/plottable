@@ -23,14 +23,12 @@ export module Interactions {
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
     /**
-     * Creates a PanZoom Interaction.
-     *
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
      *
      * @constructor
-     * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-     * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+     * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
+     * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();

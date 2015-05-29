@@ -9081,7 +9081,7 @@ var Plottable;
                 this._clickedDown = false;
             };
             /**
-             * Adds a callback to be called called when the Component is clicked.
+             * Adds a callback to be called when the Component is clicked.
              *
              * @param {ClickCallback} callback
              * @return {Interactions.Click} The calling Click Interaction.
@@ -9261,7 +9261,7 @@ var Plottable;
                 }
             };
             /**
-             * Sets a callback to be called when the key with the given keyCode is
+             * Adds a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode
@@ -9349,7 +9349,7 @@ var Plottable;
                 }
             };
             /**
-             * Sets a callback to be called when the pointer enters the Component.
+             * Adds a callback to be called when the pointer enters the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -9369,7 +9369,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets a callback to be called when the pointer moves within the Component.
+             * Adds a callback to be called when the pointer moves within the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -9389,7 +9389,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Sets a callback to be called when the pointer exits the Component.
+             * Adds a callback to be called when the pointer exits the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -9428,14 +9428,12 @@ var Plottable;
         var PanZoom = (function (_super) {
             __extends(PanZoom, _super);
             /**
-             * Creates a PanZoom Interaction.
-             *
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
              */
             function PanZoom(xScale, yScale) {
                 var _this = this;

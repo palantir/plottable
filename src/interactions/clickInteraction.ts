@@ -60,7 +60,7 @@ export module Interactions {
     }
 
     /**
-     * Adds a callback to be called called when the Component is clicked.
+     * Adds a callback to be called when the Component is clicked.
      *
      * @param {ClickCallback} callback
      * @return {Interactions.Click} The calling Click Interaction.

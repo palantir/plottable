@@ -3534,7 +3534,7 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Adds a callback to be called called when the Component is clicked.
+             * Adds a callback to be called when the Component is clicked.
              *
              * @param {ClickCallback} callback
              * @return {Interactions.Click} The calling Click Interaction.
@@ -3583,7 +3583,7 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets a callback to be called when the key with the given keyCode is
+             * Adds a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
              * @param {number} keyCode
@@ -3612,7 +3612,7 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets a callback to be called when the pointer enters the Component.
+             * Adds a callback to be called when the pointer enters the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -3626,7 +3626,7 @@ declare module Plottable {
              */
             offPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Sets a callback to be called when the pointer moves within the Component.
+             * Adds a callback to be called when the pointer moves within the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -3640,7 +3640,7 @@ declare module Plottable {
              */
             offPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Sets a callback to be called when the pointer exits the Component.
+             * Adds a callback to be called when the pointer exits the Component.
              *
              * @param {PointerCallback} callback
              * @return {Interactions.Pointer} The calling Pointer Interaction.
@@ -3666,14 +3666,12 @@ declare module Plottable {
              */
             static PIXELS_PER_LINE: number;
             /**
-             * Creates a PanZoom Interaction.
-             *
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
@@ -3690,7 +3688,7 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Returns whether or not this Interactions constrains Points passed to its
+             * Gets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
              *
              * If true, when the user drags outside of the Component, the closest Point
@@ -3701,7 +3699,7 @@ declare module Plottable {
              */
             constrainToComponent(): boolean;
             /**
-             * Sets whether or not this Interactions constrains Points passed to its
+             * Sets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
              *
              * If true, when the user drags outside of the Component, the closest Point
