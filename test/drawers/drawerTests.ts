@@ -19,7 +19,7 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-class MockDrawer extends Plottable.Drawers.AbstractDrawer {
+class MockDrawer extends Plottable.Drawer {
   public _drawStep(step: Plottable.Drawers.DrawStep) {
     step.animator.animate(this._getRenderArea(), step.attrToProjector);
   }
@@ -91,7 +91,7 @@ describe("Drawers", () => {
 
     it("_getSelection", () => {
       var svg = TestMethods.generateSVG(300, 300);
-      var drawer = new Plottable.Drawers.AbstractDrawer(null);
+      var drawer = new Plottable.Drawer(null);
       drawer.setup(svg.append("g"));
       (<any> drawer)._getSelector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];

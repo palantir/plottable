@@ -15,7 +15,7 @@ function run(svg, data, Plottable) {
 
   var ds = new Plottable.Dataset(data, { foo: "!" });
 
-  var plot = new Plottable.Plots.Bar(xScale, yScale, "vertical")
+  var plot = new Plottable.Plots.Bar("vertical")
     .addDataset(ds)
     .x(function (d, i, dataset) { return d.name + dataset.metadata().foo; }, xScale)
     .y(function(d) { return d.y; }, yScale)
@@ -30,9 +30,16 @@ function run(svg, data, Plottable) {
 
   var pointer = new Plottable.Interactions.Pointer();
   pointer.onPointerMove(function(p) {
-    var cpd = plot.getClosestPlotData(p);
-    if (cpd.data.length > 0) {
-      title.text("" + cpd.data[0].name);
+    var datum;
+    if (typeof plot.entityNearest === "function") {
+      var nearestEntity = plot.entityNearest(p);
+      datum = nearestEntity != null ? nearestEntity.datum : null;
+    } else {
+      var cpd = plot.getClosestPlotData(p);
+      datum = cpd.data.length > 0 ? cpd.data[0] : null;
+    }
+    if (datum != null) {
+      title.text("" + datum.name);
     } else {
       title.text("Who?");
     }

@@ -61,7 +61,7 @@ function run(svg, data, Plottable) {
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-          var line_aapl = new Plottable.Plots.Line(xScale, yScale_aapl).animate(true)
+          var line_aapl = new Plottable.Plots.Line().animate(true)
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
@@ -71,7 +71,7 @@ function run(svg, data, Plottable) {
           } else {
             line_aapl.automaticallyAdjustYScaleOverVisiblePoints(true);
           }
-          var line_goog = new Plottable.Plots.Line(xScale, yScale_goog).animate(true)
+          var line_goog = new Plottable.Plots.Line().animate(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
@@ -93,7 +93,7 @@ function run(svg, data, Plottable) {
           var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plots.Bar(xScale, yScale_diff, "vertical").animate(true)
+          var bar_diff = new Plottable.Plots.Bar("vertical").animate(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["net change"]; }, yScale_diff)

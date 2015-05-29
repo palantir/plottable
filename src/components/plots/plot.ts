@@ -4,10 +4,13 @@ module Plottable {
 
   export module Plots {
 
-    export type PlotData = {
-      data: any[];
-      pixelPoints: Point[];
+    export type Entity = {
+      datum: any;
+      index: number;
+      dataset: Dataset;
+      position: Point;
       selection: D3.Selection;
+      plot: Plot;
     }
 
     export interface AccessorScaleBinding<D, R> {
@@ -23,7 +26,7 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _datasetToDrawer: Utils.Map<Dataset, Drawers.AbstractDrawer>;
+    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
@@ -41,21 +44,13 @@ module Plottable {
     protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
-     * Constructs a Plot.
-     *
-     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-     *
-     * A bare Plot has a DataSource and any number of projectors, which take
-     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
-     *
      * @constructor
-     * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
      */
     constructor() {
       super();
       this._clipPathEnabled = true;
       this.classed("plot", true);
-      this._datasetToDrawer = new Utils.Map<Dataset, Drawers.AbstractDrawer>();
+      this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
@@ -88,6 +83,8 @@ module Plottable {
     }
 
     /**
+     * Adds a Dataset to the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -112,8 +109,8 @@ module Plottable {
       drawer.setup(this._renderArea.append("g"));
     }
 
-    protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(dataset);
+    protected _getDrawer(dataset: Dataset): Drawer {
+      return new Drawer(dataset);
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -131,8 +128,29 @@ module Plottable {
       this.render();
     }
 
+    /**
+     * Gets the AccessorScaleBinding for a particular attribute.
+     * 
+     * @param {string} attr
+     */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+    /**
+     * Sets a particular attribute to a constant value or the result of an Accessor.
+     * 
+     * @param {string} attr
+     * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+     * @returns {Plot} The calling Plot.
+     */
     public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+    /**
+     * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the attribute values when autoDomain()-ing.
+     * 
+     * @param {string} attr
+     * @param {A|Accessor<A>} attrValue
+     * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+     * @returns {Plot} The calling Plot.
+     */
     public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
     public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
                    scale?: Scale<A, number | string>): any {
@@ -197,8 +215,6 @@ module Plottable {
 
     /**
      * Enables or disables animation.
-     *
-     * @param {boolean} enabled Whether or not to animate.
      */
     public animate(enabled: boolean) {
       this._animate = enabled;
@@ -313,17 +329,16 @@ module Plottable {
     }
 
     /**
-     * Get the animator associated with the specified Animator key.
+     * Get the Animator associated with the specified Animator key.
      *
-     * @return {PlotAnimator} The Animator for the specified key.
+     * @return {Animators.Plot}
      */
     public animator(animatorKey: string): Animators.Plot;
     /**
-     * Set the animator associated with the specified Animator key.
+     * Set the Animator associated with the specified Animator key.
      *
-     * @param {string} animatorKey The key for the Animator.
-     * @param {PlotAnimator} animator An Animator to be assigned to
-     * the specified key.
+     * @param {string} animatorKey
+     * @param {Animators.Plot} animator
      * @returns {Plot} The calling Plot.
      */
     public animator(animatorKey: string, animator: Animators.Plot): Plot;
@@ -337,6 +352,8 @@ module Plottable {
     }
 
     /**
+     * Removes a Dataset from the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -367,7 +384,7 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
+    protected _getDrawersInOrder(): Drawer[] {
       return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
     }
 
@@ -400,20 +417,13 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the Selections of this Plot for the specified Datasets.
+     * Retrieves Selections of this Plot for the specified Datasets.
      *
-     * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-     * If not provided, all selections will be retrieved.
-     * @param {boolean} exclude If set to true, all Datasets will be queried excluding the Datasets referenced
-     * in the previous argument (default = false).
-     * @returns {D3.Selection} The retrieved Selections.
+     * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+     *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+     * @returns {D3.Selection}
      */
-    public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
-
-      if (exclude) {
-        datasets = this.datasets().filter((dataset) => datasets.indexOf(dataset) === -1);
-      }
-
+    public getAllSelections(datasets = this.datasets()): D3.Selection {
       var allSelections: EventTarget[] = [];
 
       datasets.forEach((dataset) => {
@@ -428,68 +438,56 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the PlotData of this plot for the specified dataset(s)
+     * Gets the Entities associated with the specified Datasets.
      *
-     * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
-     * If not provided, all PlotData will be retrieved.
-     * @returns {PlotData} The retrieved PlotData.
+     * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+     *   If not provided, returns defaults to all Datasets on the Plot.
+     * @return {Plots.Entity[]}
      */
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
-
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities: Plots.Entity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        if (drawer == null) { return; }
         dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = this._pixelPoint(datum, index, dataset);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+          var position = this._pixelPoint(datum, index, dataset);
+          if (position.x !== position.x || position.y !== position.y) {
             return;
           }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-          allElements.push(drawer._getSelection(index).node());
+          entities.push({
+            datum: datum,
+            index: index,
+            dataset: dataset,
+            position: position,
+            selection: drawer._getSelection(index),
+            plot: this
+          });
         });
       });
-
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return entities;
     }
 
     /**
-     * Retrieves PlotData with the lowest distance, where distance is defined
-     * to be the Euclidiean norm.
+     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
      *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
-    public getClosestPlotData(queryPoint: Point): Plots.PlotData {
+    public entityNearest(queryPoint: Point): Plots.Entity {
       var closestDistanceSquared = Infinity;
-      var closestIndex: number;
-      var plotData = this.getAllPlotData();
-      plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-        var datum = plotData.data[index];
-        var selection = d3.select(plotData.selection[0][index]);
-
-        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+      var closest: Plots.Entity;
+      this.entities().forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
-        var distance = Utils.Methods.distanceSquared(pixelPoint, queryPoint);
-        if (distance < closestDistanceSquared) {
-          closestDistanceSquared = distance;
-          closestIndex = index;
+        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        if (distanceSquared < closestDistanceSquared) {
+          closestDistanceSquared = distanceSquared;
+          closest = entity;
         }
       });
 
-      if (closestIndex == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
-      }
-
-      return {data: [plotData.data[closestIndex]],
-              pixelPoints: [plotData.pixelPoints[closestIndex]],
-              selection: d3.select(plotData.selection[0][closestIndex])};
+      return closest;
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {

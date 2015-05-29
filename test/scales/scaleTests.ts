@@ -68,7 +68,7 @@ describe("Scales", () => {
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
-    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
+    var barPlot = new Plottable.Plots.Bar();
     barPlot.addDataset(dataset);
     barPlot.x((d: any) => d.x, xScale);
     barPlot.y((d: any) => d.y, yScale);
