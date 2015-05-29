@@ -504,8 +504,7 @@ var Plottable;
             Set.prototype._setSize = function (size) {
                 Object.defineProperty(this, "size", {
                     value: this._values.length,
-                    configurable: true,
-                    writable: false
+                    configurable: true
                 });
             };
             Set.prototype.has = function (value) {

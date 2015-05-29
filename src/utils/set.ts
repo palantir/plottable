@@ -37,8 +37,7 @@ module Plottable {
       private _setSize(size: number) {
         Object.defineProperty(this, "size", {
           value: this._values.length,
-          configurable: true,
-          writable: false
+          configurable: true
         });
       }
 
