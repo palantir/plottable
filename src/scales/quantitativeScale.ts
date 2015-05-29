@@ -135,7 +135,6 @@ module Plottable {
       return this;
     }
 
-
     /**
      * Gets the padding proportion.
      */
