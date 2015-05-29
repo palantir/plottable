@@ -19,7 +19,7 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-class MockDrawer extends Plottable.Drawers.AbstractDrawer {
+class MockDrawer extends Plottable.Drawer {
   public _drawStep(step: Plottable.Drawers.DrawStep) {
     step.animator.animate(this._getRenderArea(), step.attrToProjector);
   }
@@ -46,7 +46,7 @@ describe("Drawers", () => {
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = new MockDrawer("foo");
+      drawer = new MockDrawer(null);
       drawer.setup(svg);
     });
 
@@ -60,7 +60,7 @@ describe("Drawers", () => {
       var ds1: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a1};
       var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var steps = [ds1, ds2];
-      drawer.draw([], steps, null);
+      drawer.draw([], steps);
       assert.deepEqual(timings, [0, 0], "setTimeout called twice with 0 time both times");
     });
 
@@ -85,13 +85,13 @@ describe("Drawers", () => {
       var ds2: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a2};
       var ds3: Plottable.Drawers.DrawStep = {attrToProjector: {}, animator: a3};
       var steps = [ds1, ds2, ds3];
-      drawer.draw([], steps, null);
+      drawer.draw([], steps);
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
     });
 
     it("_getSelection", () => {
       var svg = TestMethods.generateSVG(300, 300);
-      var drawer = new Plottable.Drawers.AbstractDrawer("test");
+      var drawer = new Plottable.Drawer(null);
       drawer.setup(svg.append("g"));
       (<any> drawer)._getSelector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];

@@ -84,10 +84,6 @@ svg.plottable {
   font-weight: bold;
 }
 
-.plottable .text-label-vertical {
-  writing-mode: tb;
-}
-
 .plottable .axis line.baseline {
   stroke: #CCC;
   stroke-width: 1px;
@@ -108,10 +104,6 @@ svg.plottable {
 
 .plottable .bar-plot .baseline {
   stroke: #999;
-}
-
-.bar-plot .render-area rect.not-hovered {
-  opacity: 0.5;
 }
 
 .plottable .gridlines line {
@@ -155,20 +147,8 @@ svg.plottable {
   line-height: normal;
 }
 
-.plottable .legend .toggled-off circle {
-  fill: #d3d3d3;
-}
-
 .plottable .interpolated-color-legend rect.swatch-bounding-box {
   fill: none;
   stroke: #CCC;
   stroke-width: 1px;
-}
-
-.plottable .plot.toggled-on {
-  visibility:visible;
-}
-
-.plottable .plot.toggled-off {
-  visibility:hidden;
 }

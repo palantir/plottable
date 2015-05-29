@@ -155,9 +155,11 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
+      var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
+      var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
+
       // Create mock drawers with already drawn items
-      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+      var mockDrawer1 = new Plottable.Drawer(dataset1);
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
@@ -165,23 +167,20 @@ describe("Plots", () => {
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+      var mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "_0") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
       plot.addDataset(dataset2);
       plot.renderTo(svg);
 
@@ -195,19 +194,17 @@ describe("Plots", () => {
       var oneElementSelection = plot.getAllSelections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
-
-      var nonExcludedSelection = plot.getAllSelections([dataset1], true);
-      assert.strictEqual(nonExcludedSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 
-    it("getAllPlotData() with dataset retrieval", () => {
+    it("entities() with dataset retrieval", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
+      var dataset1 = new Plottable.Dataset(data1);
+      var dataset2 = new Plottable.Dataset(data2);
 
       var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
       var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
@@ -216,106 +213,111 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("_0");
+      var mockDrawer1 = new Plottable.Drawer(dataset1);
       var renderArea1 = svg.append("g");
-      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
-      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      // HACKHACK #1984: Dataset keys are being removed, so this is the internal key
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("_1");
+      var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      var mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "_0") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      var dataset1 = new Plottable.Dataset(data1);
       plot.addDataset(dataset1);
-      var dataset2 = new Plottable.Dataset(data2);
       plot.addDataset(dataset2);
+
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
+          return data1PointConverter(datum, index);
+        } else {
+          return data2PointConverter(datum, index);
+        }
+      };
+
       plot.renderTo(svg);
 
-      var allPlotData = plot.getAllPlotData();
-      assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
-      assert.includeMembers(allPlotData.data, data1, "includes data1 members");
-      assert.includeMembers(allPlotData.data, data2, "includes data2 members");
-      assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
-      assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+      var entities = plot.entities();
+      assert.lengthOf(entities, data1.length + data2.length, "retrieved one Entity for each value on the Plot");
+      var entityData = entities.map((entity) => entity.datum);
+      assert.includeMembers(entityData, data1, "includes data1 members");
+      assert.includeMembers(entityData, data2, "includes data2 members");
+      var entityPositions = entities.map((entity) => entity.position);
+      assert.includeMembers(entityPositions, data1.map(data1PointConverter), "includes data1 points");
+      assert.includeMembers(entityPositions, data2.map(data2PointConverter), "includes data2 points");
 
-      var singlePlotData = plot.getAllPlotData([dataset1]);
-      var oneSelection = singlePlotData.selection;
-      assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
-      assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
-      assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+      entities = plot.entities([dataset1]);
+      assert.lengthOf(entities, data1.length, "retrieved one Entity for each value in dataset1");
+      assert.strictEqual(entities[0].selection.node(), renderArea1Selection.node(), "returns the selection associated with dataset1");
+      assert.includeMembers(entities.map((entity) => entity.datum), data1, "includes data1 members");
+      assert.includeMembers(entities.map((entity) => entity.position), data1.map(data1PointConverter), "includes data1 points");
 
-      var oneElementPlotData = plot.getAllPlotData([dataset2]);
-      var oneElementSelection = oneElementPlotData.selection;
-      assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
-      assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
-      assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+      entities = plot.entities([dataset2]);
+      assert.lengthOf(entities, data2.length, "retrieved one Entity for each value in dataset2");
+      assert.strictEqual(entities[0].selection.node(), renderArea2Selection.node(), "returns the selection associated with dataset1");
+      assert.includeMembers(entities.map((entity) => entity.datum), data2, "includes data1 members");
+      assert.includeMembers(entities.map((entity) => entity.position), data2.map(data2PointConverter), "includes data2 points");
       svg.remove();
     });
 
-    it("getAllPlotData() with NaN pixel points", () => {
+    it("entities() with NaN values", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data = [{value: NaN}, {value: 1}, {value: 2}];
+      var dataset = new Plottable.Dataset(data);
 
       var dataPoints = data.map((datum: any) => { return {x: datum.value, y: 10}; });
 
       var dataPointConverter = (datum: any, index: number) => dataPoints[index];
 
       // Create mock drawer with already drawn items
-      var mockDrawer = new Plottable.Drawers.AbstractDrawer("ds");
+      var mockDrawer = new Plottable.Drawer(dataset);
       var renderArea = svg.append("g");
       var circles = renderArea.selectAll("circles").data(data);
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       circles.exit().remove();
       (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
       (<any> mockDrawer)._getSelector = () => "circle";
-      (<any> mockDrawer)._getPixelPoint = dataPointConverter;
+
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        return dataPointConverter(datum, index);
+      };
 
       // Mock _getDrawer to return the mock drawer
       (<any> plot)._getDrawer = () => mockDrawer;
 
-      var dataset = new Plottable.Dataset(data);
       plot.addDataset(dataset);
       plot.renderTo(svg);
 
-      var oneElementPlotData = plot.getAllPlotData();
-      var oneElementSelection = oneElementPlotData.selection;
-      assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
-      assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
-      assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+      var entities = plot.entities();
+      assert.lengthOf(entities, 2, "returns Entities for all valid data values");
 
-      oneElementPlotData.pixelPoints.forEach((pixelPoint) => {
-        assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
-        assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+      entities.forEach((entity) => {
+        assert.isNumber(entity.position.x, "position X cannot be NaN");
+        assert.isNumber(entity.position.y, "position Y cannot be NaN");
       });
       svg.remove();
     });
 
-    it("getClosestPlotData", () => {
+    it("entityNearest()", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
       var data1 = [{value: 0}, {value: 1}, {value: 2}];
       var data2 = [{value: 0}, {value: 1}, {value: 2}];
+      var dataset1 = new Plottable.Dataset(data1);
+      var dataset2 = new Plottable.Dataset(data2);
 
       var data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
       var data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
@@ -324,36 +326,42 @@ describe("Plots", () => {
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      var mockDrawer1 = new Plottable.Drawers.AbstractDrawer("ds1");
+      var mockDrawer1 = new Plottable.Drawer(dataset1);
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
-      (<any> mockDrawer1)._getPixelPoint = data1PointConverter;
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      var mockDrawer2 = new Plottable.Drawers.AbstractDrawer("ds2");
+      var mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
-      (<any> mockDrawer2)._getPixelPoint = data2PointConverter;
 
       // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (key: string) => {
-        if (key === "ds1") {
+      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
           return mockDrawer1;
         } else {
           return mockDrawer2;
         }
       };
 
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
+      plot.addDataset(dataset1);
+      plot.addDataset(dataset2);
+
+      (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
+        if (dataset === dataset1) {
+          return data1PointConverter(datum, index);
+        } else {
+          return data2PointConverter(datum, index);
+        }
+      };
       plot.renderTo(svg);
 
       var queryPoint = {x: 1, y: 11};
-      var closestPlotData = plot.getClosestPlotData(queryPoint);
-      assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "retrieves the closest point across datasets");
+      var nearestEntity = plot.entityNearest(queryPoint);
+      assert.deepEqual(nearestEntity.position, {x: 1, y: 10}, "retrieves the closest point across datasets");
 
       svg.remove();
     });
@@ -391,8 +399,7 @@ describe("Plots", () => {
       var scale = new Plottable.Scales.Linear();
       plot2.attr("attr", (d) => d.a, scale);
       plot2.destroy();
-      var scaleCallbacks = (<any> scale)._callbacks.values();
-      assert.strictEqual(scaleCallbacks.length, 0, "the plot is no longer attached to the scale");
+      assert.strictEqual((<any> scale)._callbacks.size, 0, "the plot is no longer attached to the scale");
     });
 
     it("extent registration works as intended", () => {
@@ -440,7 +447,7 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y);
+      var plot = new Plottable.Plots.Bar();
       plot.addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {

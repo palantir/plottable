@@ -2,19 +2,15 @@
 
 module Plottable {
 export module Plots {
-  /*
-   * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
-   * One usecase is to show how much funding departments are given out of a total budget.
-   */
   export class Pie extends Plot {
 
     private static _INNER_RADIUS_KEY = "inner-radius";
     private static _OUTER_RADIUS_KEY = "outer-radius";
     private static _SECTOR_VALUE_KEY = "sector-value";
+    private _startAngles: number[];
+    private _endAngles: number[];
 
     /**
-     * Constructs a PiePlot.
-     *
      * @constructor
      */
     constructor() {
@@ -43,39 +39,85 @@ export module Plots {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
+      this._updatePieAngles();
       super.addDataset(dataset);
       return this;
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Arc(key).setClass("arc");
+    public removeDataset(dataset: Dataset) {
+      super.removeDataset(dataset);
+      this._startAngles = [];
+      this._endAngles = [];
+      return this;
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var allPlotData = super.getAllPlotData(datasets);
+    protected _onDatasetUpdate() {
+      super._onDatasetUpdate();
+      this._updatePieAngles();
+    }
 
-      allPlotData.pixelPoints.forEach((pixelPoint: Point) => {
-        pixelPoint.x = pixelPoint.x + this.width() / 2;
-        pixelPoint.y = pixelPoint.y + this.height() / 2;
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Arc(dataset).setClass("arc");
+    }
+
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities = super.entities(datasets);
+      entities.forEach((entity) => {
+        entity.position.x += this.width() / 2;
+        entity.position.y += this.height() / 2;
       });
-
-      return allPlotData;
+      return entities;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the sector value.
+     */
     public sectorValue<S>(): AccessorScaleBinding<S, number>;
+    /**
+     * Sets the sector value to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} sectorValue
+     * @returns {Pie} The calling Pie Plot.
+     */
     public sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the sector value to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {S|Accessor<S>} sectorValue
+     * @param {Scale<S, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
     public sectorValue<S>(sectorValue?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (sectorValue == null) {
         return this._propertyBindings.get(Pie._SECTOR_VALUE_KEY);
       }
       this._bindProperty(Pie._SECTOR_VALUE_KEY, sectorValue, scale);
+      this._updatePieAngles();
       this.render();
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the inner radius.
+     */
     public innerRadius<R>(): AccessorScaleBinding<R, number>;
+    /**
+     * Sets the inner radius to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} innerRadius
+     * @returns {Pie} The calling Pie Plot.
+     */
     public innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {R|Accessor<R>} innerRadius
+     * @param {Scale<R, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
     public innerRadius<R>(innerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (innerRadius == null) {
@@ -86,8 +128,25 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the outer radius.
+     */
     public outerRadius<R>(): AccessorScaleBinding<R, number>;
+    /**
+     * Sets the outer radius to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} outerRadius
+     * @returns {Pie} The calling Pie Plot.
+     */
     public outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {R|Accessor<R>} outerRadius
+     * @param {Scale<R, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
     public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (outerRadius == null) {
@@ -96,6 +155,60 @@ export module Plots {
       this._bindProperty(Pie._OUTER_RADIUS_KEY, outerRadius, scale);
       this.render();
       return this;
+    }
+
+    protected _propertyProjectors(): AttributeToProjector {
+      var attrToProjector = super._propertyProjectors();
+      var innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
+      var outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
+      attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
+        return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
+                           .outerRadius(outerRadiusAccessor(datum, index, ds))
+                           .startAngle(this._startAngles[index])
+                           .endAngle(this._endAngles[index])(datum, index);
+      };
+      return attrToProjector;
+    }
+
+    private _updatePieAngles() {
+      if (this.sectorValue() == null) { return; }
+      if (this.datasets().length === 0) { return; }
+      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var dataset = this.datasets()[0];
+      var data = dataset.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)));
+      var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      if (pie.some((slice) => slice.value < 0)) {
+        Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+      }
+      this._startAngles = pie.map((slice) => slice.startAngle);
+      this._endAngles = pie.map((slice) => slice.endAngle);
+    }
+
+    protected _getDataToDraw() {
+      var dataToDraw = super._getDataToDraw();
+      if (this.datasets().length === 0) { return dataToDraw; }
+      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var datasetKey = this._datasetKeysInOrder[0];
+      var data = dataToDraw.get(datasetKey);
+      var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+      var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
+      dataToDraw.set(datasetKey, filteredData);
+      return dataToDraw;
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
+      var innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+      var outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+      var avgRadius = (innerRadius + outerRadius) / 2;
+
+      var scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      var pie = d3.layout.pie()
+                         .sort(null)
+                         .value((d: any, i: number) => scaledValueAccessor(d, i, dataset))(dataset.data());
+      var startAngle = pie[index].startAngle;
+      var endAngle = pie[index].endAngle;
+      var avgAngle = (startAngle + endAngle) / 2;
+      return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
   }
 }

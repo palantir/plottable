@@ -9,22 +9,15 @@ export module Scales {
     private _untransformedDomain: number[];
 
     /**
-     * Creates a new Scale.ModifiedLog.
-     *
-     * A ModifiedLog scale acts as a regular log scale for large numbers.
-     * As it approaches 0, it gradually becomes linear. This means that the
-     * scale won't freak out if you give it 0 or a negative number, where an
-     * ordinary Log scale would.
-     *
-     * However, it does mean that scale will be effectively linear as values
-     * approach 0. If you want very small values on a log scale, you should use
-     * an ordinary Scale.Log instead.
+     * A ModifiedLog Scale acts as a regular log scale for large numbers.
+     * As it approaches 0, it gradually becomes linear.
+     * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
      *
      * @constructor
-     * @param {number} [base]
-     *        The base of the log. Defaults to 10, and must be > 1.
+     * @param {number} [base=10]
+     *        The base of the log. Must be > 1.
      *
-     *        For base <= x, scale(x) = log(x).
+     *        For x <= base, scale(x) = log(x).
      *
      *        For 0 < x < base, scale(x) will become more and more
      *        linear as it approaches 0.

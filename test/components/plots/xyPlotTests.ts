@@ -20,7 +20,7 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
-      plot = new Plottable.XYPlot(xScale, yScale);
+      plot = new Plottable.XYPlot<number, number>();
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)
@@ -102,11 +102,8 @@ describe("Plots", () => {
       plot.autorange("y");
       plot.destroy();
 
-      var xScaleCallbacks = (<any> xScale)._callbacks.values();
-      assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
-
-      var yScaleCallbacks = (<any> yScale)._callbacks.values();
-      assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
+      assert.strictEqual((<any> xScale)._callbacks.size, 0, "the plot is no longer attached to xScale");
+      assert.strictEqual((<any> yScale)._callbacks.size, 0, "the plot is no longer attached to yScale");
 
       svg.remove();
     });
