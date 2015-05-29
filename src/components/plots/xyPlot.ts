@@ -4,10 +4,9 @@ module Plottable {
   export class XYPlot<X, Y> extends Plot {
     protected static _X_KEY = "x";
     protected static _Y_KEY = "y";
-    private _autoAdjustXScaleDomain = false;
-    private _autoAdjustYScaleDomain = false;
-    private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
-    private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustYDomainCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustXDomainCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustingScaleType: string;
 
     /**
      * An XYPlot is a Plot that displays data along two primary directions, X and Y.
@@ -20,8 +19,8 @@ module Plottable {
       super();
       this.classed("xy-plot", true);
 
-      this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
-      this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
+      this._adjustYDomainCallback = (scale) => this._adjustYDomain();
+      this._adjustXDomainCallback = (scale) => this._adjustXDomain();
     }
 
     /**
@@ -49,12 +48,12 @@ module Plottable {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
       this._bindProperty(XYPlot._X_KEY, x, xScale);
-      if (this._autoAdjustYScaleDomain) {
+      if (this._adjustingScaleType === "y") {
         this._updateYExtentsAndAutodomain();
       }
 
       if (xScale != null) {
-        xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
+        xScale.onUpdate(this._adjustYDomainCallback);
       }
 
       this.render();
@@ -87,12 +86,12 @@ module Plottable {
       }
 
       this._bindProperty(XYPlot._Y_KEY, y, yScale);
-      if (this._autoAdjustXScaleDomain) {
+      if (this._adjustingScaleType === "x") {
         this._updateXExtentsAndAutodomain();
       }
 
       if (yScale != null) {
-        yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+        yScale.onUpdate(this._adjustXDomainCallback);
       }
 
       this.render();
@@ -100,9 +99,9 @@ module Plottable {
     }
 
     protected _filterForProperty(property: string) {
-      if (property === "x" && this._autoAdjustXScaleDomain) {
+      if (property === "x" && this._adjustingScaleType === "x") {
         return this._makeFilterByProperty("y");
-      } else if (property === "y" && this._autoAdjustYScaleDomain) {
+      } else if (property === "y" && this._adjustingScaleType === "y") {
         return this._makeFilterByProperty("x");
       }
       return null;
@@ -125,25 +124,25 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       super._uninstallScaleForKey(scale, key);
-      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                                 : this._adjustXDomainOnChangeFromYCallback;
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback
+                                                 : this._adjustXDomainCallback;
       scale.offUpdate(adjustCallback);
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       super._installScaleForKey(scale, key);
-      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
-                                                 : this._adjustXDomainOnChangeFromYCallback;
+      var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainCallback
+                                                 : this._adjustXDomainCallback;
       scale.onUpdate(adjustCallback);
     }
 
     public destroy() {
       super.destroy();
       if (this.x().scale) {
-        this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+        this.x().scale.offUpdate(this._adjustYDomainCallback);
       }
       if (this.y().scale) {
-        this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+        this.y().scale.offUpdate(this._adjustXDomainCallback);
       }
       return this;
     }
@@ -159,24 +158,26 @@ module Plottable {
      *
      * @returns {XYPlot} The calling XYPlot.
      */
-    public autorange(scaleName: string) {
-      switch (scaleName) {
+    public adjustingScaleType(): string;
+    public adjustingScaleType(adjustingScaleType: string): XYPlot<X, Y>;
+    public adjustingScaleType(adjustingScaleType?: string): any {
+      if (adjustingScaleType == null) {
+        return this._adjustingScaleType;
+      }
+      switch (adjustingScaleType) {
         case "x":
-          this._autoAdjustXScaleDomain = true;
-          this._autoAdjustYScaleDomain = false;
-          this._adjustXDomainOnChangeFromY();
+          this._adjustingScaleType = adjustingScaleType;
+          this._adjustXDomain();
           break;
         case "y":
-          this._autoAdjustXScaleDomain = false;
-          this._autoAdjustYScaleDomain = true;
-          this._adjustYDomainOnChangeFromX();
+          this._adjustingScaleType = adjustingScaleType;
+          this._adjustYDomain();
           break;
         case "none":
-          this._autoAdjustXScaleDomain = false;
-          this._autoAdjustYScaleDomain = false;
+          this._adjustingScaleType = adjustingScaleType;
           break;
         default:
-          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+          throw new Error("Invalid scale name '" + adjustingScaleType + "', must be 'x', 'y' or 'none'");
       }
       return this;
     }
@@ -228,15 +229,15 @@ module Plottable {
       return this;
     }
 
-    private _adjustYDomainOnChangeFromX() {
+    private _adjustYDomain() {
       if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustYScaleDomain) {
+      if (this._adjustingScaleType === "y") {
         this._updateYExtentsAndAutodomain();
       }
     }
-    private _adjustXDomainOnChangeFromY() {
+    private _adjustXDomain() {
       if (!this._projectorsReady()) { return; }
-      if (this._autoAdjustXScaleDomain) {
+      if (this._adjustingScaleType === "x") {
         this._updateXExtentsAndAutodomain();
       }
     }
