@@ -13,10 +13,10 @@ export module Dispatchers {
     private _cancelCallbacks: Utils.CallbackSet<TouchCallback>;
 
     /**
-     * Gets a Dispatchers.Touch for the <svg> containing elem.
+     * Gets a Touch Dispatcher for the <svg> containing elem.
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
-     * @param {SVGElement} elem A svg DOM element.
+     * @param {SVGElement} elem
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
@@ -31,9 +31,9 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatchers.Touch.
      * This constructor should not be invoked directly.
      *
+     * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
     constructor(svg: SVGElement) {
@@ -54,7 +54,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a touch starts.
+     * Registers a callback to be called when a touch starts.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -65,7 +65,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a touch starts.
+     * Removes a callback that would be called when a touch starts.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -76,7 +76,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever the touch position changes.
+     * Registers a callback to be called when the touch position changes.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -87,7 +87,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever the touch position changes.
+     * Removes a callback that would be called when the touch position changes.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -98,7 +98,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a touch ends.
+     * Registers a callback to be called when a touch ends.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -109,7 +109,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a touch ends.
+     * Removes a callback that would be called when a touch ends.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -120,7 +120,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a touch is cancelled.
+     * Registers a callback to be called when a touch is cancelled.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
@@ -131,7 +131,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a touch is cancelled.
+     * Removes a callback that would be called when a touch is cancelled.
      *
      * @param {TouchCallback} callback
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.

@@ -9,7 +9,7 @@ export module Dispatchers {
     private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
 
     /**
-     * Gets a Dispatchers.Key. If one already exists it will be returned;
+     * Gets a Key Dispatcher. If one already exists it will be returned;
      * otherwise, a new one will be created.
      *
      * @return {Dispatchers.Key}
@@ -24,8 +24,9 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatchers.Key.
-     * This constructor not be invoked directly.
+     * This constructor should not be invoked directly.
+     * 
+     * @constructor
      */
     constructor() {
       super();

@@ -16,10 +16,10 @@ export module Dispatchers {
     private _dblClickCallbacks: Utils.CallbackSet<MouseCallback>;
 
     /**
-     * Get a Dispatcher.Mouse for the <svg> containing elem.
+     * Get a Mouse Dispatcher for the <svg> containing elem.
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      *
-     * @param {SVGElement} elem A svg DOM element.
+     * @param {SVGElement} elem
      * @return {Dispatchers.Mouse}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
@@ -34,9 +34,9 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatchers.Mouse.
      * This constructor not be invoked directly.
      *
+     * @constructor
      * @param {SVGElement} svg The root <svg> to attach to.
      */
     constructor(svg: SVGElement) {
@@ -65,7 +65,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever the mouse position changes.
+     * Registers a callback to be called when the mouse position changes.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -76,7 +76,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever the mouse position changes.
+     * Removes a callback that would be called when the mouse position changes.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -87,7 +87,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a mousedown occurs.
+     * Registers a callback to be called when a mousedown occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -98,7 +98,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a mousedown occurs.
+     * Removes a callback that would be called when a mousedown occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -109,7 +109,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a mouseup occurs.
+     * Registers a callback to be called when a mouseup occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -120,7 +120,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a mouseup occurs.
+     * Removes a callback that would be called when a mouseup occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -131,7 +131,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a wheel event occurs.
+     * Registers a callback to be called when a wheel event occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -142,7 +142,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a wheel event occurs.
+     * Removes a callback that would be called when a wheel event occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -153,7 +153,7 @@ export module Dispatchers {
     }
 
     /**
-     * Registers a callback to be called whenever a dblClick occurs.
+     * Registers a callback to be called when a dblClick occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -164,7 +164,7 @@ export module Dispatchers {
     }
 
     /**
-     * Removes a callback to be called whenever a dblClick occurs.
+     * Removes a callback that would be called when a dblClick occurs.
      *
      * @param {MouseCallback} callback
      * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
@@ -187,9 +187,9 @@ export module Dispatchers {
     }
 
     /**
-     * Returns the last computed mouse position.
+     * Returns the last computed mouse position in <svg> coordinate space.
      *
-     * @return {Point} The last known mouse position in <svg> coordinate space.
+     * @return {Point}
      */
     public getLastMousePosition() {
       return this._lastMousePosition;
