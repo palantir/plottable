@@ -44,17 +44,17 @@ function run(svg, data, Plottable) {
   };
 
   //rendering
-  var scatterPlot = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries1);
+  var scatterPlot = new Plottable.Plots.Scatter().addDataset(dataseries1);
   scatterPlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-  var linePlot = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries2);
+  var linePlot = new Plottable.Plots.Line().addDataset(dataseries2);
   linePlot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-  var renderApple = new Plottable.Plots.Area(xScale, yScale).addDataset(dataseries3);
+  var renderApple = new Plottable.Plots.Area().addDataset(dataseries3);
   renderApple.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-  var renderBanana = new Plottable.Plots.Line(xScale, yScale).addDataset(dataseries4);
+  var renderBanana = new Plottable.Plots.Line().addDataset(dataseries4);
   renderBanana.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-  var renderOrange = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries5);
+  var renderOrange = new Plottable.Plots.Scatter().addDataset(dataseries5);
   renderOrange.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-  var renderGrape = new Plottable.Plots.Scatter(xScale, yScale).addDataset(dataseries6);
+  var renderGrape = new Plottable.Plots.Scatter().addDataset(dataseries6);
   renderGrape.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
   scatterPlot.attr("fill", colorProjector, colorScale1);
@@ -109,17 +109,17 @@ function run(svg, data, Plottable) {
   twoPlots();
 
   //title + legend
-  var title1 = new Plottable.Components.Label( "Two Data Series", "horizontal").classed("title-label", true);
+  var title1 = new Plottable.Components.Label( "Two Data Series", 0).classed("title-label", true);
   var legend1 = new Plottable.Components.Legend(colorScale1);
   legend1.maxEntriesPerRow(1);
   var titleTable = new Plottable.Components.Table([[title1, legend1]]);
 
-  var noTitleLabel  = new Plottable.Components.Label("no title", "horizontal");
-  var shortTitleLabel  = new Plottable.Components.Label("tiny title", "horizontal");
-  var longTitleLabel  = new Plottable.Components.Label("long title", "horizontal");
-  var noPlotsLabel  = new Plottable.Components.Label("no plots", "horizontal");
-  var shortLegendLabel  = new Plottable.Components.Label("two plots", "horizontal");
-  var tallLegendLabel  = new Plottable.Components.Label("six plots", "horizontal");
+  var noTitleLabel  = new Plottable.Components.Label("no title", 0);
+  var shortTitleLabel  = new Plottable.Components.Label("tiny title", 0);
+  var longTitleLabel  = new Plottable.Components.Label("long title", 0);
+  var noPlotsLabel  = new Plottable.Components.Label("no plots", 0);
+  var shortLegendLabel  = new Plottable.Components.Label("two plots", 0);
+  var tallLegendLabel  = new Plottable.Components.Label("six plots", 0);
 
   var labelTable = new Plottable.Components.Table([[noTitleLabel, noPlotsLabel],
     [shortTitleLabel, shortLegendLabel],

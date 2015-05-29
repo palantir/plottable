@@ -50,7 +50,7 @@ export module Interactions {
     private _handleClickDown(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
-        if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+        if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
           this._clickState = ClickState.NotClicked;
         }
         this._clickedPoint = translatedP;
@@ -60,7 +60,7 @@ export module Interactions {
 
     private _handleClickUp(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
-      if (this._clickedDown && DoubleClick.pointsEqual(translatedP, this._clickedPoint)) {
+      if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
         this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
       } else {
         this._clickState = ClickState.NotClicked;
@@ -80,15 +80,15 @@ export module Interactions {
       this._clickedDown = false;
     }
 
-    private static pointsEqual(p1: Point, p2: Point) {
+    private static _pointsEqual(p1: Point, p2: Point) {
       return p1.x === p2.x && p1.y === p2.y;
     }
 
     /**
-     * Sets the callback called when the Component is double-clicked.
+     * Adds a callback to be called when the Component is double-clicked.
      *
-     * @param {ClickCallback} callback The callback to set.
-     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     * @param {ClickCallback} callback
+     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
      */
     public onDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.add(callback);
@@ -96,10 +96,10 @@ export module Interactions {
     }
 
     /**
-     * Removes the callback called when the Component is double-clicked.
+     * Removes a callback that would be called when the Component is double-clicked.
      *
-     * @param {ClickCallback} callback The callback to remove.
-     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     * @param {ClickCallback} callback
+     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
      */
     public offDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.delete(callback);

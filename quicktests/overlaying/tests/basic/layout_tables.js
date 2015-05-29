@@ -23,14 +23,14 @@ function run(svg, data, Plottable) {
 
     //test Component constructor (default, should be no issues)
 
-    var renderAreaD0 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset1);
+    var renderAreaD0 = new Plottable.Plots.Line().addDataset(dataset1);
     renderAreaD0.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-    var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale).addDataset(dataset2)
+    var renderAreaD1 = new Plottable.Plots.Line().addDataset(dataset2)
                                       .attr( "stroke", d3.functor("red"));
     renderAreaD1.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-    var renderAreaD2 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset1);
+    var renderAreaD2 = new Plottable.Plots.Area().addDataset(dataset1);
     renderAreaD2.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
-    var renderAreaD3 = new Plottable.Plots.Area(xScale, yScale).addDataset(dataset2)
+    var renderAreaD3 = new Plottable.Plots.Area().addDataset(dataset2)
                                       .attr( "fill", d3.functor("red"));
     renderAreaD3.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
@@ -55,8 +55,8 @@ function run(svg, data, Plottable) {
 
     var bigtable = new Plottable.Components.Table();
 
-    var line1 = new Plottable.Components.Label("Tables in Tables", "horizontal");
-    var line2 = new Plottable.Components.Label("for Dan", "horizontal");
+    var line1 = new Plottable.Components.Label("Tables in Tables", 0);
+    var line2 = new Plottable.Components.Label("for Dan", 0);
 
     bigtable = new Plottable.Components.Table().add(basicTable0, 0, 0)
                                           .add(basicTable1, 0, 2)

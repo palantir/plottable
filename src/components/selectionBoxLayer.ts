@@ -31,15 +31,13 @@ export module Components {
     }
 
     /**
-     * Gets the bounds of the box.
-     *
-     * @return {Bounds} The current bounds of the box.
+     * Gets the Bounds of the box.
      */
     public bounds(): Bounds;
     /**
-     * Sets the bounds of the box, and draws the box.
+     * Sets the Bounds of the box.
      *
-     * @param {Bounds} newBounds The desired bounds of the box.
+     * @param {Bounds} newBounds
      * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
     public bounds(newBounds: Bounds): SelectionBoxLayer;
@@ -87,8 +85,6 @@ export module Components {
 
     /**
      * Gets whether the box is being shown.
-     *
-     * @return {boolean} Whether the box is showing.
      */
     public boxVisible(): boolean;
     /**

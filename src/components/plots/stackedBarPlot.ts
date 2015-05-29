@@ -7,21 +7,23 @@ export module Plots {
     private _stackedExtent: number[];
 
     /**
-     * Constructs a StackedBar plot.
-     * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
-     * other.
+     * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
+     *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
+     *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
+     *
      * @constructor
-     * @param {Scale} xScale the x scale of the plot.
-     * @param {Scale} yScale the y scale of the plot.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {Scale} xScale
+     * @param {Scale} yScale
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale, orientation);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super(orientation);
+      this.classed("stacked-bar-plot", true);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getAnimator(key: string): Animators.Plot {
       if (this._animate && this._animateOnNextRender) {
         if (this.animator(key)) {
           return this.animator(key);
@@ -35,6 +37,9 @@ export module Plots {
       return new Animators.Null();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedBar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -49,6 +54,9 @@ export module Plots {
       return this;
     }
 
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): StackedBar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();
@@ -119,24 +127,13 @@ export module Plots {
         return;
       }
 
-      var orientation = this._isVertical ? "vertical" : "horizontal";
-      var keyAccessor = StackedPlotUtils.keyAccessor(this, orientation);
-      var valueAccessor = StackedPlotUtils.valueAccessor(this, orientation);
-
-      var datasetKeys = this._datasetKeysInOrder;
-      var keyToPlotDatasetKey = this._key2PlotDatasetKey;
+      var datasets = this.datasets();
+      var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+      var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      var stackOffsets = StackedPlotUtils.computeStackOffsets.call(this, keyAccessor, valueAccessor, datasetKeys, keyToPlotDatasetKey);
-
-      for (var datasetKey in stackOffsets) {
-        if (!stackOffsets.hasOwnProperty(datasetKey)) {
-          continue;
-        }
-        this._stackOffsets.set(keyToPlotDatasetKey.get(datasetKey).dataset, stackOffsets[datasetKey]);
-      }
-
-      this._stackedExtent = StackedPlotUtils.computeStackExtents(keyAccessor, valueAccessor, this.datasets(), this._stackOffsets, filter);
+      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
     }
   }
 }

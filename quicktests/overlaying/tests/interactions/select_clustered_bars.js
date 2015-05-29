@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-  var barPlot = new Plottable.Plots.ClusteredBar(xScale, yScale)
+  var barPlot = new Plottable.Plots.ClusteredBar()
                                   .addDataset(new Plottable.Dataset(data[0]))
                                   .addDataset(new Plottable.Dataset(data[1]))
                                   .addDataset(new Plottable.Dataset(data[2]))
@@ -31,11 +31,11 @@ function run(svg, data, Plottable) {
   var clickInteraction = new Plottable.Interactions.Click();
   clickInteraction.attachTo(barPlot);
   clickInteraction.onClick(function (p) {
-    var bars = barPlot.getBars(p.x, p.y, true);
-    if (bars == null) {
+    var bars = barPlot.entitiesAt(p);
+    if (bars.length === 0) {
       barPlot.getAllSelections().style("fill", null);
     } else {
-      bars.style("fill", "red");
+      bars.forEach(function(bar) { bar.selection.style("fill", "red"); });
     }
   });
 

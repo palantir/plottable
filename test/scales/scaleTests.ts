@@ -68,7 +68,7 @@ describe("Scales", () => {
     var dB = {x: "B", y: 2};
     var dC = {x: "C", y: 2};
     var dataset = new Plottable.Dataset([dA, dB]);
-    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
+    var barPlot = new Plottable.Plots.Bar();
     barPlot.addDataset(dataset);
     barPlot.x((d: any) => d.x, xScale);
     barPlot.y((d: any) => d.y, yScale);
@@ -171,7 +171,7 @@ describe("Scales", () => {
       maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
       var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
-      var maximumColorsFromCss = (<any> Plottable.Scales.Color).MAXIMUM_COLORS_FROM_CSS;
+      var maximumColorsFromCss = (<any> Plottable.Scales.Color)._MAXIMUM_COLORS_FROM_CSS;
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");
     });

@@ -13,14 +13,10 @@ export module Plots {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("scatter-plot", true);
-
-      this.animator("symbols-reset", new Animators.Null());
-      this.animator("symbols", new Animators.Base()
-                                           .duration(250)
-                                           .delay(5));
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(250).delay(5));
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
@@ -28,8 +24,8 @@ export module Plots {
       this.symbol(() => circleSymbolFactory);
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Symbol(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Symbol(dataset);
     }
 
     public size<S>(): AccessorScaleBinding<S, number>;
@@ -40,7 +36,7 @@ export module Plots {
         return this._propertyBindings.get(Scatter._SIZE_KEY);
       }
       this._bindProperty(Scatter._SIZE_KEY, size, scale);
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -51,7 +47,7 @@ export module Plots {
         return this._propertyBindings.get(Scatter._SYMBOL_KEY);
       }
       this._propertyBindings.set(Scatter._SYMBOL_KEY, { accessor: symbol });
-      this.renderImmediately();
+      this.render();
       return this;
     }
 
@@ -60,10 +56,10 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["d"] = () => "";
-        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator("symbols-reset")});
+        drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("symbols")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 
@@ -86,17 +82,15 @@ export module Plots {
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
 
-      var xProjector = propertyToProjectors[XYPlot._X_KEY];
-      var yProjector = propertyToProjectors[XYPlot._Y_KEY];
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
 
-      var sizeProjector = propertyToProjectors[Scatter._SIZE_KEY];
-      delete propertyToProjectors[Scatter._SIZE_KEY];
+      var sizeProjector = Plot._scaledAccessor(this.size());
 
       propertyToProjectors["transform"] = (datum: any, index: number, dataset: Dataset) =>
         "translate(" + xProjector(datum, index, dataset) + "," + yProjector(datum, index, dataset) + ")";
 
-      var symbolProjector = propertyToProjectors[Scatter._SYMBOL_KEY];
-      delete propertyToProjectors[Scatter._SYMBOL_KEY];
+      var symbolProjector = Plot._scaledAccessor(this.symbol());
 
       propertyToProjectors["d"] = (datum: any, index: number, dataset: Dataset) =>
         symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));

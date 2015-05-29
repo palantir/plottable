@@ -5,26 +5,20 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
     /**
-     * Constructs a LinePlot.
-     *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale
+     * @param {QuantitativeScale} yScale
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("line-plot", true);
-      this.animator("reset", new Animators.Null());
-      this.animator("main", new Animators.Base()
-                                         .duration(600)
-                                         .easing("exp-in-out"));
-
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(key: string) {
-      return new Plottable.Drawers.Line(key);
+    protected _getDrawer(dataset: Dataset) {
+      return new Plottable.Drawers.Line(dataset);
     }
 
     protected _getResetYFunction() {
@@ -43,21 +37,19 @@ export module Plots {
       var drawSteps: Drawers.DrawStep[] = [];
       if (this._dataChanged && this._animate) {
         var attrToProjector = this._generateAttrToProjector();
-        attrToProjector["y"] = this._getResetYFunction();
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
 
       return drawSteps;
     }
 
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
-      var wholeDatumAttributes = this._wholeDatumAttributes();
-      var isSingleDatumAttr = (attr: string) => wholeDatumAttributes.indexOf(attr) === -1;
-      var singleDatumAttributes = d3.keys(attrToProjector).filter(isSingleDatumAttr);
-      singleDatumAttributes.forEach((attribute: string) => {
+      Object.keys(attrToProjector).forEach((attribute: string) => {
+        if (attribute === "d") { return; }
         var projector = attrToProjector[attribute];
         attrToProjector[attribute] = (data: any[], i: number, dataset: Dataset) =>
           data.length > 0 ? projector(data[0], i, dataset) : null;
@@ -66,89 +58,60 @@ export module Plots {
       return attrToProjector;
     }
 
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined"];
-    }
+    /**
+     * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+     *
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     */
+    public entityNearest(queryPoint: Point): Plots.Entity {
+      var minXDist = Infinity;
+      var minYDist = Infinity;
+      var closest: Plots.Entity;
+      this.entities().forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+          return;
+        }
+        var xDist = Math.abs(queryPoint.x - entity.position.x);
+        var yDist = Math.abs(queryPoint.y - entity.position.y);
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
-
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
-            return;
-          }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-        });
-
-        if (plotDatasetKey.dataset.data().length > 0) {
-          allElements.push(drawer._getSelection(0).node());
+        if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
+          closest = entity;
+          minXDist = xDist;
+          minYDist = yDist;
         }
       });
 
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return closest;
     }
 
-    /**
-     * Retrieves the closest PlotData to queryPoint.
-     *
-     * Lines implement an x-dominant notion of distance; points closest in x are
-     * tie-broken by y distance.
-     *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
-     */
-    public getClosestPlotData(queryPoint: Point): PlotData {
-      var minXDist = Infinity;
-      var minYDist = Infinity;
+    protected _propertyProjectors(): AttributeToProjector {
+      var propertyToProjectors = super._propertyProjectors();
+      propertyToProjectors["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), Plot._scaledAccessor(this.y()));
+      return propertyToProjectors;
+    }
 
-      var closestData: any[] = [];
-      var closestPixelPoints: Point[] = [];
-      var closestElements: Element[] = [];
-
-      this.datasets().forEach((dataset) => {
-        var plotData = this.getAllPlotData([dataset]);
-        plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-          var datum = plotData.data[index];
-          var line = plotData.selection[0][0];
-
-          if (!this._isVisibleOnPlot(datum, pixelPoint, d3.select(line))) {
-            return;
-          }
-
-          var xDist = Math.abs(queryPoint.x - pixelPoint.x);
-          var yDist = Math.abs(queryPoint.y - pixelPoint.y);
-
-          if (xDist < minXDist || xDist === minXDist && yDist < minYDist) {
-            closestData = [];
-            closestPixelPoints = [];
-            closestElements = [];
-
-            minXDist = xDist;
-            minYDist = yDist;
-          }
-
-          if (xDist === minXDist && yDist === minYDist) {
-            closestData.push(datum);
-            closestPixelPoints.push(pixelPoint);
-            closestElements.push(line);
-          }
-        });
-      });
-
-      return {
-        data: closestData,
-        pixelPoints: closestPixelPoints,
-        selection: d3.selectAll(closestElements)
+    protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+      var definedProjector = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return positionX != null && positionX === positionX &&
+               positionY != null && positionY === positionY;
       };
+      return (datum: any, index: number, dataset: Dataset) => {
+        return d3.svg.line()
+                     .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
+                     .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+      };
+    }
+
+    protected _getDataToDraw() {
+      var datasets: D3.Map<any[]> = d3.map();
+      this._datasetKeysInOrder.forEach((key: string) => {
+        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
+      });
+      return datasets;
     }
   }
 }
