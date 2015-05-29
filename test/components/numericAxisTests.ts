@@ -280,7 +280,7 @@ describe("NumericAxis", () => {
 
     var yLabel = new Plottable.Components.AxisLabel("LABEL");
     yLabel.angle(-90);
-    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
+    var barPlot = new Plottable.Plots.Bar();
     barPlot.x((d: any) => d.x, xScale);
     barPlot.y((d: any) => d.y, yScale);
     barPlot.addDataset(dataset);

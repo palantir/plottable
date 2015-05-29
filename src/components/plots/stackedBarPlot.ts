@@ -7,16 +7,17 @@ export module Plots {
     private _stackedExtent: number[];
 
     /**
-     * Constructs a StackedBar plot.
-     * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
-     * other.
+     * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
+     *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
+     *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
+     *
      * @constructor
-     * @param {Scale} xScale the x scale of the plot.
-     * @param {Scale} yScale the y scale of the plot.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {Scale} xScale
+     * @param {Scale} yScale
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale, orientation);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super(orientation);
       this.classed("stacked-bar-plot", true);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
@@ -36,6 +37,9 @@ export module Plots {
       return new Animators.Null();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedBar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -50,6 +54,9 @@ export module Plots {
       return this;
     }
 
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): StackedBar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();

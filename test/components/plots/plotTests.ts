@@ -448,7 +448,7 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y);
+      var plot = new Plottable.Plots.Bar();
       plot.addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {

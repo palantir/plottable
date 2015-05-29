@@ -32,7 +32,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
@@ -92,7 +92,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.attr("fill", "type", colorScale);
@@ -139,7 +139,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.attr("fill", "type", colorScale);
@@ -353,7 +353,7 @@ describe("Plots", () => {
         {x: 3, yTest: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.y((d) => d.yTest, yScale);
       renderer.x((d) => d.x, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
@@ -414,7 +414,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea<number>();
       var dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
       var dataset1 = new Plottable.Dataset(data1);
@@ -455,7 +455,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea<number>();
       var dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
       var dataset1 = new Plottable.Dataset(data1);

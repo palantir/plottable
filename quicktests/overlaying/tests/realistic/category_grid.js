@@ -47,7 +47,7 @@ function makeData() {
           {hospital: "no", hour: "2 AM", percent: 5.0},
           {hospital: "no", hour: "3 AM", percent: 5.2},
           {hospital: "no", hour: "4 AM", percent: 5.2},
-          {hospital: "no", hour: "5 AM", percent: 4.9},        
+          {hospital: "no", hour: "5 AM", percent: 4.9},
          ];
 }
 
@@ -60,7 +60,7 @@ function run(svg, data, Plottable) {
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");
-  var plot = new Plottable.Plots.Rectangle(xScale, yScale);
+  var plot = new Plottable.Plots.Rectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.hospital; }, xScale)
       .y(function(d) { return d.hour; }, yScale)

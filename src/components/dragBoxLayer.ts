@@ -31,6 +31,15 @@ export module Components {
     private _dragCallbacks: Utils.CallbackSet<DragBoxCallback>;
     private _dragEndCallbacks: Utils.CallbackSet<DragBoxCallback>;
 
+    /**
+     * Constructs a DragBoxLayer.
+     * 
+     * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
+     * A drag gesture will set the Bounds of the box.
+     * If resizing is enabled using resizable(true), the edges of box can be repositioned.
+     * 
+     * @constructor
+     */
     constructor() {
       super();
       /*
@@ -210,15 +219,13 @@ export module Components {
     }
 
     /**
-     * Gets the detection radius of the drag box.
-     *
-     * @return {number} The detection radius of the drag box.
+     * Gets the detection radius of the drag box in pixels.
      */
     public detectionRadius(): number;
     /**
-     * Sets the detection radius of the drag box.
+     * Sets the detection radius of the drag box in pixels.
      *
-     * @param {number} r The desired detection radius.
+     * @param {number} r
      * @return {DragBoxLayer} The calling DragBoxLayer.
      */
     public detectionRadius(r: number): DragBoxLayer;
@@ -236,14 +243,12 @@ export module Components {
 
     /**
      * Gets whether or not the drag box is resizable.
-     *
-     * @return {boolean} Whether or not the drag box is resizable.
      */
     public resizable(): boolean;
     /**
      * Sets whether or not the drag box is resizable.
      *
-     * @param {boolean} canResize Whether or not the drag box should be resizable.
+     * @param {boolean} canResize
      * @return {DragBoxLayer} The calling DragBoxLayer.
      */
     public resizable(canResize: boolean): DragBoxLayer;
@@ -265,7 +270,7 @@ export module Components {
     /**
      * Sets the callback to be called when dragging starts.
      *
-     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDragStart(callback: DragBoxCallback) {
@@ -276,7 +281,7 @@ export module Components {
     /**
      * Removes a callback to be called when dragging starts.
      *
-     * @param {DragBoxCallback} callback The callback to be removed.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDragStart(callback: DragBoxCallback) {
@@ -287,7 +292,7 @@ export module Components {
     /**
      * Sets a callback to be called during dragging.
      *
-     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDrag(callback: DragBoxCallback) {
@@ -298,7 +303,7 @@ export module Components {
     /**
      * Removes a callback to be called during dragging.
      *
-     * @param {DragBoxCallback} callback The callback to be removed.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDrag(callback: DragBoxCallback) {
@@ -307,9 +312,9 @@ export module Components {
     }
 
     /**
-     * Sets a callback to be called when the dragging ends.
+     * Sets a callback to be called when dragging ends.
      *
-     * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public onDragEnd(callback: DragBoxCallback) {
@@ -318,9 +323,9 @@ export module Components {
     }
 
     /**
-     * Removes a callback to be called when the dragging ends.
+     * Removes a callback to be called when dragging ends.
      *
-     * @param {DragBoxCallback} callback The callback to be removed.
+     * @param {DragBoxCallback} callback
      * @returns {DragBoxLayer} The calling DragBoxLayer.
      */
     public offDragEnd(callback: DragBoxCallback) {

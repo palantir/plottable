@@ -2,10 +2,6 @@
 
 module Plottable {
 export module Plots {
-  /*
-   * A PiePlot is a plot meant to show how much out of a total an attribute's value is.
-   * One usecase is to show how much funding departments are given out of a total budget.
-   */
   export class Pie extends Plot {
 
     private static _INNER_RADIUS_KEY = "inner-radius";
@@ -15,8 +11,6 @@ export module Plots {
     private _endAngles: number[];
 
     /**
-     * Constructs a PiePlot.
-     *
      * @constructor
      */
     constructor() {
@@ -75,8 +69,25 @@ export module Plots {
       return entities;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the sector value.
+     */
     public sectorValue<S>(): AccessorScaleBinding<S, number>;
+    /**
+     * Sets the sector value to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} sectorValue
+     * @returns {Pie} The calling Pie Plot.
+     */
     public sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the sector value to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {S|Accessor<S>} sectorValue
+     * @param {Scale<S, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
     public sectorValue<S>(sectorValue?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (sectorValue == null) {
@@ -88,8 +99,25 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the inner radius.
+     */
     public innerRadius<R>(): AccessorScaleBinding<R, number>;
+    /**
+     * Sets the inner radius to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} innerRadius
+     * @returns {Pie} The calling Pie Plot.
+     */
     public innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {R|Accessor<R>} innerRadius
+     * @param {Scale<R, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
     public innerRadius<R>(innerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (innerRadius == null) {
@@ -100,8 +128,25 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the outer radius.
+     */
     public outerRadius<R>(): AccessorScaleBinding<R, number>;
+    /**
+     * Sets the outer radius to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} outerRadius
+     * @returns {Pie} The calling Pie Plot.
+     */
     public outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+    /**
+     * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {R|Accessor<R>} outerRadius
+     * @param {Scale<R, number>} scale
+     * @returns {Pie} The calling Pie Plot.
+     */
     public outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
     public outerRadius<R>(outerRadius?: number | Accessor<number> | R | Accessor<R>, scale?: Scale<R, number>): any {
       if (outerRadius == null) {
