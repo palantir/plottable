@@ -4636,7 +4636,6 @@ describe("Plots", function () {
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
         });
-        // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
         it("auto scales correctly on stacked area", function () {
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);

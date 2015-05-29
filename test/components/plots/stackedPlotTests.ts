@@ -388,7 +388,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
     it("auto scales correctly on stacked area", () => {
       var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
