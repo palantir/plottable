@@ -20,7 +20,7 @@ describe("Plots", () => {
       svg = TestMethods.generateSVG(500, 500);
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
-      plot = new Plottable.XYPlot(xScale, yScale);
+      plot = new Plottable.XYPlot<number, number>();
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)

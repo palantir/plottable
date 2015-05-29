@@ -12,13 +12,11 @@ export module Components {
     private _padding: number;
 
     /**
-     * Creates a Label.
-     *
-     * A Label is a Component that draws a single line of text.
+     * A Label is a Component that displays a single line of text.
      *
      * @constructor
-     * @param {string} displayText The text of the Label (default = "").
-     * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
+     * @param {string} [displayText=""] The text of the Label.
+     * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
      */
     constructor(displayText = "", angle = 0) {
       super();
@@ -50,15 +48,13 @@ export module Components {
     }
 
     /**
-     * Gets the current text on the Label.
-     *
-     * @returns {string} the text on the label.
+     * Gets the Label's text.
      */
     public text(): string;
     /**
-     * Sets the current text on the Label.
+     * Sets the Label's text.
      *
-     * @param {string} displayText If provided, the new text for the Label.
+     * @param {string} displayText
      * @returns {Label} The calling Label.
      */
     public text(displayText: string): Label;
@@ -73,15 +69,13 @@ export module Components {
     }
 
     /**
-     * Gets the angle of the Label.
-     *
-     * @returns {number} the current angle.
+     * Gets the angle of the Label in degrees.
      */
     public angle(): number;
     /**
-     * Sets the angle of the Label.
+     * Sets the angle of the Label in degrees.
      *
-     * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
+     * @param {number} angle One of -90/0/90. 0 is horizontal.
      * @returns {Label} The calling Label.
      */
     public angle(angle: number): Label;
@@ -106,15 +100,13 @@ export module Components {
     }
 
     /**
-     * Gets the amount of padding in pixels around the Label.
-     *
-     * @returns {number} the current padding amount.
+     * Gets the amount of padding around the Label in pixels.
      */
     public padding(): number;
     /**
-     * Sets the amount of padding in pixels around the Label.
+     * Sets the amount of padding around the Label in pixels.
      *
-     * @param {number} padAmount The desired padding amount in pixel values
+     * @param {number} padAmount
      * @returns {Label} The calling Label.
      */
     public padding(padAmount: number): Label;
@@ -164,9 +156,9 @@ export module Components {
   export class TitleLabel extends Label {
     public static TITLE_LABEL_CLASS = "title-label";
     /**
-     * Creates a TitleLabel, a type of label made for rendering titles.
-     *
      * @constructor
+     * @param {string} [text]
+     * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);
@@ -177,9 +169,9 @@ export module Components {
   export class AxisLabel extends Label {
     public static AXIS_LABEL_CLASS = "axis-label";
     /**
-     * Creates a AxisLabel, a type of label made for rendering axis labels.
-     *
      * @constructor
+     * @param {string} [text]
+     * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);

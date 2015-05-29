@@ -30,15 +30,13 @@ module Plottable {
     private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
     /**
-     * Constructs an axis. An axis is a wrapper around a scale for rendering.
+     * Constructs an Axis.
+     * An Axis is a visual representation of a Scale.
      *
      * @constructor
-     * @param {Scale} scale The scale for this axis to render.
-     * @param {string} orientation One of ["top", "left", "bottom", "right"];
-     * on which side the axis will appear. On most axes, this is either "left"
-     * or "bottom".
-     * @param {Formatter} Data is passed through this formatter before being
-     * displayed.
+     * @param {Scale} scale
+     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
       super();
@@ -258,18 +256,15 @@ module Plottable {
     }
 
     /**
-     * Gets the current formatter on the axis. Data is passed through the
-     * formatter before being displayed.
-     *
-     * @returns {Formatter} The calling Axis, or the current
-     * Formatter.
+     * Gets the Formatter on the Axis. Tick values are passed through the
+     * Formatter before being displayed.
      */
     public formatter(): Formatter;
     /**
-     * Sets the current formatter on the axis. Data is passed through the
-     * formatter before being displayed.
+     * Sets the Formatter on the Axis. Tick values are passed through the
+     * Formatter before being displayed.
      *
-     * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+     * @param {Formatter} formatter
      * @returns {Axis} The calling Axis.
      */
     public formatter(formatter: Formatter): Axis<D>;
@@ -283,15 +278,13 @@ module Plottable {
     }
 
     /**
-     * Gets the current tick mark length.
-     *
-     * @returns {number} the current tick mark length.
+     * Gets the tick mark length in pixels.
      */
     public tickLength(): number;
     /**
-     * Sets the current tick mark length.
+     * Sets the tick mark length in pixels.
      *
-     * @param {number} length If provided, length of each tick.
+     * @param {number} length
      * @returns {Axis} The calling Axis.
      */
     public tickLength(length: number): Axis<D>;
@@ -309,16 +302,14 @@ module Plottable {
     }
 
     /**
-     * Gets the current end tick mark length.
-     *
-     * @returns {number} The current end tick mark length.
+     * Gets the end tick mark length in pixels.
      */
     public endTickLength(): number;
     /**
-     * Sets the end tick mark length.
+     * Sets the end tick mark length in pixels.
      *
-     * @param {number} length If provided, the length of the end ticks.
-     * @returns {BaseAxis} The calling Axis.
+     * @param {number} length
+     * @returns {Axis} The calling Axis.
      */
     public endTickLength(length: number): Axis<D>;
     public endTickLength(length?: number): any {
@@ -343,16 +334,13 @@ module Plottable {
     }
 
     /**
-     * Gets the padding between each tick mark and its associated label.
-     *
-     * @returns {number} the current padding.
-     * length.
+     * Gets the padding between each tick mark and its associated label in pixels.
      */
     public tickLabelPadding(): number;
     /**
-     * Sets the padding between each tick mark and its associated label.
+     * Sets the padding between each tick mark and its associated label in pixels.
      *
-     * @param {number} padding If provided, the desired padding.
+     * @param {number} padding
      * @returns {Axis} The calling Axis.
      */
     public tickLabelPadding(padding: number): Axis<D>;
@@ -370,18 +358,15 @@ module Plottable {
     }
 
     /**
-     * Gets the size of the gutter (the extra space between the tick
-     * labels and the outer edge of the axis).
-     *
-     * @returns {number} the current gutter.
-     * length.
+     * Gets the size of the gutter in pixels.
+     * The gutter is the extra space between the tick labels and the outer edge of the Axis.
      */
     public gutter(): number;
     /**
-     * Sets the size of the gutter (the extra space between the tick
-     * labels and the outer edge of the axis).
+     * Sets the size of the gutter in pixels.
+     * The gutter is the extra space between the tick labels and the outer edge of the Axis.
      *
-     * @param {number} size If provided, the desired gutter.
+     * @param {number} size
      * @returns {Axis} The calling Axis.
      */
     public gutter(size: number): Axis<D>;
@@ -400,15 +385,12 @@ module Plottable {
 
     /**
      * Gets the orientation of the Axis.
-     *
-     * @returns {number} the current orientation.
      */
     public orientation(): string;
     /**
      * Sets the orientation of the Axis.
      *
-     * @param {number} newOrientation If provided, the desired orientation
-     * (top/bottom/left/right).
+     * @param {number} orientation One of "top"/"bottom"/"left"/"right".
      * @returns {Axis} The calling Axis.
      */
     public orientation(orientation: string): Axis<D>;
@@ -430,19 +412,13 @@ module Plottable {
     }
 
     /**
-     * Gets whether the Axis is currently set to show the first and last
-     * tick labels.
-     *
-     * @returns {boolean} whether or not the last
-     * tick labels are showing.
+     * Gets whether the Axis shows the end tick labels.
      */
     public showEndTickLabels(): boolean;
     /**
-     * Sets whether the Axis is currently set to show the first and last tick
-     * labels.
+     * Sets whether the Axis shows the end tick labels.
      *
-     * @param {boolean} show Whether or not to show the first and last
-     * labels.
+     * @param {boolean} show
      * @returns {Axis} The calling Axis.
      */
     public showEndTickLabels(show: boolean): Axis<D>;
