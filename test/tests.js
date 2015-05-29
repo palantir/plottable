@@ -2163,9 +2163,6 @@ describe("Plots", function () {
             var oneElementSelection = plot.getAllSelections([dataset2]);
             assert.strictEqual(oneElementSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
-            var nonExcludedSelection = plot.getAllSelections([dataset1], true);
-            assert.strictEqual(nonExcludedSelection.size(), 1);
-            assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
             svg.remove();
         });
         it("entities() with dataset retrieval", function () {
@@ -4745,6 +4742,14 @@ describe("Plots", function () {
             var domain = yScale.domain();
             assert.strictEqual(0, domain[0], "domain starts at a min value at 0");
             assert.strictEqual(4, domain[1], "highest area stacking is at upper limit of yScale domain");
+            svg.remove();
+        });
+        it("pixel positions account for stack offsets", function () {
+            var dataYs = renderer.entities().map(function (entity) { return yScale.invert(entity.position.y); });
+            var dataset1Ys = dataset1.data().map(function (d) { return d.y; });
+            var dataset2Ys = dataset2.data().map(function (d, i) { return d.y + dataset1.data()[i].y; });
+            assert.includeMembers(dataYs, dataset1Ys, "all dataset1 points found");
+            assert.includeMembers(dataYs, dataset2Ys, "all dataset2 points found");
             svg.remove();
         });
     });

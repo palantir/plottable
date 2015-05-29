@@ -2468,11 +2468,9 @@ declare module Plottable {
          *
          * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
          * If not provided, all selections will be retrieved.
-         * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-         * in the previous datasetKeys argument (default = false).
          * @returns {D3.Selection} The retrieved Selections.
          */
-        getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
+        getAllSelections(datasets?: Dataset[]): D3.Selection;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2850,7 +2848,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
+            getAllSelections(datasets?: Dataset[]): D3._Selection<any>;
             protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
@@ -2904,6 +2902,7 @@ declare module Plottable {
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
             protected _propertyProjectors(): AttributeToProjector;
+            protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
         }
     }
 }
