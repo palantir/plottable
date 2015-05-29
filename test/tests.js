@@ -1211,7 +1211,7 @@ describe("Category Axes", function () {
     it("requests appropriate space when the scale has no domain", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var scale = new Plottable.Scales.Category();
-        var ca = new Plottable.Axes.Category(scale);
+        var ca = new Plottable.Axes.Category(scale, "bottom");
         ca.anchor(svg);
         var s = ca.requestedSpace(400, 400);
         assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
@@ -1222,7 +1222,7 @@ describe("Category Axes", function () {
         var svg = TestMethods.generateSVG(1000, 400);
         var domain = [null, undefined, true, 2, "foo"];
         var scale = new Plottable.Scales.Category().domain(domain);
-        var axis = new Plottable.Axes.Category(scale);
+        var axis = new Plottable.Axes.Category(scale, "bottom");
         axis.renderTo(svg);
         var texts = svg.selectAll("text")[0].map(function (s) { return d3.select(s).text(); });
         assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);

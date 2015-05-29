@@ -4691,7 +4691,6 @@ var Plottable;
              * @param {Formatter} [formatter=Formatters.identity()]
              */
             function Category(scale, orientation, formatter) {
-                if (orientation === void 0) { orientation = "bottom"; }
                 if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
                 _super.call(this, scale, orientation, formatter);
                 this._tickLabelAngle = 0;

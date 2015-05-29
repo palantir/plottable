@@ -1877,7 +1877,7 @@ declare module Plottable {
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.identity()]
              */
-            constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
