@@ -7792,7 +7792,7 @@ var Plottable;
             Area.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                this._lineDrawers.values().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+                this._lineDrawers.forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
             };
             Area.prototype.y = function (y, yScale) {
                 if (y == null) {
