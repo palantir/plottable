@@ -25,9 +25,7 @@ module Plottable {
     private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
 
     /**
-     * Constructs a new Scale.
-     *
-     * A Scale is a function (in the mathematical sense) that maps values from a domain (input) to a range (output).
+     * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
      * 
      * @constructor
      */
@@ -66,7 +64,7 @@ module Plottable {
     }
 
     /**
-     * Remvoes a callback that would be called when the Scale updates.
+     * Removes a callback that would be called when the Scale updates.
      * 
      * @param {ScaleCallback} callback.
      * @returns {Scale} The calling Scale.

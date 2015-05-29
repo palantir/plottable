@@ -10,8 +10,6 @@ export module Scales {
     private _outerPadding: number;
 
     /**
-     * Creates a Category Scale.
-     *
      * A Category Scale maps strings to numbers.
      *
      * @constructor

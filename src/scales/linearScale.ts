@@ -6,8 +6,6 @@ export module Scales {
     private _d3Scale: D3.Scale.LinearScale;
 
     /**
-     * Constructs a new Linear Scale.
-     *
      * @constructor
      */
     constructor() {

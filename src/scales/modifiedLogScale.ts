@@ -10,8 +10,6 @@ export module Scales {
     private _showIntermediateTicks = false;
 
     /**
-     * Creates a ModifiedLog Scale
-     *
      * A ModifiedLog Scale acts as a regular log scale for large numbers.
      * As it approaches 0, it gradually becomes linear.
      * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
@@ -178,13 +176,13 @@ export module Scales {
     }
 
     /**
-     * Gets whether or not to return tick values other than powers of the base.
+     * Gets whether or not to generate tick values other than powers of the base.
      *
      * @returns {boolean}
      */
     public showIntermediateTicks(): boolean;
     /**
-     * Sets whether or not to return ticks values other than powers of the base.
+     * Sets whether or not to generate ticks values other than powers of the base.
      *
      * @param {boolean} show
      * @returns {ModifiedLog} The calling ModifiedLog Scale.

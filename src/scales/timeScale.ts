@@ -5,8 +5,6 @@ export module Scales {
   export class Time extends QuantitativeScale<Date> {
     private _d3Scale: D3.Scale.TimeScale;
     /**
-     * Constructs a Time Scale.
-     *
      * A Time Scale maps Date objects to numbers.
      *
      * @constructor
@@ -17,10 +15,10 @@ export module Scales {
     }
 
     /**
-     * Returns an array of ticks values separated by the specified interval that span the domain.
+     * Returns an array of ticks values separated by the specified interval.
      *
      * @param {string} interval A string specifying the interval unit.
-     * @param {number?} step? The number of multiples of the interval between consecutive ticks.
+     * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
      * @return {Date[]}
      */
     public tickInterval(interval: string, step?: number): Date[] {

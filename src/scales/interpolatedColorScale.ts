@@ -54,7 +54,7 @@ export module Scales {
      * @constructor
      * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
      *   ("#FFFFFF") or keywords ("white").
-     * @param {string} [scaleType="linear"] The underlying scale type ("linear"/"log"/"sqrt"/"pow").
+     * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
      */
     constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
       super();
@@ -127,7 +127,7 @@ export module Scales {
     /**
      * Gets the color range.
      *
-     * @returns {string[]} the current color values for the range as strings.
+     * @returns {string[]}
      */
     public colorRange(): string[];
     /**
