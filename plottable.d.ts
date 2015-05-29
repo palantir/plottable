@@ -470,42 +470,51 @@ declare module Plottable {
     type DatasetCallback = (dataset: Dataset) => void;
     class Dataset {
         /**
-         * Constructs a new set.
-         *
-         * A Dataset is mostly just a wrapper around an any[], Dataset is the
-         * data you're going to plot.
+         * A Dataset contains an array of data and some metadata.
+         * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
          *
          * @constructor
-         * @param {any[]} data The data for this DataSource (default = []).
-         * @param {any} metadata An object containing additional information (default = {}).
+         * @param {any[]} [data=[]] The data for this Dataset.
+         * @param {any} [metadata={}] An object containing additional information.
          */
         constructor(data?: any[], metadata?: any);
-        onUpdate(callback: DatasetCallback): void;
-        offUpdate(callback: DatasetCallback): void;
+        /**
+         * Adds a callback to be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback.
+         * @returns {Dataset} The calling Dataset.
+         */
+        onUpdate(callback: DatasetCallback): Dataset;
+        /**
+         * Removes a callback that would be called when the Dataset updates.
+         *
+         * @param {DatasetCallback} callback
+         * @returns {Dataset} The calling Dataset.
+         */
+        offUpdate(callback: DatasetCallback): Dataset;
         /**
          * Gets the data.
          *
-         * @returns {DataSource|any[]} The calling DataSource, or the current data.
+         * @returns {any[]}
          */
         data(): any[];
         /**
          * Sets the data.
          *
-         * @param {any[]} data The new data.
+         * @param {any[]} data
          * @returns {Dataset} The calling Dataset.
          */
         data(data: any[]): Dataset;
         /**
-         * Get the metadata.
+         * Gets the metadata.
          *
-         * @returns {any} the current
-         * metadata.
+         * @returns {any}
          */
         metadata(): any;
         /**
-         * Set the metadata.
+         * Sets the metadata.
          *
-         * @param {any} metadata The new metadata.
+         * @param {any} metadata
          * @returns {Dataset} The calling Dataset.
          */
         metadata(metadata: any): Dataset;
@@ -516,14 +525,14 @@ declare module Plottable {
 declare module Plottable {
     module RenderPolicies {
         /**
-         * A policy to render components.
+         * A policy for rendering Components.
          */
         interface RenderPolicy {
             render(): any;
         }
         /**
-         * Never queue anything, render everything immediately. Useful for
-         * debugging, horrible for performance.
+         * Renders Components immediately after they are enqueued.
+         * Useful for debugging, horrible for performance.
          */
         class Immediate implements RenderPolicy {
             render(): void;
@@ -536,9 +545,9 @@ declare module Plottable {
             render(): void;
         }
         /**
-         * Renders with `setTimeout`. This is generally an inferior way to render
-         * compared to `requestAnimationFrame`, but it's still there if you want
-         * it.
+         * Renders with `setTimeout()`.
+         * Generally an inferior way to render compared to `requestAnimationFrame`,
+         * but useful for browsers that don't suppoort `requestAnimationFrame`.
          */
         class Timeout implements RenderPolicy {
             render(): void;
@@ -550,16 +559,14 @@ declare module Plottable {
 declare module Plottable {
     /**
      * The RenderController is responsible for enqueueing and synchronizing
-     * layout and render calls for Plottable components.
+     * layout and render calls for Components.
      *
-     * Layouts and renders occur inside an animation callback
+     * Layout and render calls occur inside an animation callback
      * (window.requestAnimationFrame if available).
      *
-     * If you require immediate rendering, call RenderController.flush() to
-     * perform enqueued layout and rendering serially.
+     * RenderController.flush() immediately lays out and renders all Components currently enqueued.
      *
-     * If you want to always have immediate rendering (useful for debugging),
-     * call
+     * To always have immediate rendering (useful for debugging), call
      * ```typescript
      * Plottable.RenderController.setRenderPolicy(
      *   new Plottable.RenderPolicies.Immediate()
@@ -575,22 +582,20 @@ declare module Plottable {
         var _renderPolicy: RenderPolicies.RenderPolicy;
         function setRenderPolicy(policy: string): void;
         /**
-         * If the RenderController is enabled, we enqueue the component for
-         * render. Otherwise, it is rendered immediately.
+         * Enqueues the Component for rendering.
          *
-         * @param {Component} component Any Plottable component.
+         * @param {Component} component
          */
         function registerToRender(component: Component): void;
         /**
-         * If the RenderController is enabled, we enqueue the component for
-         * layout and render. Otherwise, it is rendered immediately.
+         * Enqueues the Component for layout and rendering.
          *
-         * @param {Component} component Any Plottable component.
+         * @param {Component} component
          */
         function registerToComputeLayout(component: Component): void;
         /**
-         * Render everything that is waiting to be rendered right now, instead of
-         * waiting until the next frame.
+         * Renders all Components waiting to be rendered immediately
+         * instead of waiting until the next frame.
          *
          * Useful to call when debugging.
          */
@@ -600,7 +605,7 @@ declare module Plottable {
 
 declare module Plottable {
     /**
-     * Access specific datum property.
+     * Accesses a specific datum property.
      */
     interface Accessor<T> {
         (datum: any, index: number, dataset: Dataset): T;
@@ -609,9 +614,6 @@ declare module Plottable {
      * Retrieves scaled datum property.
      */
     type _Projector = (datum: any, index: number, dataset: Dataset) => any;
-    /**
-     * Projector with dataset and plot metadata
-     */
     type AppliedProjector = (datum: any, index: number) => any;
     /**
      * Defines a way how specific attribute needs be retrieved before rendering.
@@ -624,10 +626,6 @@ declare module Plottable {
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
-     *
-     * So if my data looks like `{foo: 5, bar: 6}` and I want the radius to scale
-     * with both `foo` and `bar`, an entry in this type might be `{"r":
-     * function(d) { return foo + bar; }`.
      */
     type AttributeToProjector = {
         [attrToSet: string]: _Projector;
@@ -639,19 +637,12 @@ declare module Plottable {
         minWidth: number;
         minHeight: number;
     };
-    /**
-     * The range of your current data. For example, [1, 2, 6, -5] has the Range
-     * `{min: -5, max: 6}`.
-     *
-     * The point of this type is to hopefully replace the less-elegant `[min,
-     * max]` ranges produced by d3.
-     */
     type Range = {
         min: number;
         max: number;
     };
     /**
-     * A simple location on the screen.
+     * A location in pixel-space.
      */
     type Point = {
         x: number;
@@ -672,49 +663,59 @@ declare module Plottable {
         (scale: S): any;
     }
     module Scales {
+        /**
+         * A function that supplies Extents to a Scale.
+         * An Extent is a request for a set of domain values to be included.
+         *
+         * @param {Scale} scale
+         * @returns {D[][]} An array of extents.
+         */
         interface ExtentsProvider<D> {
             (scale: Scale<D, any>): D[][];
         }
     }
     class Scale<D, R> {
         /**
-         * Constructs a new Scale.
-         *
-         * A Scale is a wrapper around a D3.Scale.Scale. A Scale is really just a
-         * function. Scales have a domain (input), a range (output), and a function
-         * from domain to range.
+         * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
          *
          * @constructor
          */
         constructor();
+        /**
+         * Given an array of potential domain values, computes the extent of those values.
+         *
+         * @param {D[]} values
+         * @returns {D[]} The extent of the input values.
+         */
         extentOfValues(values: D[]): D[];
         protected _getAllExtents(): D[][];
         protected _getExtent(): D[];
+        /**
+         * Adds a callback to be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        /**
+         * Removes a callback that would be called when the Scale updates.
+         *
+         * @param {ScaleCallback} callback.
+         * @returns {Scale} The calling Scale.
+         */
         offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
-         * Modifies the domain on the scale so that it includes the extent of all
-         * perspectives it depends on. This will normally happen automatically, but
-         * if you set domain explicitly with `plot.domain(x)`, you will need to
-         * call this function if you want the domain to neccessarily include all
-         * the data.
-         *
-         * Extent: The [min, max] pair for a Scale.QuantitativeScale, all covered
-         * strings for a Scale.Category.
-         *
-         * Perspective: A combination of a Dataset and an Accessor that
-         * represents a view in to the data.
+         * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.
          *
          * @returns {Scale} The calling Scale.
          */
         autoDomain(): Scale<D, R>;
         protected _autoDomainIfAutomaticMode(): void;
         /**
-         * Computes the range value corresponding to a given domain value. In other
-         * words, apply the function to value.
+         * Computes the range value corresponding to a given domain value.
          *
-         * @param {R} value A domain value to be scaled.
+         * @param {D} value
          * @returns {R} The range value corresponding to the supplied domain value.
          */
         scale(value: D): R;
@@ -727,10 +728,7 @@ declare module Plottable {
         /**
          * Sets the domain.
          *
-         * @param {D[]} values If provided, the new value for the domain. On
-         * a QuantitativeScale, this is a [min, max] pair, or a [max, min] pair to
-         * make the function decreasing. On Scale.Ordinal, this is an array of all
-         * input values.
+         * @param {D[]} values
          * @returns {Scale} The calling Scale.
          */
         domain(values: D[]): Scale<D, R>;
@@ -740,27 +738,31 @@ declare module Plottable {
         /**
          * Gets the range.
          *
-         * In the case of having a numeric range, it will be a [min, max] pair. In
-         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-         * list of all possible outputs.
-         *
          * @returns {R[]} The current range.
          */
         range(): R[];
         /**
          * Sets the range.
          *
-         * In the case of having a numeric range, it will be a [min, max] pair. In
-         * the case of string range (e.g. Scale.InterpolatedColor), it will be a
-         * list of all possible outputs.
-         *
-         * @param {R[]} values If provided, the new values for the range.
+         * @param {R[]} values
          * @returns {Scale} The calling Scale.
          */
         range(values: R[]): Scale<D, R>;
         protected _getRange(): void;
         protected _setRange(values: R[]): void;
+        /**
+         * Adds an ExtentsProvider to the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        /**
+         * Removes an ExtentsProvider from the Scale.
+         *
+         * @param {Scales.ExtentsProvider} provider
+         * @returns {Sclae} The calling Scale.
+         */
         removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
@@ -770,10 +772,8 @@ declare module Plottable {
     class QuantitativeScale<D> extends Scale<D, number> {
         protected static _DEFAULT_NUM_TICKS: number;
         /**
-         * Constructs a new QuantitativeScale.
-         *
-         * A QuantitativeScale is a Scale that maps anys to numbers. It
-         * is invertible and continuous.
+         * A QuantitativeScale is a Scale that maps number-like values to numbers.
+         * It is invertible and continuous.
          *
          * @constructor
          */
@@ -781,15 +781,55 @@ declare module Plottable {
         autoDomain(): QuantitativeScale<D>;
         protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
+        /**
+         * Adds a padding exception.
+         * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+         * that end of the domain will not be padded.
+         *
+         * @param {any} key A key that identifies the padding exception.
+         * @param {D} exception
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         addPaddingException(key: any, exception: D): QuantitativeScale<D>;
+        /**
+         * Removes the padding exception associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         removePaddingException(key: any): QuantitativeScale<D>;
+        /**
+         * Adds an included value.
+         * The supplied value will always be included in the domain when autoDomain()-ing.
+         *
+         * @param {any} key A key that identifies the included value.
+         * @param {D} value
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         addIncludedValue(key: any, value: D): QuantitativeScale<D>;
+        /**
+         * Removes the included value associated with the specified key.
+         *
+         * @param {any} key
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         removeIncludedValue(key: any): QuantitativeScale<D>;
+        /**
+         * Gets the padding proportion.
+         */
         padProportion(): number;
+        /**
+         * Sets the padding porportion.
+         * When autoDomain()-ing, the computed domain will be expanded by this proportion,
+         * then rounded to human-readable values.
+         *
+         * @param {number} padProportion The padding proportion. Passing 0 disables padding.
+         * @returns {QuantitativeScale} The calling QuantitativeScale.
+         */
         padProportion(padProportion: number): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
-         * Retrieves the domain value corresponding to a supplied range value.
+         * Computes the domain value corresponding to a supplied range value.
          *
          * @param {number} value: A value from the Scale's range.
          * @returns {D} The domain value corresponding to the supplied range value.
@@ -824,13 +864,13 @@ declare module Plottable {
         extentOfValues(values: D[]): D[];
         protected _setDomain(values: D[]): void;
         /**
-         * Gets ticks generated by the default algorithm.
+         * Gets the array of tick values generated by the default algorithm.
          */
         getDefaultTicks(): D[];
         /**
-         * Gets a set of tick values spanning the domain.
+         * Gets an array of tick values spanning the domain.
          *
-         * @returns {D[]} The generated ticks.
+         * @returns {D[]}
          */
         ticks(): D[];
         /**
@@ -840,15 +880,13 @@ declare module Plottable {
         protected _niceDomain(domain: D[], count?: number): D[];
         protected _defaultExtent(): D[];
         /**
-         * Gets the tick generator of the QuantitativeScale.
-         *
-         * @returns {TickGenerator} The current tick generator.
+         * Gets the TickGenerator.
          */
         tickGenerator(): Scales.TickGenerators.TickGenerator<D>;
         /**
-         * Sets a tick generator
+         * Sets the TickGenerator
          *
-         * @param {TickGenerator} generator, the new tick generator.
+         * @param {TickGenerator} generator
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
@@ -860,13 +898,7 @@ declare module Plottable {
     module Scales {
         class Linear extends QuantitativeScale<number> {
             /**
-             * Constructs a new LinearScale.
-             *
-             * This scale maps from domain to range with a simple `mx + b` formula.
-             *
              * @constructor
-             * @param {D3.Scale.LinearScale} [scale] The D3 LinearScale backing the
-             * LinearScale. If not supplied, uses a default scale.
              */
             constructor();
             protected _defaultExtent(): number[];
@@ -888,22 +920,15 @@ declare module Plottable {
     module Scales {
         class ModifiedLog extends QuantitativeScale<number> {
             /**
-             * Creates a new Scale.ModifiedLog.
-             *
-             * A ModifiedLog scale acts as a regular log scale for large numbers.
-             * As it approaches 0, it gradually becomes linear. This means that the
-             * scale won't freak out if you give it 0 or a negative number, where an
-             * ordinary Log scale would.
-             *
-             * However, it does mean that scale will be effectively linear as values
-             * approach 0. If you want very small values on a log scale, you should use
-             * an ordinary Scale.Log instead.
+             * A ModifiedLog Scale acts as a regular log scale for large numbers.
+             * As it approaches 0, it gradually becomes linear.
+             * Consequently, a ModifiedLog Scale can process 0 and negative numbers.
              *
              * @constructor
-             * @param {number} [base]
-             *        The base of the log. Defaults to 10, and must be > 1.
+             * @param {number} [base=10]
+             *        The base of the log. Must be > 1.
              *
-             *        For base <= x, scale(x) = log(x).
+             *        For x <= base, scale(x) = log(x).
              *
              *        For 0 < x < base, scale(x) will become more and more
              *        linear as it approaches 0.
@@ -921,19 +946,16 @@ declare module Plottable {
             ticks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
             /**
-             * Gets whether or not to return tick values other than powers of base.
+             * Gets whether or not to generate tick values other than powers of the base.
              *
-             * This defaults to false, so you'll normally only see ticks like
-             * [10, 100, 1000]. If you turn it on, you might see ticks values
-             * like [10, 50, 100, 500, 1000].
-             * @returns {boolean} the current setting.
+             * @returns {boolean}
              */
             showIntermediateTicks(): boolean;
             /**
-             * Sets whether or not to return ticks values other than powers or base.
+             * Sets whether or not to generate ticks values other than powers of the base.
              *
-             * @param {boolean} show If provided, the desired setting.
-             * @returns {ModifiedLog} The calling ModifiedLog.
+             * @param {boolean} show
+             * @returns {ModifiedLog} The calling ModifiedLog Scale.
              */
             showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
@@ -950,10 +972,7 @@ declare module Plottable {
     module Scales {
         class Category extends Scale<string, number> {
             /**
-             * Creates a CategoryScale.
-             *
-             * A CategoryScale maps strings to numbers. A common use is to map the
-             * labels of a bar plot (strings) to their pixel locations (numbers).
+             * A Category Scale maps strings to numbers.
              *
              * @constructor
              */
@@ -974,46 +993,45 @@ declare module Plottable {
             /**
              * Returns the step width of the scale.
              *
-             * The step width is defined as the entire space for a band to occupy,
-             * including the padding in between the bands.
+             * The step width is the pixel distance between adjacent values in the domain.
              *
-             * @returns {number} the full band width of the scale
+             * @returns {number}
              */
             stepWidth(): number;
             /**
-             * Returns the inner padding of the scale.
+             * Gets the inner padding.
              *
-             * The inner padding is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The inner padding is defined as the padding in between bands on the scale,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {number} The inner padding of the scale
+             * @returns {number}
              */
             innerPadding(): number;
             /**
-             * Sets the inner padding of the scale.
+             * Sets the inner padding.
              *
-             * The inner padding of the scale is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The inner padding is defined as the padding in between bands on the scale,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {Ordinal} The calling Scale.Ordinal
+             * @returns {Category} The calling Category Scale.
              */
             innerPadding(innerPadding: number): Category;
             /**
-             * Returns the outer padding of the scale.
+             * Gets the outer padding.
              *
-             * The outer padding is defined as the padding in between the outer bands and the edges on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The outer padding is the padding in between the outer bands and the edges of the range,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {number} The outer padding of the scale
+             * @returns {number}
              */
             outerPadding(): number;
             /**
-             * Sets the outer padding of the scale.
+             * Sets the outer padding.
              *
-             * The inner padding of the scale is defined as the padding in between bands on the scale.
-             * Units are a proportion of the band width (value returned by rangeBand()).
+             * The outer padding is the padding in between the outer bands and the edges of the range,
+             * expressed as a multiple of the rangeBand().
              *
-             * @returns {Ordinal} The calling Scale.Ordinal
+             * @returns {Category} The calling Category Scale.
              */
             outerPadding(outerPadding: number): Category;
             scale(value: string): number;
@@ -1030,16 +1048,23 @@ declare module Plottable {
     module Scales {
         class Color extends Scale<string, string> {
             /**
-             * Constructs a ColorScale.
+             * A Color Scale maps string values to color hex values expressed as a string.
              *
              * @constructor
-             * @param {string} [scaleType] the type of color scale to create
-             *     (Category10/Category20/Category20b/Category20c).
-             * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+             * @param {string} [scaleType] One of "Category10"/"Category20"/"Category20b"/"Category20c".
+             *   (see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
+             *   If not supplied, reads the colors defined using CSS -- see plottable.css.
              */
             constructor(scaleType?: string);
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
+            /**
+             * Returns the color-string corresponding to a given string.
+             * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+             *
+             * @param {string} value
+             * @returns {string}
+             */
             scale(value: string): string;
             protected _getDomain(): any[];
             protected _setBackingScaleDomain(values: string[]): void;
@@ -1054,20 +1079,16 @@ declare module Plottable {
     module Scales {
         class Time extends QuantitativeScale<Date> {
             /**
-             * Constructs a TimeScale.
-             *
-             * A TimeScale maps Date objects to numbers.
+             * A Time Scale maps Date objects to numbers.
              *
              * @constructor
-             * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
              */
             constructor();
             /**
-             * Specifies the interval between ticks
+             * Returns an array of ticks values separated by the specified interval.
              *
-             * @param {string} interval TimeInterval string specifying the interval unit measure
-             * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
-             *
+             * @param {string} interval A string specifying the interval unit.
+             * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
              * @return {Date[]}
              */
             tickInterval(interval: string, step?: number): Date[];
@@ -1089,43 +1110,31 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
-        /**
-         * This class implements a color scale that takes quantitive input and
-         * interpolates between a list of color values. It returns a hex string
-         * representing the interpolated color.
-         *
-         * By default it generates a linear scale internally.
-         */
         class InterpolatedColor extends Scale<number, string> {
             static REDS: string[];
             static BLUES: string[];
             static POSNEG: string[];
             /**
-             * An InterpolatedColorScale maps numbers to color strings.
+             * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @param {string[]} colors an array of strings representing color values in hex
-             *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
-             * @param {string} scaleType a string representing the underlying scale
-             *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
-             * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
+             * @constructor
+             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
+             *   ("#FFFFFF") or keywords ("white").
+             * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
             constructor(colorRange?: string[], scaleType?: string);
             extentOfValues(values: number[]): number[];
             /**
              * Gets the color range.
              *
-             * @returns {string[]} the current color values for the range as strings.
+             * @returns {string[]}
              */
             colorRange(): string[];
             /**
              * Sets the color range.
              *
-             * @param {string[]} [colorRange]. If provided and if colorRange is one of
-             * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
-             * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
-             * "dodgerblue"], the resulting scale will interpolate between the color
-             * values across the domain.
-             * @returns {InterpolatedColor} The calling InterpolatedColor.
+             * @param {string[]} colorRange
+             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
              */
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
@@ -1142,25 +1151,28 @@ declare module Plottable {
 declare module Plottable {
     module Scales {
         module TickGenerators {
+            /**
+             * Generates an array of tick values for the specified scale.
+             *
+             * @param {QuantitativeScale} scale
+             * @returns {D[]}
+             */
             interface TickGenerator<D> {
                 (scale: Plottable.QuantitativeScale<D>): D[];
             }
             /**
-             * Creates a tick generator using the specified interval.
+             * Creates a TickGenerator using the specified interval.
              *
              * Generates ticks at multiples of the interval while also including the domain boundaries.
              *
-             * @param {number} interval The interval between two ticks (not including the end ticks).
-             *
-             * @returns {TickGenerator} A tick generator using the specified interval.
+             * @param {number} interval
+             * @returns {TickGenerator}
              */
             function intervalTickGenerator(interval: number): TickGenerator<number>;
             /**
-             * Creates a tick generator that will filter for only the integers in defaultTicks and return them.
+             * Creates a TickGenerator returns only integer tick values.
              *
-             * Will also include the end ticks.
-             *
-             * @returns {TickGenerator} A tick generator returning only integer ticks.
+             * @returns {TickGenerator}
              */
             function integerTickGenerator(): TickGenerator<number>;
         }
@@ -1331,25 +1343,23 @@ declare module Plottable {
         /**
          * Attaches the Component as a child of a given D3 Selection.
          *
-         * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+         * @param {D3.Selection} selection.
          * @returns {Component} The calling Component.
          */
         anchor(selection: D3.Selection): Component;
         /**
          * Adds a callback to be called on anchoring the Component to the DOM.
-         * If the component is already anchored, the callback is called immediately.
+         * If the Component is already anchored, the callback is called immediately.
          *
-         * @param {ComponentCallback} callback The callback to be added.
-         *
+         * @param {ComponentCallback} callback
          * @return {Component}
          */
         onAnchor(callback: ComponentCallback): Component;
         /**
-         * Removes a callback to be called on anchoring the Component to the DOM.
+         * Removes a callback that would be called on anchoring the Component to the DOM.
          * The callback is identified by reference equality.
          *
-         * @param {ComponentCallback} callback The callback to be removed.
-         *
+         * @param {ComponentCallback} callback
          * @return {Component}
          */
         offAnchor(callback: ComponentCallback): Component;
@@ -1361,13 +1371,13 @@ declare module Plottable {
         protected _setup(): void;
         requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
-         * Computes the size, position, and alignment from the specified values.
+         * Computes and sets the size, position, and alignment of the Component from the specified values.
          * If no parameters are supplied and the Component is a root node,
          * they are inferred from the size of the Component's element.
          *
-         * @param {Point} origin Origin of the space offered to the Component.
-         * @param {number} availableWidth
-         * @param {number} availableHeight
+         * @param {Point} [origin] Origin of the space offered to the Component.
+         * @param {number} [availableWidth] Available width in pixels.
+         * @param {number} [availableHeight] Available height in pixels.
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
@@ -1376,52 +1386,47 @@ declare module Plottable {
             height: number;
         };
         /**
-         * Queues the Component for rendering. Set immediately to true if the Component should be rendered
-         * immediately as opposed to queued to the RenderController.
+         * Queues the Component for rendering.
          *
-         * @returns {Component} The calling Component
+         * @returns {Component} The calling Component.
          */
         render(): Component;
         renderImmediately(): Component;
         /**
-         * Causes the Component to recompute layout and redraw.
+         * Causes the Component to re-layout and render.
          *
-         * This function should be called when CSS changes could influence the size
-         * of the components, e.g. changing the font size.
+         * This function should be called when a CSS change has occured that could
+         * influence the layout of the Component, such as changing the font size.
          *
          * @returns {Component} The calling Component.
          */
         redraw(): Component;
         /**
-         * Renders the Component into a given DOM element. The element must be as <svg>.
+         * Renders the Component to a given <svg>.
          *
-         * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-         * @returns {Component} The calling component.
+         * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
+         * @returns {Component} The calling Component.
          */
         renderTo(element: String | D3.Selection): Component;
         /**
          * Gets the x alignment of the Component.
-         *
-         * @returns {string} The current x alignment.
          */
         xAlignment(): string;
         /**
          * Sets the x alignment of the Component.
          *
-         * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+         * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
          * @returns {Component} The calling Component.
          */
         xAlignment(xAlignment: string): Component;
         /**
          * Gets the y alignment of the Component.
-         *
-         * @returns {string} The current y alignment.
          */
         yAlignment(): string;
         /**
          * Sets the y alignment of the Component.
          *
-         * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
+         * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
          * @returns {Component} The calling Component.
          */
         yAlignment(yAlignment: string): Component;
@@ -1429,7 +1434,6 @@ declare module Plottable {
          * Checks if the Component has a given CSS class.
          *
          * @param {string} cssClass The CSS class to check for.
-         * @returns {boolean} Whether the Component has the given CSS class.
          */
         classed(cssClass: string): boolean;
         /**
@@ -1441,86 +1445,74 @@ declare module Plottable {
          */
         classed(cssClass: string, addClass: boolean): Component;
         /**
-         * Checks if the Component has a fixed width or false if it grows to fill available space.
+         * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
-         *
-         * @returns {boolean} Whether the component has a fixed width.
          */
         fixedWidth(): boolean;
         /**
-         * Checks if the Component has a fixed height or false if it grows to fill available space.
+         * Checks if the Component has a fixed height or if it grows to fill available space.
          * Returns false by default on the base Component class.
-         *
-         * @returns {boolean} Whether the component has a fixed height.
          */
         fixedHeight(): boolean;
         /**
-         * Detaches a Component from the DOM. The component can be reused.
+         * Detaches a Component from the DOM. The Component can be reused.
          *
-         * This should only be used if you plan on reusing the calling
-         * Components. Otherwise, use remove().
+         * This should only be used if you plan on reusing the calling Component. Otherwise, use destroy().
          *
          * @returns The calling Component.
          */
         detach(): Component;
         /**
-         * Adds a callback to be called when th Component is detach()-ed.
+         * Adds a callback to be called when the Component is detach()-ed.
          *
-         * @param {ComponentCallback} callback The callback to be added.
+         * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
         onDetach(callback: ComponentCallback): Component;
         /**
-         * Removes a callback to be called when th Component is detach()-ed.
+         * Removes a callback to be called when the Component is detach()-ed.
          * The callback is identified by reference equality.
          *
-         * @param {ComponentCallback} callback The callback to be removed.
+         * @param {ComponentCallback} callback
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
         parent(): ComponentContainer;
         parent(parent: ComponentContainer): Component;
         /**
-         * Removes a Component from the DOM and disconnects it from everything it's
-         * listening to (effectively destroying it).
+         * Removes a Component from the DOM and disconnects all listeners.
          */
         destroy(): void;
         /**
-         * Return the width of the component
-         *
-         * @return {number} width of the component
+         * Gets the width of the Component in pixels.
          */
         width(): number;
         /**
-         * Return the height of the component
-         *
-         * @return {number} height of the component
+         * Gets the height of the Component in pixels.
          */
         height(): number;
         /**
          * Gets the origin of the Component relative to its parent.
          *
-         * @return {Point} The x-y position of the Component relative to its parent.
+         * @return {Point}
          */
         origin(): Point;
         /**
          * Gets the origin of the Component relative to the root <svg>.
          *
-         * @return {Point} The x-y position of the Component relative to the root <svg>
+         * @return {Point}
          */
         originToSVG(): Point;
         /**
-         * Returns the foreground selection for the Component
-         * (A selection covering the front of the Component)
+         * Gets the Selection containing the <g> in front of the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} foreground selection for the Component
+         * @return {D3.Selection}
          */
         foreground(): D3.Selection;
         /**
-         * Returns the content selection for the Component
-         * (A selection containing the visual elements of the Component)
+         * Gets a Selection containing a <g> that holds the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
@@ -1528,8 +1520,7 @@ declare module Plottable {
          */
         content(): D3.Selection;
         /**
-         * Returns the background selection for the Component
-         * (A selection appearing behind of the Component)
+         * Gets the Selection containing the <g> behind the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
@@ -1577,13 +1568,13 @@ declare module Plottable {
     module Components {
         class Group extends ComponentContainer {
             /**
-             * Constructs a Component.Group.
+             * Constructs a Group.
              *
-             * A Component.Group is a set of Components that will be rendered on top of
-             * each other. Components added later will be rendered on top of existing Components.
+             * A Group contains Components that will be rendered on top of each other.
+             * Components added later will be rendered on top of Components already in the Group.
              *
              * @constructor
-             * @param {Component[]} components The Components in the resultant Component.Group (default = []).
+             * @param {Component[]} [components=[]] Components to be added to the Group.
              */
             constructor(components?: Component[]);
             protected _forEach(callback: (component: Component) => any): void;
@@ -1631,15 +1622,13 @@ declare module Plottable {
         protected _computedWidth: number;
         protected _computedHeight: number;
         /**
-         * Constructs an axis. An axis is a wrapper around a scale for rendering.
+         * Constructs an Axis.
+         * An Axis is a visual representation of a Scale.
          *
          * @constructor
-         * @param {Scale} scale The scale for this axis to render.
-         * @param {string} orientation One of ["top", "left", "bottom", "right"];
-         * on which side the axis will appear. On most axes, this is either "left"
-         * or "bottom".
-         * @param {Formatter} Data is passed through this formatter before being
-         * displayed.
+         * @param {Scale} scale
+         * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
         destroy(): void;
@@ -1669,106 +1658,84 @@ declare module Plottable {
         redraw(): Component;
         protected _setDefaultAlignment(): void;
         /**
-         * Gets the current formatter on the axis. Data is passed through the
-         * formatter before being displayed.
-         *
-         * @returns {Formatter} The calling Axis, or the current
-         * Formatter.
+         * Gets the Formatter on the Axis. Tick values are passed through the
+         * Formatter before being displayed.
          */
         formatter(): Formatter;
         /**
-         * Sets the current formatter on the axis. Data is passed through the
-         * formatter before being displayed.
+         * Sets the Formatter on the Axis. Tick values are passed through the
+         * Formatter before being displayed.
          *
-         * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+         * @param {Formatter} formatter
          * @returns {Axis} The calling Axis.
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
-         * Gets the current tick mark length.
-         *
-         * @returns {number} the current tick mark length.
+         * Gets the tick mark length in pixels.
          */
         tickLength(): number;
         /**
-         * Sets the current tick mark length.
+         * Sets the tick mark length in pixels.
          *
-         * @param {number} length If provided, length of each tick.
+         * @param {number} length
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis<D>;
         /**
-         * Gets the current end tick mark length.
-         *
-         * @returns {number} The current end tick mark length.
+         * Gets the end tick mark length in pixels.
          */
         endTickLength(): number;
         /**
-         * Sets the end tick mark length.
+         * Sets the end tick mark length in pixels.
          *
-         * @param {number} length If provided, the length of the end ticks.
-         * @returns {BaseAxis} The calling Axis.
+         * @param {number} length
+         * @returns {Axis} The calling Axis.
          */
         endTickLength(length: number): Axis<D>;
         protected _maxLabelTickLength(): number;
         /**
-         * Gets the padding between each tick mark and its associated label.
-         *
-         * @returns {number} the current padding.
-         * length.
+         * Gets the padding between each tick mark and its associated label in pixels.
          */
         tickLabelPadding(): number;
         /**
-         * Sets the padding between each tick mark and its associated label.
+         * Sets the padding between each tick mark and its associated label in pixels.
          *
-         * @param {number} padding If provided, the desired padding.
+         * @param {number} padding
          * @returns {Axis} The calling Axis.
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the gutter (the extra space between the tick
-         * labels and the outer edge of the axis).
-         *
-         * @returns {number} the current gutter.
-         * length.
+         * Gets the size of the gutter in pixels.
+         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
          */
         gutter(): number;
         /**
-         * Sets the size of the gutter (the extra space between the tick
-         * labels and the outer edge of the axis).
+         * Sets the size of the gutter in pixels.
+         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
          *
-         * @param {number} size If provided, the desired gutter.
+         * @param {number} size
          * @returns {Axis} The calling Axis.
          */
         gutter(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
-         *
-         * @returns {number} the current orientation.
          */
         orientation(): string;
         /**
          * Sets the orientation of the Axis.
          *
-         * @param {number} newOrientation If provided, the desired orientation
-         * (top/bottom/left/right).
+         * @param {number} orientation One of "top"/"bottom"/"left"/"right".
          * @returns {Axis} The calling Axis.
          */
         orientation(orientation: string): Axis<D>;
         /**
-         * Gets whether the Axis is currently set to show the first and last
-         * tick labels.
-         *
-         * @returns {boolean} whether or not the last
-         * tick labels are showing.
+         * Gets whether the Axis shows the end tick labels.
          */
         showEndTickLabels(): boolean;
         /**
-         * Sets whether the Axis is currently set to show the first and last tick
-         * labels.
+         * Sets whether the Axis shows the end tick labels.
          *
-         * @param {boolean} show Whether or not to show the first and last
-         * labels.
+         * @param {boolean} show
          * @returns {Axis} The calling Axis.
          */
         showEndTickLabels(show: boolean): Axis<D>;
@@ -1788,7 +1755,7 @@ declare module Plottable {
     }
     module Axes {
         /**
-         * Defines a configuration for a time axis tier.
+         * Defines a configuration for a Time Axis tier.
          * For details on how ticks are generated see: https://github.com/mbostock/d3/wiki/Time-Scales#ticks
          * interval - A time unit associated with this configuration (seconds, minutes, hours, etc).
          * step - number of intervals between each tick.
@@ -1807,34 +1774,40 @@ declare module Plottable {
         type TimeAxisConfiguration = TimeAxisTierConfiguration[];
         class Time extends Axis<Date> {
             /**
-             * The css class applied to each time axis tier
+             * The CSS class applied to each Time Axis tier
              */
             static TIME_AXIS_TIER_CLASS: string;
             /**
-             * Constructs a TimeAxis.
+             * Constructs a Time Axis.
              *
-             * A TimeAxis is used for rendering a TimeScale.
+             * A Time Axis is a visual representation of a Time Scale.
              *
              * @constructor
-             * @param {TimeScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom)
+             * @param {Scales.Time} scale
+             * @param {string} orientation One of "top"/"bottom".
              */
             constructor(scale: Scales.Time, orientation: string);
+            /**
+             * Gets the label positions for each tier.
+             */
             tierLabelPositions(): string[];
+            /**
+             * Sets the label positions for each tier.
+             *
+             * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
+             * @returns {Axes.Time} The calling Time Axis.
+             */
             tierLabelPositions(newPositions: string[]): Time;
             /**
-             * Gets the possible Axis configurations.
-             *
-             * @returns {TimeAxisConfiguration[]} The possible tier configurations.
+             * Gets the possible TimeAxisConfigurations.
              */
             axisConfigurations(): TimeAxisConfiguration[];
             /**
-             * Sets possible Axis configurations.
-             * The axis will choose the most precise configuration that will display in
-             * its current width.
+             * Sets the possible TimeAxisConfigurations.
+             * The Time Axis will choose the most precise configuration that will display in the available space.
              *
-             * @param {TimeAxisConfiguration[]} configurations Possible axis configurations.
-             * @returns {Axis.Time} The calling Axis.Time.
+             * @param {TimeAxisConfiguration[]} configurations
+             * @returns {Axes.Time} The calling Time Axis.
              */
             axisConfigurations(configurations: TimeAxisConfiguration[]): Time;
             orientation(): string;
@@ -1856,15 +1829,14 @@ declare module Plottable {
     module Axes {
         class Numeric extends Axis<number> {
             /**
-             * Constructs a NumericAxis.
+             * Constructs a Numeric Axis.
              *
-             * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-             * is for rendering a QuantitativeScale.
+             * A Numeric Axis is a visual representation of a QuantitativeScale.
              *
              * @constructor
-             * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-             * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-             * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
+             * @param {QuantitativeScale} scale
+             * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
             protected _setup(): void;
@@ -1882,11 +1854,9 @@ declare module Plottable {
             /**
              * Sets the tick label position relative to the tick marks.
              *
-             * @param {string} position If provided, the relative position of the tick label.
-             *                          [top/center/bottom] for a vertical NumericAxis,
-             *                          [left/center/right] for a horizontal NumericAxis.
-             *                          Defaults to center.
-             * @returns {Numeric} The calling Axis.Numeric.
+             * @param {string} position "top"/"center"/"bottom" for a vertical Numeric Axis,
+             *                          "left"/"center"/"right" for a horizontal Numeric Axis.
+             * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
         }
@@ -1898,16 +1868,14 @@ declare module Plottable {
     module Axes {
         class Category extends Axis<string> {
             /**
-             * Constructs a CategoryAxis.
+             * Constructs a Category Axis.
              *
-             * A CategoryAxis takes a CategoryScale and includes word-wrapping
-             * algorithms and advanced layout logic to try to display the scale as
-             * efficiently as possible.
+             * A Category Axis is a visual representation of a Category Scale.
              *
              * @constructor
-             * @param {CategoryScale} scale The scale to base the Axis on.
-             * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
-             * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
+             * @param {Scales.Category} scale
+             * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+             * @param {Formatter} [formatter=Formatters.identity()]
              */
             constructor(scale: Scales.Category, orientation?: string, formatter?: (d: any) => string);
             protected _setup(): void;
@@ -1915,17 +1883,15 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _getTickValues(): string[];
             /**
-             * Gets the tick label angle
-             * @returns {number} the tick label angle
+             * Gets the tick label angle in degrees.
              */
             tickLabelAngle(): number;
             /**
-             * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
-             * @param {number} angle The angle for the ticks
-             * @returns {Category} The calling Category Axis.
+             * Sets the tick label angle in degrees.
+             * Right now only -90/0/90 are supported. 0 is horizontal.
              *
-             * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
-             * See tracking at https://github.com/palantir/plottable/issues/504
+             * @param {number} angle
+             * @returns {Category} The calling Category Axis.
              */
             tickLabelAngle(angle: number): Category;
             renderImmediately(): Category;
@@ -1939,53 +1905,45 @@ declare module Plottable {
     module Components {
         class Label extends Component {
             /**
-             * Creates a Label.
-             *
-             * A Label is a Component that draws a single line of text.
+             * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {string} displayText The text of the Label (default = "").
-             * @param {number} angle The rotation angle of the text (-90/0/90). 0 is horizontal.
+             * @param {string} [displayText=""] The text of the Label.
+             * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
             constructor(displayText?: string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
-             * Gets the current text on the Label.
-             *
-             * @returns {string} the text on the label.
+             * Gets the Label's text.
              */
             text(): string;
             /**
-             * Sets the current text on the Label.
+             * Sets the Label's text.
              *
-             * @param {string} displayText If provided, the new text for the Label.
+             * @param {string} displayText
              * @returns {Label} The calling Label.
              */
             text(displayText: string): Label;
             /**
-             * Gets the angle of the Label.
-             *
-             * @returns {number} the current angle.
+             * Gets the angle of the Label in degrees.
              */
             angle(): number;
             /**
-             * Sets the angle of the Label.
+             * Sets the angle of the Label in degrees.
              *
-             * @param {number} angle The desired angle (-90/0/90). 0 is horizontal.
+             * @param {number} angle One of -90/0/90. 0 is horizontal.
              * @returns {Label} The calling Label.
              */
             angle(angle: number): Label;
             /**
-             * Gets the amount of padding in pixels around the Label.
-             *
-             * @returns {number} the current padding amount.
+             * Gets the amount of padding around the Label in pixels.
              */
             padding(): number;
             /**
-             * Sets the amount of padding in pixels around the Label.
+             * Sets the amount of padding around the Label in pixels.
              *
-             * @param {number} padAmount The desired padding amount in pixel values
+             * @param {number} padAmount
              * @returns {Label} The calling Label.
              */
             padding(padAmount: number): Label;
@@ -1996,18 +1954,18 @@ declare module Plottable {
         class TitleLabel extends Label {
             static TITLE_LABEL_CLASS: string;
             /**
-             * Creates a TitleLabel, a type of label made for rendering titles.
-             *
              * @constructor
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
             /**
-             * Creates a AxisLabel, a type of label made for rendering axis labels.
-             *
              * @constructor
+             * @param {string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: string, angle?: number);
         }
@@ -2031,10 +1989,7 @@ declare module Plottable {
              */
             static LEGEND_SYMBOL_CLASS: string;
             /**
-             * Creates a Legend.
-             *
-             * The Legend consists of a series of entries, each with a color and label taken from the `scale`.
-             * The entries will be displayed in the order of the `scale` domain.
+             * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
              *
              * @constructor
              * @param {Scale.Color} scale
@@ -2042,63 +1997,68 @@ declare module Plottable {
             constructor(scale: Scales.Color);
             protected _setup(): void;
             /**
-             * Gets the current max number of entries in Legend row.
-             * @returns {number} The current max number of entries in row.
+             * Gets the maximum number of entries per row.
+             *
+             * @returns {number}
              */
             maxEntriesPerRow(): number;
             /**
-             * Sets a new max number of entries in Legend row.
+             * Sets the maximum number of entries perrow.
              *
-             * @param {number} numEntries If provided, the new max number of entries in row.
+             * @param {number} numEntries
              * @returns {Legend} The calling Legend.
              */
             maxEntriesPerRow(numEntries: number): Legend;
             /**
              * Gets the current comparator for the Legend's entries.
-             * @returns {(a: string, b: string) => number} The current comparator.
+             *
+             * @returns {(a: string, b: string) => number}
              */
             comparator(): (a: string, b: string) => number;
             /**
              * Sets a new comparator for the Legend's entries.
+             * The comparator is used to set the display order of the entries.
              *
-             * @param {(a: string, b: string) => number} comparator If provided, the new comparator.
+             * @param {(a: string, b: string) => number} comparator
              * @returns {Legend} The calling Legend.
              */
             comparator(comparator: (a: string, b: string) => number): Legend;
             /**
-             * Gets the current color scale from the Legend.
+             * Gets the Color Scale.
              *
-             * @returns {ColorScale} The current color scale.
+             * @returns {Scales.Color}
              */
             scale(): Scales.Color;
             /**
-             * Assigns a new color scale to the Legend.
+             * Sets the Color Scale.
              *
-             * @param {Scale.Color} scale If provided, the new scale.
+             * @param {Scales.Color} scale
              * @returns {Legend} The calling Legend.
              */
             scale(scale: Scales.Color): Legend;
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the legend entry under the given pixel position.
+             * Gets the entry under at given pixel position.
+             * Returns an empty Selection if no entry exists at that pixel position.
              *
-             * @param {Point} position The pixel position.
-             * @returns {D3.Selection} The selected entry, or null selection if no entry was selected.
+             * @param {Point} position
+             * @returns {D3.Selection}
              */
             getEntry(position: Point): D3.Selection;
             renderImmediately(): Legend;
             /**
-             * Gets the symbolFactoryAccessor of the legend, which dictates how
-             * the symbol in each entry is drawn.
+             * Gets the SymbolFactory accessor of the Legend.
+             * The accessor determines the symbol for each entry.
              *
-             * @returns {(datum: any, index: number) => symbolFactory} The symbolFactory accessor of the legend
+             * @returns {(datum: any, index: number) => symbolFactory}
              */
             symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the symbolFactoryAccessor of the legend
+             * Sets the SymbolFactory accessor of the Legend.
+             * The accessor determines the symbol for each entry.
              *
-             * @param {(datum: any, index: number) => symbolFactory}  The symbolFactory accessor to set to
+             * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
              * @returns {Legend} The calling Legend
              */
             symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
@@ -2119,41 +2079,36 @@ declare module Plottable {
             /**
              * Creates an InterpolatedColorLegend.
              *
-             * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-             * associated Scale.InterpolatedColor sampled at various points. Two labels
-             * show the maximum and minimum values of the Scale.InterpolatedColor.
+             * The InterpolatedColorLegend consists of a sequence of swatches that show the
+             * associated InterpolatedColor Scale sampled at various points.
+             * Two labels show the maximum and minimum values of the InterpolatedColor Scale.
              *
              * @constructor
-             * @param {Scale.InterpolatedColor} interpolatedColorScale
-             * @param {string} orientation (horizontal/left/right).
-             * @param {Formatter} The labels are formatted using this function.
+             * @param {Scales.InterpolatedColor} interpolatedColorScale
+             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
+             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
             constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
             destroy(): void;
             /**
-             * Gets the current formatter on the InterpolatedColorLegend.
-             *
-             * @returns {Formatter} The current Formatter.
+             * Gets the Formatter for the labels.
              */
             formatter(): Formatter;
             /**
-             * Sets the current formatter on the InterpolatedColorLegend.
+             * Sets the Formatter for the labels.
              *
-             * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+             * @param {Formatter} formatter
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             formatter(formatter: Formatter): InterpolatedColorLegend;
             /**
-             * Gets the orientation of the InterpolatedColorLegend.
-             *
-             * @returns {string} The current orientation.
+             * Gets the orientation.
              */
             orientation(): string;
             /**
-             * Sets the orientation of the InterpolatedColorLegend.
+             * Sets the orientation.
              *
-             * @param {string} newOrientation The desired orientation (horizontal/left/right).
-             *
+             * @param {string} orientation One of "horizontal"/"left"/"right".
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
             orientation(orientation: string): InterpolatedColorLegend;
@@ -2171,9 +2126,7 @@ declare module Plottable {
     module Components {
         class Gridlines extends Component {
             /**
-             * Creates a set of Gridlines.
              * @constructor
-             *
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
@@ -2190,9 +2143,7 @@ declare module Plottable {
     module Components {
         class Table extends ComponentContainer {
             /**
-             * Constructs a Table.
-             *
-             * A Table is used to combine multiple Components in the form of a grid. A
+             * A Table combines Components in the form of a grid. A
              * common case is combining a y-axis, x-axis, and the plotted data via
              * ```typescript
              * new Table([[yAxis, plot],
@@ -2200,8 +2151,8 @@ declare module Plottable {
              * ```
              *
              * @constructor
-             * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
-             * null can be used if a cell is empty. (default = [])
+             * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
+             *   null can be used if a cell is empty.
              */
             constructor(rows?: Component[][]);
             protected _forEach(callback: (component: Component) => any): void;
@@ -2222,8 +2173,8 @@ declare module Plottable {
              * ```
              *
              * @param {Component} component The Component to be added.
-             * @param {number} row The row in which to add the Component.
-             * @param {number} col The column in which to add the Component.
+             * @param {number} row
+             * @param {number} col
              * @returns {Table} The calling Table.
              */
             add(component: Component, row: number, col: number): Table;
@@ -2231,34 +2182,35 @@ declare module Plottable {
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Table;
             /**
-             * Gets the row padding on the Table.
-             *
-             * @returns {number} the row padding.
+             * Gets the padding above and below each row in pixels.
              */
             rowPadding(): number;
             /**
-             * Sets the row padding on the Table.
+             * Sets the padding above and below each row in pixels.
              *
-             * @param {number} rowPadding The padding above and below each row, in pixels.
+             * @param {number} rowPadding
              * @returns {Table} The calling Table.
              */
             rowPadding(rowPadding: number): Table;
             /**
-             * Gets the column padding on the Table.
-             *
-             * @returns {number} the column padding.
+             * Gets the padding to the left and right of each column in pixels.
              */
             columnPadding(): number;
             /**
-             * Sets the column padding on the Table.
+             * Sets the padding to the left and right of each column in pixels.
              *
-             * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+             * @param {number} columnPadding
              * @returns {Table} The calling Table.
              */
             columnPadding(columnPadding: number): Table;
+            /**
+             * Gets the weight of the specified row.
+             *
+             * @param {number} index
+             */
             rowWeight(index: number): number;
             /**
-             * Sets the layout weight of a particular row.
+             * Sets the weight of the specified row.
              * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
              *
              * A common case would be to have one row take up 2/3rds of the space,
@@ -2278,20 +2230,25 @@ declare module Plottable {
              *  .rowWeight(1, 1)
              * ```
              *
-             * @param {number} index The index of the row.
-             * @param {number} weight The weight to be set on the row.
+             * @param {number} index
+             * @param {number} weight
              * @returns {Table} The calling Table.
              */
             rowWeight(index: number, weight: number): Table;
+            /**
+             * Gets the weight of the specified column.
+             *
+             * @param {number} index
+             */
             columnWeight(index: number): number;
             /**
-             * Sets the layout weight of a particular column.
+             * Sets the weight of the specified column.
              * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
              *
              * Please see `rowWeight` docs for an example.
              *
-             * @param {number} index The index of the column.
-             * @param {number} weight The weight to be set on the column.
+             * @param {number} index
+             * @param {number} weight
              * @returns {Table} The calling Table.
              */
             columnWeight(index: number, weight: number): Table;
@@ -2313,15 +2270,13 @@ declare module Plottable {
                 height: number;
             };
             /**
-             * Gets the bounds of the box.
-             *
-             * @return {Bounds} The current bounds of the box.
+             * Gets the Bounds of the box.
              */
             bounds(): Bounds;
             /**
-             * Sets the bounds of the box, and draws the box.
+             * Sets the Bounds of the box.
              *
-             * @param {Bounds} newBounds The desired bounds of the box.
+             * @param {Bounds} newBounds
              * @return {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             bounds(newBounds: Bounds): SelectionBoxLayer;
@@ -2329,8 +2284,6 @@ declare module Plottable {
             renderImmediately(): SelectionBoxLayer;
             /**
              * Gets whether the box is being shown.
-             *
-             * @return {boolean} Whether the box is showing.
              */
             boxVisible(): boolean;
             /**
@@ -2383,21 +2336,15 @@ declare module Plottable {
         protected _propertyExtents: D3.Map<any[]>;
         protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
-         * Constructs a Plot.
-         *
-         * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-         *
-         * A bare Plot has a DataSource and any number of projectors, which take
-         * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
-         *
          * @constructor
-         * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
          */
         constructor();
         anchor(selection: D3.Selection): Plot;
         protected _setup(): void;
         destroy(): void;
         /**
+         * Adds a Dataset to the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -2406,16 +2353,35 @@ declare module Plottable {
         protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
+        /**
+         * Gets the AccessorScaleBinding for a particular attribute.
+         *
+         * @param {string} attr
+         */
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+        /**
+         * Sets a particular attribute to a constant value or the result of an Accessor.
+         *
+         * @param {string} attr
+         * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+         * @returns {Plot} The calling Plot.
+         */
         attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+        /**
+         * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
+         * The provided Scale will account for the attribute values when autoDomain()-ing.
+         *
+         * @param {string} attr
+         * @param {A|Accessor<A>} attrValue
+         * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+         * @returns {Plot} The calling Plot.
+         */
         attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
         protected _bindProperty(property: string, value: any, scale: Scale<any, any>): void;
         protected _generateAttrToProjector(): AttributeToProjector;
         renderImmediately(): Plot;
         /**
          * Enables or disables animation.
-         *
-         * @param {boolean} enabled Whether or not to animate.
          */
         animate(enabled: boolean): Plot;
         detach(): Plot;
@@ -2430,21 +2396,22 @@ declare module Plottable {
          */
         protected _extentsForProperty(property: string): any[];
         /**
-         * Get the animator associated with the specified Animator key.
+         * Get the Animator associated with the specified Animator key.
          *
-         * @return {PlotAnimator} The Animator for the specified key.
+         * @return {Animators.Plot}
          */
         animator(animatorKey: string): Animators.Plot;
         /**
-         * Set the animator associated with the specified Animator key.
+         * Set the Animator associated with the specified Animator key.
          *
-         * @param {string} animatorKey The key for the Animator.
-         * @param {PlotAnimator} animator An Animator to be assigned to
-         * the specified key.
+         * @param {string} animatorKey
+         * @param {Animators.Plot} animator
          * @returns {Plot} The calling Plot.
          */
         animator(animatorKey: string, animator: Animators.Plot): Plot;
         /**
+         * Removes a Dataset from the Plot.
+         *
          * @param {Dataset} dataset
          * @returns {Plot} The calling Plot.
          */
@@ -2461,11 +2428,11 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
-         * Retrieves all of the Selections of this Plot for the specified Datasets.
+         * Retrieves Selections of this Plot for the specified Datasets.
          *
-         * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-         * If not provided, all selections will be retrieved.
-         * @returns {D3.Selection} The retrieved Selections.
+         * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+         *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+         * @returns {D3.Selection}
          */
         getAllSelections(datasets?: Dataset[]): D3.Selection;
         /**
@@ -2499,8 +2466,6 @@ declare module Plottable {
     module Plots {
         class Pie extends Plot {
             /**
-             * Constructs a PiePlot.
-             *
              * @constructor
              */
             constructor();
@@ -2510,14 +2475,65 @@ declare module Plottable {
             protected _onDatasetUpdate(): void;
             protected _getDrawer(dataset: Dataset): Drawers.AbstractDrawer;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
+            /**
+             * Gets the AccessorScaleBinding for the sector value.
+             */
             sectorValue<S>(): AccessorScaleBinding<S, number>;
+            /**
+             * Sets the sector value to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} sectorValue
+             * @returns {Pie} The calling Pie Plot.
+             */
             sectorValue(sectorValue: number | Accessor<number>): Plots.Pie;
+            /**
+             * Sets the sector value to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {S|Accessor<S>} sectorValue
+             * @param {Scale<S, number>} scale
+             * @returns {Pie} The calling Pie Plot.
+             */
             sectorValue<S>(sectorValue: S | Accessor<S>, scale: Scale<S, number>): Plots.Pie;
+            /**
+             * Gets the AccessorScaleBinding for the inner radius.
+             */
             innerRadius<R>(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets the inner radius to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} innerRadius
+             * @returns {Pie} The calling Pie Plot.
+             */
             innerRadius(innerRadius: number | Accessor<number>): Plots.Pie;
+            /**
+             * Sets the inner radius to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {R|Accessor<R>} innerRadius
+             * @param {Scale<R, number>} scale
+             * @returns {Pie} The calling Pie Plot.
+             */
             innerRadius<R>(innerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            /**
+             * Gets the AccessorScaleBinding for the outer radius.
+             */
             outerRadius<R>(): AccessorScaleBinding<R, number>;
+            /**
+             * Sets the outer radius to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} outerRadius
+             * @returns {Pie} The calling Pie Plot.
+             */
             outerRadius(outerRadius: number | Accessor<number>): Plots.Pie;
+            /**
+             * Sets the outer radius to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {R|Accessor<R>} outerRadius
+             * @param {Scale<R, number>} scale
+             * @returns {Pie} The calling Pie Plot.
+             */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): D3.Map<any[]>;
@@ -2535,48 +2551,75 @@ declare module Plottable {
         protected static _X_KEY: string;
         protected static _Y_KEY: string;
         /**
-         * Constructs an XYPlot.
-         *
-         * An XYPlot is a plot from drawing 2-dimensional data. Common examples
-         * include Scale.Line and Scale.Bar.
+         * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
          * @constructor
-         * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        /**
+         * Gets the AccessorScaleBinding for X.
+         */
         x(): Plots.AccessorScaleBinding<X, number>;
+        /**
+         * Sets X to a constant number or the result of an Accessor<number>.
+         *
+         * @param {number|Accessor<number>} x
+         * @returns {XYPlot} The calling XYPlot.
+         */
         x(x: number | Accessor<number>): XYPlot<X, Y>;
+        /**
+         * Sets X to a scaled constant value or scaled result of an Accessor.
+         * The provided Scale will account for the values when autoDomain()-ing.
+         *
+         * @param {X|Accessor<X>} x
+         * @param {Scale<X, number>} xScale
+         * @returns {XYPlot} The calling XYPlot.
+         */
         x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
+        /**
+         * Gets the AccessorScaleBinding for Y.
+         */
         y(): Plots.AccessorScaleBinding<Y, number>;
+        /**
+         * Sets Y to a constant number or the result of an Accessor<number>.
+         *
+         * @param {number|Accessor<number>} y
+         * @returns {XYPlot} The calling XYPlot.
+         */
         y(y: number | Accessor<number>): XYPlot<X, Y>;
+        /**
+         * Sets Y to a scaled constant value or scaled result of an Accessor.
+         * The provided Scale will account for the values when autoDomain()-ing.
+         *
+         * @param {Y|Accessor<Y>} y
+         * @param {Scale<Y, number>} yScale
+         * @returns {XYPlot} The calling XYPlot.
+         */
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
+         * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+         * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * If 'x' or 'y' is specified the adjustment is immediately performed.
-         *
-         * @param {string} scale Must be one of 'x', 'y', or 'none'.
-         *
-         * 'x' will adjust the x scale in relation to changes in the y domain.
-         *
-         * 'y' will adjust the y scale in relation to changes in the x domain.
-         *
-         * 'none' means neither scale will change automatically.
+         * @param {string} scaleName One of "x"/"y"/"none".
+         *   "x" will adjust the x Scale in relation to changes in the y domain.
+         *   "y" will adjust the y Scale in relation to changes in the x domain.
+         *   "none" means neither Scale will change automatically.
          *
          * @returns {XYPlot} The calling XYPlot.
          */
         autorange(scaleName: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
-         * Adjusts both domains' extents to show all datasets.
+         * Adjusts the domains of both X and Y scales to show all data.
+         * This call does not override the autorange() behavior.
          *
-         * This call does not override auto domain adjustment behavior over visible points.
+         * @returns {XYPlot} The calling XYPlot.
          */
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
@@ -2590,16 +2633,15 @@ declare module Plottable {
     module Plots {
         class Rectangle<X, Y> extends XYPlot<X, Y> {
             /**
-             * Constructs a RectanglePlot.
-             *
-             * A RectanglePlot consists of a bunch of rectangles. The user is required to
-             * project the left and right bounds of the rectangle (x and x1 respectively)
-             * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
-             * not set, the plot will apply auto-centering logic to the extent of x/y
+             * A Rectangle Plot displays rectangles based on the data.
+             * The left and right edges of each rectangle can be set with x() and x2().
+             *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
+             * The top and bottom edges of each rectangle can be set with y() and y2().
+             *   If only y() is set the Rectangle Plot will attempt to compute the correct top and bottom edge positions.
              *
              * @constructor
-             * @param {Scale.Scale} xScale The x scale to use.
-             * @param {Scale.Scale} yScale The y scale to use.
+             * @param {Scale.Scale} xScale
+             * @param {Scale.Scale} yScale
              */
             constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Rect;
@@ -2607,15 +2649,69 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * Gets the AccessorScaleBinding for X.
+             */
             x(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} x
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            /**
+             * Sets X to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {X|Accessor<X>} x
+             * @param {Scale<X, number>} xScale
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2.
+             */
             x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|X|Accessor<X>} x2
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y.
+             */
             y(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} y
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+            /**
+             * Sets Y to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @param {Scale<Y, number>} yScale
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
             y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
@@ -2664,12 +2760,10 @@ declare module Plottable {
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
-             * Constructs a Bar Plot.
-             *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
             x(): Plots.AccessorScaleBinding<X, number>;
@@ -2681,55 +2775,49 @@ declare module Plottable {
             protected _getDrawer(dataset: Dataset): Drawers.Rect;
             protected _setup(): void;
             /**
-             * Gets the baseline value for the bars
+             * Gets the baseline value.
+             * The baseline is the line that the bars are drawn from.
              *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @returns {number} The baseline value.
+             * @returns {number}
              */
             baseline(): number;
             /**
-             * Sets the baseline for the bars to the specified value.
+             * Sets the baseline value.
+             * The baseline is the line that the bars are drawn from.
              *
-             * The baseline is the line that the bars are drawn from, defaulting to 0.
-             *
-             * @param {number} value The value to position the baseline at.
-             * @returns {Bar} The calling Bar.
+             * @param {number} value
+             * @returns {Bar} The calling Bar Plot.
              */
             baseline(value: number): Bar<X, Y>;
             /**
              * Sets the bar alignment relative to the independent axis.
-             * VerticalBarPlot supports "left", "center", "right"
-             * HorizontalBarPlot supports "top", "center", "bottom"
+             * A vertical Bar Plot supports "left", "center", "right"
+             * A horizontal Bar Plot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
              * @returns {Bar} The calling Bar.
              */
             barAlignment(alignment: string): Bar<X, Y>;
             /**
-             * Get whether bar labels are enabled.
-             *
-             * @returns {boolean} Whether bars should display labels or not.
+             * Gets whether labels are enabled.
              */
             labelsEnabled(): boolean;
             /**
-             * Set whether bar labels are enabled.
-             * @param {boolean} Whether bars should display labels or not.
+             * Sets whether labels are enabled.
              *
-             * @returns {Bar} The calling plot.
+             * @param {boolean} labelsEnabled
+             * @returns {Bar} The calling Bar Plot.
              */
             labelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
-             * Get the formatter for bar labels.
-             *
-             * @returns {Formatter} The formatting function for bar labels.
+             * Gets the Formatter for the labels.
              */
             labelFormatter(): Formatter;
             /**
-             * Change the formatting function for bar labels.
-             * @param {Formatter} The formatting function for bar labels.
+             * Sets the Formatter for the labels.
              *
-             * @returns {Bar} The calling plot.
+             * @param {Formatter} formatter
+             * @returns {Bar} The calling Bar Plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _setupDatasetNodes(dataset: Dataset): void;
@@ -2794,11 +2882,9 @@ declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
             /**
-             * Constructs a LinePlot.
-             *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Line;
@@ -2829,23 +2915,30 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        /**
-         * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
-         */
         class Area<X> extends Line<X> {
             /**
-             * Constructs an AreaPlot.
+             * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _setup(): void;
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): Area<X>;
             y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
+            /**
+             * Gets the AccessorScaleBinding for Y0.
+             */
             y0(): Plots.AccessorScaleBinding<number, number>;
+            /**
+             * Sets Y0 to a constant number or the result of an Accessor<number>.
+             * If a Scale has been set for Y, it will also be used to scale Y0.
+             *
+             * @param {number|Accessor<number>} y0
+             * @returns {Area} The calling Area Plot.
+             */
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
@@ -2867,16 +2960,14 @@ declare module Plottable {
     module Plots {
         class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
-             * Creates a ClusteredBarPlot.
-             *
-             * A ClusteredBarPlot is a plot that plots several bar plots next to each
-             * other. For example, when plotting life expectancy across each country,
-             * you would want each country to have a "male" and "female" bar.
+             * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
+             *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
+             *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {Scale} xScale
+             * @param {Scale} yScale
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
             protected _generateAttrToProjector(): {
@@ -2892,11 +2983,9 @@ declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
             /**
-             * Constructs a StackedArea plot.
-             *
              * @constructor
-             * @param {QuantitativeScale} xScale The x scale to use.
-             * @param {QuantitativeScale} yScale The y scale to use.
+             * @param {QuantitativeScale} xScale
+             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _getAnimator(key: string): Animators.Plot;
@@ -2924,13 +3013,14 @@ declare module Plottable {
     module Plots {
         class StackedBar<X, Y> extends Bar<X, Y> {
             /**
-             * Constructs a StackedBar plot.
-             * A StackedBarPlot is a plot that plots several bar plots stacking on top of each
-             * other.
+             * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
+             *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
+             *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
+             *
              * @constructor
-             * @param {Scale} xScale the x scale of the plot.
-             * @param {Scale} yScale the y scale of the plot.
-             * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {Scale} xScale
+             * @param {Scale} yScale
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
             protected _getAnimator(key: string): Animators.Plot;
@@ -3165,114 +3255,94 @@ declare module Plottable {
         type MouseCallback = (p: Point, event: MouseEvent) => void;
         class Mouse extends Dispatcher {
             /**
-             * Get a Dispatcher.Mouse for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             * Get a Mouse Dispatcher for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
              *
-             * @param {SVGElement} elem A svg DOM element.
-             * @return {Dispatcher.Mouse} A Dispatcher.Mouse
+             * @param {SVGElement} elem
+             * @return {Dispatchers.Mouse}
              */
             static getDispatcher(elem: SVGElement): Dispatchers.Mouse;
             /**
-             * Creates a Dispatcher.Mouse.
-             * This constructor not be invoked directly under most circumstances.
+             * This constructor not be invoked directly.
              *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * @constructor
+             * @param {SVGElement} svg The root <svg> to attach to.
              */
             constructor(svg: SVGElement);
             /**
-             * Registers a callback to be called whenever the mouse position changes,
+             * Registers a callback to be called when the mouse position changes.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever the mouse position changes,
+             * Removes a callback that would be called when the mouse position changes.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseMove(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mousedown occurs.
+             * Registers a callback to be called when a mousedown occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mousedown occurs.
+             * Removes a callback that would be called when a mousedown occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseDown(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a mouseup occurs.
+             * Registers a callback to be called when a mouseup occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a mouseup occurs.
+             * Removes a callback that would be called when a mouseup occurs.
              *
-             * @param {(p: Point) => any} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offMouseUp(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a wheel occurs.
+             * Registers a callback to be called when a wheel event occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a wheel occurs.
+             * Removes a callback that would be called when a wheel event occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offWheel(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers a callback to be called whenever a dblClick occurs.
+             * Registers a callback to be called when a dblClick occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             onDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Registers the callback to be called whenever a dblClick occurs.
+             * Removes a callback that would be called when a dblClick occurs.
              *
-             * @param {MouseCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space.
-             *                                     Pass `null` to remove a callback.
-             * @return {Dispatcher.Mouse} The calling Dispatcher.Mouse.
+             * @param {MouseCallback} callback
+             * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             offDblClick(callback: MouseCallback): Dispatchers.Mouse;
             /**
-             * Returns the last computed mouse position.
+             * Returns the last computed mouse position in <svg> coordinate space.
              *
-             * @return {Point} The last known mouse position in <svg> coordinate space.
+             * @return {Point}
              */
             getLastMousePosition(): {
                 x: number;
@@ -3290,90 +3360,74 @@ declare module Plottable {
         }, event: TouchEvent) => void;
         class Touch extends Dispatcher {
             /**
-             * Get a Dispatcher.Touch for the <svg> containing elem. If one already exists
-             * on that <svg>, it will be returned; otherwise, a new one will be created.
+             * Gets a Touch Dispatcher for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
              *
-             * @param {SVGElement} elem A svg DOM element.
-             * @return {Dispatcher.Touch} A Dispatcher.Touch
+             * @param {SVGElement} elem
+             * @return {Dispatchers.Touch}
              */
             static getDispatcher(elem: SVGElement): Dispatchers.Touch;
             /**
-             * Creates a Dispatcher.Touch.
-             * This constructor should not be invoked directly under most circumstances.
+             * This constructor should not be invoked directly.
              *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * @constructor
+             * @param {SVGElement} svg The root <svg> to attach to.
              */
             constructor(svg: SVGElement);
             /**
-             * Registers a callback to be called whenever a touch starts.
+             * Registers a callback to be called when a touch starts.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch starts.
+             * Removes a callback that would be called when a touch starts.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchStart(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever the touch position changes.
+             * Registers a callback to be called when the touch position changes.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever the touch position changes.
+             * Removes a callback that would be called when the touch position changes.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchMove(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch ends.
+             * Registers a callback to be called when a touch ends.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch ends.
+             * Removes a callback that would be called when a touch ends.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchEnd(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Registers a callback to be called whenever a touch is cancelled.
+             * Registers a callback to be called when a touch is cancelled.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             onTouchCancel(callback: TouchCallback): Dispatchers.Touch;
             /**
-             * Removes the callback to be called whenever a touch is cancelled.
+             * Removes a callback that would be called when a touch is cancelled.
              *
-             * @param {TouchCallback} callback A callback that takes the pixel position
-             *                                     in svg-coordinate-space. Pass `null`
-             *                                     to remove a callback.
-             * @return {Dispatcher.Touch} The calling Dispatcher.Touch.
+             * @param {TouchCallback} callback
+             * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             offTouchCancel(callback: TouchCallback): Dispatchers.Touch;
         }
@@ -3386,31 +3440,30 @@ declare module Plottable {
         type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
-             * Get a Dispatcher.Key. If one already exists it will be returned;
+             * Gets a Key Dispatcher. If one already exists it will be returned;
              * otherwise, a new one will be created.
              *
-             * @return {Dispatcher.Key} A Dispatcher.Key
+             * @return {Dispatchers.Key}
              */
             static getDispatcher(): Dispatchers.Key;
             /**
-             * Creates a Dispatcher.Key.
-             * This constructor not be invoked directly under most circumstances.
+             * This constructor should not be invoked directly.
              *
-             * @param {SVGElement} svg The root <svg> element to attach to.
+             * @constructor
              */
             constructor();
             /**
              * Registers a callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
-             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             onKeyDown(callback: KeyCallback): Key;
             /**
              * Removes the callback to be called whenever a key is pressed.
              *
              * @param {KeyCallback} callback
-             * @return {Dispatcher.Key} The calling Dispatcher.Key.
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyDown(callback: KeyCallback): Key;
         }
@@ -3424,36 +3477,32 @@ declare module Plottable {
         protected _anchor(component: Component): void;
         protected _unanchor(): void;
         /**
-         * Attaches this interaction to a Component.
-         * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+         * Attaches this Interaction to a Component.
+         * If the Interaction was already attached to a Component, it first detaches itself from the old Component.
          *
-         * @param {Component} component The component to which to attach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         attachTo(component: Component): Interaction;
         /**
-         * Detaches this interaction from the Component.
-         * This interaction can be reused.
+         * Detaches this Interaction from the Component.
+         * This Interaction can be reused.
          *
-         * @param {Component} component The component from which to detach the interaction.
-         *
-         * @return {Interaction}
+         * @param {Component} component
+         * @returns {Interaction} The calling Interaction.
          */
         detachFrom(component: Component): Interaction;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
          * @param {Point} p A Point in <svg>-space coordinates.
-         *
          * @return {Point} The same location in Component-space coordinates.
          */
         protected _translateToComponentSpace(p: Point): Point;
         /**
          * Checks whether a Component-coordinate-space Point is inside the Component.
          *
-         * @param {Point} p A Point in Coordinate-space coordinates.
-         *
+         * @param {Point} p A Point in Compoennt-space coordinates.
          * @return {boolean} Whether or not the point is inside the Component.
          */
         protected _isInsideComponent(p: Point): boolean;
@@ -3468,17 +3517,17 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the Component is clicked.
+             * Adds a callback to be called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             onClick(callback: ClickCallback): Click;
             /**
-             * Removes the callback from click.
+             * Removes a callback that would be called when the Component is clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.Click} The calling Interaction.Click.
+             * @param {ClickCallback} callback
+             * @return {Interactions.Click} The calling Click Interaction.
              */
             offClick(callback: ClickCallback): Click;
         }
@@ -3492,17 +3541,17 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the Component is double-clicked.
+             * Adds a callback to be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to set.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             onDoubleClick(callback: ClickCallback): DoubleClick;
             /**
-             * Removes the callback called when the Component is double-clicked.
+             * Removes a callback that would be called when the Component is double-clicked.
              *
-             * @param {ClickCallback} callback The callback to remove.
-             * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+             * @param {ClickCallback} callback
+             * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
              */
             offDoubleClick(callback: ClickCallback): DoubleClick;
         }
@@ -3517,21 +3566,21 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets a callback to be called when the key with the given keyCode is
+             * Adds a callback to be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be set.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             onKey(keyCode: number, callback: KeyCallback): Key;
             /**
-             * Removes the callback to be called when the key with the given keyCode is
+             * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
              *
-             * @param {number} keyCode The key code associated with the key.
-             * @param {KeyCallback} callback Callback to be removed.
-             * @returns The calling Interaction.Key.
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
              */
             offKey(keyCode: number, callback: KeyCallback): Key;
         }
@@ -3546,45 +3595,45 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Sets the callback called when the pointer enters the Component.
+             * Adds a callback to be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer enters the Component.
+             * Removes a callback that would be called when the pointer enters the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerEnter(callback: PointerCallback): Pointer;
             /**
-             * Sets the callback called when the pointer moves.
+             * Adds a callback to be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer moves.
+             * Removes a callback that would be called when the pointer moves within the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerMove(callback: PointerCallback): Pointer;
             /**
-             * Sets the callback called when the pointer exits the Component.
+             * Adds a callback to be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to set.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             onPointerExit(callback: PointerCallback): Pointer;
             /**
-             * Removes a callback called when the pointer exits the Component.
+             * Removes a callback that would be called when the pointer exits the Component.
              *
-             * @param {PointerCallback} callback The callback to remove.
-             * @return {Interaction.Pointer} The calling Interaction.Pointer.
+             * @param {PointerCallback} callback
+             * @return {Interactions.Pointer} The calling Pointer Interaction.
              */
             offPointerExit(callback: PointerCallback): Pointer;
         }
@@ -3600,14 +3649,12 @@ declare module Plottable {
              */
             static PIXELS_PER_LINE: number;
             /**
-             * Creates a PanZoomInteraction.
-             *
-             * The allows you to move around and zoom in on a plot, interactively. It
-             * does so by changing the xScale and yScales' domains repeatedly.
+             * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
+             * in response to the user panning or zooming.
              *
              * @constructor
-             * @param {QuantitativeScale} [xScale] The X scale to update on panning/zooming.
-             * @param {QuantitativeScale} [yScale] The Y scale to update on panning/zooming.
+             * @param {QuantitativeScale} [xScale] The x-scale to update on panning/zooming.
+             * @param {QuantitativeScale} [yScale] The y-scale to update on panning/zooming.
              */
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
@@ -3624,68 +3671,68 @@ declare module Plottable {
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
             /**
-             * Returns whether or not this Interactions constrains Points passed to its
+             * Gets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
              *
              * If true, when the user drags outside of the Component, the closest Point
              * inside the Component will be passed to the callback instead of the actual
              * cursor position.
              *
-             * @return {boolean} Whether or not the Interactions.Drag constrains.
+             * @return {boolean}
              */
             constrainToComponent(): boolean;
             /**
-             * Sets whether or not this Interactions constrains Points passed to its
+             * Sets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
              *
              * If true, when the user drags outside of the Component, the closest Point
              * inside the Component will be passed to the callback instead of the actual
              * cursor position.
              *
-             * @param {boolean} constrain Whether or not to constrain Points.
-             * @return {Interactions.Drag} The calling Interactions.Drag.
+             * @param {boolean}
+             * @return {Interactions.Drag} The calling Drag Interaction.
              */
             constrainToComponent(constrain: boolean): Drag;
             /**
-             * Sets the callback to be called when dragging starts.
+             * Adds a callback to be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDragStart(callback: DragCallback): Drag;
             /**
-             * Removes the callback to be called when dragging starts.
+             * Removes a callback that would be called when dragging starts.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDragStart(callback: DragCallback): Drag;
             /**
              * Adds a callback to be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDrag(callback: DragCallback): Drag;
             /**
-             * Removes a callback to be called during dragging.
+             * Removes a callback that would be called during dragging.
              *
-             * @param {DragCallback} callback The callback to be removed.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDrag(callback: DragCallback): Drag;
             /**
-             * Adds a callback to be called when the dragging ends.
+             * Adds a callback to be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             onDragEnd(callback: DragCallback): Drag;
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback that would be called when dragging ends.
              *
-             * @param {DragCallback} callback The callback to be removed
-             * @returns {Drag} The calling Interactions.Drag.
+             * @param {DragCallback} callback
+             * @returns {Drag} The calling Drag Interaction.
              */
             offDragEnd(callback: DragCallback): Drag;
         }
@@ -3698,32 +3745,37 @@ declare module Plottable {
     module Components {
         class DragBoxLayer extends Components.SelectionBoxLayer {
             protected _hasCorners: boolean;
+            /**
+             * Constructs a DragBoxLayer.
+             *
+             * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
+             * A drag gesture will set the Bounds of the box.
+             * If resizing is enabled using resizable(true), the edges of box can be repositioned.
+             *
+             * @constructor
+             */
             constructor();
             protected _setup(): void;
             renderImmediately(): DragBoxLayer;
             /**
-             * Gets the detection radius of the drag box.
-             *
-             * @return {number} The detection radius of the drag box.
+             * Gets the detection radius of the drag box in pixels.
              */
             detectionRadius(): number;
             /**
-             * Sets the detection radius of the drag box.
+             * Sets the detection radius of the drag box in pixels.
              *
-             * @param {number} r The desired detection radius.
+             * @param {number} r
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             detectionRadius(r: number): DragBoxLayer;
             /**
              * Gets whether or not the drag box is resizable.
-             *
-             * @return {boolean} Whether or not the drag box is resizable.
              */
             resizable(): boolean;
             /**
              * Sets whether or not the drag box is resizable.
              *
-             * @param {boolean} canResize Whether or not the drag box should be resizable.
+             * @param {boolean} canResize
              * @return {DragBoxLayer} The calling DragBoxLayer.
              */
             resizable(canResize: boolean): DragBoxLayer;
@@ -3731,42 +3783,42 @@ declare module Plottable {
             /**
              * Sets the callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called when dragging starts.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragStart(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Sets a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
              * Removes a callback to be called during dragging.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDrag(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Sets a callback to be called when the dragging ends.
+             * Sets a callback to be called when dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be called. Passed the current Bounds in pixels.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             onDragEnd(callback: DragBoxCallback): DragBoxLayer;
             /**
-             * Removes a callback to be called when the dragging ends.
+             * Removes a callback to be called when dragging ends.
              *
-             * @param {DragBoxCallback} callback The callback to be removed.
+             * @param {DragBoxCallback} callback
              * @returns {DragBoxLayer} The calling DragBoxLayer.
              */
             offDragEnd(callback: DragBoxCallback): DragBoxLayer;
@@ -3782,6 +3834,12 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class XDragBoxLayer extends DragBoxLayer {
+            /**
+             * An XDragBoxLayer is a DragBoxLayer whose size can only be set in the X-direction.
+             * The y-values of the bounds() are always set to 0 and the height() of the XDragBoxLayer.
+             *
+             * @constructor
+             */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
@@ -3794,6 +3852,12 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class YDragBoxLayer extends DragBoxLayer {
+            /**
+             * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
+             * The x-values of the bounds() are always set to 0 and the width() of the YDragBoxLayer.
+             *
+             * @constructor
+             */
             constructor();
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;

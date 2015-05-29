@@ -90,26 +90,26 @@ export module Interactions {
     }
 
     /**
-     * Returns whether or not this Interactions constrains Points passed to its
+     * Gets whether the Drag Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point
      * inside the Component will be passed to the callback instead of the actual
      * cursor position.
      *
-     * @return {boolean} Whether or not the Interactions.Drag constrains.
+     * @return {boolean}
      */
     public constrainToComponent(): boolean;
     /**
-     * Sets whether or not this Interactions constrains Points passed to its
+     * Sets whether the Drag Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
      *
      * If true, when the user drags outside of the Component, the closest Point
      * inside the Component will be passed to the callback instead of the actual
      * cursor position.
      *
-     * @param {boolean} constrain Whether or not to constrain Points.
-     * @return {Interactions.Drag} The calling Interactions.Drag.
+     * @param {boolean}
+     * @return {Interactions.Drag} The calling Drag Interaction.
      */
     public constrainToComponent(constrain: boolean): Drag;
     public constrainToComponent(constrain?: boolean): any {
@@ -121,10 +121,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback to be called when dragging starts.
+     * Adds a callback to be called when dragging starts.
      *
-     * @param {DragCallback} callback The callback to be called. Takes in a Point in pixels.
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public onDragStart(callback: DragCallback) {
       this._dragStartCallbacks.add(callback);
@@ -132,10 +132,10 @@ export module Interactions {
     }
 
     /**
-     * Removes the callback to be called when dragging starts.
+     * Removes a callback that would be called when dragging starts.
      *
-     * @param {DragCallback} callback The callback to be removed.
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public offDragStart(callback: DragCallback) {
       this._dragStartCallbacks.delete(callback);
@@ -145,8 +145,8 @@ export module Interactions {
     /**
      * Adds a callback to be called during dragging.
      *
-     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public onDrag(callback: DragCallback) {
       this._dragCallbacks.add(callback);
@@ -154,10 +154,10 @@ export module Interactions {
     }
 
     /**
-     * Removes a callback to be called during dragging.
+     * Removes a callback that would be called during dragging.
      *
-     * @param {DragCallback} callback The callback to be removed.
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public offDrag(callback: DragCallback) {
       this._dragCallbacks.delete(callback);
@@ -165,10 +165,10 @@ export module Interactions {
     }
 
     /**
-     * Adds a callback to be called when the dragging ends.
+     * Adds a callback to be called when dragging ends.
      *
-     * @param {DragCallback} callback The callback to be called. Takes in Points in pixels.
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public onDragEnd(callback: DragCallback) {
       this._dragEndCallbacks.add(callback);
@@ -176,10 +176,10 @@ export module Interactions {
     }
 
     /**
-     * Removes a callback to be called when the dragging ends.
+     * Removes a callback that would be called when dragging ends.
      *
-     * @param {DragCallback} callback The callback to be removed
-     * @returns {Drag} The calling Interactions.Drag.
+     * @param {DragCallback} callback
+     * @returns {Drag} The calling Drag Interaction.
      */
     public offDragEnd(callback: DragCallback) {
       this._dragEndCallbacks.delete(callback);

@@ -9,15 +9,14 @@ export module Axes {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
     /**
-     * Constructs a NumericAxis.
-     *
-     * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-     * is for rendering a QuantitativeScale.
+     * Constructs a Numeric Axis.
+     * 
+     * A Numeric Axis is a visual representation of a QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-     * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
+     * @param {QuantitativeScale} scale
+     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
@@ -246,11 +245,9 @@ export module Axes {
     /**
      * Sets the tick label position relative to the tick marks.
      *
-     * @param {string} position If provided, the relative position of the tick label.
-     *                          [top/center/bottom] for a vertical NumericAxis,
-     *                          [left/center/right] for a horizontal NumericAxis.
-     *                          Defaults to center.
-     * @returns {Numeric} The calling Axis.Numeric.
+     * @param {string} position "top"/"center"/"bottom" for a vertical Numeric Axis,
+     *                          "left"/"center"/"right" for a horizontal Numeric Axis.
+     * @returns {Numeric} The calling Numeric Axis.
      */
     public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {

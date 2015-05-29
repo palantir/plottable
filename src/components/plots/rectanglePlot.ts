@@ -7,16 +7,15 @@ export module Plots {
     private static _Y2_KEY = "y2";
 
     /**
-     * Constructs a RectanglePlot.
-     *
-     * A RectanglePlot consists of a bunch of rectangles. The user is required to
-     * project the left and right bounds of the rectangle (x and x1 respectively)
-     * as well as the bottom and top bounds (y and y1 respectively). If x1/y1 is
-     * not set, the plot will apply auto-centering logic to the extent of x/y
+     * A Rectangle Plot displays rectangles based on the data.
+     * The left and right edges of each rectangle can be set with x() and x2().
+     *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
+     * The top and bottom edges of each rectangle can be set with y() and y2().
+     *   If only y() is set the Rectangle Plot will attempt to compute the correct top and bottom edge positions.
      *
      * @constructor
-     * @param {Scale.Scale} xScale The x scale to use.
-     * @param {Scale.Scale} yScale The y scale to use.
+     * @param {Scale.Scale} xScale
+     * @param {Scale.Scale} yScale
      */
     constructor() {
       super();
@@ -70,8 +69,25 @@ export module Plots {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
     }
 
+    /**
+     * Gets the AccessorScaleBinding for X.
+     */
     public x(): AccessorScaleBinding<X, number>;
+    /**
+     * Sets X to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} x
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    /**
+     * Sets X to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {X|Accessor<X>} x
+     * @param {Scale<X, number>} xScale
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
@@ -100,7 +116,17 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for X2.
+     */
     public x2(): AccessorScaleBinding<X, number>;
+    /**
+     * Sets X2 to a constant number or the result of an Accessor.
+     * If a Scale has been set for X, it will also be used to scale X2.
+     *
+     * @param {number|Accessor<number>|X|Accessor<X>} x2
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
     public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
       if (x2 == null) {
@@ -115,8 +141,25 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y.
+     */
     public y(): AccessorScaleBinding<Y, number>;
+    /**
+     * Sets Y to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} y
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
+    /**
+     * Sets Y to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {Y|Accessor<Y>} y
+     * @param {Scale<Y, number>} yScale
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
@@ -145,7 +188,17 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y2.
+     */
     public y2(): AccessorScaleBinding<Y, number>;
+    /**
+     * Sets Y2 to a constant number or the result of an Accessor.
+     * If a Scale has been set for Y, it will also be used to scale Y2.
+     *
+     * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
     public y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
     public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
       if (y2 == null) {

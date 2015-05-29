@@ -2,19 +2,16 @@
 
 module Plottable {
 export module Plots {
-  /**
-   * An AreaPlot draws a filled region (area) between the plot's projected "y" and projected "y0" values.
-   */
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
 
     /**
-     * Constructs an AreaPlot.
-     *
+     * An Area Plot draws a filled region (area) between Y and Y0.
+     * 
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale
+     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();
@@ -56,7 +53,17 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y0.
+     */
     public y0(): Plots.AccessorScaleBinding<number, number>;
+    /**
+     * Sets Y0 to a constant number or the result of an Accessor<number>.
+     * If a Scale has been set for Y, it will also be used to scale Y0.
+     * 
+     * @param {number|Accessor<number>} y0
+     * @returns {Area} The calling Area Plot.
+     */
     public y0(y0: number | Accessor<number>): Area<X>;
     public y0(y0?: number | Accessor<number>): any {
       if (y0 == null) {
