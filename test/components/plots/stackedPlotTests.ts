@@ -14,7 +14,7 @@ describe("Plots", () => {
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
 
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawers.AbstractDrawer(dataset);
+      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
       (<any> stackedPlot)._isVertical = true;
     });
 
@@ -160,7 +160,7 @@ describe("Plots", () => {
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
 
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawers.AbstractDrawer(dataset);
+      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
       (<any> stackedPlot)._isVertical = true;
     });
 
