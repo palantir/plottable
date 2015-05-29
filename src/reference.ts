@@ -37,7 +37,7 @@
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
-/// <reference path="drawers/rectDrawer.ts" />
+/// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
 

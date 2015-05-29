@@ -85,7 +85,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Rect(dataset);
+      return new Plottable.Drawers.Rectangle(dataset);
     }
 
     protected _setup() {

@@ -2912,15 +2912,15 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var Rect = (function (_super) {
-            __extends(Rect, _super);
-            function Rect(dataset) {
+        var Rectangle = (function (_super) {
+            __extends(Rectangle, _super);
+            function Rectangle(dataset) {
                 _super.call(this, dataset);
                 this._svgElement = "rect";
             }
-            return Rect;
+            return Rectangle;
         })(Drawers.Element);
-        Drawers.Rect = Rect;
+        Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6906,7 +6906,7 @@ var Plottable;
                 this.classed("rectangle-plot", true);
             }
             Rectangle.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset);
+                return new Plottable.Drawers.Rectangle(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -7223,7 +7223,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype._getDrawer = function (dataset) {
-                return new Plottable.Drawers.Rect(dataset);
+                return new Plottable.Drawers.Rectangle(dataset);
             };
             Bar.prototype._setup = function () {
                 _super.prototype._setup.call(this);
