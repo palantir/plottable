@@ -29,15 +29,13 @@ export module Plots {
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
 
     /**
-     * Constructs a Bar Plot.
-     *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super();
       this.classed("bar-plot", true);
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -50,6 +48,42 @@ export module Plots {
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): Bar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+
+      if (xScale == null) {
+        super.x(<number | Accessor<number>>x);
+      } else {
+        super.x(< X | Accessor<X>>x, xScale);
+      }
+
+      this._updateValueScale();
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): Bar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+
+      if (yScale == null) {
+        super.y(<number | Accessor<number>>y);
+      } else {
+        super.y(<Y | Accessor<Y>>y, yScale);
+      }
+
+      this._updateValueScale();
+      return this;
+    }
+
     protected _getDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Rect(dataset);
     }
@@ -60,20 +94,18 @@ export module Plots {
     }
 
     /**
-     * Gets the baseline value for the bars
+     * Gets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @returns {number} The baseline value.
+     * @returns {number}
      */
     public baseline(): number;
     /**
-     * Sets the baseline for the bars to the specified value.
+     * Sets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @param {number} value The value to position the baseline at.
-     * @returns {Bar} The calling Bar.
+     * @param {number} value
+     * @returns {Bar} The calling Bar Plot.
      */
     public baseline(value: number): Bar<X, Y>;
     public baseline(value?: number): any {
@@ -88,8 +120,8 @@ export module Plots {
 
     /**
      * Sets the bar alignment relative to the independent axis.
-     * VerticalBarPlot supports "left", "center", "right"
-     * HorizontalBarPlot supports "top", "center", "bottom"
+     * A vertical Bar Plot supports "left", "center", "right"
+     * A horizontal Bar Plot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
      * @returns {Bar} The calling Bar.
@@ -107,16 +139,14 @@ export module Plots {
     }
 
     /**
-     * Get whether bar labels are enabled.
-     *
-     * @returns {boolean} Whether bars should display labels or not.
+     * Gets whether labels are enabled.
      */
     public labelsEnabled(): boolean;
     /**
-     * Set whether bar labels are enabled.
-     * @param {boolean} Whether bars should display labels or not.
+     * Sets whether labels are enabled.
      *
-     * @returns {Bar} The calling plot.
+     * @param {boolean} labelsEnabled
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelsEnabled(enabled: boolean): Bar<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
@@ -130,16 +160,14 @@ export module Plots {
     }
 
     /**
-     * Get the formatter for bar labels.
-     *
-     * @returns {Formatter} The formatting function for bar labels.
+     * Gets the Formatter for the labels.
      */
     public labelFormatter(): Formatter;
     /**
-     * Change the formatting function for bar labels.
-     * @param {Formatter} The formatting function for bar labels.
+     * Sets the Formatter for the labels.
      *
-     * @returns {Bar} The calling plot.
+     * @param {Formatter} formatter
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelFormatter(formatter: Formatter): Bar<X, Y>;
     public labelFormatter(formatter?: Formatter): any {
@@ -265,7 +293,7 @@ export module Plots {
 
     /**
      * Gets the {Plots.PlotData} that correspond to the given pixel position.
-     * 
+     *
      * @param {Point} p The provided pixel position as a {Point}
      * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
      */
@@ -275,7 +303,7 @@ export module Plots {
 
     /**
      * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
-     * 
+     *
      */
     public plotDataIn(bounds: Bounds): PlotData;
     /**
@@ -315,6 +343,9 @@ export module Plots {
     }
 
     private _updateValueScale() {
+      if (!this._projectorsReady()) {
+        return;
+      }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;

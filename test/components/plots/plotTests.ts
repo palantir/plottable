@@ -194,10 +194,6 @@ describe("Plots", () => {
       var oneElementSelection = plot.getAllSelections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
-
-      var nonExcludedSelection = plot.getAllSelections([dataset1], true);
-      assert.strictEqual(nonExcludedSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(nonExcludedSelection, "cy"), 10, "retreived non-excluded selection in renderArea2");
       svg.remove();
     });
 
@@ -455,7 +451,7 @@ describe("Plots", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(x, y);
+      var plot = new Plottable.Plots.Bar();
       plot.addDataset(new Plottable.Dataset([])).animate(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {

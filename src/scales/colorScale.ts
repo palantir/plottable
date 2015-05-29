@@ -11,12 +11,12 @@ export module Scales {
     private _d3Scale: D3.Scale.OrdinalScale;
 
     /**
-     * Constructs a ColorScale.
+     * A Color Scale maps string values to color hex values expressed as a string.
      *
      * @constructor
-     * @param {string} [scaleType] the type of color scale to create
-     *     (Category10/Category20/Category20b/Category20c).
-     * See https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors
+     * @param {string} [scaleType] One of "Category10"/"Category20"/"Category20b"/"Category20c".
+     *   (see https://github.com/mbostock/d3/wiki/Ordinal-Scales#categorical-colors)
+     *   If not supplied, reads the colors defined using CSS -- see plottable.css.
      */
     constructor(scaleType?: string) {
       super();
@@ -85,8 +85,13 @@ export module Scales {
       return plottableDefaultColors;
     }
 
-    // Modifying the original scale method so that colors that are looped are lightened according
-    // to how many times they are looped.
+    /**
+     * Returns the color-string corresponding to a given string.
+     * If there are not enough colors in the range(), a lightened version of an existing color will be used.
+     * 
+     * @param {string} value
+     * @returns {string}
+     */
     public scale(value: string): string {
       var color = this._d3Scale(value);
       var index = this.domain().indexOf(value);

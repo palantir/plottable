@@ -2,14 +2,6 @@
 
 module Plottable {
 export module Scales {
-
-  /**
-   * This class implements a color scale that takes quantitive input and
-   * interpolates between a list of color values. It returns a hex string
-   * representing the interpolated color.
-   *
-   * By default it generates a linear scale internally.
-   */
   export class InterpolatedColor extends Scale<number, string> {
     public static REDS = [
       "#FFFFFF", // white
@@ -57,13 +49,12 @@ export module Scales {
     private _d3Scale: D3.Scale.QuantitativeScale<number>;
 
     /**
-     * An InterpolatedColorScale maps numbers to color strings.
+     * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
      *
-     * @param {string[]} colors an array of strings representing color values in hex
-     *     ("#FFFFFF") or keywords ("white"). Defaults to InterpolatedColor.REDS
-     * @param {string} scaleType a string representing the underlying scale
-     *     type ("linear"/"log"/"sqrt"/"pow"). Defaults to "linear"
-     * @returns {D3.Scale.QuantitativeScale} The converted QuantitativeScale d3 scale.
+     * @constructor
+     * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
+     *   ("#FFFFFF") or keywords ("white").
+     * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
      */
     constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
       super();
@@ -136,18 +127,14 @@ export module Scales {
     /**
      * Gets the color range.
      *
-     * @returns {string[]} the current color values for the range as strings.
+     * @returns {string[]}
      */
     public colorRange(): string[];
     /**
      * Sets the color range.
      *
-     * @param {string[]} [colorRange]. If provided and if colorRange is one of
-     * (reds/blues/posneg), uses the built-in color groups. If colorRange is an
-     * array of strings with at least 2 values (e.g. ["#FF00FF", "red",
-     * "dodgerblue"], the resulting scale will interpolate between the color
-     * values across the domain.
-     * @returns {InterpolatedColor} The calling InterpolatedColor.
+     * @param {string[]} colorRange
+     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
      */
     public colorRange(colorRange: string[]): InterpolatedColor;
     public colorRange(colorRange?: string[]): any {

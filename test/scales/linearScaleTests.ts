@@ -204,11 +204,11 @@ describe("Scales", () => {
         xScale.padProportion(0);
         var yScale = new Plottable.Scales.Linear();
         yScale.padProportion(0);
-        var renderAreaD1 = new Plottable.Plots.Line(xScale, yScale);
+        var renderAreaD1 = new Plottable.Plots.Line();
         renderAreaD1.addDataset(ds1);
         renderAreaD1.x((d) => d.x, xScale);
         renderAreaD1.y((d) => d.y, yScale);
-        var renderAreaD2 = new Plottable.Plots.Line(xScale, yScale);
+        var renderAreaD2 = new Plottable.Plots.Line();
         renderAreaD2.addDataset(ds2);
         renderAreaD2.x((d) => d.x, xScale);
         renderAreaD2.y((d) => d.y, yScale);

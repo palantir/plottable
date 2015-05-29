@@ -5,14 +5,12 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
     /**
-     * Constructs a LinePlot.
-     *
      * @constructor
-     * @param {QuantitativeScale} xScale The x scale to use.
-     * @param {QuantitativeScale} yScale The y scale to use.
+     * @param {QuantitativeScale} xScale
+     * @param {QuantitativeScale} yScale
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("line-plot", true);
       this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("stroke", new Scales.Color().range()[0]);

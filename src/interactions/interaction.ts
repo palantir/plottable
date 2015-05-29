@@ -17,12 +17,11 @@ module Plottable {
     }
 
     /**
-     * Attaches this interaction to a Component.
-     * If the interaction was already attached to a Component, it first detaches itself from the old Component.
+     * Attaches this Interaction to a Component.
+     * If the Interaction was already attached to a Component, it first detaches itself from the old Component.
      *
-     * @param {Component} component The component to which to attach the interaction.
-     *
-     * @return {Interaction}
+     * @param {Component} component
+     * @returns {Interaction} The calling Interaction.
      */
     public attachTo(component: Component) {
       if (this._componentAttachedTo) {
@@ -36,12 +35,11 @@ module Plottable {
     }
 
     /**
-     * Detaches this interaction from the Component.
-     * This interaction can be reused.
+     * Detaches this Interaction from the Component.
+     * This Interaction can be reused.
      *
-     * @param {Component} component The component from which to detach the interaction.
-     *
-     * @return {Interaction}
+     * @param {Component} component
+     * @returns {Interaction} The calling Interaction.
      */
     public detachFrom(component: Component) {
       if (this._isAnchored) {
@@ -57,7 +55,6 @@ module Plottable {
      * Translates an <svg>-coordinate-space point to Component-space coordinates.
      *
      * @param {Point} p A Point in <svg>-space coordinates.
-     *
      * @return {Point} The same location in Component-space coordinates.
      */
     protected _translateToComponentSpace(p: Point): Point {
@@ -71,8 +68,7 @@ module Plottable {
     /**
      * Checks whether a Component-coordinate-space Point is inside the Component.
      *
-     * @param {Point} p A Point in Coordinate-space coordinates.
-     *
+     * @param {Point} p A Point in Compoennt-space coordinates.
      * @return {boolean} Whether or not the point is inside the Component.
      */
     protected _isInsideComponent(p: Point) {
