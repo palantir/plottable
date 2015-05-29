@@ -2459,15 +2459,13 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
-         * Retrieves all of the Selections of this Plot for the specified Datasets.
+         * Retrieves Selections on this Plot for the specified Datasets.
          *
          * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
-         * @param {boolean} exclude If set to true, returns the Selections for all Datasets except
-         *   those specified in the datsets parameter.
          * @returns {D3.Selection}
          */
-        getAllSelections(datasets?: Dataset[], exclude?: boolean): D3.Selection;
+        getAllSelections(datasets?: Dataset[]): D3.Selection;
         /**
          * Retrieves all of the PlotData of this plot for the specified dataset(s)
          *
@@ -3008,7 +3006,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[], exclude?: boolean): D3._Selection<any>;
+            getAllSelections(datasets?: Dataset[]): D3._Selection<any>;
             getAllPlotData(datasets?: Dataset[]): Plots.PlotData;
             protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }

@@ -457,21 +457,14 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the Selections of this Plot for the specified Datasets.
+     * Retrieves Selections on this Plot for the specified Datasets.
      *
      * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
-     * @param {boolean} exclude If set to true, returns the Selections for all Datasets except
-     *   those specified in the datsets parameter.
      * @returns {D3.Selection}
      */
-    public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
+    public getAllSelections(datasets = this.datasets()): D3.Selection {
       var datasetKeyArray = this._keysForDatasets(datasets);
-
-      if (exclude) {
-        var excludedDatasetKeys = d3.set(datasetKeyArray);
-        datasetKeyArray = this._datasetKeysInOrder.filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
-      }
 
       var allSelections: EventTarget[] = [];
 

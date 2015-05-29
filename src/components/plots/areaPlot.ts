@@ -148,11 +148,8 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    public getAllSelections(datasets = this.datasets(), exclude = false) {
-      var allSelections = super.getAllSelections(datasets, exclude)[0];
-      if (exclude) {
-        datasets = this.datasets().filter((dataset) => datasets.indexOf(dataset) < 0);
-      }
+    public getAllSelections(datasets = this.datasets()) {
+      var allSelections = super.getAllSelections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
       lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
