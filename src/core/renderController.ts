@@ -59,7 +59,7 @@ module Plottable {
     }
 
     /**
-     * Enqueus the Component for layout and rendering.
+     * Enqueues the Component for layout and rendering.
      * 
      * @param {Component} component
      */
@@ -78,7 +78,7 @@ module Plottable {
     }
 
     /**
-     * Renders all Components waiting to be rendered immediately,
+     * Renders all Components waiting to be rendered immediately
      * instead of waiting until the next frame.
      *
      * Useful to call when debugging.

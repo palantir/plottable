@@ -1211,7 +1211,6 @@ var Plottable;
 (function (Plottable) {
     var Dataset = (function () {
         /**
-         * Constructs a new Dataset.
          * A Dataset contains an array of data and some metadata.
          * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
          *
@@ -1277,7 +1276,7 @@ var Plottable;
     var RenderPolicies;
     (function (RenderPolicies) {
         /**
-         * Never queue anything, render everything immediately.
+         * Renders Components immediately after they are enqueued.
          * Useful for debugging, horrible for performance.
          */
         var Immediate = (function () {
@@ -1382,7 +1381,7 @@ var Plottable;
         }
         RenderController.registerToRender = registerToRender;
         /**
-         * Enqueus the Component for layout and rendering.
+         * Enqueues the Component for layout and rendering.
          *
          * @param {Component} component
          */
@@ -1400,7 +1399,7 @@ var Plottable;
             }
         }
         /**
-         * Renders all Components waiting to be rendered immediately,
+         * Renders all Components waiting to be rendered immediately
          * instead of waiting until the next frame.
          *
          * Useful to call when debugging.
@@ -10085,8 +10084,6 @@ var Plottable;
         var YDragBoxLayer = (function (_super) {
             __extends(YDragBoxLayer, _super);
             /**
-             * Constructs a YDragBoxLayer.
-             *
              * A YDragBoxLayer is a DragBoxLayer whose size can only be set in the Y-direction.
              * The x-values of the bounds() are always set to 0 and the width() of the YDragBoxLayer.
              *

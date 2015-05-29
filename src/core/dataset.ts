@@ -10,7 +10,6 @@ module Plottable {
     private _callbacks: Utils.CallbackSet<DatasetCallback>;
 
     /**
-     * Constructs a new Dataset.
      * A Dataset contains an array of data and some metadata.
      * Changes to the data or metadata will cause anything subscribed to the Dataset to update.
      *

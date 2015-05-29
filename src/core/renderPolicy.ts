@@ -10,7 +10,7 @@ module Plottable {
     }
 
     /**
-     * Never queue anything, render everything immediately.
+     * Renders Components immediately after they are enqueued.
      * Useful for debugging, horrible for performance.
      */
     export class Immediate implements RenderPolicy {
