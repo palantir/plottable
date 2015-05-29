@@ -59,12 +59,26 @@ function run(svg, data, Plottable){
   var pointer = new Plottable.Interactions.Pointer();
   var defaultTitleText = "n = new point, d = delete last point, c = log points";
   pointer.onPointerMove(function(p) {
-    var cpd = plot.getClosestPlotData(p);
-    if (cpd.data.length > 0) {
-      var dist = Math.sqrt(Math.pow((p.x - cpd.pixelPoints[0].x), 2) + Math.pow((p.y - cpd.pixelPoints[0].y), 2));
+    var datum;
+    var position;
+    if (typeof plot.entityNearest === "function") {
+      var nearestEntity = plot.entityNearest(p);
+      if (nearestEntity != null) {
+        datum = nearestEntity.datum;
+        position = nearestEntity.position;
+      }
+    } else {
+      var cpd = plot.getClosestPlotData(p);
+      if (cpd.data.length > 0) {
+        datum = cpd.data[0];
+        position = cpd.pixelPoints[0];
+      }
+    }
+    if (datum != null) {
+      var dist = Math.sqrt(Math.pow((p.x - position.x), 2) + Math.pow((p.y - position.y), 2));
       if (dist < symbolSize / 2) {
-        var xString = cpd.data[0].x.toFixed(2);
-        var yString = cpd.data[0].y.toFixed(2);
+        var xString = datum.x.toFixed(2);
+        var yString = datum.y.toFixed(2);
         title.text("[ " + xString + ", " + yString + " ]");
         return;
       }

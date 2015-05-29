@@ -197,7 +197,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllPlotData() with dataset retrieval", () => {
+    it("entities() with dataset retrieval", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
@@ -215,12 +215,12 @@ describe("Plots", () => {
       // Create mock drawers with already drawn items
       var mockDrawer1 = new Plottable.Drawers.AbstractDrawer(dataset1);
       var renderArea1 = svg.append("g");
-      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._getSelector = () => "circle";
 
       var renderArea2 = svg.append("g");
-      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawers.AbstractDrawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._getSelector = () => "circle";
@@ -247,30 +247,30 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      var allPlotData = plot.getAllPlotData();
-      assert.strictEqual(allPlotData.selection.size(), 2, "all circle selections gotten");
-      assert.includeMembers(allPlotData.data, data1, "includes data1 members");
-      assert.includeMembers(allPlotData.data, data2, "includes data2 members");
-      assert.includeMembers(allPlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
-      assert.includeMembers(allPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+      var entities = plot.entities();
+      assert.lengthOf(entities, data1.length + data2.length, "retrieved one Entity for each value on the Plot");
+      var entityData = entities.map((entity) => entity.datum);
+      assert.includeMembers(entityData, data1, "includes data1 members");
+      assert.includeMembers(entityData, data2, "includes data2 members");
+      var entityPositions = entities.map((entity) => entity.position);
+      assert.includeMembers(entityPositions, data1.map(data1PointConverter), "includes data1 points");
+      assert.includeMembers(entityPositions, data2.map(data2PointConverter), "includes data2 points");
 
-      var singlePlotData = plot.getAllPlotData([dataset1]);
-      var oneSelection = singlePlotData.selection;
-      assert.strictEqual(oneSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
-      assert.includeMembers(singlePlotData.data, data1, "includes data1 members");
-      assert.includeMembers(singlePlotData.pixelPoints, data1.map(data1PointConverter), "includes data1 points");
+      entities = plot.entities([dataset1]);
+      assert.lengthOf(entities, data1.length, "retrieved one Entity for each value in dataset1");
+      assert.strictEqual(entities[0].selection.node(), renderArea1Selection.node(), "returns the selection associated with dataset1");
+      assert.includeMembers(entities.map((entity) => entity.datum), data1, "includes data1 members");
+      assert.includeMembers(entities.map((entity) => entity.position), data1.map(data1PointConverter), "includes data1 points");
 
-      var oneElementPlotData = plot.getAllPlotData([dataset2]);
-      var oneElementSelection = oneElementPlotData.selection;
-      assert.strictEqual(oneElementSelection.size(), 1);
-      assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreieved selection in renderArea2");
-      assert.includeMembers(oneElementPlotData.data, data2, "includes data2 members");
-      assert.includeMembers(oneElementPlotData.pixelPoints, data2.map(data2PointConverter), "includes data2 points");
+      entities = plot.entities([dataset2]);
+      assert.lengthOf(entities, data2.length, "retrieved one Entity for each value in dataset2");
+      assert.strictEqual(entities[0].selection.node(), renderArea2Selection.node(), "returns the selection associated with dataset1");
+      assert.includeMembers(entities.map((entity) => entity.datum), data2, "includes data1 members");
+      assert.includeMembers(entities.map((entity) => entity.position), data2.map(data2PointConverter), "includes data2 points");
       svg.remove();
     });
 
-    it("getAllPlotData() with NaN pixel points", () => {
+    it("entities() with NaN values", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
@@ -300,20 +300,17 @@ describe("Plots", () => {
       plot.addDataset(dataset);
       plot.renderTo(svg);
 
-      var oneElementPlotData = plot.getAllPlotData();
-      var oneElementSelection = oneElementPlotData.selection;
-      assert.strictEqual(oneElementSelection.size(), 2, "finds all selections that do not have NaN pixelPoint");
-      assert.lengthOf(oneElementPlotData.pixelPoints, 2, "returns pixelPoints except ones with NaN");
-      assert.lengthOf(oneElementPlotData.data, 2, "finds data that do not have NaN pixelPoint");
+      var entities = plot.entities();
+      assert.lengthOf(entities, 2, "returns Entities for all valid data values");
 
-      oneElementPlotData.pixelPoints.forEach((pixelPoint) => {
-        assert.isNumber(pixelPoint.x, "pixelPoint X cannot be NaN");
-        assert.isNumber(pixelPoint.y, "pixelPoint Y cannot be NaN");
+      entities.forEach((entity) => {
+        assert.isNumber(entity.position.x, "position X cannot be NaN");
+        assert.isNumber(entity.position.y, "position Y cannot be NaN");
       });
       svg.remove();
     });
 
-    it("getClosestPlotData", () => {
+    it("entityNearest()", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
@@ -363,8 +360,8 @@ describe("Plots", () => {
       plot.renderTo(svg);
 
       var queryPoint = {x: 1, y: 11};
-      var closestPlotData = plot.getClosestPlotData(queryPoint);
-      assert.deepEqual(closestPlotData.pixelPoints, [{x: 1, y: 10}], "retrieves the closest point across datasets");
+      var nearestEntity = plot.entityNearest(queryPoint);
+      assert.deepEqual(nearestEntity.position, {x: 1, y: 10}, "retrieves the closest point across datasets");
 
       svg.remove();
     });

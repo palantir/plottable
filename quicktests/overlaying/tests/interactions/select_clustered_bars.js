@@ -31,11 +31,11 @@ function run(svg, data, Plottable) {
   var clickInteraction = new Plottable.Interactions.Click();
   clickInteraction.attachTo(barPlot);
   clickInteraction.onClick(function (p) {
-    var bars = barPlot.getBars(p.x, p.y, true);
-    if (bars == null) {
+    var bars = barPlot.entitiesAt(p);
+    if (bars.length === 0) {
       barPlot.getAllSelections().style("fill", null);
     } else {
-      bars.style("fill", "red");
+      bars.forEach(function(bar) { bar.selection.style("fill", "red"); });
     }
   });
 

@@ -5,7 +5,7 @@ var assert = chai.assert;
 describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
-    it("getAllPlotData with NaNs", () => {
+    it("entities() with NaN in data", () => {
       var svg = TestMethods.generateSVG(500, 500);
       var dataWithNaN = [
         { foo: 0.0, bar: 0.0 },
@@ -26,11 +26,10 @@ describe("Plots", () => {
       linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
-      var apd = linePlot.getAllPlotData();
+      var entities = linePlot.entities();
 
       var expectedLength = dataWithNaN.length - 1;
-      assert.strictEqual(apd.data.length, expectedLength, "NaN data was not returned");
-      assert.strictEqual(apd.pixelPoints.length, expectedLength, "NaN data doesn't appear in pixelPoints");
+      assert.lengthOf(entities, expectedLength, "NaN data was not returned");
 
       svg.remove();
     });
@@ -210,8 +209,7 @@ describe("Plots", () => {
 
     });
 
-    describe("getAllPlotData()", () => {
-
+    describe("entities()", () => {
       it("retrieves correct data", () => {
         var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
@@ -219,24 +217,23 @@ describe("Plots", () => {
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.getAllPlotData().selection;
-        assert.strictEqual(allLines.size(), linePlot.datasets().length, "single line per dataset");
+        var nodes = linePlot.entities().map((entity) => entity.selection.node());
+        var uniqueNodes: Element[] = [];
+        nodes.forEach((node) => {
+          if (uniqueNodes.indexOf(node) === -1) {
+            uniqueNodes.push(node);
+          }
+        });
+        assert.lengthOf(uniqueNodes, linePlot.datasets().length, "one Element per Dataset");
         svg.remove();
       });
     });
 
-    describe("getClosestPlotData()", () => {
+    describe("entityNearest()", () => {
       var lines: D3.Selection;
       var d0: any, d1: any;
       var d0Px: Plottable.Point, d1Px: Plottable.Point;
       var dataset2: Plottable.Dataset;
-
-      function assertPlotDataEqual(actual: Plottable.Plots.PlotData, expected: Plottable.Plots.PlotData, msg: string) {
-        assert.deepEqual(actual.data, expected.data, msg);
-        assert.closeTo(actual.pixelPoints[0].x, expected.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(actual.pixelPoints[0].y, expected.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(actual.selection, expected.selection, msg);
-      }
 
       beforeEach(() => {
         dataset2 = new Plottable.Dataset([
@@ -260,30 +257,36 @@ describe("Plots", () => {
         };
       });
 
-      it("returns correct closest plot data", () => {
+      it("returns nearest Entity", () => {
         var expected = {
-          data: [d0],
-          pixelPoints: [d0Px],
-          selection: d3.selectAll([lines[0][1]])
+          datum: d0,
+          index: 0,
+          dataset: dataset2,
+          position: d0Px,
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        var closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y - 1});
-        assertPlotDataEqual(closest, expected, "if above a point, it is closest");
+        var closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if above a point, it is closest");
 
-        closest = linePlot.getClosestPlotData({x: d0Px.x, y: d0Px.y + 1});
-        assertPlotDataEqual(closest, expected, "if below a point, it is closest");
+        closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if below a point, it is closest");
 
-        closest = linePlot.getClosestPlotData({x: d0Px.x + 1, y: d0Px.y + 1});
-        assertPlotDataEqual(closest, expected, "if right of a point, it is closest");
+        closest = linePlot.entityNearest({x: d0Px.x + 1, y: d0Px.y + 1});
+        TestMethods.assertEntitiesEqual(closest, expected, "if right of a point, it is closest");
 
         expected = {
-          data: [d1],
-          pixelPoints: [d1Px],
-          selection: d3.selectAll([lines[0][1]])
+          datum: d1,
+          index: 1,
+          dataset: dataset2,
+          position: d1Px,
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        closest = linePlot.getClosestPlotData({x: d1Px.x - 1, y: d1Px.y});
-        assertPlotDataEqual(closest, expected, "if left of a point, it is closest");
+        closest = linePlot.entityNearest({x: d1Px.x - 1, y: d1Px.y});
+        TestMethods.assertEntitiesEqual(closest, expected, "if left of a point, it is closest");
 
         svg.remove();
       });
@@ -292,28 +295,27 @@ describe("Plots", () => {
         xScale.domain([0.25, 1]);
 
         var expected = {
-          data: [d1],
-          pixelPoints: [{
+          datum: d1,
+          index: 1,
+          dataset: dataset2,
+          position: {
             x: xScale.scale(xAccessor(d1)),
             y: yScale.scale(yAccessor(d1))
-          }],
-          selection: d3.selectAll([lines[0][1]])
+          },
+          selection: d3.selectAll([lines[0][1]]),
+          plot: linePlot
         };
 
-        var closest = linePlot.getClosestPlotData({ x: xScale.scale(0.25), y: d1Px.y });
-        assertPlotDataEqual(closest, expected, "only in-view points are considered");
+        var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
+        TestMethods.assertEntitiesEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
       });
 
-      it("handles empty plots gracefully", () => {
+      it("returns undefined if no Entities are visible", () => {
         linePlot = new Plottable.Plots.Line<number>();
-
-        var closest = linePlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
-        assert.lengthOf(closest.data, 0);
-        assert.lengthOf(closest.pixelPoints, 0);
-        assert.isTrue(closest.selection.empty());
-
+        var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+        assert.isUndefined(closest, "returns undefined if no Entity can be found");
         svg.remove();
       });
     });

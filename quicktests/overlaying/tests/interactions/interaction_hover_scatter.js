@@ -42,14 +42,28 @@ function run(svg, data, Plottable) {
 
   var pointer = new Plottable.Interactions.Pointer();
   pointer.onPointerMove(function(p) {
-    var cpd = plot.getClosestPlotData(p);
-    if (cpd.data.length > 0) {
-      var xString = cpd.data[0].x.toFixed(2);
-      var yString = cpd.data[0].y.toFixed(2);
+    var datum;
+    var position;
+    if (typeof plot.entityNearest === "function") {
+      var nearestEntity = plot.entityNearest(p);
+      if (nearestEntity != null) {
+        datum = nearestEntity.datum;
+        position = nearestEntity.position;
+      }
+    } else {
+      var cpd = plot.getClosestPlotData(p);
+      if (cpd.data.length > 0) {
+        datum = cpd.data[0];
+        position = cpd.pixelPoints[0];
+      }
+    }
+    if (datum != null) {
+      var xString = datum.x.toFixed(2);
+      var yString = datum.y.toFixed(2);
       title.text("[ " + xString + ", " + yString + " ]");
       hoverCircle.attr({
-        "cx": cpd.pixelPoints[0].x,
-        "cy": cpd.pixelPoints[0].y
+        "cx": position.x,
+        "cy": position.y
       }).style("visibility", "visible");
     } else {
       title.text(defaultTitleText);
