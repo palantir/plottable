@@ -29,15 +29,13 @@ export module Plots {
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
 
     /**
-     * Constructs a Bar Plot.
-     *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super();
       this.classed("bar-plot", true);
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -50,6 +48,42 @@ export module Plots {
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): Bar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+
+      if (xScale == null) {
+        super.x(<number | Accessor<number>>x);
+      } else {
+        super.x(< X | Accessor<X>>x, xScale);
+      }
+
+      this._updateValueScale();
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): Bar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+
+      if (yScale == null) {
+        super.y(<number | Accessor<number>>y);
+      } else {
+        super.y(<Y | Accessor<Y>>y, yScale);
+      }
+
+      this._updateValueScale();
+      return this;
+    }
+
     protected _getDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Rect(dataset);
     }
@@ -60,20 +94,18 @@ export module Plots {
     }
 
     /**
-     * Gets the baseline value for the bars
+     * Gets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @returns {number} The baseline value.
+     * @returns {number}
      */
     public baseline(): number;
     /**
-     * Sets the baseline for the bars to the specified value.
+     * Sets the baseline value.
+     * The baseline is the line that the bars are drawn from.
      *
-     * The baseline is the line that the bars are drawn from, defaulting to 0.
-     *
-     * @param {number} value The value to position the baseline at.
-     * @returns {Bar} The calling Bar.
+     * @param {number} value
+     * @returns {Bar} The calling Bar Plot.
      */
     public baseline(value: number): Bar<X, Y>;
     public baseline(value?: number): any {
@@ -88,8 +120,8 @@ export module Plots {
 
     /**
      * Sets the bar alignment relative to the independent axis.
-     * VerticalBarPlot supports "left", "center", "right"
-     * HorizontalBarPlot supports "top", "center", "bottom"
+     * A vertical Bar Plot supports "left", "center", "right"
+     * A horizontal Bar Plot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
      * @returns {Bar} The calling Bar.
@@ -107,16 +139,14 @@ export module Plots {
     }
 
     /**
-     * Get whether bar labels are enabled.
-     *
-     * @returns {boolean} Whether bars should display labels or not.
+     * Gets whether labels are enabled.
      */
     public labelsEnabled(): boolean;
     /**
-     * Set whether bar labels are enabled.
-     * @param {boolean} Whether bars should display labels or not.
+     * Sets whether labels are enabled.
      *
-     * @returns {Bar} The calling plot.
+     * @param {boolean} labelsEnabled
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelsEnabled(enabled: boolean): Bar<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
@@ -130,16 +160,14 @@ export module Plots {
     }
 
     /**
-     * Get the formatter for bar labels.
-     *
-     * @returns {Formatter} The formatting function for bar labels.
+     * Gets the Formatter for the labels.
      */
     public labelFormatter(): Formatter;
     /**
-     * Change the formatting function for bar labels.
-     * @param {Formatter} The formatting function for bar labels.
+     * Sets the Formatter for the labels.
      *
-     * @returns {Bar} The calling plot.
+     * @param {Formatter} formatter
+     * @returns {Bar} The calling Bar Plot.
      */
     public labelFormatter(formatter: Formatter): Bar<X, Y>;
     public labelFormatter(formatter?: Formatter): any {
@@ -170,23 +198,18 @@ export module Plots {
     }
 
     /**
-     * Retrieves the closest PlotData to queryPoint.
-     *
-     * Bars containing the queryPoint are considered closest. If queryPoint lies outside
-     * of all bars, we return the closest in the dominant axis (x for horizontal
-     * charts, y for vertical) and break ties using the secondary axis.
-     *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
+     * Returns the Entity nearest to the query point according to the following algorithm:
+     *   - If the query point is inside a bar, returns the Entity for that bar.
+     *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+     *     breaking ties with the secondary direction.
+     * Returns undefined if no Entity can be found.
+     * 
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
-    public getClosestPlotData(queryPoint: Point): PlotData {
+    public entityNearest(queryPoint: Point): Plots.Entity {
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
-
-      var closestData: any[] = [];
-      var closestPixelPoints: Point[] = [];
-      var closestElements: Element[] = [];
 
       var queryPtPrimary = this._isVertical ? queryPoint.x : queryPoint.y;
       var queryPtSecondary = this._isVertical ? queryPoint.y : queryPoint.x;
@@ -196,63 +219,42 @@ export module Plots {
       // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
       var tolerance = 0.5;
 
-      this.datasets().forEach((dataset) => {
-        var plotData = this.getAllPlotData([dataset]);
-        plotData.pixelPoints.forEach((plotPt, index) => {
-          var datum = plotData.data[index];
-          var bar = plotData.selection[0][index];
+      var closest: Plots.Entity;
+      this.entities().forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+          return;
+        }
+        var primaryDist = 0;
+        var secondaryDist = 0;
+        var plotPt = entity.position;
+        // if we're inside a bar, distance in both directions should stay 0
+        var barBBox = Utils.DOM.getBBox(entity.selection);
+        if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+          var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
+          primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
-          if (!this._isVisibleOnPlot(datum, plotPt, d3.select(bar))) {
-            return;
+          // compute this bar's min and max along the secondary axis
+          var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
+          var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
+
+          if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
+            // if we're within a bar's secondary axis span, it is closest in that direction
+            secondaryDist = 0;
+          } else {
+            var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
+            secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
           }
-
-          var primaryDist = 0;
-          var secondaryDist = 0;
-
-          // if we're inside a bar, distance in both directions should stay 0
-          var barBBox = bar.getBBox();
-          if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
-            var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
-            primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
-
-            // compute this bar's min and max along the secondary axis
-            var barMinSecondary = this._isVertical ? barBBox.y : barBBox.x;
-            var barMaxSecondary = barMinSecondary + (this._isVertical ? barBBox.height : barBBox.width);
-
-            if (queryPtSecondary >= barMinSecondary - tolerance && queryPtSecondary <= barMaxSecondary + tolerance) {
-              // if we're within a bar's secondary axis span, it is closest in that direction
-              secondaryDist = 0;
-            } else {
-              var plotPtSecondary = this._isVertical ? plotPt.y : plotPt.x;
-              secondaryDist = Math.abs(queryPtSecondary - plotPtSecondary);
-            }
-          }
-
-          // if we find a closer bar, record its distance and start new closest lists
-          if (primaryDist < minPrimaryDist
-              || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
-            closestData = [];
-            closestPixelPoints = [];
-            closestElements = [];
-
-            minPrimaryDist = primaryDist;
-            minSecondaryDist = secondaryDist;
-          }
-
-          // bars minPrimaryDist away are part of the closest set
-          if (primaryDist === minPrimaryDist && secondaryDist === minSecondaryDist) {
-            closestData.push(datum);
-            closestPixelPoints.push(plotPt);
-            closestElements.push(bar);
-          }
-        });
+        }
+        // if we find a closer bar, record its distance and start new closest lists
+        if (primaryDist < minPrimaryDist
+            || primaryDist === minPrimaryDist && secondaryDist < minSecondaryDist) {
+          closest = entity;
+          minPrimaryDist = primaryDist;
+          minSecondaryDist = secondaryDist;
+        }
       });
 
-      return {
-        data: closestData,
-        pixelPoints: closestPixelPoints,
-        selection: d3.selectAll(closestElements)
-      };
+      return closest;
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
@@ -264,27 +266,31 @@ export module Plots {
     }
 
     /**
-     * Gets the {Plots.PlotData} that correspond to the given pixel position.
-     * 
-     * @param {Point} p The provided pixel position as a {Point}
-     * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
+     * Gets the Entities at a particular Point.
+     *
+     * @param {Point} p
+     * @returns {Entity[]}
      */
-    public plotDataAt(p: Point): PlotData {
-      return this._getPlotData(p.x, p.y);
+    public entitiesAt(p: Point): Entity[] {
+      return this._entitiesIntersecting(p.x, p.y);
     }
 
     /**
-     * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
-     * 
+     * Gets the Entities that intersect the Bounds.
+     *
+     * @param {Bounds} bounds
+     * @returns {Entity[]}
      */
-    public plotDataIn(bounds: Bounds): PlotData;
+    public entitiesIn(bounds: Bounds): Entity[];
     /**
-     * @param {Range} xRange The specified range of x values
-     * @param {Range} yRange The specified range of y values
-     * @return {Plots.PlotData} The plot data that corresponds to the ranges
+     * Gets the Entities that intersect the area defined by the ranges.
+     * 
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {Entity[]}
      */
-    public plotDataIn(xRange: Range, yRange: Range): PlotData;
-    public plotDataIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotData {
+    public entitiesIn(xRange: Range, yRange: Range): Entity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): Entity[] {
       var dataXRange: Range;
       var dataYRange: Range;
       if (yRange == null) {
@@ -292,29 +298,26 @@ export module Plots {
         dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
         dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
       } else {
-          dataXRange = (<Range> xRangeOrBounds);
+        dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
-      return this._getPlotData(dataXRange, dataYRange);
+      return this._entitiesIntersecting(dataXRange, dataYRange);
     }
 
-    private _getPlotData(xValOrRange: number | Range, yValOrRange: number | Range): PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var elements: EventTarget[] = [];
-
-      var plotData = this.getAllPlotData();
-      plotData.selection.each(function(datum, i) {
-        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, this.getBBox())) {
-          data.push(plotData.data[i]);
-          pixelPoints.push(plotData.pixelPoints[i]);
-          elements.push(this);
+    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
+      var intersected: Entity[] = [];
+      this.entities().forEach((entity) => {
+        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+          intersected.push(entity);
         }
       });
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
+      return intersected;
     }
 
     private _updateValueScale() {
+      if (!this._projectorsReady()) {
+        return;
+      }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
@@ -521,31 +524,28 @@ export module Plots {
       return barPixelWidth;
     }
 
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var plotData = super.getAllPlotData(datasets);
-
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      if (!this._projectorsReady()) {
+        return [];
+      }
+      var entities = super.entities(datasets);
       var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
-      var isVertical = this._isVertical;
-      var barAlignmentFactor = this._barAlignmentFactor;
-
-      plotData.selection.each(function (datum, index) {
-        var bar = d3.select(this);
-
+      entities.forEach((entity) => {
+        var bar = entity.selection;
         // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
-        if (isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
-          plotData.pixelPoints[index].y += +bar.attr("height");
-        } else if (!isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
-          plotData.pixelPoints[index].x -= +bar.attr("width");
+        if (this._isVertical && Math.floor(+bar.attr("y")) >= Math.floor(scaledBaseline)) {
+          entity.position.y += +bar.attr("height");
+        } else if (!this._isVertical && Math.floor(+bar.attr("x")) < Math.floor(scaledBaseline)) {
+          entity.position.x -= +bar.attr("width");
         }
 
-        if (isVertical) {
-          plotData.pixelPoints[index].x = +bar.attr("x") + +bar.attr("width") * barAlignmentFactor;
+        if (this._isVertical) {
+          entity.position.x = +bar.attr("x") + +bar.attr("width") * this._barAlignmentFactor;
         } else {
-          plotData.pixelPoints[index].y = +bar.attr("y") + +bar.attr("height") * barAlignmentFactor;
+          entity.position.y = +bar.attr("y") + +bar.attr("height") * this._barAlignmentFactor;
         }
       });
-
-      return plotData;
+      return entities;
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {

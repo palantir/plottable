@@ -19,7 +19,7 @@ function run(svg, data, Plottable) {
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
   var dataset = new Plottable.Dataset(data);
-  var areaRenderer = new Plottable.Plots.Area(xScale, yScale)
+  var areaRenderer = new Plottable.Plots.Area()
             .addDataset(dataset)
             .attr("opacity", 0.75)
             .x(function(d) { return d.x; }, xScale)

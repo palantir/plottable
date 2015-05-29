@@ -85,10 +85,10 @@ export module Interactions {
     }
 
     /**
-     * Sets the callback called when the Component is double-clicked.
+     * Adds a callback to be called when the Component is double-clicked.
      *
-     * @param {ClickCallback} callback The callback to set.
-     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     * @param {ClickCallback} callback
+     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
      */
     public onDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.add(callback);
@@ -96,10 +96,10 @@ export module Interactions {
     }
 
     /**
-     * Removes the callback called when the Component is double-clicked.
+     * Removes a callback that would be called when the Component is double-clicked.
      *
-     * @param {ClickCallback} callback The callback to remove.
-     * @return {Interaction.DoubleClick} The calling Interaction.DoubleClick.
+     * @param {ClickCallback} callback
+     * @return {Interactions.DoubleClick} The calling DoubleClick Interaction.
      */
     public offDoubleClick(callback: ClickCallback) {
       this._onDoubleClickCallbacks.delete(callback);

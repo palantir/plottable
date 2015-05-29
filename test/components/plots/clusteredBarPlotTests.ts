@@ -44,7 +44,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
+      renderer = new Plottable.Plots.ClusteredBar<string, number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.baseline(0);
@@ -127,7 +127,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.ClusteredBar<number, string>(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+      renderer = new Plottable.Plots.ClusteredBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.baseline(0);
@@ -194,7 +194,7 @@ describe("Plots", () => {
       var data2 = [{x: "A", y: 2}, {x: "B", y: 4}];
       var data3 = [{x: "B", y: 15}, {x: "C", y: 15}];
 
-      plot = new Plottable.Plots.ClusteredBar<string, number>(xScale, yScale);
+      plot = new Plottable.Plots.ClusteredBar<string, number>();
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
@@ -255,7 +255,7 @@ describe("Plots", () => {
       var data2 = [{y: "A", x: 2}, {y: "B", x: 4}];
       var data3 = [{y: "B", x: 15}, {y: "C", x: 15}];
 
-      plot = new Plottable.Plots.ClusteredBar(xScale, yScale, Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+      plot = new Plottable.Plots.ClusteredBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));

@@ -26,14 +26,14 @@ export module Components {
     /**
      * Creates an InterpolatedColorLegend.
      *
-     * The InterpolatedColorLegend consists of a sequence of swatches, showing the
-     * associated Scale.InterpolatedColor sampled at various points. Two labels
-     * show the maximum and minimum values of the Scale.InterpolatedColor.
+     * The InterpolatedColorLegend consists of a sequence of swatches that show the
+     * associated InterpolatedColor Scale sampled at various points.
+     * Two labels show the maximum and minimum values of the InterpolatedColor Scale.
      *
      * @constructor
-     * @param {Scale.InterpolatedColor} interpolatedColorScale
-     * @param {string} orientation (horizontal/left/right).
-     * @param {Formatter} The labels are formatted using this function.
+     * @param {Scales.InterpolatedColor} interpolatedColorScale
+     * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
      */
     constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
       super();
@@ -55,15 +55,13 @@ export module Components {
     }
 
     /**
-     * Gets the current formatter on the InterpolatedColorLegend.
-     *
-     * @returns {Formatter} The current Formatter.
+     * Gets the Formatter for the labels.
      */
     public formatter(): Formatter;
     /**
-     * Sets the current formatter on the InterpolatedColorLegend.
+     * Sets the Formatter for the labels.
      *
-     * @param {Formatter} formatter If provided, data will be passed though `formatter(data)`.
+     * @param {Formatter} formatter
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
     public formatter(formatter: Formatter): InterpolatedColorLegend;
@@ -86,16 +84,13 @@ export module Components {
     }
 
     /**
-     * Gets the orientation of the InterpolatedColorLegend.
-     *
-     * @returns {string} The current orientation.
+     * Gets the orientation.
      */
     public orientation(): string;
     /**
-     * Sets the orientation of the InterpolatedColorLegend.
+     * Sets the orientation.
      *
-     * @param {string} newOrientation The desired orientation (horizontal/left/right).
-     *
+     * @param {string} orientation One of "horizontal"/"left"/"right".
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
     public orientation(orientation: string): InterpolatedColorLegend;
