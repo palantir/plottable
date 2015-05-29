@@ -10,8 +10,6 @@ module Plottable {
     private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
     /**
-     * Constructs an XYPlot.
-     *
      * An XYPlot is a Plot that displays data along two primary directions, X and Y.
      *
      * @constructor
@@ -40,7 +38,7 @@ module Plottable {
      */
     public x(): Plots.AccessorScaleBinding<X, number>;
     /**
-     * Sets X to a constant number, or to the result of an Accessor<number>.
+     * Sets X to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} x
      * @returns {XYPlot} The calling XYPlot.
@@ -72,7 +70,7 @@ module Plottable {
      */
     public y(): Plots.AccessorScaleBinding<Y, number>;
     /**
-     * Sets Y to a constant number, or to the result of an Accessor<number>.
+     * Sets Y to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} y
      * @returns {XYPlot} The calling XYPlot.
@@ -153,7 +151,7 @@ module Plottable {
      * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
      * If "x" or "y" is specified the adjustment is immediately performed.
      *
-     * @param {string} scaleName Must be one of "x", "y", or "none".
+     * @param {string} scaleName One of "x"/"y"/"none".
      *   "x" will adjust the x Scale in relation to changes in the y domain.
      *   "y" will adjust the y Scale in relation to changes in the x domain.
      *   "none" means neither Scale will change automatically.

@@ -11,9 +11,6 @@ export module Plots {
     private _endAngles: number[];
 
     /**
-     * Constructs a Pie Plot.
-     * Pie Plots only support a single Dataset.
-     *
      * @constructor
      */
     constructor() {
@@ -79,7 +76,7 @@ export module Plots {
      */
     public sectorValue<S>(): AccessorScaleBinding<S, number>;
     /**
-     * Sets the sector value to a constant number, or to the result of an Accessor<number>.
+     * Sets the sector value to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} sectorValue
      * @returns {Pie} The calling Pie Plot.
@@ -109,7 +106,7 @@ export module Plots {
      */
     public innerRadius<R>(): AccessorScaleBinding<R, number>;
     /**
-     * Sets the inner radius to a constant number, or to the result of an Accessor<number>.
+     * Sets the inner radius to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} innerRadius
      * @returns {Pie} The calling Pie Plot.
@@ -138,7 +135,7 @@ export module Plots {
      */
     public outerRadius<R>(): AccessorScaleBinding<R, number>;
     /**
-     * Sets the outer radius to a constant number, or to the result of an Accessor<number>.
+     * Sets the outer radius to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} outerRadius
      * @returns {Pie} The calling Pie Plot.

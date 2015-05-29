@@ -7,8 +7,6 @@ export module Plots {
     private _clusterOffsets: Utils.Map<Dataset, number>;
 
     /**
-     * Creates a ClusteredBar Plot.
-     *
      * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
      *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
      *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
@@ -16,7 +14,7 @@ export module Plots {
      * @constructor
      * @param {Scale} xScale
      * @param {Scale} yScale
-     * @param {string} [orientation="vertical"] The orientation of the ClusteredBar Plot ("vertical"/"horizontal").
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale, orientation);

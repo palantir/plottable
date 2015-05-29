@@ -6063,10 +6063,6 @@ var Plottable;
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
-         * Constructs a Plot.
-         *
-         * Plots display data.
-         *
          * @constructor
          */
         function Plot() {
@@ -6393,7 +6389,7 @@ var Plottable;
             this._additionalPaint(maxTime);
         };
         /**
-         * Retrieves Selections on this Plot for the specified Datasets.
+         * Retrieves Selections of this Plot for the specified Datasets.
          *
          * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -6517,9 +6513,6 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             /**
-             * Constructs a Pie Plot.
-             * Pie Plots only support a single Dataset.
-             *
              * @constructor
              */
             function Pie() {
@@ -6671,8 +6664,6 @@ var Plottable;
     var XYPlot = (function (_super) {
         __extends(XYPlot, _super);
         /**
-         * Constructs an XYPlot.
-         *
          * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
          * @constructor
@@ -6764,7 +6755,7 @@ var Plottable;
          * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
          * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * @param {string} scaleName Must be one of "x", "y", or "none".
+         * @param {string} scaleName One of "x"/"y"/"none".
          *   "x" will adjust the x Scale in relation to changes in the y domain.
          *   "y" will adjust the y Scale in relation to changes in the x domain.
          *   "none" means neither Scale will change automatically.
@@ -6893,8 +6884,6 @@ var Plottable;
         var Rectangle = (function (_super) {
             __extends(Rectangle, _super);
             /**
-             * Constructs a Rectangle Plot.
-             *
              * A Rectangle Plot displays rectangles based on the data.
              * The left and right edges of each rectangle can be set with x() and x2().
              *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
@@ -7152,12 +7141,10 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
-             * Constructs a Bar Plot.
-             *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} [orientation="vertical"] The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function Bar(xScale, yScale, orientation) {
                 var _this = this;
@@ -7196,8 +7183,8 @@ var Plottable;
             };
             /**
              * Sets the bar alignment relative to the independent axis.
-             * VerticalBarPlot supports "left", "center", "right"
-             * HorizontalBarPlot supports "top", "center", "bottom"
+             * A vertical Bar Plot supports "left", "center", "right"
+             * A horizontal Bar Plot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
              * @returns {Bar} The calling Bar.
@@ -7630,8 +7617,6 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
-             * Constructs a Line Plot.
-             *
              * @constructor
              * @param {QuantitativeScale} xScale
              * @param {QuantitativeScale} yScale
@@ -7796,8 +7781,7 @@ var Plottable;
         var Area = (function (_super) {
             __extends(Area, _super);
             /**
-             * Constructs an Area Plot.
-             * An Area Plot draws a filled region (area) between the"y" and "y0".
+             * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
              * @param {QuantitativeScale} xScale
@@ -7962,8 +7946,6 @@ var Plottable;
         var ClusteredBar = (function (_super) {
             __extends(ClusteredBar, _super);
             /**
-             * Creates a ClusteredBar Plot.
-             *
              * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
              *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
@@ -7971,7 +7953,7 @@ var Plottable;
              * @constructor
              * @param {Scale} xScale
              * @param {Scale} yScale
-             * @param {string} [orientation="vertical"] The orientation of the ClusteredBar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function ClusteredBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
@@ -8036,8 +8018,6 @@ var Plottable;
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
             /**
-             * Constructs a StackedArea Plot.
-             *
              * @constructor
              * @param {QuantitativeScale} xScale
              * @param {QuantitativeScale} yScale
@@ -8172,15 +8152,14 @@ var Plottable;
         var StackedBar = (function (_super) {
             __extends(StackedBar, _super);
             /**
-             * Constructs a StackedBar Plot.
-             * A ClusteredBar Plot stacks bars across Datasets based on the primary value of the bars.
+             * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
              *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
              *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
              *
              * @constructor
              * @param {Scale} xScale
-             * @param {Scale} yScal
-             * @param {string} [orientation="vertical"] The orientation of the Stackedbar Plot ("vertical"/"horizontal").
+             * @param {Scale} yScale
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function StackedBar(xScale, yScale, orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }

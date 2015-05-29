@@ -2350,10 +2350,6 @@ declare module Plottable {
         protected _propertyExtents: D3.Map<any[]>;
         protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
-         * Constructs a Plot.
-         *
-         * Plots display data.
-         *
          * @constructor
          */
         constructor();
@@ -2378,7 +2374,7 @@ declare module Plottable {
          */
         attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
         /**
-         * Sets a particular attribute to a constant value, or to the result of an Accessor.
+         * Sets a particular attribute to a constant value or the result of an Accessor.
          *
          * @param {string} attr
          * @param {number|string|Accessor<number>|Accessor<string>} attrValue
@@ -2446,7 +2442,7 @@ declare module Plottable {
         protected _additionalPaint(time: number): void;
         protected _getDataToDraw(): D3.Map<any[]>;
         /**
-         * Retrieves Selections on this Plot for the specified Datasets.
+         * Retrieves Selections of this Plot for the specified Datasets.
          *
          * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
@@ -2484,9 +2480,6 @@ declare module Plottable {
     module Plots {
         class Pie extends Plot {
             /**
-             * Constructs a Pie Plot.
-             * Pie Plots only support a single Dataset.
-             *
              * @constructor
              */
             constructor();
@@ -2501,7 +2494,7 @@ declare module Plottable {
              */
             sectorValue<S>(): AccessorScaleBinding<S, number>;
             /**
-             * Sets the sector value to a constant number, or to the result of an Accessor<number>.
+             * Sets the sector value to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} sectorValue
              * @returns {Pie} The calling Pie Plot.
@@ -2521,7 +2514,7 @@ declare module Plottable {
              */
             innerRadius<R>(): AccessorScaleBinding<R, number>;
             /**
-             * Sets the inner radius to a constant number, or to the result of an Accessor<number>.
+             * Sets the inner radius to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} innerRadius
              * @returns {Pie} The calling Pie Plot.
@@ -2541,7 +2534,7 @@ declare module Plottable {
              */
             outerRadius<R>(): AccessorScaleBinding<R, number>;
             /**
-             * Sets the outer radius to a constant number, or to the result of an Accessor<number>.
+             * Sets the outer radius to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} outerRadius
              * @returns {Pie} The calling Pie Plot.
@@ -2572,8 +2565,6 @@ declare module Plottable {
         protected static _X_KEY: string;
         protected static _Y_KEY: string;
         /**
-         * Constructs an XYPlot.
-         *
          * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
          * @constructor
@@ -2586,7 +2577,7 @@ declare module Plottable {
          */
         x(): Plots.AccessorScaleBinding<X, number>;
         /**
-         * Sets X to a constant number, or to the result of an Accessor<number>.
+         * Sets X to a constant number or the result of an Accessor<number>.
          *
          * @param {number|Accessor<number>} x
          * @returns {XYPlot} The calling XYPlot.
@@ -2606,7 +2597,7 @@ declare module Plottable {
          */
         y(): Plots.AccessorScaleBinding<Y, number>;
         /**
-         * Sets Y to a constant number, or to the result of an Accessor<number>.
+         * Sets Y to a constant number or the result of an Accessor<number>.
          *
          * @param {number|Accessor<number>} y
          * @returns {XYPlot} The calling XYPlot.
@@ -2629,7 +2620,7 @@ declare module Plottable {
          * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
          * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * @param {string} scaleName Must be one of "x", "y", or "none".
+         * @param {string} scaleName One of "x"/"y"/"none".
          *   "x" will adjust the x Scale in relation to changes in the y domain.
          *   "y" will adjust the y Scale in relation to changes in the x domain.
          *   "none" means neither Scale will change automatically.
@@ -2656,8 +2647,6 @@ declare module Plottable {
     module Plots {
         class Rectangle<X, Y> extends XYPlot<X, Y> {
             /**
-             * Constructs a Rectangle Plot.
-             *
              * A Rectangle Plot displays rectangles based on the data.
              * The left and right edges of each rectangle can be set with x() and x2().
              *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
@@ -2679,7 +2668,7 @@ declare module Plottable {
              */
             x(): AccessorScaleBinding<X, number>;
             /**
-             * Sets X to a constant number, or to the result of an Accessor<number>.
+             * Sets X to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} x
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -2699,7 +2688,7 @@ declare module Plottable {
              */
             x2(): AccessorScaleBinding<X, number>;
             /**
-             * Sets X2 to a constant number, or to the result of an Accessor<number>.
+             * Sets X2 to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} x2
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -2719,7 +2708,7 @@ declare module Plottable {
              */
             y(): AccessorScaleBinding<Y, number>;
             /**
-             * Sets Y to a constant number, or to the result of an Accessor<number>.
+             * Sets Y to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} y
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -2739,7 +2728,7 @@ declare module Plottable {
              */
             y2(): AccessorScaleBinding<Y, number>;
             /**
-             * Sets Y2 to a constant number, or to the result of an Accessor<number>.
+             * Sets Y2 to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} y2
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -2801,12 +2790,10 @@ declare module Plottable {
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
-             * Constructs a Bar Plot.
-             *
              * @constructor
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
-             * @param {string} [orientation="vertical"] The orientation of the Bar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getDrawer(dataset: Dataset): Drawers.Rect;
@@ -2828,30 +2815,30 @@ declare module Plottable {
             baseline(value: number): Bar<X, Y>;
             /**
              * Sets the bar alignment relative to the independent axis.
-             * VerticalBarPlot supports "left", "center", "right"
-             * HorizontalBarPlot supports "top", "center", "bottom"
+             * A vertical Bar Plot supports "left", "center", "right"
+             * A horizontal Bar Plot supports "top", "center", "bottom"
              *
              * @param {string} alignment The desired alignment.
              * @returns {Bar} The calling Bar.
              */
             barAlignment(alignment: string): Bar<X, Y>;
             /**
-             * Gets whether bar labels are enabled.
+             * Gets whether labels are enabled.
              */
             labelsEnabled(): boolean;
             /**
-             * Sets whether bar labels are enabled.
+             * Sets whether labels are enabled.
              *
              * @param {boolean} labelsEnabled
              * @returns {Bar} The calling Bar Plot.
              */
             labelsEnabled(enabled: boolean): Bar<X, Y>;
             /**
-             * Gets the Formatter for bar labels.
+             * Gets the Formatter for the labels.
              */
             labelFormatter(): Formatter;
             /**
-             * Sets the Formatter for bar labels.
+             * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
@@ -2919,8 +2906,6 @@ declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
             /**
-             * Constructs a Line Plot.
-             *
              * @constructor
              * @param {QuantitativeScale} xScale
              * @param {QuantitativeScale} yScale
@@ -2956,8 +2941,7 @@ declare module Plottable {
     module Plots {
         class Area<X> extends Line<X> {
             /**
-             * Constructs an Area Plot.
-             * An Area Plot draws a filled region (area) between the"y" and "y0".
+             * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
              * @param {QuantitativeScale} xScale
@@ -2970,7 +2954,7 @@ declare module Plottable {
              */
             y0(): Plots.AccessorScaleBinding<number, number>;
             /**
-             * Sets Y0 to a constant number, or to the result of an Accessor<number>.
+             * Sets Y0 to a constant number or the result of an Accessor<number>.
              *
              * @param {number|Accessor<number>} y0
              * @returns {Area} The calling Area Plot.
@@ -3005,8 +2989,6 @@ declare module Plottable {
     module Plots {
         class ClusteredBar<X, Y> extends Bar<X, Y> {
             /**
-             * Creates a ClusteredBar Plot.
-             *
              * A ClusteredBar Plot groups bars across Datasets based on the primary value of the bars.
              *   On a vertical ClusteredBar Plot, the bars with the same X value are grouped.
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
@@ -3014,7 +2996,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale} xScale
              * @param {Scale} yScale
-             * @param {string} [orientation="vertical"] The orientation of the ClusteredBar Plot ("vertical"/"horizontal").
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _generateAttrToProjector(): {
@@ -3030,8 +3012,6 @@ declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
             /**
-             * Constructs a StackedArea Plot.
-             *
              * @constructor
              * @param {QuantitativeScale} xScale
              * @param {QuantitativeScale} yScale
@@ -3057,15 +3037,14 @@ declare module Plottable {
     module Plots {
         class StackedBar<X, Y> extends Bar<X, Y> {
             /**
-             * Constructs a StackedBar Plot.
-             * A ClusteredBar Plot stacks bars across Datasets based on the primary value of the bars.
+             * A StackedBar Plot stacks bars across Datasets based on the primary value of the bars.
              *   On a vertical StackedBar Plot, the bars with the same X value are stacked.
              *   On a horizontal StackedBar Plot, the bars with the same Y value are stacked.
              *
              * @constructor
              * @param {Scale} xScale
-             * @param {Scale} yScal
-             * @param {string} [orientation="vertical"] The orientation of the Stackedbar Plot ("vertical"/"horizontal").
+             * @param {Scale} yScale
+             * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
             protected _getAnimator(key: string): Animators.Plot;

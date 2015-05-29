@@ -7,8 +7,7 @@ export module Plots {
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
 
     /**
-     * Constructs an Area Plot.
-     * An Area Plot draws a filled region (area) between the"y" and "y0".
+     * An Area Plot draws a filled region (area) between Y and Y0.
      * 
      * @constructor
      * @param {QuantitativeScale} xScale
@@ -35,7 +34,7 @@ export module Plots {
      */
     public y0(): Plots.AccessorScaleBinding<number, number>;
     /**
-     * Sets Y0 to a constant number, or to the result of an Accessor<number>.
+     * Sets Y0 to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} y0
      * @returns {Area} The calling Area Plot.

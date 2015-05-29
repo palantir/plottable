@@ -7,8 +7,6 @@ export module Plots {
     private static _Y2_KEY = "y2";
 
     /**
-     * Constructs a Rectangle Plot.
-     *
      * A Rectangle Plot displays rectangles based on the data.
      * The left and right edges of each rectangle can be set with x() and x2().
      *   If only x() is set the Rectangle Plot will attempt to compute the correct left and right edge positions.
@@ -84,7 +82,7 @@ export module Plots {
      */
     public x(): AccessorScaleBinding<X, number>;
     /**
-     * Sets X to a constant number, or to the result of an Accessor<number>.
+     * Sets X to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} x
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -114,7 +112,7 @@ export module Plots {
      */
     public x2(): AccessorScaleBinding<X, number>;
     /**
-     * Sets X2 to a constant number, or to the result of an Accessor<number>.
+     * Sets X2 to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} x2
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -143,7 +141,7 @@ export module Plots {
      */
     public y(): AccessorScaleBinding<Y, number>;
     /**
-     * Sets Y to a constant number, or to the result of an Accessor<number>.
+     * Sets Y to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} y
      * @returns {Plots.Rectangle} The calling Rectangle Plot.
@@ -173,7 +171,7 @@ export module Plots {
      */
     public y2(): AccessorScaleBinding<Y, number>;
     /**
-     * Sets Y2 to a constant number, or to the result of an Accessor<number>.
+     * Sets Y2 to a constant number or the result of an Accessor<number>.
      *
      * @param {number|Accessor<number>} y2
      * @returns {Plots.Rectangle} The calling Rectangle Plot.

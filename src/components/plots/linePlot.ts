@@ -5,8 +5,6 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
     /**
-     * Constructs a Line Plot.
-     *
      * @constructor
      * @param {QuantitativeScale} xScale
      * @param {QuantitativeScale} yScale

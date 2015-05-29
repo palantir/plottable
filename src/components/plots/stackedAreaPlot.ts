@@ -10,8 +10,6 @@ export module Plots {
     private _baselineValue = 0;
 
     /**
-     * Constructs a StackedArea Plot.
-     *
      * @constructor
      * @param {QuantitativeScale} xScale
      * @param {QuantitativeScale} yScale

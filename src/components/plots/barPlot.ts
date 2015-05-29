@@ -29,12 +29,10 @@ export module Plots {
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
 
     /**
-     * Constructs a Bar Plot.
-     *
      * @constructor
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
-     * @param {string} [orientation="vertical"] The orientation of the Bar Plot ("vertical"/"horizontal").
+     * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
       super(xScale, yScale);
@@ -86,8 +84,8 @@ export module Plots {
 
     /**
      * Sets the bar alignment relative to the independent axis.
-     * VerticalBarPlot supports "left", "center", "right"
-     * HorizontalBarPlot supports "top", "center", "bottom"
+     * A vertical Bar Plot supports "left", "center", "right"
+     * A horizontal Bar Plot supports "top", "center", "bottom"
      *
      * @param {string} alignment The desired alignment.
      * @returns {Bar} The calling Bar.
@@ -105,11 +103,11 @@ export module Plots {
     }
 
     /**
-     * Gets whether bar labels are enabled.
+     * Gets whether labels are enabled.
      */
     public labelsEnabled(): boolean;
     /**
-     * Sets whether bar labels are enabled.
+     * Sets whether labels are enabled.
      *
      * @param {boolean} labelsEnabled
      * @returns {Bar} The calling Bar Plot.
@@ -126,11 +124,11 @@ export module Plots {
     }
 
     /**
-     * Gets the Formatter for bar labels.
+     * Gets the Formatter for the labels.
      */
     public labelFormatter(): Formatter;
     /**
-     * Sets the Formatter for bar labels.
+     * Sets the Formatter for the labels.
      *
      * @param {Formatter} formatter
      * @returns {Bar} The calling Bar Plot.

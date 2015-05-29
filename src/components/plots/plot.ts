@@ -52,10 +52,6 @@ module Plottable {
     protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
-     * Constructs a Plot.
-     *
-     * Plots display data.
-     *
      * @constructor
      */
     constructor() {
@@ -152,7 +148,7 @@ module Plottable {
      */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
     /**
-     * Sets a particular attribute to a constant value, or to the result of an Accessor.
+     * Sets a particular attribute to a constant value or the result of an Accessor.
      * 
      * @param {string} attr
      * @param {number|string|Accessor<number>|Accessor<string>} attrValue
@@ -457,7 +453,7 @@ module Plottable {
     }
 
     /**
-     * Retrieves Selections on this Plot for the specified Datasets.
+     * Retrieves Selections of this Plot for the specified Datasets.
      *
      * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
