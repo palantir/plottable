@@ -6681,21 +6681,14 @@ var Plottable;
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
-        function XYPlot(xScale, yScale) {
+        function XYPlot() {
             var _this = this;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            if (xScale == null || yScale == null) {
-                throw new Error("XYPlots require an xScale and yScale");
-            }
             this.classed("xy-plot", true);
-            this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
-            this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
         }
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
@@ -6704,6 +6697,9 @@ var Plottable;
             this._bindProperty(XYPlot._X_KEY, x, xScale);
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
+            }
+            if (xScale != null) {
+                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             this.render();
             return this;
@@ -6715,6 +6711,9 @@ var Plottable;
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
+            }
+            if (yScale != null) {
+                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
             return this;
@@ -6800,11 +6799,13 @@ var Plottable;
         };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
             _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
-            var xScale = this.x().scale;
+            var xBinding = this.x();
+            var xScale = xBinding && xBinding.scale;
             if (xScale != null) {
                 xScale.range([0, this.width()]);
             }
-            var yScale = this.y().scale;
+            var yBinding = this.y();
+            var yScale = yBinding && yBinding.scale;
             if (yScale != null) {
                 if (this.y().scale instanceof Plottable.Scales.Category) {
                     this.y().scale.range([0, this.height()]);
@@ -6856,7 +6857,9 @@ var Plottable;
             }
         };
         XYPlot.prototype._projectorsReady = function () {
-            return this.x().accessor != null && this.y().accessor != null;
+            var xBinding = this.x();
+            var yBinding = this.y();
+            return xBinding != null && xBinding.accessor != null && yBinding != null && yBinding.accessor != null;
         };
         XYPlot.prototype._pixelPoint = function (datum, index, dataset) {
             var xProjector = Plottable.Plot._scaledAccessor(this.x());
@@ -6909,17 +6912,10 @@ var Plottable;
              * @param {Scale.Scale} xScale The x scale to use.
              * @param {Scale.Scale} yScale The y scale to use.
              */
-            function Rectangle(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Rectangle() {
+                _super.call(this);
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.classed("rectangle-plot", true);
-                // The x and y scales should render in bands with no padding for category scales
-                if (xScale instanceof Plottable.Scales.Category) {
-                    xScale.innerPadding(0).outerPadding(0);
-                }
-                if (yScale instanceof Plottable.Scales.Category) {
-                    yScale.innerPadding(0).outerPadding(0);
-                }
             }
             Rectangle.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rect(dataset);
@@ -6960,37 +6956,69 @@ var Plottable;
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
             };
-            Rectangle.prototype.x = function (x, scale) {
+            Rectangle.prototype.x = function (x, xScale) {
                 if (x == null) {
                     return _super.prototype.x.call(this);
                 }
-                if (scale == null) {
-                    return _super.prototype.x.call(this, x);
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
                 }
-                return _super.prototype.x.call(this, x, scale);
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                }
+                if (xScale != null) {
+                    var x2Binding = this.x2();
+                    var x2 = x2Binding && x2Binding.accessor;
+                    if (x2 != null) {
+                        this._bindProperty(Rectangle._X2_KEY, x2, xScale);
+                    }
+                }
+                // The x and y scales should render in bands with no padding for category scales
+                if (xScale instanceof Plottable.Scales.Category) {
+                    xScale.innerPadding(0).outerPadding(0);
+                }
+                return this;
             };
-            Rectangle.prototype.x2 = function (x2, scale) {
+            Rectangle.prototype.x2 = function (x2) {
                 if (x2 == null) {
                     return this._propertyBindings.get(Rectangle._X2_KEY);
                 }
-                this._bindProperty(Rectangle._X2_KEY, x2, scale);
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty(Rectangle._X2_KEY, x2, xScale);
                 this.render();
                 return this;
             };
-            Rectangle.prototype.y = function (y, scale) {
+            Rectangle.prototype.y = function (y, yScale) {
                 if (y == null) {
                     return _super.prototype.y.call(this);
                 }
-                if (scale == null) {
-                    return _super.prototype.y.call(this, y);
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
                 }
-                return _super.prototype.y.call(this, y, scale);
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
+                if (yScale != null) {
+                    var y2Binding = this.y2();
+                    var y2 = y2Binding && y2Binding.accessor;
+                    if (y2 != null) {
+                        this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
+                    }
+                }
+                // The x and y scales should render in bands with no padding for category scales
+                if (yScale instanceof Plottable.Scales.Category) {
+                    yScale.innerPadding(0).outerPadding(0);
+                }
+                return this;
             };
-            Rectangle.prototype.y2 = function (y2, scale) {
+            Rectangle.prototype.y2 = function (y2) {
                 if (y2 == null) {
                     return this._propertyBindings.get(Rectangle._Y2_KEY);
                 }
-                this._bindProperty(Rectangle._Y2_KEY, y2, scale);
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
                 this.render();
                 return this;
             };
@@ -7072,8 +7100,8 @@ var Plottable;
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            function Scatter(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Scatter() {
+                _super.call(this);
                 this.classed("scatter-plot", true);
                 this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(250).delay(5));
                 this.attr("opacity", 0.6);
@@ -7163,10 +7191,10 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function Bar(xScale, yScale, orientation) {
+            function Bar(orientation) {
                 var _this = this;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale);
+                _super.call(this);
                 this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
@@ -7182,6 +7210,32 @@ var Plottable;
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
             }
+            Bar.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                }
+                this._updateValueScale();
+                return this;
+            };
+            Bar.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
+                this._updateValueScale();
+                return this;
+            };
             Bar.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rect(dataset);
             };
@@ -7368,6 +7422,9 @@ var Plottable;
                 return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(elements) };
             };
             Bar.prototype._updateValueScale = function () {
+                if (!this._projectorsReady()) {
+                    return;
+                }
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
@@ -7640,8 +7697,8 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function Line(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Line() {
+                _super.call(this);
                 this.classed("line-plot", true);
                 this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
@@ -7809,10 +7866,10 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function Area(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function Area() {
+                _super.call(this);
                 this.classed("area-plot", true);
-                this.y0(0, yScale); // default
+                this.y0(0); // default
                 this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -7823,20 +7880,39 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._lineDrawers.values().forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
             };
-            Area.prototype.y0 = function (y0, y0Scale) {
+            Area.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
+                if (yScale != null) {
+                    var y0 = this.y0().accessor;
+                    if (y0 != null) {
+                        this._bindProperty(Area._Y0_KEY, y0, yScale);
+                    }
+                    this._updateYScale();
+                }
+                return this;
+            };
+            Area.prototype.y0 = function (y0) {
                 if (y0 == null) {
                     return this._propertyBindings.get(Area._Y0_KEY);
                 }
-                this._bindProperty(Area._Y0_KEY, y0, y0Scale);
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Area._Y0_KEY, y0, yScale);
                 this._updateYScale();
                 this.render();
                 return this;
             };
             Area.prototype._onDatasetUpdate = function () {
                 _super.prototype._onDatasetUpdate.call(this);
-                if (this.y().scale != null) {
-                    this._updateYScale();
-                }
+                this._updateYScale();
             };
             Area.prototype.addDataset = function (dataset) {
                 var lineDrawer = new Plottable.Drawers.Line(dataset);
@@ -7889,7 +7965,11 @@ var Plottable;
                 var extent = Plottable.Utils.Methods.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
-                var yScale = this.y().scale;
+                var yBinding = this.y();
+                var yScale = (yBinding && yBinding.scale);
+                if (yScale == null) {
+                    return;
+                }
                 if (constantBaseline != null) {
                     yScale.addPaddingException(this, constantBaseline);
                 }
@@ -7979,9 +8059,9 @@ var Plottable;
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function ClusteredBar(xScale, yScale, orientation) {
+            function ClusteredBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale, orientation);
+                _super.call(this, orientation);
                 this._clusterOffsets = new Plottable.Utils.Map();
             }
             ClusteredBar.prototype._generateAttrToProjector = function () {
@@ -8048,8 +8128,8 @@ var Plottable;
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            function StackedArea(xScale, yScale) {
-                _super.call(this, xScale, yScale);
+            function StackedArea() {
+                _super.call(this);
                 this._baselineValue = 0;
                 this.classed("stacked-area-plot", true);
                 this.attr("fill-opacity", 1);
@@ -8100,7 +8180,11 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
             };
             StackedArea.prototype._updateYScale = function () {
-                var scale = this.y().scale;
+                var yBinding = this.y();
+                var scale = (yBinding && yBinding.scale);
+                if (scale == null) {
+                    return;
+                }
                 scale.addPaddingException(this, 0);
                 scale.addIncludedValue(this, 0);
             };
@@ -8193,9 +8277,9 @@ var Plottable;
              * @param {Scale} yScale the y scale of the plot.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            function StackedBar(xScale, yScale, orientation) {
+            function StackedBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
-                _super.call(this, xScale, yScale, orientation);
+                _super.call(this, orientation);
                 this.classed("stacked-bar-plot", true);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];

@@ -16,8 +16,8 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
@@ -33,7 +33,10 @@ export module Plots {
       this._baseline = this._renderArea.append("line").classed("baseline", true);
     }
 
-    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedArea<X>;
+    public x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any {
       if (x == null) {
         return super.x();
       }
@@ -48,7 +51,10 @@ export module Plots {
       return this;
     }
 
-    public y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any {
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): StackedArea<X>;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
+    public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
       if (y == null) {
         return super.y();
       }
@@ -76,7 +82,11 @@ export module Plots {
     }
 
     protected _updateYScale() {
-      var scale = <QuantitativeScale<any>> this.y().scale;
+      var yBinding = this.y();
+      var scale = <QuantitativeScale<any>> (yBinding && yBinding.scale);
+      if (scale == null) {
+        return;
+      }
       scale.addPaddingException(this, 0);
       scale.addIncludedValue(this, 0);
     }

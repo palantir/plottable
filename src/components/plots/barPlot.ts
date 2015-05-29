@@ -36,8 +36,8 @@ export module Plots {
      * @param {Scale} yScale The y scale to use.
      * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super();
       this.classed("bar-plot", true);
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -48,6 +48,42 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
+    }
+
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): Bar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+      if (x == null) {
+        return super.x();
+      }
+
+      if (xScale == null) {
+        super.x(<number | Accessor<number>>x);
+      } else {
+        super.x(< X | Accessor<X>>x, xScale);
+      }
+
+      this._updateValueScale();
+      return this;
+    }
+
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): Bar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
+      if (y == null) {
+        return super.y();
+      }
+
+      if (yScale == null) {
+        super.y(<number | Accessor<number>>y);
+      } else {
+        super.y(<Y | Accessor<Y>>y, yScale);
+      }
+
+      this._updateValueScale();
+      return this;
     }
 
     protected _getDrawer(dataset: Dataset) {
@@ -265,7 +301,7 @@ export module Plots {
 
     /**
      * Gets the {Plots.PlotData} that correspond to the given pixel position.
-     * 
+     *
      * @param {Point} p The provided pixel position as a {Point}
      * @return {Plots.PlotData} The plot data that corresponds to the {Point}.
      */
@@ -275,7 +311,7 @@ export module Plots {
 
     /**
      * Gets the {Plots.PlotData} that correspond to a given xRange/yRange
-     * 
+     *
      */
     public plotDataIn(bounds: Bounds): PlotData;
     /**
@@ -315,6 +351,9 @@ export module Plots {
     }
 
     private _updateValueScale() {
+      if (!this._projectorsReady()) {
+        return;
+      }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;

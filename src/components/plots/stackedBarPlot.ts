@@ -15,8 +15,8 @@ export module Plots {
      * @param {Scale} yScale the y scale of the plot.
      * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation = Bar.ORIENTATION_VERTICAL) {
-      super(xScale, yScale, orientation);
+    constructor(orientation = Bar.ORIENTATION_VERTICAL) {
+      super(orientation);
       this.classed("stacked-bar-plot", true);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
@@ -36,6 +36,9 @@ export module Plots {
       return new Animators.Null();
     }
 
+    public x(): Plots.AccessorScaleBinding<X, number>;
+    public x(x: number | Accessor<number>): StackedBar<X, Y>;
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
@@ -50,6 +53,9 @@ export module Plots {
       return this;
     }
 
+    public y(): Plots.AccessorScaleBinding<Y, number>;
+    public y(y: number | Accessor<number>): StackedBar<X, Y>;
+    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
         return super.y();

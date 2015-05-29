@@ -2545,7 +2545,7 @@ declare module Plottable {
          * @param {Scale} xScale The x scale to use.
          * @param {Scale} yScale The y scale to use.
          */
-        constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+        constructor();
         x(): Plots.AccessorScaleBinding<X, number>;
         x(x: number | Accessor<number>): XYPlot<X, Y>;
         x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
@@ -2601,7 +2601,7 @@ declare module Plottable {
              * @param {Scale.Scale} xScale The x scale to use.
              * @param {Scale.Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scale<X, any>, yScale: Scale<Y, any>);
+            constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Rect;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
@@ -2609,16 +2609,14 @@ declare module Plottable {
             protected _generateDrawSteps(): Drawers.DrawStep[];
             x(): AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x(x: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Rectangle<X, Y>;
             x2(): AccessorScaleBinding<X, number>;
-            x2(x2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            x2(x2: X | Accessor<X>, scale: Scale<X, number>): Plots.Rectangle<X, Y>;
+            x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Rectangle<X, Y>;
             y(): AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y(y: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Rectangle<X, Y>;
             y2(): AccessorScaleBinding<Y, number>;
-            y2(y2: number | Accessor<number>): Plots.Rectangle<X, Y>;
-            y2(y2: Y | Accessor<Y>, scale: Scale<Y, number>): Plots.Rectangle<X, Y>;
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -2640,7 +2638,7 @@ declare module Plottable {
              * @param {Scale} xScale The x scale to use.
              * @param {Scale} yScale The y scale to use.
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>);
+            constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Symbol;
             size<S>(): AccessorScaleBinding<S, number>;
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
@@ -2673,7 +2671,13 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
+            constructor(orientation?: string);
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): Bar<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Bar<X, Y>;
+            y(): Plots.AccessorScaleBinding<Y, number>;
+            y(y: number | Accessor<number>): Bar<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
             protected _getDrawer(dataset: Dataset): Drawers.Rect;
             protected _setup(): void;
             /**
@@ -2796,7 +2800,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Line;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2836,11 +2840,13 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            constructor();
             protected _setup(): void;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): Area<X>;
+            y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
             y0(): Plots.AccessorScaleBinding<number, number>;
             y0(y0: number | Accessor<number>): Area<X>;
-            y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
             protected _additionalPaint(): void;
@@ -2872,7 +2878,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
+            constructor(orientation?: string);
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -2892,11 +2898,15 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The x scale to use.
              * @param {QuantitativeScale} yScale The y scale to use.
              */
-            constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>);
+            constructor();
             protected _getAnimator(key: string): Animators.Plot;
             protected _setup(): void;
-            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
-            y(y?: number | Accessor<number>, yScale?: Scale<number, number>): any;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): StackedArea<X>;
+            x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): StackedArea<X>;
+            y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): StackedArea<X>;
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
@@ -2922,10 +2932,14 @@ declare module Plottable {
              * @param {Scale} yScale the y scale of the plot.
              * @param {string} orientation The orientation of the Bar Plot ("vertical"/"horizontal").
              */
-            constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>, orientation?: string);
+            constructor(orientation?: string);
             protected _getAnimator(key: string): Animators.Plot;
-            x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any;
-            y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any;
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): StackedBar<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
+            y(): Plots.AccessorScaleBinding<Y, number>;
+            y(y: number | Accessor<number>): StackedBar<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };

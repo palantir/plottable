@@ -20,21 +20,12 @@ module Plottable {
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
+    constructor() {
       super();
-      if (xScale == null || yScale == null) {
-        throw new Error("XYPlots require an xScale and yScale");
-      }
       this.classed("xy-plot", true);
-
-      this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
-      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale });
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
-
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -48,6 +39,11 @@ module Plottable {
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
+
+      if (xScale != null) {
+        xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
+      }
+
       this.render();
       return this;
     }
@@ -64,6 +60,11 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
+
+      if (yScale != null) {
+        yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+      }
+
       this.render();
       return this;
     }
@@ -117,19 +118,19 @@ module Plottable {
       return this;
     }
 
-    /** 
-     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.  
-     * 
+    /**
+     * Sets the automatic domain adjustment for visible points to operate against the X scale, Y scale, or neither.
+     *
      * If 'x' or 'y' is specified the adjustment is immediately performed.
-     * 
-     * @param {string} scale Must be one of 'x', 'y', or 'none'.  
-     * 
-     * 'x' will adjust the x scale in relation to changes in the y domain.  
-     * 
+     *
+     * @param {string} scale Must be one of 'x', 'y', or 'none'.
+     *
+     * 'x' will adjust the x scale in relation to changes in the y domain.
+     *
      * 'y' will adjust the y scale in relation to changes in the x domain.
-     * 
+     *
      * 'none' means neither scale will change automatically.
-     * 
+     *
      * @returns {XYPlot} The calling XYPlot.
      */
     public autorange(scaleName: string) {
@@ -156,11 +157,13 @@ module Plottable {
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      var xScale = this.x().scale;
+      var xBinding = this.x();
+      var xScale = xBinding && xBinding.scale;
       if (xScale != null) {
         xScale.range([0, this.width()]);
       }
-      var yScale = this.y().scale;
+      var yBinding = this.y();
+      var yScale = yBinding && yBinding.scale;
       if (yScale != null) {
         if (this.y().scale instanceof Scales.Category) {
           this.y().scale.range([0, this.height()]);
@@ -212,7 +215,12 @@ module Plottable {
     }
 
     protected _projectorsReady() {
-      return this.x().accessor != null && this.y().accessor != null;
+      var xBinding = this.x();
+      var yBinding = this.y();
+      return xBinding != null &&
+          xBinding.accessor != null &&
+          yBinding != null &&
+          yBinding.accessor != null;
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {

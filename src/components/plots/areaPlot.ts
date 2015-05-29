@@ -16,10 +16,10 @@ export module Plots {
      * @param {QuantitativeScale} xScale The x scale to use.
      * @param {QuantitativeScale} yScale The y scale to use.
      */
-    constructor(xScale: QuantitativeScale<X>, yScale: QuantitativeScale<number>) {
-      super(xScale, yScale);
+    constructor() {
+      super();
       this.classed("area-plot", true);
-      this.y0(0, yScale); // default
+      this.y0(0); // default
       this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("fill-opacity", 0.25);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -32,14 +32,39 @@ export module Plots {
       this._lineDrawers.values().forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): Area<X>;
+    public y(y: number | Accessor<number>, yScale: QuantitativeScale<number>): Area<X>;
+    public y(y?: number | Accessor<number>, yScale?: QuantitativeScale<number>): any {
+      if (y == null) {
+        return super.y();
+      }
+
+      if (yScale == null) {
+        super.y(y);
+      } else {
+        super.y(y, yScale);
+      }
+
+      if (yScale != null) {
+        var y0 = this.y0().accessor;
+        if (y0 != null) {
+          this._bindProperty(Area._Y0_KEY, y0, yScale);
+        }
+        this._updateYScale();
+      }
+      return this;
+    }
+
     public y0(): Plots.AccessorScaleBinding<number, number>;
     public y0(y0: number | Accessor<number>): Area<X>;
-    public y0(y0: number | Accessor<number>, y0Scale: Scale<number, number>): Area<X>;
-    public y0(y0?: number | Accessor<number>, y0Scale?: Scale<number, number>): any {
+    public y0(y0?: number | Accessor<number>): any {
       if (y0 == null) {
         return this._propertyBindings.get(Area._Y0_KEY);
       }
-      this._bindProperty(Area._Y0_KEY, y0, y0Scale);
+      var yBinding = this.y();
+      var yScale = yBinding && yBinding.scale;
+      this._bindProperty(Area._Y0_KEY, y0, yScale);
       this._updateYScale();
       this.render();
       return this;
@@ -47,9 +72,7 @@ export module Plots {
 
     protected _onDatasetUpdate() {
       super._onDatasetUpdate();
-      if (this.y().scale != null) {
-        this._updateYScale();
-      }
+      this._updateYScale();
     }
 
     public addDataset(dataset: Dataset) {
@@ -113,7 +136,12 @@ export module Plots {
       var uniqExtentVals = Utils.Methods.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
-      var yScale = <QuantitativeScale<number>> this.y().scale;
+      var yBinding = this.y();
+      var yScale = <QuantitativeScale<number>> (yBinding && yBinding.scale);
+      if (yScale == null) {
+        return;
+      }
+
       if (constantBaseline != null) {
         yScale.addPaddingException(this, constantBaseline);
       } else {
