@@ -2543,7 +2543,7 @@ describe("Plots", function () {
             renderArea = piePlot._renderArea;
         });
         it("sectors divided evenly", function () {
-            var arcPaths = piePlot.getAllSelections();
+            var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var arcPath0 = d3.select(arcPaths[0][0]);
             var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -2571,7 +2571,7 @@ describe("Plots", function () {
         });
         it("project value onto different attribute", function () {
             piePlot.sectorValue(function (d) { return d.value2; });
-            var arcPaths = piePlot.getAllSelections();
+            var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var arcPath0 = d3.select(arcPaths[0][0]);
             var pathPoints0 = TestMethods.normalizePath(arcPath0.attr("d")).split(/[A-Z]/).slice(1, 4);
@@ -2594,7 +2594,7 @@ describe("Plots", function () {
         });
         it("innerRadius", function () {
             piePlot.innerRadius(5);
-            var arcPaths = piePlot.getAllSelections();
+            var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
             var radiusPath0 = pathPoints0[2].split(",").map(function (coordinate) { return parseFloat(coordinate); });
@@ -2610,7 +2610,7 @@ describe("Plots", function () {
         });
         it("outerRadius", function () {
             piePlot.outerRadius(function () { return 150; });
-            var arcPaths = piePlot.getAllSelections();
+            var arcPaths = renderArea.selectAll(".arc");
             assert.lengthOf(arcPaths[0], 2, "only has two sectors");
             var pathPoints0 = TestMethods.normalizePath(d3.select(arcPaths[0][0]).attr("d")).split(/[A-Z]/).slice(1, 5);
             var radiusPath0 = pathPoints0[0].split(",").map(function (coordinate) { return parseFloat(coordinate); });
@@ -2644,7 +2644,7 @@ describe("Plots", function () {
         });
         describe("Fill", function () {
             it("sectors are filled in according to defaults", function () {
-                var arcPaths = piePlot.getAllSelections();
+                var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
                 assert.strictEqual(arcPath0.attr("fill"), "#5279c7", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
@@ -2653,13 +2653,13 @@ describe("Plots", function () {
             });
             it("project fill", function () {
                 piePlot.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color("10"));
-                var arcPaths = piePlot.getAllSelections();
+                var arcPaths = renderArea.selectAll(".arc");
                 var arcPath0 = d3.select(arcPaths[0][0]);
                 assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
                 var arcPath1 = d3.select(arcPaths[0][1]);
                 assert.strictEqual(arcPath1.attr("fill"), "#ff7f0e", "second sector filled appropriately");
                 piePlot.attr("fill", function (d) { return d.type; }, new Plottable.Scales.Color("20"));
-                arcPaths = piePlot.getAllSelections();
+                arcPaths = renderArea.selectAll(".arc");
                 arcPath0 = d3.select(arcPaths[0][0]);
                 assert.strictEqual(arcPath0.attr("fill"), "#1f77b4", "first sector filled appropriately");
                 arcPath1 = d3.select(arcPaths[0][1]);
@@ -2695,7 +2695,7 @@ describe("Plots", function () {
             plot.addDataset(new Plottable.Dataset(data1));
             plot.sectorValue(function (d) { return d.v; });
             plot.renderTo(svg);
-            var elementsDrawnSel = plot.getAllSelections();
+            var elementsDrawnSel = plot._element.selectAll(".arc");
             assert.strictEqual(elementsDrawnSel.size(), 4, "There should be exactly 4 slices in the pie chart, representing the valid values");
             svg.remove();
         });
