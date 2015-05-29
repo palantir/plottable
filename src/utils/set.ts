@@ -40,9 +40,6 @@ module Plottable {
           configurable: true,
           writable: false
         });
-        if (this.size !== size) {
-          this.size = size;
-        }
       }
 
       public has(value: T) {

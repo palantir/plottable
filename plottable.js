@@ -507,9 +507,6 @@ var Plottable;
                     configurable: true,
                     writable: false
                 });
-                if (this.size !== size) {
-                    this.size = size;
-                }
             };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;

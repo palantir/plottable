@@ -271,7 +271,7 @@ before(function () {
     var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
     if (window.PHANTOMJS) {
         window.Pixel_CloseTo_Requirement = 2;
-        // HACKHACK #2179
+        // HACKHACK https://github.com/ariya/phantomjs/issues/13280
         Plottable.Utils.Set.prototype._setSize = function (size) {
             this.size = size;
         };
