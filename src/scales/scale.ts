@@ -50,7 +50,7 @@ module Plottable {
         var extents = provider(this);
         providerArray = providerArray.concat(extents);
       });
-      return providerArray
+      return providerArray;
     }
 
     protected _getExtent(): D[] {
