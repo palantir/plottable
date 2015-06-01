@@ -326,12 +326,14 @@ module Plottable {
       if (!this._isAnchored) {
         return [];
       }
-      var allIncludedValues: D[] = [];
+      console.log(1);
+
+      var allSetsOfExtents: D[][][] = [];
       this._attrBindings.forEach((attr, binding) => {
         if (binding.scale === scale) {
           var extents = this._attrExtents.get(attr);
           if (extents != null) {
-            allIncludedValues.concat(extents);
+            allSetsOfExtents.push(extents);
           }
         }
       });
@@ -340,12 +342,12 @@ module Plottable {
         if (binding.scale === scale) {
           var extents = this._extentsForProperty(property);
           if (extents != null) {
-            allIncludedValues.concat(extents);
+            allSetsOfExtents.push(extents);
           }
         }
       });
 
-      return allIncludedValues;
+      return d3.merge(d3.merge(allSetsOfExtents));
     }
 
     /**

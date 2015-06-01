@@ -1486,8 +1486,8 @@ var Plottable;
             var _this = this;
             var providerArray = [];
             this._includedValuesProviders.forEach(function (provider) {
-                var includedValues = provider(_this);
-                providerArray.concat(includedValues);
+                var extents = provider(_this);
+                providerArray = providerArray.concat(extents);
             });
             return providerArray;
         };
@@ -6281,12 +6281,13 @@ var Plottable;
             if (!this._isAnchored) {
                 return [];
             }
-            var allIncludedValues = [];
+            console.log(1);
+            var allSetsOfExtents = [];
             this._attrBindings.forEach(function (attr, binding) {
                 if (binding.scale === scale) {
                     var extents = _this._attrExtents.get(attr);
                     if (extents != null) {
-                        allIncludedValues.concat(extents);
+                        allSetsOfExtents.push(extents);
                     }
                 }
             });
@@ -6294,11 +6295,11 @@ var Plottable;
                 if (binding.scale === scale) {
                     var extents = _this._extentsForProperty(property);
                     if (extents != null) {
-                        allIncludedValues.concat(extents);
+                        allSetsOfExtents.push(extents);
                     }
                 }
             });
-            return allIncludedValues;
+            return d3.merge(d3.merge(allSetsOfExtents));
         };
         Plot.prototype.animator = function (animatorKey, animator) {
             if (animator === undefined) {

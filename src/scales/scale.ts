@@ -47,10 +47,10 @@ module Plottable {
     protected _getAllIncludedValues(): D[] {
       var providerArray: D[] = [];
       this._includedValuesProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
-        var includedValues = provider(this);
-        providerArray.concat(includedValues);
+        var extents = provider(this);
+        providerArray = providerArray.concat(extents);
       });
-      return providerArray;
+      return providerArray
     }
 
     protected _getExtent(): D[] {
