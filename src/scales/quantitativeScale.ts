@@ -107,32 +107,6 @@ module Plottable {
     }
 
     /**
-     * Adds an included value.
-     * The supplied value will always be included in the domain when autoDomain()-ing.
-     *
-     * @param {any} key A key that identifies the included value.
-     * @param {D} value
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
-     */
-    public addIncludedValue(key: any, value: D) {
-      this._includedValues.set(key, value);
-      this._autoDomainIfAutomaticMode();
-      return this;
-    }
-
-    /**
-     * Removes the included value associated with the specified key.
-     *
-     * @param {any} key
-     * @returns {QuantitativeScale} The calling QuantitativeScale.
-     */
-    public removeIncludedValue(key: any) {
-      this._includedValues.delete(key);
-      this._autoDomainIfAutomaticMode();
-      return this;
-    }
-
-    /**
      * Gets the padding proportion.
      */
     public padProportion(): number;

@@ -1705,30 +1705,6 @@ var Plottable;
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        /**
-         * Adds an included value.
-         * The supplied value will always be included in the domain when autoDomain()-ing.
-         *
-         * @param {any} key A key that identifies the included value.
-         * @param {D} value
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        QuantitativeScale.prototype.addIncludedValue = function (key, value) {
-            this._includedValues.set(key, value);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
-        /**
-         * Removes the included value associated with the specified key.
-         *
-         * @param {any} key
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        QuantitativeScale.prototype.removeIncludedValue = function (key) {
-            this._includedValues.delete(key);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
         QuantitativeScale.prototype.padProportion = function (padProportion) {
             if (padProportion == null) {
                 return this._padProportion;
@@ -7178,6 +7154,7 @@ var Plottable;
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
+                this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -7374,7 +7351,7 @@ var Plottable;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
                     qscale.addPaddingException(this, this._baselineValue);
-                    qscale.addIncludedValue(this, this._baselineValue);
+                    qscale.addIncludedValuesProvider(this._baselineValueProvider);
                 }
             };
             Bar.prototype._additionalPaint = function (time) {
@@ -7990,12 +7967,14 @@ var Plottable;
              * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
+                var _this = this;
                 _super.call(this);
                 this._baselineValue = 0;
                 this.classed("stacked-area-plot", true);
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
+                this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
@@ -8047,7 +8026,7 @@ var Plottable;
                     return;
                 }
                 scale.addPaddingException(this, 0);
-                scale.addIncludedValue(this, 0);
+                scale.addIncludedValuesProvider(this._baselineValueProvider);
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 this._updateStackExtentsAndOffsets();

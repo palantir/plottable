@@ -47,6 +47,7 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
+      this._baselineValueProvider = () => [this._baselineValue];
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -323,7 +324,7 @@ export module Plots {
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
         qscale.addPaddingException(this, this._baselineValue);
-        qscale.addIncludedValue(this, this._baselineValue);
+        qscale.addIncludedValuesProvider(this._baselineValueProvider);
       }
     }
 

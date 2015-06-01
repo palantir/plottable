@@ -8,6 +8,7 @@ export module Plots {
 
     private _baseline: D3.Selection;
     private _baselineValue = 0;
+    private _baselineValueProvider: (scale: Plottable.Scale<X, number>) => number[];
 
     /**
      * @constructor
@@ -20,6 +21,7 @@ export module Plots {
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
       this._stackedExtent = [];
+      this._baselineValueProvider = () => [this._baselineValue];
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -86,7 +88,7 @@ export module Plots {
         return;
       }
       scale.addPaddingException(this, 0);
-      scale.addIncludedValue(this, 0);
+      scale.addIncludedValuesProvider(this._baselineValueProvider);
     }
 
     protected _onDatasetUpdate() {

@@ -807,22 +807,6 @@ declare module Plottable {
          */
         removePaddingException(key: any): QuantitativeScale<D>;
         /**
-         * Adds an included value.
-         * The supplied value will always be included in the domain when autoDomain()-ing.
-         *
-         * @param {any} key A key that identifies the included value.
-         * @param {D} value
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        addIncludedValue(key: any, value: D): QuantitativeScale<D>;
-        /**
-         * Removes the included value associated with the specified key.
-         *
-         * @param {any} key
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        removeIncludedValue(key: any): QuantitativeScale<D>;
-        /**
          * Gets the padding proportion.
          */
         padProportion(): number;
