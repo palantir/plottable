@@ -24,7 +24,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       yScale.padProportion(0.1);
       var constantY0 = 30;
-      yScale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[constantY0, constantY0 + 10]]);
+      yScale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [[constantY0, constantY0 + 10]]);
       var plot = new Plottable.Plots.Area();
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);

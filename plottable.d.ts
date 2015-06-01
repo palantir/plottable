@@ -764,14 +764,14 @@ declare module Plottable {
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        addIncludedValuesProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
         /**
          * Removes an ExtentsProvider from the Scale.
          *
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeIncludedValuesProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
     }
 }
 

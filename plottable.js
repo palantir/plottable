@@ -1585,7 +1585,7 @@ var Plottable;
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        Scale.prototype.addExtentsProvider = function (provider) {
+        Scale.prototype.addIncludedValuesProvider = function (provider) {
             this._extentsProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
@@ -1596,7 +1596,7 @@ var Plottable;
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        Scale.prototype.removeExtentsProvider = function (provider) {
+        Scale.prototype.removeIncludedValuesProvider = function (provider) {
             this._extentsProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
             return this;
@@ -6241,7 +6241,7 @@ var Plottable;
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._scales().forEach(function (scale) { return scale.addExtentsProvider(_this._extentsProvider); });
+            this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._extentsProvider); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             // Filters should never be applied to attributes
@@ -6474,11 +6474,11 @@ var Plottable;
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
-            scale.removeExtentsProvider(this._extentsProvider);
+            scale.removeIncludedValuesProvider(this._extentsProvider);
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
-            scale.addExtentsProvider(this._extentsProvider);
+            scale.addIncludedValuesProvider(this._extentsProvider);
         };
         Plot.prototype._propertyProjectors = function () {
             return {};

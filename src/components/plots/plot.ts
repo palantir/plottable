@@ -97,7 +97,7 @@ module Plottable {
 
     /**
      * Adds a Dataset to the Plot.
-     * 
+     *
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -146,13 +146,13 @@ module Plottable {
 
     /**
      * Gets the AccessorScaleBinding for a particular attribute.
-     * 
+     *
      * @param {string} attr
      */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
     /**
      * Sets a particular attribute to a constant value or the result of an Accessor.
-     * 
+     *
      * @param {string} attr
      * @param {number|string|Accessor<number>|Accessor<string>} attrValue
      * @returns {Plot} The calling Plot.
@@ -161,7 +161,7 @@ module Plottable {
     /**
      * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the attribute values when autoDomain()-ing.
-     * 
+     *
      * @param {string} attr
      * @param {A|Accessor<A>} attrValue
      * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
@@ -270,7 +270,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale.addExtentsProvider(this._extentsProvider));
+      this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._extentsProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -373,7 +373,7 @@ module Plottable {
 
     /**
      * Removes a Dataset from the Plot.
-     * 
+     *
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -543,12 +543,12 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
-      scale.removeExtentsProvider(this._extentsProvider);
+      scale.removeIncludedValuesProvider(this._extentsProvider);
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
-      scale.addExtentsProvider(this._extentsProvider);
+      scale.addIncludedValuesProvider(this._extentsProvider);
     }
 
     protected _propertyProjectors(): AttributeToProjector {
