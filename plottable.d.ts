@@ -678,7 +678,7 @@ declare module Plottable {
          * @param {Scale} scale
          * @returns {D[][]} An array of extents.
          */
-        interface ExtentsProvider<D> {
+        interface IncludedValuesProvider<D> {
             (scale: Scale<D, any>): D[];
         }
     }
@@ -764,14 +764,14 @@ declare module Plottable {
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        addIncludedValuesProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
         /**
          * Removes an ExtentsProvider from the Scale.
          *
          * @param {Scales.ExtentsProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        removeIncludedValuesProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
     }
 }
 

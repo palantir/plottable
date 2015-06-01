@@ -41,7 +41,7 @@ module Plottable {
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
     protected _attrExtents: D3.Map<any[]>;
-    private _extentsProvider: Scales.ExtentsProvider<any>;
+    private _extentsProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;
     private _animators: {[animator: string]: Animators.Plot} = {};
