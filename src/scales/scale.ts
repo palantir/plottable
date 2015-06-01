@@ -22,7 +22,7 @@ module Plottable {
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
-    private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
+    private _includedValuesProviders: Utils.Set<Scales.ExtentsProvider<D>>;
 
     /**
      * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
@@ -31,7 +31,7 @@ module Plottable {
      */
     constructor() {
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
-      this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
+      this._includedValuesProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
     }
 
     /**
@@ -46,7 +46,7 @@ module Plottable {
 
     protected _getAllExtents(): D[][] {
       var providerArray: D[][][] = [];
-      this._extentsProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
+      this._includedValuesProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
         providerArray.push(provider(this));
       });
       return d3.merge(providerArray);
@@ -186,7 +186,7 @@ module Plottable {
      * @returns {Sclae} The calling Scale.
      */
     public addIncludedValuesProvider(provider: Scales.ExtentsProvider<D>) {
-      this._extentsProviders.add(provider);
+      this._includedValuesProviders.add(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
@@ -198,7 +198,7 @@ module Plottable {
      * @returns {Sclae} The calling Scale.
      */
     public removeIncludedValuesProvider(provider: Scales.ExtentsProvider<D>) {
-      this._extentsProviders.delete(provider);
+      this._includedValuesProviders.delete(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }

@@ -1471,7 +1471,7 @@ var Plottable;
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
             this._callbacks = new Plottable.Utils.CallbackSet();
-            this._extentsProviders = new Plottable.Utils.Set();
+            this._includedValuesProviders = new Plottable.Utils.Set();
         }
         /**
          * Given an array of potential domain values, computes the extent of those values.
@@ -1485,7 +1485,7 @@ var Plottable;
         Scale.prototype._getAllExtents = function () {
             var _this = this;
             var providerArray = [];
-            this._extentsProviders.forEach(function (provider) {
+            this._includedValuesProviders.forEach(function (provider) {
                 providerArray.push(provider(_this));
             });
             return d3.merge(providerArray);
@@ -1586,7 +1586,7 @@ var Plottable;
          * @returns {Sclae} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
-            this._extentsProviders.add(provider);
+            this._includedValuesProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -1597,7 +1597,7 @@ var Plottable;
          * @returns {Sclae} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
-            this._extentsProviders.delete(provider);
+            this._includedValuesProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
