@@ -27,6 +27,7 @@ export module Plots {
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
+    private _baselineValueProvider: (scale: Plottable.Scale<X, Y>) => number[];
 
     /**
      * @constructor
@@ -203,7 +204,7 @@ export module Plots {
      *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
      *     breaking ties with the secondary direction.
      * Returns undefined if no Entity can be found.
-     * 
+     *
      * @param {Point} queryPoint
      * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
@@ -284,7 +285,7 @@ export module Plots {
     public entitiesIn(bounds: Bounds): Entity[];
     /**
      * Gets the Entities that intersect the area defined by the ranges.
-     * 
+     *
      * @param {Range} xRange
      * @param {Range} yRange
      * @returns {Entity[]}
@@ -321,13 +322,8 @@ export module Plots {
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
-        if (this._baselineValue != null) {
-          qscale.addPaddingException(this, this._baselineValue);
-          qscale.addIncludedValue(this, this._baselineValue);
-        } else {
-          qscale.removePaddingException(this);
-          qscale.removeIncludedValue(this);
-        }
+        qscale.addPaddingException(this, this._baselineValue);
+        qscale.addIncludedValue(this, this._baselineValue);
       }
     }
 

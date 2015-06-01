@@ -7373,14 +7373,8 @@ var Plottable;
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
-                    if (this._baselineValue != null) {
-                        qscale.addPaddingException(this, this._baselineValue);
-                        qscale.addIncludedValue(this, this._baselineValue);
-                    }
-                    else {
-                        qscale.removePaddingException(this);
-                        qscale.removeIncludedValue(this);
-                    }
+                    qscale.addPaddingException(this, this._baselineValue);
+                    qscale.addIncludedValue(this, this._baselineValue);
                 }
             };
             Bar.prototype._additionalPaint = function (time) {
