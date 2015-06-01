@@ -326,14 +326,13 @@ module Plottable {
       if (!this._isAnchored) {
         return [];
       }
-      console.log(1);
 
-      var allSetsOfExtents: D[][][] = [];
+      var allSetsOfExtents: D[] = [];
       this._attrBindings.forEach((attr, binding) => {
         if (binding.scale === scale) {
           var extents = this._attrExtents.get(attr);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            allSetsOfExtents = allSetsOfExtents.concat(d3.merge(extents));
           }
         }
       });
@@ -342,12 +341,12 @@ module Plottable {
         if (binding.scale === scale) {
           var extents = this._extentsForProperty(property);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            allSetsOfExtents = allSetsOfExtents.concat(d3.merge(extents));
           }
         }
       });
 
-      return d3.merge(d3.merge(allSetsOfExtents));
+      return allSetsOfExtents;
     }
 
     /**
