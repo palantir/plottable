@@ -322,16 +322,16 @@ module Plottable {
       return this._propertyExtents.get(property);
     }
 
-    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    private _extentsForScale<D>(scale: Scale<D, any>): D[] {
       if (!this._isAnchored) {
         return [];
       }
-      var allSetsOfExtents: D[][][] = [];
+      var allIncludedValues: D[] = [];
       this._attrBindings.forEach((attr, binding) => {
         if (binding.scale === scale) {
           var extents = this._attrExtents.get(attr);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            allIncludedValues.concat(extents);
           }
         }
       });
@@ -340,12 +340,12 @@ module Plottable {
         if (binding.scale === scale) {
           var extents = this._extentsForProperty(property);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            allIncludedValues.concat(extents);
           }
         }
       });
 
-      return d3.merge(allSetsOfExtents);
+      return allIncludedValues;
     }
 
     /**
