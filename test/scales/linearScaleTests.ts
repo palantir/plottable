@@ -15,7 +15,7 @@ describe("Scales", () => {
     it("autoDomain() expands single value to [value - 1, value + 1]", () => {
       var scale = new Plottable.Scales.Linear();
       var singleValue = 15;
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [[singleValue, singleValue]]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue, singleValue]);
       assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
     });
 
@@ -23,7 +23,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var minBelowBottom = -10;
       scale.domainMin(minBelowBottom);
@@ -45,7 +45,7 @@ describe("Scales", () => {
 
       scale.domainMin(minInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
       assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
     });
 
@@ -53,7 +53,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var maxAboveTop = 10;
       scale.domainMax(maxAboveTop);
@@ -75,7 +75,7 @@ describe("Scales", () => {
 
       scale.domainMax(maxInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
       assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
     });
 
@@ -83,7 +83,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var desiredMin = -10;
       var desiredMax = 10;
@@ -134,7 +134,7 @@ describe("Scales", () => {
       });
 
       it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => d3.extent(data, (e) => e.foo));
         assert.isTrue((<any> scale)._autoDomainAutomatically,
                             "the autoDomain flag is still set after autoranginging and padding and nice-ing");
         scale.domain([0, 5]);
@@ -178,17 +178,17 @@ describe("Scales", () => {
       });
 
       it("addIncludedValuesProvider()", () => {
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [0, 10]);
         assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [-10, 0]);
         assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
       });
 
       it("removeIncludedValuesProvider()", () => {
-        var posProvider = (scale: Plottable.Scale<number, number>) => [[0, 10]];
+        var posProvider = (scale: Plottable.Scale<number, number>) => [0, 10];
         scale.addIncludedValuesProvider(posProvider);
-        var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
+        var negProvider = (scale: Plottable.Scale<number, number>) => [-10, 0];
         scale.addIncludedValuesProvider(negProvider);
         assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 

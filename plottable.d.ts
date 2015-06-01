@@ -679,7 +679,7 @@ declare module Plottable {
          * @returns {D[][]} An array of extents.
          */
         interface ExtentsProvider<D> {
-            (scale: Scale<D, any>): D[][];
+            (scale: Scale<D, any>): D[];
         }
     }
     class Scale<D, R> {

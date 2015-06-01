@@ -14,7 +14,7 @@ module Plottable {
      * @returns {D[][]} An array of extents.
      */
     export interface ExtentsProvider<D> {
-      (scale: Scale<D, any>): D[][];
+      (scale: Scale<D, any>): D[];
     }
   }
 
@@ -47,15 +47,10 @@ module Plottable {
     protected _getAllIncludedValues(): D[] {
       var providerArray: D[] = [];
       this._includedValuesProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
-        var extents = provider(this);
-        extents.forEach((extent) => {
-
-          extent.forEach((value: any) => {
-            providerArray.push(value);
-          });
-        });
+        var includedValues = provider(this);
+        providerArray.concat(includedValues);
       });
-      return providerArray
+      return providerArray;
     }
 
     protected _getExtent(): D[] {

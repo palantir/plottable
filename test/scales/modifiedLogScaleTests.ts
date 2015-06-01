@@ -42,7 +42,7 @@ describe("Scales", () => {
     });
 
     it("can be padded", () => {
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [[0, base]]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [0, base]);
       scale.padProportion(0);
       var unpaddedDomain = scale.domain();
       scale.padProportion(0.1);
@@ -53,7 +53,7 @@ describe("Scales", () => {
     it("autoDomain() expands single value correctly", () => {
       scale.padProportion(0);
       var singleValue = 15;
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [[singleValue, singleValue]]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [singleValue, singleValue]);
       assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base],
         "positive single-value extent was expanded to [value / base, value * base]");
       singleValue = -15;
@@ -70,7 +70,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.ModifiedLog(base);
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => requestedDomain);
 
       var minBelowBottom = -10;
       scale.domainMin(minBelowBottom);
@@ -90,7 +90,7 @@ describe("Scales", () => {
 
       scale.domainMin(minInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => requestedDomain2);
       assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
     });
 
@@ -98,7 +98,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.ModifiedLog(base);
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => requestedDomain);
 
       var maxAboveTop = 10;
       scale.domainMax(maxAboveTop);
@@ -118,7 +118,7 @@ describe("Scales", () => {
 
       scale.domainMax(maxInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => requestedDomain2);
       assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
     });
 
@@ -126,7 +126,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.ModifiedLog(base);
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.ModifiedLog) => requestedDomain);
 
       var desiredMin = -10;
       var desiredMax = 10;
@@ -143,12 +143,12 @@ describe("Scales", () => {
     });
 
     it("gives reasonable values for ticks()", () => {
-      var providedExtents = [[0, base / 2]];
+      var providedExtents = [0, base / 2];
       scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => providedExtents);
       var ticks = scale.ticks();
       assert.operator(ticks.length, ">", 0);
 
-      providedExtents = [[-base * 2, base * 2]];
+      providedExtents = [-base * 2, base * 2];
       scale.autoDomain();
       ticks = scale.ticks();
       var beforePivot = ticks.filter((x) => x <= -base);
@@ -181,10 +181,10 @@ describe("Scales", () => {
     });
 
     it("ticks() is always non-empty", () => {
-      var desiredExtents: number[][] = [];
+      var desiredExtents: number[] = [];
       scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => desiredExtents);
       [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach((extent) => {
-        desiredExtents = [extent];
+        desiredExtents = extent;
         scale.autoDomain();
         var ticks = scale.ticks();
         assert.operator(ticks.length, ">", 0);

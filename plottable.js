@@ -1486,12 +1486,8 @@ var Plottable;
             var _this = this;
             var providerArray = [];
             this._includedValuesProviders.forEach(function (provider) {
-                var extents = provider(_this);
-                extents.forEach(function (extent) {
-                    extent.forEach(function (value) {
-                        providerArray.push(value);
-                    });
-                });
+                var includedValues = provider(_this);
+                providerArray.concat(includedValues);
             });
             return providerArray;
         };
