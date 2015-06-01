@@ -696,7 +696,7 @@ declare module Plottable {
          * @returns {D[]} The extent of the input values.
          */
         extentOfValues(values: D[]): D[];
-        protected _getAllExtents(): D[][];
+        protected _getAllIncludedValues(): D[][];
         protected _getExtent(): D[];
         /**
          * Adds a callback to be called when the Scale updates.

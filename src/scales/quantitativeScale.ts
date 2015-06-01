@@ -59,7 +59,7 @@ module Plottable {
     }
 
     protected _getExtent(): D[] {
-      var extents = this._getAllExtents().filter((extent) => extent.length > 0);
+      var extents = this._getAllIncludedValues().filter((extent) => extent.length > 0);
       var extent: D[];
       var defaultExtent = this._defaultExtent();
       if (extents.length === 0) {
@@ -86,10 +86,10 @@ module Plottable {
      * Adds a padding exception.
      * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
      * that end of the domain will not be padded.
-     * 
+     *
      * @param {any} key A key that identifies the padding exception.
      * @param {D} exception
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public addPaddingException(key: any, exception: D) {
       this._paddingExceptions.set(key, exception);
@@ -99,9 +99,9 @@ module Plottable {
 
     /**
      * Removes the padding exception associated with the specified key.
-     * 
+     *
      * @param {any} key
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public removePaddingException(key: any) {
       this._paddingExceptions.delete(key);
@@ -112,10 +112,10 @@ module Plottable {
     /**
      * Adds an included value.
      * The supplied value will always be included in the domain when autoDomain()-ing.
-     * 
+     *
      * @param {any} key A key that identifies the included value.
      * @param {D} value
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public addIncludedValue(key: any, value: D) {
       this._includedValues.set(key, value);
@@ -125,9 +125,9 @@ module Plottable {
 
     /**
      * Removes the included value associated with the specified key.
-     * 
+     *
      * @param {any} key
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public removeIncludedValue(key: any) {
       this._includedValues.delete(key);
@@ -143,9 +143,9 @@ module Plottable {
      * Sets the padding porportion.
      * When autoDomain()-ing, the computed domain will be expanded by this proportion,
      * then rounded to human-readable values.
-     * 
+     *
      * @param {number} padProportion The padding proportion. Passing 0 disables padding.
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public padProportion(padProportion: number): QuantitativeScale<D>;
     public padProportion(padProportion?: number): any {

@@ -58,7 +58,7 @@ export module Scales {
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
-      var extents = this._getAllExtents();
+      var extents = this._getAllIncludedValues();
       var concatenatedExtents: string[] = [];
       extents.forEach((e) => {
         concatenatedExtents = concatenatedExtents.concat(e);
@@ -88,7 +88,7 @@ export module Scales {
     /**
      * Returns the color-string corresponding to a given string.
      * If there are not enough colors in the range(), a lightened version of an existing color will be used.
-     * 
+     *
      * @param {string} value
      * @returns {string}
      */

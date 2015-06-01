@@ -44,7 +44,7 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    protected _getAllExtents(): D[][] {
+    protected _getAllIncludedValues(): D[][] {
       var providerArray: D[][][] = [];
       this._includedValuesProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
         providerArray.push(provider(this));

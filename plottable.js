@@ -1482,7 +1482,7 @@ var Plottable;
         Scale.prototype.extentOfValues = function (values) {
             return []; // this should be overwritten
         };
-        Scale.prototype._getAllExtents = function () {
+        Scale.prototype._getAllIncludedValues = function () {
             var _this = this;
             var providerArray = [];
             this._includedValuesProviders.forEach(function (provider) {
@@ -1661,7 +1661,7 @@ var Plottable;
             _super.prototype._autoDomainIfAutomaticMode.call(this);
         };
         QuantitativeScale.prototype._getExtent = function () {
-            var extents = this._getAllExtents().filter(function (extent) { return extent.length > 0; });
+            var extents = this._getAllIncludedValues().filter(function (extent) { return extent.length > 0; });
             var extent;
             var defaultExtent = this._defaultExtent();
             if (extents.length === 0) {
@@ -2158,7 +2158,7 @@ var Plottable;
                 return Plottable.Utils.Methods.uniq(values);
             };
             Category.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
+                var extents = this._getAllIncludedValues();
                 return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
             };
             Category.prototype.domain = function (values) {
@@ -2303,7 +2303,7 @@ var Plottable;
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
+                var extents = this._getAllIncludedValues();
                 var concatenatedExtents = [];
                 extents.forEach(function (e) {
                     concatenatedExtents = concatenatedExtents.concat(e);
@@ -2549,7 +2549,7 @@ var Plottable;
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // InterpolatedColorScales do not pad
-                var extents = this._getAllExtents();
+                var extents = this._getAllIncludedValues();
                 if (extents.length > 0) {
                     this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
                 }
