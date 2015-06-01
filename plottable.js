@@ -1666,16 +1666,12 @@ var Plottable;
             _super.prototype._autoDomainIfAutomaticMode.call(this);
         };
         QuantitativeScale.prototype._getExtent = function () {
-            var extents = this._getAllIncludedValues();
-            var extent;
-            var defaultExtent = this._defaultExtent();
-            if (extents.length === 0) {
-                extent = defaultExtent;
-            }
-            else {
+            var includedValues = this._getAllIncludedValues();
+            var extent = this._defaultExtent();
+            if (includedValues.length !== 0) {
                 var combinedExtent = [
-                    Plottable.Utils.Methods.min(extents, defaultExtent[0]),
-                    Plottable.Utils.Methods.max(extents, defaultExtent[1])
+                    Plottable.Utils.Methods.min(includedValues, extent[0]),
+                    Plottable.Utils.Methods.max(includedValues, extent[1])
                 ];
                 var includedDomain = this._includeValues(combinedExtent);
                 extent = this._padDomain(includedDomain);
@@ -2163,8 +2159,7 @@ var Plottable;
                 return Plottable.Utils.Methods.uniq(values);
             };
             Category.prototype._getExtent = function () {
-                var extents = this._getAllIncludedValues();
-                return Plottable.Utils.Methods.uniq(extents);
+                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
@@ -2308,8 +2303,7 @@ var Plottable;
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
-                var extents = this._getAllIncludedValues();
-                return Plottable.Utils.Methods.uniq(extents);
+                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
@@ -2550,9 +2544,9 @@ var Plottable;
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // InterpolatedColorScales do not pad
-                var extents = this._getAllIncludedValues();
-                if (extents.length > 0) {
-                    this._setDomain([Plottable.Utils.Methods.min(extents, 0), Plottable.Utils.Methods.max(extents, 0)]);
+                var includedValues = this._getAllIncludedValues();
+                if (includedValues.length > 0) {
+                    this._setDomain([Plottable.Utils.Methods.min(includedValues, 0), Plottable.Utils.Methods.max(includedValues, 0)]);
                 }
                 return this;
             };

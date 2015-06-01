@@ -154,9 +154,9 @@ export module Scales {
 
     public autoDomain() {
       // InterpolatedColorScales do not pad
-      var extents = this._getAllIncludedValues();
-      if (extents.length > 0) {
-        this._setDomain([Utils.Methods.min(extents, 0), Utils.Methods.max(extents, 0)]);
+      var includedValues = this._getAllIncludedValues();
+      if (includedValues.length > 0) {
+        this._setDomain([Utils.Methods.min(includedValues, 0), Utils.Methods.max(includedValues, 0)]);
       }
       return this;
     }

@@ -27,8 +27,7 @@ export module Scales {
     }
 
     protected _getExtent(): string[] {
-      var extents: string[] = this._getAllIncludedValues();
-      return Utils.Methods.uniq(extents);
+      return Utils.Methods.uniq(this._getAllIncludedValues());
     }
 
     public domain(): string[];

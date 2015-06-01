@@ -58,8 +58,7 @@ export module Scales {
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
-      var extents = this._getAllIncludedValues();
-      return Utils.Methods.uniq(extents);
+      return Utils.Methods.uniq(this._getAllIncludedValues());
     }
 
     private static _getPlottableColors(): string[] {
