@@ -1486,9 +1486,14 @@ var Plottable;
             var _this = this;
             var providerArray = [];
             this._includedValuesProviders.forEach(function (provider) {
-                providerArray.push(provider(_this));
+                var extents = provider(_this);
+                extents.forEach(function (extent) {
+                    extent.forEach(function (value) {
+                        providerArray.push(value);
+                    });
+                });
             });
-            return d3.merge(providerArray);
+            return providerArray;
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
@@ -1661,7 +1666,7 @@ var Plottable;
             _super.prototype._autoDomainIfAutomaticMode.call(this);
         };
         QuantitativeScale.prototype._getExtent = function () {
-            var extents = this._getAllIncludedValues().filter(function (extent) { return extent.length > 0; });
+            var extents = this._getAllIncludedValues();
             var extent;
             var defaultExtent = this._defaultExtent();
             if (extents.length === 0) {
@@ -1669,8 +1674,8 @@ var Plottable;
             }
             else {
                 var combinedExtent = [
-                    Plottable.Utils.Methods.min(extents, function (extent) { return extent[0]; }, defaultExtent[0]),
-                    Plottable.Utils.Methods.max(extents, function (extent) { return extent[1]; }, defaultExtent[1])
+                    Plottable.Utils.Methods.min(extents, defaultExtent[0]),
+                    Plottable.Utils.Methods.max(extents, defaultExtent[1])
                 ];
                 var includedDomain = this._includeValues(combinedExtent);
                 extent = this._padDomain(includedDomain);
@@ -2159,7 +2164,7 @@ var Plottable;
             };
             Category.prototype._getExtent = function () {
                 var extents = this._getAllIncludedValues();
-                return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
+                return Plottable.Utils.Methods.uniq(extents);
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
@@ -2304,11 +2309,7 @@ var Plottable;
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 var extents = this._getAllIncludedValues();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Utils.Methods.uniq(concatenatedExtents);
+                return Plottable.Utils.Methods.uniq(extents);
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
@@ -2551,7 +2552,7 @@ var Plottable;
                 // InterpolatedColorScales do not pad
                 var extents = this._getAllIncludedValues();
                 if (extents.length > 0) {
-                    this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
+                    this._setDomain([Plottable.Utils.Methods.min(extents, 0), Plottable.Utils.Methods.max(extents, 0)]);
                 }
                 return this;
             };

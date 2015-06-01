@@ -44,12 +44,18 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    protected _getAllIncludedValues(): D[][] {
-      var providerArray: D[][][] = [];
+    protected _getAllIncludedValues(): D[] {
+      var providerArray: D[] = [];
       this._includedValuesProviders.forEach((provider: Scales.ExtentsProvider<D>) => {
-        providerArray.push(provider(this));
+        var extents = provider(this);
+        extents.forEach((extent) => {
+
+          extent.forEach((value: any) => {
+            providerArray.push(value);
+          });
+        });
       });
-      return d3.merge(providerArray);
+      return providerArray
     }
 
     protected _getExtent(): D[] {

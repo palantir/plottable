@@ -59,15 +59,15 @@ module Plottable {
     }
 
     protected _getExtent(): D[] {
-      var extents = this._getAllIncludedValues().filter((extent) => extent.length > 0);
+      var extents = this._getAllIncludedValues();
       var extent: D[];
       var defaultExtent = this._defaultExtent();
       if (extents.length === 0) {
         extent = defaultExtent;
       } else {
         var combinedExtent = [
-          Utils.Methods.min<D[], D>(extents, (extent) => extent[0], defaultExtent[0]),
-          Utils.Methods.max<D[], D>(extents, (extent) => extent[1], defaultExtent[1])
+          Utils.Methods.min<D>(extents, defaultExtent[0]),
+          Utils.Methods.max<D>(extents, defaultExtent[1])
         ];
         var includedDomain = this._includeValues(combinedExtent);
         extent = this._padDomain(includedDomain);
