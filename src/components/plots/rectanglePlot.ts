@@ -25,7 +25,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Drawers.Rect(dataset);
+      return new Drawers.Rectangle(dataset);
     }
 
     protected _generateAttrToProjector() {

@@ -1293,7 +1293,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Rect extends Element {
+        class Rectangle extends Element {
             constructor(dataset: Dataset);
         }
     }
@@ -2641,7 +2641,7 @@ declare module Plottable {
              * @param {Scale.Scale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Rect;
+            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -2769,7 +2769,7 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): Bar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
-            protected _getDrawer(dataset: Dataset): Drawers.Rect;
+            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
              * Gets the baseline value.
