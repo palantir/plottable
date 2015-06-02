@@ -301,6 +301,10 @@ export module Plots {
         return;
       }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+      // HACKHACK #2208
+      if (valueScale instanceof Scales.Time && this._baselineValue === 0) {
+        this.baseline(new Date(0));
+      }
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
         qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
