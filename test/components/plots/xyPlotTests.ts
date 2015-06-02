@@ -26,6 +26,23 @@ describe("Plots", () => {
           .y(yAccessor, yScale)
           .renderTo(svg);
     });
+    
+    it("autorange getters", () => {
+      plot.autorange("x");
+      assert.equal(plot.autorange(), "x");
+      plot.autorange("y");
+      assert.equal(plot.autorange(), "y");
+      plot.autorange("none");
+      assert.equal(plot.autorange(), "none");
+      svg.remove();
+    });
+    
+    it("autorange invalid inputs", () => {
+      assert.throws(() => {
+        plot.autorange("foobar");
+      });
+      svg.remove();
+    });
 
     it("automatically adjusting Y domain over visible points", () => {
       xScale.domain([-3, 3]);

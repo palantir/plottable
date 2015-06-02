@@ -2439,6 +2439,21 @@ describe("Plots", function () {
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
+        it("autorange getters", function () {
+            plot.autorange("x");
+            assert.equal(plot.autorange(), "x");
+            plot.autorange("y");
+            assert.equal(plot.autorange(), "y");
+            plot.autorange("none");
+            assert.equal(plot.autorange(), "none");
+            svg.remove();
+        });
+        it("autorange invalid inputs", function () {
+            assert.throws(function () {
+                plot.autorange("foobar");
+            });
+            svg.remove();
+        });
         it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");

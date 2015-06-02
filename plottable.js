@@ -6745,18 +6745,16 @@ var Plottable;
             }
             return this;
         };
-        /**
-         * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
-         * If "x" or "y" is specified the adjustment is immediately performed.
-         *
-         * @param {string} scaleName One of "x"/"y"/"none".
-         *   "x" will adjust the x Scale in relation to changes in the y domain.
-         *   "y" will adjust the y Scale in relation to changes in the x domain.
-         *   "none" means neither Scale will change automatically.
-         *
-         * @returns {XYPlot} The calling XYPlot.
-         */
         XYPlot.prototype.autorange = function (scaleName) {
+            if (typeof (scaleName) == "undefined") {
+                if (this._autoAdjustXScaleDomain) {
+                    return "x";
+                }
+                if (this._autoAdjustYScaleDomain) {
+                    return "y";
+                }
+                return "none";
+            }
             switch (scaleName) {
                 case "x":
                     this._autoAdjustXScaleDomain = true;
