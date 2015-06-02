@@ -1630,7 +1630,7 @@ var Plottable;
             this._padProportion = 0.05;
             this._paddingExceptions = new Plottable.Utils.Map();
             this._includedValues = new Plottable.Utils.Map();
-            this._paddingExceptionProviders = new Plottable.Utils.Set();
+            this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
             this._domainMin = null;
@@ -1706,13 +1706,13 @@ var Plottable;
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        QuantitativeScale.prototype.addPaddingExceptionProvider = function (provider) {
-            this._paddingExceptionProviders.add(provider);
+        QuantitativeScale.prototype.addPaddingExceptionsProvider = function (provider) {
+            this._paddingExceptionsProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        QuantitativeScale.prototype.removePaddingExceptionProvider = function (provider) {
-            this._paddingExceptionProviders.delete(provider);
+        QuantitativeScale.prototype.removePaddingExceptionsProvider = function (provider) {
+            this._paddingExceptionsProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };

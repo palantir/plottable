@@ -688,8 +688,8 @@ declare module Plottable {
          * @param {Scale} scale
          * @returns {D[][]} An array of extents.
          */
-        interface PaddingExceptionProvider<D> {
-            (scale: Scale<D, any>): D;
+        interface PaddingExceptionsProvider<D> {
+            (scale: Scale<D, any>): D[];
         }
     }
     class Scale<D, R> {
@@ -816,8 +816,8 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         removePaddingException(key: any): QuantitativeScale<D>;
-        addPaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>): QuantitativeScale<D>;
-        removePaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>): QuantitativeScale<D>;
+        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
+        removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         /**
          * Gets the padding proportion.
          */

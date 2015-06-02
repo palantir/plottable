@@ -24,8 +24,8 @@ module Plottable {
      * @param {Scale} scale
      * @returns {D[][]} An array of extents.
      */
-    export interface PaddingExceptionProvider<D> {
-      (scale: Scale<D, any>): D;
+    export interface PaddingExceptionsProvider<D> {
+      (scale: Scale<D, any>): D[];
     }
   }
 

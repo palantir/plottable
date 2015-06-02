@@ -6,7 +6,7 @@ module Plottable {
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
     private _padProportion = 0.05;
     private _paddingExceptions: Utils.Map<any, D>;
-    private _paddingExceptionProviders: Utils.Set<Scales.PaddingExceptionProvider<D>>;
+    private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
     private _includedValues: Utils.Map<any, D>;
     private _domainMin: D;
     private _domainMax: D;
@@ -21,7 +21,7 @@ module Plottable {
       super();
       this._paddingExceptions = new Utils.Map<any, D>();
       this._includedValues = new Utils.Map<any, D>();
-      this._paddingExceptionProviders = new Utils.Set<Scales.PaddingExceptionProvider<D>>();
+      this._paddingExceptionsProviders = new Utils.Set<Scales.PaddingExceptionsProvider<D>>();
     }
 
     public autoDomain() {
@@ -108,14 +108,14 @@ module Plottable {
       return this;
     }
 
-    public addPaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>) {
-      this._paddingExceptionProviders.add(provider);
+    public addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+      this._paddingExceptionsProviders.add(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
-    public removePaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>) {
-      this._paddingExceptionProviders.delete(provider);
+    public removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+      this._paddingExceptionsProviders.delete(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
