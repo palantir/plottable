@@ -16,8 +16,9 @@ declare module SVGTypewriter.Utils.Methods {
 }
 
 declare module SVGTypewriter.Utils.DOM {
-    function transform(s: D3.Selection, x?: number, y?: number): any;
-    function getBBox(element: D3.Selection): SVGRect;
+    function transform(s: d3.Selection<any>): d3.Transform;
+    function transform(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
+    function getBBox(element: d3.Selection<any>): SVGRect;
 }
 
 
@@ -79,8 +80,8 @@ declare module SVGTypewriter.Animators {
          */
         static DEFAULT_EASING: string;
         constructor();
-        animate(selection: D3.Selection): any;
-        _animate(selection: D3.Selection, attr: any): D3.Transition.Transition;
+        animate(selection: d3.Selection<any>): any;
+        _animate(selection: d3.Selection<any>, attr: any): d3.Transition<any>;
         duration(): number;
         duration(duration: number): BaseAnimator;
         moveX(): number;
@@ -107,7 +108,7 @@ declare module SVGTypewriter.Animators {
 
 declare module SVGTypewriter.Animators {
     class OpacityAnimator extends BaseAnimator {
-        animate(selection: D3.Selection): any;
+        animate(selection: d3.Selection<any>): any;
     }
 }
 
@@ -143,7 +144,7 @@ declare module SVGTypewriter.Wrappers {
 
 declare module SVGTypewriter.Writers {
     interface WriteOptions {
-        selection: D3.Selection;
+        selection: d3.Selection<any>;
         xAlign: string;
         yAlign: string;
         textRotation: number;
@@ -171,7 +172,7 @@ declare module SVGTypewriter.Measurers {
     }
     class AbstractMeasurer {
         static HEIGHT_TEXT: string;
-        constructor(area: D3.Selection, className?: string);
+        constructor(area: d3.Selection<void>, className?: string);
         measure(text?: string): Dimensions;
     }
 }
@@ -179,7 +180,7 @@ declare module SVGTypewriter.Measurers {
 
 declare module SVGTypewriter.Measurers {
     class Measurer extends AbstractMeasurer {
-        constructor(area: D3.Selection, className?: string, useGuards?: boolean);
+        constructor(area: d3.Selection<void>, className?: string, useGuards?: boolean);
         _addGuards(text: string): string;
         _measureLine(line: string): Dimensions;
         measure(text?: string): {
@@ -203,7 +204,7 @@ declare module SVGTypewriter.Measurers {
 
 declare module SVGTypewriter.Measurers {
     class CacheCharacterMeasurer extends CharacterMeasurer {
-        constructor(area: D3.Selection, className?: string);
+        constructor(area: d3.Selection<void>, className?: string);
         _measureCharacterNotFromCache(c: string): Dimensions;
         _measureCharacter(c: string): Dimensions;
         reset(): void;
