@@ -7134,7 +7134,6 @@ var Plottable;
                 var _this = this;
                 if (orientation === void 0) { orientation = Bar.ORIENTATION_VERTICAL; }
                 _super.call(this);
-                this._barAlignmentFactor = 0.5;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
@@ -7188,24 +7187,6 @@ var Plottable;
                 }
                 this._baselineValue = value;
                 this._updateValueScale();
-                this.render();
-                return this;
-            };
-            /**
-             * Sets the bar alignment relative to the independent axis.
-             * A vertical Bar Plot supports "left", "center", "right"
-             * A horizontal Bar Plot supports "top", "center", "bottom"
-             *
-             * @param {string} alignment The desired alignment.
-             * @returns {Bar} The calling Bar.
-             */
-            Bar.prototype.barAlignment = function (alignment) {
-                var alignmentLC = alignment.toLowerCase();
-                var align2factor = this.constructor._BarAlignmentToFactor;
-                if (align2factor[alignmentLC] === undefined) {
-                    throw new Error("unsupported bar alignment");
-                }
-                this._barAlignmentFactor = align2factor[alignmentLC];
                 this.render();
                 return this;
             };
@@ -7456,12 +7437,10 @@ var Plottable;
                 return drawSteps;
             };
             Bar.prototype._generateAttrToProjector = function () {
-                var _this = this;
                 // Primary scale/direction: the "length" of the bars
                 // Secondary scale/direction: the "width" of the bars
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                var secondaryScale = this._isVertical ? this.x().scale : this.y().scale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
                 var scaledBaseline = primaryScale.scale(this._baselineValue);
@@ -7473,12 +7452,7 @@ var Plottable;
                 };
                 attrToProjector["width"] = this._isVertical ? widthF : heightF;
                 attrToProjector["height"] = this._isVertical ? heightF : widthF;
-                if (secondaryScale instanceof Plottable.Scales.Category) {
-                    attrToProjector[secondaryAttr] = function (d, i, dataset) { return positionF(d, i, dataset) - widthF(d, i, dataset) / 2; };
-                }
-                else {
-                    attrToProjector[secondaryAttr] = function (d, i, dataset) { return positionF(d, i, dataset) - widthF(d, i, dataset) * _this._barAlignmentFactor; };
-                }
+                attrToProjector[secondaryAttr] = function (d, i, dataset) { return positionF(d, i, dataset) - widthF(d, i, dataset) / 2; };
                 attrToProjector[primaryAttr] = function (d, i, dataset) {
                     var originalPos = originalPositionFn(d, i, dataset);
                     // If it is past the baseline, it should start at the baselin then width/height
@@ -7518,13 +7492,13 @@ var Plottable;
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
                     var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
                     var minScaledDatum = Plottable.Utils.Methods.min(scaledData, 0);
-                    if (this._barAlignmentFactor !== 0 && minScaledDatum > 0) {
-                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum / this._barAlignmentFactor);
+                    if (minScaledDatum > 0) {
+                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
                     }
                     var maxScaledDatum = Plottable.Utils.Methods.max(scaledData, 0);
-                    if (this._barAlignmentFactor !== 1 && maxScaledDatum < barWidthDimension) {
+                    if (maxScaledDatum < barWidthDimension) {
                         var margin = barWidthDimension - maxScaledDatum;
-                        barPixelWidth = Math.min(barPixelWidth, margin / (1 - this._barAlignmentFactor));
+                        barPixelWidth = Math.min(barPixelWidth, margin * 2);
                     }
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
@@ -7548,10 +7522,10 @@ var Plottable;
                         entity.position.x -= +bar.attr("width");
                     }
                     if (_this._isVertical) {
-                        entity.position.x = +bar.attr("x") + +bar.attr("width") * _this._barAlignmentFactor;
+                        entity.position.x = +bar.attr("x") + +bar.attr("width") / 2;
                     }
                     else {
-                        entity.position.y = +bar.attr("y") + +bar.attr("height") * _this._barAlignmentFactor;
+                        entity.position.y = +bar.attr("y") + +bar.attr("height") / 2;
                     }
                 });
                 return entities;
@@ -7577,7 +7551,6 @@ var Plottable;
             };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";
-            Bar._BarAlignmentToFactor = { "left": 0, "center": 0.5, "right": 1 };
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;

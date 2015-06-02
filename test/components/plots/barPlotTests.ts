@@ -153,30 +153,6 @@ describe("Plots", () => {
             svg.remove();
           });
 
-         describe("barAlignment", () => {
-           it("entities() positions corrected for barAlignment left", () => {
-             barPlot.barAlignment("left");
-             var entities = barPlot.entities();
-             entities.forEach((entity) => {
-               var barSelection = entity.selection;
-               var pixelPointX = entity.position.x;
-               assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-             });
-             svg.remove();
-           });
-
-           it("entities() positions corrected for barAlignment right", () => {
-             barPlot.barAlignment("right");
-             var entities = barPlot.entities();
-             entities.forEach((entity) => {
-               var barSelection = entity.selection;
-               var pixelPointX = entity.position.x;
-               assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-             });
-             svg.remove();
-           });
-         });
-
         });
 
       });
@@ -533,30 +509,6 @@ describe("Plots", () => {
               }
             });
             svg.remove();
-          });
-
-          describe("accounting for barAlignment", () => {
-            it("entity() positions corrected for barAlignment left", () => {
-              barPlot.barAlignment("left");
-              var entities = barPlot.entities();
-              entities.forEach((entity) => {
-                var barSelection = entity.selection;
-                var pixelPointY = entity.position.y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-              });
-              svg.remove();
-            });
-
-            it("entity() positions corrected for barAlignment right", () => {
-              barPlot.barAlignment("right");
-              var entities = barPlot.entities();
-              entities.forEach((entity) => {
-                var barSelection = entity.selection;
-                var pixelPointY = entity.position.y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-              });
-              svg.remove();
-            });
           });
 
         });

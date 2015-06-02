@@ -3284,28 +3284,6 @@ describe("Plots", function () {
                         });
                         svg.remove();
                     });
-                    describe("barAlignment", function () {
-                        it("entities() positions corrected for barAlignment left", function () {
-                            barPlot.barAlignment("left");
-                            var entities = barPlot.entities();
-                            entities.forEach(function (entity) {
-                                var barSelection = entity.selection;
-                                var pixelPointX = entity.position.x;
-                                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-                            });
-                            svg.remove();
-                        });
-                        it("entities() positions corrected for barAlignment right", function () {
-                            barPlot.barAlignment("right");
-                            var entities = barPlot.entities();
-                            entities.forEach(function (entity) {
-                                var barSelection = entity.selection;
-                                var pixelPointX = entity.position.x;
-                                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-                            });
-                            svg.remove();
-                        });
-                    });
                 });
             });
             describe("entityNearest()", function () {
@@ -3612,28 +3590,6 @@ describe("Plots", function () {
                             }
                         });
                         svg.remove();
-                    });
-                    describe("accounting for barAlignment", function () {
-                        it("entity() positions corrected for barAlignment left", function () {
-                            barPlot.barAlignment("left");
-                            var entities = barPlot.entities();
-                            entities.forEach(function (entity) {
-                                var barSelection = entity.selection;
-                                var pixelPointY = entity.position.y;
-                                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-                            });
-                            svg.remove();
-                        });
-                        it("entity() positions corrected for barAlignment right", function () {
-                            barPlot.barAlignment("right");
-                            var entities = barPlot.entities();
-                            entities.forEach(function (entity) {
-                                var barSelection = entity.selection;
-                                var pixelPointY = entity.position.y;
-                                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-                            });
-                            svg.remove();
-                        });
                     });
                 });
             });
