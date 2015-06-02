@@ -26,7 +26,7 @@ module TestMethods {
   export function fixComponentSize(c: Plottable.Component, fixedWidth?: number, fixedHeight?: number) {
     c.requestedSpace = function(w, h) {
       return {
-        minWidth: fixedWidth  == null ? 0 : fixedWidth,
+        minWidth: fixedWidth == null ? 0 : fixedWidth,
         minHeight: fixedHeight == null ? 0 : fixedHeight
       };
     };
@@ -89,6 +89,20 @@ module TestMethods {
     var height = el.attr("height");
     assert.strictEqual(width, String(widthExpected), "width: " + message);
     assert.strictEqual(height, String(heightExpected), "height: " + message);
+  }
+
+  export function assertEntitiesEqual(actual: Plottable.Plots.Entity, expected: Plottable.Plots.Entity,
+      msg: string) {
+    assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
+    assert.strictEqual(actual.index, expected.index, msg + " (index)");
+    assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
+    assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
+    assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
+    assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection contents)");
+    actual.selection[0].forEach((element: Element, index: number) => {
+      assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
+    });
+    assert.strictEqual(actual.plot, expected.plot, msg + " (plot)");
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {

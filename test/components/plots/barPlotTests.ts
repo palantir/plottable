@@ -10,22 +10,18 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(xScale, yScale);
-      plot.x((d) => d.x, xScale);
-      plot.y((d) => d.y, yScale);
+      var plot = new Plottable.Plots.Bar<number, number>();
+      plot.x((d: any) => d.x, xScale);
+      plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
     });
 
-    function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
-        msg: string) {
-      assert.deepEqual(expected.data, actual.data, msg);
-      assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-      assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-      assert.deepEqual(expected.selection, actual.selection, msg);
-    }
+    it("rejects invalid orientations", () => {
+      assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
+    });
 
     describe("Vertical Bar Plot", () => {
       var svg: D3.Selection;
@@ -46,7 +42,7 @@ describe("Plots", () => {
           {x: "B", y: 1} // duplicate X-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -99,55 +95,56 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("getBars()", () => {
-        var bar: D3.Selection = barPlot.getBars(155, 150); // in the middle of bar 0
-
-        assert.lengthOf(bar[0], 1, "getBar returns a bar");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in the bar matches the datasource");
-
-        bar = barPlot.getBars(-1, -1); // no bars here
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-
-        bar = barPlot.getBars(200, 50); // between the two bars
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-
-        bar = barPlot.getBars(155, 10); // above bar 0
-        assert.isTrue(bar.empty(), "returns empty selection if no bar was selected");
-
-        // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
-        // origin is at the top left!
-
-        bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 150});
-        assert.lengthOf(bar.data(), 2, "selected 2 bars (not the negative one)");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bar.data()[1], dataset.data()[2], "the data in bar 1 matches the datasource");
-
-        bar = barPlot.getBars({min: 155, max: 455}, {min: 150, max: 350});
-        assert.lengthOf(bar.data(), 3, "selected all the bars");
-        assert.strictEqual(bar.data()[0], dataset.data()[0], "the data in bar 0 matches the datasource");
-        assert.strictEqual(bar.data()[1], dataset.data()[1], "the data in bar 1 matches the datasource");
-        assert.strictEqual(bar.data()[2], dataset.data()[2], "the data in bar 2 matches the datasource");
-
-        svg.remove();
-      });
-
       it("don't show points from outside of domain", () => {
         xScale.domain(["C"]);
-        var bars =  (<any> barPlot)._renderArea.selectAll("rect");
+        var bars = (<any> barPlot)._renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 0, "no bars have been rendered");
         svg.remove();
       });
 
-      describe("getAllPlotData()", () => {
+      it("entitiesAt()", () => {
+        var bars = barPlot.entitiesAt({x: 155, y: 150}); // in the middle of bar 0
 
-        describe("pixelPoints", () => {
+        assert.lengthOf(bars, 1, "entitiesAt() returns an Entity for the bar at the given location");
+        assert.strictEqual(bars[0].datum, dataset.data()[0], "the data in the bar matches the data from the datasource");
 
-          it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
-            var plotData = barPlot.getAllPlotData();
-            plotData.data.forEach((datum, i) => {
-              var barSelection = d3.select(plotData.selection[0][i]);
-              var pixelPointY = plotData.pixelPoints[i].y;
-              if (datum.y < 0) {
+        bars = barPlot.entitiesAt({x: -1, y: -1}); // no bars here
+        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
+
+        bars = barPlot.entitiesAt({x: 200, y: 50}); // between the two bars
+        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
+
+        bars = barPlot.entitiesAt({x: 155, y: 10}); // above bar 0
+        assert.lengthOf(bars, 0, "returns empty array if no bars at query point");
+        svg.remove();
+      });
+
+      it("entitiesIn()", () => {
+        // the bars are now (140,100),(150,300) and (440,300),(450,350) - the
+        // origin is at the top left!
+
+        var bars = barPlot.entitiesIn({min: 155, max: 455}, {min: 150, max: 150});
+        assert.lengthOf(bars, 2, "selected 2 bars (not the negative one)");
+        assert.strictEqual(bars[0].datum, dataset.data()[bars[0].index], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bars[1].datum, dataset.data()[bars[1].index], "the data in bar 1 matches the datasource");
+
+        bars = barPlot.entitiesIn({min: 155, max: 455}, {min: 150, max: 350});
+        assert.lengthOf(bars, 3, "selected all the bars");
+        assert.strictEqual(bars[0].datum, dataset.data()[bars[0].index], "the data in bar 0 matches the datasource");
+        assert.strictEqual(bars[1].datum, dataset.data()[bars[1].index], "the data in bar 1 matches the datasource");
+        assert.strictEqual(bars[2].datum, dataset.data()[bars[2].index], "the data in bar 2 matches the datasource");
+
+        svg.remove();
+      });
+
+      describe("entities()", () => {
+        describe("position", () => {
+          it("entities() pixel points corrected for negative-valued bars", () => {
+            var entities = barPlot.entities();
+            entities.forEach((entity) => {
+              var barSelection = entity.selection;
+              var pixelPointY = entity.position.y;
+              if (entity.datum.y < 0) {
                 assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
               } else {
                 assert.strictEqual(pixelPointY, +barSelection.attr("y"), "positive on top");
@@ -156,42 +153,18 @@ describe("Plots", () => {
             svg.remove();
           });
 
-          describe("barAlignment", () => {
-            it("getAllPlotData() pixel points corrected for barAlignment left", () => {
-              barPlot.barAlignment("left");
-              var plotData = barPlot.getAllPlotData();
-              plotData.data.forEach((datum, i) => {
-                var barSelection = d3.select(plotData.selection[0][i]);
-                var pixelPointX = plotData.pixelPoints[i].x;
-                assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-              });
-              svg.remove();
-            });
-
-            it("getAllPlotData() pixel points corrected for barAlignment right", () => {
-              barPlot.barAlignment("right");
-              var plotData = barPlot.getAllPlotData();
-              plotData.data.forEach((datum, i) => {
-                var barSelection = d3.select(plotData.selection[0][i]);
-                var pixelPointX = plotData.pixelPoints[i].x;
-                assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-              });
-              svg.remove();
-            });
-          });
-
         });
 
       });
 
-      describe("getClosestPlotData()", () => {
+      describe("entityNearest()", () => {
         var bars: D3.Selection;
         var zeroY: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = d3.selectAll(".bar-area rect");
+          bars = barPlot.getAllSelections();
           zeroY = yScale.scale(0);
 
           d0 = dataset.data()[0];
@@ -206,36 +179,41 @@ describe("Plots", () => {
           };
         });
 
-        it("returns correct closest plot data", () => {
+        it("returns nearest Entity", () => {
           var expected = {
-            data: [d0],
-            pixelPoints: [d0Px],
-            selection: d3.selectAll([bars[0][0]])
+            datum: d0,
+            index: 0,
+            dataset: dataset,
+            position: d0Px,
+            selection: d3.selectAll([bars[0][0]]),
+            plot: barPlot
           };
 
-          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y + 1 });
-          assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
+          var closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y - 1 });
-          assertPlotDataEqual(expected, closest, "if above a positive bar, it is closest");
+          closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-          assertPlotDataEqual(expected, closest, "if below a positive bar, it is closest");
+          closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: 0, y: d0Px.y });
-          assertPlotDataEqual(expected, closest, "if to the right of the first bar, it is closest");
+          closest = barPlot.entityNearest({ x: 0, y: d0Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
 
           expected = {
-            data: [d1],
-            pixelPoints: [d1Px],
-            selection: d3.selectAll([bars[0][1]])
+            datum: d1,
+            index: 1,
+            dataset: dataset,
+            position: d1Px,
+            selection: d3.selectAll([bars[0][1]]),
+            plot: barPlot
           };
+          closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y - 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y - 1 });
-          assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
-
-          closest = barPlot.getClosestPlotData({ x: d1Px.x, y: d1Px.y + 1 });
-          assertPlotDataEqual(expected, closest, "if below a negative bar, it is closest");
+          closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y + 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
 
           svg.remove();
         });
@@ -243,30 +221,30 @@ describe("Plots", () => {
         it("considers only in-view bars", () => {
           // set the domain such that the first bar is out of view
           yScale.domain([-2, -0.1]);
-
-          var expected = {
-            data: [d1],
-            pixelPoints: [{
-              x: xScale.scale(d1.x),
-              y: yScale.scale(d1.y)
-            }],
-            selection: d3.selectAll([bars[0][1]])
+          d1Px = {
+            x: xScale.scale(d1.x),
+            y: yScale.scale(d1.y)
           };
 
-          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: zeroY + 1 });
-          assertPlotDataEqual(expected, closest, "closest plot data is on-plot data");
+          var expected = {
+            datum: d1,
+            index: 1,
+            dataset: dataset,
+            position: d1Px,
+            selection: d3.selectAll([bars[0][1]]),
+            plot: barPlot
+          };
+
+          var closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
+          TestMethods.assertEntitiesEqual(closest, expected, "nearest Entity is the visible one");
 
           svg.remove();
         });
 
-        it("handles empty plots gracefully", () => {
-          barPlot = new Plottable.Plots.Bar(xScale, yScale);
-
-          var closest = barPlot.getClosestPlotData({ x: d0Px.x, y: d0Px.y });
-          assert.lengthOf(closest.data, 0, "empty plots return empty data");
-          assert.lengthOf(closest.pixelPoints, 0, "empty plots return empty pixelPoints");
-          assert.isTrue(closest.selection.empty(), "empty plots return empty selection");
-
+        it("returns undefined if no Entities are visible", () => {
+          barPlot = new Plottable.Plots.Bar<string, number>();
+          var closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+          assert.isUndefined(closest, "returns undefined if no Entity can be found");
           svg.remove();
         });
       });
@@ -291,7 +269,7 @@ describe("Plots", () => {
           {x: 100, y: 1}
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -340,13 +318,19 @@ describe("Plots", () => {
           {x: 10, y: -1.5},
           {x: 100, y: 1}
         ];
-        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar<number, number>();
         dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
         barPlot.baseline(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
+      });
+
+      it("calculating width does not crash if handed invalid values", () => {
+        var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+        assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
+        svg.remove();
       });
 
       it("bar width takes an appropriate value", () => {
@@ -407,7 +391,7 @@ describe("Plots", () => {
           { x: "12/01/97", y: 2, type: "a" }];
         xScale = new Plottable.Scales.Time();
         var yScale = new Plottable.Scales.Linear();
-        barPlot = new Plottable.Plots.Bar(xScale, yScale);
+        barPlot = new Plottable.Plots.Bar<Date, number>();
         barPlot.addDataset(new Plottable.Dataset(data));
         barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
                .y((d) => d.y, yScale)
@@ -443,7 +427,7 @@ describe("Plots", () => {
           {y: "B", x: 1} // duplicate Y-value
         ];
         dataset = new Plottable.Dataset(data);
-        barPlot = new Plottable.Plots.Bar(xScale, yScale, false);
+        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
         barPlot.baseline(0);
@@ -511,16 +495,14 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      describe("getAllPlotData()", () => {
-
-        describe("pixelPoints", () => {
-
-          it("getAllPlotData() pixel points corrected for negative-valued bars", () => {
-            var plotData = barPlot.getAllPlotData();
-            plotData.data.forEach((datum, i) => {
-              var barSelection = d3.select(plotData.selection[0][i]);
-              var pixelPointX = plotData.pixelPoints[i].x;
-              if (datum.x < 0) {
+      describe("entities()", () => {
+        describe("position", () => {
+          it("entities() pixel points corrected for negative-valued bars", () => {
+            var entities = barPlot.entities();
+            entities.forEach((entity) => {
+              var barSelection = entity.selection;
+              var pixelPointX = entity.position.x;
+              if (entity.datum.x < 0) {
                 assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
               } else {
                 assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "positive on right");
@@ -529,42 +511,18 @@ describe("Plots", () => {
             svg.remove();
           });
 
-          describe("accounting for barAlignment", () => {
-            it("getAllPlotData() pixel points corrected for barAlignment left", () => {
-              barPlot.barAlignment("left");
-              var plotData = barPlot.getAllPlotData();
-              plotData.data.forEach((datum, i) => {
-                var barSelection = d3.select(plotData.selection[0][i]);
-                var pixelPointY = plotData.pixelPoints[i].y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-              });
-              svg.remove();
-            });
-
-            it("getAllPlotData() pixel points corrected for barAlignment right", () => {
-              barPlot.barAlignment("right");
-              var plotData = barPlot.getAllPlotData();
-              plotData.data.forEach((datum, i) => {
-                var barSelection = d3.select(plotData.selection[0][i]);
-                var pixelPointY = plotData.pixelPoints[i].y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-              });
-              svg.remove();
-            });
-          });
-
         });
 
       });
 
-      describe("getClosestPlotData()", () => {
+      describe("entityNearest()", () => {
         var bars: D3.Selection;
         var zeroX: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = d3.selectAll(".bar-area rect");
+          bars = barPlot.getAllSelections();
           zeroX = xScale.scale(0);
 
           d0 = dataset.data()[0];
@@ -579,36 +537,42 @@ describe("Plots", () => {
           };
         });
 
-        it("returns correct closest plot data", () => {
+        it("returns nearest Entity", () => {
           var expected = {
-            data: [d0],
-            pixelPoints: [d0Px],
-            selection: d3.selectAll([bars[0][0]])
+            datum: d0,
+            index: 0,
+            dataset: dataset,
+            position: d0Px,
+            selection: d3.selectAll([bars[0][0]]),
+            plot: barPlot
           };
 
-          var closest = barPlot.getClosestPlotData({ x: d0Px.x - 1, y: d0Px.y });
-          assertPlotDataEqual(expected, closest, "if inside a bar, it is closest");
+          var closest = barPlot.entityNearest({ x: d0Px.x - 1, y: d0Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x + 1, y: d0Px.y });
-          assertPlotDataEqual(expected, closest, "if right of a positive bar, it is closest");
+          closest = barPlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-          assertPlotDataEqual(expected, closest, "if left of a positive bar, it is closest");
+          closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d0Px.x, y: 0 });
-          assertPlotDataEqual(expected, closest, "if above the first bar, it is closest");
+          closest = barPlot.entityNearest({ x: d0Px.x, y: 0 });
+          TestMethods.assertEntitiesEqual(closest, expected, "if above the first bar, it is closest");
 
           expected = {
-            data: [d1],
-            pixelPoints: [d1Px],
-            selection: d3.selectAll([bars[0][1]])
+            datum: d1,
+            index: 1,
+            dataset: dataset,
+            position: d1Px,
+            selection: d3.selectAll([bars[0][1]]),
+            plot: barPlot
           };
 
-          closest = barPlot.getClosestPlotData({ x: d1Px.x + 1, y: d1Px.y });
-          assertPlotDataEqual(expected, closest, "if inside a negative bar, it is closest");
+          closest = barPlot.entityNearest({ x: d1Px.x + 1, y: d1Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
 
-          closest = barPlot.getClosestPlotData({ x: d1Px.x - 1, y: d1Px.y });
-          assertPlotDataEqual(expected, closest, "if left of a negative bar, it is closest");
+          closest = barPlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
+          TestMethods.assertEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
 
           svg.remove();
         });
@@ -616,18 +580,22 @@ describe("Plots", () => {
         it("considers only in-view bars", () => {
           // set the domain such that the first bar is out of view
           xScale.domain([-2, -0.1]);
-
+          d1 = dataset.data()[1];
+          d1Px = {
+            x: xScale.scale(d1.x),
+            y: yScale.scale(d1.y)
+          };
           var expected = {
-            data: [d1],
-            pixelPoints: [{
-              x: xScale.scale(d1.x),
-              y: yScale.scale(d1.y)
-            }],
-            selection: d3.selectAll([bars[0][1]])
+            datum: d1,
+            index: 1,
+            dataset: dataset,
+            position: d1Px,
+            selection: d3.selectAll([bars[0][1]]),
+            plot: barPlot
           };
 
-          var closest = barPlot.getClosestPlotData({ x: zeroX - 1, y: d0Px.y });
-          assertPlotDataEqual(expected, closest, "closest plot data is on-plot data");
+          var closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
+          TestMethods.assertEntitiesEqual(expected, closest, "closest plot data is on-plot data");
 
           svg.remove();
         });
@@ -649,7 +617,7 @@ describe("Plots", () => {
         xScale = new Plottable.Scales.Category();
         yScale = new Plottable.Scales.Linear();
         dataset = new Plottable.Dataset(data);
-        plot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
+        plot = new Plottable.Plots.Bar<string, number>();
         plot.addDataset(dataset);
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
@@ -725,7 +693,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset();
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Linear();
-        verticalBarPlot = new Plottable.Plots.Bar<string, number>(xScale, yScale);
+        verticalBarPlot = new Plottable.Plots.Bar<string, number>();
         verticalBarPlot.x((d) => d.x, xScale);
         verticalBarPlot.y((d) => d.y, yScale);
       });
@@ -779,14 +747,14 @@ describe("Plots", () => {
       var simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar(xScale, yScale);
+      var plot = new Plottable.Plots.Bar<string, number>();
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.automaticallyAdjustYScaleOverVisiblePoints(true);
+      plot.autorange("y");
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });

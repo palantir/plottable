@@ -3,27 +3,22 @@
 module Plottable {
 export module Scales {
   export class Time extends QuantitativeScale<Date> {
+    private _d3Scale: D3.Scale.TimeScale;
     /**
-     * Constructs a TimeScale.
-     *
-     * A TimeScale maps Date objects to numbers.
+     * A Time Scale maps Date objects to numbers.
      *
      * @constructor
-     * @param {D3.Scale.Time} scale The D3 LinearScale backing the Scale.Time. If not supplied, uses a default scale.
      */
-    constructor();
-    constructor(scale: D3.Scale.LinearScale);
-    constructor(scale?: D3.Scale.LinearScale) {
-      // need to cast since d3 time scales do not descend from QuantitativeScale scales
-      super(scale == null ? (<any>d3.time.scale()) : scale);
+    constructor() {
+      super();
+      this._d3Scale = d3.time.scale();
     }
 
     /**
-     * Specifies the interval between ticks
+     * Returns an array of ticks values separated by the specified interval.
      *
-     * @param {string} interval TimeInterval string specifying the interval unit measure
-     * @param {number?} step? The distance between adjacent ticks (using the interval unit measure)
-     *
+     * @param {string} interval A string specifying the interval unit.
+     * @param {number?} [step] The number of multiples of the interval between consecutive ticks.
      * @return {Date[]}
      */
     public tickInterval(interval: string, step?: number): Date[] {
@@ -42,10 +37,51 @@ export module Scales {
       return super._setDomain(values);
     }
 
-    public _defaultExtent(): Date[] {
+    protected _defaultExtent(): Date[] {
       var endTimeValue = new Date().valueOf();
-      var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+      var startTimeValue = endTimeValue - MILLISECONDS_IN_ONE_DAY;
       return [new Date(startTimeValue), new Date(endTimeValue)];
+    }
+
+    protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
+      var startTime = singleValueDomain[0].getTime();
+      var endTime = singleValueDomain[1].getTime();
+      if (startTime === endTime) {
+        return [new Date(startTime - MILLISECONDS_IN_ONE_DAY), new Date(endTime + MILLISECONDS_IN_ONE_DAY)];
+      }
+      return singleValueDomain;
+    }
+
+    public scale(value: Date): number {
+      return this._d3Scale(value);
+    }
+
+    protected _getDomain() {
+      return this._d3Scale.domain();
+    }
+
+    protected _setBackingScaleDomain(values: Date[]) {
+      this._d3Scale.domain(values);
+    }
+
+    protected _getRange() {
+      return this._d3Scale.range();
+    }
+
+    protected _setRange(values: number[]) {
+      this._d3Scale.range(values);
+    }
+
+    public invert(value: number) {
+      return this._d3Scale.invert(value);
+    }
+
+    public getDefaultTicks(): Date[] {
+      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    }
+
+    protected _niceDomain(domain: Date[], count?: number) {
+      return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
     }
   }
 }

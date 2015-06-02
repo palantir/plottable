@@ -8,19 +8,16 @@
       "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
     },
     "d3/d3.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "mocha/mocha.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "jquery/jquery.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     },
     "jquery.simulate/jquery.simulate.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
-    },
-    "touch-events/touch-events.d.ts": {
-      "commit": "b0056383b51495b373a32b791de8112fcafe2ace"
+      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
     }
   }
 }

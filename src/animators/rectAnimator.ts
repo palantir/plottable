@@ -36,8 +36,8 @@ export module Animators {
       }
       var movingAttrProjector = attrToProjector[this._getMovingAttr()];
       var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
-      return (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
-        return movingAttrProjector(d, i, dataset, m) + growingAttrProjector(d, i, dataset, m);
+      return (d: any, i: number, dataset: Dataset) => {
+        return movingAttrProjector(d, i, dataset) + growingAttrProjector(d, i, dataset);
       };
     }
 

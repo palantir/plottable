@@ -33,9 +33,7 @@ export module Components {
     private _calculatedLayout: _IterateLayoutResult = null;
 
     /**
-     * Constructs a Table.
-     *
-     * A Table is used to combine multiple Components in the form of a grid. A
+     * A Table combines Components in the form of a grid. A
      * common case is combining a y-axis, x-axis, and the plotted data via
      * ```typescript
      * new Table([[yAxis, plot],
@@ -43,8 +41,8 @@ export module Components {
      * ```
      *
      * @constructor
-     * @param {Component[][]} [rows] A 2-D array of the Components to place in the table.
-     * null can be used if a cell is empty. (default = [])
+     * @param {Component[][]} [rows=[]] A 2-D array of Components to be added to the Table.
+     *   null can be used if a cell is empty.
      */
     constructor(rows: Component[][] = []) {
       super();
@@ -95,8 +93,8 @@ export module Components {
      * ```
      *
      * @param {Component} component The Component to be added.
-     * @param {number} row The row in which to add the Component.
-     * @param {number} col The column in which to add the Component.
+     * @param {number} row
+     * @param {number} col
      * @returns {Table} The calling Table.
      */
     public add(component: Component, row: number, col: number) {
@@ -157,11 +155,11 @@ export module Components {
      */
       var rows = this._rows;
       var cols = d3.transpose(this._rows);
-      var availableWidthAfterPadding  = availableWidth  - this._columnPadding * (this._nCols - 1);
+      var availableWidthAfterPadding = availableWidth - this._columnPadding * (this._nCols - 1);
       var availableHeightAfterPadding = availableHeight - this._rowPadding * (this._nRows - 1);
 
       var rowWeights = Table._calcComponentWeights(this._rowWeights, rows, (c: Component) => (c == null) || c.fixedHeight());
-      var colWeights = Table._calcComponentWeights(this._columnWeights,  cols, (c: Component) => (c == null) || c.fixedWidth());
+      var colWeights = Table._calcComponentWeights(this._columnWeights, cols, (c: Component) => (c == null) || c.fixedWidth());
 
       // To give the table a good starting position to iterate from, we give the fixed-width components half-weight
       // so that they will get some initial space allocated to work with
@@ -171,7 +169,7 @@ export module Components {
       var colProportionalSpace = Table._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding );
       var rowProportionalSpace = Table._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
 
-      var guaranteedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
+      var guaranteedWidths = Utils.Methods.createFilledArray(0, this._nCols);
       var guaranteedHeights = Utils.Methods.createFilledArray(0, this._nRows);
 
       var freeWidth: number;
@@ -180,16 +178,16 @@ export module Components {
       var nIterations = 0;
       while (true) {
         var offeredHeights = Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths = Utils.Methods.addArrays(guaranteedWidths,  colProportionalSpace);
+        var offeredWidths = Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
         var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
-        var wantsWidth  = guarantees.wantsWidthArr .some((x: boolean) => x);
+        var wantsWidth = guarantees.wantsWidthArr .some((x: boolean) => x);
         var wantsHeight = guarantees.wantsHeightArr.some((x: boolean) => x);
 
-        var lastFreeWidth  = freeWidth ;
+        var lastFreeWidth = freeWidth ;
         var lastFreeHeight = freeHeight;
-        freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
+        freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths );
         freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
@@ -211,7 +209,7 @@ export module Components {
         rowProportionalSpace = Table._calcProportionalSpace(yWeights, freeHeight);
         nIterations++;
 
-        var canImproveWidthAllocation  = freeWidth  > 0 && freeWidth  !== lastFreeWidth;
+        var canImproveWidthAllocation = freeWidth > 0 && freeWidth !== lastFreeWidth;
         var canImproveHeightAllocation = freeHeight > 0 && freeHeight !== lastFreeHeight;
 
         if (!(canImproveWidthAllocation || canImproveHeightAllocation)) {
@@ -224,7 +222,7 @@ export module Components {
       }
 
       // Redo the proportional space one last time, to ensure we use the real weights not the wantsWidth/Height weights
-      freeWidth  = availableWidthAfterPadding  - d3.sum(guarantees.guaranteedWidths );
+      freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths );
       freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
       colProportionalSpace = Table._calcProportionalSpace(colWeights, freeWidth );
       rowProportionalSpace = Table._calcProportionalSpace(rowWeights, freeHeight);
@@ -238,9 +236,9 @@ export module Components {
     }
 
     private _determineGuarantees(offeredWidths: number[], offeredHeights: number[], isFinalOffer = false): _LayoutAllocation {
-      var requestedWidths  = Utils.Methods.createFilledArray(0, this._nCols);
+      var requestedWidths = Utils.Methods.createFilledArray(0, this._nCols);
       var requestedHeights = Utils.Methods.createFilledArray(0, this._nRows);
-      var columnNeedsWidth  = Utils.Methods.createFilledArray(false, this._nCols);
+      var columnNeedsWidth = Utils.Methods.createFilledArray(false, this._nCols);
       var rowNeedsHeight = Utils.Methods.createFilledArray(false, this._nRows);
 
       this._rows.forEach((row: Component[], rowIndex: number) => {
@@ -296,7 +294,7 @@ export module Components {
 
       var childYOrigin = 0;
       var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-      var colWidths  = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
+      var colWidths = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
       this._rows.forEach((row: Component[], rowIndex: number) => {
         var childXOrigin = 0;
         row.forEach((component: Component, colIndex: number) => {
@@ -312,15 +310,13 @@ export module Components {
     }
 
     /**
-     * Gets the row padding on the Table.
-     *
-     * @returns {number} the row padding.
+     * Gets the padding above and below each row in pixels.
      */
     public rowPadding(): number;
     /**
-     * Sets the row padding on the Table.
+     * Sets the padding above and below each row in pixels.
      *
-     * @param {number} rowPadding The padding above and below each row, in pixels.
+     * @param {number} rowPadding 
      * @returns {Table} The calling Table.
      */
     public rowPadding(rowPadding: number): Table;
@@ -334,15 +330,13 @@ export module Components {
     }
 
     /**
-     * Gets the column padding on the Table.
-     *
-     * @returns {number} the column padding.
+     * Gets the padding to the left and right of each column in pixels.
      */
     public columnPadding(): number;
     /**
-     * Sets the column padding on the Table.
+     * Sets the padding to the left and right of each column in pixels.
      *
-     * @param {number} columnPadding the padding to the left and right of each column, in pixels.
+     * @param {number} columnPadding
      * @returns {Table} The calling Table.
      */
     public columnPadding(columnPadding: number): Table;
@@ -355,9 +349,14 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the weight of the specified row.
+     * 
+     * @param {number} index
+     */
     public rowWeight(index: number): number;
     /**
-     * Sets the layout weight of a particular row.
+     * Sets the weight of the specified row.
      * Space is allocated to rows based on their weight. Rows with higher weights receive proportionally more space.
      *
      * A common case would be to have one row take up 2/3rds of the space,
@@ -377,8 +376,8 @@ export module Components {
      *  .rowWeight(1, 1)
      * ```
      *
-     * @param {number} index The index of the row.
-     * @param {number} weight The weight to be set on the row.
+     * @param {number} index
+     * @param {number} weight
      * @returns {Table} The calling Table.
      */
     public rowWeight(index: number, weight: number): Table;
@@ -391,15 +390,20 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the weight of the specified column.
+     * 
+     * @param {number} index
+     */
     public columnWeight(index: number): number;
     /**
-     * Sets the layout weight of a particular column.
+     * Sets the weight of the specified column.
      * Space is allocated to columns based on their weight. Columns with higher weights receive proportionally more space.
      *
      * Please see `rowWeight` docs for an example.
      *
-     * @param {number} index The index of the column.
-     * @param {number} weight The weight to be set on the column.
+     * @param {number} index
+     * @param {number} weight
      * @returns {Table} The calling Table.
      */
     public columnWeight(index: number, weight: number): Table;

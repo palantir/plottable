@@ -9,38 +9,29 @@ export module Drawers {
    */
   export type DrawStep = {
     attrToProjector: AttributeToProjector;
-    animator: Animators.PlotAnimator;
+    animator: Animators.Plot;
   }
 
   export type AppliedDrawStep = {
     attrToProjector: AttributeToAppliedProjector;
-    animator: Animators.PlotAnimator;
+    animator: Animators.Plot;
   }
 
-  export class AbstractDrawer {
+}
+
+  export class Drawer {
     private _renderArea: D3.Selection;
     protected _className: string;
-    public key: string;
-    protected _attrToProjector: AttributeToAppliedProjector;
-
-    /**
-     * Sets the class, which needs to be applied to bound elements.
-     *
-     * @param{string} className The class name to be applied.
-     */
-    public setClass(className: string): AbstractDrawer {
-      this._className = className;
-      return this;
-    }
+    protected _dataset: Dataset;
 
     /**
      * Constructs a Drawer
      *
      * @constructor
-     * @param{string} key The key associated with this Drawer
+     * @param {Dataset} dataset The dataset associated with this Drawer
      */
-    constructor(key: string) {
-        this.key = key;
+    constructor(dataset: Dataset) {
+        this._dataset = dataset;
     }
 
     public setup(area: D3.Selection) {
@@ -70,7 +61,7 @@ export module Drawers {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    protected _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: Drawers.AppliedDrawStep) {
       // no-op
     }
 
@@ -78,24 +69,14 @@ export module Drawers {
       return data.length;
     }
 
-    private _applyMetadata(attrToProjector: AttributeToProjector,
-                          dataset: Dataset,
-                          plotMetadata: Plots.PlotMetadata): AttributeToAppliedProjector {
+    private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
-      d3.keys(attrToProjector).forEach((attr: string) => {
+      Object.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
-          (datum: any, index: number) => attrToProjector[attr](datum, index, dataset, plotMetadata);
+          (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);
       });
 
       return modifiedAttrToProjector;
-    }
-
-    protected _prepareDrawSteps(drawSteps: AppliedDrawStep[]) {
-      // no-op
-    }
-
-    protected _prepareData(data: any[], drawSteps: AppliedDrawStep[]) {
-      return data;
     }
 
     /**
@@ -103,25 +84,18 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
-     * @param{Dataset} dataset The Dataset
-     * @param{any} plotMetadata The metadata provided by plot
      */
-    public draw(data: any[], drawSteps: DrawStep[], dataset: Dataset, plotMetadata: Plots.PlotMetadata) {
-      var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._applyMetadata(dr.attrToProjector, dataset, plotMetadata);
-        this._attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(appliedAttrToProjector);
+    public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
+      var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
         return {
           attrToProjector: appliedAttrToProjector,
           animator: dr.animator
         };
       });
 
-      var preparedData = this._prepareData(data, appliedDrawSteps);
-
-      this._prepareDrawSteps(appliedDrawSteps);
-
-      this._enterData(preparedData);
-      var numberOfIterations = this._numberOfAnimationIterations(preparedData);
+      this._enterData(data);
+      var numberOfIterations = this._numberOfAnimationIterations(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
@@ -145,15 +119,10 @@ export module Drawers {
       return "";
     }
 
-    public _getPixelPoint(datum: any, index: number): Point {
-      return null;
-    }
-
     public _getSelection(index: number): D3.Selection {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);
     }
 
   }
-}
 }

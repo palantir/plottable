@@ -12,8 +12,13 @@ before(() => {
   var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
   if (window.PHANTOMJS) {
     window.Pixel_CloseTo_Requirement = 2;
+    // HACKHACK https://github.com/ariya/phantomjs/issues/13280
+    (<any>Plottable.Utils.Set.prototype)._updateSize = function() {
+      this.size = (<any>this)._values.length;
+    };
   } else if (isFirefox) {
-    window.Pixel_CloseTo_Requirement = 1;
+    // HACKHACK #2122
+    window.Pixel_CloseTo_Requirement = 2;
   } else {
     window.Pixel_CloseTo_Requirement = 0.5;
   }

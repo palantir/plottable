@@ -3,16 +3,14 @@
 module Plottable {
   /**
    * The RenderController is responsible for enqueueing and synchronizing
-   * layout and render calls for Plottable components.
+   * layout and render calls for Components.
    *
-   * Layouts and renders occur inside an animation callback
+   * Layout and render calls occur inside an animation callback
    * (window.requestAnimationFrame if available).
    *
-   * If you require immediate rendering, call RenderController.flush() to
-   * perform enqueued layout and rendering serially.
+   * RenderController.flush() immediately lays out and renders all Components currently enqueued.
    *
-   * If you want to always have immediate rendering (useful for debugging),
-   * call
+   * To always have immediate rendering (useful for debugging), call
    * ```typescript
    * Plottable.RenderController.setRenderPolicy(
    *   new Plottable.RenderPolicies.Immediate()
@@ -24,33 +22,33 @@ module Plottable {
     var _componentsNeedingComputeLayout = new Utils.Set<Component>();
     var _animationRequested = false;
     var _isCurrentlyFlushing = false;
+    export module Policy {
+      export var IMMEDIATE = "immediate";
+      export var ANIMATION_FRAME = "animationframe";
+      export var TIMEOUT = "timeout";
+    }
     export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string | RenderPolicies.RenderPolicy): void {
-      if (typeof(policy) === "string") {
-        switch ((<string> policy).toLowerCase()) {
-          case "immediate":
-          policy = new RenderPolicies.Immediate();
+    export function setRenderPolicy(policy: string) {
+      switch (policy.toLowerCase()) {
+        case Policy.IMMEDIATE:
+          _renderPolicy = new RenderPolicies.Immediate();
           break;
-          case "animationframe":
-          policy = new RenderPolicies.AnimationFrame();
+        case Policy.ANIMATION_FRAME:
+          _renderPolicy = new RenderPolicies.AnimationFrame();
           break;
-          case "timeout":
-          policy = new RenderPolicies.Timeout();
+        case Policy.TIMEOUT:
+          _renderPolicy = new RenderPolicies.Timeout();
           break;
-          default:
+        default:
           Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
-          return;
-        }
       }
-      _renderPolicy = <RenderPolicies.RenderPolicy> policy;
     }
 
     /**
-     * If the RenderController is enabled, we enqueue the component for
-     * render. Otherwise, it is rendered immediately.
-     *
-     * @param {Component} component Any Plottable component.
+     * Enqueues the Component for rendering.
+     * 
+     * @param {Component} component
      */
     export function registerToRender(component: Component) {
       if (_isCurrentlyFlushing) {
@@ -61,10 +59,9 @@ module Plottable {
     }
 
     /**
-     * If the RenderController is enabled, we enqueue the component for
-     * layout and render. Otherwise, it is rendered immediately.
-     *
-     * @param {Component} component Any Plottable component.
+     * Enqueues the Component for layout and rendering.
+     * 
+     * @param {Component} component
      */
     export function registerToComputeLayout(component: Component) {
       _componentsNeedingComputeLayout.add(component);
@@ -81,22 +78,22 @@ module Plottable {
     }
 
     /**
-     * Render everything that is waiting to be rendered right now, instead of
-     * waiting until the next frame.
+     * Renders all Components waiting to be rendered immediately
+     * instead of waiting until the next frame.
      *
      * Useful to call when debugging.
      */
     export function flush() {
       if (_animationRequested) {
         // Layout
-        _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
+        _componentsNeedingComputeLayout.forEach((component: Component) => component.computeLayout());
 
         // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().forEach((component: Component) => component.render());
+        _componentsNeedingRender.forEach((component: Component) => component.render());
 
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
-        _componentsNeedingRender.values().forEach((component: Component) => {
+        _componentsNeedingRender.forEach((component: Component) => {
           try {
             component.renderImmediately();
           } catch (err) {

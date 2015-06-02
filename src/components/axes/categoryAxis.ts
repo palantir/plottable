@@ -9,18 +9,16 @@ export module Axes {
     private _writer: SVGTypewriter.Writers.Writer;
 
     /**
-     * Constructs a CategoryAxis.
-     *
-     * A CategoryAxis takes a CategoryScale and includes word-wrapping
-     * algorithms and advanced layout logic to try to display the scale as
-     * efficiently as possible.
+     * Constructs a Category Axis.
+     * 
+     * A Category Axis is a visual representation of a Category Scale.
      *
      * @constructor
-     * @param {CategoryScale} scale The scale to base the Axis on.
-     * @param {string} orientation The orientation of the Axis (top/bottom/left/right) (default = "bottom").
-     * @param {Formatter} formatter The Formatter for the Axis (default Formatters.identity())
+     * @param {Scales.Category} scale
+     * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.identity()]
      */
-    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation: string, formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }
@@ -61,17 +59,15 @@ export module Axes {
     }
 
     /**
-     * Gets the tick label angle
-     * @returns {number} the tick label angle
+     * Gets the tick label angle in degrees.
      */
     public tickLabelAngle(): number;
     /**
-     * Sets the angle for the tick labels. Right now vertical-left (-90), horizontal (0), and vertical-right (90) are the only options.
-     * @param {number} angle The angle for the ticks
-     * @returns {Category} The calling Category Axis.
+     * Sets the tick label angle in degrees.
+     * Right now only -90/0/90 are supported. 0 is horizontal.
      *
-     * Warning - this is not currently well supported and is likely to behave badly unless all the tick labels are short.
-     * See tracking at https://github.com/palantir/plottable/issues/504
+     * @param {number} angle
+     * @returns {Category} The calling Category Axis.
      */
     public tickLabelAngle(angle: number): Category;
     public tickLabelAngle(angle?: number): any {
@@ -96,21 +92,21 @@ export module Axes {
       var yAlign: {[s: string]: string};
       switch (this.tickLabelAngle()) {
         case 0:
-          xAlign = {left: "right",  right: "left", top: "center", bottom: "center"};
-          yAlign = {left: "center",  right: "center", top: "bottom", bottom: "top"};
+          xAlign = {left: "right", right: "left", top: "center", bottom: "center"};
+          yAlign = {left: "center", right: "center", top: "bottom", bottom: "top"};
           break;
         case 90:
-          xAlign = {left: "center",  right: "center", top: "right", bottom: "left"};
-          yAlign = {left: "top",  right: "bottom", top: "center", bottom: "center"};
+          xAlign = {left: "center", right: "center", top: "right", bottom: "left"};
+          yAlign = {left: "top", right: "bottom", top: "center", bottom: "center"};
           break;
         case -90:
-          xAlign = {left: "center",  right: "center", top: "left", bottom: "right"};
-          yAlign = {left: "bottom",  right: "top", top: "center", bottom: "center"};
+          xAlign = {left: "center", right: "center", top: "left", bottom: "right"};
+          yAlign = {left: "bottom", right: "top", top: "center", bottom: "center"};
           break;
       }
       ticks.each(function (d: string) {
         var bandWidth = scale.stepWidth();
-        var width  = self._isHorizontal() ? bandWidth  : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
+        var width = self._isHorizontal() ? bandWidth : axisWidth - self._maxLabelTickLength() - self.tickLabelPadding();
         var height = self._isHorizontal() ? axisHeight - self._maxLabelTickLength() - self.tickLabelPadding() : bandWidth;
         var writeOptions = {
           selection: d3.select(this),

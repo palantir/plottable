@@ -3,6 +3,7 @@
     "ban": [true,
         ["d3", "max"],
         ["d3", "min"],
+        ["d3", "keys"],
         ["assert", "equal"]
     ],
     "class-name": true,

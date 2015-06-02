@@ -9,10 +9,10 @@ export module Dispatchers {
     private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
 
     /**
-     * Get a Dispatcher.Key. If one already exists it will be returned;
+     * Gets a Key Dispatcher. If one already exists it will be returned;
      * otherwise, a new one will be created.
      *
-     * @return {Dispatcher.Key} A Dispatcher.Key
+     * @return {Dispatchers.Key}
      */
     public static getDispatcher(): Dispatchers.Key {
       var dispatcher: Key = (<any> document)[Key._DISPATCHER_KEY];
@@ -24,10 +24,9 @@ export module Dispatchers {
     }
 
     /**
-     * Creates a Dispatcher.Key.
-     * This constructor not be invoked directly under most circumstances.
-     *
-     * @param {SVGElement} svg The root <svg> element to attach to.
+     * This constructor should not be invoked directly.
+     * 
+     * @constructor
      */
     constructor() {
       super();
@@ -42,7 +41,7 @@ export module Dispatchers {
      * Registers a callback to be called whenever a key is pressed.
      *
      * @param {KeyCallback} callback
-     * @return {Dispatcher.Key} The calling Dispatcher.Key.
+     * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public onKeyDown(callback: KeyCallback): Key {
       this.setCallback(this._keydownCallbacks, callback);
@@ -53,7 +52,7 @@ export module Dispatchers {
      * Removes the callback to be called whenever a key is pressed.
      *
      * @param {KeyCallback} callback
-     * @return {Dispatcher.Key} The calling Dispatcher.Key.
+     * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public offKeyDown(callback: KeyCallback): Key {
       this.unsetCallback(this._keydownCallbacks, callback);

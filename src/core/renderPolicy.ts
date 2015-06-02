@@ -3,15 +3,15 @@
 module Plottable {
   export module RenderPolicies {
     /**
-     * A policy to render components.
+     * A policy for rendering Components.
      */
     export interface RenderPolicy {
       render(): any;
     }
 
     /**
-     * Never queue anything, render everything immediately. Useful for
-     * debugging, horrible for performance.
+     * Renders Components immediately after they are enqueued.
+     * Useful for debugging, horrible for performance.
      */
     export class Immediate implements RenderPolicy {
       public render() {
@@ -30,12 +30,12 @@ module Plottable {
     }
 
     /**
-     * Renders with `setTimeout`. This is generally an inferior way to render
-     * compared to `requestAnimationFrame`, but it's still there if you want
-     * it.
+     * Renders with `setTimeout()`.
+     * Generally an inferior way to render compared to `requestAnimationFrame`,
+     * but useful for browsers that don't suppoort `requestAnimationFrame`.
      */
     export class Timeout implements RenderPolicy {
-      public _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+      private _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
 
       public render() {
         setTimeout(RenderController.flush, this._timeoutMsec);

@@ -2,63 +2,84 @@
 
 module Plottable {
   export class XYPlot<X, Y> extends Plot {
-    private static _X_KEY = "x";
-    private static _Y_KEY = "y";
+    protected static _X_KEY = "x";
+    protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
     private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
     private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
     /**
-     * Constructs an XYPlot.
-     *
-     * An XYPlot is a plot from drawing 2-dimensional data. Common examples
-     * include Scale.Line and Scale.Bar.
+     * An XYPlot is a Plot that displays data along two primary directions, X and Y.
      *
      * @constructor
-     * @param {any[]|Dataset} [dataset] The data or Dataset to be associated with this Renderer.
      * @param {Scale} xScale The x scale to use.
      * @param {Scale} yScale The y scale to use.
      */
-    constructor(xScale: Scale<X, number>, yScale: Scale<Y, number>) {
+    constructor() {
       super();
-      if (xScale == null || yScale == null) {
-        throw new Error("XYPlots require an xScale and yScale");
-      }
       this.classed("xy-plot", true);
-
-      this._propertyBindings.set(XYPlot._X_KEY, { accessor: null, scale: xScale });
-      this._propertyBindings.set(XYPlot._Y_KEY, { accessor: null, scale: yScale});
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
-
-      this._updateXDomainer();
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-
-      this._updateYDomainer();
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
+    /**
+     * Gets the AccessorScaleBinding for X.
+     */
     public x(): Plots.AccessorScaleBinding<X, number>;
+    /**
+     * Sets X to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} x
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public x(x: number | Accessor<number>): XYPlot<X, Y>;
+    /**
+     * Sets X to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {X|Accessor<X>} x
+     * @param {Scale<X, number>} xScale
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): XYPlot<X, Y>;
     public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return this._propertyBindings.get(XYPlot._X_KEY);
       }
-
       this._bindProperty(XYPlot._X_KEY, x, xScale);
       if (this._autoAdjustYScaleDomain) {
         this._updateYExtentsAndAutodomain();
       }
-      this._updateXDomainer();
-      this.renderImmediately();
+
+      if (xScale != null) {
+        xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
+      }
+
+      this.render();
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for Y.
+     */
     public y(): Plots.AccessorScaleBinding<Y, number>;
+    /**
+     * Sets Y to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} y
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public y(y: number | Accessor<number>): XYPlot<X, Y>;
+    /**
+     * Sets Y to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {Y|Accessor<Y>} y
+     * @param {Scale<Y, number>} yScale
+     * @returns {XYPlot} The calling XYPlot.
+     */
     public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
     public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
       if (y == null) {
@@ -69,8 +90,12 @@ module Plottable {
       if (this._autoAdjustXScaleDomain) {
         this._updateXExtentsAndAutodomain();
       }
-      this._updateYDomainer();
-      this.renderImmediately();
+
+      if (yScale != null) {
+        yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
+      }
+
+      this.render();
       return this;
     }
 
@@ -89,9 +114,9 @@ module Plottable {
         var accessor = binding.accessor;
         var scale = binding.scale;
         if (scale != null) {
-          return (datum: any, index: number, dataset: Dataset, plotMetadata: Plots.PlotMetadata) => {
+          return (datum: any, index: number, dataset: Dataset) => {
             var range = scale.range();
-            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset, plotMetadata)), range[0], range[1]);
+            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
           };
         }
       }
@@ -124,53 +149,47 @@ module Plottable {
     }
 
     /**
-     * Sets the automatic domain adjustment over visible points for y scale.
+     * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+     * If "x" or "y" is specified the adjustment is immediately performed.
      *
-     * If autoAdjustment is true adjustment is immediately performend.
+     * @param {string} scaleName One of "x"/"y"/"none".
+     *   "x" will adjust the x Scale in relation to changes in the y domain.
+     *   "y" will adjust the y Scale in relation to changes in the x domain.
+     *   "none" means neither Scale will change automatically.
      *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for y scale.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public automaticallyAdjustYScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y> {
-      this._autoAdjustYScaleDomain = autoAdjustment;
-      this._adjustYDomainOnChangeFromX();
+    public autorange(scaleName: string) {
+      switch (scaleName) {
+        case "x":
+          this._autoAdjustXScaleDomain = true;
+          this._autoAdjustYScaleDomain = false;
+          this._adjustXDomainOnChangeFromY();
+          break;
+        case "y":
+          this._autoAdjustXScaleDomain = false;
+          this._autoAdjustYScaleDomain = true;
+          this._adjustYDomainOnChangeFromX();
+          break;
+        case "none":
+          this._autoAdjustXScaleDomain = false;
+          this._autoAdjustYScaleDomain = false;
+          break;
+        default:
+          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+      }
       return this;
-    }
-
-    /**
-     * Sets the automatic domain adjustment over visible points for x scale.
-     *
-     * If autoAdjustment is true adjustment is immediately performend.
-     *
-     * @param {boolean} autoAdjustment The new value for the automatic adjustment domain for x scale.
-     * @returns {XYPlot} The calling XYPlot.
-     */
-    public automaticallyAdjustXScaleOverVisiblePoints(autoAdjustment: boolean): XYPlot<X, Y>  {
-      this._autoAdjustXScaleDomain = autoAdjustment;
-      this._adjustXDomainOnChangeFromY();
-      return this;
-    }
-
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector = super._generatePropertyToProjectors();
-      var positionXFn = attrToProjector["x"];
-      var positionYFn = attrToProjector["y"];
-      attrToProjector["defined"] = (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => {
-        var positionX = positionXFn(d, i, dataset, m);
-        var positionY = positionYFn(d, i, dataset, m);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
-      };
-      return attrToProjector;
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
-      var xScale = this.x().scale;
+      var xBinding = this.x();
+      var xScale = xBinding && xBinding.scale;
       if (xScale != null) {
         xScale.range([0, this.width()]);
       }
-      var yScale = this.y().scale;
+      var yBinding = this.y();
+      var yScale = yBinding && yBinding.scale;
       if (yScale != null) {
         if (this.y().scale instanceof Scales.Category) {
           this.y().scale.range([0, this.height()]);
@@ -179,24 +198,6 @@ module Plottable {
         }
       }
       return this;
-    }
-
-    protected _updateXDomainer() {
-      if (this.x().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.x().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
-    }
-
-    protected _updateYDomainer() {
-      if (this.y().scale instanceof QuantitativeScale) {
-        var scale = <QuantitativeScale<any>> this.y().scale;
-        if (!scale._userSetDomainer) {
-          scale.domainer().pad().nice();
-        }
-      }
     }
 
     private _updateXExtentsAndAutodomain() {
@@ -216,9 +217,10 @@ module Plottable {
     }
 
     /**
-     * Adjusts both domains' extents to show all datasets.
-     *
-     * This call does not override auto domain adjustment behavior over visible points.
+     * Adjusts the domains of both X and Y scales to show all data.
+     * This call does not override the autorange() behavior.
+     * 
+     * @returns {XYPlot} The calling XYPlot.
      */
     public showAllData() {
       this._updateXExtentsAndAutodomain();
@@ -240,7 +242,34 @@ module Plottable {
     }
 
     protected _projectorsReady() {
-      return this.x().accessor != null && this.y().accessor != null;
+      var xBinding = this.x();
+      var yBinding = this.y();
+      return xBinding != null &&
+          xBinding.accessor != null &&
+          yBinding != null &&
+          yBinding.accessor != null;
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
+      return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
+    }
+
+    protected _getDataToDraw() {
+      var dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
+
+      var definedFunction = (d: any, i: number, dataset: Dataset) => {
+        var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+        var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+        return Utils.Methods.isValidNumber(positionX) &&
+               Utils.Methods.isValidNumber(positionY);
+      };
+
+      this.datasets().forEach((dataset) => {
+        dataToDraw.set(dataset, dataToDraw.get(dataset).filter((d, i) => definedFunction(d, i, dataset)));
+      });
+      return dataToDraw;
     }
   }
 }

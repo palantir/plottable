@@ -42,7 +42,7 @@ module Plottable {
     private _boxContainer: D3.Selection;
     private _rootSVG: D3.Selection;
     private _isTopLevelComponent = false;
-    private _width: number; // Width and height of the component. Used to size the hitbox, bounding box, etc
+    private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
     private _cssClasses: string[] = ["component"];
     private _destroyed = false;
@@ -52,12 +52,12 @@ module Plottable {
     /**
      * Attaches the Component as a child of a given D3 Selection.
      *
-     * @param {D3.Selection} selection The Selection containing the Element to anchor under.
+     * @param {D3.Selection} selection.
      * @returns {Component} The calling Component.
      */
     public anchor(selection: D3.Selection) {
       if (this._destroyed) {
-        throw new Error("Can't reuse destroy()-ed components!");
+        throw new Error("Can't reuse destroy()-ed Components!");
       }
 
       if (selection.node().nodeName.toLowerCase() === "svg") {
@@ -83,10 +83,9 @@ module Plottable {
 
     /**
      * Adds a callback to be called on anchoring the Component to the DOM.
-     * If the component is already anchored, the callback is called immediately.
+     * If the Component is already anchored, the callback is called immediately.
      *
-     * @param {ComponentCallback} callback The callback to be added.
-     *
+     * @param {ComponentCallback} callback
      * @return {Component}
      */
     public onAnchor(callback: ComponentCallback) {
@@ -98,11 +97,10 @@ module Plottable {
     }
 
     /**
-     * Removes a callback to be called on anchoring the Component to the DOM.
+     * Removes a callback that would be called on anchoring the Component to the DOM.
      * The callback is identified by reference equality.
      *
-     * @param {ComponentCallback} callback The callback to be removed.
-     *
+     * @param {ComponentCallback} callback
      * @return {Component}
      */
     public offAnchor(callback: ComponentCallback) {
@@ -147,13 +145,13 @@ module Plottable {
     }
 
     /**
-     * Computes the size, position, and alignment from the specified values.
+     * Computes and sets the size, position, and alignment of the Component from the specified values.
      * If no parameters are supplied and the Component is a root node,
      * they are inferred from the size of the Component's element.
      *
-     * @param {Point} origin Origin of the space offered to the Component.
-     * @param {number} availableWidth
-     * @param {number} availableHeight
+     * @param {Point} [origin] Origin of the space offered to the Component.
+     * @param {number} [availableWidth] Available width in pixels.
+     * @param {number} [availableHeight] Available height in pixels.
      * @returns {Component} The calling Component.
      */
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -175,7 +173,7 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth  = Utils.DOM.getElementWidth(elem);
+          availableWidth = Utils.DOM.getElementWidth(elem);
           availableHeight = Utils.DOM.getElementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
@@ -198,16 +196,15 @@ module Plottable {
     protected _getSize(availableWidth: number, availableHeight: number) {
       var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
-        width: this.fixedWidth()  ? Math.min(availableWidth , requestedSpace.minWidth)  : availableWidth,
+        width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
         height: this.fixedHeight() ? Math.min(availableHeight, requestedSpace.minHeight) : availableHeight
       };
     }
 
     /**
-     * Queues the Component for rendering. Set immediately to true if the Component should be rendered
-     * immediately as opposed to queued to the RenderController.
+     * Queues the Component for rendering.
      *
-     * @returns {Component} The calling Component
+     * @returns {Component} The calling Component.
      */
     public render() {
       if (this._isAnchored && this._isSetup && this.width() >= 0 && this.height() >= 0) {
@@ -227,10 +224,10 @@ module Plottable {
     }
 
     /**
-     * Causes the Component to recompute layout and redraw.
+     * Causes the Component to re-layout and render.
      *
-     * This function should be called when CSS changes could influence the size
-     * of the components, e.g. changing the font size.
+     * This function should be called when a CSS change has occured that could
+     * influence the layout of the Component, such as changing the font size.
      *
      * @returns {Component} The calling Component.
      */
@@ -246,10 +243,10 @@ module Plottable {
     }
 
     /**
-     * Renders the Component into a given DOM element. The element must be as <svg>.
+     * Renders the Component to a given <svg>.
      *
-     * @param {String|D3.Selection} element A D3 selection or a selector for getting the element to render into.
-     * @returns {Component} The calling component.
+     * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
+     * @returns {Component} The calling Component.
      */
     public renderTo(element: String | D3.Selection): Component {
       this.detach();
@@ -266,7 +263,7 @@ module Plottable {
         this.anchor(selection);
       }
       if (this._element == null) {
-        throw new Error("If a component has never been rendered before, then renderTo must be given a node to render to, \
+        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
           or a D3.Selection, or a selector string");
       }
       this.computeLayout();
@@ -278,14 +275,12 @@ module Plottable {
 
     /**
      * Gets the x alignment of the Component.
-     *
-     * @returns {string} The current x alignment.
      */
     public xAlignment(): string;
     /**
      * Sets the x alignment of the Component.
      *
-     * @param {string} alignment The x alignment of the Component (one of ["left", "center", "right"]).
+     * @param {string} xAlignment The x alignment of the Component ("left"/"center"/"right").
      * @returns {Component} The calling Component.
      */
     public xAlignment(xAlignment: string): Component;
@@ -305,14 +300,12 @@ module Plottable {
 
     /**
      * Gets the y alignment of the Component.
-     *
-     * @returns {string} The current y alignment.
      */
     public yAlignment(): string;
     /**
      * Sets the y alignment of the Component.
      *
-     * @param {string} alignment The y alignment of the Component (one of ["top", "center", "bottom"]).
+     * @param {string} yAlignment The y alignment of the Component ("top"/"center"/"bottom").
      * @returns {Component} The calling Component.
      */
     public yAlignment(yAlignment: string): Component;
@@ -346,7 +339,7 @@ module Plottable {
     }
 
     private _generateClipPath() {
-      // The clip path will prevent content from overflowing its component space.
+      // The clip path will prevent content from overflowing its Component space.
       // HACKHACK: IE <=9 does not respect the HTML base element in SVG.
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
@@ -362,7 +355,6 @@ module Plottable {
      * Checks if the Component has a given CSS class.
      *
      * @param {string} cssClass The CSS class to check for.
-     * @returns {boolean} Whether the Component has the given CSS class.
      */
     public classed(cssClass: string): boolean;
     /**
@@ -401,30 +393,25 @@ module Plottable {
     }
 
     /**
-     * Checks if the Component has a fixed width or false if it grows to fill available space.
+     * Checks if the Component has a fixed width or if it grows to fill available space.
      * Returns false by default on the base Component class.
-     *
-     * @returns {boolean} Whether the component has a fixed width.
      */
     public fixedWidth() {
       return false;
     }
 
     /**
-     * Checks if the Component has a fixed height or false if it grows to fill available space.
+     * Checks if the Component has a fixed height or if it grows to fill available space.
      * Returns false by default on the base Component class.
-     *
-     * @returns {boolean} Whether the component has a fixed height.
      */
     public fixedHeight() {
       return false;
     }
 
     /**
-     * Detaches a Component from the DOM. The component can be reused.
+     * Detaches a Component from the DOM. The Component can be reused.
      *
-     * This should only be used if you plan on reusing the calling
-     * Components. Otherwise, use remove().
+     * This should only be used if you plan on reusing the calling Component. Otherwise, use destroy().
      *
      * @returns The calling Component.
      */
@@ -441,9 +428,9 @@ module Plottable {
     }
 
     /**
-     * Adds a callback to be called when th Component is detach()-ed.
+     * Adds a callback to be called when the Component is detach()-ed.
      *
-     * @param {ComponentCallback} callback The callback to be added.
+     * @param {ComponentCallback} callback
      * @return {Component} The calling Component.
      */
     public onDetach(callback: ComponentCallback) {
@@ -452,10 +439,10 @@ module Plottable {
     }
 
     /**
-     * Removes a callback to be called when th Component is detach()-ed.
+     * Removes a callback to be called when the Component is detach()-ed.
      * The callback is identified by reference equality.
      *
-     * @param {ComponentCallback} callback The callback to be removed.
+     * @param {ComponentCallback} callback
      * @return {Component} The calling Component.
      */
     public offDetach(callback: ComponentCallback) {
@@ -477,8 +464,7 @@ module Plottable {
     }
 
     /**
-     * Removes a Component from the DOM and disconnects it from everything it's
-     * listening to (effectively destroying it).
+     * Removes a Component from the DOM and disconnects all listeners.
      */
     public destroy() {
       this._destroyed = true;
@@ -486,18 +472,14 @@ module Plottable {
     }
 
     /**
-     * Return the width of the component
-     *
-     * @return {number} width of the component
+     * Gets the width of the Component in pixels.
      */
     public width(): number {
       return this._width;
     }
 
     /**
-     * Return the height of the component
-     *
-     * @return {number} height of the component
+     * Gets the height of the Component in pixels.
      */
     public height(): number {
       return this._height;
@@ -506,7 +488,7 @@ module Plottable {
     /**
      * Gets the origin of the Component relative to its parent.
      *
-     * @return {Point} The x-y position of the Component relative to its parent.
+     * @return {Point}
      */
     public origin(): Point {
       return {
@@ -518,7 +500,7 @@ module Plottable {
     /**
      * Gets the origin of the Component relative to the root <svg>.
      *
-     * @return {Point} The x-y position of the Component relative to the root <svg>
+     * @return {Point}
      */
     public originToSVG(): Point {
       var origin = this.origin();
@@ -533,20 +515,18 @@ module Plottable {
     }
 
     /**
-     * Returns the foreground selection for the Component
-     * (A selection covering the front of the Component)
-     *
+     * Gets the Selection containing the <g> in front of the visual elements of the Component.
+     * 
      * Will return undefined if the Component has not been anchored.
      *
-     * @return {D3.Selection} foreground selection for the Component
+     * @return {D3.Selection}
      */
     public foreground(): D3.Selection {
       return this._foregroundContainer;
     }
 
     /**
-     * Returns the content selection for the Component
-     * (A selection containing the visual elements of the Component)
+     * Gets a Selection containing a <g> that holds the visual elements of the Component.
      *
      * Will return undefined if the Component has not been anchored.
      *
@@ -557,9 +537,8 @@ module Plottable {
     }
 
     /**
-     * Returns the background selection for the Component
-     * (A selection appearing behind of the Component)
-     *
+     * Gets the Selection containing the <g> behind the visual elements of the Component.
+     * 
      * Will return undefined if the Component has not been anchored.
      *
      * @return {D3.Selection} background selection for the Component

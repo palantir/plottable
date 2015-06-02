@@ -147,32 +147,6 @@ describe("NumericAxis", () => {
     svg.remove();
   });
 
-  it("can hide tick labels that don't fit", () => {
-    var SVG_WIDTH = 500;
-    var SVG_HEIGHT = 100;
-    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    var scale = new Plottable.Scales.Linear();
-    scale.range([0, SVG_WIDTH]);
-    var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
-
-    numericAxis.showEndTickLabel("left", false);
-    assert.isFalse(numericAxis.showEndTickLabel("left"), "retrieve showEndTickLabel setting");
-    numericAxis.showEndTickLabel("right", true);
-    assert.isTrue(numericAxis.showEndTickLabel("right"), "retrieve showEndTickLabel setting");
-    assert.throws(() => numericAxis.showEndTickLabel("top", true), Error);
-    assert.throws(() => numericAxis.showEndTickLabel("bottom", true), Error);
-
-    numericAxis.renderTo(svg);
-
-    var tickLabels = (<any> numericAxis)._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
-    var firstLabel = d3.select(tickLabels[0][0]);
-    assert.strictEqual(firstLabel.style("visibility"), "hidden", "first label is hidden");
-    var lastLabel = d3.select(tickLabels[0][tickLabels[0].length - 1]);
-    assert.strictEqual(lastLabel.style("visibility"), "hidden", "last label is hidden");
-
-    svg.remove();
-  });
-
   it("tick labels don't overlap in a constrained space", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 100;
@@ -180,7 +154,6 @@ describe("NumericAxis", () => {
     var scale = new Plottable.Scales.Linear();
     scale.range([0, SVG_WIDTH]);
     var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
-    numericAxis.showEndTickLabel("left", false).showEndTickLabel("right", false);
     numericAxis.renderTo(svg);
 
     var visibleTickLabels = (<any> numericAxis)._element
@@ -295,7 +268,7 @@ describe("NumericAxis", () => {
   it("truncates long labels", () => {
     var dataset = new Plottable.Dataset([
       { x: "A", y: 500000000 },
-      { x: "B", y:  400000000 }
+      { x: "B", y: 400000000 }
     ]);
     var SVG_WIDTH = 120;
     var SVG_HEIGHT = 300;
@@ -304,11 +277,12 @@ describe("NumericAxis", () => {
     var xScale = new Plottable.Scales.Category();
     var yScale = new Plottable.Scales.Linear();
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var yLabel = new Plottable.Components.Label("LABEL", "left");
-    yLabel.classed(Plottable.Components.Label.AXIS_LABEL_CLASS, true);
-    var barPlot = new Plottable.Plots.Bar(xScale, yScale);
-    barPlot.x((d) => d.x, xScale);
-    barPlot.y((d) => d.y, yScale);
+
+    var yLabel = new Plottable.Components.AxisLabel("LABEL");
+    yLabel.angle(-90);
+    var barPlot = new Plottable.Plots.Bar();
+    barPlot.x((d: any) => d.x, xScale);
+    barPlot.y((d: any) => d.y, yScale);
     barPlot.addDataset(dataset);
 
     var chart = new Plottable.Components.Table([
@@ -387,7 +361,7 @@ describe("NumericAxis", () => {
     tickMarks.each(function() {
       var tickMark = d3.select(this);
       var tickMarkPosition = Number(tickMark.attr("x"));
-      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <=  SVG_WIDTH, "tick marks are located within the bounding SVG");
+      assert.isTrue(tickMarkPosition >= 0 && tickMarkPosition <= SVG_WIDTH, "tick marks are located within the bounding SVG");
     });
     svg.remove();
   });

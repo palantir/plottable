@@ -2,11 +2,13 @@
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
 /// <reference path="utils/utils.ts" />
+/// <reference path="utils/d3ScaleUtils.ts" />
 /// <reference path="utils/map.ts" />
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/color.ts" />
 /// <reference path="utils/callbackSet.ts" />
+/// <reference path="utils/stackedUtils.ts" />
 
 /// <reference path="utils/formatters.ts" />
 /// <reference path="utils/symbolFactories.ts" />
@@ -15,13 +17,11 @@
 
 /// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
-/// <reference path="core/colors.ts" />
 
 /// <reference path="core/dataset.ts" />
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/interfaces.ts" />
-/// <reference path="core/domainer.ts" />
 
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitativeScale.ts" />
@@ -37,7 +37,7 @@
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/elementDrawer.ts" />
-/// <reference path="drawers/rectDrawer.ts" />
+/// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
 
@@ -62,12 +62,10 @@
 /// <reference path="components/plots/xyPlot.ts" />
 /// <reference path="components/plots/rectanglePlot.ts" />
 /// <reference path="components/plots/scatterPlot.ts" />
-/// <reference path="components/plots/gridPlot.ts" />
 /// <reference path="components/plots/barPlot.ts" />
 /// <reference path="components/plots/linePlot.ts" />
 /// <reference path="components/plots/areaPlot.ts" />
 /// <reference path="components/plots/clusteredBarPlot.ts" />
-/// <reference path="components/plots/stackedPlot.ts" />
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 

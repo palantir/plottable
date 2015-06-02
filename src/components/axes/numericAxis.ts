@@ -5,23 +5,18 @@ export module Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
-    // Whether or not first/last tick label will still be displayed even if
-    // the label is cut off.
-    private _showFirstTickLabel = false;
-    private _showLastTickLabel = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
     /**
-     * Constructs a NumericAxis.
-     *
-     * Just as an CategoryAxis is for rendering an OrdinalScale, a NumericAxis
-     * is for rendering a QuantitativeScale.
+     * Constructs a Numeric Axis.
+     * 
+     * A Numeric Axis is a visual representation of a QuantitativeScale.
      *
      * @constructor
-     * @param {QuantitativeScale} scale The QuantitativeScale to base the axis on.
-     * @param {string} orientation The orientation of the QuantitativeScale (top/bottom/left/right)
-     * @param {Formatter} formatter A function to format tick labels (default Formatters.general()).
+     * @param {QuantitativeScale} scale
+     * @param {string} orientation One of "top"/"bottom"/"left"/"right".
+     * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
       super(scale, orientation, formatter);
@@ -204,8 +199,8 @@ export module Axes {
       this._hideOverlappingTickLabels();
 
       if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
+          this._tickLabelPositioning === "top" ||
+          this._tickLabelPositioning === "left" ||
           this._tickLabelPositioning === "right") {
         this._hideTickMarksWithoutLabel();
       }
@@ -250,11 +245,9 @@ export module Axes {
     /**
      * Sets the tick label position relative to the tick marks.
      *
-     * @param {string} position If provided, the relative position of the tick label.
-     *                          [top/center/bottom] for a vertical NumericAxis,
-     *                          [left/center/right] for a horizontal NumericAxis.
-     *                          Defaults to center.
-     * @returns {Numeric} The calling Axis.Numeric.
+     * @param {string} position "top"/"center"/"bottom" for a vertical Numeric Axis,
+     *                          "left"/"center"/"right" for a horizontal Numeric Axis.
+     * @returns {Numeric} The calling Numeric Axis.
      */
     public tickLabelPosition(position: string): Numeric;
     public tickLabelPosition(position?: string): any {
@@ -274,56 +267,6 @@ export module Axes {
         this._tickLabelPositioning = positionLC;
         this.redraw();
         return this;
-      }
-    }
-
-    /**
-     * Gets whether or not the tick labels at the end of the graph are
-     * displayed when partially cut off.
-     *
-     * @param {string} orientation Where on the scale to change tick labels.
-     *                 On a "top" or "bottom" axis, this can be "left" or
-     *                 "right". On a "left" or "right" axis, this can be "top"
-     *                 or "bottom".
-     * @returns {boolean} The current setting.
-     */
-    public showEndTickLabel(orientation: string): boolean;
-    /**
-     * Sets whether or not the tick labels at the end of the graph are
-     * displayed when partially cut off.
-     *
-     * @param {string} orientation If provided, where on the scale to change tick labels.
-     *                 On a "top" or "bottom" axis, this can be "left" or
-     *                 "right". On a "left" or "right" axis, this can be "top"
-     *                 or "bottom".
-     * @param {boolean} show Whether or not the given tick should be
-     * displayed.
-     * @returns {Numeric} The calling NumericAxis.
-     */
-    public showEndTickLabel(orientation: string, show: boolean): Numeric;
-    public showEndTickLabel(orientation: string, show?: boolean): any {
-      if ((this._isHorizontal() && orientation === "left") ||
-          (!this._isHorizontal() && orientation === "bottom")) {
-        if (show === undefined) {
-          return this._showFirstTickLabel;
-        } else {
-          this._showFirstTickLabel = show;
-          this.render();
-          return this;
-        }
-      } else if ((this._isHorizontal() && orientation === "right") ||
-                 (!this._isHorizontal() && orientation === "top")) {
-        if (show === undefined) {
-          return this._showLastTickLabel;
-        } else {
-          this._showLastTickLabel = show;
-          this.render();
-          return this;
-        }
-      } else {
-        throw new Error("Attempt to show " + orientation + " tick label on a " +
-                        (this._isHorizontal() ? "horizontal" : "vertical") +
-                        " axis");
       }
     }
 
@@ -395,9 +338,9 @@ export module Axes {
       var padding = this.tickLabelPadding();
 
       if (this._tickLabelPositioning === "bottom" ||
-          this._tickLabelPositioning === "top"    ||
-          this._tickLabelPositioning === "left"   ||
-          this._tickLabelPositioning === "right"  ) {
+          this._tickLabelPositioning === "top" ||
+          this._tickLabelPositioning === "left" ||
+          this._tickLabelPositioning === "right" ) {
         padding *= 3;
       }
 

@@ -63,8 +63,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
-  // Test is flaky under SauceLabs for firefox version 30
-  it.skip("a legend with a long label does not overflow horizontally", () => {
+  it("a legend with a long label does not overflow horizontally", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     svg.attr("width", 100);
     legend.renderTo(svg);
@@ -250,7 +249,7 @@ describe("Legend", () => {
     svg.remove();
   });
 
- it("sortFunction() works as expected", () => {
+ it("comparator() works as expected", () => {
     var newDomain = ["F", "E", "D", "C", "B", "A"];
     color.domain(newDomain);
     legend.renderTo(svg);
@@ -258,11 +257,11 @@ describe("Legend", () => {
     var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
     assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
 
-    var sortFn = (a: string, b: string) => a.localeCompare(b);
-    legend.sortFunction(sortFn);
+    var compareFunction = (a: string, b: string) => a.localeCompare(b);
+    legend.comparator(compareFunction);
     entries = (<any> legend)._element.selectAll(entrySelector);
     elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
-    newDomain.sort(sortFn);
+    newDomain.sort(compareFunction);
     assert.deepEqual(elementTexts, newDomain, "entry has been sorted alphabetically");
 
     svg.remove();

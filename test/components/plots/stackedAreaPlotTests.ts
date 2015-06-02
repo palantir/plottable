@@ -15,8 +15,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
@@ -30,7 +32,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
@@ -58,6 +60,15 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("pixel positions account for stack offsets", () => {
+      var dataYs = renderer.entities().map((entity) => yScale.invert(entity.position.y));
+      var dataset1Ys = dataset1.data().map((d) => d.y);
+      var dataset2Ys = dataset2.data().map((d, i) => d.y + dataset1.data()[i].y);
+      assert.includeMembers(dataYs, dataset1Ys, "all dataset1 points found");
+      assert.includeMembers(dataYs, dataset2Ys, "all dataset2 points found");
+      svg.remove();
+    });
+
   });
 
   describe("Stacked Area Plot no data", () => {
@@ -68,8 +79,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      var yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      var xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      var yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10");
 
       var data1: any[] = [
@@ -79,7 +92,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.attr("fill", "type", colorScale);
@@ -112,7 +125,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
       yScale = new Plottable.Scales.Linear();
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
@@ -125,7 +139,7 @@ describe("Plots", () => {
         {x: 3, y: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
       renderer.attr("fill", "type", colorScale);
@@ -324,8 +338,10 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([1, 3]);
-      yScale = new Plottable.Scales.Linear().domain([0, 4]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([1, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 4]);
       var colorScale = new Plottable.Scales.Color("10").domain(["a", "b"]);
 
       var data1 = [
@@ -337,7 +353,7 @@ describe("Plots", () => {
         {x: 3, yTest: 1, type: "b"}
       ];
 
-      renderer = new Plottable.Plots.StackedArea(xScale, yScale);
+      renderer = new Plottable.Plots.StackedArea<number>();
       renderer.y((d) => d.yTest, yScale);
       renderer.x((d) => d.x, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
@@ -398,7 +414,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea<number>();
       var dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
       var dataset1 = new Plottable.Dataset(data1);
@@ -408,9 +424,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) sh1uld have no offset on middle point");
@@ -439,7 +455,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedArea(xScale, yScale);
+      var plot = new Plottable.Plots.StackedArea<number>();
       var dataset0 = new Plottable.Dataset(data0);
       plot.addDataset(dataset0);
       var dataset1 = new Plottable.Dataset(data1);
@@ -449,9 +465,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get(2);
-      var ds1Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get(2);
-      var ds2Point2Offset = (<any> plot)._key2PlotDatasetKey.get("_2").plotMetadata.offsets.get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) should have no offset on middle point");

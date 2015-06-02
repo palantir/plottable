@@ -9,12 +9,29 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Area(xScale, yScale);
-      plot.x((d) => d.x, xScale);
+      var plot = new Plottable.Plots.Area();
+      plot.x((d: any) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
       assert.strictEqual(plot.width(), 400, "was allocated width");
       assert.strictEqual(plot.height(), 400, "was allocated height");
+      svg.remove();
+    });
+
+    it("adds a padding exception to the y scale at the constant y0 value", () => {
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      yScale.padProportion(0.1);
+      var constantY0 = 30;
+      yScale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[constantY0, constantY0 + 10]]);
+      var plot = new Plottable.Plots.Area();
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
+      plot.y0(constantY0);
+      plot.addDataset(new Plottable.Dataset([{ x: 0, y: constantY0 + 5 }]));
+      plot.renderTo(svg);
+      assert.strictEqual(yScale.domain()[0], constantY0, "y Scale doesn't pad beyond 0 when used in a Plots.Area");
       svg.remove();
     });
   });
@@ -34,8 +51,10 @@ describe("Plots", () => {
     var renderArea: D3.Selection;
 
     before(() => {
-      xScale = new Plottable.Scales.Linear().domain([0, 1]);
-      yScale = new Plottable.Scales.Linear().domain([0, 1]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 1]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 1]);
       xAccessor = (d: any) => d.foo;
       yAccessor = (d: any) => d.bar;
       y0Accessor = () => 0;
@@ -46,11 +65,11 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
       simpleDataset = new Plottable.Dataset(twoPointData);
-      areaPlot = new Plottable.Plots.Area(xScale, yScale);
+      areaPlot = new Plottable.Plots.Area<number>();
       areaPlot.addDataset(simpleDataset);
       areaPlot.x(xAccessor, xScale)
               .y(yAccessor, yScale);
-      areaPlot.y0(y0Accessor, yScale)
+      areaPlot.y0(y0Accessor)
               .attr("fill", fillAccessor)
               .attr("stroke", colorAccessor)
               .renderTo(svg);
@@ -73,7 +92,7 @@ describe("Plots", () => {
     });
 
     it("area fill works for non-zero floor values appropriately, e.g. half the height of the line", () => {
-      areaPlot.y0((d) => d.bar / 2, yScale);
+      areaPlot.y0((d) => d.bar / 2);
       areaPlot.renderTo(svg);
       renderArea = (<any> areaPlot)._renderArea;
       var areaPath = renderArea.select(".area");
@@ -169,9 +188,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       areaPlot.attr("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable.Drawers.Area.AREA_CLASS);
+      var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.AREA_CLASS));
+      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
       svg.remove();
     });
   });

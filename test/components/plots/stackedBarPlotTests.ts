@@ -20,7 +20,8 @@ describe("Plots", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       xScale = new Plottable.Scales.Category();
-      yScale = new Plottable.Scales.Linear().domain([0, 3]);
+      yScale = new Plottable.Scales.Linear();
+      yScale.domain([0, 3]);
 
       originalData1 = [
         {x: "A", y: 1},
@@ -42,7 +43,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedBar(xScale, yScale);
+      renderer = new Plottable.Plots.StackedBar<string, number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
@@ -92,14 +93,6 @@ describe("Plots", () => {
     });
 
     it("considers lying within a bar's y-range to mean it is closest", () => {
-      function assertPlotDataEqual(expected: Plottable.Plots.PlotData, actual: Plottable.Plots.PlotData,
-        msg: string) {
-        assert.deepEqual(expected.data, actual.data, msg);
-        assert.closeTo(expected.pixelPoints[0].x, actual.pixelPoints[0].x, 0.01, msg);
-        assert.closeTo(expected.pixelPoints[0].y, actual.pixelPoints[0].y, 0.01, msg);
-        assert.deepEqual(expected.selection, actual.selection, msg);
-      }
-
       var bars = (<any> renderer)._renderArea.selectAll("rect");
 
       var d0 = dataset1.data()[0];
@@ -115,22 +108,27 @@ describe("Plots", () => {
       };
 
       var expected = {
-        data: [d0],
-        pixelPoints: [d0Px],
-        selection: d3.selectAll([bars[0][0]])
+        datum: d0,
+        index: 0,
+        dataset: dataset1,
+        position: d0Px,
+        selection: d3.selectAll([bars[0][0]]),
+        plot: renderer
       };
 
-      var closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y + 1 });
-      assertPlotDataEqual(expected, closest, "bottom bar is closest when within its range");
+      var closest = renderer.entityNearest({ x: 0, y: d0Px.y + 1 });
+      TestMethods.assertEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
 
       expected = {
-        data: [d1],
-        pixelPoints: [d1Px],
-        selection: d3.selectAll([bars[0][2]])
+        datum: d1,
+        index: 0,
+        dataset: dataset2,
+        position: d1Px,
+        selection: d3.selectAll([bars[0][2]]),
+        plot: renderer
       };
-
-      closest = renderer.getClosestPlotData({ x: 0, y: d0Px.y - 1 });
-      assertPlotDataEqual(expected, closest, "top bar is closest when within its range");
+      closest = renderer.entityNearest({ x: 0, y: d0Px.y - 1 });
+      TestMethods.assertEntitiesEqual(closest, expected, "top bar is closest when within its range");
 
       svg.remove();
     });
@@ -167,7 +165,7 @@ describe("Plots", () => {
         {x: "B", y: 4}
       ];
 
-      plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      plot = new Plottable.Plots.StackedBar<string, number>();
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
@@ -221,7 +219,8 @@ describe("Plots", () => {
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      xScale = new Plottable.Scales.Linear().domain([0, 6]);
+      xScale = new Plottable.Scales.Linear();
+      xScale.domain([0, 6]);
       yScale = new Plottable.Scales.Category();
 
       var data1 = [
@@ -235,7 +234,7 @@ describe("Plots", () => {
       dataset1 = new Plottable.Dataset(data1);
       dataset2 = new Plottable.Dataset(data2);
 
-      renderer = new Plottable.Plots.StackedBar(xScale, yScale, false);
+      renderer = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       renderer.y((d) => d.name, yScale);
       renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
@@ -309,7 +308,7 @@ describe("Plots", () => {
         {x: "C", y: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plots.StackedBar(xScale, yScale);
+      plot = new Plottable.Plots.StackedBar<string, number>();
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
@@ -370,7 +369,7 @@ describe("Plots", () => {
         {y: "C", x: 7, type: "c"}
       ];
 
-      plot = new Plottable.Plots.StackedBar(xScale, yScale, false);
+      plot = new Plottable.Plots.StackedBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
@@ -417,14 +416,16 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
+      var plot = new Plottable.Plots.StackedBar<string, number>();
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      plot.addDataset(ds1);
+      plot.addDataset(ds2);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_0").plotMetadata.offsets.get("A");
-      var ds2FirstColumnOffset = (<any> plot)._key2PlotDatasetKey.get("_1").plotMetadata.offsets.get("A");
+      var ds1FirstColumnOffset = (<any> plot)._stackOffsets.get(ds1).get("A");
+      var ds2FirstColumnOffset = (<any> plot)._stackOffsets.get(ds2).get("A");
 
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
@@ -453,19 +454,23 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Linear();
 
-      var plot = new Plottable.Plots.StackedBar(xScale, yScale);
-      plot.addDataset(new Plottable.Dataset(data1));
-      plot.addDataset(new Plottable.Dataset(data2));
-      plot.addDataset(new Plottable.Dataset(data3));
-      plot.addDataset(new Plottable.Dataset(data4));
-      plot.addDataset(new Plottable.Dataset(data5));
+      var plot = new Plottable.Plots.StackedBar<string, number>();
+      var ds1 = new Plottable.Dataset(data1);
+      var ds2 = new Plottable.Dataset(data2);
+      var ds3 = new Plottable.Dataset(data3);
+      var ds4 = new Plottable.Dataset(data4);
+      var ds5 = new Plottable.Dataset(data5);
+      plot.addDataset(ds1);
+      plot.addDataset(ds2);
+      plot.addDataset(ds3);
+      plot.addDataset(ds4);
+      plot.addDataset(ds5);
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var keys = (<any> plot)._key2PlotDatasetKey.keys();
-      var offset0 = (<any> plot)._key2PlotDatasetKey.get(keys[0]).plotMetadata.offsets.get("A");
-      var offset2 = (<any> plot)._key2PlotDatasetKey.get(keys[2]).plotMetadata.offsets.get("A");
-      var offset4 = (<any> plot)._key2PlotDatasetKey.get(keys[4]).plotMetadata.offsets.get("A");
+      var offset0 = (<any> plot)._stackOffsets.get(ds1).get("A");
+      var offset2 = (<any> plot)._stackOffsets.get(ds3).get("A");
+      var offset4 = (<any> plot)._stackOffsets.get(ds5).get("A");
 
       assert.strictEqual(offset0, 0,
         "Plot columns should start from offset 0 (at the very bottom)");

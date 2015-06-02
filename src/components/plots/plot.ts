@@ -4,36 +4,29 @@ module Plottable {
 
   export module Plots {
 
-    /**
-     * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-     */
-    export type PlotDatasetKey = {
+    export type Entity = {
+      datum: any;
+      index: number;
       dataset: Dataset;
-      drawer: Drawers.AbstractDrawer;
-      plotMetadata: PlotMetadata;
-      key: string;
-    }
-
-    export interface PlotMetadata {
-      datasetKey: string;
-    }
-
-    export type PlotData = {
-      data: any[];
-      pixelPoints: Point[];
+      position: Point;
       selection: D3.Selection;
+      plot: Plot;
     }
 
     export interface AccessorScaleBinding<D, R> {
       accessor: Accessor<any>;
       scale?: Scale<D, R>;
     }
+
+    export module Animator {
+      export var MAIN = "main";
+      export var RESET = "reset";
+    }
   }
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-    protected _datasetKeysInOrder: string[];
+    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
@@ -41,9 +34,9 @@ module Plottable {
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
     protected _animate: boolean = false;
-    private _animators: Animators.PlotAnimatorMap = {};
+    private _animators: {[animator: string]: Animators.Plot} = {};
+
     protected _animateOnNextRender = true;
-    private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -51,30 +44,22 @@ module Plottable {
     protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
-     * Constructs a Plot.
-     *
-     * Plots render data. Common example include Plot.Scatter, Plot.Bar, and Plot.Line.
-     *
-     * A bare Plot has a DataSource and any number of projectors, which take
-     * data and "project" it onto the Plot, such as "x", "y", "fill", "r".
-     *
      * @constructor
-     * @param {any[]|Dataset} [dataset] If provided, the data or Dataset to be associated with this Plot.
      */
     constructor() {
       super();
       this._clipPathEnabled = true;
       this.classed("plot", true);
-      this._key2PlotDatasetKey = d3.map();
+      this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
-      this._datasetKeysInOrder = [];
-      this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map();
       this._propertyExtents = d3.map();
+      this._animators[Plots.Animator.MAIN] = new Animators.Base();
+      this._animators[Plots.Animator.RESET] = new Animators.Null();
     }
 
     public anchor(selection: D3.Selection) {
@@ -88,8 +73,7 @@ module Plottable {
     protected _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
-      // HACKHACK on 591
-      this._getDrawersInOrder().forEach((d) => d.setup(this._renderArea.append("g")));
+      this.datasets().forEach((dataset) => this._setupDatasetNodes(dataset));
     }
 
     public destroy() {
@@ -99,22 +83,20 @@ module Plottable {
     }
 
     /**
+     * Adds a Dataset to the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
     public addDataset(dataset: Dataset) {
-      var key = "_" + this._nextSeriesIndex++;
-      if (this._key2PlotDatasetKey.has(key)) {
+      if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(key);
-      var metadata = this._getPlotMetadataForDataset(key);
-      var pdk = {drawer: drawer, dataset: dataset, key: key, plotMetadata: metadata};
-      this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(key, pdk);
+      var drawer = this._getDrawer(dataset);
+      this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
-        drawer.setup(this._renderArea.append("g"));
+        this._setupDatasetNodes(dataset);
       }
 
       dataset.onUpdate(this._onDatasetUpdateCallback);
@@ -122,11 +104,16 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawer(key: string): Drawers.AbstractDrawer {
-      return new Drawers.AbstractDrawer(key);
+    protected _setupDatasetNodes(dataset: Dataset) {
+      var drawer = this._datasetToDrawer.get(dataset);
+      drawer.setup(this._renderArea.append("g"));
     }
 
-    protected _getAnimator(key: string): Animators.PlotAnimator {
+    protected _getDrawer(dataset: Dataset): Drawer {
+      return new Drawer(dataset);
+    }
+
+    protected _getAnimator(key: string): Animators.Plot {
       if (this._animate && this._animateOnNextRender) {
         return this._animators[key] || new Animators.Null();
       } else {
@@ -141,8 +128,29 @@ module Plottable {
       this.render();
     }
 
+    /**
+     * Gets the AccessorScaleBinding for a particular attribute.
+     * 
+     * @param {string} attr
+     */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
+    /**
+     * Sets a particular attribute to a constant value or the result of an Accessor.
+     * 
+     * @param {string} attr
+     * @param {number|string|Accessor<number>|Accessor<string>} attrValue
+     * @returns {Plot} The calling Plot.
+     */
     public attr(attr: string, attrValue: number | string | Accessor<number> | Accessor<string>): Plot;
+    /**
+     * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the attribute values when autoDomain()-ing.
+     * 
+     * @param {string} attr
+     * @param {A|Accessor<A>} attrValue
+     * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
+     * @returns {Plot} The calling Plot.
+     */
     public attr<A>(attr: string, attrValue: A | Accessor<A>, scale: Scale<A, number | string>): Plot;
     public attr<A>(attr: string, attrValue?: number | string | Accessor<number> | Accessor<string> | A | Accessor<A>,
                    scale?: Scale<A, number | string>): any {
@@ -184,41 +192,16 @@ module Plottable {
       this._attrBindings.forEach((attr, binding) => {
         var accessor = binding.accessor;
         var scale = binding.scale;
-        var fn = scale ? (d: any, i: number, dataset: Dataset, m: Plots.PlotMetadata) => scale.scale(accessor(d, i, dataset, m)) : accessor;
+        var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
         h[attr] = fn;
       });
-      var propertyProjectors = this._generatePropertyToProjectors();
+      var propertyProjectors = this._propertyProjectors();
       Object.keys(propertyProjectors).forEach((key) => {
         if (h[key] == null) {
           h[key] = propertyProjectors[key];
         }
       });
       return h;
-    }
-
-    /**
-     * Generates a dictionary mapping an attribute to a function that calculate that attribute's value
-     * in accordance with the given datasetKey.
-     *
-     * Note that this will return all of the data attributes, which may not perfectly align to svg attributes
-     *
-     * @param {Dataset} dataset The dataset to generate the dictionary for
-     * @returns {AttributeToAppliedProjector} A dictionary mapping attributes to functions
-     */
-    public generateProjectors(dataset: Dataset): AttributeToAppliedProjector {
-      var attrToAppliedProjector: AttributeToAppliedProjector = {};
-      var datasetKey = this._keyForDataset(dataset);
-      if (datasetKey != null) {
-        var attrToProjector = this._generateAttrToProjector();
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        d3.entries(attrToProjector).forEach((keyValue: any) => {
-          attrToAppliedProjector[keyValue.key] = (datum: any, index: number) => {
-            return keyValue.value(datum, index, plotDatasetKey.dataset, plotMetadata);
-          };
-        });
-      }
-      return attrToAppliedProjector;
     }
 
     public renderImmediately() {
@@ -232,8 +215,6 @@ module Plottable {
 
     /**
      * Enables or disables animation.
-     *
-     * @param {boolean} enabled Whether or not to animate.
      */
     public animate(enabled: boolean) {
       this._animate = enabled;
@@ -273,7 +254,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale._autoDomainIfAutomaticMode());
+      this._scales().forEach((scale) => scale.addExtentsProvider(this._extentsProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -293,33 +274,25 @@ module Plottable {
         extents: D3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
-      extents.set(key, this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        var plotMetadata = plotDatasetKey.plotMetadata;
-        return this._computeExtent(dataset, accScaleBinding.accessor, plotMetadata, filter);
-      }));
+      extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
     }
 
-    private _computeExtent(dataset: Dataset, accessor: Accessor<any>, plotMetadata: any, filter: Accessor<boolean>): any[] {
+    private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+      var accessor = accScaleBinding.accessor;
+      var scale = accScaleBinding.scale;
+
+      if (scale == null) {
+        return [];
+      }
+
       var data = dataset.data();
       if (filter != null) {
-        data = data.filter((d, i) => filter(d, i, dataset, plotMetadata));
+        data = data.filter((d, i) => filter(d, i, dataset));
       }
-      var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset, plotMetadata);
+      var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
       var mappedData = data.map(appliedAccessor);
-      if (mappedData.length === 0) {
-        return [];
-      } else if (typeof(mappedData[0]) === "string") {
-        return Utils.Methods.uniq(mappedData);
-      } else {
-        var extent = d3.extent(mappedData);
-        if (extent[0] == null || extent[1] == null) {
-          return [];
-        } else {
-          return extent;
-        }
-      }
+
+      return scale.extentOfValues(mappedData);
     }
 
     /**
@@ -356,21 +329,20 @@ module Plottable {
     }
 
     /**
-     * Get the animator associated with the specified Animator key.
+     * Get the Animator associated with the specified Animator key.
      *
-     * @return {PlotAnimator} The Animator for the specified key.
+     * @return {Animators.Plot}
      */
-    public animator(animatorKey: string): Animators.PlotAnimator;
+    public animator(animatorKey: string): Animators.Plot;
     /**
-     * Set the animator associated with the specified Animator key.
+     * Set the Animator associated with the specified Animator key.
      *
-     * @param {string} animatorKey The key for the Animator.
-     * @param {PlotAnimator} animator An Animator to be assigned to
-     * the specified key.
+     * @param {string} animatorKey
+     * @param {Animators.Plot} animator
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.PlotAnimator): Plot;
-    public animator(animatorKey: string, animator?: Animators.PlotAnimator): any {
+    public animator(animatorKey: string, animator: Animators.Plot): Plot;
+    public animator(animatorKey: string, animator?: Animators.Plot): any {
       if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
@@ -380,40 +352,31 @@ module Plottable {
     }
 
     /**
+     * Removes a Dataset from the Plot.
+     * 
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
     public removeDataset(dataset: Dataset): Plot {
-      var key = this._keyForDataset(dataset);
-      if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var pdk = this._key2PlotDatasetKey.get(key);
-        pdk.drawer.remove();
-        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.remove(key);
+      if (this.datasets().indexOf(dataset) > -1) {
+        this._removeDatasetNodes(dataset);
+        dataset.offUpdate(this._onDatasetUpdateCallback);
+        this._datasetToDrawer.delete(dataset);
         this._onDatasetUpdate();
       }
       return this;
     }
 
-    /**
-     * Returns the internal key for the Dataset, or undefined if not found
-     */
-    private _keyForDataset(dataset: Dataset) {
-      return this._datasetKeysInOrder[this.datasets().indexOf(dataset)];
-    }
-
-    /**
-     * Returns an array of internal keys corresponding to those Datasets actually on the plot
-     */
-    protected _keysForDatasets(datasets: Dataset[]) {
-      return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
+    protected _removeDatasetNodes(dataset: Dataset) {
+      var drawer = this._datasetToDrawer.get(dataset);
+      drawer.remove();
     }
 
     public datasets(): Dataset[];
     public datasets(datasets: Dataset[]): Plot;
     public datasets(datasets?: Dataset[]): any {
-      var currentDatasets = this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
+      var currentDatasets: Dataset[] = [];
+      this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
       if (datasets == null) {
         return currentDatasets;
       }
@@ -422,8 +385,8 @@ module Plottable {
       return this;
     }
 
-    protected _getDrawersInOrder(): Drawers.AbstractDrawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
+    protected _getDrawersInOrder(): Drawer[] {
+      return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -435,22 +398,9 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
-      });
-      return datasets;
-    }
-
-    /**
-     * Gets the new plot metadata for new dataset with provided key
-     *
-     * @param {string} key The key of new dataset
-     */
-    protected _getPlotMetadataForDataset(key: string): Plots.PlotMetadata {
-      return {
-        datasetKey: key
-      };
+      var dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      return dataToDraw;
     }
 
     private _paint() {
@@ -458,40 +408,28 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      var times = this._datasetKeysInOrder.map((k, i) =>
+      var times = this.datasets().map((ds, i) =>
         drawers[i].draw(
-          dataToDraw.get(k),
-          drawSteps,
-          this._key2PlotDatasetKey.get(k).dataset,
-          this._key2PlotDatasetKey.get(k).plotMetadata
+          dataToDraw.get(ds),
+          drawSteps
         ));
       var maxTime = Utils.Methods.max(times, 0);
       this._additionalPaint(maxTime);
     }
 
     /**
-     * Retrieves all of the Selections of this Plot for the specified Datasets.
+     * Retrieves Selections of this Plot for the specified Datasets.
      *
-     * @param {Dataset[]} datasets The Datasets to retrieve the selections from.
-     * If not provided, all selections will be retrieved.
-     * @param {boolean} exclude If set to true, all Datasets will be queried excluding the keys referenced
-     * in the previous datasetKeys argument (default = false).
-     * @returns {D3.Selection} The retrieved Selections.
+     * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
+     *   If not provided, Selections will be retrieved for all Datasets on the Plot.
+     * @returns {D3.Selection}
      */
-    public getAllSelections(datasets = this.datasets(), exclude = false): D3.Selection {
-      var datasetKeyArray = this._keysForDatasets(datasets);
-
-      if (exclude) {
-        var excludedDatasetKeys = d3.set(datasetKeyArray);
-        datasetKeyArray = this._datasetKeysInOrder.filter((datasetKey) => !excludedDatasetKeys.has(datasetKey));
-      }
-
+    public getAllSelections(datasets = this.datasets()): D3.Selection {
       var allSelections: EventTarget[] = [];
 
-      datasetKeyArray.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
+      datasets.forEach((dataset) => {
+        var drawer = this._datasetToDrawer.get(dataset);
+        if (drawer == null) { return; }
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
           allSelections.push(this);
         });
@@ -501,69 +439,56 @@ module Plottable {
     }
 
     /**
-     * Retrieves all of the PlotData of this plot for the specified dataset(s)
+     * Gets the Entities associated with the specified Datasets.
      *
-     * @param {Dataset[]} datasets The Datasets to retrieve the PlotData from.
-     * If not provided, all PlotData will be retrieved.
-     * @returns {PlotData} The retrieved PlotData.
+     * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
+     *   If not provided, returns defaults to all Datasets on the Plot.
+     * @return {Plots.Entity[]}
      */
-    public getAllPlotData(datasets = this.datasets()): Plots.PlotData {
-      var data: any[] = [];
-      var pixelPoints: Point[] = [];
-      var allElements: EventTarget[] = [];
-
-      this._keysForDatasets(datasets).forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
-        plotDatasetKey.dataset.data().forEach((datum: any, index: number) => {
-          var pixelPoint = drawer._getPixelPoint(datum, index);
-          if (pixelPoint.x !== pixelPoint.x || pixelPoint.y !== pixelPoint.y) {
+    public entities(datasets = this.datasets()): Plots.Entity[] {
+      var entities: Plots.Entity[] = [];
+      datasets.forEach((dataset) => {
+        var drawer = this._datasetToDrawer.get(dataset);
+        dataset.data().forEach((datum: any, index: number) => {
+          var position = this._pixelPoint(datum, index, dataset);
+          if (position.x !== position.x || position.y !== position.y) {
             return;
           }
-          data.push(datum);
-          pixelPoints.push(pixelPoint);
-          allElements.push(drawer._getSelection(index).node());
+          entities.push({
+            datum: datum,
+            index: index,
+            dataset: dataset,
+            position: position,
+            selection: drawer._getSelection(index),
+            plot: this
+          });
         });
       });
-
-      return { data: data, pixelPoints: pixelPoints, selection: d3.selectAll(allElements) };
+      return entities;
     }
 
     /**
-     * Retrieves PlotData with the lowest distance, where distance is defined
-     * to be the Euclidiean norm.
+     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
      *
-     * @param {Point} queryPoint The point to which plot data should be compared
-     *
-     * @returns {PlotData} The PlotData closest to queryPoint
+     * @param {Point} queryPoint
+     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
-    public getClosestPlotData(queryPoint: Point): Plots.PlotData {
+    public entityNearest(queryPoint: Point): Plots.Entity {
       var closestDistanceSquared = Infinity;
-      var closestIndex: number;
-      var plotData = this.getAllPlotData();
-      plotData.pixelPoints.forEach((pixelPoint: Point, index: number) => {
-        var datum = plotData.data[index];
-        var selection = d3.select(plotData.selection[0][index]);
-
-        if (!this._isVisibleOnPlot(datum, pixelPoint, selection)) {
+      var closest: Plots.Entity;
+      this.entities().forEach((entity) => {
+        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
-        var distance = Utils.Methods.distanceSquared(pixelPoint, queryPoint);
-        if (distance < closestDistanceSquared) {
-          closestDistanceSquared = distance;
-          closestIndex = index;
+        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        if (distanceSquared < closestDistanceSquared) {
+          closestDistanceSquared = distanceSquared;
+          closest = entity;
         }
       });
 
-      if (closestIndex == null) {
-        return {data: [], pixelPoints: [], selection: d3.select()};
-      }
-
-      return {data: [plotData.data[closestIndex]],
-              pixelPoints: [plotData.pixelPoints[closestIndex]],
-              selection: d3.select(plotData.selection[0][closestIndex])};
+      return closest;
     }
 
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
@@ -574,22 +499,25 @@ module Plottable {
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
       scale.removeExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
       scale.addExtentsProvider(this._extentsProvider);
-      scale._autoDomainIfAutomaticMode();
     }
 
-    protected _generatePropertyToProjectors(): AttributeToProjector {
-      var attrToProjector: AttributeToProjector = {};
-      this._propertyBindings.forEach((key, binding) => {
-        var scaledAccessor = (d: any, i: number, dataset: Dataset, m: any) => binding.scale.scale(binding.accessor(d, i, dataset, m));
-        attrToProjector[key] = binding.scale == null ? binding.accessor : scaledAccessor;
-      });
-      return attrToProjector;
+    protected _propertyProjectors(): AttributeToProjector {
+      return {};
+    }
+
+    protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>) {
+      return binding.scale == null ?
+               binding.accessor :
+               (d: any, i: number, ds: Dataset) => binding.scale.scale(binding.accessor(d, i, ds));
+    }
+
+    protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
+      return { x: 0, y: 0 };
     }
   }
 }
