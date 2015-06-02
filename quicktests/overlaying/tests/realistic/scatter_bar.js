@@ -12,7 +12,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  var xScale = new Plottable.Scales.Linear();
+  var xScale = new Plottable.Scales.Linear().domain([0, 0.50]);
   var yScale = new Plottable.Scales.Category();
 
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
@@ -47,15 +47,18 @@ function run(svg, data, Plottable) {
     .y(function(d) { return d.company; }, yScale)
     .attr("fill", function(d, i, ds) {
      if(ds === ds1){
-        return "#0000ff";
+        return "#000059";
       }
       else{
-        return "#ff0000";
+        return "#660066";
       }      
     })
+    .attr("opacity", function(){return 1;})
     .size(function(){ return yScale.rangeBand();});
 
-  var plots = new Plottable.Components.Group([bars, dots]);
+  var grid = new Plottable.Components.Gridlines(xScale, null);
+
+  var plots = new Plottable.Components.Group([bars, dots, grid]);
   var chart = new Plottable.Components.Table([[yAxis, plots],
                                               [null, xAxis]]);
 
