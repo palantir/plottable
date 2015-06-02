@@ -2761,7 +2761,7 @@ declare module Plottable {
              *
              * @returns {number}
              */
-            baseline(): number;
+            baselineValue(): number;
             /**
              * Sets the baseline value.
              * The baseline is the line that the bars are drawn from.
@@ -2769,7 +2769,7 @@ declare module Plottable {
              * @param {number} value
              * @returns {Bar} The calling Bar Plot.
              */
-            baseline(value: number): Bar<X, Y>;
+            baselineValue(value: number): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *

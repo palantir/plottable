@@ -47,7 +47,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.ClusteredBar<string, number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -130,7 +130,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.ClusteredBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
@@ -198,7 +198,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
-      plot.baseline(0);
+      plot.baselineValue(0);
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");

@@ -7246,7 +7246,7 @@ var Plottable;
                 }
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("baseline", new Plottable.Animators.Null());
-                this.baseline(0);
+                this.baselineValue(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
@@ -7284,7 +7284,7 @@ var Plottable;
                 _super.prototype._setup.call(this);
                 this._baseline = this._renderArea.append("line").classed("baseline", true);
             };
-            Bar.prototype.baseline = function (value) {
+            Bar.prototype.baselineValue = function (value) {
                 if (value == null) {
                     return this._baselineValue;
                 }
@@ -7619,7 +7619,7 @@ var Plottable;
                     return [];
                 }
                 var entities = _super.prototype.entities.call(this, datasets);
-                var scaledBaseline = (this._isVertical ? this.y().scale : this.x().scale).scale(this.baseline());
+                var scaledBaseline = (this._isVertical ? this.y().scale : this.x().scale).scale(this.baselineValue());
                 entities.forEach(function (entity) {
                     var bar = entity.selection;
                     // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
@@ -8222,7 +8222,7 @@ var Plottable;
                     }
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                        var scaledBaseline = primaryScale.scale(this.baseline());
+                        var scaledBaseline = primaryScale.scale(this.baselineValue());
                         return new Plottable.Animators.MovingRect(scaledBaseline, this._isVertical);
                     }
                 }

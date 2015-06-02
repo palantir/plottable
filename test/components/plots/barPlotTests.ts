@@ -45,7 +45,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -76,7 +76,7 @@ describe("Plots", () => {
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baseline(-1);
+        barPlot.baselineValue(-1);
 
         var renderArea = (<any> barPlot)._renderArea;
         var bars = renderArea.selectAll("rect");
@@ -272,7 +272,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -321,7 +321,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, number>();
         dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
@@ -430,7 +430,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
@@ -460,7 +460,7 @@ describe("Plots", () => {
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baseline(-1);
+        barPlot.baselineValue(-1);
 
         var renderArea = (<any> barPlot)._renderArea;
         var bars = renderArea.selectAll("rect");
