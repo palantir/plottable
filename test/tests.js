@@ -7177,6 +7177,48 @@ describe("Scales", function () {
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
+        describe("Padding exceptions", function () {
+            it("addPaddingExceptionsProvider() works as expected on one end", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is padded");
+                scale.addPaddingExceptionsProvider(function () { return [11]; });
+                assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is not changed");
+                scale.addPaddingExceptionsProvider(function () { return [10]; });
+                assert.strictEqual(scale.domain()[0], 10, "The left side of the domain is no longer padded");
+            });
+            it("addPaddingExceptionsProvider() works as expected on both ends", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+                scale.addPaddingExceptionsProvider(function () { return [0.9, 11, 12, 13.5]; });
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain padding has not changed");
+                scale.addPaddingExceptionsProvider(function () { return [13]; });
+                assert.deepEqual(scale.domain(), [9.5, 13], "The right side of the domain is no longer padded");
+                scale.addPaddingExceptionsProvider(function () { return [10, 13]; });
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+            });
+            it("removePaddingExceptionsProvider() works as expected", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                var paddingExceptionProviderLeft = function () { return [10]; };
+                var paddingExceptionProviderBoth = function () { return [10, 13]; };
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [10, 13.5], "The left side of the domain is no longer padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+                scale.removePaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13.5], "The left side of domain is still padded, right is not");
+                scale.removePaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded again");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is still no longer padded");
+            });
+        });
         describe("autoranging behavior", function () {
             var data;
             var dataset;
