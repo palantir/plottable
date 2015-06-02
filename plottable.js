@@ -6261,12 +6261,12 @@ var Plottable;
             if (!this._isAnchored) {
                 return [];
             }
-            var allSetsOfExtents = [];
+            var includedValues = [];
             this._attrBindings.forEach(function (attr, binding) {
                 if (binding.scale === scale) {
                     var extents = _this._attrExtents.get(attr);
                     if (extents != null) {
-                        allSetsOfExtents = allSetsOfExtents.concat(d3.merge(extents));
+                        includedValues = includedValues.concat(d3.merge(extents));
                     }
                 }
             });
@@ -6274,11 +6274,11 @@ var Plottable;
                 if (binding.scale === scale) {
                     var extents = _this._extentsForProperty(property);
                     if (extents != null) {
-                        allSetsOfExtents = allSetsOfExtents.concat(d3.merge(extents));
+                        includedValues = includedValues.concat(d3.merge(extents));
                     }
                 }
             });
-            return allSetsOfExtents;
+            return includedValues;
         };
         Plot.prototype.animator = function (animatorKey, animator) {
             if (animator === undefined) {
