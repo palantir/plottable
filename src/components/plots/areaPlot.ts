@@ -5,7 +5,7 @@ export module Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
-    private _constantBaselineValueProvider: () => X[];
+    private _constantBaselineValueProvider: () => number[];
 
     /**
      * An Area Plot draws a filled region (area) between Y and Y0.
