@@ -77,12 +77,11 @@ module Plottable {
     }
 
     /**
-     * Adds a padding exception.
+     * Adds a padding exception provider.
      * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
      * that end of the domain will not be padded.
      *
-     * @param {any} key A key that identifies the padding exception.
-     * @param {D} exception
+     * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
      * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
@@ -92,9 +91,9 @@ module Plottable {
     }
 
     /**
-     * Removes the padding exception associated with the specified key.
+     * Removes the padding exception provider.
      *
-     * @param {any} key
+     * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
      * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {

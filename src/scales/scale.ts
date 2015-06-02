@@ -6,23 +6,24 @@ module Plottable {
   }
 
   export module Scales {
+
     /**
-     * A function that supplies Extents to a Scale.
-     * An Extent is a request for a set of domain values to be included.
+     * A function that supplies domain values to be included into a Scale.
      *
      * @param {Scale} scale
-     * @returns {D[][]} An array of extents.
+     * @returns {D[]} An array of values in the domain.
      */
     export interface IncludedValuesProvider<D> {
       (scale: Scale<D, any>): D[];
     }
 
     /**
-     * A function that supplies Extents to a Scale.
-     * An Extent is a request for a set of domain values to be included.
+     * A function that supplies padding exception values for the Scale.
+     * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+     * that end of the domain will not be padded.
      *
      * @param {Scale} scale
-     * @returns {D[][]} An array of extents.
+     * @returns {D[]} An array of extents.
      */
     export interface PaddingExceptionsProvider<D> {
       (scale: Scale<D, any>): D[];
@@ -192,9 +193,9 @@ module Plottable {
     }
 
     /**
-     * Adds an ExtentsProvider to the Scale.
+     * Adds an IncludedValuesProvider to the Scale.
      *
-     * @param {Scales.ExtentsProvider} provider
+     * @param {Scales.IncludedValuesProvider} provider
      * @returns {Sclae} The calling Scale.
      */
     public addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
@@ -204,9 +205,9 @@ module Plottable {
     }
 
     /**
-     * Removes an ExtentsProvider from the Scale.
+     * Removes the IncludedValuesProvider from the Scale.
      *
-     * @param {Scales.ExtentsProvider} provider
+     * @param {Scales.IncludedValuesProvider} provider
      * @returns {Sclae} The calling Scale.
      */
     public removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {

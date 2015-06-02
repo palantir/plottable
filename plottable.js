@@ -1581,9 +1581,9 @@ var Plottable;
             throw new Error("Subclasses should override _setRange");
         };
         /**
-         * Adds an ExtentsProvider to the Scale.
+         * Adds an IncludedValuesProvider to the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
@@ -1592,9 +1592,9 @@ var Plottable;
             return this;
         };
         /**
-         * Removes an ExtentsProvider from the Scale.
+         * Removes the IncludedValuesProvider from the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
@@ -1679,12 +1679,11 @@ var Plottable;
             return extent;
         };
         /**
-         * Adds a padding exception.
+         * Adds a padding exception provider.
          * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
          * that end of the domain will not be padded.
          *
-         * @param {any} key A key that identifies the padding exception.
-         * @param {D} exception
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         QuantitativeScale.prototype.addPaddingExceptionsProvider = function (provider) {
@@ -1693,9 +1692,9 @@ var Plottable;
             return this;
         };
         /**
-         * Removes the padding exception associated with the specified key.
+         * Removes the padding exception provider.
          *
-         * @param {any} key
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         QuantitativeScale.prototype.removePaddingExceptionsProvider = function (provider) {
