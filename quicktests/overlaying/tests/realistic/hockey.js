@@ -14,8 +14,8 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear().domain([0, 80]);
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-  var xLabel = new Plottable.Components.Label("Goals", "horizontal");
-  var yLabel = new Plottable.Components.Label("Assists", "left");
+  var xLabel = new Plottable.Components.Label("Goals", "0");
+  var yLabel = new Plottable.Components.Label("Assists", "270");
 
   var plot = new Plottable.Plots.Scatter(xScale, yScale);
   plot.addDataset(ds);
