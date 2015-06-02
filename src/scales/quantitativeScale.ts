@@ -169,16 +169,7 @@ module Plottable {
       var max = domain[1];
       var minExistsInExceptions = false;
       var maxExistsInExceptions = false;
-      this._paddingExceptions.forEach((value: D) => {
-        if (value === min) {
-          minExistsInExceptions = true;
-        }
-        if (value === max) {
-          maxExistsInExceptions = true;
-        }
-      });
-      // this._paddingExceptionProviders.forEach((provider) => {
-      //   var value = provider(this);
+      // this._paddingExceptions.forEach((value: D) => {
       //   if (value === min) {
       //     minExistsInExceptions = true;
       //   }
@@ -186,6 +177,17 @@ module Plottable {
       //     maxExistsInExceptions = true;
       //   }
       // });
+      this._paddingExceptionsProviders.forEach((provider) => {
+        var values = provider(this);
+        values.forEach((value) => {
+          if (value === min) {
+            minExistsInExceptions = true;
+          }
+          if (value === max) {
+            maxExistsInExceptions = true;
+          }
+        });
+      });
       var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
       var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
       return this._niceDomain([newMin, newMax]);

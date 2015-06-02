@@ -5,6 +5,7 @@ export module Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
+    private _constantBaselineValueProvider: () => number[];
 
     /**
      * An Area Plot draws a filled region (area) between Y and Y0.
@@ -149,10 +150,14 @@ export module Plots {
         return;
       }
 
+      if (this._constantBaselineValueProvider != null) {
+        yScale.removePaddingExceptionsProvider(this._constantBaselineValueProvider);
+        this._constantBaselineValueProvider = null;
+      }
+
       if (constantBaseline != null) {
-        yScale.addPaddingException(this, constantBaseline);
-      } else {
-        yScale.removePaddingException(this);
+        this._constantBaselineValueProvider = () => [constantBaseline];
+        yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
       }
     }
 

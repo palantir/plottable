@@ -8,7 +8,7 @@ export module Plots {
 
     private _baseline: D3.Selection;
     private _baselineValue = 0;
-    private _baselineValueProvider: (scale: Plottable.Scale<X, number>) => number[];
+    private _baselineValueProvider: () => number[];
 
     /**
      * @constructor
@@ -87,7 +87,7 @@ export module Plots {
       if (scale == null) {
         return;
       }
-      scale.addPaddingException(this, 0);
+      scale.addPaddingExceptionsProvider(this._baselineValueProvider);
       scale.addIncludedValuesProvider(this._baselineValueProvider);
     }
 

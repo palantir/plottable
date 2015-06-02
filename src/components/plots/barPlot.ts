@@ -323,7 +323,7 @@ export module Plots {
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
-        qscale.addPaddingException(this, this._baselineValue);
+        qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
         qscale.addIncludedValuesProvider(this._baselineValueProvider);
       }
     }

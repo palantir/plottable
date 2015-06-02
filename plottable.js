@@ -1739,6 +1739,7 @@ var Plottable;
             return domain;
         };
         QuantitativeScale.prototype._padDomain = function (domain) {
+            var _this = this;
             if (domain[0].valueOf() === domain[1].valueOf()) {
                 return this._expandSingleValueDomain(domain);
             }
@@ -1750,16 +1751,7 @@ var Plottable;
             var max = domain[1];
             var minExistsInExceptions = false;
             var maxExistsInExceptions = false;
-            this._paddingExceptions.forEach(function (value) {
-                if (value === min) {
-                    minExistsInExceptions = true;
-                }
-                if (value === max) {
-                    maxExistsInExceptions = true;
-                }
-            });
-            // this._paddingExceptionProviders.forEach((provider) => {
-            //   var value = provider(this);
+            // this._paddingExceptions.forEach((value: D) => {
             //   if (value === min) {
             //     minExistsInExceptions = true;
             //   }
@@ -1767,6 +1759,17 @@ var Plottable;
             //     maxExistsInExceptions = true;
             //   }
             // });
+            this._paddingExceptionsProviders.forEach(function (provider) {
+                var values = provider(_this);
+                values.forEach(function (value) {
+                    if (value === min) {
+                        minExistsInExceptions = true;
+                    }
+                    if (value === max) {
+                        maxExistsInExceptions = true;
+                    }
+                });
+            });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
             return this._niceDomain([newMin, newMax]);
@@ -7370,7 +7373,7 @@ var Plottable;
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
-                    qscale.addPaddingException(this, this._baselineValue);
+                    qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
                     qscale.addIncludedValuesProvider(this._baselineValueProvider);
                 }
             };
@@ -7854,11 +7857,13 @@ var Plottable;
                 if (yScale == null) {
                     return;
                 }
-                if (constantBaseline != null) {
-                    yScale.addPaddingException(this, constantBaseline);
+                if (this._constantBaselineValueProvider != null) {
+                    yScale.removePaddingExceptionsProvider(this._constantBaselineValueProvider);
+                    this._constantBaselineValueProvider = null;
                 }
-                else {
-                    yScale.removePaddingException(this);
+                if (constantBaseline != null) {
+                    this._constantBaselineValueProvider = function () { return [constantBaseline]; };
+                    yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
                 }
             };
             Area.prototype._getResetYFunction = function () {
@@ -8045,7 +8050,7 @@ var Plottable;
                 if (scale == null) {
                     return;
                 }
-                scale.addPaddingException(this, 0);
+                scale.addPaddingExceptionsProvider(this._baselineValueProvider);
                 scale.addIncludedValuesProvider(this._baselineValueProvider);
             };
             StackedArea.prototype._onDatasetUpdate = function () {
