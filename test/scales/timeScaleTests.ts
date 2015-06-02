@@ -21,7 +21,6 @@ describe("TimeScale tests", () => {
     scale.padProportion(0.1);
     assert.operator(scale.domain()[0].getTime(), "<", minValue.getTime(), "left side of domain is normally padded");
     assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(), "right side of domain is normally padded");
-    var exceptionKey = "unitTests";
     scale.addPaddingExceptionsProvider(() => [minValue]);
     assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(), "left side of domain isn't padded if it matches the exception");
     scale.addPaddingExceptionsProvider(() => [maxValue]);
