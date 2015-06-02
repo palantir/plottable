@@ -6746,7 +6746,7 @@ var Plottable;
             return this;
         };
         XYPlot.prototype.autorange = function (scaleName) {
-            if (typeof (scaleName) === "undefined") {
+            if (scaleName == null) {
                 if (this._autoAdjustXScaleDomain) {
                     return "x";
                 }

@@ -164,7 +164,7 @@ module Plottable {
      */
     public autorange(scaleName: string): XYPlot<X, Y>;
     public autorange(scaleName?: string): any {
-      if (typeof(scaleName) === "undefined") {
+      if (scaleName == null) {
         if (this._autoAdjustXScaleDomain) {
           return "x";
         }

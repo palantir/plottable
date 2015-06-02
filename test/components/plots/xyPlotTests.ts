@@ -27,8 +27,9 @@ describe("Plots", () => {
           .renderTo(svg);
     });
 
-    it("autorange getters", () => {
-      plot.autorange("x");
+    it("autorange() getter", () => {
+      assert.deepEqual(plot.autorange(), "none");
+      assert.deepEqual(plot.autorange("x"), plot);
       assert.deepEqual(plot.autorange(), "x");
       plot.autorange("y");
       assert.deepEqual(plot.autorange(), "y");
@@ -37,7 +38,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("autorange invalid inputs", () => {
+    it("autorange() invalid inputs", () => {
       assert.throws(() => {
         plot.autorange("foobar");
       });

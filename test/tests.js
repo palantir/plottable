@@ -2439,8 +2439,9 @@ describe("Plots", function () {
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
-        it("autorange getters", function () {
-            plot.autorange("x");
+        it("autorange() getter", function () {
+            assert.deepEqual(plot.autorange(), "none");
+            assert.deepEqual(plot.autorange("x"), plot);
             assert.deepEqual(plot.autorange(), "x");
             plot.autorange("y");
             assert.deepEqual(plot.autorange(), "y");
@@ -2448,7 +2449,7 @@ describe("Plots", function () {
             assert.deepEqual(plot.autorange(), "none");
             svg.remove();
         });
-        it("autorange invalid inputs", function () {
+        it("autorange() invalid inputs", function () {
             assert.throws(function () {
                 plot.autorange("foobar");
             });
