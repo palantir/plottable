@@ -6049,7 +6049,7 @@ var Plottable;
             this._key2PlotDatasetKey = d3.map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
-            this._extentsProvider = function (scale) { return _this._extentsForScale(scale); };
+            this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
             this._datasetKeysInOrder = [];
             this._nextSeriesIndex = 0;
             this._renderCallback = function (scale) { return _this.render(); };
@@ -6212,7 +6212,7 @@ var Plottable;
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._extentsProvider); });
+            this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             // Filters should never be applied to attributes
@@ -6256,7 +6256,7 @@ var Plottable;
         Plot.prototype._extentsForProperty = function (property) {
             return this._propertyExtents.get(property);
         };
-        Plot.prototype._extentsForScale = function (scale) {
+        Plot.prototype._includedValuesForScale = function (scale) {
             var _this = this;
             if (!this._isAnchored) {
                 return [];
@@ -6445,11 +6445,11 @@ var Plottable;
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
-            scale.removeIncludedValuesProvider(this._extentsProvider);
+            scale.removeIncludedValuesProvider(this._includedValuesProvider);
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
-            scale.addIncludedValuesProvider(this._extentsProvider);
+            scale.addIncludedValuesProvider(this._includedValuesProvider);
         };
         Plot.prototype._propertyProjectors = function () {
             return {};

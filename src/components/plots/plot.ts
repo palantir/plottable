@@ -41,7 +41,7 @@ module Plottable {
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
     protected _attrExtents: D3.Map<any[]>;
-    private _extentsProvider: Scales.IncludedValuesProvider<any>;
+    private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;
     private _animators: {[animator: string]: Animators.Plot} = {};
@@ -64,7 +64,7 @@ module Plottable {
       this._key2PlotDatasetKey = d3.map();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
-      this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
+      this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
       this._datasetKeysInOrder = [];
       this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
@@ -270,7 +270,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._extentsProvider));
+      this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -322,7 +322,7 @@ module Plottable {
       return this._propertyExtents.get(property);
     }
 
-    private _extentsForScale<D>(scale: Scale<D, any>): D[] {
+    private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
       if (!this._isAnchored) {
         return [];
       }
@@ -544,12 +544,12 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
-      scale.removeIncludedValuesProvider(this._extentsProvider);
+      scale.removeIncludedValuesProvider(this._includedValuesProvider);
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
-      scale.addIncludedValuesProvider(this._extentsProvider);
+      scale.addIncludedValuesProvider(this._includedValuesProvider);
     }
 
     protected _propertyProjectors(): AttributeToProjector {
