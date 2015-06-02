@@ -1628,7 +1628,6 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
             this._padProportion = 0.05;
-            this._paddingExceptions = new Plottable.Utils.Map();
             this._includedValues = new Plottable.Utils.Map();
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
@@ -1690,8 +1689,8 @@ var Plottable;
          * @param {D} exception
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        QuantitativeScale.prototype.addPaddingException = function (key, exception) {
-            this._paddingExceptions.set(key, exception);
+        QuantitativeScale.prototype.addPaddingExceptionsProvider = function (provider) {
+            this._paddingExceptionsProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -1701,16 +1700,6 @@ var Plottable;
          * @param {any} key
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        QuantitativeScale.prototype.removePaddingException = function (key) {
-            this._paddingExceptions.delete(key);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
-        QuantitativeScale.prototype.addPaddingExceptionsProvider = function (provider) {
-            this._paddingExceptionsProviders.add(provider);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
         QuantitativeScale.prototype.removePaddingExceptionsProvider = function (provider) {
             this._paddingExceptionsProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
@@ -1751,14 +1740,6 @@ var Plottable;
             var max = domain[1];
             var minExistsInExceptions = false;
             var maxExistsInExceptions = false;
-            // this._paddingExceptions.forEach((value: D) => {
-            //   if (value === min) {
-            //     minExistsInExceptions = true;
-            //   }
-            //   if (value === max) {
-            //     maxExistsInExceptions = true;
-            //   }
-            // });
             this._paddingExceptionsProviders.forEach(function (provider) {
                 var values = provider(_this);
                 values.forEach(function (value) {

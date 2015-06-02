@@ -808,15 +808,13 @@ declare module Plottable {
          * @param {D} exception
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        addPaddingException(key: any, exception: D): QuantitativeScale<D>;
+        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         /**
          * Removes the padding exception associated with the specified key.
          *
          * @param {any} key
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        removePaddingException(key: any): QuantitativeScale<D>;
-        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         /**
          * Gets the padding proportion.
