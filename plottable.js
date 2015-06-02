@@ -1630,6 +1630,7 @@ var Plottable;
             this._padProportion = 0.05;
             this._paddingExceptions = new Plottable.Utils.Map();
             this._includedValues = new Plottable.Utils.Map();
+            this._paddingExceptionProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
             this._domainMin = null;
@@ -1705,6 +1706,16 @@ var Plottable;
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        QuantitativeScale.prototype.addPaddingExceptionProvider = function (provider) {
+            this._paddingExceptionProviders.add(provider);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
+        QuantitativeScale.prototype.removePaddingExceptionProvider = function (provider) {
+            this._paddingExceptionProviders.delete(provider);
+            this._autoDomainIfAutomaticMode();
+            return this;
+        };
         QuantitativeScale.prototype.padProportion = function (padProportion) {
             if (padProportion == null) {
                 return this._padProportion;
@@ -1747,6 +1758,15 @@ var Plottable;
                     maxExistsInExceptions = true;
                 }
             });
+            // this._paddingExceptionProviders.forEach((provider) => {
+            //   var value = provider(this);
+            //   if (value === min) {
+            //     minExistsInExceptions = true;
+            //   }
+            //   if (value === max) {
+            //     maxExistsInExceptions = true;
+            //   }
+            // });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
             return this._niceDomain([newMin, newMax]);

@@ -6,6 +6,7 @@ module Plottable {
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
     private _padProportion = 0.05;
     private _paddingExceptions: Utils.Map<any, D>;
+    private _paddingExceptionProviders: Utils.Set<Scales.PaddingExceptionProvider<D>>;
     private _includedValues: Utils.Map<any, D>;
     private _domainMin: D;
     private _domainMax: D;
@@ -20,6 +21,7 @@ module Plottable {
       super();
       this._paddingExceptions = new Utils.Map<any, D>();
       this._includedValues = new Utils.Map<any, D>();
+      this._paddingExceptionProviders = new Utils.Set<Scales.PaddingExceptionProvider<D>>();
     }
 
     public autoDomain() {
@@ -106,6 +108,18 @@ module Plottable {
       return this;
     }
 
+    public addPaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>) {
+      this._paddingExceptionProviders.add(provider);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
+    public removePaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>) {
+      this._paddingExceptionProviders.delete(provider);
+      this._autoDomainIfAutomaticMode();
+      return this;
+    }
+
     /**
      * Gets the padding proportion.
      */
@@ -163,6 +177,15 @@ module Plottable {
           maxExistsInExceptions = true;
         }
       });
+      // this._paddingExceptionProviders.forEach((provider) => {
+      //   var value = provider(this);
+      //   if (value === min) {
+      //     minExistsInExceptions = true;
+      //   }
+      //   if (value === max) {
+      //     maxExistsInExceptions = true;
+      //   }
+      // });
       var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
       var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
       return this._niceDomain([newMin, newMax]);

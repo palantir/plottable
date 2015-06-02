@@ -681,6 +681,16 @@ declare module Plottable {
         interface IncludedValuesProvider<D> {
             (scale: Scale<D, any>): D[];
         }
+        /**
+         * A function that supplies Extents to a Scale.
+         * An Extent is a request for a set of domain values to be included.
+         *
+         * @param {Scale} scale
+         * @returns {D[][]} An array of extents.
+         */
+        interface PaddingExceptionProvider<D> {
+            (scale: Scale<D, any>): D;
+        }
     }
     class Scale<D, R> {
         /**
@@ -806,6 +816,8 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         removePaddingException(key: any): QuantitativeScale<D>;
+        addPaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>): QuantitativeScale<D>;
+        removePaddingExceptionProvider(provider: Scales.PaddingExceptionProvider<D>): QuantitativeScale<D>;
         /**
          * Gets the padding proportion.
          */

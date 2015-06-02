@@ -16,6 +16,17 @@ module Plottable {
     export interface IncludedValuesProvider<D> {
       (scale: Scale<D, any>): D[];
     }
+
+    /**
+     * A function that supplies Extents to a Scale.
+     * An Extent is a request for a set of domain values to be included.
+     *
+     * @param {Scale} scale
+     * @returns {D[][]} An array of extents.
+     */
+    export interface PaddingExceptionProvider<D> {
+      (scale: Scale<D, any>): D;
+    }
   }
 
   export class Scale<D, R> {
