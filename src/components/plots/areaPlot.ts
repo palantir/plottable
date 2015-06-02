@@ -96,10 +96,7 @@ export module Plots {
     protected _additionalPaint() {
       var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
-      });
+      this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
     private _generateLineDrawSteps() {

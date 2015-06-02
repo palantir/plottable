@@ -4,15 +4,6 @@ module Plottable {
 
   export module Plots {
 
-    /**
-     * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-     */
-    export type PlotDatasetKey = {
-      dataset: Dataset;
-      drawer: Drawer;
-      key: string;
-    }
-
     export type Entity = {
       datum: any;
       index: number;
@@ -35,8 +26,7 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-    protected _datasetKeysInOrder: string[];
+    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: D3.Selection;
     protected _attrBindings: D3.Map<_Projection>;
@@ -47,7 +37,6 @@ module Plottable {
     private _animators: {[animator: string]: Animators.Plot} = {};
 
     protected _animateOnNextRender = true;
-    private _nextSeriesIndex: number;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -61,12 +50,10 @@ module Plottable {
       super();
       this._clipPathEnabled = true;
       this.classed("plot", true);
-      this._key2PlotDatasetKey = d3.map();
+      this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map();
       this._attrExtents = d3.map();
       this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
-      this._datasetKeysInOrder = [];
-      this._nextSeriesIndex = 0;
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map();
@@ -102,14 +89,11 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public addDataset(dataset: Dataset) {
-      var key = "_" + this._nextSeriesIndex++;
-      if (this._key2PlotDatasetKey.has(key)) {
+      if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
       var drawer = this._getDrawer(dataset);
-      var pdk = {drawer: drawer, dataset: dataset, key: key};
-      this._datasetKeysInOrder.push(key);
-      this._key2PlotDatasetKey.set(key, pdk);
+      this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
         this._setupDatasetNodes(dataset);
@@ -121,7 +105,7 @@ module Plottable {
     }
 
     protected _setupDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      var drawer = this._datasetToDrawer.get(dataset);
       drawer.setup(this._renderArea.append("g"));
     }
 
@@ -290,11 +274,7 @@ module Plottable {
         extents: D3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
-      extents.set(key, this._datasetKeysInOrder.map((key) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(key);
-        var dataset = plotDatasetKey.dataset;
-        return this._computeExtent(dataset, accScaleBinding, filter);
-      }));
+      extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
     }
 
     private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
@@ -378,41 +358,25 @@ module Plottable {
      * @returns {Plot} The calling Plot.
      */
     public removeDataset(dataset: Dataset): Plot {
-      var key = this._keyForDataset(dataset);
-      if (key != null && this._key2PlotDatasetKey.has(key)) {
-        var pdk = this._key2PlotDatasetKey.get(key);
+      if (this.datasets().indexOf(dataset) > -1) {
         this._removeDatasetNodes(dataset);
-        pdk.dataset.offUpdate(this._onDatasetUpdateCallback);
-        this._datasetKeysInOrder.splice(this._datasetKeysInOrder.indexOf(key), 1);
-        this._key2PlotDatasetKey.remove(key);
+        dataset.offUpdate(this._onDatasetUpdateCallback);
+        this._datasetToDrawer.delete(dataset);
         this._onDatasetUpdate();
       }
       return this;
     }
 
     protected _removeDatasetNodes(dataset: Dataset) {
-      var drawer = this._key2PlotDatasetKey.get(this._keyForDataset(dataset)).drawer;
+      var drawer = this._datasetToDrawer.get(dataset);
       drawer.remove();
-    }
-
-    /**
-     * Returns the internal key for the Dataset, or undefined if not found
-     */
-    private _keyForDataset(dataset: Dataset) {
-      return this._datasetKeysInOrder[this.datasets().indexOf(dataset)];
-    }
-
-    /**
-     * Returns an array of internal keys corresponding to those Datasets actually on the plot
-     */
-    protected _keysForDatasets(datasets: Dataset[]) {
-      return datasets.map((dataset) => this._keyForDataset(dataset)).filter((key) => key != null);
     }
 
     public datasets(): Dataset[];
     public datasets(datasets: Dataset[]): Plot;
     public datasets(datasets?: Dataset[]): any {
-      var currentDatasets = this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).dataset);
+      var currentDatasets: Dataset[] = [];
+      this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
       if (datasets == null) {
         return currentDatasets;
       }
@@ -422,7 +386,7 @@ module Plottable {
     }
 
     protected _getDrawersInOrder(): Drawer[] {
-      return this._datasetKeysInOrder.map((k) => this._key2PlotDatasetKey.get(k).drawer);
+      return this.datasets().map((dataset) => this._datasetToDrawer.get(dataset));
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
@@ -434,11 +398,9 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        datasets.set(key, this._key2PlotDatasetKey.get(key).dataset.data());
-      });
-      return datasets;
+      var dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      return dataToDraw;
     }
 
     private _paint() {
@@ -446,9 +408,9 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      var times = this._datasetKeysInOrder.map((k, i) =>
+      var times = this.datasets().map((ds, i) =>
         drawers[i].draw(
-          dataToDraw.get(k),
+          dataToDraw.get(ds),
           drawSteps
         ));
       var maxTime = Utils.Methods.max(times, 0);
@@ -463,14 +425,11 @@ module Plottable {
      * @returns {D3.Selection}
      */
     public getAllSelections(datasets = this.datasets()): D3.Selection {
-      var datasetKeyArray = this._keysForDatasets(datasets);
-
       var allSelections: EventTarget[] = [];
 
-      datasetKeyArray.forEach((datasetKey) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(datasetKey);
-        if (plotDatasetKey == null) { return; }
-        var drawer = plotDatasetKey.drawer;
+      datasets.forEach((dataset) => {
+        var drawer = this._datasetToDrawer.get(dataset);
+        if (drawer == null) { return; }
         drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
           allSelections.push(this);
         });
@@ -489,11 +448,7 @@ module Plottable {
     public entities(datasets = this.datasets()): Plots.Entity[] {
       var entities: Plots.Entity[] = [];
       datasets.forEach((dataset) => {
-        var plotDatasetKey = this._key2PlotDatasetKey.get(this._keyForDataset(dataset));
-        if (plotDatasetKey == null) {
-          return;
-        }
-        var drawer = plotDatasetKey.drawer;
+        var drawer = this._datasetToDrawer.get(dataset);
         dataset.data().forEach((datum: any, index: number) => {
           var position = this._pixelPoint(datum, index, dataset);
           if (position.x !== position.x || position.y !== position.y) {

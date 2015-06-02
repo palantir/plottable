@@ -1286,7 +1286,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Rect extends Element {
+        class Rectangle extends Element {
             constructor(dataset: Dataset);
         }
     }
@@ -2291,14 +2291,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        /**
-         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-         */
-        type PlotDatasetKey = {
-            dataset: Dataset;
-            drawer: Drawer;
-            key: string;
-        };
         type Entity = {
             datum: any;
             index: number;
@@ -2318,8 +2310,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-        protected _datasetKeysInOrder: string[];
+        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;
         protected _attrExtents: D3.Map<any[]>;
@@ -2409,16 +2400,12 @@ declare module Plottable {
          */
         removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
-        /**
-         * Returns an array of internal keys corresponding to those Datasets actually on the plot
-         */
-        protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
          *
@@ -2526,7 +2513,7 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
@@ -2614,7 +2601,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
 }
 
@@ -2634,7 +2621,7 @@ declare module Plottable {
              * @param {Scale.Scale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Rect;
+            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -2708,7 +2695,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2744,9 +2731,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _BarAlignmentToFactor: {
-                [alignment: string]: number;
-            };
             protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
@@ -2762,7 +2746,7 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): Bar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
-            protected _getDrawer(dataset: Dataset): Drawers.Rect;
+            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
              * Gets the baseline value.
@@ -2780,16 +2764,9 @@ declare module Plottable {
              */
             baseline(value: number): Bar<X, Y>;
             /**
-             * Sets the bar alignment relative to the independent axis.
-             * A vertical Bar Plot supports "left", "center", "right"
-             * A horizontal Bar Plot supports "top", "center", "bottom"
+             * Get whether bar labels are enabled.
              *
-             * @param {string} alignment The desired alignment.
-             * @returns {Bar} The calling Bar.
-             */
-            barAlignment(alignment: string): Bar<X, Y>;
-            /**
-             * Gets whether labels are enabled.
+             * @returns {boolean} Whether bars should display labels or not.
              */
             labelsEnabled(): boolean;
             /**
@@ -2865,7 +2842,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2895,7 +2872,7 @@ declare module Plottable {
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2960,7 +2937,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
