@@ -27,7 +27,7 @@ export module Plots {
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-    private _baselineValueProvider: (scale: Plottable.Scale<X, Y>) => number[];
+    private _baselineValueProvider: () => number[];
 
     /**
      * @constructor
