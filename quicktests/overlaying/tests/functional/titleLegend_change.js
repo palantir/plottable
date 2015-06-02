@@ -28,8 +28,8 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   if (Plottable.Domainer != null) {
 try {
-    var domainer_X = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0] });
-    var domainer_Y = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0] });
+    var domainer_X = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0]; });
+    var domainer_Y = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0]; });
     xScale.domainer(domainer_X);
     yScale.domainer(domainer_Y);
 } catch (error) {
@@ -40,8 +40,8 @@ try {
 }
   } else {
 try {
-    xScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0] });
-    yScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0] });
+    xScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0]; });
+    yScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0]; });
 } catch (error) {
     xScale.padProportion(0).addPaddingException("overlaying", 0);
     yScale.padProportion(0).addPaddingException("overlaying", 0);
