@@ -1628,7 +1628,6 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
             this._padProportion = 0.05;
-            this._includedValues = new Plottable.Utils.Map();
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1669,8 +1668,7 @@ var Plottable;
                     Plottable.Utils.Methods.min(includedValues, extent[0]),
                     Plottable.Utils.Methods.max(includedValues, extent[1])
                 ];
-                var includedDomain = this._includeValues(combinedExtent);
-                extent = this._padDomain(includedDomain);
+                extent = this._padDomain(combinedExtent);
             }
             if (this._domainMin != null) {
                 extent[0] = this._domainMin;
@@ -1715,17 +1713,6 @@ var Plottable;
             this._padProportion = padProportion;
             this._autoDomainIfAutomaticMode();
             return this;
-        };
-        QuantitativeScale.prototype._includeValues = function (domain) {
-            this._includedValues.forEach(function (value) {
-                if (value < domain[0]) {
-                    domain[0] = value;
-                }
-                if (value > domain[1]) {
-                    domain[1] = value;
-                }
-            });
-            return domain;
         };
         QuantitativeScale.prototype._padDomain = function (domain) {
             var _this = this;

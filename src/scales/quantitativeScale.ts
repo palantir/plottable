@@ -6,7 +6,6 @@ module Plottable {
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
     private _padProportion = 0.05;
     private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
-    private _includedValues: Utils.Map<any, D>;
     private _domainMin: D;
     private _domainMax: D;
 
@@ -18,7 +17,6 @@ module Plottable {
      */
     constructor() {
       super();
-      this._includedValues = new Utils.Map<any, D>();
       this._paddingExceptionsProviders = new Utils.Set<Scales.PaddingExceptionsProvider<D>>();
     }
 
@@ -66,8 +64,7 @@ module Plottable {
           Utils.Methods.min<D>(includedValues, extent[0]),
           Utils.Methods.max<D>(includedValues, extent[1])
         ];
-        var includedDomain = this._includeValues(combinedExtent);
-        extent = this._padDomain(includedDomain);
+        extent = this._padDomain(combinedExtent);
       }
 
       if (this._domainMin != null) {
@@ -129,18 +126,6 @@ module Plottable {
       this._padProportion = padProportion;
       this._autoDomainIfAutomaticMode();
       return this;
-    }
-
-    private _includeValues(domain: D[]) {
-      this._includedValues.forEach((value) => {
-        if (value < domain[0]) {
-          domain[0] = value;
-        }
-        if (value > domain[1]) {
-          domain[1] = value;
-        }
-      });
-      return domain;
     }
 
     private _padDomain(domain: D[]) {
