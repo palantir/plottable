@@ -353,8 +353,7 @@ export module Plots {
     private _drawLabels() {
       var dataToDraw = this._getDataToDraw();
       var labelsTooWide = false;
-      this._datasetKeysInOrder.forEach((k, i) =>
-        labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(k), this._key2PlotDatasetKey.get(k).dataset));
+      this.datasets().forEach((dataset) => labelsTooWide = labelsTooWide || this._drawLabel(dataToDraw.get(dataset), dataset));
       if (this._hideBarsIfAnyAreTooWide && labelsTooWide) {
         this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       }
@@ -492,8 +491,7 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
-        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i, dataset))
                                .filter((d) => d != null)
                                .map((d) => d.valueOf());
@@ -560,17 +558,16 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
+      var dataToDraw = new Utils.Map<Dataset, any[]>();
       var attrToProjector = this._generateAttrToProjector();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+      this.datasets().forEach((dataset: Dataset) => {
         var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
-        datasets.set(key, data);
+        dataToDraw.set(dataset, data);
       });
-      return datasets;
+      return dataToDraw;
     }
   }
 }

@@ -240,8 +240,7 @@ export module Plots {
         return (<Plottable.Scales.Category> scale).rangeBand();
       } else {
         var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-        var accessorData = d3.set(Utils.Methods.flatten(this._datasetKeysInOrder.map((k) => {
-          var dataset = this._key2PlotDatasetKey.get(k).dataset;
+        var accessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
         }))).values().map((value) => +value);
         // Get the absolute difference between min and max
@@ -254,17 +253,16 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = d3.map();
+      var dataToDraw = new Utils.Map<Dataset, any[]>();
       var attrToProjector = this._generateAttrToProjector();
-      this._datasetKeysInOrder.forEach((key: string) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
+      this.datasets().forEach((dataset) => {
         var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                                                    Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
-        datasets.set(key, data);
+        dataToDraw.set(dataset, data);
       });
-      return datasets;
+      return dataToDraw;
     }
 
   }

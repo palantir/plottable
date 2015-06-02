@@ -2298,14 +2298,6 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        /**
-         * A key that is also coupled with a dataset, a drawer and a metadata in Plot.
-         */
-        type PlotDatasetKey = {
-            dataset: Dataset;
-            drawer: Drawer;
-            key: string;
-        };
         type Entity = {
             datum: any;
             index: number;
@@ -2325,8 +2317,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _key2PlotDatasetKey: D3.Map<Plots.PlotDatasetKey>;
-        protected _datasetKeysInOrder: string[];
+        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: D3.Selection;
         protected _attrBindings: D3.Map<_Projection>;
         protected _attrExtents: D3.Map<any[]>;
@@ -2416,16 +2407,12 @@ declare module Plottable {
          */
         removeDataset(dataset: Dataset): Plot;
         protected _removeDatasetNodes(dataset: Dataset): void;
-        /**
-         * Returns an array of internal keys corresponding to those Datasets actually on the plot
-         */
-        protected _keysForDatasets(datasets: Dataset[]): string[];
         datasets(): Dataset[];
         datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
         protected _additionalPaint(time: number): void;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
          *
@@ -2533,7 +2520,7 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             protected _propertyProjectors(): AttributeToProjector;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
@@ -2621,7 +2608,7 @@ declare module Plottable {
         showAllData(): XYPlot<X, Y>;
         protected _projectorsReady(): boolean;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
-        protected _getDataToDraw(): D3.Map<any[]>;
+        protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
     }
 }
 
@@ -2715,7 +2702,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2872,7 +2859,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2902,7 +2889,7 @@ declare module Plottable {
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
@@ -2967,7 +2954,7 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _getDataToDraw(): D3.Map<any[]>;
+            protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
 }
