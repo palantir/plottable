@@ -7,7 +7,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("../overlaying/tests/hockey.csv").get(function(error, rows) {
-  var data = rows.reverse(); 
+  var data = rows; 
   var ds = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 80]);
