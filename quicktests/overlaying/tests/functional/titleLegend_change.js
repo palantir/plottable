@@ -27,13 +27,26 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
   if (Plottable.Domainer != null) {
+try {
+    var domainer_X = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0] });
+    var domainer_Y = new Plottable.Domainer().addPaddingExceptionsProvider(function() { return [0] });
+    xScale.domainer(domainer_X);
+    yScale.domainer(domainer_Y);
+} catch (error) {
     var domainer_X = new Plottable.Domainer().addPaddingException("overlaying", 0);
     var domainer_Y = new Plottable.Domainer().addPaddingException("overlaying", 0);
     xScale.domainer(domainer_X);
     yScale.domainer(domainer_Y);
+}
   } else {
+try {
+    xScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0] });
+    yScale.padProportion(0).addPaddingExceptionsProvider(function() { return [0] });
+} catch (error) {
     xScale.padProportion(0).addPaddingException("overlaying", 0);
     yScale.padProportion(0).addPaddingException("overlaying", 0);
+}
+
   }
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
