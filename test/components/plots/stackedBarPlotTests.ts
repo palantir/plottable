@@ -48,7 +48,7 @@ describe("Plots", () => {
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -172,7 +172,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data4));
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
-      plot.baseline(0);
+      plot.baselineValue(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -239,7 +239,7 @@ describe("Plots", () => {
       renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
       new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();

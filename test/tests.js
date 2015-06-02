@@ -3214,7 +3214,7 @@ describe("Plots", function () {
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
-                barPlot.baseline(0);
+                barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);
@@ -3242,7 +3242,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
-                barPlot.baseline(-1);
+                barPlot.baselineValue(-1);
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -3406,7 +3406,7 @@ describe("Plots", function () {
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
-                barPlot.baseline(0);
+                barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);
@@ -3450,7 +3450,7 @@ describe("Plots", function () {
                 barPlot = new Plottable.Plots.Bar();
                 dataset = new Plottable.Dataset(data);
                 barPlot.addDataset(dataset);
-                barPlot.baseline(0);
+                barPlot.baselineValue(0);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);
                 barPlot.renderTo(svg);
@@ -3546,7 +3546,7 @@ describe("Plots", function () {
                 barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
                 barPlot.addDataset(dataset);
                 barPlot.animate(false);
-                barPlot.baseline(0);
+                barPlot.baselineValue(0);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);
                 barPlot.renderTo(svg);
@@ -3573,7 +3573,7 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("baseline value can be changed; barPlot updates appropriately", function () {
-                barPlot.baseline(-1);
+                barPlot.baselineValue(-1);
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 var bar0 = d3.select(bars[0][0]);
@@ -5169,7 +5169,7 @@ describe("Plots", function () {
             renderer.addDataset(dataset2);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
-            renderer.baseline(0);
+            renderer.baselineValue(0);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
             new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
@@ -5280,7 +5280,7 @@ describe("Plots", function () {
             plot.addDataset(new Plottable.Dataset(data4));
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
-            plot.baseline(0);
+            plot.baselineValue(0);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
             new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
             axisHeight = xAxis.height();
@@ -5339,7 +5339,7 @@ describe("Plots", function () {
             renderer.x(function (d) { return d.y; }, xScale);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
-            renderer.baseline(0);
+            renderer.baselineValue(0);
             var yAxis = new Plottable.Axes.Category(yScale, "left");
             new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
             rendererWidth = renderer.width();
@@ -5581,7 +5581,7 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.ClusteredBar();
             renderer.addDataset(dataset1);
             renderer.addDataset(dataset2);
-            renderer.baseline(0);
+            renderer.baselineValue(0);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -5651,7 +5651,7 @@ describe("Plots", function () {
             renderer = new Plottable.Plots.ClusteredBar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
             renderer.addDataset(new Plottable.Dataset(data1));
             renderer.addDataset(new Plottable.Dataset(data2));
-            renderer.baseline(0);
+            renderer.baselineValue(0);
             renderer.x(function (d) { return d.x; }, xScale);
             renderer.y(function (d) { return d.y; }, yScale);
             var yAxis = new Plottable.Axes.Category(yScale, "left");
@@ -5706,7 +5706,7 @@ describe("Plots", function () {
             plot.addDataset(new Plottable.Dataset(data1));
             plot.addDataset(new Plottable.Dataset(data2));
             plot.addDataset(new Plottable.Dataset(data3));
-            plot.baseline(0);
+            plot.baselineValue(0);
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
             var xAxis = new Plottable.Axes.Category(xScale, "bottom");

@@ -40,7 +40,7 @@ export module Plots {
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("baseline", new Animators.Null());
-      this.baseline(0);
+      this.baselineValue(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
@@ -97,7 +97,7 @@ export module Plots {
      *
      * @returns {number}
      */
-    public baseline(): number;
+    public baselineValue(): number;
     /**
      * Sets the baseline value.
      * The baseline is the line that the bars are drawn from.
@@ -105,8 +105,8 @@ export module Plots {
      * @param {number} value
      * @returns {Bar} The calling Bar Plot.
      */
-    public baseline(value: number): Bar<X, Y>;
-    public baseline(value?: number): any {
+    public baselineValue(value: number): Bar<X, Y>;
+    public baselineValue(value?: number): any {
       if (value == null) {
         return this._baselineValue;
       }
@@ -183,7 +183,7 @@ export module Plots {
      *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
      *     breaking ties with the secondary direction.
      * Returns undefined if no Entity can be found.
-     * 
+     *
      * @param {Point} queryPoint
      * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
@@ -264,7 +264,7 @@ export module Plots {
     public entitiesIn(bounds: Bounds): Entity[];
     /**
      * Gets the Entities that intersect the area defined by the ranges.
-     * 
+     *
      * @param {Range} xRange
      * @param {Range} yRange
      * @returns {Entity[]}
@@ -501,7 +501,7 @@ export module Plots {
         return [];
       }
       var entities = super.entities(datasets);
-      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baseline());
+      var scaledBaseline = (<Scale<any, any>> (this._isVertical ? this.y().scale : this.x().scale)).scale(this.baselineValue());
       entities.forEach((entity) => {
         var bar = entity.selection;
         // Using floored pixel values to account for pixel accuracy inconsistencies across browsers
