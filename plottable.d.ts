@@ -2600,7 +2600,7 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Get the automatic domain adjustment setting for visible points.
+         * Gets the automatic domain adjustment setting for visible points.
          */
         autorange(): string;
         /**

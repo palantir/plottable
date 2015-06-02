@@ -149,7 +149,7 @@ module Plottable {
     }
 
     /**
-     * Get the automatic domain adjustment setting for visible points.
+     * Gets the automatic domain adjustment setting for visible points.
      */
     public autorange(): string;
     /**
@@ -164,7 +164,7 @@ module Plottable {
      */
     public autorange(scaleName: string): XYPlot<X, Y>;
     public autorange(scaleName?: string): any {
-      if (typeof(scaleName) == "undefined") {
+      if (typeof(scaleName) === "undefined") {
         if (this._autoAdjustXScaleDomain) {
           return "x";
         }

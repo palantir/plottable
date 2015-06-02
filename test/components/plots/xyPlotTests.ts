@@ -26,17 +26,17 @@ describe("Plots", () => {
           .y(yAccessor, yScale)
           .renderTo(svg);
     });
-    
+
     it("autorange getters", () => {
       plot.autorange("x");
-      assert.equal(plot.autorange(), "x");
+      assert.deepEqual(plot.autorange(), "x");
       plot.autorange("y");
-      assert.equal(plot.autorange(), "y");
+      assert.deepEqual(plot.autorange(), "y");
       plot.autorange("none");
-      assert.equal(plot.autorange(), "none");
+      assert.deepEqual(plot.autorange(), "none");
       svg.remove();
     });
-    
+
     it("autorange invalid inputs", () => {
       assert.throws(() => {
         plot.autorange("foobar");
