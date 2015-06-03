@@ -1,7 +1,7 @@
 {
   "name": "plottable.js",
   "description": "A library for creating charts out of D3",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "repository": {
     "type": "git",
     "url": "https://github.com/palantir/plottable.git"
