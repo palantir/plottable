@@ -7045,7 +7045,6 @@ var Plottable;
                 }
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("baseline", new Plottable.Animators.Null());
-                this.baselineValue(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
@@ -7094,7 +7093,25 @@ var Plottable;
             };
             Bar.prototype.baselineValue = function (value) {
                 if (value == null) {
-                    return this._baselineValue;
+                    if (this._baselineValue != null) {
+                        return this._baselineValue;
+                    }
+                    if (!this._projectorsReady()) {
+                        Plottable.Utils.Methods.warn("Asking for the baseline value when no scale is attached is not safe");
+                        return 0;
+                    }
+                    var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+                    if (!valueScale) {
+                        Plottable.Utils.Methods.warn("Asking for the baseline value when no value scale is attached is not safe");
+                        return 0;
+                    }
+                    if (valueScale instanceof Plottable.Scales.Time) {
+                        return new Date(0);
+                    }
+                    if (valueScale instanceof Plottable.Scales.Category) {
+                        throw new Error("The value scale cannot be a Category Scale");
+                    }
+                    return 0;
                 }
                 this._baselineValue = value;
                 this._updateValueScale();
@@ -7235,10 +7252,6 @@ var Plottable;
                     return;
                 }
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
-                // HACKHACK #2208
-                if (valueScale instanceof Plottable.Scales.Time && this._baselineValue === 0) {
-                    this.baselineValue(new Date(0));
-                }
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
                     qscale.addPaddingExceptionsProvider(this._baselineValueProvider);

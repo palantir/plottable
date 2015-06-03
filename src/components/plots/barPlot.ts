@@ -42,7 +42,6 @@ export module Plots {
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("baseline", new Animators.Null());
-      this.baselineValue(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
@@ -120,7 +119,27 @@ export module Plots {
     public baselineValue(value: number): Bar<X, Y>;
     public baselineValue(value?: number): any {
       if (value == null) {
-        return this._baselineValue;
+        if (this._baselineValue != null) {
+          return this._baselineValue;
+        }
+        if (!this._projectorsReady()) {
+          Utils.Methods.warn("Asking for the baseline value when no scale is attached is not safe");
+          return 0;
+        }
+        var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+        if (!valueScale) {
+          Utils.Methods.warn("Asking for the baseline value when no value scale is attached is not safe");
+          return 0;
+        }
+
+        if (valueScale instanceof Scales.Time) {
+          return new Date(0);
+        }
+        if (valueScale instanceof Scales.Category) {
+          throw new Error("The value scale cannot be a Category Scale");
+        }
+
+        return 0;
       }
       this._baselineValue = value;
       this._updateValueScale();
@@ -313,10 +332,6 @@ export module Plots {
         return;
       }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
-      // HACKHACK #2208
-      if (valueScale instanceof Scales.Time && this._baselineValue === 0) {
-        this.baselineValue(<any> new Date(0));
-      }
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
         qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
