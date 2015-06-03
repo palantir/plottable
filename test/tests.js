@@ -5877,7 +5877,7 @@ describe("ComponentGroups", function () {
         c1.renderTo(svg);
         componentGroup.remove(c1);
         assert.deepEqual(componentGroup.components(), [c0, c2], "removing a Component not in the Group does not remove Components from the Group");
-        assert.strictEqual(svg.node().childNodes[0], c1._element.node(), "The Component not in the Group stayed put");
+        assert.strictEqual(c1.content().node().ownerSVGElement, svg.node(), "The Component not in the Group stayed put");
         svg.remove();
     });
     it("detach()-ing a Component that is in the Group removes it from the Group", function () {
