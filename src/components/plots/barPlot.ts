@@ -46,7 +46,7 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
-      this._baselineValueProvider = () => [this._baselineValue];
+      this._baselineValueProvider = () => [this.baselineValue()];
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -326,7 +326,7 @@ export module Plots {
 
     protected _additionalPaint(time: number) {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var scaledBaseline = primaryScale.scale(this.baselineValue());
 
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
@@ -362,7 +362,7 @@ export module Plots {
         var primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
         var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var scaledBaseline = primaryScale.scale(this.baselineValue());
         var text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         var w = attrToProjector["width"](d, i, dataset);
         var h = attrToProjector["height"](d, i, dataset);
@@ -417,7 +417,7 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var scaledBaseline = primaryScale.scale(this.baselineValue());
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
@@ -435,7 +435,7 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAttr = this._isVertical ? "y" : "x";
       var secondaryAttr = this._isVertical ? "x" : "y";
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var scaledBaseline = primaryScale.scale(this.baselineValue());
 
       var positionF = this._isVertical ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.y());
       var widthF = attrToProjector["width"];
