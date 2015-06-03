@@ -20,13 +20,13 @@ export module Plots {
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
     private _baseline: d3.Selection<void>;
-    private _baselineValue: number;
+    private _baselineValue: X|Y;
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-    private _baselineValueProvider: () => number[];
+    private _baselineValueProvider: () => (X|Y)[];
 
     /**
      * @constructor
@@ -106,18 +106,18 @@ export module Plots {
      * Gets the baseline value.
      * The baseline is the line that the bars are drawn from.
      *
-     * @returns {number}
+     * @returns {X|Y}
      */
-    public baselineValue(): number;
+    public baselineValue(): X|Y;
     /**
      * Sets the baseline value.
      * The baseline is the line that the bars are drawn from.
      *
-     * @param {number} value
+     * @param {X|Y} value
      * @returns {Bar} The calling Bar Plot.
      */
-    public baselineValue(value: number): Bar<X, Y>;
-    public baselineValue(value?: number): any {
+    public baselineValue(value: X|Y): Bar<X, Y>;
+    public baselineValue(value?: X|Y): any {
       if (value == null) {
         if (this._baselineValue != null) {
           return this._baselineValue;

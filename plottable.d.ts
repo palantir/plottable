@@ -2719,17 +2719,17 @@ declare module Plottable {
              * Gets the baseline value.
              * The baseline is the line that the bars are drawn from.
              *
-             * @returns {number}
+             * @returns {X|Y}
              */
-            baselineValue(): number;
+            baselineValue(): X | Y;
             /**
              * Sets the baseline value.
              * The baseline is the line that the bars are drawn from.
              *
-             * @param {number} value
+             * @param {X|Y} value
              * @returns {Bar} The calling Bar Plot.
              */
-            baselineValue(value: number): Bar<X, Y>;
+            baselineValue(value: X | Y): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
