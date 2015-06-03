@@ -2440,13 +2440,13 @@ describe("Plots", function () {
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
         it("autorange() getter", function () {
-            assert.deepEqual(plot.autorange(), "none");
-            assert.deepEqual(plot.autorange("x"), plot);
-            assert.deepEqual(plot.autorange(), "x");
+            assert.strictEqual(plot.autorange(), "none");
+            assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
+            assert.strictEqual(plot.autorange(), "x");
             plot.autorange("y");
-            assert.deepEqual(plot.autorange(), "y");
+            assert.strictEqual(plot.autorange(), "y");
             plot.autorange("none");
-            assert.deepEqual(plot.autorange(), "none");
+            assert.strictEqual(plot.autorange(), "none");
             svg.remove();
         });
         it("autorange() invalid inputs", function () {

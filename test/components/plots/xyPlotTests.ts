@@ -28,13 +28,13 @@ describe("Plots", () => {
     });
 
     it("autorange() getter", () => {
-      assert.deepEqual(plot.autorange(), "none");
-      assert.deepEqual(plot.autorange("x"), plot);
-      assert.deepEqual(plot.autorange(), "x");
+      assert.strictEqual(plot.autorange(), "none");
+      assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
+      assert.strictEqual(plot.autorange(), "x");
       plot.autorange("y");
-      assert.deepEqual(plot.autorange(), "y");
+      assert.strictEqual(plot.autorange(), "y");
       plot.autorange("none");
-      assert.deepEqual(plot.autorange(), "none");
+      assert.strictEqual(plot.autorange(), "none");
       svg.remove();
     });
 
