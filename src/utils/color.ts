@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Utils {
-  export module Colors {
+  export module Color {
     /**
      * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
      * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)

@@ -622,8 +622,8 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var Colors;
-        (function (Colors) {
+        var Color;
+        (function (Color) {
             /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -653,8 +653,8 @@ var Plottable;
                 var l2 = luminance(b) + 0.05;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
-            Colors.contrast = contrast;
-        })(Colors = Utils.Colors || (Utils.Colors = {}));
+            Color.contrast = contrast;
+        })(Color = Utils.Color || (Utils.Color = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 

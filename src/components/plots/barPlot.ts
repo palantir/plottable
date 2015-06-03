@@ -371,7 +371,7 @@ export module Plots {
         var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         var measurement = measurer.measure(text);
         var color = attrToProjector["fill"](d, i, dataset);
-        var dark = Utils.Colors.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
+        var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
 
