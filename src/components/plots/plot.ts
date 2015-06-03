@@ -29,7 +29,7 @@ module Plottable {
     protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: D3.Selection;
-    protected _attrBindings: D3.Map<_Projection>;
+    protected _attrBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
     protected _attrExtents: D3.Map<any[]>;
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
@@ -84,7 +84,7 @@ module Plottable {
 
     /**
      * Adds a Dataset to the Plot.
-     * 
+     *
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */
@@ -130,13 +130,13 @@ module Plottable {
 
     /**
      * Gets the AccessorScaleBinding for a particular attribute.
-     * 
+     *
      * @param {string} attr
      */
     public attr<A>(attr: string): Plots.AccessorScaleBinding<A, number | string>;
     /**
      * Sets a particular attribute to a constant value or the result of an Accessor.
-     * 
+     *
      * @param {string} attr
      * @param {number|string|Accessor<number>|Accessor<string>} attrValue
      * @returns {Plot} The calling Plot.
@@ -145,7 +145,7 @@ module Plottable {
     /**
      * Sets a particular attribute to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the attribute values when autoDomain()-ing.
-     * 
+     *
      * @param {string} attr
      * @param {A|Accessor<A>} attrValue
      * @param {Scale<A, number | string>} scale The Scale used to scale the attrValue.
@@ -353,7 +353,7 @@ module Plottable {
 
     /**
      * Removes a Dataset from the Plot.
-     * 
+     *
      * @param {Dataset} dataset
      * @returns {Plot} The calling Plot.
      */

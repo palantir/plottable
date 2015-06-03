@@ -91,7 +91,7 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+    protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
