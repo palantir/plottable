@@ -15,6 +15,7 @@ export module Plots {
     protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
+    private static _BAR_AREA_CLASS = "bar-area";
     private static _LABEL_AREA_CLASS = "bar-label-text-area";
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
@@ -171,12 +172,14 @@ export module Plots {
       }
     }
 
-    protected _setupDatasetNodes(dataset: Dataset) {
-      super._setupDatasetNodes(dataset);
+    protected _createNodesForDataset(dataset: Dataset) {
+      var drawer = super._createNodesForDataset(dataset);
+      drawer._getRenderArea().classed(Bar._BAR_AREA_CLASS, true);
       var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
       var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+      return drawer;
     }
 
     protected _removeDatasetNodes(dataset: Dataset) {

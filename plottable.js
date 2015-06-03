@@ -6000,7 +6000,7 @@ var Plottable;
             var _this = this;
             _super.prototype._setup.call(this);
             this._renderArea = this._content.append("g").classed("render-area", true);
-            this.datasets().forEach(function (dataset) { return _this._setupDatasetNodes(dataset); });
+            this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
         };
         Plot.prototype.destroy = function () {
             var _this = this;
@@ -6022,15 +6022,16 @@ var Plottable;
             var drawer = this._getDrawer(dataset);
             this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
-                this._setupDatasetNodes(dataset);
+                this._createNodesForDataset(dataset);
             }
             dataset.onUpdate(this._onDatasetUpdateCallback);
             this._onDatasetUpdate();
             return this;
         };
-        Plot.prototype._setupDatasetNodes = function (dataset) {
+        Plot.prototype._createNodesForDataset = function (dataset) {
             var drawer = this._datasetToDrawer.get(dataset);
             drawer.setup(this._renderArea.append("g"));
+            return drawer;
         };
         Plot.prototype._getDrawer = function (dataset) {
             return new Plottable.Drawer(dataset);
@@ -7120,12 +7121,14 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype._setupDatasetNodes = function (dataset) {
-                _super.prototype._setupDatasetNodes.call(this, dataset);
+            Bar.prototype._createNodesForDataset = function (dataset) {
+                var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
+                drawer._getRenderArea().classed(Bar._BAR_AREA_CLASS, true);
                 var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
                 var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
+                return drawer;
             };
             Bar.prototype._removeDatasetNodes = function (dataset) {
                 _super.prototype._removeDatasetNodes.call(this, dataset);
@@ -7462,6 +7465,7 @@ var Plottable;
             Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
+            Bar._BAR_AREA_CLASS = "bar-area";
             Bar._LABEL_AREA_CLASS = "bar-label-text-area";
             Bar._LABEL_VERTICAL_PADDING = 5;
             Bar._LABEL_HORIZONTAL_PADDING = 5;
