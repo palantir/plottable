@@ -13,11 +13,11 @@ declare module d3 {
      * Find the first element that matches the given selector string.
      */
     export function select(selector: string): Selection<any>;
-    
+
     /**
      * Create a selection from the given node reference.
      */
-    export function select(node: Node): Selection<any>;
+    export function select(node: EventTarget): Selection<any>;
 
     /**
      * Find all elements that match the given selector string.
@@ -27,7 +27,7 @@ declare module d3 {
     /**
      * Create a selection from the given list of nodes.
      */
-    export function selectAll(nodes: Node[]): Selection<any>;
+    export function selectAll(nodes: EventTarget[]): Selection<any>;
 
     /**
      * Returns the root selection (as if by d3.select(document.documentElement)). This function may be used for 'instanceof' tests, and extending its prototype will add properties to all selections.
@@ -40,8 +40,8 @@ declare module d3 {
         /**
          * Selections are grouped into arrays of nodes, with the parent tracked in the 'parentNode' property.
          */
-        interface Group extends Array<Node> {
-            parentNode: Node;
+        interface Group extends Array<EventTarget> {
+            parentNode: EventTarget;
         }
 
         interface Update<Datum> {
@@ -86,7 +86,7 @@ declare module d3 {
             attr(obj: { [key: string]: Primitive | ((datum: Datum, index: number) => Primitive) }): Update<Datum>;
 
             /**
-             * Returns true if the first node in this selection has the given class list. If multiple classes are specified (i.e., "foo bar"), then returns true only if all classes match. 
+             * Returns true if the first node in this selection has the given class list. If multiple classes are specified (i.e., "foo bar"), then returns true only if all classes match.
              *
              * @param name The class list to query.
              */
@@ -221,7 +221,7 @@ declare module d3 {
              *
              * @param name the function to compute a new element
              */
-            append(name: (datum: Datum, index: number) => Node): Update<Datum>;
+            append(name: (datum: Datum, index: number) => EventTarget): Update<Datum>;
 
             /**
              * Inserts a new child to each node in the selection. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
@@ -235,21 +235,21 @@ declare module d3 {
              * @param name the element name to append. May be prefixed (see d3.ns.prefix).
              * @param before a function to determine the node to use as the next sibling
              */
-            insert(name: string, before: (datum: Datum, index: number) => Node): Update<Datum>;
+            insert(name: string, before: (datum: Datum, index: number) => EventTarget): Update<Datum>;
 
             /**
              * Inserts a new child to the end of each node in the selection by computing a new node. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
              * @param name the function to compute a new child
              * @param before the selector to determine position (e.g., ":first-child")
              */
-            insert(name: (datum: Datum, index: number) => Node, before: string): Update<Datum>;
+            insert(name: (datum: Datum, index: number) => EventTarget, before: string): Update<Datum>;
 
             /**
              * Inserts a new child to the end of each node in the selection by computing a new node. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
              * @param name the function to compute a new child
              * @param before a function to determine the node to use as the next sibling
              */
-            insert(name: (datum: Datum, index: number) => Node, before: (datum: Datum, index: number) => Node): Update<Datum>;
+            insert(name: (datum: Datum, index: number) => EventTarget, before: (datum: Datum, index: number) => EventTarget): Update<Datum>;
 
             /**
              * Removes the elements from the DOM. They are in a detached state and may be re-added (though there is currently no dedicated API for doing so).
@@ -351,7 +351,7 @@ declare module d3 {
              * Creates a subselection by using a function to find descendent elements. Bound data is inherited.
              * @param selector the function to find matching descendants
              */
-            select(selector: (datum: Datum, index: number) => Node): Update<Datum>;
+            select(selector: (datum: Datum, index: number) => EventTarget): Update<Datum>;
 
             /**
              * Creates a subselection by finding all descendents that match the given selector. Bound data is not inherited.
@@ -363,7 +363,7 @@ declare module d3 {
              * Creates a subselection by using a function to find descendent elements. Bound data is not inherited.
              * @param selector the function to find matching descendents
              */
-            selectAll(selector: (datum: Datum, index: number) => Array<Node> | NodeList): Update<any>;
+            selectAll(selector: (datum: Datum, index: number) => Array<EventTarget> | NodeList): Update<any>;
 
             /**
              * Invoke the given function for each element in the selection. The return value of the function is ignored.
@@ -386,7 +386,7 @@ declare module d3 {
             /**
              * Returns the first non-null element in the selection, or null otherwise.
              */
-            node(): Node;
+            node(): EventTarget;
 
             /**
              * Returns the total number of elements in the selection.
@@ -406,14 +406,14 @@ declare module d3 {
 
         interface Enter<Datum> {
             append(name: string): Selection<Datum>;
-            append(name: (datum: Datum, index: number) => Node): Selection<Datum>;
+            append(name: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
             insert(name: string, before?: string): Selection<Datum>;
-            insert(name: string, before: (datum: Datum, index: number) => Node): Selection<Datum>;
-            insert(name: (datum: Datum, index: number) => Node, before?: string): Selection<Datum>;
-            insert(name: (datum: Datum, index: number) => Node, before: (datum: Datum, index: number) => Node): Selection<Datum>;
+            insert(name: string, before: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
+            insert(name: (datum: Datum, index: number) => EventTarget, before?: string): Selection<Datum>;
+            insert(name: (datum: Datum, index: number) => EventTarget, before: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
-            select(name: (datum: Datum, index: number) => Node): Selection<Datum>;
+            select(name: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
             call(func: (selection: Enter<Datum>, ...args: any[]) => any, ...args: any[]): Enter<Datum>;
         }
     }
@@ -476,7 +476,7 @@ declare module d3 {
         attr(obj: { [key: string]: Primitive | ((datum: Datum, index: number) => Primitive) }): Selection<Datum>;
 
         /**
-         * Returns true if the first node in this selection has the given class list. If multiple classes are specified (i.e., "foo bar"), then returns true only if all classes match. 
+         * Returns true if the first node in this selection has the given class list. If multiple classes are specified (i.e., "foo bar"), then returns true only if all classes match.
          *
          * @param name The class list to query.
          */
@@ -611,7 +611,7 @@ declare module d3 {
          *
          * @param name the function to compute a new element
          */
-        append(name: (datum: Datum, index: number) => Node): Selection<Datum>;
+        append(name: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
         /**
          * Inserts a new child to each node in the selection. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
@@ -625,21 +625,21 @@ declare module d3 {
          * @param name the element name to append. May be prefixed (see d3.ns.prefix).
          * @param before a function to determine the node to use as the next sibling
          */
-        insert(name: string, before: (datum: Datum, index: number) => Node): Selection<Datum>;
+        insert(name: string, before: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
         /**
          * Inserts a new child to the end of each node in the selection by computing a new node. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
          * @param name the function to compute a new child
          * @param before the selector to determine position (e.g., ":first-child")
          */
-        insert(name: (datum: Datum, index: number) => Node, before: string): Selection<Datum>;
+        insert(name: (datum: Datum, index: number) => EventTarget, before: string): Selection<Datum>;
 
         /**
          * Inserts a new child to the end of each node in the selection by computing a new node. This child will inherit its parent's data (if available). Returns a fresh selection consisting of the newly-inserted children.
          * @param name the function to compute a new child
          * @param before a function to determine the node to use as the next sibling
          */
-        insert(name: (datum: Datum, index: number) => Node, before: (datum: Datum, index: number) => Node): Selection<Datum>;
+        insert(name: (datum: Datum, index: number) => EventTarget, before: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
         /**
          * Removes the elements from the DOM. They are in a detached state and may be re-added (though there is currently no dedicated API for doing so).
@@ -741,7 +741,7 @@ declare module d3 {
          * Creates a subselection by using a function to find descendent elements. Bound data is inherited.
          * @param selector the function to find matching descendants
          */
-        select(selector: (datum: Datum, index: number) => Node): Selection<Datum>;
+        select(selector: (datum: Datum, index: number) => EventTarget): Selection<Datum>;
 
         /**
          * Creates a subselection by finding all descendents that match the given selector. Bound data is not inherited.
@@ -760,7 +760,7 @@ declare module d3 {
          * Creates a subselection by using a function to find descendent elements. Bound data is not inherited.
          * @param selector the function to find matching descendents
          */
-        selectAll(selector: (datum: Datum, index: number) => Array<Node> | NodeList): Selection<any>;
+        selectAll(selector: (datum: Datum, index: number) => Array<EventTarget> | NodeList): Selection<any>;
 
         /**
          * Creates a subselection by using a function to find descendent elements. Bound data is not inherited.
@@ -768,7 +768,7 @@ declare module d3 {
          * Use this overload when data-binding a subselection (that is, sel.selectAll('.foo').data(d => ...)). The type will carry over.
          * @param selector the function to find matching descendents
          */
-        selectAll<T>(selector: (datum: Datum, index: number) => Array<Node> | NodeList): Selection<T>;
+        selectAll<T>(selector: (datum: Datum, index: number) => Array<EventTarget> | NodeList): Selection<T>;
 
         /**
          * Invoke the given function for each element in the selection. The return value of the function is ignored.
@@ -791,7 +791,7 @@ declare module d3 {
         /**
          * Returns the first non-null element in the selection, or null otherwise.
          */
-        node(): Node;
+        node(): EventTarget;
 
         /**
          * Returns the total number of elements in the selection.
@@ -837,10 +837,10 @@ declare module d3 {
         remove(): Transition<Datum>;
 
         select(selector: string): Transition<Datum>;
-        select(selector: (d: Datum, i: number) => Node): Transition<Datum>;
+        select(selector: (d: Datum, i: number) => EventTarget): Transition<Datum>;
 
         selectAll(selector: string): Transition<any>;
-        selectAll(selector: (d: Datum, i: number) => Node[]): Transition<any>;
+        selectAll(selector: (d: Datum, i: number) => EventTarget[]): Transition<any>;
 
         filter(selector: string): Transition<Datum>;
         filter(selector: (d: Datum, i: number) => boolean): Transition<Datum>;
@@ -851,7 +851,7 @@ declare module d3 {
         call(func: (transition: Transition<Datum>, ...args: any[]) => any, ...args: any[]): Transition<Datum>;
 
         empty(): boolean;
-        node(): Node;
+        node(): EventTarget;
         size(): number;
     }
 
@@ -928,20 +928,20 @@ declare module d3 {
      */
     export function mouse(container: EventTarget): [number, number];
 
-    /** 
+    /**
      * Given a container element and a touch identifier, determine the x and y coordinates of the touch.
      * @param container the container element (e.g., an SVG <svg> element)
      * @param identifier the given touch identifier
      */
     export function touch(container: EventTarget, identifer: number): [number, number];
 
-    /** 
+    /**
      * Given a container element, a list of touches, and a touch identifier, determine the x and y coordinates of the touch.
      * @param container the container element (e.g., an SVG <svg> element)
      * @param identifier the given touch identifier
      */
     export function touch(container: EventTarget, touches: TouchList, identifer: number): [number, number];
-    
+
     /**
      * Given a container element and an optional list of touches, return the position of every touch relative to the container.
      * @param container the container element
@@ -1024,7 +1024,7 @@ declare module d3 {
      * Return the min and max simultaneously.
      */
     export function extent(array: number[]): [number, number];
-    
+
     /**
      * Return the min and max simultaneously.
      */
@@ -1172,7 +1172,7 @@ declare module d3 {
          * Calls the function for each key and value pair in the map. The 'this' context is the map itself.
          */
         forEach(func: (key: string, value: T) => any): void;
-        
+
         /**
          * Is this map empty?
          */
@@ -1639,7 +1639,7 @@ declare module d3 {
         export function category20b<Domain extends { toString(): string }>(): Ordinal<Domain, string>;
         export function category20c(): Ordinal<string,string>;
         export function category20c<Domain extends { toString(): string }>(): Ordinal<Domain, string>;
- 
+
         interface Ordinal<Domain extends { toString(): string }, Range> {
             (x: Domain): Range;
 
@@ -1770,7 +1770,7 @@ declare module d3 {
         export function wednesdayOfYear(d: Date): number;
         export function fridayOfYear(d: Date): number;
         export function saturdayOfYear(d: Date): number;
-        
+
         export function format(specifier: string): Format;
 
         export module format {
@@ -1937,7 +1937,7 @@ declare module d3 {
 
             minorStep(): [number, number];
             minorStep(step: [number, number]): Graticule;
-          
+
             precision(): number;
             precision(precision: number): Graticule;
         }
@@ -2649,7 +2649,7 @@ declare module d3 {
         parseRows<T>(string: string, accessor: (row: string[], index: number) => T): T[];
 
         format(rows: Object[]): string;
-        
+
         formatRows(rows: string[][]): string;
     }
 

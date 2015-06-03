@@ -218,7 +218,7 @@ describe("Plots", () => {
         linePlot.addDataset(dataset3);
 
         var nodes = linePlot.entities().map((entity) => entity.selection.node());
-        var uniqueNodes: Node[] = [];
+        var uniqueNodes: EventTarget[] = [];
         nodes.forEach((node) => {
           if (uniqueNodes.indexOf(node) === -1) {
             uniqueNodes.push(node);

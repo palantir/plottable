@@ -60,7 +60,7 @@ module Plottable {
         throw new Error("Can't reuse destroy()-ed Components!");
       }
 
-      if (selection.node().nodeName.toLowerCase() === "svg") {
+      if ((<Node> selection.node()).nodeName.toLowerCase() === "svg") {
         // svg node gets the "plottable" CSS class
         this._rootSVG = selection;
         this._rootSVG.classed("plottable", true);
@@ -71,7 +71,7 @@ module Plottable {
 
       if (this._element != null) {
         // reattach existing element
-        selection.node().appendChild(this._element.node());
+        (<Node> selection.node()).appendChild(<Node> this._element.node());
       } else {
         this._element = selection.append("g");
         this._setup();
@@ -257,7 +257,7 @@ module Plottable {
         } else {
           selection = <d3.Selection<void>> element;
         }
-        if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
+        if (!selection.node() || (<Node> selection.node()).nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
         }
         this.anchor(selection);

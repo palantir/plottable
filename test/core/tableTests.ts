@@ -88,7 +88,7 @@ describe("Tables", () => {
       c1.renderTo(svg);
       var table = new Plottable.Components.Table();
       table.add(c1, 0, 0);
-      assert.isFalse(svg.node().hasChildNodes(), "Component was detach()-ed");
+      assert.isFalse((<Node> svg.node()).hasChildNodes(), "Component was detach()-ed");
       svg.remove();
     });
 

@@ -71,7 +71,7 @@ export module Utils {
         var widthAttr = svg.attr("width");
 
         if (widthAttr.indexOf("%") !== -1) { // percentage
-          var ancestorNode = <Element> svg.node().parentNode;
+          var ancestorNode = <Element> (<Element> svg.node()).parentNode;
           while (ancestorNode != null && ancestorNode.clientWidth === 0) {
             ancestorNode = <Element> ancestorNode.parentNode;
           }

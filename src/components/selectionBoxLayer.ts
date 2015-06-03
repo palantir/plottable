@@ -76,7 +76,7 @@ export module Components {
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
         });
-        this._content.node().appendChild(this._box.node());
+        (<Node> this._content.node()).appendChild(<Node> this._box.node());
       } else {
         this._box.remove();
       }
