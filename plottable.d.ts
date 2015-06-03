@@ -2722,6 +2722,12 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): Bar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Bar<X, Y>;
+            /**
+             * Gets the orientation of the plot
+             *
+             * @return "vertical" | "horizontal"
+             */
+            orientation(): string;
             protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
