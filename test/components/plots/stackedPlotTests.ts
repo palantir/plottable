@@ -297,7 +297,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on numeric", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scales.Linear;
@@ -350,7 +350,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on Category", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scales.Linear;
@@ -402,7 +402,7 @@ describe("Plots", () => {
   });
 
   describe("scale extent updates", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Category;
     var yScale: Plottable.Scales.Linear;
     var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;

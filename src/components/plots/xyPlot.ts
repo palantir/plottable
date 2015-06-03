@@ -232,7 +232,7 @@ module Plottable {
     /**
      * Adjusts the domains of both X and Y scales to show all data.
      * This call does not override the autorange() behavior.
-     * 
+     *
      * @returns {XYPlot} The calling XYPlot.
      */
     public showAllData() {

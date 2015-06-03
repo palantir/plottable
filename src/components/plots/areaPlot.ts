@@ -185,7 +185,7 @@ export module Plots {
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-        return areaGenerator(datum, index);
+        return areaGenerator(datum);
       };
     }
   }

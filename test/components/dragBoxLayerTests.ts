@@ -270,9 +270,9 @@ describe("Interactive Components", () => {
     });
 
     describe("resizing", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dbl: Plottable.Components.DragBoxLayer;
-      var target: D3.Selection;
+      var target: d3.Selection<void>;
       var midPoint = {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT / 2

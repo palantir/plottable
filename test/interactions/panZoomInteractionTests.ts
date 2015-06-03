@@ -4,11 +4,11 @@ var assert = chai.assert;
 
 describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var SVG_WIDTH = 400;
     var SVG_HEIGHT = 500;
 
-    var eventTarget: D3.Selection;
+    var eventTarget: d3.Selection<void>;
 
     var xScale: Plottable.QuantitativeScale<number>;
     var yScale: Plottable.QuantitativeScale<number>;
