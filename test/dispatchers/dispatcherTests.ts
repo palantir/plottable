@@ -10,7 +10,7 @@ describe("Dispatchers", () => {
       var callbackCalls = 0;
       (<any> dispatcher)._event2Callback["click"] = () => callbackCalls++;
 
-      var d3document = d3.select(document);
+      var d3document = d3.select(document.documentElement);
       (<any> dispatcher)._connect();
       TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
@@ -37,7 +37,7 @@ describe("Dispatchers", () => {
       callbackSet.add(callback);
       (<any> dispatcher)._callbacks = [callbackSet];
 
-      var d3document = d3.select(document);
+      var d3document = d3.select(document.documentElement);
       (<any> dispatcher)._connect();
 
       TestMethods.triggerFakeUIEvent("click", d3document);

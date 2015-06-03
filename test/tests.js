@@ -9444,7 +9444,7 @@ describe("Dispatchers", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackCalls = 0;
             dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
-            var d3document = d3.select(document);
+            var d3document = d3.select(document.documentElement);
             dispatcher._connect();
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
@@ -9465,7 +9465,7 @@ describe("Dispatchers", function () {
             var callbackSet = new Plottable.Utils.CallbackSet();
             callbackSet.add(callback);
             dispatcher._callbacks = [callbackSet];
-            var d3document = d3.select(document);
+            var d3document = d3.select(document.documentElement);
             dispatcher._connect();
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.isTrue(callbackWasCalled, "connected correctly (callback was called)");
