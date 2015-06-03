@@ -6,7 +6,7 @@ describe("Utils.DOM", () => {
 
   it("getBBox works properly", () => {
     var svg = TestMethods.generateSVG();
-    var expectedBox = {
+    var expectedBox: { [key: string]: number } = {
       x: 0,
       y: 0,
       width: 40,
@@ -19,7 +19,7 @@ describe("Utils.DOM", () => {
   });
 
   it("getBBox does not fail on disconnected and display:none nodes", () => {
-    var expectedBox = {
+    var expectedBox: { [key: string]: number } = {
       x: 0,
       y: 0,
       width: 40,
@@ -42,7 +42,7 @@ describe("Utils.DOM", () => {
       var parent = TestMethods.getSVGParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
-      var parentElem = parent[0][0];
+      var parentElem = <Element> parent[0][0];
 
       var width = Plottable.Utils.DOM.getElementWidth(parentElem);
       assert.strictEqual(width, 300, "measured width matches set width");
@@ -52,7 +52,7 @@ describe("Utils.DOM", () => {
 
     it("can get the svg's size", () => {
       var svg = TestMethods.generateSVG(450, 120);
-      var svgElem = svg[0][0];
+      var svgElem = <Element> svg[0][0];
 
       var width = Plottable.Utils.DOM.getElementWidth(svgElem);
       assert.strictEqual(width, 450, "measured width matches set width");
@@ -63,9 +63,9 @@ describe("Utils.DOM", () => {
 
     it("can accept multiple units and convert to pixels", () => {
       var parent = TestMethods.getSVGParent();
-      var parentElem = parent[0][0];
+      var parentElem = <Element> parent[0][0];
       var child = parent.append("div");
-      var childElem = child[0][0];
+      var childElem = <Element> child[0][0];
 
       parent.style("width", "200px");
       parent.style("height", "50px");

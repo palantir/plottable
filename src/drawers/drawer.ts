@@ -13,14 +13,14 @@ export module Drawers {
   }
 
   export type AppliedDrawStep = {
-    attrToProjector: AttributeToAppliedProjector;
+    attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animators.Plot;
   }
 
 }
 
   export class Drawer {
-    private _renderArea: D3.Selection;
+    private _renderArea: d3.Selection<void>;
     protected _className: string;
     protected _dataset: Dataset;
 
@@ -34,7 +34,7 @@ export module Drawers {
         this._dataset = dataset;
     }
 
-    public setup(area: D3.Selection) {
+    public setup(area: d3.Selection<void>) {
       this._renderArea = area;
     }
 
@@ -87,9 +87,9 @@ export module Drawers {
      */
     public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
       var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
+        var attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
         return {
-          attrToProjector: appliedAttrToProjector,
+          attrToAppliedProjector: attrToAppliedProjector,
           animator: dr.animator
         };
       });
@@ -109,9 +109,9 @@ export module Drawers {
     /**
      * Retrieves the renderArea selection for the drawer
      *
-     * @returns {D3.Selection} the renderArea selection
+     * @returns {d3.Selection} the renderArea selection
      */
-    public _getRenderArea(): D3.Selection {
+    public _getRenderArea() {
       return this._renderArea;
     }
 
@@ -119,7 +119,7 @@ export module Drawers {
       return "";
     }
 
-    public _getSelection(index: number): D3.Selection {
+    public _getSelection(index: number): d3.Selection<any> {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);
     }

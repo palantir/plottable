@@ -14,7 +14,7 @@ export module Interactions {
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
 
-    private _touchIds: D3.Map<Point>;
+    private _touchIds: d3.Map<Point>;
 
     private _wheelCallback = (p: Point, e: WheelEvent) => this._handleWheelEvent(p, e);
     private _touchStartCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchStart(ids, idToPoint, e);
@@ -37,7 +37,7 @@ export module Interactions {
 
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
-      this._touchIds = d3.map();
+      this._touchIds = d3.map<Point>();
     }
 
     protected _anchor(component: Component) {

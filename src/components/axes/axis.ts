@@ -14,9 +14,9 @@ module Plottable {
      * The css class applied to each tick label (the text associated with the tick).
      */
     public static TICK_LABEL_CLASS = "tick-label";
-    protected _tickMarkContainer: D3.Selection;
-    protected _tickLabelContainer: D3.Selection;
-    protected _baseline: D3.Selection;
+    protected _tickMarkContainer: d3.Selection<void>;
+    protected _tickLabelContainer: d3.Selection<void>;
+    protected _baseline: d3.Selection<void>;
     protected _scale: Scale<D, number>;
     private _formatter: Formatter;
     private _orientation: string;
@@ -155,7 +155,7 @@ module Plottable {
     }
 
     protected _generateBaselineAttrHash() {
-      var baselineAttrHash = {
+      var baselineAttrHash: { [key: string]: number } = {
         x1: 0,
         y1: 0,
         x2: 0,
@@ -164,23 +164,23 @@ module Plottable {
 
       switch (this._orientation) {
         case "bottom":
-          baselineAttrHash.x2 = this.width();
+          baselineAttrHash["x2"] = this.width();
           break;
 
         case "top":
-          baselineAttrHash.x2 = this.width();
-          baselineAttrHash.y1 = this.height();
-          baselineAttrHash.y2 = this.height();
+          baselineAttrHash["x2"] = this.width();
+          baselineAttrHash["y1"] = this.height();
+          baselineAttrHash["y2"] = this.height();
           break;
 
         case "left":
-          baselineAttrHash.x1 = this.width();
-          baselineAttrHash.x2 = this.width();
-          baselineAttrHash.y2 = this.height();
+          baselineAttrHash["x1"] = this.width();
+          baselineAttrHash["x2"] = this.width();
+          baselineAttrHash["y2"] = this.height();
           break;
 
         case "right":
-          baselineAttrHash.y2 = this.height();
+          baselineAttrHash["y2"] = this.height();
           break;
       }
 
@@ -188,11 +188,11 @@ module Plottable {
     }
 
     protected _generateTickMarkAttrHash(isEndTickMark = false) {
-      var tickMarkAttrHash = {
-        x1: <any> 0,
-        y1: <any> 0,
-        x2: <any> 0,
-        y2: <any> 0
+      var tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0
       };
 
       var scalingFunction = (d: any) => this._scale.scale(d);

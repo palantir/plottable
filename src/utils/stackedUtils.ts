@@ -14,20 +14,20 @@ module Plottable {
        * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
        * for drawing purposes.
        *
-       * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
+       * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
       public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
 
         var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
-        var positiveDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+        var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
           return Utils.Methods.populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
-        var negativeDataMapArray: D3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
+        var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
           return Utils.Methods.populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
           });
@@ -53,7 +53,7 @@ module Plottable {
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>,
-          stackOffsets: Utils.Map<Dataset, D3.Map<number>>,
+          stackOffsets: Utils.Map<Dataset, d3.Map<number>>,
           filter: Accessor<boolean>) {
 
         var maxStackExtent = Utils.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
@@ -100,12 +100,12 @@ module Plottable {
        * Feeds the data through d3's stack layout function which will calculate
        * the stack offsets and use the the function declared in .out to set the offsets on the data.
        */
-      private static _stack(dataArray: D3.Map<StackedDatum>[], domainKeys: string[]) {
+      private static _stack(dataArray: d3.Map<StackedDatum>[], domainKeys: string[]) {
         var outFunction = (d: StackedDatum, y0: number, y: number) => {
           d.offset = y0;
         };
 
-        d3.layout.stack()
+        d3.layout.stack<d3.Map<StackedDatum>, StackedDatum>()
           .x((d) => d.key)
           .y((d) => +d.value)
           .values((d) => domainKeys.map((domainKey) => d.get(domainKey)))
@@ -143,14 +143,14 @@ module Plottable {
        */
       private static _generateStackOffsets(
           datasets: Dataset[],
-          positiveDataMapArray: D3.Map<StackedDatum>[],
-          negativeDataMapArray: D3.Map<StackedDatum>[],
+          positiveDataMapArray: d3.Map<StackedDatum>[],
+          negativeDataMapArray: d3.Map<StackedDatum>[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>) {
 
-        var stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+        var stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
         datasets.forEach((dataset, index) => {
-          var datasetOffsets = d3.map();
+          var datasetOffsets = d3.map<number>();
           var positiveDataMap = positiveDataMapArray[index];
           var negativeDataMap = negativeDataMapArray[index];
           var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);

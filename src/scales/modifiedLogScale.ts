@@ -4,7 +4,7 @@ module Plottable {
 export module Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
-    private _d3Scale: D3.Scale.LinearScale;
+    private _d3Scale: d3.scale.Linear<number, number>;
     private _pivot: number;
     private _untransformedDomain: number[];
     private _showIntermediateTicks = false;

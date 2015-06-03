@@ -102,7 +102,7 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };
     }
 

@@ -9,7 +9,7 @@ module Plottable {
       index: number;
       dataset: Dataset;
       position: Point;
-      selection: D3.Selection;
+      selection: d3.Selection<any>;
       plot: Plot;
     }
 
@@ -28,9 +28,9 @@ module Plottable {
     protected _dataChanged = false;
     protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
-    protected _renderArea: D3.Selection;
-    protected _attrBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: D3.Map<any[]>;
+    protected _renderArea: d3.Selection<void>;
+    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    protected _attrExtents: d3.Map<any[]>;
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
     protected _animate: boolean = false;
@@ -40,8 +40,8 @@ module Plottable {
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
-    protected _propertyExtents: D3.Map<any[]>;
-    protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
+    protected _propertyExtents: d3.Map<any[]>;
+    protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
      * @constructor
@@ -51,18 +51,18 @@ module Plottable {
       this._clipPathEnabled = true;
       this.classed("plot", true);
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
-      this._attrBindings = d3.map();
-      this._attrExtents = d3.map();
+      this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+      this._attrExtents = d3.map<any[]>();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
-      this._propertyBindings = d3.map();
-      this._propertyExtents = d3.map();
+      this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
+      this._propertyExtents = d3.map<any[]>();
       this._animators[Plots.Animator.MAIN] = new Animators.Base();
       this._animators[Plots.Animator.RESET] = new Animators.Null();
     }
 
-    public anchor(selection: D3.Selection) {
+    public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
       this._animateOnNextRender = true;
       this._dataChanged = true;
@@ -173,7 +173,7 @@ module Plottable {
     }
 
     private _bind(key: string, value: any, scale: Scale<any, any>,
-                      bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>, extents: D3.Map<any[]>) {
+                      bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>, extents: d3.Map<any[]>) {
       var binding = bindings.get(key);
       var oldScale = binding != null ? binding.scale : null;
 
@@ -270,8 +270,8 @@ module Plottable {
       return null;
     }
 
-    private _updateExtentsForKey(key: string, bindings: D3.Map<Plots.AccessorScaleBinding<any, any>>,
-        extents: D3.Map<any[]>, filter: Accessor<boolean>) {
+    private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
+        extents: d3.Map<any[]>, filter: Accessor<boolean>) {
       var accScaleBinding = bindings.get(key);
       if (accScaleBinding.accessor == null) { return; }
       extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
@@ -422,15 +422,15 @@ module Plottable {
      *
      * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
-     * @returns {D3.Selection}
+     * @returns {d3.Selection}
      */
-    public getAllSelections(datasets = this.datasets()): D3.Selection {
-      var allSelections: EventTarget[] = [];
+    public getAllSelections(datasets = this.datasets()): d3.Selection<any> {
+      var allSelections: Element[] = [];
 
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
           allSelections.push(this);
         });
       });
@@ -491,7 +491,7 @@ module Plottable {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }

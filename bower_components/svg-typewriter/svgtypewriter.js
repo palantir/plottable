@@ -1,5 +1,5 @@
 /*!
-SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -7,7 +7,9 @@ Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICE
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var Methods;
         (function (Methods) {
             /**
              * Check if two arrays are equal by strict equality.
@@ -47,15 +49,15 @@ var SVGTypewriter;
                 return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
-        })(Utils.Methods || (Utils.Methods = {}));
-        var Methods = Utils.Methods;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var DOM;
         (function (DOM) {
             function transform(s, x, y) {
                 var xform = d3.transform(s.attr("transform"));
@@ -87,15 +89,14 @@ var SVGTypewriter;
                 return bbox;
             }
             DOM.getBBox = getBBox;
-        })(Utils.DOM || (Utils.DOM = {}));
-        var DOM = Utils.DOM;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
         var Cache = (function () {
             /**
@@ -137,13 +138,13 @@ var SVGTypewriter;
             return Cache;
         })();
         Utils.Cache = Cache;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
         var Tokenizer = (function () {
             function Tokenizer() {
@@ -178,14 +179,15 @@ var SVGTypewriter;
             return Tokenizer;
         })();
         Utils.Tokenizer = Tokenizer;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var StringMethods;
         (function (StringMethods) {
             /**
              * Treat all sequences of consecutive whitespace as a single " ".
@@ -218,15 +220,14 @@ var SVGTypewriter;
                 return reversedChars.join("");
             }
             StringMethods.trimEnd = trimEnd;
-        })(Utils.StringMethods || (Utils.StringMethods = {}));
-        var StringMethods = Utils.StringMethods;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var BaseAnimator = (function () {
             function BaseAnimator() {
@@ -302,8 +303,7 @@ var SVGTypewriter;
             return BaseAnimator;
         })();
         Animators.BaseAnimator = BaseAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -315,6 +315,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var UnveilAnimator = (function (_super) {
             __extends(UnveilAnimator, _super);
@@ -368,8 +369,7 @@ var SVGTypewriter;
             return UnveilAnimator;
         })(Animators.BaseAnimator);
         Animators.UnveilAnimator = UnveilAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -381,6 +381,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var OpacityAnimator = (function (_super) {
             __extends(OpacityAnimator, _super);
@@ -399,13 +400,13 @@ var SVGTypewriter;
             return OpacityAnimator;
         })(Animators.BaseAnimator);
         Animators.OpacityAnimator = OpacityAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Wrappers;
     (function (Wrappers) {
         var Wrapper = (function () {
             function Wrapper() {
@@ -611,8 +612,7 @@ var SVGTypewriter;
             return Wrapper;
         })();
         Wrappers.Wrapper = Wrapper;
-    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
-    var Wrappers = SVGTypewriter.Wrappers;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -624,6 +624,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Wrappers;
     (function (Wrappers) {
         var SingleLineWrapper = (function (_super) {
             __extends(SingleLineWrapper, _super);
@@ -664,13 +665,13 @@ var SVGTypewriter;
             return SingleLineWrapper;
         })(Wrappers.Wrapper);
         Wrappers.SingleLineWrapper = SingleLineWrapper;
-    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
-    var Wrappers = SVGTypewriter.Wrappers;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Writers;
     (function (Writers) {
         var Writer = (function () {
             function Writer(measurer, wrapper) {
@@ -759,9 +760,14 @@ var SVGTypewriter;
                 var clipPathID = "clipPath" + this._writerID + "_" + elementID;
                 selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
                 var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
-                var attr = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
                 var box = clipPathParent.append("rect");
-                box.classed("clip-rect", true).attr(attr);
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
             };
             Writer.nextID = 0;
             Writer.SupportedRotation = [-90, 0, 180, 90];
@@ -783,13 +789,13 @@ var SVGTypewriter;
             return Writer;
         })();
         Writers.Writer = Writer;
-    })(SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
-    var Writers = SVGTypewriter.Writers;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         ;
         var AbstractMeasurer = (function () {
@@ -845,8 +851,7 @@ var SVGTypewriter;
             return AbstractMeasurer;
         })();
         Measurers.AbstractMeasurer = AbstractMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -858,6 +863,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var Measurer = (function (_super) {
             __extends(Measurer, _super);
@@ -898,8 +904,7 @@ var SVGTypewriter;
             return Measurer;
         })(Measurers.AbstractMeasurer);
         Measurers.Measurer = Measurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -911,6 +916,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var CharacterMeasurer = (function (_super) {
             __extends(CharacterMeasurer, _super);
@@ -931,8 +937,7 @@ var SVGTypewriter;
             return CharacterMeasurer;
         })(Measurers.Measurer);
         Measurers.CharacterMeasurer = CharacterMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -944,6 +949,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var CacheCharacterMeasurer = (function (_super) {
             __extends(CacheCharacterMeasurer, _super);
@@ -964,6 +970,5 @@ var SVGTypewriter;
             return CacheCharacterMeasurer;
         })(Measurers.CharacterMeasurer);
         Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));

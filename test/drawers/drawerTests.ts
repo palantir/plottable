@@ -20,8 +20,8 @@ class MockAnimator implements Plottable.Animators.Plot {
 }
 
 class MockDrawer extends Plottable.Drawer {
-  public _drawStep(step: Plottable.Drawers.DrawStep) {
-    step.animator.animate(this._getRenderArea(), step.attrToProjector);
+  public _drawStep(step: Plottable.Drawers.AppliedDrawStep) {
+    step.animator.animate(this._getRenderArea(), step.attrToAppliedProjector);
   }
 }
 
@@ -29,7 +29,7 @@ describe("Drawers", () => {
   describe("Abstract Drawer", () => {
     var oldTimeout: any;
     var timings: number[] = [];
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var drawer: MockDrawer;
     before(() => {
       oldTimeout = Plottable.Utils.Methods.setTimeout;
