@@ -1015,7 +1015,7 @@ var Plottable;
          * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
          * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
-        function timeIntervalTod3Time(timeInterval) {
+        function timeIntervalToD3Time(timeInterval) {
             switch (timeInterval) {
                 case Plottable.TimeInterval.second:
                     return d3.time.second;
@@ -1035,7 +1035,7 @@ var Plottable;
                     throw Error("TimeInterval specified does not exist: " + timeInterval);
             }
         }
-        Formatters.timeIntervalTod3Time = timeIntervalTod3Time;
+        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
         /**
          * Creates a formatter for relative dates.
          *
@@ -2344,7 +2344,7 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
-                var d3Interval = Plottable.Formatters.timeIntervalTod3Time(interval);
+                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
                 return tempScale.ticks(d3Interval, step);
@@ -3987,7 +3987,7 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var d3Interval = Plottable.Formatters.timeIntervalTod3Time(config.interval);
+                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(config.interval);
                 var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
@@ -5375,10 +5375,10 @@ var Plottable;
                 var swatchX;
                 var swatchY;
                 var boundingBoxAttr = {
-                    "x": 0,
-                    "y": padding,
-                    "width": 0,
-                    "height": 0
+                    x: 0,
+                    y: padding,
+                    width: 0,
+                    height: 0
                 };
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
@@ -8308,10 +8308,10 @@ var Plottable;
                 if (this.isVertical === this.isReverse) {
                     return attrToAppliedProjector[this._getMovingAttr()];
                 }
-                var movingAttrAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
-                var growingAttrAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
+                var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
+                var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
                 return function (d, i) {
-                    return movingAttrAppliedProjector(d, i) + growingAttrAppliedProjector(d, i);
+                    return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
                 };
             };
             Rect.prototype._getGrowingAttr = function () {

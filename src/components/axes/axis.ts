@@ -189,10 +189,10 @@ module Plottable {
 
     protected _generateTickMarkAttrHash(isEndTickMark = false) {
       var tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
-        x1: <any> 0,
-        y1: <any> 0,
-        x2: <any> 0,
-        y2: <any> 0
+        x1: 0,
+        y1: 0,
+        x2: 0,
+        y2: 0
       };
 
       var scalingFunction = (d: any) => this._scale.scale(d);

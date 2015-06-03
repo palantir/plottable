@@ -34,10 +34,10 @@ export module Animators {
       if (this.isVertical === this.isReverse) {
         return attrToAppliedProjector[this._getMovingAttr()];
       }
-      var movingAttrAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
-      var growingAttrAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
+      var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
+      var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
       return (d: any, i: number) => {
-        return movingAttrAppliedProjector(d, i) + growingAttrAppliedProjector(d, i);
+        return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
       };
     }
 

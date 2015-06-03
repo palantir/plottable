@@ -193,7 +193,7 @@ module Plottable {
      * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
      * If the provided TimeInterval is incorrect, the default is d3.time.year
      */
-    export function timeIntervalTod3Time(timeInterval: string) {
+    export function timeIntervalToD3Time(timeInterval: string) {
       switch (timeInterval) {
       case TimeInterval.second:
         return d3.time.second;

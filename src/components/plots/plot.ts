@@ -424,7 +424,6 @@ module Plottable {
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
      * @returns {d3.Selection}
      */
-
     public getAllSelections(datasets = this.datasets()): d3.Selection<any> {
       var allSelections: Element[] = [];
 

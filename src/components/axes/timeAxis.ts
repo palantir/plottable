@@ -281,7 +281,7 @@ export module Axes {
 
     private _getIntervalLength(config: TimeAxisTierConfiguration) {
       var startDate = this._scale.domain()[0];
-      var d3Interval = Formatters.timeIntervalTod3Time(config.interval);
+      var d3Interval = Formatters.timeIntervalToD3Time(config.interval);
       var endDate = d3Interval.offset(startDate, config.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width

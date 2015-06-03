@@ -384,7 +384,7 @@ declare module Plottable {
          * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
          * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
-        function timeIntervalTod3Time(timeInterval: string): d3.time.Interval;
+        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
         /**
          * Creates a formatter for relative dates.
          *

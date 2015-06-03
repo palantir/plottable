@@ -202,11 +202,11 @@ export module Components {
       var swatchX: (d: any, i: number) => number;
       var swatchY: (d: any, i: number) => number;
 
-      var boundingBoxAttr: { [key: string]: number} = {
-        "x": 0,
-        "y": padding,
-        "width": 0,
-        "height": 0
+      var boundingBoxAttr: { [key: string]: number } = {
+        x: 0,
+        y: padding,
+        width: 0,
+        height: 0
       };
 
       if (this._isVertical()) {
