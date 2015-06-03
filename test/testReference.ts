@@ -54,7 +54,7 @@
 ///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
-///<reference path="utils/utilsTests.ts" />
+///<reference path="utils/methodUtilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
 ///<reference path="utils/stackedUtilsTests.ts" />
 
