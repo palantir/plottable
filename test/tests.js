@@ -2456,6 +2456,22 @@ describe("Plots", function () {
                 .y(yAccessor, yScale)
                 .renderTo(svg);
         });
+        it("autorange() getter", function () {
+            assert.strictEqual(plot.autorange(), "none");
+            assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
+            assert.strictEqual(plot.autorange(), "x");
+            plot.autorange("y");
+            assert.strictEqual(plot.autorange(), "y");
+            plot.autorange("none");
+            assert.strictEqual(plot.autorange(), "none");
+            svg.remove();
+        });
+        it("autorange() invalid inputs", function () {
+            assert.throws(function () {
+                plot.autorange("foobar");
+            });
+            svg.remove();
+        });
         it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");

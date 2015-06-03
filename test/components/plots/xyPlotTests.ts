@@ -27,6 +27,24 @@ describe("Plots", () => {
           .renderTo(svg);
     });
 
+    it("autorange() getter", () => {
+      assert.strictEqual(plot.autorange(), "none");
+      assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
+      assert.strictEqual(plot.autorange(), "x");
+      plot.autorange("y");
+      assert.strictEqual(plot.autorange(), "y");
+      plot.autorange("none");
+      assert.strictEqual(plot.autorange(), "none");
+      svg.remove();
+    });
+
+    it("autorange() invalid inputs", () => {
+      assert.throws(() => {
+        plot.autorange("foobar");
+      });
+      svg.remove();
+    });
+
     it("automatically adjusting Y domain over visible points", () => {
       xScale.domain([-3, 3]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
