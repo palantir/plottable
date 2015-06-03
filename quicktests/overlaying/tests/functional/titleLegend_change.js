@@ -28,13 +28,8 @@ function run(svg, data, Plottable) {
   var yScale = new Plottable.Scales.Linear();
   xScale.padProportion(0);
   yScale.padProportion(0);
-  if (typeof xScale.addPaddingExceptionsProvider === "function") {
-    xScale.addPaddingExceptionsProvider(function() { return [0]; });
-    yScale.addPaddingExceptionsProvider(function() { return [0]; });
-  } else {
-    xScale.addPaddingException("overlaying", 0);
-    yScale.addPaddingException("overlaying", 0);
-  }
+  xScale.addPaddingExceptionsProvider(function() { return [0]; });
+  yScale.addPaddingExceptionsProvider(function() { return [0]; });
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
