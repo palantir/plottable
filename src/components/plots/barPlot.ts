@@ -3,7 +3,7 @@
 module Plottable {
 
 type LabelConfig = {
-  labelArea: D3.Selection;
+  labelArea: d3.Selection<void>;
   measurer: SVGTypewriter.Measurers.Measurer;
   writer: SVGTypewriter.Writers.Writer;
 };
@@ -18,7 +18,7 @@ export module Plots {
     private static _LABEL_AREA_CLASS = "bar-label-text-area";
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
-    private _baseline: D3.Selection;
+    private _baseline: d3.Selection<void>;
     private _baselineValue: number;
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
@@ -183,7 +183,7 @@ export module Plots {
      *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
      *     breaking ties with the secondary direction.
      * Returns undefined if no Entity can be found.
-     * 
+     *
      * @param {Point} queryPoint
      * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
      */
@@ -237,10 +237,10 @@ export module Plots {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
-      var barBBox = selection[0][0].getBBox();
+      var barBBox = Utils.DOM.getBBox(selection);
 
       return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
     }
@@ -264,7 +264,7 @@ export module Plots {
     public entitiesIn(bounds: Bounds): Entity[];
     /**
      * Gets the Entities that intersect the area defined by the ranges.
-     * 
+     *
      * @param {Range} xRange
      * @param {Range} yRange
      * @returns {Entity[]}

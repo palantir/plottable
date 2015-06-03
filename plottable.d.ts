@@ -34,33 +34,13 @@ declare module Plottable {
              */
             function addArrays(alist: number[], blist: number[]): number[];
             /**
-             * Takes two sets and returns the intersection
-             *
-             * Due to the fact that D3.Sets store strings internally, return type is always a string set
-             *
-             * @param {D3.Set<T>} set1 The first set
-             * @param {D3.Set<T>} set2 The second set
-             * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
-             */
-            function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
-            /**
-             * Takes two sets and returns the union
-             *
-             * Due to the fact that D3.Sets store strings internally, return type is always a string set
-             *
-             * @param {D3.Set<T>} set1 The first set
-             * @param {D3.Set<T>} set2 The second set
-             * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
-             */
-            function union<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string>;
-            /**
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
              * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {D3.Map<T>} A map mapping keys to their transformed values.
+             * @return {d3.Map<T>} A map mapping keys to their transformed values.
              */
-            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T>;
+            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): d3.Map<T>;
             /**
              * Take an array of values, and return the unique values.
              * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
@@ -136,7 +116,7 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            function colorTest(colorTester: D3.Selection, className: string): string;
+            function colorTest(colorTester: d3.Selection<void>, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             function isIE(): boolean;
@@ -161,15 +141,6 @@ declare module Plottable {
              * @returns {Range} The generated Range
              */
             function parseRange(input: any): Range;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Utils {
-        module D3Scale {
-            function niceDomain<D>(scale: D3.Scale.QuantitativeScale<D>, domain: D[], count?: number): any[];
         }
     }
 }
@@ -256,17 +227,18 @@ declare module Plottable {
         module DOM {
             /**
              * Gets the bounding box of an element.
-             * @param {D3.Selection} element
+             * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element: D3.Selection): SVGRect;
+            function getBBox(element: d3.Selection<any>): SVGRect;
             var POLYFILL_TIMEOUT_MSEC: number;
             function requestAnimationFramePolyfill(fn: () => any): void;
-            function isSelectionRemovedFromSVG(selection: D3.Selection): boolean;
-            function getElementWidth(elem: HTMLScriptElement): number;
-            function getElementHeight(elem: HTMLScriptElement): number;
-            function getSVGPixelWidth(svg: D3.Selection): number;
-            function translate(s: D3.Selection, x?: number, y?: number): any;
+            function isSelectionRemovedFromSVG(selection: d3.Selection<any>): boolean;
+            function getElementWidth(elem: Element): number;
+            function getElementHeight(elem: Element): number;
+            function getSVGPixelWidth(svg: d3.Selection<void>): number;
+            function translate(s: d3.Selection<any>): d3.Transform;
+            function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
             function getBoundingSVG(elem: SVGElement): SVGElement;
@@ -313,16 +285,16 @@ declare module Plottable {
              * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
              * for drawing purposes.
              *
-             * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
+             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
-            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, D3.Map<number>>;
+            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, d3.Map<number>>;
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that
              * accounts for the fact that stacked bits have to be added together when calculating the extent
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, D3.Map<number>>, filter: Accessor<boolean>): number[];
+            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, d3.Map<number>>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
@@ -412,7 +384,7 @@ declare module Plottable {
          * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
          * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
-        function timeIntervalToD3Time(timeInterval: string): D3.Time.Interval;
+        function timeIntervalTod3Time(timeInterval: string): d3.time.Interval;
         /**
          * Creates a formatter for relative dates.
          *
@@ -912,9 +884,9 @@ declare module Plottable {
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             scale(value: number): number;
-            protected _getDomain(): any[];
+            protected _getDomain(): number[];
             protected _setBackingScaleDomain(values: number[]): void;
-            protected _getRange(): any[];
+            protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             invert(value: number): number;
             getDefaultTicks(): number[];
@@ -968,7 +940,7 @@ declare module Plottable {
             showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
-            protected _getRange(): any[];
+            protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             getDefaultTicks(): number[];
         }
@@ -990,8 +962,8 @@ declare module Plottable {
             domain(): string[];
             domain(values: string[]): Category;
             protected _setDomain(values: string[]): void;
-            range(): number[];
-            range(values: number[]): Category;
+            range(): [number, number];
+            range(values: [number, number]): Category;
             /**
              * Returns the width of the range band.
              *
@@ -1043,9 +1015,9 @@ declare module Plottable {
              */
             outerPadding(outerPadding: number): Category;
             scale(value: string): number;
-            protected _getDomain(): any[];
+            protected _getDomain(): string[];
             protected _setBackingScaleDomain(values: string[]): void;
-            protected _getRange(): any[];
+            protected _getRange(): number[];
             protected _setRange(values: number[]): void;
         }
     }
@@ -1074,9 +1046,9 @@ declare module Plottable {
              * @returns {string}
              */
             scale(value: string): string;
-            protected _getDomain(): any[];
+            protected _getDomain(): string[];
             protected _setBackingScaleDomain(values: string[]): void;
-            protected _getRange(): any[];
+            protected _getRange(): string[];
             protected _setRange(values: string[]): void;
         }
     }
@@ -1104,13 +1076,13 @@ declare module Plottable {
             protected _defaultExtent(): Date[];
             protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[];
             scale(value: Date): number;
-            protected _getDomain(): any[];
+            protected _getDomain(): Date[];
             protected _setBackingScaleDomain(values: Date[]): void;
-            protected _getRange(): any[];
+            protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             invert(value: number): Date;
             getDefaultTicks(): Date[];
-            protected _niceDomain(domain: Date[], count?: number): any[];
+            protected _niceDomain(domain: Date[]): Date[];
         }
     }
 }
@@ -1147,7 +1119,7 @@ declare module Plottable {
             colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
-            protected _getDomain(): any[];
+            protected _getDomain(): number[];
             protected _setBackingScaleDomain(values: number[]): void;
             protected _getRange(): string[];
             protected _setRange(values: string[]): void;
@@ -1200,7 +1172,7 @@ declare module Plottable {
             animator: Animators.Plot;
         };
         type AppliedDrawStep = {
-            attrToProjector: AttributeToAppliedProjector;
+            attrToAppliedProjector: AttributeToAppliedProjector;
             animator: Animators.Plot;
         };
     }
@@ -1214,7 +1186,7 @@ declare module Plottable {
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         constructor(dataset: Dataset);
-        setup(area: D3.Selection): void;
+        setup(area: d3.Selection<void>): void;
         /**
          * Removes the Drawer and its renderArea
          */
@@ -1242,11 +1214,11 @@ declare module Plottable {
         /**
          * Retrieves the renderArea selection for the drawer
          *
-         * @returns {D3.Selection} the renderArea selection
+         * @returns {d3.Selection} the renderArea selection
          */
-        _getRenderArea(): D3.Selection;
+        _getRenderArea(): d3.Selection<void>;
         _getSelector(): string;
-        _getSelection(index: number): D3.Selection;
+        _getSelection(index: number): d3.Selection<any>;
     }
 }
 
@@ -1256,11 +1228,11 @@ declare module Plottable {
         class Line extends Drawer {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(line: D3.Selection): void;
+            setup(line: d3.Selection<void>): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
-            _getSelection(index: number): D3.Selection;
+            _getSelection(index: number): d3.Selection<void>;
         }
     }
 }
@@ -1271,7 +1243,7 @@ declare module Plottable {
         class Area extends Line {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(area: D3.Selection): void;
+            setup(area: d3.Selection<void>): void;
             protected _drawStep(step: AppliedDrawStep): void;
             _getSelector(): string;
         }
@@ -1330,19 +1302,19 @@ declare module Plottable {
         }
     }
     class Component {
-        protected _element: D3.Selection;
-        protected _content: D3.Selection;
-        protected _boundingBox: D3.Selection;
+        protected _element: d3.Selection<void>;
+        protected _content: d3.Selection<void>;
+        protected _boundingBox: d3.Selection<void>;
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
         /**
-         * Attaches the Component as a child of a given D3 Selection.
+         * Attaches the Component as a child of a given d3 Selection.
          *
-         * @param {D3.Selection} selection.
+         * @param {d3.Selection} selection.
          * @returns {Component} The calling Component.
          */
-        anchor(selection: D3.Selection): Component;
+        anchor(selection: d3.Selection<void>): Component;
         /**
          * Adds a callback to be called on anchoring the Component to the DOM.
          * If the Component is already anchored, the callback is called immediately.
@@ -1400,10 +1372,10 @@ declare module Plottable {
         /**
          * Renders the Component to a given <svg>.
          *
-         * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
+         * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
-        renderTo(element: String | D3.Selection): Component;
+        renderTo(element: String | d3.Selection<void>): Component;
         /**
          * Gets the x alignment of the Component.
          */
@@ -1504,25 +1476,25 @@ declare module Plottable {
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection}
+         * @return {d3.Selection}
          */
-        foreground(): D3.Selection;
+        foreground(): d3.Selection<void>;
         /**
          * Gets a Selection containing a <g> that holds the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} content selection for the Component
+         * @return {d3.Selection} content selection for the Component
          */
-        content(): D3.Selection;
+        content(): d3.Selection<void>;
         /**
          * Gets the Selection containing the <g> behind the visual elements of the Component.
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} background selection for the Component
+         * @return {d3.Selection} background selection for the Component
          */
-        background(): D3.Selection;
+        background(): d3.Selection<void>;
     }
 }
 
@@ -1530,7 +1502,7 @@ declare module Plottable {
 declare module Plottable {
     class ComponentContainer extends Component {
         constructor();
-        anchor(selection: D3.Selection): ComponentContainer;
+        anchor(selection: d3.Selection<void>): ComponentContainer;
         render(): ComponentContainer;
         /**
          * Checks whether the specified Component is in the ComponentContainer.
@@ -1611,9 +1583,9 @@ declare module Plottable {
          * The css class applied to each tick label (the text associated with the tick).
          */
         static TICK_LABEL_CLASS: string;
-        protected _tickMarkContainer: D3.Selection;
-        protected _tickLabelContainer: D3.Selection;
-        protected _baseline: D3.Selection;
+        protected _tickMarkContainer: d3.Selection<void>;
+        protected _tickLabelContainer: d3.Selection<void>;
+        protected _baseline: d3.Selection<void>;
         protected _scale: Scale<D, number>;
         protected _computedWidth: number;
         protected _computedHeight: number;
@@ -1640,16 +1612,10 @@ declare module Plottable {
         protected _getTickValues(): D[];
         renderImmediately(): Axis<D>;
         protected _generateBaselineAttrHash(): {
-            x1: number;
-            y1: number;
-            x2: number;
-            y2: number;
+            [key: string]: number;
         };
         protected _generateTickMarkAttrHash(isEndTickMark?: boolean): {
-            x1: any;
-            y1: any;
-            x2: any;
-            y2: any;
+            [key: string]: number | ((d: any) => number);
         };
         redraw(): Component;
         protected _setDefaultAlignment(): void;
@@ -2039,9 +2005,9 @@ declare module Plottable {
              * Returns an empty Selection if no entry exists at that pixel position.
              *
              * @param {Point} position
-             * @returns {D3.Selection}
+             * @returns {d3.Selection}
              */
-            getEntry(position: Point): D3.Selection;
+            getEntry(position: Point): d3.Selection<void>;
             renderImmediately(): Legend;
             /**
              * Gets the SymbolFactory accessor of the Legend.
@@ -2258,7 +2224,7 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class SelectionBoxLayer extends Component {
-            protected _box: D3.Selection;
+            protected _box: d3.Selection<void>;
             constructor();
             protected _setup(): void;
             protected _getSize(availableWidth: number, availableHeight: number): {
@@ -2303,7 +2269,7 @@ declare module Plottable {
             index: number;
             dataset: Dataset;
             position: Point;
-            selection: D3.Selection;
+            selection: d3.Selection<any>;
             plot: Plot;
         };
         interface AccessorScaleBinding<D, R> {
@@ -2318,18 +2284,18 @@ declare module Plottable {
     class Plot extends Component {
         protected _dataChanged: boolean;
         protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
-        protected _renderArea: D3.Selection;
-        protected _attrBindings: D3.Map<_Projection>;
-        protected _attrExtents: D3.Map<any[]>;
+        protected _renderArea: d3.Selection<void>;
+        protected _attrBindings: d3.Map<_Projection>;
+        protected _attrExtents: d3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
-        protected _propertyExtents: D3.Map<any[]>;
-        protected _propertyBindings: D3.Map<Plots.AccessorScaleBinding<any, any>>;
+        protected _propertyExtents: d3.Map<any[]>;
+        protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
          * @constructor
          */
         constructor();
-        anchor(selection: D3.Selection): Plot;
+        anchor(selection: d3.Selection<void>): Plot;
         protected _setup(): void;
         destroy(): void;
         /**
@@ -2418,9 +2384,9 @@ declare module Plottable {
          *
          * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
-         * @returns {D3.Selection}
+         * @returns {d3.Selection}
          */
-        getAllSelections(datasets?: Dataset[]): D3.Selection;
+        getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2436,7 +2402,7 @@ declare module Plottable {
          * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
          */
         entityNearest(queryPoint: Point): Plots.Entity;
-        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
@@ -2726,7 +2692,7 @@ declare module Plottable {
             symbol(): AccessorScaleBinding<any, any>;
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2807,7 +2773,7 @@ declare module Plottable {
              * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
              */
             entityNearest(queryPoint: Point): Plots.Entity;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean;
+            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
@@ -2920,7 +2886,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[]): D3._Selection<any>;
+            getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
             protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
@@ -3017,16 +2983,16 @@ declare module Plottable {
     module Animators {
         interface Plot {
             /**
-             * Applies the supplied attributes to a D3.Selection with some animation.
+             * Applies the supplied attributes to a d3.Selection with some animation.
              *
-             * @param {D3.Selection} selection The update selection or transition selection that we wish to animate.
-             * @param {AttributeToProjector} attrToProjector The set of
-             *     IAccessors that we will use to set attributes on the selection.
+             * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+             * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+             *     AppliedProjectors that we will use to set attributes on the selection.
              * @return {any} Animators should return the selection or
              *     transition object so that plots may chain the transitions between
              *     animators.
              */
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection | D3.Transition.Transition;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
             /**
              * Given the number of elements, return the total time the animation requires
              * @param number numberofIterations The number of elements that will be drawn
@@ -3049,7 +3015,7 @@ declare module Plottable {
          */
         class Null implements Animators.Plot {
             getTiming(selection: any): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
         }
     }
 }
@@ -3097,7 +3063,7 @@ declare module Plottable {
              */
             constructor();
             getTiming(numberOfIterations: number): number;
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
              * Gets the duration of the animation in milliseconds.
              *
@@ -3178,8 +3144,8 @@ declare module Plottable {
             isVertical: boolean;
             isReverse: boolean;
             constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition;
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): (datum: any, index: number, dataset: Dataset) => any;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
+            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): (datum: any, index: number) => any;
         }
     }
 }
@@ -3203,7 +3169,7 @@ declare module Plottable {
              * @param {boolean} isVertical If the movement/animation is vertical
              */
             constructor(startPixelValue: number, isVertical?: boolean);
-            protected _startMovingProjector(attrToProjector: AttributeToProjector): (p: any) => number;
+            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): () => number;
         }
     }
 }

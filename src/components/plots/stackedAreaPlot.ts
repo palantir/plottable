@@ -3,10 +3,10 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
+    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
     private _stackedExtent: number[];
 
-    private _baseline: D3.Selection;
+    private _baseline: d3.Selection<void>;
     private _baselineValue = 0;
 
     /**
@@ -18,7 +18,7 @@ export module Plots {
       super();
       this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
-      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
       this._stackedExtent = [];
     }
 

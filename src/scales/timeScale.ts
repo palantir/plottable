@@ -3,7 +3,7 @@
 module Plottable {
 export module Scales {
   export class Time extends QuantitativeScale<Date> {
-    private _d3Scale: D3.Scale.TimeScale;
+    private _d3Scale: d3.time.Scale<number, number>;
     /**
      * A Time Scale maps Date objects to numbers.
      *
@@ -24,10 +24,10 @@ export module Scales {
     public tickInterval(interval: string, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
-      var d3Interval = Formatters.timeIntervalToD3Time(interval);
+      var d3Interval: d3.time.Interval = Formatters.timeIntervalTod3Time(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
-      return tempScale.ticks(d3Interval.range, step);
+      return tempScale.ticks(d3Interval, step);
     }
 
     protected _setDomain(values: Date[]) {
@@ -80,8 +80,8 @@ export module Scales {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 
-    protected _niceDomain(domain: Date[], count?: number) {
-      return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
+    protected _niceDomain(domain: Date[]) {
+      return this._d3Scale.copy().domain(domain).nice().domain();
     }
   }
 }

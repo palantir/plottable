@@ -62,49 +62,14 @@ export module Utils {
     }
 
     /**
-     * Takes two sets and returns the intersection
-     *
-     * Due to the fact that D3.Sets store strings internally, return type is always a string set
-     *
-     * @param {D3.Set<T>} set1 The first set
-     * @param {D3.Set<T>} set2 The second set
-     * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
-     */
-    export function intersection<T>(set1: D3.Set<T>, set2: D3.Set<T>): D3.Set<string> {
-      var set: D3.Set<string> = d3.set();
-      set1.forEach((v) => {
-        if (set2.has(<any> v)) { // checking a string is always appropriate due to d3.set implementation
-          set.add(v);
-        }
-      });
-      return set;
-    }
-
-    /**
-     * Takes two sets and returns the union
-     *
-     * Due to the fact that D3.Sets store strings internally, return type is always a string set
-     *
-     * @param {D3.Set<T>} set1 The first set
-     * @param {D3.Set<T>} set2 The second set
-     * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
-     */
-    export function union<T>(set1: D3.Set<T>, set2: D3.Set<T>) {
-      var set: D3.Set<string> = d3.set();
-      set1.forEach((v) => set.add(v));
-      set2.forEach((v) => set.add(v));
-      return set;
-    }
-
-    /**
      * Populates a map from an array of keys and a transformation function.
      *
      * @param {string[]} keys The array of keys.
      * @param {(string, number) => T} transform A transformation function to apply to the keys.
-     * @return {D3.Map<T>} A map mapping keys to their transformed values.
+     * @return {d3.Map<T>} A map mapping keys to their transformed values.
      */
-    export function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): D3.Map<T> {
-      var map: D3.Map<T> = d3.map();
+    export function populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
+      var map = d3.map<T>();
       keys.forEach((key: string, i: number) => {
         map.set(key, transform(key, i));
       });
@@ -119,11 +84,11 @@ export module Utils {
      * @return {T[]} The unique values
      */
     export function uniq<T>(arr: T[]): T[] {
-      var seen: D3.Set<T> = d3.set();
+      var seen: d3.Set = d3.set();
       var result: T[] = [];
       arr.forEach((x) => {
-        if (!seen.has(x)) {
-          seen.add(x);
+        if (!seen.has(String(x))) {
+          seen.add(String(x));
           result.push(x);
         }
       });
@@ -278,7 +243,7 @@ export module Utils {
       }
     }
 
-    export function colorTest(colorTester: D3.Selection, className: string) {
+    export function colorTest(colorTester: d3.Selection<void>, className: string) {
       colorTester.classed(className, true);
       // Use regex to get the text inside the rgb parentheses
       var colorStyle = colorTester.style("background-color");
@@ -301,7 +266,7 @@ export module Utils {
     }
 
     export function lightenColor(color: string, factor: number) {
-      var hsl = <D3.Color.HSLColor> d3.hsl(color).brighter(factor);
+      var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
       return hsl.rgb().toString();
     }
 

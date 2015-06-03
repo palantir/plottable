@@ -4,10 +4,10 @@ export module Utils {
   export module DOM {
     /**
      * Gets the bounding box of an element.
-     * @param {D3.Selection} element
+     * @param {d3.Selection} element
      * @returns {SVGRed} The bounding box.
      */
-    export function getBBox(element: D3.Selection): SVGRect {
+    export function getBBox(element: d3.Selection<any>): SVGRect {
       var bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
@@ -38,7 +38,7 @@ export module Utils {
       return parsedValue;
     }
 
-    export function isSelectionRemovedFromSVG(selection: D3.Selection) {
+    export function isSelectionRemovedFromSVG(selection: d3.Selection<any>) {
       var n = (<Node> selection.node());
       while (n !== null && n.nodeName.toLowerCase() !== "svg") {
         n = n.parentNode;
@@ -46,7 +46,7 @@ export module Utils {
       return (n == null);
     }
 
-    export function getElementWidth(elem: HTMLScriptElement): number {
+    export function getElementWidth(elem: Element): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
@@ -55,7 +55,7 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(elem: HTMLScriptElement): number {
+    export function getElementHeight(elem: Element): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")
@@ -64,8 +64,8 @@ export module Utils {
         + getParsedStyleValue(style, "border-bottom-width");
     }
 
-    export function getSVGPixelWidth(svg: D3.Selection) {
-      var width = svg.node().clientWidth;
+    export function getSVGPixelWidth(svg: d3.Selection<void>) {
+      var width = (<Element> svg.node()).clientWidth;
 
       if (width === 0) { // Firefox bug #874811
         var widthAttr = svg.attr("width");
@@ -87,7 +87,9 @@ export module Utils {
       return width;
     }
 
-    export function translate(s: D3.Selection, x?: number, y?: number) {
+    export function translate(s: d3.Selection<any>): d3.Transform;
+    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>
+    export function translate(s: d3.Selection<any>, x?: number, y?: number): any {
       var xform = d3.transform(s.attr("transform"));
       if (x == null) {
         return xform.translate;

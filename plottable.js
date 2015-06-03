@@ -70,46 +70,11 @@ var Plottable;
             }
             Methods.addArrays = addArrays;
             /**
-             * Takes two sets and returns the intersection
-             *
-             * Due to the fact that D3.Sets store strings internally, return type is always a string set
-             *
-             * @param {D3.Set<T>} set1 The first set
-             * @param {D3.Set<T>} set2 The second set
-             * @return {D3.Set<string>} A set that contains elements that appear in both set1 and set2
-             */
-            function intersection(set1, set2) {
-                var set = d3.set();
-                set1.forEach(function (v) {
-                    if (set2.has(v)) {
-                        set.add(v);
-                    }
-                });
-                return set;
-            }
-            Methods.intersection = intersection;
-            /**
-             * Takes two sets and returns the union
-             *
-             * Due to the fact that D3.Sets store strings internally, return type is always a string set
-             *
-             * @param {D3.Set<T>} set1 The first set
-             * @param {D3.Set<T>} set2 The second set
-             * @return {D3.Set<string>} A set that contains elements that appear in either set1 or set2
-             */
-            function union(set1, set2) {
-                var set = d3.set();
-                set1.forEach(function (v) { return set.add(v); });
-                set2.forEach(function (v) { return set.add(v); });
-                return set;
-            }
-            Methods.union = union;
-            /**
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
              * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {D3.Map<T>} A map mapping keys to their transformed values.
+             * @return {d3.Map<T>} A map mapping keys to their transformed values.
              */
             function populateMap(keys, transform) {
                 var map = d3.map();
@@ -130,8 +95,8 @@ var Plottable;
                 var seen = d3.set();
                 var result = [];
                 arr.forEach(function (x) {
-                    if (!seen.has(x)) {
-                        seen.add(x);
+                    if (!seen.has(String(x))) {
+                        seen.add(String(x));
                         result.push(x);
                     }
                 });
@@ -363,21 +328,6 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var D3Scale;
-        (function (D3Scale) {
-            function niceDomain(scale, domain, count) {
-                return scale.copy().domain(domain).nice(count).domain();
-            }
-            D3Scale.niceDomain = niceDomain;
-        })(D3Scale = Utils.D3Scale || (Utils.D3Scale = {}));
-    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Utils;
-    (function (Utils) {
         /**
          * Shim for ES6 map.
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
@@ -537,7 +487,7 @@ var Plottable;
         (function (DOM) {
             /**
              * Gets the bounding box of an element.
-             * @param {D3.Selection} element
+             * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
             function getBBox(element) {
@@ -758,7 +708,7 @@ var Plottable;
              * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
              * for drawing purposes.
              *
-             * @return {Utils.Map<Dataset, D3.Map<number>>} A map from each dataset to the offset of each datapoint
+             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
             Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
                 var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
@@ -1065,7 +1015,7 @@ var Plottable;
          * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
          * If the provided TimeInterval is incorrect, the default is d3.time.year
          */
-        function timeIntervalToD3Time(timeInterval) {
+        function timeIntervalTod3Time(timeInterval) {
             switch (timeInterval) {
                 case Plottable.TimeInterval.second:
                     return d3.time.second;
@@ -1085,7 +1035,7 @@ var Plottable;
                     throw Error("TimeInterval specified does not exist: " + timeInterval);
             }
         }
-        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
+        Formatters.timeIntervalTod3Time = timeIntervalTod3Time;
         /**
          * Creates a formatter for relative dates.
          *
@@ -1119,27 +1069,27 @@ var Plottable;
     var SymbolFactories;
     (function (SymbolFactories) {
         function circle() {
-            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null); };
         }
         SymbolFactories.circle = circle;
         function square() {
-            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(null); };
         }
         SymbolFactories.square = square;
         function cross() {
-            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null); };
         }
         SymbolFactories.cross = cross;
         function diamond() {
-            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(); };
+            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null); };
         }
         SymbolFactories.diamond = diamond;
         function triangleUp() {
-            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
         }
         SymbolFactories.triangleUp = triangleUp;
         function triangleDown() {
-            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(); };
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
         }
         SymbolFactories.triangleDown = triangleDown;
     })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
@@ -1814,6 +1764,7 @@ var Plottable;
             return this;
         };
         QuantitativeScale.prototype.extentOfValues = function (values) {
+            // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
             var extent = d3.extent(values);
             if (extent[0] == null || extent[1] == null) {
                 return [];
@@ -1920,7 +1871,7 @@ var Plottable;
                 return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
             };
             Linear.prototype._niceDomain = function (domain, count) {
-                return Plottable.Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
+                return this._d3Scale.copy().domain(domain).nice(count).domain();
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -2393,10 +2344,10 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(interval);
+                var d3Interval = Plottable.Formatters.timeIntervalTod3Time(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
-                return tempScale.ticks(d3Interval.range, step);
+                return tempScale.ticks(d3Interval, step);
             };
             Time.prototype._setDomain = function (values) {
                 if (values[1] < values[0]) {
@@ -2438,8 +2389,8 @@ var Plottable;
             Time.prototype.getDefaultTicks = function () {
                 return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
             };
-            Time.prototype._niceDomain = function (domain, count) {
-                return Plottable.Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
+            Time.prototype._niceDomain = function (domain) {
+                return this._d3Scale.copy().domain(domain).nice().domain();
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -2490,7 +2441,7 @@ var Plottable;
                 if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                this._d3Scale = this._D3InterpolatedScale();
+                this._d3Scale = this._d3InterpolatedScale();
             }
             InterpolatedColor.prototype.extentOfValues = function (values) {
                 var extent = d3.extent(values);
@@ -2503,16 +2454,12 @@ var Plottable;
             };
             /**
              * Generates the converted QuantitativeScale.
-             *
-             * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
              */
-            InterpolatedColor.prototype._D3InterpolatedScale = function () {
+            InterpolatedColor.prototype._d3InterpolatedScale = function () {
                 return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
             };
             /**
              * Generates the d3 interpolator for colors.
-             *
-             * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
              */
             InterpolatedColor.prototype._interpolateColors = function () {
                 var colors = this._colorRange;
@@ -2520,7 +2467,7 @@ var Plottable;
                     throw new Error("Color scale arrays must have at least two elements.");
                 }
                 ;
-                return function (ignored) {
+                return function (a, b) {
                     return function (t) {
                         // Clamp t parameter to [0,1]
                         t = Math.max(0, Math.min(1, t));
@@ -2543,7 +2490,7 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype._resetScale = function () {
-                this._d3Scale = this._D3InterpolatedScale();
+                this._d3Scale = this._d3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
                 this._dispatchUpdate();
             };
@@ -2556,7 +2503,6 @@ var Plottable;
                 return this;
             };
             InterpolatedColor.prototype.scale = function (value) {
-                // HACKHACK D3 Quantitative Scales should return their interpolator return type
                 return this._d3Scale(value);
             };
             InterpolatedColor.prototype._getDomain = function () {
@@ -2729,9 +2675,9 @@ var Plottable;
         Drawer.prototype.draw = function (data, drawSteps) {
             var _this = this;
             var appliedDrawSteps = drawSteps.map(function (dr) {
-                var appliedAttrToProjector = _this._appliedProjectors(dr.attrToProjector);
+                var attrToAppliedProjector = _this._appliedProjectors(dr.attrToProjector);
                 return {
-                    attrToProjector: appliedAttrToProjector,
+                    attrToAppliedProjector: attrToAppliedProjector,
                     animator: dr.animator
                 };
             });
@@ -2747,7 +2693,7 @@ var Plottable;
         /**
          * Retrieves the renderArea selection for the drawer
          *
-         * @returns {D3.Selection} the renderArea selection
+         * @returns {d3.Selection} the renderArea selection
          */
         Drawer.prototype._getRenderArea = function () {
             return this._renderArea;
@@ -2792,7 +2738,7 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToAppliedProjector);
                 step.animator.animate(this._pathSelection, attrToProjector);
                 this._pathSelection.classed(Line.PATH_CLASS, true);
             };
@@ -2833,7 +2779,7 @@ var Plottable;
                 this._areaSelection = area.append("path").style("stroke", "none");
             };
             Area.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToProjector);
+                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToAppliedProjector);
                 step.animator.animate(this._areaSelection, attrToProjector);
                 this._areaSelection.classed(Area.PATH_CLASS, true);
             };
@@ -2869,10 +2815,10 @@ var Plottable;
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
                 var drawSelection = this._getDrawSelection();
-                if (step.attrToProjector["fill"]) {
-                    drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
+                if (step.attrToAppliedProjector["fill"]) {
+                    drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
                 }
-                step.animator.animate(drawSelection, step.attrToProjector);
+                step.animator.animate(drawSelection, step.attrToAppliedProjector);
             };
             Element.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
@@ -2996,9 +2942,9 @@ var Plottable;
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
         }
         /**
-         * Attaches the Component as a child of a given D3 Selection.
+         * Attaches the Component as a child of a given d3 Selection.
          *
-         * @param {D3.Selection} selection.
+         * @param {d3.Selection} selection.
          * @returns {Component} The calling Component.
          */
         Component.prototype.anchor = function (selection) {
@@ -3179,7 +3125,7 @@ var Plottable;
         /**
          * Renders the Component to a given <svg>.
          *
-         * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
+         * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
          * @returns {Component} The calling Component.
          */
         Component.prototype.renderTo = function (element) {
@@ -3199,7 +3145,7 @@ var Plottable;
             }
             if (this._element == null) {
                 throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a D3.Selection, or a selector string");
+          or a d3.Selection, or a selector string");
             }
             this.computeLayout();
             this.render();
@@ -3400,7 +3346,7 @@ var Plottable;
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection}
+         * @return {d3.Selection}
          */
         Component.prototype.foreground = function () {
             return this._foregroundContainer;
@@ -3410,7 +3356,7 @@ var Plottable;
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} content selection for the Component
+         * @return {d3.Selection} content selection for the Component
          */
         Component.prototype.content = function () {
             return this._content;
@@ -3420,7 +3366,7 @@ var Plottable;
          *
          * Will return undefined if the Component has not been anchored.
          *
-         * @return {D3.Selection} background selection for the Component
+         * @return {d3.Selection} background selection for the Component
          */
         Component.prototype.background = function () {
             return this._backgroundContainer;
@@ -3753,20 +3699,20 @@ var Plottable;
             };
             switch (this._orientation) {
                 case "bottom":
-                    baselineAttrHash.x2 = this.width();
+                    baselineAttrHash["x2"] = this.width();
                     break;
                 case "top":
-                    baselineAttrHash.x2 = this.width();
-                    baselineAttrHash.y1 = this.height();
-                    baselineAttrHash.y2 = this.height();
+                    baselineAttrHash["x2"] = this.width();
+                    baselineAttrHash["y1"] = this.height();
+                    baselineAttrHash["y2"] = this.height();
                     break;
                 case "left":
-                    baselineAttrHash.x1 = this.width();
-                    baselineAttrHash.x2 = this.width();
-                    baselineAttrHash.y2 = this.height();
+                    baselineAttrHash["x1"] = this.width();
+                    baselineAttrHash["x2"] = this.width();
+                    baselineAttrHash["y2"] = this.height();
                     break;
                 case "right":
-                    baselineAttrHash.y2 = this.height();
+                    baselineAttrHash["y2"] = this.height();
                     break;
             }
             return baselineAttrHash;
@@ -4041,7 +3987,7 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(config.interval);
+                var d3Interval = Plottable.Formatters.timeIntervalTod3Time(config.interval);
                 var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
@@ -4130,7 +4076,7 @@ var Plottable;
                 else {
                     labelPos = tickPos;
                 }
-                var tickLabels = container.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return d.valueOf(); });
+                var tickLabels = container.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(labelPos, function (d) { return String(d.valueOf()); });
                 var tickLabelsEnter = tickLabels.enter().append("g").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabelsEnter.append("text");
                 var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
@@ -4753,7 +4699,7 @@ var Plottable;
             };
             /**
              * Measures the size of the ticks while also writing them to the DOM.
-             * @param {D3.Selection} ticks The tick elements to be written to.
+             * @param {d3.Selection} ticks The tick elements to be written to.
              */
             Category.prototype._drawTicks = function (axisWidth, axisHeight, scale, ticks) {
                 var self = this;
@@ -5174,13 +5120,13 @@ var Plottable;
              * Returns an empty Selection if no entry exists at that pixel position.
              *
              * @param {Point} position
-             * @returns {D3.Selection}
+             * @returns {d3.Selection}
              */
             Legend.prototype.getEntry = function (position) {
                 if (!this._isSetup) {
-                    return d3.select();
+                    return d3.select(null);
                 }
-                var entry = d3.select();
+                var entry = d3.select(null);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
                 this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
@@ -5429,10 +5375,10 @@ var Plottable;
                 var swatchX;
                 var swatchY;
                 var boundingBoxAttr = {
-                    x: 0,
-                    y: padding,
-                    width: 0,
-                    height: 0
+                    "x": 0,
+                    "y": padding,
+                    "width": 0,
+                    "height": 0
                 };
                 if (this._isVertical()) {
                     var longestTextWidth = Math.max(text0Width, text1Width);
@@ -5457,8 +5403,8 @@ var Plottable;
                         lowerWriteOptions.xAlign = "left";
                         lowerLabelShift.x = padding + swatchWidth + padding;
                     }
-                    boundingBoxAttr.width = swatchWidth;
-                    boundingBoxAttr.height = numSwatches * swatchHeight;
+                    boundingBoxAttr["width"] = swatchWidth;
+                    boundingBoxAttr["height"] = numSwatches * swatchHeight;
                 }
                 else {
                     swatchWidth = Math.max(((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
@@ -5469,10 +5415,10 @@ var Plottable;
                     upperLabelShift.x = -padding;
                     lowerWriteOptions.xAlign = "left";
                     lowerLabelShift.x = padding;
-                    boundingBoxAttr.width = numSwatches * swatchWidth;
-                    boundingBoxAttr.height = swatchHeight;
+                    boundingBoxAttr["width"] = numSwatches * swatchWidth;
+                    boundingBoxAttr["height"] = swatchHeight;
                 }
-                boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
+                boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
                 this._upperLabel.text(""); // clear the upper label
                 this._writer.write(text1, this.width(), this.height(), upperWriteOptions);
                 var upperTranslateString = "translate(" + upperLabelShift.x + ", " + upperLabelShift.y + ")";
@@ -6367,7 +6313,7 @@ var Plottable;
          *
          * @param {Dataset[]} [datasets] The Datasets to retrieve the Selections for.
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
-         * @returns {D3.Selection}
+         * @returns {d3.Selection}
          */
         Plot.prototype.getAllSelections = function (datasets) {
             var _this = this;
@@ -7084,7 +7030,7 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = selection[0][0].getBBox();
+                var bbox = Plottable.Utils.DOM.getBBox(selection);
                 var translatedBbox = {
                     x: bbox.x + translation[0],
                     y: bbox.y + translation[1],
@@ -7282,7 +7228,7 @@ var Plottable;
             Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var barBBox = selection[0][0].getBBox();
+                var barBBox = Plottable.Utils.DOM.getBBox(selection);
                 return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
@@ -7661,7 +7607,7 @@ var Plottable;
                     return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
                 };
                 return function (datum, index, dataset) {
-                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum, index);
+                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
                 };
             };
             Line.prototype._getDataToDraw = function () {
@@ -7828,7 +7774,7 @@ var Plottable;
                 };
                 return function (datum, index, dataset) {
                     var areaGenerator = d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
-                    return areaGenerator(datum, index);
+                    return areaGenerator(datum);
                 };
             };
             Area._Y0_KEY = "y0";
@@ -8204,8 +8150,8 @@ var Plottable;
             Null.prototype.getTiming = function (selection) {
                 return 0;
             };
-            Null.prototype.animate = function (selection, attrToProjector) {
-                return selection.attr(attrToProjector);
+            Null.prototype.animate = function (selection, attrToAppliedProjector) {
+                return selection.attr(attrToAppliedProjector);
             };
             return Null;
         })();
@@ -8249,12 +8195,12 @@ var Plottable;
                 var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
                 return time;
             };
-            Base.prototype.animate = function (selection, attrToProjector) {
+            Base.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToProjector);
+                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.delay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
             Base.prototype.duration = function (duration) {
                 if (duration == null) {
@@ -8350,22 +8296,22 @@ var Plottable;
                 this.isVertical = isVertical;
                 this.isReverse = isReverse;
             }
-            Rect.prototype.animate = function (selection, attrToProjector) {
-                var startAttrToProjector = {};
-                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToProjector[attr] = attrToProjector[attr]; });
-                startAttrToProjector[this._getMovingAttr()] = this._startMovingProjector(attrToProjector);
-                startAttrToProjector[this._getGrowingAttr()] = function () { return 0; };
-                selection.attr(startAttrToProjector);
-                return _super.prototype.animate.call(this, selection, attrToProjector);
+            Rect.prototype.animate = function (selection, attrToAppliedProjector) {
+                var startAttrToAppliedProjector = {};
+                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
+                startAttrToAppliedProjector[this._getMovingAttr()] = this._startMovingProjector(attrToAppliedProjector);
+                startAttrToAppliedProjector[this._getGrowingAttr()] = function () { return 0; };
+                selection.attr(attrToAppliedProjector);
+                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
-            Rect.prototype._startMovingProjector = function (attrToProjector) {
+            Rect.prototype._startMovingProjector = function (attrToAppliedProjector) {
                 if (this.isVertical === this.isReverse) {
-                    return attrToProjector[this._getMovingAttr()];
+                    return attrToAppliedProjector[this._getMovingAttr()];
                 }
-                var movingAttrProjector = attrToProjector[this._getMovingAttr()];
-                var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
-                return function (d, i, dataset) {
-                    return movingAttrProjector(d, i, dataset) + growingAttrProjector(d, i, dataset);
+                var movingAttrAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
+                var growingAttrAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
+                return function (d, i) {
+                    return movingAttrAppliedProjector(d, i) + growingAttrAppliedProjector(d, i);
                 };
             };
             Rect.prototype._getGrowingAttr = function () {
@@ -8409,7 +8355,7 @@ var Plottable;
                 _super.call(this, isVertical);
                 this.startPixelValue = startPixelValue;
             }
-            MovingRect.prototype._startMovingProjector = function (attrToProjector) {
+            MovingRect.prototype._startMovingProjector = function (attrToAppliedProjector) {
                 return d3.functor(this.startPixelValue);
             };
             return MovingRect;
@@ -10034,7 +9980,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 /*!
-SVG Typewriter 0.1.11 (https://github.com/palantir/svg-typewriter)
+SVG Typewriter 0.3.0 (https://github.com/palantir/svg-typewriter)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICENSE)
 */
@@ -10042,7 +9988,9 @@ Licensed under MIT (https://github.com/palantir/svg-typewriter/blob/develop/LICE
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var Methods;
         (function (Methods) {
             /**
              * Check if two arrays are equal by strict equality.
@@ -10082,15 +10030,15 @@ var SVGTypewriter;
                 return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
             }
             Methods.objEq = objEq;
-        })(Utils.Methods || (Utils.Methods = {}));
-        var Methods = Utils.Methods;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(Methods = Utils.Methods || (Utils.Methods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var DOM;
         (function (DOM) {
             function transform(s, x, y) {
                 var xform = d3.transform(s.attr("transform"));
@@ -10122,15 +10070,14 @@ var SVGTypewriter;
                 return bbox;
             }
             DOM.getBBox = getBBox;
-        })(Utils.DOM || (Utils.DOM = {}));
-        var DOM = Utils.DOM;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(DOM = Utils.DOM || (Utils.DOM = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
         var Cache = (function () {
             /**
@@ -10172,13 +10119,13 @@ var SVGTypewriter;
             return Cache;
         })();
         Utils.Cache = Cache;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
         var Tokenizer = (function () {
             function Tokenizer() {
@@ -10213,14 +10160,15 @@ var SVGTypewriter;
             return Tokenizer;
         })();
         Utils.Tokenizer = Tokenizer;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Utils;
     (function (Utils) {
+        var StringMethods;
         (function (StringMethods) {
             /**
              * Treat all sequences of consecutive whitespace as a single " ".
@@ -10253,15 +10201,14 @@ var SVGTypewriter;
                 return reversedChars.join("");
             }
             StringMethods.trimEnd = trimEnd;
-        })(Utils.StringMethods || (Utils.StringMethods = {}));
-        var StringMethods = Utils.StringMethods;
-    })(SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
-    var Utils = SVGTypewriter.Utils;
+        })(StringMethods = Utils.StringMethods || (Utils.StringMethods = {}));
+    })(Utils = SVGTypewriter.Utils || (SVGTypewriter.Utils = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var BaseAnimator = (function () {
             function BaseAnimator() {
@@ -10337,8 +10284,7 @@ var SVGTypewriter;
             return BaseAnimator;
         })();
         Animators.BaseAnimator = BaseAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10350,6 +10296,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var UnveilAnimator = (function (_super) {
             __extends(UnveilAnimator, _super);
@@ -10403,8 +10350,7 @@ var SVGTypewriter;
             return UnveilAnimator;
         })(Animators.BaseAnimator);
         Animators.UnveilAnimator = UnveilAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10416,6 +10362,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Animators;
     (function (Animators) {
         var OpacityAnimator = (function (_super) {
             __extends(OpacityAnimator, _super);
@@ -10434,13 +10381,13 @@ var SVGTypewriter;
             return OpacityAnimator;
         })(Animators.BaseAnimator);
         Animators.OpacityAnimator = OpacityAnimator;
-    })(SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
-    var Animators = SVGTypewriter.Animators;
+    })(Animators = SVGTypewriter.Animators || (SVGTypewriter.Animators = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Wrappers;
     (function (Wrappers) {
         var Wrapper = (function () {
             function Wrapper() {
@@ -10646,8 +10593,7 @@ var SVGTypewriter;
             return Wrapper;
         })();
         Wrappers.Wrapper = Wrapper;
-    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
-    var Wrappers = SVGTypewriter.Wrappers;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10659,6 +10605,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Wrappers;
     (function (Wrappers) {
         var SingleLineWrapper = (function (_super) {
             __extends(SingleLineWrapper, _super);
@@ -10699,13 +10646,13 @@ var SVGTypewriter;
             return SingleLineWrapper;
         })(Wrappers.Wrapper);
         Wrappers.SingleLineWrapper = SingleLineWrapper;
-    })(SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
-    var Wrappers = SVGTypewriter.Wrappers;
+    })(Wrappers = SVGTypewriter.Wrappers || (SVGTypewriter.Wrappers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Writers;
     (function (Writers) {
         var Writer = (function () {
             function Writer(measurer, wrapper) {
@@ -10794,9 +10741,14 @@ var SVGTypewriter;
                 var clipPathID = "clipPath" + this._writerID + "_" + elementID;
                 selection.select(".text-area").attr("clip-path", "url(\"" + prefix + "#" + clipPathID + "\")");
                 var clipPathParent = selection.append("clipPath").attr("id", clipPathID);
-                var attr = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
+                var bboxAttrs = SVGTypewriter.Utils.DOM.getBBox(selection.select(".text-area"));
                 var box = clipPathParent.append("rect");
-                box.classed("clip-rect", true).attr(attr);
+                box.classed("clip-rect", true).attr({
+                    x: bboxAttrs.x,
+                    y: bboxAttrs.y,
+                    width: bboxAttrs.width,
+                    height: bboxAttrs.height
+                });
             };
             Writer.nextID = 0;
             Writer.SupportedRotation = [-90, 0, 180, 90];
@@ -10818,13 +10770,13 @@ var SVGTypewriter;
             return Writer;
         })();
         Writers.Writer = Writer;
-    })(SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
-    var Writers = SVGTypewriter.Writers;
+    })(Writers = SVGTypewriter.Writers || (SVGTypewriter.Writers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         ;
         var AbstractMeasurer = (function () {
@@ -10880,8 +10832,7 @@ var SVGTypewriter;
             return AbstractMeasurer;
         })();
         Measurers.AbstractMeasurer = AbstractMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10893,6 +10844,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var Measurer = (function (_super) {
             __extends(Measurer, _super);
@@ -10933,8 +10885,7 @@ var SVGTypewriter;
             return Measurer;
         })(Measurers.AbstractMeasurer);
         Measurers.Measurer = Measurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10946,6 +10897,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var CharacterMeasurer = (function (_super) {
             __extends(CharacterMeasurer, _super);
@@ -10966,8 +10918,7 @@ var SVGTypewriter;
             return CharacterMeasurer;
         })(Measurers.Measurer);
         Measurers.CharacterMeasurer = CharacterMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 ///<reference path="../reference.ts" />
@@ -10979,6 +10930,7 @@ var __extends = this.__extends || function (d, b) {
 };
 var SVGTypewriter;
 (function (SVGTypewriter) {
+    var Measurers;
     (function (Measurers) {
         var CacheCharacterMeasurer = (function (_super) {
             __extends(CacheCharacterMeasurer, _super);
@@ -10999,6 +10951,5 @@ var SVGTypewriter;
             return CacheCharacterMeasurer;
         })(Measurers.CharacterMeasurer);
         Measurers.CacheCharacterMeasurer = CacheCharacterMeasurer;
-    })(SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
-    var Measurers = SVGTypewriter.Measurers;
+    })(Measurers = SVGTypewriter.Measurers || (SVGTypewriter.Measurers = {}));
 })(SVGTypewriter || (SVGTypewriter = {}));

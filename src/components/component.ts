@@ -14,11 +14,11 @@ module Plottable {
     }
   }
   export class Component {
-    protected _element: D3.Selection;
-    protected _content: D3.Selection;
-    protected _boundingBox: D3.Selection;
-    private _backgroundContainer: D3.Selection;
-    private _foregroundContainer: D3.Selection;
+    protected _element: d3.Selection<void>;
+    protected _content: d3.Selection<void>;
+    protected _boundingBox: d3.Selection<void>;
+    private _backgroundContainer: d3.Selection<void>;
+    private _foregroundContainer: d3.Selection<void>;
     protected _clipPathEnabled = false;
     private _origin: Point = { x: 0, y: 0 }; // Origin of the coordinate space for the Component.
 
@@ -38,9 +38,9 @@ module Plottable {
     protected _isSetup = false;
     protected _isAnchored = false;
 
-    private _boxes: D3.Selection[] = [];
-    private _boxContainer: D3.Selection;
-    private _rootSVG: D3.Selection;
+    private _boxes: d3.Selection<void>[] = [];
+    private _boxContainer: d3.Selection<void>;
+    private _rootSVG: d3.Selection<void>;
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
@@ -50,12 +50,12 @@ module Plottable {
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
     /**
-     * Attaches the Component as a child of a given D3 Selection.
+     * Attaches the Component as a child of a given d3 Selection.
      *
-     * @param {D3.Selection} selection.
+     * @param {d3.Selection} selection.
      * @returns {Component} The calling Component.
      */
-    public anchor(selection: D3.Selection) {
+    public anchor(selection: d3.Selection<void>) {
       if (this._destroyed) {
         throw new Error("Can't reuse destroy()-ed Components!");
       }
@@ -189,7 +189,7 @@ module Plottable {
         y: origin.y + (availableHeight - this.height()) * yAlignProportion
       };
       this._element.attr("transform", "translate(" + this._origin.x + "," + this._origin.y + ")");
-      this._boxes.forEach((b: D3.Selection) => b.attr("width", this.width()).attr("height", this.height()));
+      this._boxes.forEach((b: d3.Selection<void>) => b.attr("width", this.width()).attr("height", this.height()));
       return this;
     }
 
@@ -245,17 +245,17 @@ module Plottable {
     /**
      * Renders the Component to a given <svg>.
      *
-     * @param {String|D3.Selection} element A selector-string for the <svg>, or a D3 selection containing an <svg>.
+     * @param {String|d3.Selection} element A selector-string for the <svg>, or a d3 selection containing an <svg>.
      * @returns {Component} The calling Component.
      */
-    public renderTo(element: String | D3.Selection): Component {
+    public renderTo(element: String | d3.Selection<void>): Component {
       this.detach();
       if (element != null) {
-        var selection: D3.Selection;
+        var selection: d3.Selection<void>;
         if (typeof(element) === "string") {
           selection = d3.select(<string> element);
         } else {
-          selection = <D3.Selection> element;
+          selection = <d3.Selection<void>> element;
         }
         if (!selection.node() || selection.node().nodeName.toLowerCase() !== "svg") {
           throw new Error("Plottable requires a valid SVG to renderTo");
@@ -264,7 +264,7 @@ module Plottable {
       }
       if (this._element == null) {
         throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a D3.Selection, or a selector string");
+          or a d3.Selection, or a selector string");
       }
       this.computeLayout();
       this.render();
@@ -323,7 +323,7 @@ module Plottable {
       return this;
     }
 
-    private _addBox(className?: string, parentElement?: D3.Selection) {
+    private _addBox(className?: string, parentElement?: d3.Selection<void>) {
       if (this._element == null) {
         throw new Error("Adding boxes before anchoring is currently disallowed");
       }
@@ -516,12 +516,12 @@ module Plottable {
 
     /**
      * Gets the Selection containing the <g> in front of the visual elements of the Component.
-     * 
+     *
      * Will return undefined if the Component has not been anchored.
      *
-     * @return {D3.Selection}
+     * @return {d3.Selection}
      */
-    public foreground(): D3.Selection {
+    public foreground(): d3.Selection<void> {
       return this._foregroundContainer;
     }
 
@@ -530,20 +530,20 @@ module Plottable {
      *
      * Will return undefined if the Component has not been anchored.
      *
-     * @return {D3.Selection} content selection for the Component
+     * @return {d3.Selection} content selection for the Component
      */
-    public content(): D3.Selection {
+    public content(): d3.Selection<void> {
       return this._content;
     }
 
     /**
      * Gets the Selection containing the <g> behind the visual elements of the Component.
-     * 
+     *
      * Will return undefined if the Component has not been anchored.
      *
-     * @return {D3.Selection} background selection for the Component
+     * @return {d3.Selection} background selection for the Component
      */
-    public background(): D3.Selection {
+    public background(): d3.Selection<void> {
       return this._backgroundContainer;
     }
   }

@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
+    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
     private _stackedExtent: number[];
 
     /**
@@ -19,7 +19,7 @@ export module Plots {
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
       this.classed("stacked-bar-plot", true);
-      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
       this._stackedExtent = [];
     }
 
