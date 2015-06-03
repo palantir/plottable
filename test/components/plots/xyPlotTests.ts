@@ -3,7 +3,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("XY Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var plot: Plottable.XYPlot<number, number>;

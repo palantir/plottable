@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Category;
@@ -99,7 +99,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var yScale: Plottable.Scales.Category;
@@ -180,7 +180,7 @@ describe("Plots", () => {
   });
 
   describe("Clustered Bar Plot Missing Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.ClusteredBar<string, number>;
 
     beforeEach(() => {
@@ -241,7 +241,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot Missing Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.ClusteredBar<number, string>;
 
     beforeEach(() => {

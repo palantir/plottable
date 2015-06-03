@@ -24,7 +24,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Category;
       var yScale: Plottable.Scales.Linear;
@@ -158,7 +158,7 @@ describe("Plots", () => {
       });
 
       describe("entityNearest()", () => {
-        var bars: D3.Selection;
+        var bars: d3.Selection<void>;
         var zeroY: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
@@ -251,7 +251,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot modified log scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.ModifiedLog;
       var yScale: Plottable.Scales.Linear;
@@ -301,7 +301,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot linear scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Linear;
       var yScale: Plottable.Scales.Linear;
@@ -377,7 +377,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot time scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var barPlot: Plottable.Plots.Bar<Date, number>;
       var xScale: Plottable.Scales.Time;
 
@@ -408,7 +408,7 @@ describe("Plots", () => {
     });
 
     describe("Horizontal Bar Plot", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scales.Category;
       var xScale: Plottable.Scales.Linear;
@@ -516,7 +516,7 @@ describe("Plots", () => {
       });
 
       describe("entityNearest()", () => {
-        var bars: D3.Selection;
+        var bars: d3.Selection<void>;
         var zeroX: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
@@ -609,7 +609,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Category;
       var yScale: Plottable.Scales.Linear;
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -686,7 +686,7 @@ describe("Plots", () => {
     describe("getAllSelections", () => {
       var verticalBarPlot: Plottable.Plots.Bar<string, number>;
       var dataset: Plottable.Dataset;
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();

@@ -8,7 +8,7 @@ describe("Interactions", () => {
     var SVG_HEIGHT = 400;
 
     describe("onDblClick generic callback", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dblClickInteraction: Plottable.Interactions.DoubleClick;
       var component: Plottable.Component;
       var doubleClickedPoint: Plottable.Point = null;

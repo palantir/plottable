@@ -12,7 +12,7 @@ function assertComponentXY(component: Plottable.Component, x: number, y: number,
 }
 
 describe("Component behavior", () => {
-  var svg: D3.Selection;
+  var svg: d3.Selection<void>;
   var c: Plottable.Component;
   var SVG_WIDTH = 400;
   var SVG_HEIGHT = 300;
@@ -165,7 +165,7 @@ describe("Component behavior", () => {
 
     it("computeLayout works with CSS layouts", () => {
       // Manually size parent
-      var parent = d3.select(svg.node().parentNode);
+      var parent = d3.select(<Element> svg.node().parentNode);
       parent.style("width", "400px");
       parent.style("height", "200px");
 

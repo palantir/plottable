@@ -327,7 +327,7 @@ var MockDrawer = (function (_super) {
         _super.apply(this, arguments);
     }
     MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this._getRenderArea(), step.attrToProjector);
+        step.animator.animate(this._getRenderArea(), step.attrToAppliedProjector);
     };
     return MockDrawer;
 })(Plottable.Drawer);
@@ -1745,7 +1745,7 @@ describe("Legend", function () {
         legend.renderTo(svg);
         assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
         assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(legend.getEntry({ x: 10, y: 150 }), d3.select(), "no entries at location outside legend");
+        assert.strictEqual(legend.getEntry({ x: 10, y: 150 }).size(), 0, "no entries at location outside legend");
         svg.remove();
     });
     it("getEntry() retrieves the correct entry for horizontal legends", function () {
@@ -1754,7 +1754,7 @@ describe("Legend", function () {
         legend.renderTo(svg);
         assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
         assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.deepEqual(legend.getEntry({ x: 150, y: 10 }), d3.select(), "no entries at location outside legend");
+        assert.strictEqual(legend.getEntry({ x: 150, y: 10 }).size(), 0, "no entries at location outside legend");
         svg.remove();
     });
     it("comparator() works as expected", function () {
@@ -4072,26 +4072,26 @@ describe("Plots", function () {
             var c2 = d3.select(symbols[0][1]);
             var c1Position = d3.transform(c1.attr("transform")).translate;
             var c2Position = d3.transform(c2.attr("transform")).translate;
-            assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first symbol cx is correct");
-            assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct");
-            assert.closeTo(parseFloat(c2Position[0]), 11, 0.01, "second symbol cx is correct");
-            assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second symbol cy is correct");
+            assert.closeTo(c1Position[0], 0, 0.01, "first symbol cx is correct");
+            assert.closeTo(c1Position[1], 20, 0.01, "first symbol cy is correct");
+            assert.closeTo(c2Position[0], 11, 0.01, "second symbol cx is correct");
+            assert.closeTo(c2Position[1], 20, 0.01, "second symbol cy is correct");
             data = [{ x: 2, y: 2 }, { x: 4, y: 4 }];
             dataset.data(data);
             c1Position = d3.transform(c1.attr("transform")).translate;
             c2Position = d3.transform(c2.attr("transform")).translate;
-            assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after data change");
-            assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first symbol cy is correct after data change");
-            assert.closeTo(parseFloat(c2Position[0]), 14, 0.01, "second symbol cx is correct after data change");
-            assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second symbol cy is correct after data change");
+            assert.closeTo(c1Position[0], 2, 0.01, "first symbol cx is correct after data change");
+            assert.closeTo(c1Position[1], 20, 0.01, "first symbol cy is correct after data change");
+            assert.closeTo(c2Position[0], 14, 0.01, "second symbol cx is correct after data change");
+            assert.closeTo(c2Position[1], 20, 0.01, "second symbol cy is correct after data change");
             metadata = { foo: 0, bar: 0 };
             dataset.metadata(metadata);
             c1Position = d3.transform(c1.attr("transform")).translate;
             c2Position = d3.transform(c2.attr("transform")).translate;
-            assert.closeTo(parseFloat(c1Position[0]), 2, 0.01, "first symbol cx is correct after metadata change");
-            assert.closeTo(parseFloat(c1Position[1]), 0, 0.01, "first symbol cy is correct after metadata change");
-            assert.closeTo(parseFloat(c2Position[0]), 4, 0.01, "second symbol cx is correct after metadata change");
-            assert.closeTo(parseFloat(c2Position[1]), 0, 0.01, "second symbol cy is correct after metadata change");
+            assert.closeTo(c1Position[0], 2, 0.01, "first symbol cx is correct after metadata change");
+            assert.closeTo(c1Position[1], 0, 0.01, "first symbol cy is correct after metadata change");
+            assert.closeTo(c2Position[0], 4, 0.01, "second symbol cx is correct after metadata change");
+            assert.closeTo(c2Position[1], 0, 0.01, "second symbol cy is correct after metadata change");
             svg.remove();
         });
         it("getAllSelections()", function () {
@@ -5730,18 +5730,18 @@ describe("Metadata", function () {
         var c2 = d3.select(circles[0][1]);
         var c1Position = d3.transform(c1.attr("transform")).translate;
         var c2Position = d3.transform(c2.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first circle cx is correct");
-        assert.closeTo(parseFloat(c1Position[1]), 20, 0.01, "first circle cy is correct");
-        assert.closeTo(parseFloat(c2Position[0]), 11, 0.01, "second circle cx is correct");
-        assert.closeTo(parseFloat(c2Position[1]), 20, 0.01, "second circle cy is correct");
+        assert.closeTo(c1Position[0], 0, 0.01, "first circle cx is correct");
+        assert.closeTo(c1Position[1], 20, 0.01, "first circle cy is correct");
+        assert.closeTo(c2Position[0], 11, 0.01, "second circle cx is correct");
+        assert.closeTo(c2Position[1], 20, 0.01, "second circle cy is correct");
         metadata = { foo: 0, bar: 0 };
         dataset.metadata(metadata);
         c1Position = d3.transform(c1.attr("transform")).translate;
         c2Position = d3.transform(c2.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 0, 0.01, "first circle cx is correct after metadata change");
-        assert.closeTo(parseFloat(c1Position[1]), 0, 0.01, "first circle cy is correct after metadata change");
-        assert.closeTo(parseFloat(c2Position[0]), 1, 0.01, "second circle cx is correct after metadata change");
-        assert.closeTo(parseFloat(c2Position[1]), 0, 0.01, "second circle cy is correct after metadata change");
+        assert.closeTo(c1Position[0], 0, 0.01, "first circle cx is correct after metadata change");
+        assert.closeTo(c1Position[1], 0, 0.01, "first circle cy is correct after metadata change");
+        assert.closeTo(c2Position[0], 1, 0.01, "second circle cx is correct after metadata change");
+        assert.closeTo(c2Position[1], 0, 0.01, "second circle cy is correct after metadata change");
         svg.remove();
     });
     it("user metadata is applied to associated dataset", function () {
@@ -5765,10 +5765,10 @@ describe("Metadata", function () {
         var c2Position = d3.transform(c2.attr("transform")).translate;
         var c3Position = d3.transform(c3.attr("transform")).translate;
         var c4Position = d3.transform(c4.attr("transform")).translate;
-        assert.closeTo(parseFloat(c1Position[0]), 10, 0.01, "first circle is correct");
-        assert.closeTo(parseFloat(c2Position[0]), 21, 0.01, "second circle is correct");
-        assert.closeTo(parseFloat(c3Position[0]), 32, 0.01, "third circle is correct");
-        assert.closeTo(parseFloat(c4Position[0]), 63, 0.01, "fourth circle is correct");
+        assert.closeTo(c1Position[0], 10, 0.01, "first circle is correct");
+        assert.closeTo(c2Position[0], 21, 0.01, "second circle is correct");
+        assert.closeTo(c3Position[0], 32, 0.01, "third circle is correct");
+        assert.closeTo(c4Position[0], 63, 0.01, "fourth circle is correct");
         svg.remove();
     });
     it("each plot passes metadata to projectors", function () {
