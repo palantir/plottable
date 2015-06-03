@@ -25,6 +25,7 @@ export module Plots {
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
+    private _baselineValueProvider: () => number[];
 
     /**
      * @constructor
@@ -44,6 +45,7 @@ export module Plots {
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
+      this._baselineValueProvider = () => [this._baselineValue];
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -299,15 +301,14 @@ export module Plots {
         return;
       }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+      // HACKHACK #2208
+      if (valueScale instanceof Scales.Time && this._baselineValue === 0) {
+        this.baselineValue(<any> new Date(0));
+      }
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
-        if (this._baselineValue != null) {
-          qscale.addPaddingException(this, this._baselineValue);
-          qscale.addIncludedValue(this, this._baselineValue);
-        } else {
-          qscale.removePaddingException(this);
-          qscale.removeIncludedValue(this);
-        }
+        qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
+        qscale.addIncludedValuesProvider(this._baselineValueProvider);
       }
     }
 

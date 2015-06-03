@@ -636,14 +636,24 @@ declare module Plottable {
     }
     module Scales {
         /**
-         * A function that supplies Extents to a Scale.
-         * An Extent is a request for a set of domain values to be included.
+         * A function that supplies domain values to be included into a Scale.
          *
          * @param {Scale} scale
-         * @returns {D[][]} An array of extents.
+         * @returns {D[]} An array of values in the domain.
          */
-        interface ExtentsProvider<D> {
-            (scale: Scale<D, any>): D[][];
+        interface IncludedValuesProvider<D> {
+            (scale: Scale<D, any>): D[];
+        }
+        /**
+         * A function that supplies padding exception values for the Scale.
+         * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+         * that end of the domain will not be padded.
+         *
+         * @param {Scale} scale
+         * @returns {D[]} An array of extents.
+         */
+        interface PaddingExceptionsProvider<D> {
+            (scale: Scale<D, any>): D[];
         }
     }
     class Scale<D, R> {
@@ -660,7 +670,7 @@ declare module Plottable {
          * @returns {D[]} The extent of the input values.
          */
         extentOfValues(values: D[]): D[];
-        protected _getAllExtents(): D[][];
+        protected _getAllIncludedValues(): D[];
         protected _getExtent(): D[];
         /**
          * Adds a callback to be called when the Scale updates.
@@ -723,19 +733,19 @@ declare module Plottable {
         protected _getRange(): void;
         protected _setRange(values: R[]): void;
         /**
-         * Adds an ExtentsProvider to the Scale.
+         * Adds an IncludedValuesProvider to the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        addExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
         /**
-         * Removes an ExtentsProvider from the Scale.
+         * Removes the IncludedValuesProvider from the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        removeExtentsProvider(provider: Scales.ExtentsProvider<D>): Scale<D, R>;
+        removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
     }
 }
 
@@ -754,38 +764,21 @@ declare module Plottable {
         protected _autoDomainIfAutomaticMode(): void;
         protected _getExtent(): D[];
         /**
-         * Adds a padding exception.
+         * Adds a padding exception provider.
          * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
          * that end of the domain will not be padded.
          *
-         * @param {any} key A key that identifies the padding exception.
-         * @param {D} exception
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        addPaddingException(key: any, exception: D): QuantitativeScale<D>;
+        addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         /**
-         * Removes the padding exception associated with the specified key.
+         * Removes the padding exception provider.
          *
-         * @param {any} key
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        removePaddingException(key: any): QuantitativeScale<D>;
-        /**
-         * Adds an included value.
-         * The supplied value will always be included in the domain when autoDomain()-ing.
-         *
-         * @param {any} key A key that identifies the included value.
-         * @param {D} value
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        addIncludedValue(key: any, value: D): QuantitativeScale<D>;
-        /**
-         * Removes the included value associated with the specified key.
-         *
-         * @param {any} key
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        removeIncludedValue(key: any): QuantitativeScale<D>;
+        removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>): QuantitativeScale<D>;
         /**
          * Gets the padding proportion.
          */

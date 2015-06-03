@@ -31,7 +31,7 @@ module Plottable {
     protected _renderArea: d3.Selection<void>;
     protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
     protected _attrExtents: d3.Map<any[]>;
-    private _extentsProvider: Scales.ExtentsProvider<any>;
+    private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;
     private _animators: {[animator: string]: Animators.Plot} = {};
@@ -53,7 +53,7 @@ module Plottable {
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._attrExtents = d3.map<any[]>();
-      this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
+      this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
       this._renderCallback = (scale) => this.render();
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
@@ -254,7 +254,7 @@ module Plottable {
     protected _updateExtents() {
       this._attrBindings.forEach((attr) => this._updateExtentsForAttr(attr));
       this._propertyExtents.forEach((property) => this._updateExtentsForProperty(property));
-      this._scales().forEach((scale) => scale.addExtentsProvider(this._extentsProvider));
+      this._scales().forEach((scale) => scale.addIncludedValuesProvider(this._includedValuesProvider));
     }
 
     private _updateExtentsForAttr(attr: string) {
@@ -302,16 +302,16 @@ module Plottable {
       return this._propertyExtents.get(property);
     }
 
-    private _extentsForScale<D>(scale: Scale<D, any>): D[][] {
+    private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
       if (!this._isAnchored) {
         return [];
       }
-      var allSetsOfExtents: D[][][] = [];
+      var includedValues: D[] = [];
       this._attrBindings.forEach((attr, binding) => {
         if (binding.scale === scale) {
           var extents = this._attrExtents.get(attr);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            includedValues = includedValues.concat(<D[]> d3.merge(extents));
           }
         }
       });
@@ -320,12 +320,12 @@ module Plottable {
         if (binding.scale === scale) {
           var extents = this._extentsForProperty(property);
           if (extents != null) {
-            allSetsOfExtents.push(extents);
+            includedValues = includedValues.concat(<D[]> d3.merge(extents));
           }
         }
       });
 
-      return d3.merge(allSetsOfExtents);
+      return includedValues;
     }
 
     /**
@@ -498,12 +498,12 @@ module Plottable {
 
     protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
       scale.offUpdate(this._renderCallback);
-      scale.removeExtentsProvider(this._extentsProvider);
+      scale.removeIncludedValuesProvider(this._includedValuesProvider);
     }
 
     protected _installScaleForKey(scale: Scale<any, any>, key: string) {
       scale.onUpdate(this._renderCallback);
-      scale.addExtentsProvider(this._extentsProvider);
+      scale.addIncludedValuesProvider(this._includedValuesProvider);
     }
 
     protected _propertyProjectors(): AttributeToProjector {

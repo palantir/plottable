@@ -5,8 +5,7 @@ module Plottable {
     protected static _DEFAULT_NUM_TICKS = 10;
     private _tickGenerator: Scales.TickGenerators.TickGenerator<D> = (scale: Plottable.QuantitativeScale<D>) => scale.getDefaultTicks();
     private _padProportion = 0.05;
-    private _paddingExceptions: Utils.Map<any, D>;
-    private _includedValues: Utils.Map<any, D>;
+    private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
     private _domainMin: D;
     private _domainMax: D;
 
@@ -18,8 +17,7 @@ module Plottable {
      */
     constructor() {
       super();
-      this._paddingExceptions = new Utils.Map<any, D>();
-      this._includedValues = new Utils.Map<any, D>();
+      this._paddingExceptionsProviders = new Utils.Set<Scales.PaddingExceptionsProvider<D>>();
     }
 
     public autoDomain() {
@@ -59,18 +57,14 @@ module Plottable {
     }
 
     protected _getExtent(): D[] {
-      var extents = this._getAllExtents().filter((extent) => extent.length > 0);
-      var extent: D[];
-      var defaultExtent = this._defaultExtent();
-      if (extents.length === 0) {
-        extent = defaultExtent;
-      } else {
+      var includedValues = this._getAllIncludedValues();
+      var extent = this._defaultExtent();
+      if (includedValues.length !== 0) {
         var combinedExtent = [
-          Utils.Methods.min<D[], D>(extents, (extent) => extent[0], defaultExtent[0]),
-          Utils.Methods.max<D[], D>(extents, (extent) => extent[1], defaultExtent[1])
+          Utils.Methods.min<D>(includedValues, extent[0]),
+          Utils.Methods.max<D>(includedValues, extent[1])
         ];
-        var includedDomain = this._includeValues(combinedExtent);
-        extent = this._padDomain(includedDomain);
+        extent = this._padDomain(combinedExtent);
       }
 
       if (this._domainMin != null) {
@@ -83,54 +77,27 @@ module Plottable {
     }
 
     /**
-     * Adds a padding exception.
+     * Adds a padding exception provider.
      * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
      * that end of the domain will not be padded.
-     * 
-     * @param {any} key A key that identifies the padding exception.
-     * @param {D} exception
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     *
+     * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
-    public addPaddingException(key: any, exception: D) {
-      this._paddingExceptions.set(key, exception);
+    public addPaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+      this._paddingExceptionsProviders.add(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
     /**
-     * Removes the padding exception associated with the specified key.
-     * 
-     * @param {any} key
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * Removes the padding exception provider.
+     *
+     * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
-    public removePaddingException(key: any) {
-      this._paddingExceptions.delete(key);
-      this._autoDomainIfAutomaticMode();
-      return this;
-    }
-
-    /**
-     * Adds an included value.
-     * The supplied value will always be included in the domain when autoDomain()-ing.
-     * 
-     * @param {any} key A key that identifies the included value.
-     * @param {D} value
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
-     */
-    public addIncludedValue(key: any, value: D) {
-      this._includedValues.set(key, value);
-      this._autoDomainIfAutomaticMode();
-      return this;
-    }
-
-    /**
-     * Removes the included value associated with the specified key.
-     * 
-     * @param {any} key
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
-     */
-    public removeIncludedValue(key: any) {
-      this._includedValues.delete(key);
+    public removePaddingExceptionsProvider(provider: Scales.PaddingExceptionsProvider<D>) {
+      this._paddingExceptionsProviders.delete(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
@@ -143,9 +110,9 @@ module Plottable {
      * Sets the padding porportion.
      * When autoDomain()-ing, the computed domain will be expanded by this proportion,
      * then rounded to human-readable values.
-     * 
+     *
      * @param {number} padProportion The padding proportion. Passing 0 disables padding.
-     * @returns {QuantitativeScale} The calling QuantitativeScale. 
+     * @returns {QuantitativeScale} The calling QuantitativeScale.
      */
     public padProportion(padProportion: number): QuantitativeScale<D>;
     public padProportion(padProportion?: number): any {
@@ -160,18 +127,6 @@ module Plottable {
       return this;
     }
 
-    private _includeValues(domain: D[]) {
-      this._includedValues.forEach((value) => {
-        if (value < domain[0]) {
-          domain[0] = value;
-        }
-        if (value > domain[1]) {
-          domain[1] = value;
-        }
-      });
-      return domain;
-    }
-
     private _padDomain(domain: D[]) {
       if (domain[0].valueOf() === domain[1].valueOf()) {
         return this._expandSingleValueDomain(domain);
@@ -184,13 +139,16 @@ module Plottable {
       var max = domain[1];
       var minExistsInExceptions = false;
       var maxExistsInExceptions = false;
-      this._paddingExceptions.forEach((value: D) => {
-        if (value === min) {
-          minExistsInExceptions = true;
-        }
-        if (value === max) {
-          maxExistsInExceptions = true;
-        }
+      this._paddingExceptionsProviders.forEach((provider) => {
+        var values = provider(this);
+        values.forEach((value) => {
+          if (value.valueOf() === min.valueOf()) {
+            minExistsInExceptions = true;
+          }
+          if (value.valueOf() === max.valueOf()) {
+            maxExistsInExceptions = true;
+          }
+        });
       });
       var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
       var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);

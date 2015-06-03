@@ -1421,7 +1421,7 @@ var Plottable;
             this._autoDomainAutomatically = true;
             this._domainModificationInProgress = false;
             this._callbacks = new Plottable.Utils.CallbackSet();
-            this._extentsProviders = new Plottable.Utils.Set();
+            this._includedValuesProviders = new Plottable.Utils.Set();
         }
         /**
          * Given an array of potential domain values, computes the extent of those values.
@@ -1432,13 +1432,14 @@ var Plottable;
         Scale.prototype.extentOfValues = function (values) {
             return []; // this should be overwritten
         };
-        Scale.prototype._getAllExtents = function () {
+        Scale.prototype._getAllIncludedValues = function () {
             var _this = this;
             var providerArray = [];
-            this._extentsProviders.forEach(function (provider) {
-                providerArray.push(provider(_this));
+            this._includedValuesProviders.forEach(function (provider) {
+                var extents = provider(_this);
+                providerArray = providerArray.concat(extents);
             });
-            return d3.merge(providerArray);
+            return providerArray;
         };
         Scale.prototype._getExtent = function () {
             return []; // this should be overwritten
@@ -1530,24 +1531,24 @@ var Plottable;
             throw new Error("Subclasses should override _setRange");
         };
         /**
-         * Adds an ExtentsProvider to the Scale.
+         * Adds an IncludedValuesProvider to the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        Scale.prototype.addExtentsProvider = function (provider) {
-            this._extentsProviders.add(provider);
+        Scale.prototype.addIncludedValuesProvider = function (provider) {
+            this._includedValuesProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
         /**
-         * Removes an ExtentsProvider from the Scale.
+         * Removes the IncludedValuesProvider from the Scale.
          *
-         * @param {Scales.ExtentsProvider} provider
+         * @param {Scales.IncludedValuesProvider} provider
          * @returns {Sclae} The calling Scale.
          */
-        Scale.prototype.removeExtentsProvider = function (provider) {
-            this._extentsProviders.delete(provider);
+        Scale.prototype.removeIncludedValuesProvider = function (provider) {
+            this._includedValuesProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -1577,8 +1578,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.getDefaultTicks(); };
             this._padProportion = 0.05;
-            this._paddingExceptions = new Plottable.Utils.Map();
-            this._includedValues = new Plottable.Utils.Map();
+            this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
             this._domainMin = null;
@@ -1611,19 +1611,14 @@ var Plottable;
             _super.prototype._autoDomainIfAutomaticMode.call(this);
         };
         QuantitativeScale.prototype._getExtent = function () {
-            var extents = this._getAllExtents().filter(function (extent) { return extent.length > 0; });
-            var extent;
-            var defaultExtent = this._defaultExtent();
-            if (extents.length === 0) {
-                extent = defaultExtent;
-            }
-            else {
+            var includedValues = this._getAllIncludedValues();
+            var extent = this._defaultExtent();
+            if (includedValues.length !== 0) {
                 var combinedExtent = [
-                    Plottable.Utils.Methods.min(extents, function (extent) { return extent[0]; }, defaultExtent[0]),
-                    Plottable.Utils.Methods.max(extents, function (extent) { return extent[1]; }, defaultExtent[1])
+                    Plottable.Utils.Methods.min(includedValues, extent[0]),
+                    Plottable.Utils.Methods.max(includedValues, extent[1])
                 ];
-                var includedDomain = this._includeValues(combinedExtent);
-                extent = this._padDomain(includedDomain);
+                extent = this._padDomain(combinedExtent);
             }
             if (this._domainMin != null) {
                 extent[0] = this._domainMin;
@@ -1634,51 +1629,26 @@ var Plottable;
             return extent;
         };
         /**
-         * Adds a padding exception.
+         * Adds a padding exception provider.
          * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
          * that end of the domain will not be padded.
          *
-         * @param {any} key A key that identifies the padding exception.
-         * @param {D} exception
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        QuantitativeScale.prototype.addPaddingException = function (key, exception) {
-            this._paddingExceptions.set(key, exception);
+        QuantitativeScale.prototype.addPaddingExceptionsProvider = function (provider) {
+            this._paddingExceptionsProviders.add(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
         /**
-         * Removes the padding exception associated with the specified key.
+         * Removes the padding exception provider.
          *
-         * @param {any} key
+         * @param {Scales.PaddingExceptionProvider<D>} provider The provider function.
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
-        QuantitativeScale.prototype.removePaddingException = function (key) {
-            this._paddingExceptions.delete(key);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
-        /**
-         * Adds an included value.
-         * The supplied value will always be included in the domain when autoDomain()-ing.
-         *
-         * @param {any} key A key that identifies the included value.
-         * @param {D} value
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        QuantitativeScale.prototype.addIncludedValue = function (key, value) {
-            this._includedValues.set(key, value);
-            this._autoDomainIfAutomaticMode();
-            return this;
-        };
-        /**
-         * Removes the included value associated with the specified key.
-         *
-         * @param {any} key
-         * @returns {QuantitativeScale} The calling QuantitativeScale.
-         */
-        QuantitativeScale.prototype.removeIncludedValue = function (key) {
-            this._includedValues.delete(key);
+        QuantitativeScale.prototype.removePaddingExceptionsProvider = function (provider) {
+            this._paddingExceptionsProviders.delete(provider);
             this._autoDomainIfAutomaticMode();
             return this;
         };
@@ -1693,18 +1663,8 @@ var Plottable;
             this._autoDomainIfAutomaticMode();
             return this;
         };
-        QuantitativeScale.prototype._includeValues = function (domain) {
-            this._includedValues.forEach(function (value) {
-                if (value < domain[0]) {
-                    domain[0] = value;
-                }
-                if (value > domain[1]) {
-                    domain[1] = value;
-                }
-            });
-            return domain;
-        };
         QuantitativeScale.prototype._padDomain = function (domain) {
+            var _this = this;
             if (domain[0].valueOf() === domain[1].valueOf()) {
                 return this._expandSingleValueDomain(domain);
             }
@@ -1716,13 +1676,16 @@ var Plottable;
             var max = domain[1];
             var minExistsInExceptions = false;
             var maxExistsInExceptions = false;
-            this._paddingExceptions.forEach(function (value) {
-                if (value === min) {
-                    minExistsInExceptions = true;
-                }
-                if (value === max) {
-                    maxExistsInExceptions = true;
-                }
+            this._paddingExceptionsProviders.forEach(function (provider) {
+                var values = provider(_this);
+                values.forEach(function (value) {
+                    if (value.valueOf() === min.valueOf()) {
+                        minExistsInExceptions = true;
+                    }
+                    if (value.valueOf() === max.valueOf()) {
+                        maxExistsInExceptions = true;
+                    }
+                });
             });
             var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
             var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
@@ -2109,8 +2072,7 @@ var Plottable;
                 return Plottable.Utils.Methods.uniq(values);
             };
             Category.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                return Plottable.Utils.Methods.uniq(Plottable.Utils.Methods.flatten(extents));
+                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
@@ -2254,12 +2216,7 @@ var Plottable;
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
-                var extents = this._getAllExtents();
-                var concatenatedExtents = [];
-                extents.forEach(function (e) {
-                    concatenatedExtents = concatenatedExtents.concat(e);
-                });
-                return Plottable.Utils.Methods.uniq(concatenatedExtents);
+                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
@@ -2496,9 +2453,9 @@ var Plottable;
             };
             InterpolatedColor.prototype.autoDomain = function () {
                 // InterpolatedColorScales do not pad
-                var extents = this._getAllExtents();
-                if (extents.length > 0) {
-                    this._setDomain([Plottable.Utils.Methods.min(extents, function (x) { return x[0]; }, 0), Plottable.Utils.Methods.max(extents, function (x) { return x[1]; }, 0)]);
+                var includedValues = this._getAllIncludedValues();
+                if (includedValues.length > 0) {
+                    this._setDomain([Plottable.Utils.Methods.min(includedValues, 0), Plottable.Utils.Methods.max(includedValues, 0)]);
                 }
                 return this;
             };
@@ -6024,7 +5981,7 @@ var Plottable;
             this._datasetToDrawer = new Plottable.Utils.Map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
-            this._extentsProvider = function (scale) { return _this._extentsForScale(scale); };
+            this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
             this._renderCallback = function (scale) { return _this.render(); };
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
@@ -6182,7 +6139,7 @@ var Plottable;
             var _this = this;
             this._attrBindings.forEach(function (attr) { return _this._updateExtentsForAttr(attr); });
             this._propertyExtents.forEach(function (property) { return _this._updateExtentsForProperty(property); });
-            this._scales().forEach(function (scale) { return scale.addExtentsProvider(_this._extentsProvider); });
+            this._scales().forEach(function (scale) { return scale.addIncludedValuesProvider(_this._includedValuesProvider); });
         };
         Plot.prototype._updateExtentsForAttr = function (attr) {
             // Filters should never be applied to attributes
@@ -6222,17 +6179,17 @@ var Plottable;
         Plot.prototype._extentsForProperty = function (property) {
             return this._propertyExtents.get(property);
         };
-        Plot.prototype._extentsForScale = function (scale) {
+        Plot.prototype._includedValuesForScale = function (scale) {
             var _this = this;
             if (!this._isAnchored) {
                 return [];
             }
-            var allSetsOfExtents = [];
+            var includedValues = [];
             this._attrBindings.forEach(function (attr, binding) {
                 if (binding.scale === scale) {
                     var extents = _this._attrExtents.get(attr);
                     if (extents != null) {
-                        allSetsOfExtents.push(extents);
+                        includedValues = includedValues.concat(d3.merge(extents));
                     }
                 }
             });
@@ -6240,11 +6197,11 @@ var Plottable;
                 if (binding.scale === scale) {
                     var extents = _this._extentsForProperty(property);
                     if (extents != null) {
-                        allSetsOfExtents.push(extents);
+                        includedValues = includedValues.concat(d3.merge(extents));
                     }
                 }
             });
-            return d3.merge(allSetsOfExtents);
+            return includedValues;
         };
         Plot.prototype.animator = function (animatorKey, animator) {
             if (animator === undefined) {
@@ -6387,11 +6344,11 @@ var Plottable;
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
             scale.offUpdate(this._renderCallback);
-            scale.removeExtentsProvider(this._extentsProvider);
+            scale.removeIncludedValuesProvider(this._includedValuesProvider);
         };
         Plot.prototype._installScaleForKey = function (scale, key) {
             scale.onUpdate(this._renderCallback);
-            scale.addExtentsProvider(this._extentsProvider);
+            scale.addIncludedValuesProvider(this._includedValuesProvider);
         };
         Plot.prototype._propertyProjectors = function () {
             return {};
@@ -7091,6 +7048,7 @@ var Plottable;
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
+                this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -7266,16 +7224,14 @@ var Plottable;
                     return;
                 }
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+                // HACKHACK #2208
+                if (valueScale instanceof Plottable.Scales.Time && this._baselineValue === 0) {
+                    this.baselineValue(new Date(0));
+                }
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
-                    if (this._baselineValue != null) {
-                        qscale.addPaddingException(this, this._baselineValue);
-                        qscale.addIncludedValue(this, this._baselineValue);
-                    }
-                    else {
-                        qscale.removePaddingException(this);
-                        qscale.removeIncludedValue(this);
-                    }
+                    qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
+                    qscale.addIncludedValuesProvider(this._baselineValueProvider);
                 }
             };
             Bar.prototype._additionalPaint = function (time) {
@@ -7740,11 +7696,13 @@ var Plottable;
                 if (yScale == null) {
                     return;
                 }
-                if (constantBaseline != null) {
-                    yScale.addPaddingException(this, constantBaseline);
+                if (this._constantBaselineValueProvider != null) {
+                    yScale.removePaddingExceptionsProvider(this._constantBaselineValueProvider);
+                    this._constantBaselineValueProvider = null;
                 }
-                else {
-                    yScale.removePaddingException(this);
+                if (constantBaseline != null) {
+                    this._constantBaselineValueProvider = function () { return [constantBaseline]; };
+                    yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
                 }
             };
             Area.prototype._getResetYFunction = function () {
@@ -7873,12 +7831,14 @@ var Plottable;
              * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
+                var _this = this;
                 _super.call(this);
                 this._baselineValue = 0;
                 this.classed("stacked-area-plot", true);
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
+                this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
             StackedArea.prototype._getAnimator = function (key) {
                 return new Plottable.Animators.Null();
@@ -7929,8 +7889,8 @@ var Plottable;
                 if (scale == null) {
                     return;
                 }
-                scale.addPaddingException(this, 0);
-                scale.addIncludedValue(this, 0);
+                scale.addPaddingExceptionsProvider(this._baselineValueProvider);
+                scale.addIncludedValuesProvider(this._baselineValueProvider);
             };
             StackedArea.prototype._onDatasetUpdate = function () {
                 this._updateStackExtentsAndOffsets();

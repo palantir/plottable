@@ -8,6 +8,7 @@ export module Plots {
 
     private _baseline: d3.Selection<void>;
     private _baselineValue = 0;
+    private _baselineValueProvider: () => number[];
 
     /**
      * @constructor
@@ -20,6 +21,7 @@ export module Plots {
       this.attr("fill-opacity", 1);
       this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
       this._stackedExtent = [];
+      this._baselineValueProvider = () => [this._baselineValue];
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -85,8 +87,8 @@ export module Plots {
       if (scale == null) {
         return;
       }
-      scale.addPaddingException(this, 0);
-      scale.addIncludedValue(this, 0);
+      scale.addPaddingExceptionsProvider(this._baselineValueProvider);
+      scale.addIncludedValuesProvider(this._baselineValueProvider);
     }
 
     protected _onDatasetUpdate() {

@@ -3024,7 +3024,7 @@ describe("Plots", function () {
             var yScale = new Plottable.Scales.Linear();
             yScale.padProportion(0.1);
             var constantY0 = 30;
-            yScale.addExtentsProvider(function (scale) { return [[constantY0, constantY0 + 10]]; });
+            yScale.addIncludedValuesProvider(function (scale) { return [constantY0, constantY0 + 10]; });
             var plot = new Plottable.Plots.Area();
             plot.x(function (d) { return d.x; }, xScale);
             plot.y(function (d) { return d.y; }, yScale);
@@ -7062,14 +7062,14 @@ describe("Scales", function () {
         it("autoDomain() expands single value to [value - 1, value + 1]", function () {
             var scale = new Plottable.Scales.Linear();
             var singleValue = 15;
-            scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+            scale.addIncludedValuesProvider(function (scale) { return [singleValue, singleValue]; });
             assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
         });
         it("domainMin()", function () {
             var scale = new Plottable.Scales.Linear();
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var minBelowBottom = -10;
             scale.domainMin(minBelowBottom);
             assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
@@ -7085,14 +7085,14 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop + 1], "domain is set to [min, min + 1] if the requested value is >= to autoDomain()-ed max value");
             scale.domainMin(minInMiddle);
             var requestedDomain2 = [-10, 10];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
             assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
         });
         it("domainMax()", function () {
             var scale = new Plottable.Scales.Linear();
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var maxAboveTop = 10;
             scale.domainMax(maxAboveTop);
             assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
@@ -7108,14 +7108,14 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [maxEqualBottom - 1, maxEqualBottom], "domain is set to [max - 1, max] if the requested value is <= to autoDomain()-ed min value");
             scale.domainMax(maxInMiddle);
             var requestedDomain2 = [-10, 10];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
             assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
         });
         it("domainMin() and domainMax() together", function () {
             var scale = new Plottable.Scales.Linear();
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var desiredMin = -10;
             var desiredMax = 10;
             scale.domainMin(desiredMin);
@@ -7149,6 +7149,48 @@ describe("Scales", function () {
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
+        describe("Padding exceptions", function () {
+            it("addPaddingExceptionsProvider() works as expected on one end", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is padded");
+                scale.addPaddingExceptionsProvider(function () { return [11]; });
+                assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is not changed");
+                scale.addPaddingExceptionsProvider(function () { return [10]; });
+                assert.strictEqual(scale.domain()[0], 10, "The left side of the domain is no longer padded");
+            });
+            it("addPaddingExceptionsProvider() works as expected on both ends", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+                scale.addPaddingExceptionsProvider(function () { return [0.9, 11, 12, 13.5]; });
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain padding has not changed");
+                scale.addPaddingExceptionsProvider(function () { return [13]; });
+                assert.deepEqual(scale.domain(), [9.5, 13], "The right side of the domain is no longer padded");
+                scale.addPaddingExceptionsProvider(function () { return [10, 13]; });
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+            });
+            it("removePaddingExceptionsProvider() works as expected", function () {
+                var scale = new Plottable.Scales.Linear();
+                scale.addIncludedValuesProvider(function () { return [10, 13]; });
+                var paddingExceptionProviderLeft = function () { return [10]; };
+                var paddingExceptionProviderBoth = function () { return [10, 13]; };
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [10, 13.5], "The left side of the domain is no longer padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+                scale.removePaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13.5], "The left side of domain is still padded, right is not");
+                scale.removePaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded again");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+                scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+                assert.deepEqual(scale.domain(), [10, 13], "The domain is still no longer padded");
+            });
+        });
         describe("autoranging behavior", function () {
             var data;
             var dataset;
@@ -7160,7 +7202,7 @@ describe("Scales", function () {
                 scale.padProportion(0);
             });
             it("scale autoDomain flag is not overwritten without explicitly setting the domain", function () {
-                scale.addExtentsProvider(function (scale) { return [d3.extent(data, function (e) { return e.foo; })]; });
+                scale.addIncludedValuesProvider(function (scale) { return d3.extent(data, function (e) { return e.foo; }); });
                 assert.isTrue(scale._autoDomainAutomatically, "the autoDomain flag is still set after autoranginging and padding and nice-ing");
                 scale.domain([0, 5]);
                 assert.isFalse(scale._autoDomainAutomatically, "the autoDomain flag is false after domain explicitly set");
@@ -7192,19 +7234,19 @@ describe("Scales", function () {
                 svg1.remove();
                 svg2.remove();
             });
-            it("addExtentsProvider()", function () {
-                scale.addExtentsProvider(function (scale) { return [[0, 10]]; });
+            it("addIncludedValuesProvider()", function () {
+                scale.addIncludedValuesProvider(function (scale) { return [0, 10]; });
                 assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
-                scale.addExtentsProvider(function (scale) { return [[-10, 0]]; });
+                scale.addIncludedValuesProvider(function (scale) { return [-10, 0]; });
                 assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
             });
-            it("removeExtentsProvider()", function () {
-                var posProvider = function (scale) { return [[0, 10]]; };
-                scale.addExtentsProvider(posProvider);
-                var negProvider = function (scale) { return [[-10, 0]]; };
-                scale.addExtentsProvider(negProvider);
+            it("removeIncludedValuesProvider()", function () {
+                var posProvider = function (scale) { return [0, 10]; };
+                scale.addIncludedValuesProvider(posProvider);
+                var negProvider = function (scale) { return [-10, 0]; };
+                scale.addIncludedValuesProvider(negProvider);
                 assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
-                scale.removeExtentsProvider(negProvider);
+                scale.removeIncludedValuesProvider(negProvider);
                 assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
             });
             it("should resize when a plot is removed", function () {
@@ -7273,7 +7315,7 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [0, base], "default domain is [0, base]");
         });
         it("can be padded", function () {
-            scale.addExtentsProvider(function (scale) { return [[0, base]]; });
+            scale.addIncludedValuesProvider(function (scale) { return [0, base]; });
             scale.padProportion(0);
             var unpaddedDomain = scale.domain();
             scale.padProportion(0.1);
@@ -7283,7 +7325,7 @@ describe("Scales", function () {
         it("autoDomain() expands single value correctly", function () {
             scale.padProportion(0);
             var singleValue = 15;
-            scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+            scale.addIncludedValuesProvider(function (scale) { return [singleValue, singleValue]; });
             assert.deepEqual(scale.domain(), [singleValue / base, singleValue * base], "positive single-value extent was expanded to [value / base, value * base]");
             singleValue = -15;
             scale.autoDomain();
@@ -7296,7 +7338,7 @@ describe("Scales", function () {
             var scale = new Plottable.Scales.ModifiedLog(base);
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var minBelowBottom = -10;
             scale.domainMin(minBelowBottom);
             assert.deepEqual(scale.domain(), [minBelowBottom, requestedDomain[1]], "lower end of domain was set by domainMin()");
@@ -7310,14 +7352,14 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [minEqualTop, minEqualTop * base], "domain is set to [min, min * base] if the requested value is >= autoDomain()-ed max value");
             scale.domainMin(minInMiddle);
             var requestedDomain2 = [-10, 10];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
             assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
         });
         it("domainMax()", function () {
             var scale = new Plottable.Scales.ModifiedLog(base);
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var maxAboveTop = 10;
             scale.domainMax(maxAboveTop);
             assert.deepEqual(scale.domain(), [requestedDomain[0], maxAboveTop], "upper end of domain was set by domainMax()");
@@ -7331,14 +7373,14 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [maxEqualBottom * base, maxEqualBottom], "domain is set to [max * base, max] if the requested value is <= autoDomain()-ed min value and negative");
             scale.domainMax(maxInMiddle);
             var requestedDomain2 = [-10, 10];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
             assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
         });
         it("domainMin() and domainMax() together", function () {
             var scale = new Plottable.Scales.ModifiedLog(base);
             scale.padProportion(0);
             var requestedDomain = [-5, 5];
-            scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+            scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
             var desiredMin = -10;
             var desiredMax = 10;
             scale.domainMin(desiredMin);
@@ -7352,11 +7394,11 @@ describe("Scales", function () {
             assert.deepEqual(scale.domain(), [bigMin, smallMax], "setting both is allowed even if it reverse the domain");
         });
         it("gives reasonable values for ticks()", function () {
-            var providedExtents = [[0, base / 2]];
-            scale.addExtentsProvider(function (scale) { return providedExtents; });
+            var providedExtents = [0, base / 2];
+            scale.addIncludedValuesProvider(function (scale) { return providedExtents; });
             var ticks = scale.ticks();
             assert.operator(ticks.length, ">", 0);
-            providedExtents = [[-base * 2, base * 2]];
+            providedExtents = [-base * 2, base * 2];
             scale.autoDomain();
             ticks = scale.ticks();
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
@@ -7387,9 +7429,9 @@ describe("Scales", function () {
         });
         it("ticks() is always non-empty", function () {
             var desiredExtents = [];
-            scale.addExtentsProvider(function (scale) { return desiredExtents; });
+            scale.addIncludedValuesProvider(function (scale) { return desiredExtents; });
             [[2, 9], [0, 1], [1, 2], [0.001, 0.01], [-0.1, 0.1], [-3, -2]].forEach(function (extent) {
-                desiredExtents = [extent];
+                desiredExtents = extent;
                 scale.autoDomain();
                 var ticks = scale.ticks();
                 assert.operator(ticks.length, ">", 0);
@@ -7405,7 +7447,7 @@ describe("TimeScale tests", function () {
         var scale = new Plottable.Scales.Time();
         scale.padProportion(0);
         var unpaddedDomain = scale.domain();
-        scale.addExtentsProvider(function (scale) { return [unpaddedDomain]; });
+        scale.addIncludedValuesProvider(function (scale) { return unpaddedDomain; });
         scale.padProportion(0.1);
         assert.operator(scale.domain()[0].getTime(), "<", unpaddedDomain[0].getTime(), "left side of domain was padded");
         assert.operator(scale.domain()[1].getTime(), ">", unpaddedDomain[1].getTime(), "right side of domain was padded");
@@ -7414,14 +7456,13 @@ describe("TimeScale tests", function () {
         var scale = new Plottable.Scales.Time();
         var minValue = new Date(2000, 5, 4);
         var maxValue = new Date(2000, 5, 6);
-        scale.addExtentsProvider(function (scale) { return [[minValue, maxValue]]; });
+        scale.addIncludedValuesProvider(function (scale) { return [minValue, maxValue]; });
         scale.padProportion(0.1);
         assert.operator(scale.domain()[0].getTime(), "<", minValue.getTime(), "left side of domain is normally padded");
         assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(), "right side of domain is normally padded");
-        var exceptionKey = "unitTests";
-        scale.addPaddingException(exceptionKey, minValue);
+        scale.addPaddingExceptionsProvider(function () { return [minValue]; });
         assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(), "left side of domain isn't padded if it matches the exception");
-        scale.addPaddingException(exceptionKey, maxValue);
+        scale.addPaddingExceptionsProvider(function () { return [maxValue]; });
         assert.strictEqual(scale.domain()[1].getTime(), maxValue.getTime(), "right side of domain isn't padded if it matches the exception");
     });
     it("autoDomain() expands single value to [value - 1 day, value + 1 day]", function () {
@@ -7430,7 +7471,7 @@ describe("TimeScale tests", function () {
         var singleValue = new Date(2000, 5, 5);
         var dayBefore = new Date(2000, 5, 4);
         var dayAfter = new Date(2000, 5, 6);
-        scale.addExtentsProvider(function (scale) { return [[singleValue, singleValue]]; });
+        scale.addIncludedValuesProvider(function (scale) { return [singleValue, singleValue]; });
         scale.autoDomain();
         var domain = scale.domain();
         assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "left side of domain was expaded by one day");
@@ -7444,7 +7485,7 @@ describe("TimeScale tests", function () {
         var scale = new Plottable.Scales.Time();
         scale.padProportion(0);
         var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-        scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+        scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
         var minBelowBottom = new Date("2015-04-01");
         scale.domainMin(minBelowBottom);
         assert.strictEqual(scale.domain()[0].getTime(), minBelowBottom.getTime(), "lower end of domain was set by domainMin()");
@@ -7463,14 +7504,14 @@ describe("TimeScale tests", function () {
         assert.strictEqual(domain[1].getTime(), nextDay.getTime(), "upper end is set one day later");
         scale.domainMin(minInMiddle);
         var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
-        scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+        scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
         assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMin()");
     });
     it("domainMax()", function () {
         var scale = new Plottable.Scales.Time();
         scale.padProportion(0);
         var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-        scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+        scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
         var maxAboveTop = new Date("2015-08-01");
         scale.domainMax(maxAboveTop);
         assert.strictEqual(scale.domain()[1].getTime(), maxAboveTop.getTime(), "upper end of domain was set by domainMax()");
@@ -7489,14 +7530,14 @@ describe("TimeScale tests", function () {
         assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "lower end is set one day before");
         scale.domainMax(maxInMiddle);
         var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
-        scale.addExtentsProvider(function (scale) { return [requestedDomain2]; });
+        scale.addIncludedValuesProvider(function (scale) { return requestedDomain2; });
         assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMax()");
     });
     it("domainMin() and domainMax() together", function () {
         var scale = new Plottable.Scales.Time();
         scale.padProportion(0);
         var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-        scale.addExtentsProvider(function (scale) { return [requestedDomain]; });
+        scale.addIncludedValuesProvider(function (scale) { return requestedDomain; });
         var desiredMin = new Date("2015-04-01");
         var desiredMax = new Date("2015-08-01");
         scale.domainMin(desiredMin);
