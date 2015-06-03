@@ -3,7 +3,7 @@
 module Plottable {
 export module Scales {
   export class Category extends Scale<string, number> {
-    private _d3Scale: D3.Scale.OrdinalScale;
+    private _d3Scale: d3.scale.Ordinal<string, number>;
     private _range = [0, 1];
 
     private _innerPadding: number;
@@ -16,7 +16,7 @@ export module Scales {
      */
     constructor() {
       super();
-      this._d3Scale = d3.scale.ordinal();
+      this._d3Scale = d3.scale.ordinal<string, number>();
       var d3InnerPadding = 0.3;
       this._innerPadding = Category._convertToPlottableInnerPadding(d3InnerPadding);
       this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
@@ -41,9 +41,9 @@ export module Scales {
       this.range(this.range()); // update range
     }
 
-    public range(): number[];
-    public range(values: number[]): Category;
-    public range(values?: number[]): any {
+    public range(): [number, number];
+    public range(values: [number, number]): Category;
+    public range(values?: [number, number]): any {
       if (values == null) {
         return this._range;
       } else {

@@ -12,10 +12,10 @@ export module Components {
     private _numSwatches = 10;
     private _formatter: Formatter;
 
-    private _swatchContainer: D3.Selection;
-    private _swatchBoundingBox: D3.Selection;
-    private _lowerLabel: D3.Selection;
-    private _upperLabel: D3.Selection;
+    private _swatchContainer: d3.Selection<void>;
+    private _swatchBoundingBox: d3.Selection<void>;
+    private _lowerLabel: d3.Selection<void>;
+    private _upperLabel: d3.Selection<void>;
     private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
 
     /**
@@ -202,7 +202,7 @@ export module Components {
       var swatchX: (d: any, i: number) => number;
       var swatchY: (d: any, i: number) => number;
 
-      var boundingBoxAttr = {
+      var boundingBoxAttr: { [key: string]: number } = {
         x: 0,
         y: padding,
         width: 0,
@@ -233,8 +233,8 @@ export module Components {
           lowerWriteOptions.xAlign = "left";
           lowerLabelShift.x = padding + swatchWidth + padding;
         }
-        boundingBoxAttr.width = swatchWidth;
-        boundingBoxAttr.height = numSwatches * swatchHeight;
+        boundingBoxAttr["width"] = swatchWidth;
+        boundingBoxAttr["height"] = numSwatches * swatchHeight;
       } else { // horizontal
         swatchWidth = Math.max( ((this.width() - 4 * padding - text0Width - text1Width) / numSwatches), 0);
         swatchHeight = Math.max( (this.height() - 2 * padding), 0);
@@ -246,10 +246,10 @@ export module Components {
         lowerWriteOptions.xAlign = "left";
         lowerLabelShift.x = padding;
 
-        boundingBoxAttr.width = numSwatches * swatchWidth;
-        boundingBoxAttr.height = swatchHeight;
+        boundingBoxAttr["width"] = numSwatches * swatchWidth;
+        boundingBoxAttr["height"] = swatchHeight;
       }
-      boundingBoxAttr.x = swatchX(null, 0); // position of the first swatch
+      boundingBoxAttr["x"] = swatchX(null, 0); // position of the first swatch
 
       this._upperLabel.text(""); // clear the upper label
       this._writer.write(text1, this.width(), this.height(), upperWriteOptions);

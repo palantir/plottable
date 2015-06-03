@@ -14,14 +14,14 @@ export module Components {
 
   export class DragBoxLayer extends Components.SelectionBoxLayer {
     private _dragInteraction: Interactions.Drag;
-    private _detectionEdgeT: D3.Selection;
-    private _detectionEdgeB: D3.Selection;
-    private _detectionEdgeL: D3.Selection;
-    private _detectionEdgeR: D3.Selection;
-    private _detectionCornerTL: D3.Selection;
-    private _detectionCornerTR: D3.Selection;
-    private _detectionCornerBL: D3.Selection;
-    private _detectionCornerBR: D3.Selection;
+    private _detectionEdgeT: d3.Selection<void>;
+    private _detectionEdgeB: d3.Selection<void>;
+    private _detectionEdgeL: d3.Selection<void>;
+    private _detectionEdgeR: d3.Selection<void>;
+    private _detectionCornerTL: d3.Selection<void>;
+    private _detectionCornerTR: d3.Selection<void>;
+    private _detectionCornerBL: d3.Selection<void>;
+    private _detectionCornerBR: d3.Selection<void>;
 
     private _detectionRadius = 3;
     private _resizable = false;
@@ -33,11 +33,11 @@ export module Components {
 
     /**
      * Constructs a DragBoxLayer.
-     * 
+     *
      * A DragBoxLayer is a SelectionBoxLayer with a built-in Drag Interaction.
      * A drag gesture will set the Bounds of the box.
      * If resizing is enabled using resizable(true), the edges of box can be repositioned.
-     * 
+     *
      * @constructor
      */
     constructor() {

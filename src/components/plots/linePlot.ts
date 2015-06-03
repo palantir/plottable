@@ -91,7 +91,7 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector) {
+    protected _constructLineProjector(xProjector: Projector, yProjector: Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
@@ -102,7 +102,7 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum, index);
+                     .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };
     }
 

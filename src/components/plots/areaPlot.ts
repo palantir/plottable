@@ -178,7 +178,7 @@ export module Plots {
       return d3.selectAll(allSelections);
     }
 
-    protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
+    protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
@@ -190,7 +190,7 @@ export module Plots {
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-        return areaGenerator(datum, index);
+        return areaGenerator(datum);
       };
     }
   }

@@ -12,10 +12,10 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
-      if (step.attrToProjector["fill"]) {
-        drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
+      if (step.attrToAppliedProjector["fill"]) {
+        drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
       }
-      step.animator.animate(drawSelection, step.attrToProjector);
+      step.animator.animate(drawSelection, step.attrToAppliedProjector);
     }
 
     protected _enterData(data: any[]) {

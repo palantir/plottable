@@ -52,7 +52,7 @@ describe("Plots", () => {
   });
 
   describe("LinePlot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
@@ -61,7 +61,7 @@ describe("Plots", () => {
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
     var linePlot: Plottable.Plots.Line<number>;
-    var renderArea: D3.Selection;
+    var renderArea: d3.Selection<void>;
 
     before(() => {
       xScale = new Plottable.Scales.Linear();
@@ -218,7 +218,7 @@ describe("Plots", () => {
         linePlot.addDataset(dataset3);
 
         var nodes = linePlot.entities().map((entity) => entity.selection.node());
-        var uniqueNodes: Element[] = [];
+        var uniqueNodes: EventTarget[] = [];
         nodes.forEach((node) => {
           if (uniqueNodes.indexOf(node) === -1) {
             uniqueNodes.push(node);
@@ -230,7 +230,7 @@ describe("Plots", () => {
     });
 
     describe("entityNearest()", () => {
-      var lines: D3.Selection;
+      var lines: d3.Selection<void>;
       var d0: any, d1: any;
       var d0Px: Plottable.Point, d1Px: Plottable.Point;
       var dataset2: Plottable.Dataset;

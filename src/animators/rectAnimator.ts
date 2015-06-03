@@ -19,25 +19,25 @@ export module Animators {
       this.isReverse = isReverse;
     }
 
-    public animate(selection: any, attrToProjector: AttributeToProjector) {
-      var startAttrToProjector: AttributeToProjector = {};
-      Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToProjector[attr] = attrToProjector[attr]);
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+      var startAttrToAppliedProjector: AttributeToAppliedProjector = {};
+      Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]);
 
-      startAttrToProjector[this._getMovingAttr()] = this._startMovingProjector(attrToProjector);
-      startAttrToProjector[this._getGrowingAttr()] = () => 0;
+      startAttrToAppliedProjector[this._getMovingAttr()] = this._startMovingProjector(attrToAppliedProjector);
+      startAttrToAppliedProjector[this._getGrowingAttr()] = () => 0;
 
-      selection.attr(startAttrToProjector);
-      return super.animate(selection, attrToProjector);
+      selection.attr(attrToAppliedProjector);
+      return super.animate(selection, attrToAppliedProjector);
     }
 
-    protected _startMovingProjector(attrToProjector: AttributeToProjector) {
+    protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector) {
       if (this.isVertical === this.isReverse) {
-        return attrToProjector[this._getMovingAttr()];
+        return attrToAppliedProjector[this._getMovingAttr()];
       }
-      var movingAttrProjector = attrToProjector[this._getMovingAttr()];
-      var growingAttrProjector = attrToProjector[this._getGrowingAttr()];
-      return (d: any, i: number, dataset: Dataset) => {
-        return movingAttrProjector(d, i, dataset) + growingAttrProjector(d, i, dataset);
+      var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
+      var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
+      return (d: any, i: number) => {
+        return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
       };
     }
 

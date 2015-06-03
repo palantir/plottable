@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Legend", () => {
-  var svg: D3.Selection;
+  var svg: d3.Selection<void>;
   var color: Plottable.Scales.Color;
   var legend: Plottable.Components.Legend;
 
@@ -233,7 +233,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     assert.deepEqual(legend.getEntry({x: 10, y: 10}).data(), ["AA"], "get first entry");
     assert.deepEqual(legend.getEntry({x: 10, y: 30}).data(), ["BB"], "get second entry");
-    assert.deepEqual(legend.getEntry({x: 10, y: 150}), d3.select(), "no entries at location outside legend");
+    assert.strictEqual(legend.getEntry({x: 10, y: 150}).size(), 0, "no entries at location outside legend");
 
     svg.remove();
   });
@@ -244,7 +244,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     assert.deepEqual(legend.getEntry({x: 10, y: 10}).data(), ["AA"], "get first entry");
     assert.deepEqual(legend.getEntry({x: 50, y: 10}).data(), ["BB"], "get second entry");
-    assert.deepEqual(legend.getEntry({x: 150, y: 10}), d3.select(), "no entries at location outside legend");
+    assert.strictEqual(legend.getEntry({x: 150, y: 10}).size(), 0, "no entries at location outside legend");
 
     svg.remove();
   });

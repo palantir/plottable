@@ -5,14 +5,14 @@ export module Drawers {
   export class Line extends Drawer {
     public static PATH_CLASS = "line";
 
-    private _pathSelection: D3.Selection;
+    private _pathSelection: d3.Selection<void>;
 
     protected _enterData(data: any[]) {
       super._enterData(data);
       this._pathSelection.datum(data);
     }
 
-    public setup(line: D3.Selection) {
+    public setup(line: d3.Selection<void>) {
       this._pathSelection = line.append("path")
                                 .classed(Line.PATH_CLASS, true)
                                 .style("fill", "none");
@@ -24,7 +24,7 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToAppliedProjector);
       step.animator.animate(this._pathSelection, attrToProjector);
       this._pathSelection.classed(Line.PATH_CLASS, true);
     }
@@ -33,7 +33,7 @@ export module Drawers {
       return "." + Line.PATH_CLASS;
     }
 
-    public _getSelection(index: number): D3.Selection {
+    public _getSelection(index: number) {
       return this._getRenderArea().select(this._getSelector());
     }
   }

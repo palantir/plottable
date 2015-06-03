@@ -8,7 +8,7 @@ export module Scales {
     // The maximum number of colors we are getting from CSS stylesheets
     private static _MAXIMUM_COLORS_FROM_CSS = 256;
 
-    private _d3Scale: D3.Scale.OrdinalScale;
+    private _d3Scale: d3.scale.Ordinal<string, string>;
 
     /**
      * A Color Scale maps string values to color hex values expressed as a string.
@@ -20,11 +20,11 @@ export module Scales {
      */
     constructor(scaleType?: string) {
       super();
-      var scale: D3.Scale.OrdinalScale;
+      var scale: d3.scale.Ordinal<string, string>;
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color._getPlottableColors());
+          scale = d3.scale.ordinal<string, string>().range(Color._getPlottableColors());
           break;
         case "Category10":
         case "category10":

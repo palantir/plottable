@@ -3,7 +3,7 @@
 module Plottable {
 export module Components {
   export class Label extends Component {
-    private _textContainer: D3.Selection;
+    private _textContainer: d3.Selection<void>;
     private _text: string; // text assigned to the Label; may not be the actual text displayed due to truncation
     private _angle: number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
