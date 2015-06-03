@@ -44,7 +44,12 @@ function run(svg, data, Plottable) {
             });
           }
 
+          var extentFcnA = function() { return [new Date("2014-08-22"), new Date("2014-08-25")]; };
+          var extentFcnB = function() { return [new Date("2013-08-22"), new Date("2015-08-25")]; };
+
           var xScale = new Plottable.Scales.Time();
+          xScale.addIncludedValuesProvider(extentFcnA);
+
           var xAxis = new Plottable.Axes.Time(xScale, "bottom");
           var xAxisTop = new Plottable.Axes.Time(xScale, "top");
 
