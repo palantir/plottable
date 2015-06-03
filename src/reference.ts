@@ -5,7 +5,7 @@
 /// <reference path="utils/map.ts" />
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
-/// <reference path="utils/color.ts" />
+/// <reference path="utils/colorUtils.ts" />
 /// <reference path="utils/callbackSet.ts" />
 /// <reference path="utils/stackedUtils.ts" />
 

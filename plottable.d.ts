@@ -250,7 +250,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        module Colors {
+        module Color {
             /**
              * Return contrast ratio between two colors
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
