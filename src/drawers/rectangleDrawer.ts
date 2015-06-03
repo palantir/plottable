@@ -2,11 +2,11 @@
 
 module Plottable {
 export module Drawers {
-  export class Rect extends Element {
+  export class Rectangle extends Element {
 
     constructor(dataset: Dataset) {
       super(dataset);
-      this.svgElement("rect");
+      this._svgElement = "rect";
     }
 
   }

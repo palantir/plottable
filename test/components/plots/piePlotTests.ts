@@ -17,11 +17,11 @@ describe("Plots", () => {
   });
 
   describe("PiePlot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
     var piePlot: Plottable.Plots.Pie;
-    var renderArea: D3.Selection;
+    var renderArea: d3.Selection<void>;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);

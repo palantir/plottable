@@ -44,7 +44,7 @@ describe("TimeAxis", () => {
       scale.domain(domain);
       axis.renderTo(svg);
 
-      function checkLabelsForContainer(container: D3.Selection) {
+      function checkLabelsForContainer(container: d3.Selection<void>) {
         var visibleTickLabels = container
                 .selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)
                 .filter(function(d: any, i: number) {
@@ -55,8 +55,8 @@ describe("TimeAxis", () => {
         var box2: ClientRect;
         for (var i = 0; i < numLabels; i++) {
           for (var j = i + 1; j < numLabels; j++) {
-            box1 = visibleTickLabels[0][i].getBoundingClientRect();
-            box2 = visibleTickLabels[0][j].getBoundingClientRect();
+            box1 = (<Element> visibleTickLabels[0][i]).getBoundingClientRect();
+            box2 = (<Element> visibleTickLabels[0][j]).getBoundingClientRect();
 
             assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
           }
@@ -259,7 +259,7 @@ describe("TimeAxis", () => {
         if (visibility === "inherit") {
           visibility = getStyleInIE9(sel[0][0]);
         }
-        if (isInsideAxisBoundingRect(sel[0][0].getBoundingClientRect())) {
+        if (isInsideAxisBoundingRect((<Element> sel[0][0]).getBoundingClientRect())) {
           assert.strictEqual(visibility, "visible",
             "time axis tiers inside the axis should be visible. Tier #" + (i + 1));
         } else {

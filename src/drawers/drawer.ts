@@ -13,24 +13,16 @@ export module Drawers {
   }
 
   export type AppliedDrawStep = {
-    attrToProjector: AttributeToAppliedProjector;
+    attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animators.Plot;
   }
 
-  export class AbstractDrawer {
-    private _renderArea: D3.Selection;
+}
+
+  export class Drawer {
+    private _renderArea: d3.Selection<void>;
     protected _className: string;
     protected _dataset: Dataset;
-
-    /**
-     * Sets the class, which needs to be applied to bound elements.
-     *
-     * @param{string} className The class name to be applied.
-     */
-    public setClass(className: string): AbstractDrawer {
-      this._className = className;
-      return this;
-    }
 
     /**
      * Constructs a Drawer
@@ -42,7 +34,7 @@ export module Drawers {
         this._dataset = dataset;
     }
 
-    public setup(area: D3.Selection) {
+    public setup(area: d3.Selection<void>) {
       this._renderArea = area;
     }
 
@@ -69,7 +61,7 @@ export module Drawers {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    protected _drawStep(step: AppliedDrawStep) {
+    protected _drawStep(step: Drawers.AppliedDrawStep) {
       // no-op
     }
 
@@ -93,11 +85,11 @@ export module Drawers {
      * @param{any[]} data The data to be drawn
      * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
      */
-    public draw(data: any[], drawSteps: DrawStep[]) {
-      var appliedDrawSteps: AppliedDrawStep[] = drawSteps.map((dr: DrawStep) => {
-        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
+    public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
+      var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
+        var attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
         return {
-          attrToProjector: appliedAttrToProjector,
+          attrToAppliedProjector: attrToAppliedProjector,
           animator: dr.animator
         };
       });
@@ -117,9 +109,9 @@ export module Drawers {
     /**
      * Retrieves the renderArea selection for the drawer
      *
-     * @returns {D3.Selection} the renderArea selection
+     * @returns {d3.Selection} the renderArea selection
      */
-    public _getRenderArea(): D3.Selection {
+    public _getRenderArea() {
       return this._renderArea;
     }
 
@@ -127,11 +119,10 @@ export module Drawers {
       return "";
     }
 
-    public _getSelection(index: number): D3.Selection {
+    public _getSelection(index: number): d3.Selection<any> {
       var allSelections = this._getRenderArea().selectAll(this._getSelector());
       return d3.select(allSelections[0][index]);
     }
 
   }
-}
 }

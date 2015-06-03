@@ -35,7 +35,7 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      if (this._datasetKeysInOrder.length === 1) {
+      if (this.datasets().length === 1) {
         Utils.Methods.warn("Only one dataset is supported in Pie plots");
         return this;
       }
@@ -57,7 +57,7 @@ export module Plots {
     }
 
     protected _getDrawer(dataset: Dataset) {
-      return new Plottable.Drawers.Arc(dataset).setClass("arc");
+      return new Plottable.Drawers.Arc(dataset);
     }
 
     public entities(datasets = this.datasets()): Plots.Entity[] {
@@ -188,11 +188,10 @@ export module Plots {
       var dataToDraw = super._getDataToDraw();
       if (this.datasets().length === 0) { return dataToDraw; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      var datasetKey = this._datasetKeysInOrder[0];
-      var data = dataToDraw.get(datasetKey);
-      var ds = this._key2PlotDatasetKey.get(datasetKey).dataset;
+      var ds = this.datasets()[0];
+      var data = dataToDraw.get(ds);
       var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
-      dataToDraw.set(datasetKey, filteredData);
+      dataToDraw.set(ds, filteredData);
       return dataToDraw;
     }
 

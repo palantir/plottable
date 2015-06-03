@@ -7,7 +7,7 @@ module Plottable {
     private _connected = false;
 
     private _hasNoListeners() {
-      return this._callbacks.every((cbs) => cbs.values().length === 0);
+      return this._callbacks.every((cbs) => cbs.size === 0);
     }
 
     private _connect() {

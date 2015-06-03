@@ -8,7 +8,7 @@ export module Scales {
     // The maximum number of colors we are getting from CSS stylesheets
     private static _MAXIMUM_COLORS_FROM_CSS = 256;
 
-    private _d3Scale: D3.Scale.OrdinalScale;
+    private _d3Scale: d3.scale.Ordinal<string, string>;
 
     /**
      * A Color Scale maps string values to color hex values expressed as a string.
@@ -20,11 +20,11 @@ export module Scales {
      */
     constructor(scaleType?: string) {
       super();
-      var scale: D3.Scale.OrdinalScale;
+      var scale: d3.scale.Ordinal<string, string>;
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal().range(Color._getPlottableColors());
+          scale = d3.scale.ordinal<string, string>().range(Color._getPlottableColors());
           break;
         case "Category10":
         case "category10":
@@ -58,12 +58,7 @@ export module Scales {
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
-      var extents = this._getAllExtents();
-      var concatenatedExtents: string[] = [];
-      extents.forEach((e) => {
-        concatenatedExtents = concatenatedExtents.concat(e);
-      });
-      return Utils.Methods.uniq(concatenatedExtents);
+      return Utils.Methods.uniq(this._getAllIncludedValues());
     }
 
     private static _getPlottableColors(): string[] {
@@ -88,7 +83,7 @@ export module Scales {
     /**
      * Returns the color-string corresponding to a given string.
      * If there are not enough colors in the range(), a lightened version of an existing color will be used.
-     * 
+     *
      * @param {string} value
      * @returns {string}
      */

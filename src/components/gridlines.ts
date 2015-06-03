@@ -5,8 +5,8 @@ export module Components {
   export class Gridlines extends Component {
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
-    private _xLinesContainer: D3.Selection;
-    private _yLinesContainer: D3.Selection;
+    private _xLinesContainer: d3.Selection<void>;
+    private _yLinesContainer: d3.Selection<void>;
 
     private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
 

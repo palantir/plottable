@@ -24,7 +24,7 @@ describe("Plots", () => {
       var yScale = new Plottable.Scales.Linear();
       yScale.padProportion(0.1);
       var constantY0 = 30;
-      yScale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[constantY0, constantY0 + 10]]);
+      yScale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [constantY0, constantY0 + 10]);
       var plot = new Plottable.Plots.Area();
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
@@ -37,7 +37,7 @@ describe("Plots", () => {
   });
 
   describe("AreaPlot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var xAccessor: any;
@@ -48,7 +48,7 @@ describe("Plots", () => {
     var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
     var simpleDataset: Plottable.Dataset;
     var areaPlot: Plottable.Plots.Area<number>;
-    var renderArea: D3.Selection;
+    var renderArea: d3.Selection<void>;
 
     before(() => {
       xScale = new Plottable.Scales.Linear();
@@ -80,13 +80,13 @@ describe("Plots", () => {
       var areaPath = renderArea.select(".area");
       assert.strictEqual(TestMethods.normalizePath(areaPath.attr("d")), "M0,500L500,0L500,500L0,500Z", "area d was set correctly");
       assert.strictEqual(areaPath.attr("fill"), "steelblue", "area fill was set correctly");
-      var areaComputedStyle = window.getComputedStyle(areaPath.node());
+      var areaComputedStyle = window.getComputedStyle(<Element> areaPath.node());
       assert.strictEqual(areaComputedStyle.stroke, "none", "area stroke renders as \"none\"");
 
       var linePath = renderArea.select(".line");
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       assert.strictEqual(linePath.attr("stroke"), "#000000", "line stroke was set correctly");
-      var lineComputedStyle = window.getComputedStyle(linePath.node());
+      var lineComputedStyle = window.getComputedStyle(<Element> linePath.node());
       assert.strictEqual(lineComputedStyle.fill, "none", "line fill renders as \"none\"");
       svg.remove();
     });

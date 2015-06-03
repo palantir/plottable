@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Category;
@@ -47,7 +47,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.ClusteredBar<string, number>();
       renderer.addDataset(dataset1);
       renderer.addDataset(dataset2);
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -99,7 +99,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var yScale: Plottable.Scales.Category;
@@ -130,7 +130,7 @@ describe("Plots", () => {
       renderer = new Plottable.Plots.ClusteredBar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
@@ -180,7 +180,7 @@ describe("Plots", () => {
   });
 
   describe("Clustered Bar Plot Missing Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.ClusteredBar<string, number>;
 
     beforeEach(() => {
@@ -198,7 +198,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data1));
       plot.addDataset(new Plottable.Dataset(data2));
       plot.addDataset(new Plottable.Dataset(data3));
-      plot.baseline(0);
+      plot.baselineValue(0);
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
@@ -241,7 +241,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Clustered Bar Plot Missing Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.ClusteredBar<number, string>;
 
     beforeEach(() => {

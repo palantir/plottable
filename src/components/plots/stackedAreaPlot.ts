@@ -3,11 +3,12 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackOffsets: Utils.Map<Dataset, D3.Map<number>>;
+    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
     private _stackedExtent: number[];
 
-    private _baseline: D3.Selection;
+    private _baseline: d3.Selection<void>;
     private _baselineValue = 0;
+    private _baselineValueProvider: () => number[];
 
     /**
      * @constructor
@@ -18,8 +19,9 @@ export module Plots {
       super();
       this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
-      this._stackOffsets = new Utils.Map<Dataset, D3.Map<number>>();
+      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
       this._stackedExtent = [];
+      this._baselineValueProvider = () => [this._baselineValue];
     }
 
     protected _getAnimator(key: string): Animators.Plot {
@@ -33,8 +35,8 @@ export module Plots {
 
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): StackedArea<X>;
-    public x(x: X | Accessor<X>, xScale: QuantitativeScale<X>): StackedArea<X>;
-    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: QuantitativeScale<X>): any {
+    public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedArea<X>;
+    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
       if (x == null) {
         return super.x();
       }
@@ -85,8 +87,8 @@ export module Plots {
       if (scale == null) {
         return;
       }
-      scale.addPaddingException(this, 0);
-      scale.addIncludedValue(this, 0);
+      scale.addPaddingExceptionsProvider(this._baselineValueProvider);
+      scale.addIncludedValuesProvider(this._baselineValueProvider);
     }
 
     protected _onDatasetUpdate() {

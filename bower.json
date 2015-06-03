@@ -1,7 +1,7 @@
 {
   "name": "plottable",
   "description": "A library for creating charts out of D3",
-  "version": "1.0.0-rc3",
+  "version": "1.0.0-rc4",
   "main": ["plottable.js", "plottable.css"],
   "license": "MIT",
   "ignore": [
@@ -29,7 +29,7 @@
   ],
   "dependencies": {
     "d3": "3.5.5",
-    "svg-typewriter": "0.1.11"
+    "svg-typewriter": "0.3.0"
   },
   "homepage": "plottablejs.org",
   "repository": {

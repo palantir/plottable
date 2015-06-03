@@ -149,9 +149,9 @@ export module Axes {
       ]
     ];
 
-    private _tierLabelContainers: D3.Selection[];
-    private _tierMarkContainers: D3.Selection[];
-    private _tierBaselines: D3.Selection[];
+    private _tierLabelContainers: d3.Selection<void>[];
+    private _tierMarkContainers: d3.Selection<void>[];
+    private _tierBaselines: d3.Selection<void>[];
     private _tierHeights: number[];
     private _possibleTimeAxisConfigurations: TimeAxisConfiguration[];
     private _numTiers: number;
@@ -185,7 +185,7 @@ export module Axes {
     public tierLabelPositions(): string[];
     /**
      * Sets the label positions for each tier.
-     * 
+     *
      * @param {string[]} newPositions The positions for each tier. "bottom" and "center" are the only supported values.
      * @returns {Axes.Time} The calling Time Axis.
      */
@@ -371,7 +371,7 @@ export module Axes {
       return tickPos;
     }
 
-    private _renderTierLabels(container: D3.Selection, config: TimeAxisTierConfiguration, index: number) {
+    private _renderTierLabels(container: d3.Selection<void>, config: TimeAxisTierConfiguration, index: number) {
       var tickPos = this._getTickValuesForConfiguration(config);
       var labelPos: Date[] = [];
       if (this._tierLabelPositions[index] === "between" && config.step === 1) {
@@ -385,7 +385,7 @@ export module Axes {
         labelPos = tickPos;
       }
 
-      var tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => d.valueOf());
+      var tickLabels = container.selectAll("." + Axis.TICK_LABEL_CLASS).data(labelPos, (d) => String(d.valueOf()));
       var tickLabelsEnter = tickLabels.enter().append("g").classed(Axis.TICK_LABEL_CLASS, true);
       tickLabelsEnter.append("text");
       var xTranslate = (this._tierLabelPositions[index] === "center" || config.step === 1) ? 0 : this.tickLabelPadding();
@@ -503,7 +503,7 @@ export module Axes {
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {
-      var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+      var boundingBox = (<Element> this._element.select(".bounding-box")[0][0]).getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (

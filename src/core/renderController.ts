@@ -86,14 +86,14 @@ module Plottable {
     export function flush() {
       if (_animationRequested) {
         // Layout
-        _componentsNeedingComputeLayout.values().forEach((component: Component) => component.computeLayout());
+        _componentsNeedingComputeLayout.forEach((component: Component) => component.computeLayout());
 
         // Top level render; Containers will put their children in the toRender queue
-        _componentsNeedingRender.values().forEach((component: Component) => component.render());
+        _componentsNeedingRender.forEach((component: Component) => component.render());
 
         _isCurrentlyFlushing = true;
         var failed = new Utils.Set<Component>();
-        _componentsNeedingRender.values().forEach((component: Component) => {
+        _componentsNeedingRender.forEach((component: Component) => {
           try {
             component.renderImmediately();
           } catch (err) {

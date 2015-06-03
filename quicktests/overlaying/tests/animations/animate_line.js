@@ -1,17 +1,19 @@
 
 function makeData() {
   "use strict";
-  var data = makeRandomData(20);
-  data[10].y = NaN;
-  data[13].x = undefined;
+  var data = [{x: new Date("2014-04-01 00:24"), y: 4},
+              {x: new Date("2014-08-29 00:24"), y: 6}];
   return data;
 }
 
 function run(svg, data, Plottable) {
   "use strict";
   var doAnimate = true;
-  var xScale = new Plottable.Scales.Linear();
-  var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
+  var xScale = new Plottable.Scales.Time();
+  var xAxis = new Plottable.Axes.Time(xScale, "bottom");
+
+  var extent = function(){ return [new Date("2014-04-01 00:24"), new Date("2014-08-29 00:24")]; };
+  xScale.addPaddingExceptionsProvider(extent);
 
   var yScale = new Plottable.Scales.Linear();
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");

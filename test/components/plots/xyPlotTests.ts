@@ -3,7 +3,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("XY Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var plot: Plottable.XYPlot<number, number>;
@@ -25,6 +25,24 @@ describe("Plots", () => {
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)
           .renderTo(svg);
+    });
+
+    it("autorange() getter", () => {
+      assert.strictEqual(plot.autorange(), "none");
+      assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
+      assert.strictEqual(plot.autorange(), "x");
+      plot.autorange("y");
+      assert.strictEqual(plot.autorange(), "y");
+      plot.autorange("none");
+      assert.strictEqual(plot.autorange(), "none");
+      svg.remove();
+    });
+
+    it("autorange() invalid inputs", () => {
+      assert.throws(() => {
+        plot.autorange("foobar");
+      });
+      svg.remove();
     });
 
     it("automatically adjusting Y domain over visible points", () => {
@@ -102,11 +120,8 @@ describe("Plots", () => {
       plot.autorange("y");
       plot.destroy();
 
-      var xScaleCallbacks = (<any> xScale)._callbacks.values();
-      assert.strictEqual(xScaleCallbacks.length, 0, "the plot is no longer attached to xScale");
-
-      var yScaleCallbacks = (<any> yScale)._callbacks.values();
-      assert.strictEqual(yScaleCallbacks.length, 0, "the plot is no longer attached to yScale");
+      assert.strictEqual((<any> xScale)._callbacks.size, 0, "the plot is no longer attached to xScale");
+      assert.strictEqual((<any> yScale)._callbacks.size, 0, "the plot is no longer attached to yScale");
 
       svg.remove();
     });

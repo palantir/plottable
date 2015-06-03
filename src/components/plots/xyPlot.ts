@@ -149,6 +149,10 @@ module Plottable {
     }
 
     /**
+     * Gets the automatic domain adjustment setting for visible points.
+     */
+    public autorange(): string;
+    /**
      * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
      * If "x" or "y" is specified the adjustment is immediately performed.
      *
@@ -156,10 +160,19 @@ module Plottable {
      *   "x" will adjust the x Scale in relation to changes in the y domain.
      *   "y" will adjust the y Scale in relation to changes in the x domain.
      *   "none" means neither Scale will change automatically.
-     *
      * @returns {XYPlot} The calling XYPlot.
      */
-    public autorange(scaleName: string) {
+    public autorange(scaleName: string): XYPlot<X, Y>;
+    public autorange(scaleName?: string): any {
+      if (scaleName == null) {
+        if (this._autoAdjustXScaleDomain) {
+          return "x";
+        }
+        if (this._autoAdjustYScaleDomain) {
+          return "y";
+        }
+        return "none";
+      }
       switch (scaleName) {
         case "x":
           this._autoAdjustXScaleDomain = true;
@@ -219,7 +232,7 @@ module Plottable {
     /**
      * Adjusts the domains of both X and Y scales to show all data.
      * This call does not override the autorange() behavior.
-     * 
+     *
      * @returns {XYPlot} The calling XYPlot.
      */
     public showAllData() {
@@ -257,7 +270,7 @@ module Plottable {
     }
 
     protected _getDataToDraw() {
-      var datasets: D3.Map<any[]> = super._getDataToDraw();
+      var dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
       var definedFunction = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
@@ -266,11 +279,10 @@ module Plottable {
                Utils.Methods.isValidNumber(positionY);
       };
 
-      datasets.forEach((key, data) => {
-        var dataset = this._key2PlotDatasetKey.get(key).dataset;
-        datasets.set(key, data.filter((d, i) => definedFunction(d, i, dataset)));
+      this.datasets().forEach((dataset) => {
+        dataToDraw.set(dataset, dataToDraw.get(dataset).filter((d, i) => definedFunction(d, i, dataset)));
       });
-      return datasets;
+      return dataToDraw;
     }
   }
 }

@@ -23,8 +23,19 @@ describe("Plots", () => {
       assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
     });
 
+    it("orientation() works as expected", () => {
+      var defaultPlot = new Plottable.Plots.Bar<number, number>();
+      assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
+
+      var verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
+      assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
+
+      var horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
+      assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
+    });
+
     describe("Vertical Bar Plot", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Category;
       var yScale: Plottable.Scales.Linear;
@@ -45,7 +56,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -76,7 +87,7 @@ describe("Plots", () => {
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baseline(-1);
+        barPlot.baselineValue(-1);
 
         var renderArea = (<any> barPlot)._renderArea;
         var bars = renderArea.selectAll("rect");
@@ -153,36 +164,12 @@ describe("Plots", () => {
             svg.remove();
           });
 
-         describe("barAlignment", () => {
-           it("entities() positions corrected for barAlignment left", () => {
-             barPlot.barAlignment("left");
-             var entities = barPlot.entities();
-             entities.forEach((entity) => {
-               var barSelection = entity.selection;
-               var pixelPointX = entity.position.x;
-               assert.strictEqual(pixelPointX, +barSelection.attr("x"), "barAlignment left x correct");
-             });
-             svg.remove();
-           });
-
-           it("entities() positions corrected for barAlignment right", () => {
-             barPlot.barAlignment("right");
-             var entities = barPlot.entities();
-             entities.forEach((entity) => {
-               var barSelection = entity.selection;
-               var pixelPointX = entity.position.x;
-               assert.strictEqual(pixelPointX, +barSelection.attr("x") + +barSelection.attr("width"), "barAlignment right x correct");
-             });
-             svg.remove();
-           });
-         });
-
         });
 
       });
 
       describe("entityNearest()", () => {
-        var bars: D3.Selection;
+        var bars: d3.Selection<void>;
         var zeroY: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
@@ -275,7 +262,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot modified log scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.ModifiedLog;
       var yScale: Plottable.Scales.Linear;
@@ -296,7 +283,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -325,7 +312,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot linear scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Linear;
       var yScale: Plottable.Scales.Linear;
@@ -345,7 +332,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, number>();
         dataset = new Plottable.Dataset(data);
         barPlot.addDataset(dataset);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
@@ -401,7 +388,7 @@ describe("Plots", () => {
     });
 
     describe("Vertical Bar Plot time scale", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var barPlot: Plottable.Plots.Bar<Date, number>;
       var xScale: Plottable.Scales.Time;
 
@@ -432,7 +419,7 @@ describe("Plots", () => {
     });
 
     describe("Horizontal Bar Plot", () => {
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;
       var yScale: Plottable.Scales.Category;
       var xScale: Plottable.Scales.Linear;
@@ -454,7 +441,7 @@ describe("Plots", () => {
         barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
         barPlot.animate(false);
-        barPlot.baseline(0);
+        barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
         barPlot.renderTo(svg);
@@ -484,7 +471,7 @@ describe("Plots", () => {
       });
 
       it("baseline value can be changed; barPlot updates appropriately", () => {
-        barPlot.baseline(-1);
+        barPlot.baselineValue(-1);
 
         var renderArea = (<any> barPlot)._renderArea;
         var bars = renderArea.selectAll("rect");
@@ -535,36 +522,12 @@ describe("Plots", () => {
             svg.remove();
           });
 
-          describe("accounting for barAlignment", () => {
-            it("entity() positions corrected for barAlignment left", () => {
-              barPlot.barAlignment("left");
-              var entities = barPlot.entities();
-              entities.forEach((entity) => {
-                var barSelection = entity.selection;
-                var pixelPointY = entity.position.y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y"), "barAlignment left y correct");
-              });
-              svg.remove();
-            });
-
-            it("entity() positions corrected for barAlignment right", () => {
-              barPlot.barAlignment("right");
-              var entities = barPlot.entities();
-              entities.forEach((entity) => {
-                var barSelection = entity.selection;
-                var pixelPointY = entity.position.y;
-                assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "barAlignment right y correct");
-              });
-              svg.remove();
-            });
-          });
-
         });
 
       });
 
       describe("entityNearest()", () => {
-        var bars: D3.Selection;
+        var bars: d3.Selection<void>;
         var zeroX: number;
         var d0: any, d1: any;
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
@@ -657,7 +620,7 @@ describe("Plots", () => {
       var dataset: Plottable.Dataset;
       var xScale: Plottable.Scales.Category;
       var yScale: Plottable.Scales.Linear;
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
@@ -734,7 +697,7 @@ describe("Plots", () => {
     describe("getAllSelections", () => {
       var verticalBarPlot: Plottable.Plots.Bar<string, number>;
       var dataset: Plottable.Dataset;
-      var svg: D3.Selection;
+      var svg: d3.Selection<void>;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();

@@ -14,7 +14,7 @@ describe("Plots", () => {
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
 
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawers.AbstractDrawer(dataset);
+      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
       (<any> stackedPlot)._isVertical = true;
     });
 
@@ -160,7 +160,7 @@ describe("Plots", () => {
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
 
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawers.AbstractDrawer(dataset);
+      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
       (<any> stackedPlot)._isVertical = true;
     });
 
@@ -297,7 +297,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on numeric", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scales.Linear;
@@ -350,7 +350,7 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on Category", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
     var yScale: Plottable.Scales.Linear;
@@ -376,12 +376,23 @@ describe("Plots", () => {
       ]);
     });
 
-    // TODO: #2003 - The test should be taking in xScales but the StackedArea signature disallows category scales
-    it.skip("auto scales correctly on stacked area", () => {
+    it("auto scales correctly on stacked bar", () => {
+      var plot = new Plottable.Plots.StackedBar();
+      plot.addDataset(dataset1)
+          .addDataset(dataset2);
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .autorange("y");
+      plot.renderTo(svg);
+      assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
+      svg.remove();
+    });
+
+    it("auto scales correctly on stacked area", () => {
       var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
-      plot.x((d: any) => d.x, yScale)
+      plot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale)
           .autorange("y");
       plot.renderTo(svg);
@@ -391,7 +402,7 @@ describe("Plots", () => {
   });
 
   describe("scale extent updates", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Category;
     var yScale: Plottable.Scales.Linear;
     var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;

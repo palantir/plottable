@@ -30,7 +30,7 @@ describe("ClientToSVGTranslator", () => {
 
     var translator = Plottable.Utils.ClientToSVGTranslator.getTranslator(<SVGElement> svg.node());
 
-    var rectBCR = rect.node().getBoundingClientRect();
+    var rectBCR = (<Element> rect.node()).getBoundingClientRect();
     var computedOrigin = translator.computePosition(rectBCR.left, rectBCR.top);
     TestMethods.assertPointsClose(computedOrigin, rectOrigin, 0.5, "translates client coordinates to <svg> coordinates correctly");
 

@@ -5,10 +5,11 @@ export module Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
+    private _constantBaselineValueProvider: () => number[];
 
     /**
      * An Area Plot draws a filled region (area) between Y and Y0.
-     * 
+     *
      * @constructor
      * @param {QuantitativeScale} xScale
      * @param {QuantitativeScale} yScale
@@ -26,7 +27,7 @@ export module Plots {
 
     protected _setup() {
       super._setup();
-      this._lineDrawers.values().forEach((d) => d.setup(this._renderArea.append("g")));
+      this._lineDrawers.forEach((d) => d.setup(this._renderArea.append("g")));
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -60,7 +61,7 @@ export module Plots {
     /**
      * Sets Y0 to a constant number or the result of an Accessor<number>.
      * If a Scale has been set for Y, it will also be used to scale Y0.
-     * 
+     *
      * @param {number|Accessor<number>} y0
      * @returns {Area} The calling Area Plot.
      */
@@ -95,10 +96,7 @@ export module Plots {
     protected _additionalPaint() {
       var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
-      });
+      this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
     private _generateLineDrawSteps() {
@@ -149,10 +147,14 @@ export module Plots {
         return;
       }
 
+      if (this._constantBaselineValueProvider != null) {
+        yScale.removePaddingExceptionsProvider(this._constantBaselineValueProvider);
+        this._constantBaselineValueProvider = null;
+      }
+
       if (constantBaseline != null) {
-        yScale.addPaddingException(this, constantBaseline);
-      } else {
-        yScale.removePaddingException(this);
+        this._constantBaselineValueProvider = () => [constantBaseline];
+        yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
       }
     }
 
@@ -176,7 +178,7 @@ export module Plots {
       return d3.selectAll(allSelections);
     }
 
-    protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
+    protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
@@ -188,7 +190,7 @@ export module Plots {
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-        return areaGenerator(datum, index);
+        return areaGenerator(datum);
       };
     }
   }

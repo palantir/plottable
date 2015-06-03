@@ -6,15 +6,27 @@ module Plottable {
   }
 
   export module Scales {
+
     /**
-     * A function that supplies Extents to a Scale.
-     * An Extent is a request for a set of domain values to be included.
-     * 
+     * A function that supplies domain values to be included into a Scale.
+     *
      * @param {Scale} scale
-     * @returns {D[][]} An array of extents.
+     * @returns {D[]} An array of values in the domain.
      */
-    export interface ExtentsProvider<D> {
-      (scale: Scale<D, any>): D[][];
+    export interface IncludedValuesProvider<D> {
+      (scale: Scale<D, any>): D[];
+    }
+
+    /**
+     * A function that supplies padding exception values for the Scale.
+     * If one end of the domain is set to an excepted value as a result of autoDomain()-ing,
+     * that end of the domain will not be padded.
+     *
+     * @param {Scale} scale
+     * @returns {D[]} An array of extents.
+     */
+    export interface PaddingExceptionsProvider<D> {
+      (scale: Scale<D, any>): D[];
     }
   }
 
@@ -22,21 +34,21 @@ module Plottable {
     private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
-    private _extentsProviders: Utils.Set<Scales.ExtentsProvider<D>>;
+    private _includedValuesProviders: Utils.Set<Scales.IncludedValuesProvider<D>>;
 
     /**
      * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
-     * 
+     *
      * @constructor
      */
     constructor() {
       this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
-      this._extentsProviders = new Utils.Set<Scales.ExtentsProvider<D>>();
+      this._includedValuesProviders = new Utils.Set<Scales.IncludedValuesProvider<D>>();
     }
 
     /**
      * Given an array of potential domain values, computes the extent of those values.
-     * 
+     *
      * @param {D[]} values
      * @returns {D[]} The extent of the input values.
      */
@@ -44,8 +56,13 @@ module Plottable {
       return []; // this should be overwritten
     }
 
-    protected _getAllExtents(): D[][] {
-      return d3.merge(this._extentsProviders.values().map((provider) => provider(this)));
+    protected _getAllIncludedValues(): D[] {
+      var providerArray: D[] = [];
+      this._includedValuesProviders.forEach((provider: Scales.IncludedValuesProvider<D>) => {
+        var extents = provider(this);
+        providerArray = providerArray.concat(extents);
+      });
+      return providerArray;
     }
 
     protected _getExtent(): D[] {
@@ -54,7 +71,7 @@ module Plottable {
 
     /**
      * Adds a callback to be called when the Scale updates.
-     * 
+     *
      * @param {ScaleCallback} callback.
      * @returns {Scale} The calling Scale.
      */
@@ -65,7 +82,7 @@ module Plottable {
 
     /**
      * Removes a callback that would be called when the Scale updates.
-     * 
+     *
      * @param {ScaleCallback} callback.
      * @returns {Scale} The calling Scale.
      */
@@ -147,13 +164,13 @@ module Plottable {
 
     /**
      * Gets the range.
-     * 
+     *
      * @returns {R[]} The current range.
      */
     public range(): R[];
     /**
      * Sets the range.
-     * 
+     *
      * @param {R[]} values
      * @returns {Scale} The calling Scale.
      */
@@ -176,25 +193,25 @@ module Plottable {
     }
 
     /**
-     * Adds an ExtentsProvider to the Scale.
-     * 
-     * @param {Scales.ExtentsProvider} provider
+     * Adds an IncludedValuesProvider to the Scale.
+     *
+     * @param {Scales.IncludedValuesProvider} provider
      * @returns {Sclae} The calling Scale.
      */
-    public addExtentsProvider(provider: Scales.ExtentsProvider<D>) {
-      this._extentsProviders.add(provider);
+    public addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
+      this._includedValuesProviders.add(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }
 
     /**
-     * Removes an ExtentsProvider from the Scale.
-     * 
-     * @param {Scales.ExtentsProvider} provider
+     * Removes the IncludedValuesProvider from the Scale.
+     *
+     * @param {Scales.IncludedValuesProvider} provider
      * @returns {Sclae} The calling Scale.
      */
-    public removeExtentsProvider(provider: Scales.ExtentsProvider<D>) {
-      this._extentsProviders.delete(provider);
+    public removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
+      this._includedValuesProviders.delete(provider);
       this._autoDomainIfAutomaticMode();
       return this;
     }

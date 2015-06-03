@@ -2,18 +2,8 @@
 
 module Plottable {
 export module Drawers {
-  export class Element extends AbstractDrawer {
+  export class Element extends Drawer {
     protected _svgElement: string;
-
-    /**
-     * Sets the svg element, which needs to be bind to data
-     *
-     * @param{string} tag The svg element to be bind
-     */
-    public svgElement(tag: string): Element {
-      this._svgElement = tag;
-      return this;
-    }
 
     private _getDrawSelection() {
       return this._getRenderArea().selectAll(this._svgElement);
@@ -22,10 +12,10 @@ export module Drawers {
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
       var drawSelection = this._getDrawSelection();
-      if (step.attrToProjector["fill"]) {
-        drawSelection.attr("fill", step.attrToProjector["fill"]); // so colors don't animate
+      if (step.attrToAppliedProjector["fill"]) {
+        drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
       }
-      step.animator.animate(drawSelection, step.attrToProjector);
+      step.animator.animate(drawSelection, step.attrToAppliedProjector);
     }
 
     protected _enterData(data: any[]) {

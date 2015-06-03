@@ -10,7 +10,7 @@ export module Axes {
 
     /**
      * Constructs a Category Axis.
-     * 
+     *
      * A Category Axis is a visual representation of a Category Scale.
      *
      * @constructor
@@ -18,7 +18,7 @@ export module Axes {
      * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.identity()]
      */
-    constructor(scale: Scales.Category, orientation = "bottom", formatter = Formatters.identity()) {
+    constructor(scale: Scales.Category, orientation: string, formatter = Formatters.identity()) {
       super(scale, orientation, formatter);
       this.classed("category-axis", true);
     }
@@ -84,9 +84,9 @@ export module Axes {
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
-     * @param {D3.Selection} ticks The tick elements to be written to.
+     * @param {d3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: d3.Selection<string>) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};

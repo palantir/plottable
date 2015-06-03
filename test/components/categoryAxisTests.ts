@@ -16,7 +16,7 @@ describe("Category Axes", () => {
   it("requests appropriate space when the scale has no domain", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var scale = new Plottable.Scales.Category();
-    var ca = new Plottable.Axes.Category(scale);
+    var ca = new Plottable.Axes.Category(scale, "bottom");
     ca.anchor(svg);
     var s = ca.requestedSpace(400, 400);
     assert.operator(s.minWidth, ">=", 0, "it requested 0 or more width");
@@ -28,7 +28,7 @@ describe("Category Axes", () => {
     var svg = TestMethods.generateSVG(1000, 400);
     var domain: any[] = [null, undefined, true, 2, "foo"];
     var scale = new Plottable.Scales.Category().domain(domain);
-    var axis = new Plottable.Axes.Category(scale);
+    var axis = new Plottable.Axes.Category(scale, "bottom");
     axis.renderTo(svg);
     var texts = svg.selectAll("text")[0].map((s: any) => d3.select(s).text());
     assert.deepEqual(texts, ["null", "undefined", "true", "2", "foo"]);
@@ -140,10 +140,10 @@ describe("Category Axes", () => {
 
   it("axis labels respect tick labels", () => {
 
-    function verifyTickLabelOverlaps(tickLabels: D3.Selection, tickMarks: D3.Selection) {
+    function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
         for (var i = 0; i < tickLabels[0].length; i++) {
-          var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
-          var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
+          var tickLabelBox = (<Element> tickLabels[0][i]).getBoundingClientRect();
+          var tickMarkBox = (<Element> tickMarks[0][i]).getBoundingClientRect();
           assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
         }
     }
