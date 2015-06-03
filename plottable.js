@@ -1742,10 +1742,10 @@ var Plottable;
             this._paddingExceptionsProviders.forEach(function (provider) {
                 var values = provider(_this);
                 values.forEach(function (value) {
-                    if (value === min) {
+                    if (value.valueOf() === min.valueOf()) {
                         minExistsInExceptions = true;
                     }
-                    if (value === max) {
+                    if (value.valueOf() === max.valueOf()) {
                         maxExistsInExceptions = true;
                     }
                 });
