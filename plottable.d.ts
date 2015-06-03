@@ -2290,7 +2290,7 @@ declare module Plottable {
          * @returns {Plot} The calling Plot.
          */
         addDataset(dataset: Dataset): Plot;
-        protected _setupDatasetNodes(dataset: Dataset): void;
+        protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _getDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animators.Plot;
         protected _onDatasetUpdate(): void;
@@ -2754,7 +2754,7 @@ declare module Plottable {
              * @returns {Bar} The calling Bar Plot.
              */
             labelFormatter(formatter: Formatter): Bar<X, Y>;
-            protected _setupDatasetNodes(dataset: Dataset): void;
+            protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**
              * Returns the Entity nearest to the query point according to the following algorithm:

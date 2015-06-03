@@ -73,7 +73,7 @@ module Plottable {
     protected _setup() {
       super._setup();
       this._renderArea = this._content.append("g").classed("render-area", true);
-      this.datasets().forEach((dataset) => this._setupDatasetNodes(dataset));
+      this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 
     public destroy() {
@@ -96,7 +96,7 @@ module Plottable {
       this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
-        this._setupDatasetNodes(dataset);
+        this._createNodesForDataset(dataset);
       }
 
       dataset.onUpdate(this._onDatasetUpdateCallback);
@@ -104,9 +104,10 @@ module Plottable {
       return this;
     }
 
-    protected _setupDatasetNodes(dataset: Dataset) {
+    protected _createNodesForDataset(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
       drawer.setup(this._renderArea.append("g"));
+      return drawer;
     }
 
     protected _getDrawer(dataset: Dataset): Drawer {
