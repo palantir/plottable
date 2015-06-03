@@ -29,7 +29,7 @@ module Plottable {
     protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<_Projection>;
+    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
     protected _attrExtents: d3.Map<any[]>;
     private _extentsProvider: Scales.ExtentsProvider<any>;
 
@@ -51,7 +51,7 @@ module Plottable {
       this._clipPathEnabled = true;
       this.classed("plot", true);
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
-      this._attrBindings = d3.map<_Projection>();
+      this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._attrExtents = d3.map<any[]>();
       this._extentsProvider = (scale: Scale<any, any>) => this._extentsForScale(scale);
       this._renderCallback = (scale) => this.render();

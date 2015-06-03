@@ -593,22 +593,14 @@ declare module Plottable {
     /**
      * Retrieves scaled datum property.
      */
-    type _Projector = (datum: any, index: number, dataset: Dataset) => any;
+    type Projector = (datum: any, index: number, dataset: Dataset) => any;
     type AppliedProjector = (datum: any, index: number) => any;
-    /**
-     * Defines a way how specific attribute needs be retrieved before rendering.
-     */
-    type _Projection = {
-        accessor: Accessor<any>;
-        scale?: Scale<any, any>;
-        attribute: string;
-    };
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
      */
     type AttributeToProjector = {
-        [attrToSet: string]: _Projector;
+        [attrToSet: string]: Projector;
     };
     type AttributeToAppliedProjector = {
         [attrToSet: string]: AppliedProjector;
@@ -2285,7 +2277,7 @@ declare module Plottable {
         protected _dataChanged: boolean;
         protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: d3.Selection<void>;
-        protected _attrBindings: d3.Map<_Projection>;
+        protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         protected _attrExtents: d3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
@@ -2847,7 +2839,7 @@ declare module Plottable {
              */
             entityNearest(queryPoint: Point): Plots.Entity;
             protected _propertyProjectors(): AttributeToProjector;
-            protected _constructLineProjector(xProjector: _Projector, yProjector: _Projector): (datum: any, index: number, dataset: Dataset) => string;
+            protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
@@ -2890,7 +2882,7 @@ declare module Plottable {
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
             getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
-            protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector): (datum: any[], index: number, dataset: Dataset) => string;
+            protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
 }
