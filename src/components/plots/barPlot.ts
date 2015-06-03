@@ -84,6 +84,15 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the orientation of the plot
+     *
+     * @return "vertical" | "horizontal"
+     */
+    public orientation() {
+      return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+    }
+
     protected _getDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Rectangle(dataset);
     }

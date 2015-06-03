@@ -7076,6 +7076,14 @@ var Plottable;
                 this._updateValueScale();
                 return this;
             };
+            /**
+             * Gets the orientation of the plot
+             *
+             * @return "vertical" | "horizontal"
+             */
+            Bar.prototype.orientation = function () {
+                return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+            };
             Bar.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };

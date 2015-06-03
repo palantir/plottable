@@ -23,6 +23,17 @@ describe("Plots", () => {
       assert.throws(() => new Plottable.Plots.Bar("diagonal"), Error);
     });
 
+    it("orientation() works as expected", () => {
+      var defaultPlot = new Plottable.Plots.Bar<number, number>();
+      assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
+
+      var verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
+      assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
+
+      var horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
+      assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
+    });
+
     describe("Vertical Bar Plot", () => {
       var svg: d3.Selection<void>;
       var dataset: Plottable.Dataset;

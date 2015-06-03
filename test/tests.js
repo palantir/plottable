@@ -3187,6 +3187,14 @@ describe("Plots", function () {
         it("rejects invalid orientations", function () {
             assert.throws(function () { return new Plottable.Plots.Bar("diagonal"); }, Error);
         });
+        it("orientation() works as expected", function () {
+            var defaultPlot = new Plottable.Plots.Bar();
+            assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
+            var verticalPlot = new Plottable.Plots.Bar("vertical");
+            assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
+            var horizontalPlot = new Plottable.Plots.Bar("horizontal");
+            assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
+        });
         describe("Vertical Bar Plot", function () {
             var svg;
             var dataset;
