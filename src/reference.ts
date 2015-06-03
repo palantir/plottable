@@ -1,7 +1,7 @@
 /// <reference path="../typings/d3/d3.d.ts" />
 /// <reference path="../bower_components/svg-typewriter/svgtypewriter.d.ts" />
 
-/// <reference path="utils/utils.ts" />
+/// <reference path="utils/methods.ts" />
 /// <reference path="utils/map.ts" />
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
