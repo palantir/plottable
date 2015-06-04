@@ -7,7 +7,7 @@ export module Components {
     guaranteedHeights: number[];
     wantsWidthArr: boolean[];
     wantsHeightArr: boolean[];
-  }
+  };
 
   type _IterateLayoutResult = {
     colProportionalSpace: number[];
@@ -316,7 +316,7 @@ export module Components {
     /**
      * Sets the padding above and below each row in pixels.
      *
-     * @param {number} rowPadding 
+     * @param {number} rowPadding
      * @returns {Table} The calling Table.
      */
     public rowPadding(rowPadding: number): Table;
@@ -351,7 +351,7 @@ export module Components {
 
     /**
      * Gets the weight of the specified row.
-     * 
+     *
      * @param {number} index
      */
     public rowWeight(index: number): number;
@@ -392,7 +392,7 @@ export module Components {
 
     /**
      * Gets the weight of the specified column.
-     * 
+     *
      * @param {number} index
      */
     public columnWeight(index: number): number;

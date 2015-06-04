@@ -10,7 +10,7 @@ export module Axes {
 
     /**
      * Constructs a Numeric Axis.
-     * 
+     *
      * A Numeric Axis is a visual representation of a QuantitativeScale.
      *
      * @constructor
