@@ -6,6 +6,7 @@
 /// <reference path="utils/set.ts" />
 /// <reference path="utils/domUtils.ts" />
 /// <reference path="utils/colorUtils.ts" />
+/// <reference path="utils/arrayUtils.ts" />
 /// <reference path="utils/callbackSet.ts" />
 /// <reference path="utils/stackedUtils.ts" />
 /// <reference path="utils/windowUtils.ts" />

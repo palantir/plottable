@@ -58,6 +58,7 @@
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/methodUtilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
+///<reference path="utils/arrayUtilsTests.ts" />
 ///<reference path="utils/stackedUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />

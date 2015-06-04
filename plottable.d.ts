@@ -231,6 +231,14 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
+        module Array {
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Utils {
         /**
          * A set of callbacks which can be all invoked at once.
          * Each callback exists at most once in the set (based on reference equality).

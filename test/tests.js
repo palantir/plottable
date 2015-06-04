@@ -8336,6 +8336,13 @@ describe("Utils", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Utils", function () {
+    describe("ArrayUtils", function () {
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Utils", function () {
     describe("StackedUtils", function () {
         var keyAccessor = function (d) { return d.key; };
         var valueAccessor = function (d) { return d.value; };
