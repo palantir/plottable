@@ -51,25 +51,6 @@ var Plottable;
             }
             Methods.populateMap = populateMap;
             /**
-             * Take an array of values, and return the unique values.
-             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
-             *
-             * @param {T[]} values The values to find uniqueness for
-             * @return {T[]} The unique values
-             */
-            function uniq(arr) {
-                var seen = d3.set();
-                var result = [];
-                arr.forEach(function (x) {
-                    if (!seen.has(String(x))) {
-                        seen.add(String(x));
-                        result.push(x);
-                    }
-                });
-                return result;
-            }
-            Methods.uniq = uniq;
-            /**
              * Creates an array of length `count`, filled with value or (if value is a function), value()
              *
              * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
@@ -580,6 +561,25 @@ var Plottable;
                 return alist.map(function (_, i) { return alist[i] + blist[i]; });
             }
             Array.add = add;
+            /**
+             * Take an array of values, and return the unique values.
+             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+             *
+             * @param {T[]} values The values to find uniqueness for
+             * @return {T[]} The unique values
+             */
+            function uniq(arr) {
+                var seen = d3.set();
+                var result = [];
+                arr.forEach(function (x) {
+                    if (!seen.has(String(x))) {
+                        seen.add(String(x));
+                        result.push(x);
+                    }
+                });
+                return result;
+            }
+            Array.uniq = uniq;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -1955,7 +1955,7 @@ var Plottable;
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
                 var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
                 var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
-                var uniqMultiples = Plottable.Utils.Methods.uniq(multiples);
+                var uniqMultiples = Plottable.Utils.Array.uniq(multiples);
                 var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this._base, b - 1) * x; }); });
                 var flattened = Plottable.Utils.Methods.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
@@ -2049,10 +2049,10 @@ var Plottable;
                 this._outerPadding = Category._convertToPlottableOuterPadding(0.5, d3InnerPadding);
             }
             Category.prototype.extentOfValues = function (values) {
-                return Plottable.Utils.Methods.uniq(values);
+                return Plottable.Utils.Array.uniq(values);
             };
             Category.prototype._getExtent = function () {
-                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
+                return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
             };
             Category.prototype.domain = function (values) {
                 return _super.prototype.domain.call(this, values);
@@ -2192,11 +2192,11 @@ var Plottable;
                 this._d3Scale = scale;
             }
             Color.prototype.extentOfValues = function (values) {
-                return Plottable.Utils.Methods.uniq(values);
+                return Plottable.Utils.Array.uniq(values);
             };
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
-                return Plottable.Utils.Methods.uniq(this._getAllIncludedValues());
+                return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
@@ -7681,7 +7681,7 @@ var Plottable;
             Area.prototype._updateYScale = function () {
                 var extents = this._propertyExtents.get("y0");
                 var extent = Plottable.Utils.Methods.flatten(extents);
-                var uniqExtentVals = Plottable.Utils.Methods.uniq(extent);
+                var uniqExtentVals = Plottable.Utils.Array.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 var yBinding = this.y();
                 var yScale = (yBinding && yBinding.scale);

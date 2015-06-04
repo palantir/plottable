@@ -53,12 +53,12 @@ export module Scales {
     }
 
     public extentOfValues(values: string[]) {
-      return Utils.Methods.uniq(values);
+      return Utils.Array.uniq(values);
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
-      return Utils.Methods.uniq(this._getAllIncludedValues());
+      return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
     private static _getPlottableColors(): string[] {

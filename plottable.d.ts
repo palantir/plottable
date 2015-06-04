@@ -29,14 +29,6 @@ declare module Plottable {
              */
             function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): d3.Map<T>;
             /**
-             * Take an array of values, and return the unique values.
-             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
-             *
-             * @param {T[]} values The values to find uniqueness for
-             * @return {T[]} The unique values
-             */
-            function uniq<T>(arr: T[]): T[];
-            /**
              * Creates an array of length `count`, filled with value or (if value is a function), value()
              *
              * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
@@ -232,6 +224,14 @@ declare module Plottable {
              * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
              */
             function add(alist: number[], blist: number[]): number[];
+            /**
+             * Take an array of values, and return the unique values.
+             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+             *
+             * @param {T[]} values The values to find uniqueness for
+             * @return {T[]} The unique values
+             */
+            function uniq<T>(arr: T[]): T[];
         }
     }
 }

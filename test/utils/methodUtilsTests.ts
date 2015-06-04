@@ -9,11 +9,6 @@ describe("Utils.Methods", () => {
     assert.isTrue(!Plottable.Utils.Methods.inRange(0, 1, 2), "returns false when false");
   });
 
-  it("uniq works as expected", () => {
-    var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
-    assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
-  });
-
   describe("max() and min()", () => {
     var max = Plottable.Utils.Methods.max;
     var min = Plottable.Utils.Methods.min;

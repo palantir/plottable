@@ -7432,7 +7432,7 @@ describe("Scales", function () {
             assert.deepEqual(b.slice().reverse(), b.slice().sort(function (x, y) { return x - y; }));
             var ticks = scale.ticks();
             assert.deepEqual(ticks, ticks.slice().sort(function (x, y) { return x - y; }), "ticks should be sorted");
-            assert.deepEqual(ticks, Plottable.Utils.Methods.uniq(ticks), "ticks should not be repeated");
+            assert.deepEqual(ticks, Plottable.Utils.Array.uniq(ticks), "ticks should not be repeated");
             var beforePivot = ticks.filter(function (x) { return x <= -base; });
             var afterPivot = ticks.filter(function (x) { return base <= x; });
             var betweenPivots = ticks.filter(function (x) { return -base < x && x < base; });
@@ -8153,10 +8153,6 @@ describe("Utils.Methods", function () {
         assert.isTrue(Plottable.Utils.Methods.inRange(0, 0, 1), "it is a closed interval");
         assert.isTrue(!Plottable.Utils.Methods.inRange(0, 1, 2), "returns false when false");
     });
-    it("uniq works as expected", function () {
-        var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
-        assert.deepEqual(Plottable.Utils.Methods.uniq(strings), ["foo", "bar", "baz", "bam"]);
-    });
     describe("max() and min()", function () {
         var max = Plottable.Utils.Methods.max;
         var min = Plottable.Utils.Methods.min;
@@ -8337,6 +8333,10 @@ describe("Utils", function () {
 var assert = chai.assert;
 describe("Utils", function () {
     describe("ArrayUtils", function () {
+        it("uniq()", function () {
+            var strings = ["foo", "bar", "foo", "foo", "baz", "bam"];
+            assert.deepEqual(Plottable.Utils.Array.uniq(strings), ["foo", "bar", "baz", "bam"]);
+        });
     });
 });
 

@@ -44,25 +44,6 @@ export module Utils {
     }
 
     /**
-     * Take an array of values, and return the unique values.
-     * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
-     *
-     * @param {T[]} values The values to find uniqueness for
-     * @return {T[]} The unique values
-     */
-    export function uniq<T>(arr: T[]): T[] {
-      var seen: d3.Set = d3.set();
-      var result: T[] = [];
-      arr.forEach((x) => {
-        if (!seen.has(String(x))) {
-          seen.add(String(x));
-          result.push(x);
-        }
-      });
-      return result;
-    }
-
-    /**
      * Creates an array of length `count`, filled with value or (if value is a function), value()
      *
      * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)

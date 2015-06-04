@@ -24,7 +24,6 @@ module Plottable {
         /* tslint:enable:no-console */
       }
 
-
       /**
        * Is like setTimeout, but activates synchronously if time=0
        * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
