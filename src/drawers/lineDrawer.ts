@@ -29,12 +29,12 @@ export module Drawers {
       this._pathSelection.classed(Line.PATH_CLASS, true);
     }
 
-    public _getSelector() {
+    public selector() {
       return "." + Line.PATH_CLASS;
     }
 
-    public _getSelection(index: number) {
-      return this._getRenderArea().select(this._getSelector());
+    public selectionForIndex(index: number) {
+      return this.renderArea().select(this.selector());
     }
   }
 }

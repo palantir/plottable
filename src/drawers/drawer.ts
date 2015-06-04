@@ -42,8 +42,8 @@ export module Drawers {
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this._getRenderArea() != null) {
-        this._getRenderArea().remove();
+      if (this.renderArea() != null) {
+        this.renderArea().remove();
       }
     }
 
@@ -111,16 +111,22 @@ export module Drawers {
      *
      * @returns {d3.Selection} the renderArea selection
      */
-    public _getRenderArea() {
+    public renderArea() {
       return this._renderArea;
     }
 
-    public _getSelector(): string {
+    /**
+     * Returns the selector for this Drawer's visual elements.
+     */
+    public selector() {
       return "";
     }
 
-    public _getSelection(index: number): d3.Selection<any> {
-      var allSelections = this._getRenderArea().selectAll(this._getSelector());
+    /**
+     * Returns the D3 selection corresponding to the datum with the specified index.
+     */
+    public selectionForIndex(index: number) {
+      var allSelections = this.renderArea().selectAll(this.selector());
       return d3.select(allSelections[0][index]);
     }
 

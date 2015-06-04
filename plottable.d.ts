@@ -1201,9 +1201,15 @@ declare module Plottable {
          *
          * @returns {d3.Selection} the renderArea selection
          */
-        _getRenderArea(): d3.Selection<void>;
-        _getSelector(): string;
-        _getSelection(index: number): d3.Selection<any>;
+        renderArea(): d3.Selection<void>;
+        /**
+         * Returns the selector for this Drawer's visual elements.
+         */
+        selector(): string;
+        /**
+         * Returns the D3 selection corresponding to the datum with the specified index.
+         */
+        selectionForIndex(index: number): d3.Selection<any>;
     }
 }
 
@@ -1216,8 +1222,8 @@ declare module Plottable {
             setup(line: d3.Selection<void>): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
-            _getSelection(index: number): d3.Selection<void>;
+            selector(): string;
+            selectionForIndex(index: number): d3.Selection<void>;
         }
     }
 }
@@ -1230,7 +1236,7 @@ declare module Plottable {
             protected _enterData(data: any[]): void;
             setup(area: d3.Selection<void>): void;
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
+            selector(): string;
         }
     }
 }
@@ -1242,7 +1248,7 @@ declare module Plottable {
             protected _svgElement: string;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
-            _getSelector(): string;
+            selector(): string;
         }
     }
 }

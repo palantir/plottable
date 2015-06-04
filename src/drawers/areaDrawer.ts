@@ -22,7 +22,7 @@ export module Drawers {
       this._areaSelection.classed(Area.PATH_CLASS, true);
     }
 
-    public _getSelector(): string {
+    public selector(): string {
       return "path";
     }
   }

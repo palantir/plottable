@@ -2592,8 +2592,8 @@ var Plottable;
          * Removes the Drawer and its renderArea
          */
         Drawer.prototype.remove = function () {
-            if (this._getRenderArea() != null) {
-                this._getRenderArea().remove();
+            if (this.renderArea() != null) {
+                this.renderArea().remove();
             }
         };
         /**
@@ -2652,14 +2652,20 @@ var Plottable;
          *
          * @returns {d3.Selection} the renderArea selection
          */
-        Drawer.prototype._getRenderArea = function () {
+        Drawer.prototype.renderArea = function () {
             return this._renderArea;
         };
-        Drawer.prototype._getSelector = function () {
+        /**
+         * Returns the selector for this Drawer's visual elements.
+         */
+        Drawer.prototype.selector = function () {
             return "";
         };
-        Drawer.prototype._getSelection = function (index) {
-            var allSelections = this._getRenderArea().selectAll(this._getSelector());
+        /**
+         * Returns the D3 selection corresponding to the datum with the specified index.
+         */
+        Drawer.prototype.selectionForIndex = function (index) {
+            var allSelections = this.renderArea().selectAll(this.selector());
             return d3.select(allSelections[0][index]);
         };
         return Drawer;
@@ -2699,11 +2705,11 @@ var Plottable;
                 step.animator.animate(this._pathSelection, attrToProjector);
                 this._pathSelection.classed(Line.PATH_CLASS, true);
             };
-            Line.prototype._getSelector = function () {
+            Line.prototype.selector = function () {
                 return "." + Line.PATH_CLASS;
             };
-            Line.prototype._getSelection = function (index) {
-                return this._getRenderArea().select(this._getSelector());
+            Line.prototype.selectionForIndex = function (index) {
+                return this.renderArea().select(this.selector());
             };
             Line.PATH_CLASS = "line";
             return Line;
@@ -2740,7 +2746,7 @@ var Plottable;
                 step.animator.animate(this._areaSelection, attrToProjector);
                 this._areaSelection.classed(Area.PATH_CLASS, true);
             };
-            Area.prototype._getSelector = function () {
+            Area.prototype.selector = function () {
                 return "path";
             };
             Area.PATH_CLASS = "area";
@@ -2767,7 +2773,7 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Element.prototype._getDrawSelection = function () {
-                return this._getRenderArea().selectAll(this._svgElement);
+                return this.renderArea().selectAll(this._svgElement);
             };
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
@@ -2786,7 +2792,7 @@ var Plottable;
                 }
                 dataElements.exit().remove();
             };
-            Element.prototype._getSelector = function () {
+            Element.prototype.selector = function () {
                 return this._svgElement;
             };
             return Element;
@@ -6282,7 +6288,7 @@ var Plottable;
                 if (drawer == null) {
                     return;
                 }
-                drawer._getRenderArea().selectAll(drawer._getSelector()).each(function () {
+                drawer.renderArea().selectAll(drawer.selector()).each(function () {
                     allSelections.push(this);
                 });
             });
@@ -6311,7 +6317,7 @@ var Plottable;
                         index: index,
                         dataset: dataset,
                         position: position,
-                        selection: drawer._getSelection(index),
+                        selection: drawer.selectionForIndex(index),
                         plot: _this
                     });
                 });
@@ -7135,7 +7141,7 @@ var Plottable;
             };
             Bar.prototype._createNodesForDataset = function (dataset) {
                 var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
-                drawer._getRenderArea().classed(Bar._BAR_AREA_CLASS, true);
+                drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
                 var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
                 var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
@@ -7738,7 +7744,7 @@ var Plottable;
                 if (datasets === void 0) { datasets = this.datasets(); }
                 var allSelections = _super.prototype.getAllSelections.call(this, datasets)[0];
                 var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
-                lineDrawers.forEach(function (ld, i) { return allSelections.push(ld._getSelection(i).node()); });
+                lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
                 return d3.selectAll(allSelections);
             };
             Area.prototype._constructAreaProjector = function (xProjector, yProjector, y0Projector) {

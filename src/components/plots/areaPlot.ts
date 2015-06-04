@@ -174,7 +174,7 @@ export module Plots {
       var allSelections = super.getAllSelections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
-      lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
+      lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
       return d3.selectAll(allSelections);
     }
 
