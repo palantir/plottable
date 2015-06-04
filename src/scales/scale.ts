@@ -23,7 +23,7 @@ module Plottable {
      * that end of the domain will not be padded.
      *
      * @param {QuantitativeScale} scale
-     * @returns {D[]} An array of values to be added as exception.
+     * @returns {D[]} An array of values to become padding exceptions.
      */
     export interface PaddingExceptionsProvider<D> {
       (scale: QuantitativeScale<D>): D[];
