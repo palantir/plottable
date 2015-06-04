@@ -177,8 +177,8 @@ export module Components {
 
       var nIterations = 0;
       while (true) {
-        var offeredHeights = Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-        var offeredWidths = Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
+        var offeredHeights = Utils.Array.add(guaranteedHeights, rowProportionalSpace);
+        var offeredWidths = Utils.Array.add(guaranteedWidths, colProportionalSpace);
         var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
         guaranteedWidths = guarantees.guaranteedWidths;
         guaranteedHeights = guarantees.guaranteedHeights;
@@ -192,7 +192,7 @@ export module Components {
         var xWeights: number[];
         if (wantsWidth) { // If something wants width, divide free space between components that want more width
           xWeights = guarantees.wantsWidthArr.map((x) => x ? 0.1 : 0);
-          xWeights = Utils.Methods.addArrays(xWeights, colWeights);
+          xWeights = Utils.Array.add(xWeights, colWeights);
         } else { // Otherwise, divide free space according to the weights
           xWeights = colWeights;
         }
@@ -200,7 +200,7 @@ export module Components {
         var yWeights: number[];
         if (wantsHeight) {
           yWeights = guarantees.wantsHeightArr.map((x) => x ? 0.1 : 0);
-          yWeights = Utils.Methods.addArrays(yWeights, rowWeights);
+          yWeights = Utils.Array.add(yWeights, rowWeights);
         } else {
           yWeights = rowWeights;
         }
@@ -293,8 +293,8 @@ export module Components {
       }
 
       var childYOrigin = 0;
-      var rowHeights = Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-      var colWidths = Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths );
+      var rowHeights = Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
+      var colWidths = Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths );
       this._rows.forEach((row: Component[], rowIndex: number) => {
         var childXOrigin = 0;
         row.forEach((component: Component, colIndex: number) => {
@@ -316,7 +316,7 @@ export module Components {
     /**
      * Sets the padding above and below each row in pixels.
      *
-     * @param {number} rowPadding 
+     * @param {number} rowPadding
      * @returns {Table} The calling Table.
      */
     public rowPadding(rowPadding: number): Table;
@@ -351,7 +351,7 @@ export module Components {
 
     /**
      * Gets the weight of the specified row.
-     * 
+     *
      * @param {number} index
      */
     public rowWeight(index: number): number;
@@ -392,7 +392,7 @@ export module Components {
 
     /**
      * Gets the weight of the specified column.
-     * 
+     *
      * @param {number} index
      */
     public columnWeight(index: number): number;

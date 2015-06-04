@@ -29,20 +29,6 @@ export module Utils {
     }
 
     /**
-     * Takes two arrays of numbers and adds them together
-     *
-     * @param {number[]} alist The first array of numbers
-     * @param {number[]} blist The second array of numbers
-     * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
-     */
-    export function addArrays(alist: number[], blist: number[]): number[] {
-      if (alist.length !== blist.length) {
-        throw new Error("attempted to add arrays of unequal length");
-      }
-      return alist.map((_: number, i: number) => alist[i] + blist[i]);
-    }
-
-    /**
      * Populates a map from an array of keys and a transformation function.
      *
      * @param {string[]} keys The array of keys.
@@ -96,7 +82,7 @@ export module Utils {
      * @return {T[]} Every array in a, concatenated together in the order they appear.
      */
     export function flatten<T>(a: T[][]): T[] {
-      return Array.prototype.concat.apply([], a);
+      return (<any>window).Array.prototype.concat.apply([], a);
     }
 
     /**

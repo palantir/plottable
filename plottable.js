@@ -36,20 +36,6 @@ var Plottable;
             }
             Methods.clamp = clamp;
             /**
-             * Takes two arrays of numbers and adds them together
-             *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
-             */
-            function addArrays(alist, blist) {
-                if (alist.length !== blist.length) {
-                    throw new Error("attempted to add arrays of unequal length");
-                }
-                return alist.map(function (_, i) { return alist[i] + blist[i]; });
-            }
-            Methods.addArrays = addArrays;
-            /**
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
@@ -103,7 +89,7 @@ var Plottable;
              * @return {T[]} Every array in a, concatenated together in the order they appear.
              */
             function flatten(a) {
-                return Array.prototype.concat.apply([], a);
+                return window.Array.prototype.concat.apply([], a);
             }
             Methods.flatten = flatten;
             function max(array, firstArg, secondArg) {
@@ -574,6 +560,29 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        var Array;
+        (function (Array) {
+            /**
+             * Takes two arrays of numbers and adds them together
+             *
+             * @param {number[]} alist The first array of numbers
+             * @param {number[]} blist The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             */
+            function add(alist, blist) {
+                if (alist.length !== blist.length) {
+                    throw new Error("attempted to add arrays of unequal length");
+                }
+                return alist.map(function (_, i) { return alist[i] + blist[i]; });
+            }
+            Array.add = add;
+        })(Array = Utils.Array || (Utils.Array = {}));
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var __extends = this.__extends || function (d, b) {
@@ -5621,8 +5630,8 @@ var Plottable;
                 var freeHeight;
                 var nIterations = 0;
                 while (true) {
-                    var offeredHeights = Plottable.Utils.Methods.addArrays(guaranteedHeights, rowProportionalSpace);
-                    var offeredWidths = Plottable.Utils.Methods.addArrays(guaranteedWidths, colProportionalSpace);
+                    var offeredHeights = Plottable.Utils.Array.add(guaranteedHeights, rowProportionalSpace);
+                    var offeredWidths = Plottable.Utils.Array.add(guaranteedWidths, colProportionalSpace);
                     var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
@@ -5635,7 +5644,7 @@ var Plottable;
                     var xWeights;
                     if (wantsWidth) {
                         xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
-                        xWeights = Plottable.Utils.Methods.addArrays(xWeights, colWeights);
+                        xWeights = Plottable.Utils.Array.add(xWeights, colWeights);
                     }
                     else {
                         xWeights = colWeights;
@@ -5643,7 +5652,7 @@ var Plottable;
                     var yWeights;
                     if (wantsHeight) {
                         yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
-                        yWeights = Plottable.Utils.Methods.addArrays(yWeights, rowWeights);
+                        yWeights = Plottable.Utils.Array.add(yWeights, rowWeights);
                     }
                     else {
                         yWeights = rowWeights;
@@ -5719,8 +5728,8 @@ var Plottable;
                     layout = this._iterateLayout(this.width(), this.height(), true);
                 }
                 var childYOrigin = 0;
-                var rowHeights = Plottable.Utils.Methods.addArrays(layout.rowProportionalSpace, layout.guaranteedHeights);
-                var colWidths = Plottable.Utils.Methods.addArrays(layout.colProportionalSpace, layout.guaranteedWidths);
+                var rowHeights = Plottable.Utils.Array.add(layout.rowProportionalSpace, layout.guaranteedHeights);
+                var colWidths = Plottable.Utils.Array.add(layout.colProportionalSpace, layout.guaranteedWidths);
                 this._rows.forEach(function (row, rowIndex) {
                     var childXOrigin = 0;
                     row.forEach(function (component, colIndex) {

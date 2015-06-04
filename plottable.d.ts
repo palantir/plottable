@@ -21,14 +21,6 @@ declare module Plottable {
              */
             function clamp(x: number, min: number, max: number): number;
             /**
-             * Takes two arrays of numbers and adds them together
-             *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
-             */
-            function addArrays(alist: number[], blist: number[]): number[];
-            /**
              * Populates a map from an array of keys and a transformation function.
              *
              * @param {string[]} keys The array of keys.
@@ -232,6 +224,14 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         module Array {
+            /**
+             * Takes two arrays of numbers and adds them together
+             *
+             * @param {number[]} alist The first array of numbers
+             * @param {number[]} blist The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             */
+            function add(alist: number[], blist: number[]): number[];
         }
     }
 }
