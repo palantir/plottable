@@ -310,7 +310,7 @@ describe("Plots", () => {
 
     it("warning is thrown when datasets are updated with different domains", () => {
       var flag = false;
-      var oldWarn = Plottable.Utils.Methods.warn;
+      var oldWarn = Plottable.Utils.Window.warn;
       (<any> Plottable.Utils.Methods).warn = (msg: string) => {
         if (msg.indexOf("domain") > -1) { flag = true; }
       };

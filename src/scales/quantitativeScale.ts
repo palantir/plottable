@@ -235,7 +235,7 @@ module Plottable {
     protected _setDomain(values: D[]) {
       var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
       if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-        Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+        Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
         return;
       }
       super._setDomain(values);

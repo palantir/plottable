@@ -250,7 +250,7 @@ export module Axes {
       });
 
       if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
-        Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        Utils.Window.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
 

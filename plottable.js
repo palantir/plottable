@@ -35,26 +35,6 @@ var Plottable;
                 return Math.min(Math.max(min, x), max);
             }
             Methods.clamp = clamp;
-            /** Print a warning message to the console, if it is available.
-             *
-             * @param {string} The warnings to print
-             */
-            function warn(warning) {
-                if (!Plottable.Configs.SHOW_WARNINGS) {
-                    return;
-                }
-                /* tslint:disable:no-console */
-                if (window.console != null) {
-                    if (window.console.warn != null) {
-                        console.warn(warning);
-                    }
-                    else if (window.console.log != null) {
-                        console.log(warning);
-                    }
-                }
-                /* tslint:enable:no-console */
-            }
-            Methods.warn = warn;
             /**
              * Takes two arrays of numbers and adds them together
              *
@@ -784,6 +764,35 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var Utils;
+    (function (Utils) {
+        var Window;
+        (function (Window) {
+            /** Print a warning message to the console, if it is available.
+             *
+             * @param {string} The warnings to print
+             */
+            function warn(warning) {
+                if (!Plottable.Configs.SHOW_WARNINGS) {
+                    return;
+                }
+                /* tslint:disable:no-console */
+                if (window.console != null) {
+                    if (window.console.warn != null) {
+                        console.warn(warning);
+                    }
+                    else if (window.console.log != null) {
+                        console.log(warning);
+                    }
+                }
+                /* tslint:enable:no-console */
+            }
+            Window.warn = warn;
+        })(Window = Utils.Window || (Utils.Window = {}));
+    })(Utils = Plottable.Utils || (Plottable.Utils = {}));
+})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -1291,7 +1300,7 @@ var Plottable;
                     RenderController._renderPolicy = new Plottable.RenderPolicies.Timeout();
                     break;
                 default:
-                    Plottable.Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+                    Plottable.Utils.Window.warn("Unrecognized renderPolicy: " + policy);
             }
         }
         RenderController.setRenderPolicy = setRenderPolicy;
@@ -1302,7 +1311,7 @@ var Plottable;
          */
         function registerToRender(component) {
             if (_isCurrentlyFlushing) {
-                Plottable.Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+                Plottable.Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
             }
             _componentsNeedingRender.add(component);
             requestRender();
@@ -1697,7 +1706,7 @@ var Plottable;
         QuantitativeScale.prototype._setDomain = function (values) {
             var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-                Plottable.Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+                Plottable.Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
             }
             _super.prototype._setDomain.call(this, values);
@@ -3880,7 +3889,7 @@ var Plottable;
                     }
                 });
                 if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
-                    Plottable.Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+                    Plottable.Utils.Window.warn("zoomed out too far: could not find suitable interval to display labels");
                     --mostPreciseIndex;
                 }
                 return mostPreciseIndex;
@@ -6361,7 +6370,7 @@ var Plottable;
             };
             Pie.prototype.addDataset = function (dataset) {
                 if (this.datasets().length === 1) {
-                    Plottable.Utils.Methods.warn("Only one dataset is supported in Pie plots");
+                    Plottable.Utils.Window.warn("Only one dataset is supported in Pie plots");
                     return this;
                 }
                 this._updatePieAngles();
@@ -6438,7 +6447,7 @@ var Plottable;
                 var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)); });
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 if (pie.some(function (slice) { return slice.value < 0; })) {
-                    Plottable.Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+                    Plottable.Utils.Window.warn("Negative values will not render correctly in a pie chart.");
                 }
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
@@ -7903,7 +7912,7 @@ var Plottable;
                 });
                 var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
-                    Plottable.Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+                    Plottable.Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
             };
             StackedArea.prototype._propertyProjectors = function () {

@@ -2691,13 +2691,13 @@ describe("Plots", function () {
         });
         it("throws warnings on negative data", function () {
             var message;
-            var oldWarn = Plottable.Utils.Methods.warn;
-            Plottable.Utils.Methods.warn = function (warn) { return message = warn; };
+            var oldWarn = Plottable.Utils.Window.warn;
+            Plottable.Utils.Window.warn = function (warn) { return message = warn; };
             piePlot.removeDataset(simpleDataset);
             var negativeDataset = new Plottable.Dataset([{ value: -5 }, { value: 15 }]);
             piePlot.addDataset(negativeDataset);
             assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
-            Plottable.Utils.Methods.warn = oldWarn;
+            Plottable.Utils.Window.warn = oldWarn;
             svg.remove();
         });
     });
@@ -4933,7 +4933,7 @@ describe("Plots", function () {
         });
         it("warning is thrown when datasets are updated with different domains", function () {
             var flag = false;
-            var oldWarn = Plottable.Utils.Methods.warn;
+            var oldWarn = Plottable.Utils.Window.warn;
             Plottable.Utils.Methods.warn = function (msg) {
                 if (msg.indexOf("domain") > -1) {
                     flag = true;

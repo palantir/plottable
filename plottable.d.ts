@@ -20,11 +20,6 @@ declare module Plottable {
              * @return {number} A clamped value in the range [min, max].
              */
             function clamp(x: number, min: number, max: number): number;
-            /** Print a warning message to the console, if it is available.
-             *
-             * @param {string} The warnings to print
-             */
-            function warn(warning: string): void;
             /**
              * Takes two arrays of numbers and adds them together
              *
@@ -286,6 +281,11 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         module Window {
+            /** Print a warning message to the console, if it is available.
+             *
+             * @param {string} The warnings to print
+             */
+            function warn(warning: string): void;
         }
     }
 }

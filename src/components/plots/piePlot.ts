@@ -36,7 +36,7 @@ export module Plots {
 
     public addDataset(dataset: Dataset) {
       if (this.datasets().length === 1) {
-        Utils.Methods.warn("Only one dataset is supported in Pie plots");
+        Utils.Window.warn("Only one dataset is supported in Pie plots");
         return this;
       }
       this._updatePieAngles();
@@ -178,7 +178,7 @@ export module Plots {
       var data = dataset.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)));
       var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       if (pie.some((slice) => slice.value < 0)) {
-        Utils.Methods.warn("Negative values will not render correctly in a pie chart.");
+        Utils.Window.warn("Negative values will not render correctly in a pie chart.");
       }
       this._startAngles = pie.map((slice) => slice.startAngle);
       this._endAngles = pie.map((slice) => slice.endAngle);
