@@ -65,10 +65,10 @@ export module Scales {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 
-      var defaultColorHex: string = Utils.Methods.colorTest(colorTester, "");
+      var defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
+      while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
               i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;

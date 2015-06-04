@@ -205,26 +205,6 @@ var Plottable;
                 }
             }
             Methods.setTimeout = setTimeout;
-            function colorTest(colorTester, className) {
-                colorTester.classed(className, true);
-                // Use regex to get the text inside the rgb parentheses
-                var colorStyle = colorTester.style("background-color");
-                if (colorStyle === "transparent") {
-                    return null;
-                }
-                var rgb = /\((.+)\)/.exec(colorStyle)[1].split(",").map(function (colorValue) {
-                    var colorNumber = +colorValue;
-                    var hexValue = colorNumber.toString(16);
-                    return colorNumber < 16 ? "0" + hexValue : hexValue;
-                });
-                if (rgb.length === 4 && rgb[3] === "00") {
-                    return null;
-                }
-                var hexCode = "#" + rgb.join("");
-                colorTester.classed(className, false);
-                return hexCode;
-            }
-            Methods.colorTest = colorTest;
             function distanceSquared(p1, p2) {
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
@@ -593,6 +573,26 @@ var Plottable;
                 return hsl.rgb().toString();
             }
             Color.lightenColor = lightenColor;
+            function colorTest(colorTester, className) {
+                colorTester.classed(className, true);
+                // Use regex to get the text inside the rgb parentheses
+                var colorStyle = colorTester.style("background-color");
+                if (colorStyle === "transparent") {
+                    return null;
+                }
+                var rgb = /\((.+)\)/.exec(colorStyle)[1].split(",").map(function (colorValue) {
+                    var colorNumber = +colorValue;
+                    var hexValue = colorNumber.toString(16);
+                    return colorNumber < 16 ? "0" + hexValue : hexValue;
+                });
+                if (rgb.length === 4 && rgb[3] === "00") {
+                    return null;
+                }
+                var hexCode = "#" + rgb.join("");
+                colorTester.classed(className, false);
+                return hexCode;
+            }
+            Color.colorTest = colorTest;
             /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -2177,10 +2177,10 @@ var Plottable;
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
                 var colorTester = d3.select("body").append("plottable-color-tester");
-                var defaultColorHex = Plottable.Utils.Methods.colorTest(colorTester, "");
+                var defaultColorHex = Plottable.Utils.Color.colorTest(colorTester, "");
                 var i = 0;
                 var colorHex;
-                while ((colorHex = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this._MAXIMUM_COLORS_FROM_CSS) {
+                while ((colorHex = Plottable.Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null && i < this._MAXIMUM_COLORS_FROM_CSS) {
                     if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
                         break;
                     }

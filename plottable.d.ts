@@ -103,7 +103,6 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            function colorTest(colorTester: d3.Selection<void>, className: string): string;
             function distanceSquared(p1: Point, p2: Point): number;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
@@ -237,6 +236,7 @@ declare module Plottable {
              */
             function contrast(a: string, b: string): number;
             function lightenColor(color: string, factor: number): string;
+            function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
     }
 }
