@@ -39,8 +39,8 @@ function run(svg, data, Plottable) {
 
   var AusColor = "#ff6969";
   var IndColor = "#662a48";
-  var AusDataset = new Plottable.Components.Dataset(data[0]);
-  var IndDataset = new Plottable.Components.Dataset(data[1]);
+  var AusDataset = new Plottable.Dataset(data[0]);
+  var IndDataset = new Plottable.Dataset(data[1]);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 1]);
   var xScale_reverse = new Plottable.Scales.Linear().domain([1, 0]);
@@ -48,6 +48,8 @@ function run(svg, data, Plottable) {
 
   var AusLabels = new Plottable.Axes.Category(yScale, "left");
   var IndLabels = new Plottable.Axes.Category(yScale, "left");
+  var featureLabel = new Plottable.Components.Label("Feature Phones", 0);
+  var smartLabel = new Plottable.Components.Label("Smart Phones", 0);
 
   var filterFeatureX = function(d){
     if(d.phoneType === "feature"){
@@ -70,25 +72,25 @@ function run(svg, data, Plottable) {
     }
   }  
   var AusFeaturePlot = new Plottable.Plots.Bar("horizontal")
-      .dataset(AusDataset)
+      .addDataset(AusDataset)
       .x(filterFeatureX, xScale_reverse)
       .y(filterFeatureY, yScale)
       .attr("fill", AusColor);
 
   var AusSmartPlot = new Plottable.Plots.Bar("horizontal")
-      .dataset(AusDataset)
+      .addDataset(AusDataset)
       .x(filterFeatureX, xScale)
       .y(filterFeatureY, yScale)
       .attr("fill", AusColor);
 
   var IndFeaturePlot = new Plottable.Plots.Bar("horizontal")
-      .dataset(IndDataset)
+      .addDataset(IndDataset)
       .x(filterFeatureX, xScale_reverse)
       .y(filterFeatureY, yScale)
       .attr("fill", IndColor);   
 
   var IndSmartPlot = new Plottable.Plots.Bar("horizontal")
-      .dataset(IndDataset)
+      .addDataset(IndDataset)
       .x(filterSmartX, xScale)
       .y(filterSmartY, yScale)
       .attr("fill", IndColor);          
