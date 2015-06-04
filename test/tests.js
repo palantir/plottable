@@ -4934,7 +4934,7 @@ describe("Plots", function () {
         it("warning is thrown when datasets are updated with different domains", function () {
             var flag = false;
             var oldWarn = Plottable.Utils.Window.warn;
-            Plottable.Utils.Methods.warn = function (msg) {
+            Plottable.Utils.Window.warn = function (msg) {
                 if (msg.indexOf("domain") > -1) {
                     flag = true;
                 }
@@ -4944,7 +4944,7 @@ describe("Plots", function () {
             ];
             var dataset = new Plottable.Dataset(missingDomainData);
             renderer.addDataset(dataset);
-            Plottable.Utils.Methods.warn = oldWarn;
+            Plottable.Utils.Window.warn = oldWarn;
             assert.isTrue(flag, "warning has been issued about differing domains");
             svg.remove();
         });
