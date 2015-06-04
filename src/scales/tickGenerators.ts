@@ -13,7 +13,7 @@ module Plottable {
        */
       export interface TickGenerator<D> {
         (scale: Plottable.QuantitativeScale<D>): D[];
-      };
+      }
       /**
        * Creates a TickGenerator using the specified interval.
        *

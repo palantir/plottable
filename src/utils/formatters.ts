@@ -11,7 +11,7 @@ module Plottable {
     interface TimeFilterFormat {
       format: string;
       filter: (d: any) => any;
-    };
+    }
 
     /**
      * Creates a formatter for currency values.
