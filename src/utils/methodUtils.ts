@@ -59,14 +59,6 @@ export module Utils {
     }
 
     /**
-     * @param {T[][]} a The 2D array that will have its elements joined together.
-     * @return {T[]} Every array in a, concatenated together in the order they appear.
-     */
-    export function flatten<T>(a: T[][]): T[] {
-      return (<any>window).Array.prototype.concat.apply([], a);
-    }
-
-    /**
      * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
      * If no maximum value can be computed, returns defaultValue.
      */

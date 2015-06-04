@@ -37,6 +37,14 @@ module Plottable {
         return result;
       }
 
+      /**
+       * @param {T[][]} a The 2D array that will have its elements joined together.
+       * @return {T[]} Every array in a, concatenated together in the order they appear.
+       */
+      export function flatten<T>(a: T[][]): T[] {
+        return (<any>window).Array.prototype.concat.apply([], a);
+      }
+
     }
   }
 }

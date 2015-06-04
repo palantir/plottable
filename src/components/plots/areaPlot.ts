@@ -137,7 +137,7 @@ export module Plots {
 
     protected _updateYScale() {
       var extents = this._propertyExtents.get("y0");
-      var extent = Utils.Methods.flatten<number>(extents);
+      var extent = Utils.Array.flatten<number>(extents);
       var uniqExtentVals = Utils.Array.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 

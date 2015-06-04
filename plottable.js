@@ -65,14 +65,6 @@ var Plottable;
                 return out;
             }
             Methods.createFilledArray = createFilledArray;
-            /**
-             * @param {T[][]} a The 2D array that will have its elements joined together.
-             * @return {T[]} Every array in a, concatenated together in the order they appear.
-             */
-            function flatten(a) {
-                return window.Array.prototype.concat.apply([], a);
-            }
-            Methods.flatten = flatten;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -580,6 +572,14 @@ var Plottable;
                 return result;
             }
             Array.uniq = uniq;
+            /**
+             * @param {T[][]} a The 2D array that will have its elements joined together.
+             * @return {T[]} Every array in a, concatenated together in the order they appear.
+             */
+            function flatten(a) {
+                return window.Array.prototype.concat.apply([], a);
+            }
+            Array.flatten = flatten;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -1957,7 +1957,7 @@ var Plottable;
                 var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
                 var uniqMultiples = Plottable.Utils.Array.uniq(multiples);
                 var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this._base, b - 1) * x; }); });
-                var flattened = Plottable.Utils.Methods.flatten(clusters);
+                var flattened = Plottable.Utils.Array.flatten(clusters);
                 var filtered = flattened.filter(function (x) { return lower <= x && x <= upper; });
                 var sorted = filtered.sort(function (x, y) { return x - y; });
                 return sorted;
@@ -6875,7 +6875,7 @@ var Plottable;
                 }
                 else {
                     var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-                    var accessorData = d3.set(Plottable.Utils.Methods.flatten(this.datasets().map(function (dataset) {
+                    var accessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return accessor(d, i, dataset).valueOf(); });
                     }))).values().map(function (value) { return +value; });
                     // Get the absolute difference between min and max
@@ -7372,7 +7372,7 @@ var Plottable;
                 }
                 else {
                     var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-                    var numberBarAccessorData = d3.set(Plottable.Utils.Methods.flatten(this.datasets().map(function (dataset) {
+                    var numberBarAccessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); }).filter(function (d) { return d != null; }).map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
@@ -7680,7 +7680,7 @@ var Plottable;
             };
             Area.prototype._updateYScale = function () {
                 var extents = this._propertyExtents.get("y0");
-                var extent = Plottable.Utils.Methods.flatten(extents);
+                var extent = Plottable.Utils.Array.flatten(extents);
                 var uniqExtentVals = Plottable.Utils.Array.uniq(extent);
                 var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
                 var yBinding = this.y();

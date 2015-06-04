@@ -148,7 +148,7 @@ export module Scales {
       var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
       var uniqMultiples = Utils.Array.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
-      var flattened = Utils.Methods.flatten(clusters);
+      var flattened = Utils.Array.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;

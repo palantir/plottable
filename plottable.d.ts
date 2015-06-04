@@ -37,11 +37,6 @@ declare module Plottable {
              */
             function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
             /**
-             * @param {T[][]} a The 2D array that will have its elements joined together.
-             * @return {T[]} Every array in a, concatenated together in the order they appear.
-             */
-            function flatten<T>(a: T[][]): T[];
-            /**
              * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
              * If no maximum value can be computed, returns defaultValue.
              */
@@ -232,6 +227,11 @@ declare module Plottable {
              * @return {T[]} The unique values
              */
             function uniq<T>(arr: T[]): T[];
+            /**
+             * @param {T[][]} a The 2D array that will have its elements joined together.
+             * @return {T[]} Every array in a, concatenated together in the order they appear.
+             */
+            function flatten<T>(a: T[][]): T[];
         }
     }
 }
