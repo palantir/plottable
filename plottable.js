@@ -68,18 +68,6 @@ var Plottable;
                 return typeof n === "number" && !Plottable.Utils.Methods.isNaN(n) && isFinite(n);
             }
             Methods.isValidNumber = isValidNumber;
-            /**
-             * Creates shallow copy of map.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied map.
-             */
-            function copyMap(oldMap) {
-                var newMap = {};
-                Object.keys(oldMap).forEach(function (key) { return newMap[key] = oldMap[key]; });
-                return newMap;
-            }
-            Methods.copyMap = copyMap;
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -802,6 +790,18 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
+            /**
+             * Creates shallow copy of the object.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied object.
+             */
+            function copyObject(oldObject) {
+                var newObject = {};
+                Object.keys(oldObject).forEach(function (key) { return newObject[key] = oldObject[key]; });
+                return newObject;
+            }
+            Window.copyObject = copyObject;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -2674,7 +2674,7 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToAppliedProjector);
+                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
                 step.animator.animate(this._pathSelection, attrToProjector);
                 this._pathSelection.classed(Line.PATH_CLASS, true);
             };
@@ -2715,7 +2715,7 @@ var Plottable;
                 this._areaSelection = area.append("path").style("stroke", "none");
             };
             Area.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToAppliedProjector);
+                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
                 step.animator.animate(this._areaSelection, attrToProjector);
                 this._areaSelection.classed(Area.PATH_CLASS, true);
             };

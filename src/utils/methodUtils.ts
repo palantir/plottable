@@ -73,18 +73,6 @@ export module Utils {
       return typeof n === "number" && !Plottable.Utils.Methods.isNaN(n) && isFinite(n);
     }
 
-    /**
-     * Creates shallow copy of map.
-     * @param {{ [key: string]: any }} oldMap Map to copy
-     *
-     * @returns {[{ [key: string]: any }} coppied map.
-     */
-    export function copyMap<T>(oldMap: { [key: string]: T }): { [key: string]: T } {
-      var newMap: { [key: string]: any } = {};
-      Object.keys(oldMap).forEach(key => newMap[key] = oldMap[key]);
-      return newMap;
-    }
-
     export function range(start: number, stop: number, step = 1): number[] {
       if (step === 0) {
         throw new Error("step cannot be 0");

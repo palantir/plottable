@@ -7786,6 +7786,21 @@ describe("Utils.Color", function () {
 var assert = chai.assert;
 describe("Utils", function () {
     describe("WindowUtils", function () {
+        it("copyObject()", function () {
+            var oldMap = {};
+            oldMap["a"] = 1;
+            oldMap["b"] = 2;
+            oldMap["c"] = 3;
+            oldMap["undefined"] = undefined;
+            oldMap["null"] = null;
+            oldMap["fun"] = function (d) { return d; };
+            oldMap["NaN"] = 0 / 0;
+            oldMap["inf"] = 1 / 0;
+            var map = Plottable.Utils.Window.copyObject(oldMap);
+            assert.deepEqual(map, oldMap, "All values were copied.");
+            map = Plottable.Utils.Window.copyObject({});
+            assert.deepEqual(map, {}, "No values were added.");
+        });
     });
 });
 
@@ -8247,21 +8262,6 @@ describe("Utils.Methods", function () {
         assert.isFalse(isValidNumber([1]), "([1] is not a valid number");
         assert.isFalse(isValidNumber({}), "({} is not a valid number");
         assert.isFalse(isValidNumber({ 1: 1 }), "({1: 1} is not a valid number");
-    });
-    it("copyMap works as expected", function () {
-        var oldMap = {};
-        oldMap["a"] = 1;
-        oldMap["b"] = 2;
-        oldMap["c"] = 3;
-        oldMap["undefined"] = undefined;
-        oldMap["null"] = null;
-        oldMap["fun"] = function (d) { return d; };
-        oldMap["NaN"] = 0 / 0;
-        oldMap["inf"] = 1 / 0;
-        var map = Plottable.Utils.Methods.copyMap(oldMap);
-        assert.deepEqual(map, oldMap, "All values were copied.");
-        map = Plottable.Utils.Methods.copyMap({});
-        assert.deepEqual(map, {}, "No values were added.");
     });
     it("range works as expected", function () {
         var start = 0;

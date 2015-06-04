@@ -17,7 +17,7 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToAppliedProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Window.copyObject(step.attrToAppliedProjector);
       step.animator.animate(this._areaSelection, attrToProjector);
       this._areaSelection.classed(Area.PATH_CLASS, true);
     }

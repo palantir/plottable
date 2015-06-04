@@ -41,17 +41,6 @@ declare module Plottable {
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n: any): boolean;
-            /**
-             * Creates shallow copy of map.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied map.
-             */
-            function copyMap<T>(oldMap: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
             function range(start: number, stop: number, step?: number): number[];
             function distanceSquared(p1: Point, p2: Point): number;
         }
@@ -288,6 +277,17 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * Creates shallow copy of the object.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied object.
+             */
+            function copyObject<T>(oldObject: {
+                [key: string]: T;
+            }): {
+                [key: string]: T;
+            };
         }
     }
 }
