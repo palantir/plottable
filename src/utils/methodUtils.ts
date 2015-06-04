@@ -227,11 +227,6 @@ export module Utils {
       return hexCode;
     }
 
-    export function lightenColor(color: string, factor: number) {
-      var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
-      return hsl.rgb().toString();
-    }
-
     export function distanceSquared(p1: Point, p2: Point) {
       return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
     }

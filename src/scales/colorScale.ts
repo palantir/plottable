@@ -92,7 +92,7 @@ export module Scales {
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
       var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-      return Utils.Methods.lightenColor(color, modifyFactor);
+      return Utils.Color.lightenColor(color, modifyFactor);
     }
 
     protected _getDomain() {

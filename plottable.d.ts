@@ -104,7 +104,6 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function colorTest(colorTester: d3.Selection<void>, className: string): string;
-            function lightenColor(color: string, factor: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
@@ -237,6 +236,7 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            function lightenColor(color: string, factor: number): string;
         }
     }
 }

@@ -225,11 +225,6 @@ var Plottable;
                 return hexCode;
             }
             Methods.colorTest = colorTest;
-            function lightenColor(color, factor) {
-                var hsl = d3.hsl(color).brighter(factor);
-                return hsl.rgb().toString();
-            }
-            Methods.lightenColor = lightenColor;
             function distanceSquared(p1, p2) {
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
@@ -593,6 +588,11 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            function lightenColor(color, factor) {
+                var hsl = d3.hsl(color).brighter(factor);
+                return hsl.rgb().toString();
+            }
+            Color.lightenColor = lightenColor;
             /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -2202,7 +2202,7 @@ var Plottable;
                 var index = this.domain().indexOf(value);
                 var numLooped = Math.floor(index / this.range().length);
                 var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-                return Plottable.Utils.Methods.lightenColor(color, modifyFactor);
+                return Plottable.Utils.Color.lightenColor(color, modifyFactor);
             };
             Color.prototype._getDomain = function () {
                 return this._d3Scale.domain();

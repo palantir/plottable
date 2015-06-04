@@ -16,6 +16,11 @@ export module Utils {
       return l1 > l2 ? l1 / l2 : l2 / l1;
     }
 
+    export function lightenColor(color: string, factor: number) {
+      var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
+      return hsl.rgb().toString();
+    }
+
     /**
      * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
      * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
