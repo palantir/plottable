@@ -145,25 +145,6 @@ var Plottable;
                 return true;
             }
             Methods.arrayEq = arrayEq;
-            /**
-             * @param {any} a Object to check against b for equality.
-             * @param {any} b Object to check against a for equality.
-             *
-             * @returns {boolean} whether or not two objects share the same keys, and
-             *          values associated with those keys. Values will be compared
-             *          with ===.
-             */
-            function objEq(a, b) {
-                if (a == null || b == null) {
-                    return a === b;
-                }
-                var keysA = Object.keys(a).sort();
-                var keysB = Object.keys(b).sort();
-                var valuesA = keysA.map(function (k) { return a[k]; });
-                var valuesB = keysB.map(function (k) { return b[k]; });
-                return arrayEq(keysA, keysB) && arrayEq(valuesA, valuesB);
-            }
-            Methods.objEq = objEq;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;

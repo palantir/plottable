@@ -8215,14 +8215,6 @@ describe("Utils.Methods", function () {
         assert.isFalse(isValidNumber({}), "({} is not a valid number");
         assert.isFalse(isValidNumber({ 1: 1 }), "({1: 1} is not a valid number");
     });
-    it("objEq works as expected", function () {
-        assert.isTrue(Plottable.Utils.Methods.objEq({}, {}));
-        assert.isTrue(Plottable.Utils.Methods.objEq({ a: 5 }, { a: 5 }));
-        assert.isFalse(Plottable.Utils.Methods.objEq({ a: 5, b: 6 }, { a: 5 }));
-        assert.isFalse(Plottable.Utils.Methods.objEq({ a: 5 }, { a: 5, b: 6 }));
-        assert.isTrue(Plottable.Utils.Methods.objEq({ a: "hello" }, { a: "hello" }));
-        assert.isFalse(Plottable.Utils.Methods.objEq({ constructor: {}.constructor }, {}), "using \"constructor\" isn't hidden");
-    });
     it("populateMap works as expected", function () {
         var keys = ["a", "b", "c"];
         var map = Plottable.Utils.Methods.populateMap(keys, function (key) { return key + "Value"; });

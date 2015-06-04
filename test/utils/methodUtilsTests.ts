@@ -146,16 +146,6 @@ describe("Utils.Methods", () => {
 
   });
 
-  it("objEq works as expected", () => {
-    assert.isTrue(Plottable.Utils.Methods.objEq({}, {}));
-    assert.isTrue(Plottable.Utils.Methods.objEq({a: 5}, {a: 5}));
-    assert.isFalse(Plottable.Utils.Methods.objEq({a: 5, b: 6}, {a: 5}));
-    assert.isFalse(Plottable.Utils.Methods.objEq({a: 5}, {a: 5, b: 6}));
-    assert.isTrue(Plottable.Utils.Methods.objEq({a: "hello"}, {a: "hello"}));
-    assert.isFalse(Plottable.Utils.Methods.objEq({constructor: {}.constructor}, {}),
-                  "using \"constructor\" isn't hidden");
-  });
-
   it("populateMap works as expected", () => {
     var keys = ["a", "b", "c"];
     var map = Plottable.Utils.Methods.populateMap(keys, (key) => key + "Value");
