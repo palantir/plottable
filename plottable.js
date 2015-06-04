@@ -164,27 +164,6 @@ var Plottable;
                 return range;
             }
             Methods.range = range;
-            /** Is like setTimeout, but activates synchronously if time=0
-             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
-             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
-             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
-             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
-             * setTimeout appears out-of-sync with the rest of the plot.
-             */
-            function setTimeout(f, time) {
-                var args = [];
-                for (var _i = 2; _i < arguments.length; _i++) {
-                    args[_i - 2] = arguments[_i];
-                }
-                if (time === 0) {
-                    f(args);
-                    return -1;
-                }
-                else {
-                    return window.setTimeout(f, time, args);
-                }
-            }
-            Methods.setTimeout = setTimeout;
             function distanceSquared(p1, p2) {
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
@@ -770,7 +749,8 @@ var Plottable;
     (function (Utils) {
         var Window;
         (function (Window) {
-            /** Print a warning message to the console, if it is available.
+            /**
+             * Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
              */
@@ -790,6 +770,28 @@ var Plottable;
                 /* tslint:enable:no-console */
             }
             Window.warn = warn;
+            /**
+             * Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f, time) {
+                var args = [];
+                for (var _i = 2; _i < arguments.length; _i++) {
+                    args[_i - 2] = arguments[_i];
+                }
+                if (time === 0) {
+                    f(args);
+                    return -1;
+                }
+                else {
+                    return window.setTimeout(f, time, args);
+                }
+            }
+            Window.setTimeout = setTimeout;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -2609,7 +2611,7 @@ var Plottable;
             var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
-                Plottable.Utils.Methods.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
+                Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                 delay += drawStep.animator.getTiming(numberOfIterations);
             });
             return delay;
@@ -7225,7 +7227,7 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
                 this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 if (this._labelsEnabled) {
-                    Plottable.Utils.Methods.setTimeout(function () { return _this._drawLabels(); }, time);
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
             Bar.prototype._drawLabels = function () {

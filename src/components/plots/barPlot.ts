@@ -339,7 +339,7 @@ export module Plots {
 
       this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       if (this._labelsEnabled) {
-        Utils.Methods.setTimeout(() => this._drawLabels(), time);
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
     }
 

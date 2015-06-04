@@ -343,8 +343,8 @@ describe("Drawers", function () {
         var svg;
         var drawer;
         before(function () {
-            oldTimeout = Plottable.Utils.Methods.setTimeout;
-            Plottable.Utils.Methods.setTimeout = function (f, time) {
+            oldTimeout = Plottable.Utils.Window.setTimeout;
+            Plottable.Utils.Window.setTimeout = function (f, time) {
                 var args = [];
                 for (var _i = 2; _i < arguments.length; _i++) {
                     args[_i - 2] = arguments[_i];
@@ -354,7 +354,7 @@ describe("Drawers", function () {
             };
         });
         after(function () {
-            Plottable.Utils.Methods.setTimeout = oldTimeout;
+            Plottable.Utils.Window.setTimeout = oldTimeout;
         });
         beforeEach(function () {
             timings = [];

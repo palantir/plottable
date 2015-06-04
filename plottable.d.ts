@@ -90,14 +90,6 @@ declare module Plottable {
                 [key: string]: T;
             };
             function range(start: number, stop: number, step?: number): number[];
-            /** Is like setTimeout, but activates synchronously if time=0
-             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
-             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
-             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
-             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
-             * setTimeout appears out-of-sync with the rest of the plot.
-             */
-            function setTimeout(f: Function, time: number, ...args: any[]): number;
             function distanceSquared(p1: Point, p2: Point): number;
         }
     }
@@ -281,11 +273,21 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         module Window {
-            /** Print a warning message to the console, if it is available.
+            /**
+             * Print a warning message to the console, if it is available.
              *
              * @param {string} The warnings to print
              */
             function warn(warning: string): void;
+            /**
+             * Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f: Function, time: number, ...args: any[]): number;
         }
     }
 }
