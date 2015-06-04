@@ -275,7 +275,6 @@ var Plottable;
                     throw new Error("input '" + input + "' can't be parsed as an Range");
                 }
             }
-            Methods.parseRange = parseRange;
         })(Methods = Utils.Methods || (Utils.Methods = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));

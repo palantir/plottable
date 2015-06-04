@@ -119,14 +119,6 @@ declare module Plottable {
              * contained by bbox, false otherwise.
              */
             function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
-            /**
-             * Create a Range from a number or an object with "min" and "max" defined.
-             *
-             * @param {any} input The object to parse
-             *
-             * @returns {Range} The generated Range
-             */
-            function parseRange(input: any): Range;
         }
     }
 }

@@ -268,7 +268,7 @@ export module Utils {
      *
      * @returns {Range} The generated Range
      */
-    export function parseRange(input: any): Range {
+    function parseRange(input: any): Range {
       if (typeof (input) === "number") {
         return { min: input, max: input };
       } else if (input instanceof Object && "min" in input && "max" in input) {
