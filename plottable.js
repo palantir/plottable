@@ -209,47 +209,6 @@ var Plottable;
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
-            /**
-             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
-             *
-             * @param {number | Range} xValOrRange The x coordinate or Range to test
-             * @param {number | Range} yValOrRange The y coordinate or Range to test
-             * @param {SVGRect} bbox The bbox
-             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
-             * testing intersection
-             *
-             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
-             * contained by bbox, false otherwise.
-             */
-            function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
-                if (tolerance === void 0) { tolerance = 0.5; }
-                var xRange = parseRange(xValOrRange);
-                var yRange = parseRange(yValOrRange);
-                // SVGRects are positioned with sub-pixel accuracy (the default unit
-                // for the x, y, height & width attributes), but user selections (e.g. via
-                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
-                // seems appropriate.
-                return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance && bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
-            }
-            Methods.intersectsBBox = intersectsBBox;
-            /**
-             * Create a Range from a number or an object with "min" and "max" defined.
-             *
-             * @param {any} input The object to parse
-             *
-             * @returns {Range} The generated Range
-             */
-            function parseRange(input) {
-                if (typeof (input) === "number") {
-                    return { min: input, max: input };
-                }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
-                }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Range");
-                }
-            }
         })(Methods = Utils.Methods || (Utils.Methods = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -544,6 +503,47 @@ var Plottable;
                 return "plottableClipPath" + ++_latestClipPathId;
             }
             DOM.getUniqueClipPathId = getUniqueClipPathId;
+            /**
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+             *
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
+                if (tolerance === void 0) { tolerance = 0.5; }
+                var xRange = parseRange(xValOrRange);
+                var yRange = parseRange(yValOrRange);
+                // SVGRects are positioned with sub-pixel accuracy (the default unit
+                // for the x, y, height & width attributes), but user selections (e.g. via
+                // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+                // seems appropriate.
+                return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance && bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
+            }
+            DOM.intersectsBBox = intersectsBBox;
+            /**
+             * Create a Range from a number or an object with "min" and "max" defined.
+             *
+             * @param {any} input The object to parse
+             *
+             * @returns {Range} The generated Range
+             */
+            function parseRange(input) {
+                if (typeof (input) === "number") {
+                    return { min: input, max: input };
+                }
+                else if (input instanceof Object && "min" in input && "max" in input) {
+                    return input;
+                }
+                else {
+                    throw new Error("input '" + input + "' can't be parsed as an Range");
+                }
+            }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -6949,7 +6949,7 @@ var Plottable;
                     width: bbox.width,
                     height: bbox.height
                 };
-                return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
             Scatter.prototype._propertyProjectors = function () {
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
@@ -7124,7 +7124,7 @@ var Plottable;
                     var plotPt = entity.position;
                     // if we're inside a bar, distance in both directions should stay 0
                     var barBBox = Plottable.Utils.DOM.getBBox(entity.selection);
-                    if (!Plottable.Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+                    if (!Plottable.Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                         var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
                         // compute this bar's min and max along the secondary axis
@@ -7152,7 +7152,7 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.getBBox(selection);
-                return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
              * Gets the Entities at a particular Point.
@@ -7180,7 +7180,7 @@ var Plottable;
             Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
                 var intersected = [];
                 this.entities().forEach(function (entity) {
-                    if (Plottable.Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
                         intersected.push(entity);
                     }
                 });

@@ -104,19 +104,6 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             function distanceSquared(p1: Point, p2: Point): number;
-            /**
-             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
-             *
-             * @param {number | Range} xValOrRange The x coordinate or Range to test
-             * @param {number | Range} yValOrRange The y coordinate or Range to test
-             * @param {SVGRect} bbox The bbox
-             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
-             * testing intersection
-             *
-             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
-             * contained by bbox, false otherwise.
-             */
-            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
         }
     }
 }
@@ -219,6 +206,19 @@ declare module Plottable {
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
             function getBoundingSVG(elem: SVGElement): SVGElement;
             function getUniqueClipPathId(): string;
+            /**
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+             *
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
         }
     }
 }

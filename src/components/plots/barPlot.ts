@@ -223,7 +223,7 @@ export module Plots {
         var plotPt = entity.position;
         // if we're inside a bar, distance in both directions should stay 0
         var barBBox = Utils.DOM.getBBox(entity.selection);
-        if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+        if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
           var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
           primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
@@ -256,7 +256,7 @@ export module Plots {
       var yRange = { min: 0, max: this.height() };
       var barBBox = Utils.DOM.getBBox(selection);
 
-      return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
+      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 
     /**
@@ -301,7 +301,7 @@ export module Plots {
     private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
       var intersected: Entity[] = [];
       this.entities().forEach((entity) => {
-        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
           intersected.push(entity);
         }
       });

@@ -134,6 +134,48 @@ export module Utils {
     export function getUniqueClipPathId() {
       return "plottableClipPath" + ++_latestClipPathId;
     }
+
+    /**
+     * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+     *
+     * @param {number | Range} xValOrRange The x coordinate or Range to test
+     * @param {number | Range} yValOrRange The y coordinate or Range to test
+     * @param {SVGRect} bbox The bbox
+     * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+     * testing intersection
+     *
+     * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+     * contained by bbox, false otherwise.
+     */
+    export function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range,
+      bbox: SVGRect, tolerance = 0.5): boolean {
+      var xRange: Range = parseRange(xValOrRange);
+      var yRange: Range = parseRange(yValOrRange);
+
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+      // seems appropriate.
+      return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
+    }
+
+    /**
+     * Create a Range from a number or an object with "min" and "max" defined.
+     *
+     * @param {any} input The object to parse
+     *
+     * @returns {Range} The generated Range
+     */
+    function parseRange(input: any): Range {
+      if (typeof (input) === "number") {
+        return { min: input, max: input };
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <Range> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an Range");
+      }
+    }
   }
 }
 }
