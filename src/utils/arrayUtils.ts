@@ -3,6 +3,7 @@
 module Plottable {
   export module Utils {
     export module Array {
+      var nativeArray = (<any>window).Array;
 
       /**
        * Takes two arrays of numbers and adds them together
@@ -42,7 +43,7 @@ module Plottable {
        * @return {T[]} Every array in a, concatenated together in the order they appear.
        */
       export function flatten<T>(a: T[][]): T[] {
-        return (<any>window).Array.prototype.concat.apply([], a);
+        return nativeArray.prototype.concat.apply([], a);
       }
 
       /**

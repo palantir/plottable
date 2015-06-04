@@ -497,6 +497,7 @@ var Plottable;
     (function (Utils) {
         var Array;
         (function (Array) {
+            var nativeArray = window.Array;
             /**
              * Takes two arrays of numbers and adds them together
              *
@@ -535,7 +536,7 @@ var Plottable;
              * @return {T[]} Every array in a, concatenated together in the order they appear.
              */
             function flatten(a) {
-                return window.Array.prototype.concat.apply([], a);
+                return nativeArray.prototype.concat.apply([], a);
             }
             Array.flatten = flatten;
             /**
