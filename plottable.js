@@ -8102,7 +8102,6 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
-        ;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
