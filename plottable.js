@@ -11,6 +11,7 @@ var Plottable;
     (function (Utils) {
         var Methods;
         (function (Methods) {
+            var nativeMath = window.Math;
             /**
              * Checks if x is between a and b.
              *
@@ -20,7 +21,7 @@ var Plottable;
              * @return {boolean} Whether x is in [a, b]
              */
             function inRange(x, a, b) {
-                return (Math.min(a, b) <= x && x <= Math.max(a, b));
+                return (nativeMath.min(a, b) <= x && x <= nativeMath.max(a, b));
             }
             Methods.inRange = inRange;
             /**
@@ -32,7 +33,7 @@ var Plottable;
              * @return {number} A clamped value in the range [min, max].
              */
             function clamp(x, min, max) {
-                return Math.min(Math.max(min, x), max);
+                return nativeMath.min(nativeMath.max(min, x), max);
             }
             Methods.clamp = clamp;
             function max(array, firstArg, secondArg) {
@@ -73,7 +74,7 @@ var Plottable;
                 if (step === 0) {
                     throw new Error("step cannot be 0");
                 }
-                var length = Math.max(Math.ceil((stop - start) / step), 0);
+                var length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
                 var range = [];
                 for (var i = 0; i < length; ++i) {
                     range[i] = start + step * i;
@@ -82,7 +83,7 @@ var Plottable;
             }
             Methods.range = range;
             function distanceSquared(p1, p2) {
-                return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
+                return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
         })(Methods = Utils.Methods || (Utils.Methods = {}));

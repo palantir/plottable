@@ -4,6 +4,8 @@ module Plottable {
 export module Utils {
   export module Methods {
 
+    var nativeMath: Math = (<any>window).Math;
+
     /**
      * Checks if x is between a and b.
      *
@@ -13,7 +15,7 @@ export module Utils {
      * @return {boolean} Whether x is in [a, b]
      */
     export function inRange(x: number, a: number, b: number) {
-      return (Math.min(a, b) <= x && x <= Math.max(a, b));
+      return (nativeMath.min(a, b) <= x && x <= nativeMath.max(a, b));
     }
 
     /**
@@ -25,7 +27,7 @@ export module Utils {
      * @return {number} A clamped value in the range [min, max].
      */
     export function clamp(x: number, min: number, max: number) {
-      return Math.min(Math.max(min, x), max);
+      return nativeMath.min(nativeMath.max(min, x), max);
     }
 
     /**
@@ -77,7 +79,7 @@ export module Utils {
       if (step === 0) {
         throw new Error("step cannot be 0");
       }
-      var length = Math.max(Math.ceil((stop - start) / step), 0);
+      var length = nativeMath.max(nativeMath.ceil((stop - start) / step), 0);
       var range: number[] = [];
 
       for (var i = 0; i < length; ++i) {
@@ -88,7 +90,7 @@ export module Utils {
     }
 
     export function distanceSquared(p1: Point, p2: Point) {
-      return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
+      return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
     }
   }
 }
