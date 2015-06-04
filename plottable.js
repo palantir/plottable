@@ -7097,19 +7097,14 @@ var Plottable;
                         return this._baselineValue;
                     }
                     if (!this._projectorsReady()) {
-                        Plottable.Utils.Methods.warn("Asking for the baseline value when no scale is attached is not safe");
                         return 0;
                     }
                     var valueScale = this._isVertical ? this.y().scale : this.x().scale;
                     if (!valueScale) {
-                        Plottable.Utils.Methods.warn("Asking for the baseline value when no value scale is attached is not safe");
                         return 0;
                     }
                     if (valueScale instanceof Plottable.Scales.Time) {
                         return new Date(0);
-                    }
-                    if (valueScale instanceof Plottable.Scales.Category) {
-                        throw new Error("The value scale cannot be a Category Scale");
                     }
                     return 0;
                 }
