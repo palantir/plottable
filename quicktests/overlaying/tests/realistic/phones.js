@@ -55,7 +55,7 @@ function run(svg, data, Plottable) {
 
   var AusColor = "#ff6969";
   var IndColor = "#662a48";
-  var RoKColor = "#cc3300"
+  var RoKColor = "#cc3300";
 
   var colorScale = new Plottable.Scales.Color();
   colorScale.domain(["Australia", "India", "South Korea"]);
@@ -69,7 +69,7 @@ function run(svg, data, Plottable) {
   var IndDataset = new Plottable.Dataset(data[1]);
   var RoKDataset = new Plottable.Dataset(data[2]);
 
-  var xScale = new Plottable.Scales.Linear().domain([0, 1])
+  var xScale = new Plottable.Scales.Linear().domain([0, 1]);
   var xScale_reverse = new Plottable.Scales.Linear().domain([1, 0]);
   var yScale = new Plottable.Scales.Category();
 
@@ -89,22 +89,22 @@ function run(svg, data, Plottable) {
     if(d.phoneType === "feature"){
       return d.value;
     }
-  }
+  };
   var filterFeatureY = function(d){
     if(d.phoneType === "feature"){
       return d.demographic;
     }
-  }  
+  };
   var filterSmartX = function(d){
     if(d.phoneType === "smart"){
       return d.value;
     }
-  }
+  };
   var filterSmartY = function(d){
     if(d.phoneType === "smart"){
       return d.demographic;
     }
-  }  
+  };  
   var AusFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(AusDataset)
       .x(filterFeatureX, xScale_reverse)
