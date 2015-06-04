@@ -100,7 +100,7 @@ export module Drawers {
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
         Utils.Methods.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.getTiming(numberOfIterations);
+        delay += drawStep.animator.totalTime(numberOfIterations);
       });
 
       return delay;

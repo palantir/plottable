@@ -49,7 +49,7 @@ module Plottable {
        */
       export function integerTickGenerator(): TickGenerator<number> {
         return function(s: QuantitativeScale<number>) {
-          var defaultTicks = s.getDefaultTicks();
+          var defaultTicks = s.defaultTicks();
           return defaultTicks.filter((tick, i) => (tick % 1 === 0) || (i === 0) || (i === defaultTicks.length - 1));
         };
       }

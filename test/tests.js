@@ -310,7 +310,7 @@ var MockAnimator = (function () {
         this._time = time;
         this._callback = callback;
     }
-    MockAnimator.prototype.getTiming = function (selection) {
+    MockAnimator.prototype.totalTime = function (numberOfIterations) {
         return this._time;
     };
     MockAnimator.prototype.animate = function (selection, attrToProjector) {
@@ -7153,7 +7153,7 @@ describe("Scales", function () {
             scale.domain([0, 10]);
             var ticks = scale.ticks();
             assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-            scale.tickGenerator(function (scale) { return scale.getDefaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
+            scale.tickGenerator(function (scale) { return scale.defaultTicks().filter(function (tick) { return tick % 3 === 0; }); });
             ticks = scale.ticks();
             assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
         });
@@ -9572,10 +9572,10 @@ describe("Dispatchers", function () {
             assert.strictEqual(md1, md2, "returned the existing Dispatcher if called again with same <svg>");
             svg.remove();
         });
-        it("getLastMousePosition() defaults to a non-null value", function () {
+        it("lastMousePosition() defaults to a non-null value", function () {
             var svg = TestMethods.generateSVG();
             var md = Plottable.Dispatchers.Mouse.getDispatcher(svg.node());
-            var p = md.getLastMousePosition();
+            var p = md.lastMousePosition();
             assert.isNotNull(p, "returns a value after initialization");
             assert.isNotNull(p.x, "x value is set");
             assert.isNotNull(p.y, "y value is set");

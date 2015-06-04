@@ -7,7 +7,8 @@ class MockAnimator implements Plottable.Animators.Plot {
     this._time = time;
     this._callback = callback;
   }
-  public getTiming(selection: any) {
+  
+  totalTime(numberOfIterations: number) {
     return this._time;
   }
 
