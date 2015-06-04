@@ -833,6 +833,7 @@ var Plottable;
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters;
     (function (Formatters) {
+        ;
         /**
          * Creates a formatter for currency values.
          *
@@ -1245,6 +1246,7 @@ var Plottable;
 (function (Plottable) {
     var RenderPolicies;
     (function (RenderPolicies) {
+        ;
         /**
          * Renders Components immediately after they are enqueued.
          * Useful for debugging, horrible for performance.
@@ -1412,6 +1414,12 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    ;
+    var Scales;
+    (function (Scales) {
+        ;
+        ;
+    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
     var Scale = (function () {
         /**
          * A Scale is a function (in the mathematical sense) that maps values from a domain to a range.
@@ -2529,6 +2537,7 @@ var Plottable;
     (function (Scales) {
         var TickGenerators;
         (function (TickGenerators) {
+            ;
             /**
              * Creates a TickGenerator using the specified interval.
              *
@@ -8104,6 +8113,7 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
+        ;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 

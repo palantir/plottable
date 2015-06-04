@@ -7,13 +7,13 @@ module Plottable {
       // https://github.com/Microsoft/TypeScript/issues/1616
       /**
        * Generates an array of tick values for the specified scale.
-       * 
+       *
        * @param {QuantitativeScale} scale
        * @returns {D[]}
        */
       export interface TickGenerator<D> {
         (scale: Plottable.QuantitativeScale<D>): D[];
-      }
+      };
       /**
        * Creates a TickGenerator using the specified interval.
        *

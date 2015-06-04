@@ -264,6 +264,7 @@ var Mocks;
 })(Mocks || (Mocks = {}));
 
 ///<reference path="testReference.ts" />
+;
 before(function () {
     // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
     Plottable.RenderController.setRenderPolicy("immediate");

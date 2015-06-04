@@ -22,7 +22,7 @@ export module Animators {
      * @returns {any} The time required for the animation
      */
     getTiming(numberOfIterations: number): number;
-  }
+  };
 
   export type PlotAnimatorMap = { [animatorKey: string]: Plot; };
 }

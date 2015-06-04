@@ -7,7 +7,7 @@ module Plottable {
      */
     export interface RenderPolicy {
       render(): any;
-    }
+    };
 
     /**
      * Renders Components immediately after they are enqueued.

@@ -3,7 +3,7 @@
 module Plottable {
   export interface ScaleCallback<S extends Scale<any, any>> {
     (scale: S): any;
-  }
+  };
 
   export module Scales {
 
@@ -15,7 +15,7 @@ module Plottable {
      */
     export interface IncludedValuesProvider<D> {
       (scale: Scale<D, any>): D[];
-    }
+    };
 
     /**
      * A function that supplies padding exception values for the Scale.
@@ -27,7 +27,7 @@ module Plottable {
      */
     export interface PaddingExceptionsProvider<D> {
       (scale: Scale<D, any>): D[];
-    }
+    };
   }
 
   export class Scale<D, R> {

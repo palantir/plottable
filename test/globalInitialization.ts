@@ -3,7 +3,7 @@
 interface Window {
   PHANTOMJS: boolean;
   Pixel_CloseTo_Requirement: number;
-}
+};
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
