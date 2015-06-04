@@ -20,13 +20,13 @@ export module Plots {
     private static _LABEL_VERTICAL_PADDING = 5;
     private static _LABEL_HORIZONTAL_PADDING = 5;
     private _baseline: d3.Selection<void>;
-    private _baselineValue: number;
+    private _baselineValue: X|Y;
     protected _isVertical: boolean;
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
     private _hideBarsIfAnyAreTooWide = true;
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
-    private _baselineValueProvider: () => number[];
+    private _baselineValueProvider: () => (X|Y)[];
 
     /**
      * @constructor
@@ -42,11 +42,10 @@ export module Plots {
       }
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("baseline", new Animators.Null());
-      this.baselineValue(0);
       this.attr("fill", new Scales.Color().range()[0]);
       this.attr("width", () => this._getBarPixelWidth());
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
-      this._baselineValueProvider = () => [this._baselineValue];
+      this._baselineValueProvider = () => [this.baselineValue()];
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -107,20 +106,35 @@ export module Plots {
      * Gets the baseline value.
      * The baseline is the line that the bars are drawn from.
      *
-     * @returns {number}
+     * @returns {X|Y}
      */
-    public baselineValue(): number;
+    public baselineValue(): X|Y;
     /**
      * Sets the baseline value.
      * The baseline is the line that the bars are drawn from.
      *
-     * @param {number} value
+     * @param {X|Y} value
      * @returns {Bar} The calling Bar Plot.
      */
-    public baselineValue(value: number): Bar<X, Y>;
-    public baselineValue(value?: number): any {
+    public baselineValue(value: X|Y): Bar<X, Y>;
+    public baselineValue(value?: X|Y): any {
       if (value == null) {
-        return this._baselineValue;
+        if (this._baselineValue != null) {
+          return this._baselineValue;
+        }
+        if (!this._projectorsReady()) {
+          return 0;
+        }
+        var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+        if (!valueScale) {
+          return 0;
+        }
+
+        if (valueScale instanceof Scales.Time) {
+          return new Date(0);
+        }
+
+        return 0;
       }
       this._baselineValue = value;
       this._updateValueScale();
@@ -313,10 +327,6 @@ export module Plots {
         return;
       }
       var valueScale = this._isVertical ? this.y().scale : this.x().scale;
-      // HACKHACK #2208
-      if (valueScale instanceof Scales.Time && this._baselineValue === 0) {
-        this.baselineValue(<any> new Date(0));
-      }
       if (valueScale instanceof QuantitativeScale) {
         var qscale = <QuantitativeScale<any>> valueScale;
         qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
@@ -326,7 +336,7 @@ export module Plots {
 
     protected _additionalPaint(time: number) {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var scaledBaseline = primaryScale.scale(this.baselineValue());
 
       var baselineAttr: any = {
         "x1": this._isVertical ? 0 : scaledBaseline,
@@ -362,7 +372,7 @@ export module Plots {
         var primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
         var originalPositionFn = this._isVertical ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.x());
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var scaledBaseline = primaryScale.scale(this.baselineValue());
         var text = this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
         var w = attrToProjector["width"](d, i, dataset);
         var h = attrToProjector["height"](d, i, dataset);
@@ -417,7 +427,7 @@ export module Plots {
       if (this._dataChanged && this._animate) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-        var scaledBaseline = primaryScale.scale(this._baselineValue);
+        var scaledBaseline = primaryScale.scale(this.baselineValue());
         var positionAttr = this._isVertical ? "y" : "x";
         var dimensionAttr = this._isVertical ? "height" : "width";
         resetAttrToProjector[positionAttr] = () => scaledBaseline;
@@ -435,7 +445,7 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAttr = this._isVertical ? "y" : "x";
       var secondaryAttr = this._isVertical ? "x" : "y";
-      var scaledBaseline = primaryScale.scale(this._baselineValue);
+      var scaledBaseline = primaryScale.scale(this.baselineValue());
 
       var positionF = this._isVertical ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.y());
       var widthF = attrToProjector["width"];

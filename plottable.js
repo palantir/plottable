@@ -7045,11 +7045,10 @@ var Plottable;
                 }
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("baseline", new Plottable.Animators.Null());
-                this.baselineValue(0);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.attr("width", function () { return _this._getBarPixelWidth(); });
                 this._labelConfig = new Plottable.Utils.Map();
-                this._baselineValueProvider = function () { return [_this._baselineValue]; };
+                this._baselineValueProvider = function () { return [_this.baselineValue()]; };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -7094,7 +7093,20 @@ var Plottable;
             };
             Bar.prototype.baselineValue = function (value) {
                 if (value == null) {
-                    return this._baselineValue;
+                    if (this._baselineValue != null) {
+                        return this._baselineValue;
+                    }
+                    if (!this._projectorsReady()) {
+                        return 0;
+                    }
+                    var valueScale = this._isVertical ? this.y().scale : this.x().scale;
+                    if (!valueScale) {
+                        return 0;
+                    }
+                    if (valueScale instanceof Plottable.Scales.Time) {
+                        return new Date(0);
+                    }
+                    return 0;
                 }
                 this._baselineValue = value;
                 this._updateValueScale();
@@ -7235,10 +7247,6 @@ var Plottable;
                     return;
                 }
                 var valueScale = this._isVertical ? this.y().scale : this.x().scale;
-                // HACKHACK #2208
-                if (valueScale instanceof Plottable.Scales.Time && this._baselineValue === 0) {
-                    this.baselineValue(new Date(0));
-                }
                 if (valueScale instanceof Plottable.QuantitativeScale) {
                     var qscale = valueScale;
                     qscale.addPaddingExceptionsProvider(this._baselineValueProvider);
@@ -7248,7 +7256,7 @@ var Plottable;
             Bar.prototype._additionalPaint = function (time) {
                 var _this = this;
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var scaledBaseline = primaryScale.scale(this.baselineValue());
                 var baselineAttr = {
                     "x1": this._isVertical ? 0 : scaledBaseline,
                     "y1": this._isVertical ? scaledBaseline : 0,
@@ -7281,7 +7289,7 @@ var Plottable;
                     var primaryAccessor = _this._isVertical ? _this.y().accessor : _this.x().accessor;
                     var originalPositionFn = _this._isVertical ? Plottable.Plot._scaledAccessor(_this.y()) : Plottable.Plot._scaledAccessor(_this.x());
                     var primaryScale = _this._isVertical ? _this.y().scale : _this.x().scale;
-                    var scaledBaseline = primaryScale.scale(_this._baselineValue);
+                    var scaledBaseline = primaryScale.scale(_this.baselineValue());
                     var text = _this._labelFormatter(primaryAccessor(d, i, dataset)).toString();
                     var w = attrToProjector["width"](d, i, dataset);
                     var h = attrToProjector["height"](d, i, dataset);
@@ -7337,7 +7345,7 @@ var Plottable;
                 if (this._dataChanged && this._animate) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                    var scaledBaseline = primaryScale.scale(this._baselineValue);
+                    var scaledBaseline = primaryScale.scale(this.baselineValue());
                     var positionAttr = this._isVertical ? "y" : "x";
                     var dimensionAttr = this._isVertical ? "height" : "width";
                     resetAttrToProjector[positionAttr] = function () { return scaledBaseline; };
@@ -7354,7 +7362,7 @@ var Plottable;
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                 var primaryAttr = this._isVertical ? "y" : "x";
                 var secondaryAttr = this._isVertical ? "x" : "y";
-                var scaledBaseline = primaryScale.scale(this._baselineValue);
+                var scaledBaseline = primaryScale.scale(this.baselineValue());
                 var positionF = this._isVertical ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.y());
                 var widthF = attrToProjector["width"];
                 var originalPositionFn = this._isVertical ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.x());
