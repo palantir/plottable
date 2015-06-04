@@ -47,7 +47,7 @@ module Plottable {
 
     /**
      * Enqueues the Component for rendering.
-     * 
+     *
      * @param {Component} component
      */
     export function registerToRender(component: Component) {
@@ -60,7 +60,7 @@ module Plottable {
 
     /**
      * Enqueues the Component for layout and rendering.
-     * 
+     *
      * @param {Component} component
      */
     export function registerToComputeLayout(component: Component) {

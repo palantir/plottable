@@ -10,12 +10,12 @@ export module Drawers {
   export type DrawStep = {
     attrToProjector: AttributeToProjector;
     animator: Animators.Plot;
-  }
+  };
 
   export type AppliedDrawStep = {
     attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animators.Plot;
-  }
+  };
 
 }
 

@@ -25,7 +25,7 @@ module Plottable {
 
     /**
      * Adds a callback to be called when the Dataset updates.
-     * 
+     *
      * @param {DatasetCallback} callback.
      * @returns {Dataset} The calling Dataset.
      */
@@ -36,7 +36,7 @@ module Plottable {
 
     /**
      * Removes a callback that would be called when the Dataset updates.
-     * 
+     *
      * @param {DatasetCallback} callback
      * @returns {Dataset} The calling Dataset.
      */
