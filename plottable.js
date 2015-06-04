@@ -50,21 +50,6 @@ var Plottable;
                 return map;
             }
             Methods.populateMap = populateMap;
-            /**
-             * Creates an array of length `count`, filled with value or (if value is a function), value()
-             *
-             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
-             * @param {number} count The length of the array to generate
-             * @return {any[]}
-             */
-            function createFilledArray(value, count) {
-                var out = [];
-                for (var i = 0; i < count; i++) {
-                    out[i] = typeof (value) === "function" ? value(i) : value;
-                }
-                return out;
-            }
-            Methods.createFilledArray = createFilledArray;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -580,6 +565,21 @@ var Plottable;
                 return window.Array.prototype.concat.apply([], a);
             }
             Array.flatten = flatten;
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
+            function createFilledArray(value, count) {
+                var out = [];
+                for (var i = 0; i < count; i++) {
+                    out[i] = typeof (value) === "function" ? value(i) : value;
+                }
+                return out;
+            }
+            Array.createFilledArray = createFilledArray;
         })(Array = Utils.Array || (Utils.Array = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -5624,8 +5624,8 @@ var Plottable;
                 var heuristicRowWeights = rowWeights.map(function (c) { return c === 0 ? 0.5 : c; });
                 var colProportionalSpace = Table._calcProportionalSpace(heuristicColWeights, availableWidthAfterPadding);
                 var rowProportionalSpace = Table._calcProportionalSpace(heuristicRowWeights, availableHeightAfterPadding);
-                var guaranteedWidths = Plottable.Utils.Methods.createFilledArray(0, this._nCols);
-                var guaranteedHeights = Plottable.Utils.Methods.createFilledArray(0, this._nRows);
+                var guaranteedWidths = Plottable.Utils.Array.createFilledArray(0, this._nCols);
+                var guaranteedHeights = Plottable.Utils.Array.createFilledArray(0, this._nRows);
                 var freeWidth;
                 var freeHeight;
                 var nIterations = 0;
@@ -5678,10 +5678,10 @@ var Plottable;
             };
             Table.prototype._determineGuarantees = function (offeredWidths, offeredHeights, isFinalOffer) {
                 if (isFinalOffer === void 0) { isFinalOffer = false; }
-                var requestedWidths = Plottable.Utils.Methods.createFilledArray(0, this._nCols);
-                var requestedHeights = Plottable.Utils.Methods.createFilledArray(0, this._nRows);
-                var columnNeedsWidth = Plottable.Utils.Methods.createFilledArray(false, this._nCols);
-                var rowNeedsHeight = Plottable.Utils.Methods.createFilledArray(false, this._nRows);
+                var requestedWidths = Plottable.Utils.Array.createFilledArray(0, this._nCols);
+                var requestedHeights = Plottable.Utils.Array.createFilledArray(0, this._nRows);
+                var columnNeedsWidth = Plottable.Utils.Array.createFilledArray(false, this._nCols);
+                var rowNeedsHeight = Plottable.Utils.Array.createFilledArray(false, this._nRows);
                 this._rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         var spaceRequest;
@@ -5816,7 +5816,7 @@ var Plottable;
             Table._calcProportionalSpace = function (weights, freeSpace) {
                 var weightSum = d3.sum(weights);
                 if (weightSum === 0) {
-                    return Plottable.Utils.Methods.createFilledArray(0, weights.length);
+                    return Plottable.Utils.Array.createFilledArray(0, weights.length);
                 }
                 else {
                     return weights.map(function (w) { return freeSpace * w / weightSum; });

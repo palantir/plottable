@@ -29,14 +29,6 @@ declare module Plottable {
              */
             function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): d3.Map<T>;
             /**
-             * Creates an array of length `count`, filled with value or (if value is a function), value()
-             *
-             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
-             * @param {number} count The length of the array to generate
-             * @return {any[]}
-             */
-            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
-            /**
              * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
              * If no maximum value can be computed, returns defaultValue.
              */
@@ -232,6 +224,14 @@ declare module Plottable {
              * @return {T[]} Every array in a, concatenated together in the order they appear.
              */
             function flatten<T>(a: T[][]): T[];
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
+            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
         }
     }
 }
