@@ -1406,6 +1406,7 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
+    ;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -5958,6 +5959,7 @@ var Plottable;
 (function (Plottable) {
     var Plots;
     (function (Plots) {
+        ;
         var Animator;
         (function (Animator) {
             Animator.MAIN = "main";

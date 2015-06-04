@@ -4,7 +4,7 @@ module Plottable {
    */
   export interface Accessor<T> {
     (datum: any, index: number, dataset: Dataset): T;
-  }
+  };
 
   /**
    * Retrieves scaled datum property.
@@ -45,5 +45,5 @@ module Plottable {
   export type Bounds = {
     topLeft: Point;
     bottomRight: Point;
-  }
+  };
 }

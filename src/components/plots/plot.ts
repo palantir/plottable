@@ -11,12 +11,12 @@ module Plottable {
       position: Point;
       selection: d3.Selection<any>;
       plot: Plot;
-    }
+    };
 
     export interface AccessorScaleBinding<D, R> {
       accessor: Accessor<any>;
       scale?: Scale<D, R>;
-    }
+    };
 
     export module Animator {
       export var MAIN = "main";
