@@ -284,6 +284,14 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Utils {
+        module Window {
+        }
+    }
+}
+
+
+declare module Plottable {
     type Formatter = (d: any) => string;
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {

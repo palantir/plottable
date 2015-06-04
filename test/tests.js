@@ -7784,6 +7784,13 @@ describe("Utils.Color", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils", function () {
+    describe("WindowUtils", function () {
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Formatters", function () {
     describe("fixed", function () {
         it("shows exactly [precision] digits", function () {
