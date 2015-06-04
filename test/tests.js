@@ -327,7 +327,7 @@ var MockDrawer = (function (_super) {
         _super.apply(this, arguments);
     }
     MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this._getRenderArea(), step.attrToAppliedProjector);
+        step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
     };
     return MockDrawer;
 })(Plottable.Drawer);
@@ -393,15 +393,15 @@ describe("Drawers", function () {
             drawer.draw([], steps);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
-        it("_getSelection", function () {
+        it("selectionForIndex", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var drawer = new Plottable.Drawer(null);
             drawer.setup(svg.append("g"));
-            drawer._getSelector = function () { return "circle"; };
+            drawer.selector = function () { return "circle"; };
             var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
-            var circles = drawer._getRenderArea().selectAll("circle").data(data);
+            var circles = drawer.renderArea().selectAll("circle").data(data);
             circles.enter().append("circle").attr("cx", function (datum) { return datum.one; }).attr("cy", function (datum) { return datum.two; }).attr("r", 10);
-            var selection = drawer._getSelection(1);
+            var selection = drawer.selectionForIndex(1);
             assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
             svg.remove();
         });
@@ -411,7 +411,7 @@ describe("Drawers", function () {
 ///<reference path="../testReference.ts" />
 describe("Drawers", function () {
     describe("Line Drawer", function () {
-        it("getSelection", function () {
+        it("selectionForIndex()", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var data = [{ a: 12, b: 10 }, { a: 13, b: 24 }, { a: 14, b: 21 }, { a: 15, b: 14 }];
             var dataset = new Plottable.Dataset(data);
@@ -426,7 +426,7 @@ describe("Drawers", function () {
             linePlot.renderTo(svg);
             var lineSelection = linePlot.getAllSelections();
             data.forEach(function (datum, index) {
-                var selection = drawer._getSelection(index);
+                var selection = drawer.selectionForIndex(index);
                 assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
             });
             svg.remove();
@@ -2141,12 +2141,12 @@ describe("Plots", function () {
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
-            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1.selector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
-            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2.selector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (dataset) {
                 if (dataset === dataset1) {
@@ -2189,12 +2189,12 @@ describe("Plots", function () {
             var renderArea1 = svg.append("g");
             var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
-            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1.selector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
-            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2.selector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (dataset) {
                 if (dataset === dataset1) {
@@ -2251,7 +2251,7 @@ describe("Plots", function () {
             circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             circles.exit().remove();
             mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
-            mockDrawer._getSelector = function () { return "circle"; };
+            mockDrawer.selector = function () { return "circle"; };
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
             };
@@ -2287,12 +2287,12 @@ describe("Plots", function () {
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
-            mockDrawer1._getSelector = function () { return "circle"; };
+            mockDrawer1.selector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
-            mockDrawer2._getSelector = function () { return "circle"; };
+            mockDrawer2.selector = function () { return "circle"; };
             // Mock _getDrawer to return the mock drawers
             plot._getDrawer = function (dataset) {
                 if (dataset === dataset1) {

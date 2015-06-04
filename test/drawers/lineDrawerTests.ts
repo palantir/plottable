@@ -2,7 +2,7 @@
 
 describe("Drawers", () => {
   describe("Line Drawer", () => {
-    it("getSelection", () => {
+    it("selectionForIndex()", () => {
       var svg = TestMethods.generateSVG(300, 300);
       var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
       var dataset = new Plottable.Dataset(data);
@@ -20,7 +20,7 @@ describe("Drawers", () => {
 
       var lineSelection = linePlot.getAllSelections();
       data.forEach((datum: any, index: number) => {
-        var selection = drawer._getSelection(index);
+        var selection = drawer.selectionForIndex(index);
         assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
       });
 
