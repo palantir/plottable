@@ -234,11 +234,4 @@ describe("Utils.Methods", () => {
     assert.strictEqual(nullHexcode, null, "null hexcode returned");
     colorTester.remove();
   });
-
-  it("lightenColor()", () => {
-    var colorHex = "#12fced";
-    var oldColor = d3.hsl(colorHex);
-    var lightenedColor = Plottable.Utils.Methods.lightenColor(colorHex, 1);
-    assert.operator(d3.hsl(lightenedColor).l, ">", oldColor.l, "color got lighter");
-  });
 });

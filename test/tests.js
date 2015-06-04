@@ -7759,6 +7759,11 @@ describe("Utils.DOM", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils.Color", function () {
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Formatters", function () {
     describe("fixed", function () {
         it("shows exactly [precision] digits", function () {
@@ -8283,12 +8288,6 @@ describe("Utils.Methods", function () {
         var nullHexcode = Plottable.Utils.Methods.colorTest(colorTester, "plottable-colors-11");
         assert.strictEqual(nullHexcode, null, "null hexcode returned");
         colorTester.remove();
-    });
-    it("lightenColor()", function () {
-        var colorHex = "#12fced";
-        var oldColor = d3.hsl(colorHex);
-        var lightenedColor = Plottable.Utils.Methods.lightenColor(colorHex, 1);
-        assert.operator(d3.hsl(lightenedColor).l, ">", oldColor.l, "color got lighter");
     });
 });
 

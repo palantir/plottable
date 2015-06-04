@@ -581,6 +581,19 @@ var Plottable;
         var Color;
         (function (Color) {
             /**
+             * Return contrast ratio between two colors
+             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
+             * chroma.js may be found here: https://github.com/gka/chroma.js
+             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
+             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+             */
+            function contrast(a, b) {
+                var l1 = luminance(a) + 0.05;
+                var l2 = luminance(b) + 0.05;
+                return l1 > l2 ? l1 / l2 : l2 / l1;
+            }
+            Color.contrast = contrast;
+            /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
              * chroma.js may be found here: https://github.com/gka/chroma.js
@@ -597,19 +610,6 @@ var Plottable;
                 var b = lum(rgb.b);
                 return 0.2126 * r + 0.7152 * g + 0.0722 * b;
             }
-            /**
-             * Return contrast ratio between two colors
-             * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
-             * chroma.js may be found here: https://github.com/gka/chroma.js
-             * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
-             * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
-             */
-            function contrast(a, b) {
-                var l1 = luminance(a) + 0.05;
-                var l2 = luminance(b) + 0.05;
-                return l1 > l2 ? l1 / l2 : l2 / l1;
-            }
-            Color.contrast = contrast;
         })(Color = Utils.Color || (Utils.Color = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));

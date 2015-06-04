@@ -4,6 +4,19 @@ module Plottable {
 export module Utils {
   export module Color {
     /**
+     * Return contrast ratio between two colors
+     * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
+     * chroma.js may be found here: https://github.com/gka/chroma.js
+     * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
+     * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
+     */
+    export function contrast(a: string, b: string) {
+      var l1 = luminance(a) + 0.05;
+      var l2 = luminance(b) + 0.05;
+      return l1 > l2 ? l1 / l2 : l2 / l1;
+    }
+
+    /**
      * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
      * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
      * chroma.js may be found here: https://github.com/gka/chroma.js
@@ -20,19 +33,6 @@ export module Utils {
       var g = lum(rgb.g);
       var b = lum(rgb.b);
       return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-    }
-
-    /**
-     * Return contrast ratio between two colors
-     * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
-     * chroma.js may be found here: https://github.com/gka/chroma.js
-     * License may be found here: https://github.com/gka/chroma.js/blob/master/LICENSE
-     * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
-     */
-    export function contrast(a: string, b: string) {
-      var l1 = luminance(a) + 0.05;
-      var l2 = luminance(b) + 0.05;
-      return l1 > l2 ? l1 / l2 : l2 / l1;
     }
   }
 }
