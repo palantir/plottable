@@ -187,11 +187,11 @@ declare module Plottable {
             /**
              * Takes two arrays of numbers and adds them together
              *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             * @param {number[]} aList The first array of numbers
+             * @param {number[]} bList The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = aList[i] + bList[i]
              */
-            function add(alist: number[], blist: number[]): number[];
+            function add(aList: number[], bList: number[]): number[];
             /**
              * Take an array of values, and return the unique values.
              * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs

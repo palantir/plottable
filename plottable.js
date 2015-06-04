@@ -500,15 +500,15 @@ var Plottable;
             /**
              * Takes two arrays of numbers and adds them together
              *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
+             * @param {number[]} aList The first array of numbers
+             * @param {number[]} bList The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = aList[i] + bList[i]
              */
-            function add(alist, blist) {
-                if (alist.length !== blist.length) {
+            function add(aList, bList) {
+                if (aList.length !== bList.length) {
                     throw new Error("attempted to add arrays of unequal length");
                 }
-                return alist.map(function (_, i) { return alist[i] + blist[i]; });
+                return aList.map(function (_, i) { return aList[i] + bList[i]; });
             }
             Array.add = add;
             /**
