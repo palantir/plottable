@@ -21,14 +21,6 @@ declare module Plottable {
              */
             function clamp(x: number, min: number, max: number): number;
             /**
-             * Populates a map from an array of keys and a transformation function.
-             *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {d3.Map<T>} A map mapping keys to their transformed values.
-             */
-            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): d3.Map<T>;
-            /**
              * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
              * If no maximum value can be computed, returns defaultValue.
              */

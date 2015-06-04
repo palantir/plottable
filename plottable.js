@@ -35,21 +35,6 @@ var Plottable;
                 return Math.min(Math.max(min, x), max);
             }
             Methods.clamp = clamp;
-            /**
-             * Populates a map from an array of keys and a transformation function.
-             *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {d3.Map<T>} A map mapping keys to their transformed values.
-             */
-            function populateMap(keys, transform) {
-                var map = d3.map();
-                keys.forEach(function (key, i) {
-                    map.set(key, transform(key, i));
-                });
-                return map;
-            }
-            Methods.populateMap = populateMap;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -640,12 +625,12 @@ var Plottable;
                 var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
                 var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return Stacked.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return Stacked.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
@@ -705,7 +690,7 @@ var Plottable;
             };
             Stacked._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
                 var dataMapArray = datasets.map(function () {
-                    return Utils.Methods.populateMap(domainKeys, function (domainKey) {
+                    return Stacked.populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
                     });
                 });
@@ -746,6 +731,20 @@ var Plottable;
                     stackOffsets.set(dataset, datasetOffsets);
                 });
                 return stackOffsets;
+            };
+            /**
+             * Populates a map from an array of keys and a transformation function.
+             *
+             * @param {string[]} keys The array of keys.
+             * @param {(string, number) => T} transform A transformation function to apply to the keys.
+             * @return {d3.Map<T>} A map mapping keys to their transformed values.
+             */
+            Stacked.populateMap = function (keys, transform) {
+                var map = d3.map();
+                keys.forEach(function (key, i) {
+                    map.set(key, transform(key, i));
+                });
+                return map;
             };
             return Stacked;
         })();

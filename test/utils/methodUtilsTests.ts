@@ -141,27 +141,6 @@ describe("Utils.Methods", () => {
 
   });
 
-  it("populateMap works as expected", () => {
-    var keys = ["a", "b", "c"];
-    var map = Plottable.Utils.Methods.populateMap(keys, (key) => key + "Value");
-
-    assert.strictEqual(map.get("a"), "aValue", "key properly goes through map function");
-    assert.strictEqual(map.get("b"), "bValue", "key properly goes through map function");
-    assert.strictEqual(map.get("c"), "cValue", "key properly goes through map function");
-
-    var indexMap = Plottable.Utils.Methods.populateMap(keys, (key, i) => key + i + "Value");
-
-    assert.strictEqual(indexMap.get("a"), "a0Value", "key and index properly goes through map function");
-    assert.strictEqual(indexMap.get("b"), "b1Value", "key and index properly goes through map function");
-    assert.strictEqual(indexMap.get("c"), "c2Value", "key and index properly goes through map function");
-
-    var emptyKeys: string[] = [];
-    var emptyMap = Plottable.Utils.Methods.populateMap(emptyKeys, (key) => key + "Value");
-
-    assert.isTrue(emptyMap.empty(), "no entries in map if no keys in input array");
-
-  });
-
   it("copyMap works as expected", () => {
     var oldMap: {[key: string]: any} = {};
     oldMap["a"] = 1;
