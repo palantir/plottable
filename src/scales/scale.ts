@@ -11,7 +11,7 @@ module Plottable {
      * A function that supplies domain values to be included into a Scale.
      *
      * @param {Scale} scale
-     * @returns {D[]} An array of values in the domain.
+     * @returns {D[]} An array of values that should be included in the Scale.
      */
     export interface IncludedValuesProvider<D> {
       (scale: Scale<D, any>): D[];
@@ -23,7 +23,7 @@ module Plottable {
      * that end of the domain will not be padded.
      *
      * @param {QuantitativeScale} scale
-     * @returns {D[]} An array of values to become padding exceptions.
+     * @returns {D[]} An array of values that should not be padded.
      */
     export interface PaddingExceptionsProvider<D> {
       (scale: QuantitativeScale<D>): D[];
