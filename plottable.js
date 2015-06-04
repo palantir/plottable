@@ -126,25 +126,6 @@ var Plottable;
                 return Array.prototype.concat.apply([], a);
             }
             Methods.flatten = flatten;
-            /**
-             * Check if two arrays are equal by strict equality.
-             */
-            function arrayEq(a, b) {
-                // Technically, null and undefined are arrays too
-                if (a == null || b == null) {
-                    return a === b;
-                }
-                if (a.length !== b.length) {
-                    return false;
-                }
-                for (var i = 0; i < a.length; i++) {
-                    if (a[i] !== b[i]) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-            Methods.arrayEq = arrayEq;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -253,11 +234,6 @@ var Plottable;
                 return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
             }
             Methods.distanceSquared = distanceSquared;
-            function isIE() {
-                var userAgent = window.navigator.userAgent;
-                return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
-            }
-            Methods.isIE = isIE;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *

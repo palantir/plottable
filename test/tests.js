@@ -145,12 +145,17 @@ var TestMethods;
         triggerFakeMouseEvent("mouseup", target, end.x, end.y);
     }
     TestMethods.triggerFakeDragSequence = triggerFakeDragSequence;
+    function isIE() {
+        var userAgent = window.navigator.userAgent;
+        return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+    }
+    TestMethods.isIE = isIE;
     function triggerFakeWheelEvent(type, target, relativeX, relativeY, deltaY) {
         var clientRect = target.node().getBoundingClientRect();
         var xPos = clientRect.left + relativeX;
         var yPos = clientRect.top + relativeY;
         var event;
-        if (Plottable.Utils.Methods.isIE()) {
+        if (isIE()) {
             event = document.createEvent("WheelEvent");
             event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
         }

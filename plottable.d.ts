@@ -63,10 +63,6 @@ declare module Plottable {
              */
             function flatten<T>(a: T[][]): T[];
             /**
-             * Check if two arrays are equal by strict equality.
-             */
-            function arrayEq<T>(a: T[], b: T[]): boolean;
-            /**
              * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
              * If no maximum value can be computed, returns defaultValue.
              */
@@ -110,7 +106,6 @@ declare module Plottable {
             function colorTest(colorTester: d3.Selection<void>, className: string): string;
             function lightenColor(color: string, factor: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
-            function isIE(): boolean;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *

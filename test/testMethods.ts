@@ -153,12 +153,17 @@ module TestMethods {
     triggerFakeMouseEvent("mouseup", target, end.x, end.y);
   }
 
+  export function isIE() {
+    var userAgent = window.navigator.userAgent;
+    return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+  }
+
   export function triggerFakeWheelEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, deltaY: number) {
     var clientRect = (<Element> target.node()).getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var event: WheelEvent;
-    if (Plottable.Utils.Methods.isIE()) {
+    if (isIE()) {
       event = document.createEvent("WheelEvent");
       event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
     } else {

@@ -119,25 +119,6 @@ export module Utils {
     }
 
     /**
-     * Check if two arrays are equal by strict equality.
-     */
-    export function arrayEq<T>(a: T[], b: T[]): boolean {
-      // Technically, null and undefined are arrays too
-      if (a == null || b == null) {
-        return a === b;
-      }
-      if (a.length !== b.length) {
-        return false;
-      }
-      for (var i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) {
-          return false;
-        }
-      }
-      return true;
-    }
-
-    /**
      * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
      * If no maximum value can be computed, returns defaultValue.
      */
@@ -253,11 +234,6 @@ export module Utils {
 
     export function distanceSquared(p1: Point, p2: Point) {
       return Math.pow(p2.y - p1.y, 2) + Math.pow(p2.x - p1.x, 2);
-    }
-
-    export function isIE() {
-      var userAgent = window.navigator.userAgent;
-      return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
     }
 
     /**
