@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Utils.Methods", () => {
-  it("inRange works correct", () => {
+  it("inRange()", () => {
     assert.isTrue(Plottable.Utils.Methods.inRange(0, -1, 1), "basic functionality works");
     assert.isTrue(Plottable.Utils.Methods.inRange(0, 0, 1), "it is a closed interval");
     assert.isTrue(!Plottable.Utils.Methods.inRange(0, 1, 2), "returns false when false");
@@ -14,7 +14,7 @@ describe("Utils.Methods", () => {
     var min = Plottable.Utils.Methods.min;
     var today = new Date();
 
-    it("return the default value if max or min can't be computed", () => {
+    it("return the default value if max() or min() can't be computed", () => {
       var minValue = 1;
       var maxValue = 5;
       var defaultValue = 3;
@@ -83,7 +83,7 @@ describe("Utils.Methods", () => {
     });
   });
 
-  it("isNaN works as expected", () => {
+  it("isNaN()", () => {
     var isNaN = Plottable.Utils.Methods.isNaN;
 
     assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
@@ -98,50 +98,33 @@ describe("Utils.Methods", () => {
     assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
   });
 
-  it("isValidNumber works as expected", () => {
+  it("isValidNumber()", () => {
     var isValidNumber = Plottable.Utils.Methods.isValidNumber;
 
-    assert.isTrue(isValidNumber(0),
-      "(0 is a valid number");
-    assert.isTrue(isValidNumber(1),
-      "(1 is a valid number");
-    assert.isTrue(isValidNumber(-1),
-      "(-1 is a valid number");
-    assert.isTrue(isValidNumber(0.1),
-      "(0.1 is a valid number");
+    assert.isTrue(isValidNumber(0), "(0 is a valid number");
+    assert.isTrue(isValidNumber(1), "(1 is a valid number");
+    assert.isTrue(isValidNumber(-1), "(-1 is a valid number");
+    assert.isTrue(isValidNumber(0.1), "(0.1 is a valid number");
 
-    assert.isFalse(isValidNumber(null),
-      "(null is not a valid number");
-    assert.isFalse(isValidNumber(NaN),
-      "(NaN is not a valid number");
-    assert.isFalse(isValidNumber(undefined),
-      "(undefined is not a valid number");
-    assert.isFalse(isValidNumber(Infinity),
-      "(Infinity is not a valid number");
-    assert.isFalse(isValidNumber(-Infinity),
-      "(-Infinity is not a valid number");
+    assert.isFalse(isValidNumber(null), "(null is not a valid number");
+    assert.isFalse(isValidNumber(NaN), "(NaN is not a valid number");
+    assert.isFalse(isValidNumber(undefined), "(undefined is not a valid number");
+    assert.isFalse(isValidNumber(Infinity), "(Infinity is not a valid number");
+    assert.isFalse(isValidNumber(-Infinity), "(-Infinity is not a valid number");
 
-    assert.isFalse(isValidNumber("number"),
-      "('number' is not a valid number");
-    assert.isFalse(isValidNumber("string"),
-      "('string' is not a valid number");
-    assert.isFalse(isValidNumber("0"),
-      "('0' is not a valid number");
-    assert.isFalse(isValidNumber("1"),
-      "('1' is not a valid number");
+    assert.isFalse(isValidNumber("number"), "('number' is not a valid number");
+    assert.isFalse(isValidNumber("string"), "('string' is not a valid number");
+    assert.isFalse(isValidNumber("0"), "('0' is not a valid number");
+    assert.isFalse(isValidNumber("1"), "('1' is not a valid number");
 
-    assert.isFalse(isValidNumber([]),
-      "([] is not a valid number");
-    assert.isFalse(isValidNumber([1]),
-      "([1] is not a valid number");
-    assert.isFalse(isValidNumber({}),
-      "({} is not a valid number");
-    assert.isFalse(isValidNumber({1: 1}),
-      "({1: 1} is not a valid number");
+    assert.isFalse(isValidNumber([]), "([] is not a valid number");
+    assert.isFalse(isValidNumber([1]), "([1] is not a valid number");
+    assert.isFalse(isValidNumber({}), "({} is not a valid number");
+    assert.isFalse(isValidNumber({1: 1}), "({1: 1} is not a valid number");
 
   });
 
-  it("range works as expected", () => {
+  it("range()", () => {
     var start = 0;
     var end = 6;
     var range = Plottable.Utils.Methods.range(start, end);
