@@ -1193,7 +1193,7 @@ declare module Plottable {
          * @param{any[]} data The data to be drawn
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
-        draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
@@ -2366,7 +2366,7 @@ declare module Plottable {
         datasets(datasets: Dataset[]): Plot;
         protected _getDrawersInOrder(): Drawer[];
         protected _generateDrawSteps(): Drawers.DrawStep[];
-        protected _additionalPaint(time: number): void;
+        protected _additionalPaint(): void;
         protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
@@ -2794,7 +2794,7 @@ declare module Plottable {
              * @returns {Entity[]}
              */
             entitiesIn(xRange: Range, yRange: Range): Entity[];
-            protected _additionalPaint(time: number): void;
+            protected _additionalPaint(): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;

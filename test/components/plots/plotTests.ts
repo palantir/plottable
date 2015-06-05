@@ -446,7 +446,8 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("additionalPaint timing works properly", () => {
+    // TODO: delete before merge.
+    it.skip("additionalPaint timing works properly", () => {
       var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();

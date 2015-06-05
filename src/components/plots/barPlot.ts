@@ -334,7 +334,7 @@ export module Plots {
       }
     }
 
-    protected _additionalPaint(time: number) {
+    protected _additionalPaint() {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var scaledBaseline = primaryScale.scale(this.baselineValue());
 
@@ -349,7 +349,7 @@ export module Plots {
 
       this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       if (this._labelsEnabled) {
-        Utils.Window.setTimeout(() => this._drawLabels(), time);
+        this._drawLabels();
       }
     }
 

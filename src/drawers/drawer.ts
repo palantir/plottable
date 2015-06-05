@@ -118,7 +118,7 @@ export module Drawers {
         delay += drawStep.animator.totalTime(numberOfIterations);
       });
 
-      return delay;
+      return this;
     }
 
     /**
