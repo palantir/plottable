@@ -4,6 +4,14 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   describe("Linear Scales", () => {
+    it("extentOfValues() filters out invalid numbers", () => {
+      var scale = new Plottable.Scales.Linear();
+      var expectedExtent = [0, 1];
+      var arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, 1];
+      var extent = scale.extentOfValues(arrayWithBadValues);
+      assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+    });
+
     it("autoDomain() defaults to [0, 1]", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();

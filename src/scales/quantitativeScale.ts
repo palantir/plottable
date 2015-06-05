@@ -223,8 +223,8 @@ module Plottable {
     }
 
     public extentOfValues(values: D[]): D[] {
-      // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
-      var extent = d3.extent(<any[]> values);
+//       HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
+      var extent = d3.extent(<any[]> values.filter((value) => Utils.Math.isValidNumber(+value)));
       if (extent[0] == null || extent[1] == null) {
         return [];
       } else {

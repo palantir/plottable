@@ -1711,8 +1711,8 @@ var Plottable;
             return this;
         };
         QuantitativeScale.prototype.extentOfValues = function (values) {
-            // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
-            var extent = d3.extent(values);
+            //       HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
+            var extent = d3.extent(values.filter(function (value) { return Plottable.Utils.Math.isValidNumber(+value); }));
             if (extent[0] == null || extent[1] == null) {
                 return [];
             }

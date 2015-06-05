@@ -7254,6 +7254,13 @@ describe("Scales", function () {
 var assert = chai.assert;
 describe("Scales", function () {
     describe("Linear Scales", function () {
+        it("extentOfValues() filters out invalid numbers", function () {
+            var scale = new Plottable.Scales.Linear();
+            var expectedExtent = [0, 1];
+            var arrayWithBadValues = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, 1];
+            var extent = scale.extentOfValues(arrayWithBadValues);
+            assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+        });
         it("autoDomain() defaults to [0, 1]", function () {
             var scale = new Plottable.Scales.Linear();
             scale.autoDomain();
@@ -7645,6 +7652,14 @@ describe("Scales", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("TimeScale tests", function () {
+    it.skip("extentOfValues() filters out invalid Dates", function () {
+        var scale = new Plottable.Scales.Time();
+        var expectedExtent = [new Date("2015-06-05"), new Date("2015-06-04")];
+        var arrayWithBadValues = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, new Date("2015-06-05"), new Date("2015-06-04")];
+        var extent = scale.extentOfValues(arrayWithBadValues);
+        assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");
+        assert.strictEqual(extent[1].getTime(), expectedExtent[1].getTime(), "returned correct max");
+    });
     it("can be padded", function () {
         var scale = new Plottable.Scales.Time();
         scale.padProportion(0);
