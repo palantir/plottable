@@ -7,7 +7,8 @@ class MockAnimator implements Plottable.Animators.Plot {
     this._time = time;
     this._callback = callback;
   }
-  public getTiming(selection: any) {
+
+  public totalTime(numberOfIterations: number) {
     return this._time;
   }
 
@@ -21,7 +22,7 @@ class MockAnimator implements Plottable.Animators.Plot {
 
 class MockDrawer extends Plottable.Drawer {
   public _drawStep(step: Plottable.Drawers.AppliedDrawStep) {
-    step.animator.animate(this._getRenderArea(), step.attrToAppliedProjector);
+    step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
   }
 }
 
@@ -47,7 +48,7 @@ describe("Drawers", () => {
       timings = [];
       svg = TestMethods.generateSVG();
       drawer = new MockDrawer(null);
-      drawer.setup(svg);
+      drawer.renderArea(svg);
     });
 
     afterEach(() => {
@@ -89,15 +90,15 @@ describe("Drawers", () => {
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
     });
 
-    it("_getSelection", () => {
+    it("selectionForIndex()", () => {
       var svg = TestMethods.generateSVG(300, 300);
       var drawer = new Plottable.Drawer(null);
-      drawer.setup(svg.append("g"));
-      (<any> drawer)._getSelector = () => "circle";
+      drawer.renderArea(svg.append("g"));
+      drawer.selector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
-      var circles = drawer._getRenderArea().selectAll("circle").data(data);
+      var circles = drawer.renderArea().selectAll("circle").data(data);
       circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
-      var selection = drawer._getSelection(1);
+      var selection = drawer.selectionForIndex(1);
       assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
       svg.remove();
     });

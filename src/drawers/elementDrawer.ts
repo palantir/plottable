@@ -6,7 +6,7 @@ export module Drawers {
     protected _svgElement: string;
 
     private _getDrawSelection() {
-      return this._getRenderArea().selectAll(this._svgElement);
+      return this.renderArea().selectAll(this._svgElement);
     }
 
     protected _drawStep(step: AppliedDrawStep) {
@@ -28,7 +28,7 @@ export module Drawers {
       dataElements.exit().remove();
     }
 
-    public _getSelector(): string {
+    public selector(): string {
       return this._svgElement;
     }
   }

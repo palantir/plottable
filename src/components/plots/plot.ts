@@ -106,7 +106,7 @@ module Plottable {
 
     protected _createNodesForDataset(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
-      drawer.setup(this._renderArea.append("g"));
+      drawer.renderArea(this._renderArea.append("g"));
       return drawer;
     }
 
@@ -431,7 +431,7 @@ module Plottable {
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
+        drawer.renderArea().selectAll(drawer.selector()).each(function() {
           allSelections.push(this);
         });
       });
@@ -460,7 +460,7 @@ module Plottable {
             index: index,
             dataset: dataset,
             position: position,
-            selection: drawer._getSelection(index),
+            selection: drawer.selectionForIndex(index),
             plot: this
           });
         });

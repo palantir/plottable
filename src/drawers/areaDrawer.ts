@@ -11,9 +11,15 @@ export module Drawers {
       this._areaSelection.datum(data);
     }
 
-    public setup(area: d3.Selection<void>) {
-      Drawer.prototype.setup.call(this, area);
+    public renderArea(): d3.Selection<void>;
+    public renderArea(area: d3.Selection<void>): Drawer;
+    public renderArea(area?: d3.Selection<void>): any {
+      if (area == null) {
+        return super.renderArea();
+      }
+      Drawer.prototype.renderArea.call(this, area);
       this._areaSelection = area.append("path").style("stroke", "none");
+      return this;
     }
 
     protected _drawStep(step: AppliedDrawStep) {
@@ -22,7 +28,7 @@ export module Drawers {
       this._areaSelection.classed(Area.PATH_CLASS, true);
     }
 
-    public _getSelector(): string {
+    public selector(): string {
       return "path";
     }
   }
