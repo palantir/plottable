@@ -1203,7 +1203,7 @@ declare module Plottable {
          */
         renderArea(): d3.Selection<void>;
         /**
-         * Returns the selector for this Drawer's visual elements.
+         * Returns the CSS selector for this Drawer's visual elements.
          */
         selector(): string;
         /**

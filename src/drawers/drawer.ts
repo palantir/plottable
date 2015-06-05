@@ -116,10 +116,10 @@ export module Drawers {
     }
 
     /**
-     * Returns the selector for this Drawer's visual elements.
+     * Returns the CSS selector for this Drawer's visual elements.
      */
-    public selector() {
-      return "";
+    public selector(): string {
+      throw new Error("The base Drawer class has no elements to select");
     }
 
     /**

@@ -2656,10 +2656,10 @@ var Plottable;
             return this._renderArea;
         };
         /**
-         * Returns the selector for this Drawer's visual elements.
+         * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            return "";
+            throw new Error("The base Drawer class has no elements to select");
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
