@@ -215,10 +215,19 @@ module Plottable {
     }
 
     /**
-     * Enables or disables animation.
+     * Returns whether or not the plot will be animated
      */
-    public animated(enabled: boolean) {
-      this._animate = enabled;
+    public animated(): boolean;
+    /**
+     * Enables or disables animation of the plot.
+     */
+    public animated(willAnimate: boolean): Plot;
+    public animated(willAnimate?: boolean): any {
+      if (willAnimate == null) {
+        return this._animate;
+      }
+
+      this._animate = willAnimate;
       return this;
     }
 
