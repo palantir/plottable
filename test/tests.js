@@ -2423,7 +2423,7 @@ describe("Plots", function () {
             assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
             assert.strictEqual(plot.animated(), true, "animated toggled on");
             plot.animated(false);
-            assert.strictEqual(plot.animated(), true, "animated toggled off");
+            assert.strictEqual(plot.animated(), false, "animated toggled off");
         });
     });
 });
