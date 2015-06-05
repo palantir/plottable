@@ -25,7 +25,7 @@ export module Dispatchers {
 
     /**
      * This constructor should not be invoked directly.
-     * 
+     *
      * @constructor
      */
     constructor() {

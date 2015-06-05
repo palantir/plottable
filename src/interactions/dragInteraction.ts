@@ -55,8 +55,8 @@ export module Interactions {
       }
 
       return {
-        x: Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-        y: Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
+        x: Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+        y: Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height())
       };
     }
 

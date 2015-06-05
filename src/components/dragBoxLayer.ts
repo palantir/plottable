@@ -10,7 +10,7 @@ export module Components {
     bottom: boolean;
     left: boolean;
     right: boolean;
-  }
+  };
 
   export class DragBoxLayer extends Components.SelectionBoxLayer {
     private _dragInteraction: Interactions.Drag;

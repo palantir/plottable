@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
               .x(function(d) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)
               .attr("opacity", 0.75)
-              .animate(doAnimate);
+              .animated(doAnimate);
 
   var lineChart = new Plottable.Components.Table([[yAxis, lineRenderer],
                                                  [null,  xAxis]]);

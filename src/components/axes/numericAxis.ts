@@ -10,7 +10,7 @@ export module Axes {
 
     /**
      * Constructs a Numeric Axis.
-     * 
+     *
      * A Numeric Axis is a visual representation of a QuantitativeScale.
      *
      * @constructor
@@ -35,7 +35,7 @@ export module Axes {
         return this._measurer.measure(formattedValue).width;
       });
 
-      var maxTextLength = Utils.Methods.max(textLengths, 0);
+      var maxTextLength = Utils.Math.max(textLengths, 0);
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;

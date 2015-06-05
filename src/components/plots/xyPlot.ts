@@ -116,7 +116,7 @@ module Plottable {
         if (scale != null) {
           return (datum: any, index: number, dataset: Dataset) => {
             var range = scale.range();
-            return Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
+            return Utils.Math.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
           };
         }
       }
@@ -275,8 +275,8 @@ module Plottable {
       var definedFunction = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return Utils.Methods.isValidNumber(positionX) &&
-               Utils.Methods.isValidNumber(positionY);
+        return Utils.Math.isValidNumber(positionX) &&
+               Utils.Math.isValidNumber(positionY);
       };
 
       this.datasets().forEach((dataset) => {

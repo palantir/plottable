@@ -18,10 +18,11 @@ export module Animators {
 
     /**
      * Given the number of elements, return the total time the animation requires
-     * @param number numberofIterations The number of elements that will be drawn
-     * @returns {any} The time required for the animation
+     * 
+     * @param {number} numberofIterations The number of elements that will be drawn
+     * @returns {number}
      */
-    getTiming(numberOfIterations: number): number;
+    totalTime(numberOfIterations: number): number;
   }
 
   export type PlotAnimatorMap = { [animatorKey: string]: Plot; };

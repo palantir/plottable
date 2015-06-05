@@ -25,7 +25,7 @@ function run(svg, data, Plottable) {
                                          .addDataset(new Plottable.Dataset(data[0]))
                                          .addDataset(new Plottable.Dataset(data[1]))
                                          .addDataset(new Plottable.Dataset(data[2]))
-                                         .animate(true);
+                                         .animated(true);
 
   var center = new Plottable.Components.Group([stackedAreaPlot, new Plottable.Components.Legend(colorScale)]);
 

@@ -45,5 +45,5 @@ module Plottable {
   export type Bounds = {
     topLeft: Point;
     bottomRight: Point;
-  }
+  };
 }

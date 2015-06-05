@@ -76,7 +76,7 @@ export module Plots {
         height: bbox.height
       };
 
-      return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     protected _propertyProjectors(): AttributeToProjector {
