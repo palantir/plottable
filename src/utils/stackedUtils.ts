@@ -56,23 +56,23 @@ module Plottable {
           stackOffsets: Utils.Map<Dataset, d3.Map<number>>,
           filter: Accessor<boolean>) {
 
-        var maxStackExtent = Utils.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
+        var maxStackExtent = Utils.Math.max<Dataset, number>(datasets, (dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             data = data.filter((d, i) => filter(d, i, dataset));
           }
-          return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
+          return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
           }, 0);
         }, 0);
 
-        var minStackExtent = Utils.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
+        var minStackExtent = Utils.Math.min<Dataset, number>(datasets, (dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             data = data.filter((d, i) => filter(d, i, dataset));
           }
-          return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
+          return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
           }, 0);

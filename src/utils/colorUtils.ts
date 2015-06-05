@@ -3,6 +3,8 @@
 module Plottable {
 export module Utils {
   export module Color {
+    var nativeMath: Math = (<any>window).Math;
+
     /**
      * Return contrast ratio between two colors
      * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -54,7 +56,7 @@ export module Utils {
 
       var lum = (x: number) => {
         x = x / 255;
-        return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+        return x <= 0.03928 ? x / 12.92 : nativeMath.pow((x + 0.055) / 1.055, 2.4);
       };
       var r = lum(rgb.r);
       var g = lum(rgb.g);

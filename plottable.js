@@ -9,8 +9,8 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var Methods;
-        (function (Methods) {
+        var Math;
+        (function (Math) {
             var nativeMath = window.Math;
             /**
              * Checks if x is between a and b.
@@ -23,7 +23,7 @@ var Plottable;
             function inRange(x, a, b) {
                 return (nativeMath.min(a, b) <= x && x <= nativeMath.max(a, b));
             }
-            Methods.inRange = inRange;
+            Math.inRange = inRange;
             /**
              * Clamps x to the range [min, max].
              *
@@ -35,7 +35,7 @@ var Plottable;
             function clamp(x, min, max) {
                 return nativeMath.min(nativeMath.max(min, x), max);
             }
-            Methods.clamp = clamp;
+            Math.clamp = clamp;
             function max(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -44,7 +44,7 @@ var Plottable;
                 /* tslint:enable:ban */
                 return maxValue !== undefined ? maxValue : defaultValue;
             }
-            Methods.max = max;
+            Math.max = max;
             function min(array, firstArg, secondArg) {
                 var accessor = typeof (firstArg) === "function" ? firstArg : null;
                 var defaultValue = accessor == null ? firstArg : secondArg;
@@ -53,22 +53,22 @@ var Plottable;
                 /* tslint:enable:ban */
                 return minValue !== undefined ? minValue : defaultValue;
             }
-            Methods.min = min;
+            Math.min = min;
             /**
              * Returns true **only** if x is NaN
              */
             function isNaN(n) {
                 return n !== n;
             }
-            Methods.isNaN = isNaN;
+            Math.isNaN = isNaN;
             /**
              * Returns true if the argument is a number, which is not NaN
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n) {
-                return typeof n === "number" && !Plottable.Utils.Methods.isNaN(n) && isFinite(n);
+                return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
             }
-            Methods.isValidNumber = isValidNumber;
+            Math.isValidNumber = isValidNumber;
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -81,12 +81,12 @@ var Plottable;
                 }
                 return range;
             }
-            Methods.range = range;
+            Math.range = range;
             function distanceSquared(p1, p2) {
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
-            Methods.distanceSquared = distanceSquared;
-        })(Methods = Utils.Methods || (Utils.Methods = {}));
+            Math.distanceSquared = distanceSquared;
+        })(Math = Utils.Math || (Utils.Math = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -252,6 +252,7 @@ var Plottable;
     (function (Utils) {
         var DOM;
         (function (DOM) {
+            var nativeMath = window.Math;
             /**
              * Gets the bounding box of an element.
              * @param {d3.Selection} element
@@ -361,7 +362,7 @@ var Plottable;
             }
             DOM.boxesOverlap = boxesOverlap;
             function boxIsInside(inner, outer) {
-                return (Math.floor(outer.left) <= Math.ceil(inner.left) && Math.floor(outer.top) <= Math.ceil(inner.top) && Math.floor(inner.right) <= Math.ceil(outer.right) && Math.floor(inner.bottom) <= Math.ceil(outer.bottom));
+                return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
             }
             DOM.boxIsInside = boxIsInside;
             function getBoundingSVG(elem) {
@@ -432,6 +433,7 @@ var Plottable;
     (function (Utils) {
         var Color;
         (function (Color) {
+            var nativeMath = window.Math;
             /**
              * Return contrast ratio between two colors
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -480,7 +482,7 @@ var Plottable;
                 var rgb = d3.rgb(color);
                 var lum = function (x) {
                     x = x / 255;
-                    return x <= 0.03928 ? x / 12.92 : Math.pow((x + 0.055) / 1.055, 2.4);
+                    return x <= 0.03928 ? x / 12.92 : nativeMath.pow((x + 0.055) / 1.055, 2.4);
                 };
                 var r = lum(rgb.r);
                 var g = lum(rgb.g);
@@ -616,12 +618,12 @@ var Plottable;
                 var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Stacked.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+                        return { key: domainKey, value: Utils.Math.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
                     return Stacked.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+                        return { key: domainKey, value: Utils.Math.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
                 var stackOffsets = Stacked._generateStackOffsets(datasets, Stacked._stack(positiveDataMapArray, domainKeys), Stacked._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
@@ -634,25 +636,25 @@ var Plottable;
              * @return {[number]} The extent that spans all the stacked data
              */
             Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
-                var maxStackExtent = Utils.Methods.max(datasets, function (dataset) {
+                var maxStackExtent = Utils.Math.max(datasets, function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
                         data = data.filter(function (d, i) { return filter(d, i, dataset); });
                     }
-                    return Utils.Methods.max(data, function (datum, i) {
+                    return Utils.Math.max(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
                     }, 0);
                 }, 0);
-                var minStackExtent = Utils.Methods.min(datasets, function (dataset) {
+                var minStackExtent = Utils.Math.min(datasets, function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
                         data = data.filter(function (d, i) { return filter(d, i, dataset); });
                     }
-                    return Utils.Methods.min(data, function (datum, i) {
+                    return Utils.Math.min(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
                     }, 0);
                 }, 0);
-                return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+                return [Utils.Math.min(minStackExtent, 0), Utils.Math.max(0, maxStackExtent)];
             };
             /**
              * Given an array of datasets and the accessor function for the key, computes the
@@ -1596,8 +1598,8 @@ var Plottable;
             var extent = this._defaultExtent();
             if (includedValues.length !== 0) {
                 var combinedExtent = [
-                    Plottable.Utils.Methods.min(includedValues, extent[0]),
-                    Plottable.Utils.Methods.max(includedValues, extent[1])
+                    Plottable.Utils.Math.min(includedValues, extent[0]),
+                    Plottable.Utils.Math.max(includedValues, extent[1])
                 ];
                 extent = this._padDomain(combinedExtent);
             }
@@ -1916,8 +1918,8 @@ var Plottable;
                 // then we're going to draw negative log ticks from -100 to -10,
                 // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
                 var middle = function (x, y, z) { return [x, y, z].sort(function (a, b) { return a - b; })[1]; };
-                var min = Plottable.Utils.Methods.min(this._untransformedDomain, 0);
-                var max = Plottable.Utils.Methods.max(this._untransformedDomain, 0);
+                var min = Plottable.Utils.Math.min(this._untransformedDomain, 0);
+                var max = Plottable.Utils.Math.max(this._untransformedDomain, 0);
                 var negativeLower = min;
                 var negativeUpper = middle(min, max, -this._pivot);
                 var positiveLower = middle(min, max, this._pivot);
@@ -1971,8 +1973,8 @@ var Plottable;
              * distance when plotted.
              */
             ModifiedLog.prototype._howManyTicks = function (lower, upper) {
-                var adjustedMin = this._adjustedLog(Plottable.Utils.Methods.min(this._untransformedDomain, 0));
-                var adjustedMax = this._adjustedLog(Plottable.Utils.Methods.max(this._untransformedDomain, 0));
+                var adjustedMin = this._adjustedLog(Plottable.Utils.Math.min(this._untransformedDomain, 0));
+                var adjustedMax = this._adjustedLog(Plottable.Utils.Math.max(this._untransformedDomain, 0));
                 var adjustedLower = this._adjustedLog(lower);
                 var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -2436,7 +2438,7 @@ var Plottable;
                 // InterpolatedColorScales do not pad
                 var includedValues = this._getAllIncludedValues();
                 if (includedValues.length > 0) {
-                    this._setDomain([Plottable.Utils.Methods.min(includedValues, 0), Plottable.Utils.Methods.max(includedValues, 0)]);
+                    this._setDomain([Plottable.Utils.Math.min(includedValues, 0), Plottable.Utils.Math.max(includedValues, 0)]);
                 }
                 return this;
             };
@@ -2528,7 +2530,7 @@ var Plottable;
                     var firstTick = Math.ceil(low / interval) * interval;
                     var numTicks = Math.floor((high - firstTick) / interval) + 1;
                     var lowTicks = low % interval === 0 ? [] : [low];
-                    var middleTicks = Plottable.Utils.Methods.range(0, numTicks).map(function (t) { return firstTick + t * interval; });
+                    var middleTicks = Plottable.Utils.Math.range(0, numTicks).map(function (t) { return firstTick + t * interval; });
                     var highTicks = high % interval === 0 ? [] : [high];
                     return lowTicks.concat(middleTicks).concat(highTicks);
                 };
@@ -3448,8 +3450,8 @@ var Plottable;
             Group.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var requests = this._components.map(function (c) { return c.requestedSpace(offeredWidth, offeredHeight); });
                 return {
-                    minWidth: Plottable.Utils.Methods.max(requests, function (request) { return request.minWidth; }, 0),
-                    minHeight: Plottable.Utils.Methods.max(requests, function (request) { return request.minHeight; }, 0)
+                    minWidth: Plottable.Utils.Math.max(requests, function (request) { return request.minWidth; }, 0),
+                    minHeight: Plottable.Utils.Math.max(requests, function (request) { return request.minHeight; }, 0)
                 };
             };
             Group.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -3878,7 +3880,7 @@ var Plottable;
                     return this._possibleTimeAxisConfigurations;
                 }
                 this._possibleTimeAxisConfigurations = configurations;
-                this._numTiers = Plottable.Utils.Methods.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
+                this._numTiers = Plottable.Utils.Math.max(this._possibleTimeAxisConfigurations.map(function (config) { return config.length; }), 0);
                 if (this._isAnchored) {
                     this._setupDomElements();
                 }
@@ -4299,7 +4301,7 @@ var Plottable;
                     var formattedValue = _this.formatter()(v);
                     return _this._measurer.measure(formattedValue).width;
                 });
-                var maxTextLength = Plottable.Utils.Methods.max(textLengths, 0);
+                var maxTextLength = Plottable.Utils.Math.max(textLengths, 0);
                 if (this._tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
                 }
@@ -4707,8 +4709,8 @@ var Plottable;
                     return _this._wrapper.wrap(_this.formatter()(s), _this._measurer, width, height);
                 });
                 // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-                var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Methods.max;
-                var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Methods.max : d3.sum;
+                var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Plottable.Utils.Math.max;
+                var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Plottable.Utils.Math.max : d3.sum;
                 var textFits = wrappingResults.every(function (t) { return !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1; });
                 var usedWidth = widthFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).width; }, 0);
                 var usedHeight = heightFn(wrappingResults, function (t) { return _this._measurer.measure(t.wrappedText).height; }, 0);
@@ -5027,7 +5029,7 @@ var Plottable;
                 var untruncatedRowLengths = estimatedLayout.rows.map(function (row) {
                     return d3.sum(row, function (entry) { return estimatedLayout.untruncatedEntryLengths.get(entry); });
                 });
-                var longestUntruncatedRowLength = Plottable.Utils.Methods.max(untruncatedRowLengths, 0);
+                var longestUntruncatedRowLength = Plottable.Utils.Math.max(untruncatedRowLengths, 0);
                 return {
                     minWidth: this._padding + longestUntruncatedRowLength,
                     minHeight: estimatedLayout.rows.length * estimatedLayout.textHeight + 2 * this._padding
@@ -5267,7 +5269,7 @@ var Plottable;
                 var desiredHeight;
                 var desiredWidth;
                 if (this._isVertical()) {
-                    var longestWidth = Plottable.Utils.Methods.max(labelWidths, 0);
+                    var longestWidth = Plottable.Utils.Math.max(labelWidths, 0);
                     desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
                     desiredHeight = this._padding + numSwatches * textHeight + this._padding;
                 }
@@ -6244,7 +6246,7 @@ var Plottable;
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
             var times = this.datasets().map(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
-            var maxTime = Plottable.Utils.Methods.max(times, 0);
+            var maxTime = Plottable.Utils.Math.max(times, 0);
             this._additionalPaint(maxTime);
         };
         /**
@@ -6313,7 +6315,7 @@ var Plottable;
                 if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
-                var distanceSquared = Plottable.Utils.Methods.distanceSquared(entity.position, queryPoint);
+                var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
                 if (distanceSquared < closestDistanceSquared) {
                     closestDistanceSquared = distanceSquared;
                     closest = entity;
@@ -6458,7 +6460,7 @@ var Plottable;
                 }
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var dataset = this.datasets()[0];
-                var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)); });
+                var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)); });
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 if (pie.some(function (slice) { return slice.value < 0; })) {
                     Plottable.Utils.Window.warn("Negative values will not render correctly in a pie chart.");
@@ -6474,7 +6476,7 @@ var Plottable;
                 var sectorValueAccessor = Plottable.Plot._scaledAccessor(this.sectorValue());
                 var ds = this.datasets()[0];
                 var data = dataToDraw.get(ds);
-                var filteredData = data.filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)); });
+                var filteredData = data.filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)); });
                 dataToDraw.set(ds, filteredData);
                 return dataToDraw;
             };
@@ -6570,7 +6572,7 @@ var Plottable;
                 if (scale != null) {
                     return function (datum, index, dataset) {
                         var range = scale.range();
-                        return Plottable.Utils.Methods.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
+                        return Plottable.Utils.Math.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
                     };
                 }
             }
@@ -6702,7 +6704,7 @@ var Plottable;
             var definedFunction = function (d, i, dataset) {
                 var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                 var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                return Plottable.Utils.Methods.isValidNumber(positionX) && Plottable.Utils.Methods.isValidNumber(positionY);
+                return Plottable.Utils.Math.isValidNumber(positionX) && Plottable.Utils.Math.isValidNumber(positionY);
             };
             this.datasets().forEach(function (dataset) {
                 dataToDraw.set(dataset, dataToDraw.get(dataset).filter(function (d, i) { return definedFunction(d, i, dataset); }));
@@ -6880,8 +6882,8 @@ var Plottable;
                         return dataset.data().map(function (d, i) { return accessor(d, i, dataset).valueOf(); });
                     }))).values().map(function (value) { return +value; });
                     // Get the absolute difference between min and max
-                    var min = Plottable.Utils.Methods.min(accessorData, 0);
-                    var max = Plottable.Utils.Methods.max(accessorData, 0);
+                    var min = Plottable.Utils.Math.min(accessorData, 0);
+                    var max = Plottable.Utils.Math.max(accessorData, 0);
                     var scaledMin = scale.scale(min);
                     var scaledMax = scale.scale(max);
                     return (scaledMax - scaledMin) / Math.abs(max - min);
@@ -6891,7 +6893,7 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 var attrToProjector = this._generateAttrToProjector();
                 this.datasets().forEach(function (dataset) {
-                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)); });
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;
@@ -7379,15 +7381,15 @@ var Plottable;
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
                     var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
-                    barPixelWidth = Plottable.Utils.Methods.min(barAccessorDataPairs, function (pair, i) {
+                    barPixelWidth = Plottable.Utils.Math.min(barAccessorDataPairs, function (pair, i) {
                         return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
                     var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
-                    var minScaledDatum = Plottable.Utils.Methods.min(scaledData, 0);
+                    var minScaledDatum = Plottable.Utils.Math.min(scaledData, 0);
                     if (minScaledDatum > 0) {
                         barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
                     }
-                    var maxScaledDatum = Plottable.Utils.Methods.max(scaledData, 0);
+                    var maxScaledDatum = Plottable.Utils.Math.max(scaledData, 0);
                     if (maxScaledDatum < barWidthDimension) {
                         var margin = barWidthDimension - maxScaledDatum;
                         barPixelWidth = Math.min(barPixelWidth, margin * 2);
@@ -7436,7 +7438,7 @@ var Plottable;
                 var dataToDraw = new Plottable.Utils.Map();
                 var attrToProjector = this._generateAttrToProjector();
                 this.datasets().forEach(function (dataset) {
-                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)); });
+                    var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) && Plottable.Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)); });
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;
@@ -7719,7 +7721,7 @@ var Plottable;
                 var definedProjector = function (d, i, dataset) {
                     var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                     var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                    return Plottable.Utils.Methods.isValidNumber(positionX) && Plottable.Utils.Methods.isValidNumber(positionY);
+                    return Plottable.Utils.Math.isValidNumber(positionX) && Plottable.Utils.Math.isValidNumber(positionY);
                 };
                 return function (datum, index, dataset) {
                     var areaGenerator = d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
@@ -9451,8 +9453,8 @@ var Plottable;
                     return translatedP;
                 }
                 return {
-                    x: Plottable.Utils.Methods.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
-                    y: Plottable.Utils.Methods.clamp(translatedP.y, 0, this._componentAttachedTo.height())
+                    x: Plottable.Utils.Math.clamp(translatedP.x, 0, this._componentAttachedTo.width()),
+                    y: Plottable.Utils.Math.clamp(translatedP.y, 0, this._componentAttachedTo.height())
                 };
             };
             Drag.prototype._startDrag = function (point, event) {

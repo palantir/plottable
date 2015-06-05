@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Utils {
-  export module Method {
+  export module Math {
 
     var nativeMath: Math = (<any>window).Math;
 

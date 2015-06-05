@@ -220,7 +220,7 @@ export module Axes {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
-      this._numTiers = Utils.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+      this._numTiers = Utils.Math.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       if (this._isAnchored) {
         this._setupDomElements();

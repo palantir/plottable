@@ -147,7 +147,7 @@ export module Components {
       var desiredHeight: number;
       var desiredWidth: number;
       if (this._isVertical()) {
-        var longestWidth = Utils.Methods.max(labelWidths, 0);
+        var longestWidth = Utils.Math.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
         desiredHeight = this._padding + numSwatches * textHeight + this._padding;
       } else {

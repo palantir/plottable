@@ -61,8 +61,8 @@ module Plottable {
       var extent = this._defaultExtent();
       if (includedValues.length !== 0) {
         var combinedExtent = [
-          Utils.Methods.min<D>(includedValues, extent[0]),
-          Utils.Methods.max<D>(includedValues, extent[1])
+          Utils.Math.min<D>(includedValues, extent[0]),
+          Utils.Math.max<D>(includedValues, extent[1])
         ];
         extent = this._padDomain(combinedExtent);
       }

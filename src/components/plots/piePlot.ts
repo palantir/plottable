@@ -175,7 +175,7 @@ export module Plots {
       if (this.datasets().length === 0) { return; }
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       var dataset = this.datasets()[0];
-      var data = dataset.data().filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, dataset)));
+      var data = dataset.data().filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)));
       var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       if (pie.some((slice) => slice.value < 0)) {
         Utils.Window.warn("Negative values will not render correctly in a pie chart.");
@@ -190,7 +190,7 @@ export module Plots {
       var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
       var ds = this.datasets()[0];
       var data = dataToDraw.get(ds);
-      var filteredData = data.filter((d, i) => Plottable.Utils.Methods.isValidNumber(sectorValueAccessor(d, i, ds)));
+      var filteredData = data.filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)));
       dataToDraw.set(ds, filteredData);
       return dataToDraw;
     }

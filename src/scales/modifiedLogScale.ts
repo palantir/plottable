@@ -101,8 +101,8 @@ export module Scales {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = Utils.Methods.min(this._untransformedDomain, 0);
-      var max = Utils.Methods.max(this._untransformedDomain, 0);
+      var min = Utils.Math.min(this._untransformedDomain, 0);
+      var max = Utils.Math.max(this._untransformedDomain, 0);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this._pivot);
       var positiveLower = middle(min, max, this._pivot);
@@ -162,8 +162,8 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this._adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
-      var adjustedMax = this._adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
+      var adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
+      var adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
       var adjustedLower = this._adjustedLog(lower);
       var adjustedUpper = this._adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);

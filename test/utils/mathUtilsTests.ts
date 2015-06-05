@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-describe("Utils.Math", () => {
+describe("Utils.Methods", () => {
   it("inRange()", () => {
     assert.isTrue(Plottable.Utils.Math.inRange(0, -1, 1), "basic functionality works");
     assert.isTrue(Plottable.Utils.Math.inRange(0, 0, 1), "it is a closed interval");

@@ -430,8 +430,8 @@ describe("Plots", () => {
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
 
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
     });
 
     it("bad values on the primary axis should default to 0 (be ignored)", () => {

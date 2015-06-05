@@ -2,6 +2,8 @@
 module Plottable {
 export module Utils {
   export module DOM {
+    var nativeMath: Math = (<any>window).Math;
+
     /**
      * Gets the bounding box of an element.
      * @param {d3.Selection} element
@@ -112,10 +114,10 @@ export module Utils {
 
     export function boxIsInside(inner: ClientRect, outer: ClientRect) {
       return (
-        Math.floor(outer.left) <= Math.ceil(inner.left) &&
-        Math.floor(outer.top) <= Math.ceil(inner.top) &&
-        Math.floor(inner.right) <= Math.ceil(outer.right) &&
-        Math.floor(inner.bottom) <= Math.ceil(outer.bottom)
+        nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) &&
+        nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) &&
+        nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) &&
+        nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom)
       );
     }
 
