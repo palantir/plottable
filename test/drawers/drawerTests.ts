@@ -32,15 +32,15 @@ describe("Drawers", () => {
     var svg: d3.Selection<void>;
     var drawer: MockDrawer;
     before(() => {
-      oldTimeout = Plottable.Utils.Methods.setTimeout;
-      Plottable.Utils.Methods.setTimeout = function(f: Function, time: number, ...args: any[]) {
+      oldTimeout = Plottable.Utils.Window.setTimeout;
+      Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
         timings.push(time);
         return oldTimeout(f, time, args);
       };
     });
 
     after(() => {
-      Plottable.Utils.Methods.setTimeout = oldTimeout;
+      Plottable.Utils.Window.setTimeout = oldTimeout;
     });
 
     beforeEach(() => {

@@ -240,12 +240,12 @@ export module Plots {
         return (<Plottable.Scales.Category> scale).rangeBand();
       } else {
         var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-        var accessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
+        var accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
         }))).values().map((value) => +value);
         // Get the absolute difference between min and max
-        var min = Plottable.Utils.Methods.min(accessorData, 0);
-        var max = Plottable.Utils.Methods.max(accessorData, 0);
+        var min = Plottable.Utils.Math.min(accessorData, 0);
+        var max = Plottable.Utils.Math.max(accessorData, 0);
         var scaledMin = scale.scale(min);
         var scaledMax = scale.scale(max);
         return (scaledMax - scaledMin) / Math.abs(max - min);
@@ -256,10 +256,10 @@ export module Plots {
       var dataToDraw = new Utils.Map<Dataset, any[]>();
       var attrToProjector = this._generateAttrToProjector();
       this.datasets().forEach((dataset) => {
-        var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
+        var data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;

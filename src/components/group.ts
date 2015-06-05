@@ -34,8 +34,8 @@ export module Components {
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
       var requests = this._components.map((c: Component) => c.requestedSpace(offeredWidth, offeredHeight));
       return {
-        minWidth: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
-        minHeight: Utils.Methods.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
+        minWidth: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minWidth, 0),
+        minHeight: Utils.Math.max<SpaceRequest, number>(requests, (request) => request.minHeight, 0)
       };
     }
 

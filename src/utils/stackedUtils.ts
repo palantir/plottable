@@ -8,6 +8,8 @@ module Plottable {
       offset?: number;
     };
 
+    var nativeMath: Math = (<any>window).Math;
+
     export class Stacked {
 
       /**
@@ -22,14 +24,14 @@ module Plottable {
         var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+          return Stacked.populateMap(domainKeys, (domainKey) => {
+            return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
         var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+          return Stacked.populateMap(domainKeys, (domainKey) => {
+            return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
           });
         });
 
@@ -56,29 +58,29 @@ module Plottable {
           stackOffsets: Utils.Map<Dataset, d3.Map<number>>,
           filter: Accessor<boolean>) {
 
-        var maxStackExtent = Utils.Methods.max<Dataset, number>(datasets, (dataset: Dataset) => {
+        var maxStackExtent = Utils.Math.max<Dataset, number>(datasets, (dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             data = data.filter((d, i) => filter(d, i, dataset));
           }
-          return Utils.Methods.max<any, number>(data, (datum: any, i: number) => {
+          return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
           }, 0);
         }, 0);
 
-        var minStackExtent = Utils.Methods.min<Dataset, number>(datasets, (dataset: Dataset) => {
+        var minStackExtent = Utils.Math.min<Dataset, number>(datasets, (dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             data = data.filter((d, i) => filter(d, i, dataset));
           }
-          return Utils.Methods.min<any, number>(data, (datum: any, i: number) => {
+          return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
           }, 0);
         }, 0);
 
-        return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+        return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
       }
 
       /**
@@ -121,7 +123,7 @@ module Plottable {
           domainKeys: string[]) {
 
         var dataMapArray = datasets.map(() => {
-          return Utils.Methods.populateMap(domainKeys, (domainKey) => {
+          return Stacked.populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: 0 };
           });
         });
@@ -174,6 +176,22 @@ module Plottable {
         });
         return stackOffsets;
       }
+
+      /**
+       * Populates a map from an array of keys and a transformation function.
+       *
+       * @param {string[]} keys The array of keys.
+       * @param {(string, number) => T} transform A transformation function to apply to the keys.
+       * @return {d3.Map<T>} A map mapping keys to their transformed values.
+       */
+      private static populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
+        var map = d3.map<T>();
+        keys.forEach((key: string, i: number) => {
+          map.set(key, transform(key, i));
+        });
+        return map;
+      }
+
     }
   }
 }

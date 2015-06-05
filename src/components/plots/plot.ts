@@ -414,7 +414,7 @@ module Plottable {
           dataToDraw.get(ds),
           drawSteps
         ));
-      var maxTime = Utils.Methods.max(times, 0);
+      var maxTime = Utils.Math.max(times, 0);
       this._additionalPaint(maxTime);
     }
 
@@ -482,7 +482,7 @@ module Plottable {
           return;
         }
 
-        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
         if (distanceSquared < closestDistanceSquared) {
           closestDistanceSquared = distanceSquared;
           closest = entity;

@@ -61,8 +61,8 @@ module Plottable {
       var extent = this._defaultExtent();
       if (includedValues.length !== 0) {
         var combinedExtent = [
-          Utils.Methods.min<D>(includedValues, extent[0]),
-          Utils.Methods.max<D>(includedValues, extent[1])
+          Utils.Math.min<D>(includedValues, extent[0]),
+          Utils.Math.max<D>(includedValues, extent[1])
         ];
         extent = this._padDomain(combinedExtent);
       }
@@ -235,7 +235,7 @@ module Plottable {
     protected _setDomain(values: D[]) {
       var isNaNOrInfinity = (x: any) => x !== x || x === Infinity || x === -Infinity;
       if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
-        Utils.Methods.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
+        Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
         return;
       }
       super._setDomain(values);

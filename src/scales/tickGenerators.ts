@@ -35,7 +35,7 @@ module Plottable {
           var numTicks = Math.floor((high - firstTick) / interval) + 1;
 
           var lowTicks = low % interval === 0 ? [] : [low];
-          var middleTicks = Utils.Methods.range(0, numTicks).map(t => firstTick + t * interval);
+          var middleTicks = Utils.Math.range(0, numTicks).map(t => firstTick + t * interval);
           var highTicks = high % interval === 0 ? [] : [high];
 
           return lowTicks.concat(middleTicks).concat(highTicks);
