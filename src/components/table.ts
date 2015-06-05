@@ -7,7 +7,7 @@ export module Components {
     guaranteedHeights: number[];
     wantsWidthArr: boolean[];
     wantsHeightArr: boolean[];
-  }
+  };
 
   type _IterateLayoutResult = {
     colProportionalSpace: number[];
