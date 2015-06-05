@@ -294,118 +294,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type Formatter = (d: any) => string;
-    var MILLISECONDS_IN_ONE_DAY: number;
-    module Formatters {
-        /**
-         * Creates a formatter for currency values.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 2).
-         * @param {string} [symbol] The currency symbol to use (default "$").
-         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for currency values.
-         */
-        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
-        /**
-         * Creates a formatter that displays exactly [precision] decimal places.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
-         */
-        function fixed(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for general values.
-         */
-        function general(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter that stringifies its input.
-         *
-         * @returns {Formatter} A formatter that stringifies its input.
-         */
-        function identity(): (d: any) => string;
-        /**
-         * Creates a formatter for percentage values.
-         * Multiplies the input by 100 and appends "%".
-         *
-         * @param {number} [precision] The number of decimal places to show (default 0).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for percentage values.
-         */
-        function percentage(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter for values that displays [precision] significant figures
-         * and puts SI notation.
-         *
-         * @param {number} [precision] The number of significant figures to show (default 3).
-         *
-         * @returns {Formatter} A formatter for SI values.
-         */
-        function siSuffix(precision?: number): (d: any) => string;
-        /**
-         * Creates a multi time formatter that displays dates.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function multiTime(): (d: any) => string;
-        /**
-         * Creates a time formatter that displays time/date using given specifier.
-         *
-         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
-         *
-         * @param {string} [specifier] The specifier for the formatter.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function time(specifier: string): Formatter;
-        /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
-        /**
-         * Creates a formatter for relative dates.
-         *
-         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-         * @param {string} label The label to append to the formatted string (default "")
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
-    }
-}
-
-
-declare module Plottable {
-    /**
-     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
-     * and returns a string representing the 'd' attribute of the resultant 'path' element
-     */
-    type SymbolFactory = (symbolSize: number) => string;
-    module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
-        function circle(): SymbolFactory;
-        function square(): SymbolFactory;
-        function cross(): SymbolFactory;
-        function diamond(): SymbolFactory;
-        function triangleUp(): SymbolFactory;
-        function triangleDown(): SymbolFactory;
-    }
-}
-
-
-declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
@@ -615,6 +503,118 @@ declare module Plottable {
         topLeft: Point;
         bottomRight: Point;
     };
+}
+
+
+declare module Plottable {
+    type Formatter = (d: any) => string;
+    var MILLISECONDS_IN_ONE_DAY: number;
+    module Formatters {
+        /**
+         * Creates a formatter for currency values.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 2).
+         * @param {string} [symbol] The currency symbol to use (default "$").
+         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for currency values.
+         */
+        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
+        /**
+         * Creates a formatter that displays exactly [precision] decimal places.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
+         */
+        function fixed(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter that formats numbers to show no more than
+         * [precision] decimal places. All other values are stringified.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for general values.
+         */
+        function general(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter that stringifies its input.
+         *
+         * @returns {Formatter} A formatter that stringifies its input.
+         */
+        function identity(): (d: any) => string;
+        /**
+         * Creates a formatter for percentage values.
+         * Multiplies the input by 100 and appends "%".
+         *
+         * @param {number} [precision] The number of decimal places to show (default 0).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for percentage values.
+         */
+        function percentage(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter for values that displays [precision] significant figures
+         * and puts SI notation.
+         *
+         * @param {number} [precision] The number of significant figures to show (default 3).
+         *
+         * @returns {Formatter} A formatter for SI values.
+         */
+        function siSuffix(precision?: number): (d: any) => string;
+        /**
+         * Creates a multi time formatter that displays dates.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function multiTime(): (d: any) => string;
+        /**
+         * Creates a time formatter that displays time/date using given specifier.
+         *
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function time(specifier: string): Formatter;
+        /**
+         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
+         */
+        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
+        /**
+         * Creates a formatter for relative dates.
+         *
+         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
+         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
+         * @param {string} label The label to append to the formatted string (default "")
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    }
+}
+
+
+declare module Plottable {
+    /**
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
+     */
+    type SymbolFactory = (symbolSize: number) => string;
+    module SymbolFactories {
+        type StringAccessor = (datum: any, index: number) => string;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
+    }
 }
 
 

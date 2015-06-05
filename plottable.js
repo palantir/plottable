@@ -814,274 +814,6 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
-    var Formatters;
-    (function (Formatters) {
-        /**
-         * Creates a formatter for currency values.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 2).
-         * @param {string} [symbol] The currency symbol to use (default "$").
-         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for currency values.
-         */
-        function currency(precision, symbol, prefix) {
-            if (precision === void 0) { precision = 2; }
-            if (symbol === void 0) { symbol = "$"; }
-            if (prefix === void 0) { prefix = true; }
-            var fixedFormatter = Formatters.fixed(precision);
-            return function (d) {
-                var formattedValue = fixedFormatter(Math.abs(d));
-                if (formattedValue !== "") {
-                    if (prefix) {
-                        formattedValue = symbol + formattedValue;
-                    }
-                    else {
-                        formattedValue += symbol;
-                    }
-                    if (d < 0) {
-                        formattedValue = "-" + formattedValue;
-                    }
-                }
-                return formattedValue;
-            };
-        }
-        Formatters.currency = currency;
-        /**
-         * Creates a formatter that displays exactly [precision] decimal places.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
-         */
-        function fixed(precision) {
-            if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
-            return function (d) { return d.toFixed(precision); };
-        }
-        Formatters.fixed = fixed;
-        /**
-         * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for general values.
-         */
-        function general(precision) {
-            if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
-            return function (d) {
-                if (typeof d === "number") {
-                    var multiplier = Math.pow(10, precision);
-                    return String(Math.round(d * multiplier) / multiplier);
-                }
-                else {
-                    return String(d);
-                }
-            };
-        }
-        Formatters.general = general;
-        /**
-         * Creates a formatter that stringifies its input.
-         *
-         * @returns {Formatter} A formatter that stringifies its input.
-         */
-        function identity() {
-            return function (d) { return String(d); };
-        }
-        Formatters.identity = identity;
-        /**
-         * Creates a formatter for percentage values.
-         * Multiplies the input by 100 and appends "%".
-         *
-         * @param {number} [precision] The number of decimal places to show (default 0).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for percentage values.
-         */
-        function percentage(precision) {
-            if (precision === void 0) { precision = 0; }
-            var fixedFormatter = Formatters.fixed(precision);
-            return function (d) {
-                var valToFormat = d * 100;
-                // Account for float imprecision
-                var valString = d.toString();
-                var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
-                valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
-                return fixedFormatter(valToFormat) + "%";
-            };
-        }
-        Formatters.percentage = percentage;
-        /**
-         * Creates a formatter for values that displays [precision] significant figures
-         * and puts SI notation.
-         *
-         * @param {number} [precision] The number of significant figures to show (default 3).
-         *
-         * @returns {Formatter} A formatter for SI values.
-         */
-        function siSuffix(precision) {
-            if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
-            return function (d) { return d3.format("." + precision + "s")(d); };
-        }
-        Formatters.siSuffix = siSuffix;
-        /**
-         * Creates a multi time formatter that displays dates.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function multiTime() {
-            var numFormats = 8;
-            // these defaults were taken from d3
-            // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
-            var timeFormat = {};
-            timeFormat[0] = {
-                format: ".%L",
-                filter: function (d) { return d.getMilliseconds() !== 0; }
-            };
-            timeFormat[1] = {
-                format: ":%S",
-                filter: function (d) { return d.getSeconds() !== 0; }
-            };
-            timeFormat[2] = {
-                format: "%I:%M",
-                filter: function (d) { return d.getMinutes() !== 0; }
-            };
-            timeFormat[3] = {
-                format: "%I %p",
-                filter: function (d) { return d.getHours() !== 0; }
-            };
-            timeFormat[4] = {
-                format: "%a %d",
-                filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; }
-            };
-            timeFormat[5] = {
-                format: "%b %d",
-                filter: function (d) { return d.getDate() !== 1; }
-            };
-            timeFormat[6] = {
-                format: "%b",
-                filter: function (d) { return d.getMonth() !== 0; }
-            };
-            timeFormat[7] = {
-                format: "%Y",
-                filter: function () { return true; }
-            };
-            return function (d) {
-                for (var i = 0; i < numFormats; i++) {
-                    if (timeFormat[i].filter(d)) {
-                        return d3.time.format(timeFormat[i].format)(d);
-                    }
-                }
-            };
-        }
-        Formatters.multiTime = multiTime;
-        /**
-         * Creates a time formatter that displays time/date using given specifier.
-         *
-         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
-         *
-         * @param {string} [specifier] The specifier for the formatter.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function time(specifier) {
-            return d3.time.format(specifier);
-        }
-        Formatters.time = time;
-        /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval) {
-            switch (timeInterval) {
-                case Plottable.TimeInterval.second:
-                    return d3.time.second;
-                case Plottable.TimeInterval.minute:
-                    return d3.time.minute;
-                case Plottable.TimeInterval.hour:
-                    return d3.time.hour;
-                case Plottable.TimeInterval.day:
-                    return d3.time.day;
-                case Plottable.TimeInterval.week:
-                    return d3.time.week;
-                case Plottable.TimeInterval.month:
-                    return d3.time.month;
-                case Plottable.TimeInterval.year:
-                    return d3.time.year;
-                default:
-                    throw Error("TimeInterval specified does not exist: " + timeInterval);
-            }
-        }
-        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
-        /**
-         * Creates a formatter for relative dates.
-         *
-         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-         * @param {string} label The label to append to the formatted string (default "")
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function relativeDate(baseValue, increment, label) {
-            if (baseValue === void 0) { baseValue = 0; }
-            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
-            if (label === void 0) { label = ""; }
-            return function (d) {
-                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
-                return relativeDate.toString() + label;
-            };
-        }
-        Formatters.relativeDate = relativeDate;
-        function verifyPrecision(precision) {
-            if (precision < 0 || precision > 20) {
-                throw new RangeError("Formatter precision must be between 0 and 20");
-            }
-        }
-    })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var SymbolFactories;
-    (function (SymbolFactories) {
-        function circle() {
-            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null); };
-        }
-        SymbolFactories.circle = circle;
-        function square() {
-            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(null); };
-        }
-        SymbolFactories.square = square;
-        function cross() {
-            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null); };
-        }
-        SymbolFactories.cross = cross;
-        function diamond() {
-            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null); };
-        }
-        SymbolFactories.diamond = diamond;
-        function triangleUp() {
-            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
-        }
-        SymbolFactories.triangleUp = triangleUp;
-        function triangleDown() {
-            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
-        }
-        SymbolFactories.triangleDown = triangleDown;
-    })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
     var Utils;
     (function (Utils) {
         var ClientToSVGTranslator = (function () {
@@ -1390,6 +1122,274 @@ var Plottable;
 
 var Plottable;
 (function (Plottable) {
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
+    var Formatters;
+    (function (Formatters) {
+        /**
+         * Creates a formatter for currency values.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 2).
+         * @param {string} [symbol] The currency symbol to use (default "$").
+         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for currency values.
+         */
+        function currency(precision, symbol, prefix) {
+            if (precision === void 0) { precision = 2; }
+            if (symbol === void 0) { symbol = "$"; }
+            if (prefix === void 0) { prefix = true; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var formattedValue = fixedFormatter(Math.abs(d));
+                if (formattedValue !== "") {
+                    if (prefix) {
+                        formattedValue = symbol + formattedValue;
+                    }
+                    else {
+                        formattedValue += symbol;
+                    }
+                    if (d < 0) {
+                        formattedValue = "-" + formattedValue;
+                    }
+                }
+                return formattedValue;
+            };
+        }
+        Formatters.currency = currency;
+        /**
+         * Creates a formatter that displays exactly [precision] decimal places.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
+         */
+        function fixed(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            return function (d) { return d.toFixed(precision); };
+        }
+        Formatters.fixed = fixed;
+        /**
+         * Creates a formatter that formats numbers to show no more than
+         * [precision] decimal places. All other values are stringified.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for general values.
+         */
+        function general(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            return function (d) {
+                if (typeof d === "number") {
+                    var multiplier = Math.pow(10, precision);
+                    return String(Math.round(d * multiplier) / multiplier);
+                }
+                else {
+                    return String(d);
+                }
+            };
+        }
+        Formatters.general = general;
+        /**
+         * Creates a formatter that stringifies its input.
+         *
+         * @returns {Formatter} A formatter that stringifies its input.
+         */
+        function identity() {
+            return function (d) { return String(d); };
+        }
+        Formatters.identity = identity;
+        /**
+         * Creates a formatter for percentage values.
+         * Multiplies the input by 100 and appends "%".
+         *
+         * @param {number} [precision] The number of decimal places to show (default 0).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for percentage values.
+         */
+        function percentage(precision) {
+            if (precision === void 0) { precision = 0; }
+            var fixedFormatter = Formatters.fixed(precision);
+            return function (d) {
+                var valToFormat = d * 100;
+                // Account for float imprecision
+                var valString = d.toString();
+                var integerPowerTen = Math.pow(10, valString.length - (valString.indexOf(".") + 1));
+                valToFormat = parseInt((valToFormat * integerPowerTen).toString(), 10) / integerPowerTen;
+                return fixedFormatter(valToFormat) + "%";
+            };
+        }
+        Formatters.percentage = percentage;
+        /**
+         * Creates a formatter for values that displays [precision] significant figures
+         * and puts SI notation.
+         *
+         * @param {number} [precision] The number of significant figures to show (default 3).
+         *
+         * @returns {Formatter} A formatter for SI values.
+         */
+        function siSuffix(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            return function (d) { return d3.format("." + precision + "s")(d); };
+        }
+        Formatters.siSuffix = siSuffix;
+        /**
+         * Creates a multi time formatter that displays dates.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function multiTime() {
+            var numFormats = 8;
+            // these defaults were taken from d3
+            // https://github.com/mbostock/d3/wiki/Time-Formatting#format_multi
+            var timeFormat = {};
+            timeFormat[0] = {
+                format: ".%L",
+                filter: function (d) { return d.getMilliseconds() !== 0; }
+            };
+            timeFormat[1] = {
+                format: ":%S",
+                filter: function (d) { return d.getSeconds() !== 0; }
+            };
+            timeFormat[2] = {
+                format: "%I:%M",
+                filter: function (d) { return d.getMinutes() !== 0; }
+            };
+            timeFormat[3] = {
+                format: "%I %p",
+                filter: function (d) { return d.getHours() !== 0; }
+            };
+            timeFormat[4] = {
+                format: "%a %d",
+                filter: function (d) { return d.getDay() !== 0 && d.getDate() !== 1; }
+            };
+            timeFormat[5] = {
+                format: "%b %d",
+                filter: function (d) { return d.getDate() !== 1; }
+            };
+            timeFormat[6] = {
+                format: "%b",
+                filter: function (d) { return d.getMonth() !== 0; }
+            };
+            timeFormat[7] = {
+                format: "%Y",
+                filter: function () { return true; }
+            };
+            return function (d) {
+                for (var i = 0; i < numFormats; i++) {
+                    if (timeFormat[i].filter(d)) {
+                        return d3.time.format(timeFormat[i].format)(d);
+                    }
+                }
+            };
+        }
+        Formatters.multiTime = multiTime;
+        /**
+         * Creates a time formatter that displays time/date using given specifier.
+         *
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function time(specifier) {
+            return d3.time.format(specifier);
+        }
+        Formatters.time = time;
+        /**
+         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
+         */
+        function timeIntervalToD3Time(timeInterval) {
+            switch (timeInterval) {
+                case Plottable.TimeInterval.second:
+                    return d3.time.second;
+                case Plottable.TimeInterval.minute:
+                    return d3.time.minute;
+                case Plottable.TimeInterval.hour:
+                    return d3.time.hour;
+                case Plottable.TimeInterval.day:
+                    return d3.time.day;
+                case Plottable.TimeInterval.week:
+                    return d3.time.week;
+                case Plottable.TimeInterval.month:
+                    return d3.time.month;
+                case Plottable.TimeInterval.year:
+                    return d3.time.year;
+                default:
+                    throw Error("TimeInterval specified does not exist: " + timeInterval);
+            }
+        }
+        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
+        /**
+         * Creates a formatter for relative dates.
+         *
+         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
+         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
+         * @param {string} label The label to append to the formatted string (default "")
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function relativeDate(baseValue, increment, label) {
+            if (baseValue === void 0) { baseValue = 0; }
+            if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
+            if (label === void 0) { label = ""; }
+            return function (d) {
+                var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
+                return relativeDate.toString() + label;
+            };
+        }
+        Formatters.relativeDate = relativeDate;
+        function verifyPrecision(precision) {
+            if (precision < 0 || precision > 20) {
+                throw new RangeError("Formatter precision must be between 0 and 20");
+            }
+        }
+    })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var Plottable;
+(function (Plottable) {
+    var SymbolFactories;
+    (function (SymbolFactories) {
+        function circle() {
+            return function (symbolSize) { return d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null); };
+        }
+        SymbolFactories.circle = circle;
+        function square() {
+            return function (symbolSize) { return d3.svg.symbol().type("square").size(Math.pow(symbolSize, 2))(null); };
+        }
+        SymbolFactories.square = square;
+        function cross() {
+            return function (symbolSize) { return d3.svg.symbol().type("cross").size((5 / 9) * Math.pow(symbolSize, 2))(null); };
+        }
+        SymbolFactories.cross = cross;
+        function diamond() {
+            return function (symbolSize) { return d3.svg.symbol().type("diamond").size(Math.tan(Math.PI / 6) * Math.pow(symbolSize, 2) / 2)(null); };
+        }
+        SymbolFactories.diamond = diamond;
+        function triangleUp() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-up").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
+        }
+        SymbolFactories.triangleUp = triangleUp;
+        function triangleDown() {
+            return function (symbolSize) { return d3.svg.symbol().type("triangle-down").size(Math.sqrt(3) * Math.pow(symbolSize / 2, 2))(null); };
+        }
+        SymbolFactories.triangleDown = triangleDown;
+    })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />

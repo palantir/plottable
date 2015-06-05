@@ -10,10 +10,6 @@
 /// <reference path="utils/callbackSet.ts" />
 /// <reference path="utils/stackedUtils.ts" />
 /// <reference path="utils/windowUtils.ts" />
-
-/// <reference path="utils/formatters.ts" />
-/// <reference path="utils/symbolFactories.ts" />
-
 /// <reference path="utils/clientToSVGTranslator.ts" />
 
 /// <reference path="core/config.ts" />
@@ -23,6 +19,9 @@
 /// <reference path="core/renderPolicy.ts" />
 /// <reference path="core/renderController.ts" />
 /// <reference path="core/interfaces.ts" />
+
+/// <reference path="core/formatters.ts" />
+/// <reference path="core/symbolFactories.ts" />
 
 /// <reference path="scales/scale.ts" />
 /// <reference path="scales/quantitativeScale.ts" />
