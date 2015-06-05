@@ -478,5 +478,14 @@ describe("Plots", () => {
       assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
       svg.remove();
     });
+
+    it("animated() getter", () => {
+      var plot = new Plottable.Plot();
+      assert.strictEqual(plot.animated(), false, "by default the plot is not animated");
+      assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
+      assert.strictEqual(plot.animated(), true, "animated toggled on");
+      plot.animated(false);
+      assert.strictEqual(plot.animated(), true, "animated toggled off");
+    });
   });
 });
