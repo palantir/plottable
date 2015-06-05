@@ -42,6 +42,7 @@
 ///<reference path="core/componentTests.ts" />
 ///<reference path="core/datasetTests.ts" />
 ///<reference path="core/tableTests.ts" />
+///<reference path="core/formattersTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
 ///<reference path="scales/linearScaleTests.ts" />
@@ -50,12 +51,14 @@
 ///<reference path="scales/tickGeneratorsTests.ts" />
 
 ///<reference path="utils/domUtilsTests.ts" />
-///<reference path="utils/formattersTests.ts" />
+///<reference path="utils/colorUtilsTests.ts" />
+///<reference path="utils/windowUtilsTests.ts" />
 ///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
-///<reference path="utils/utilsTests.ts" />
+///<reference path="utils/mathUtilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
+///<reference path="utils/arrayUtilsTests.ts" />
 ///<reference path="utils/stackedUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />

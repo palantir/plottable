@@ -139,7 +139,7 @@ export module Plots {
       var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+        Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
     }
 

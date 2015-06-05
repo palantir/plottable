@@ -237,7 +237,7 @@ export module Plots {
         var plotPt = entity.position;
         // if we're inside a bar, distance in both directions should stay 0
         var barBBox = Utils.DOM.getBBox(entity.selection);
-        if (!Utils.Methods.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
+        if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
           var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
           primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
 
@@ -270,7 +270,7 @@ export module Plots {
       var yRange = { min: 0, max: this.height() };
       var barBBox = Utils.DOM.getBBox(selection);
 
-      return Plottable.Utils.Methods.intersectsBBox(xRange, yRange, barBBox);
+      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 
     /**
@@ -315,7 +315,7 @@ export module Plots {
     private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
       var intersected: Entity[] = [];
       this.entities().forEach((entity) => {
-        if (Utils.Methods.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
           intersected.push(entity);
         }
       });
@@ -349,7 +349,7 @@ export module Plots {
 
       this.datasets().forEach((dataset) => this._labelConfig.get(dataset).labelArea.selectAll("g").remove());
       if (this._labelsEnabled) {
-        Utils.Methods.setTimeout(() => this._drawLabels(), time);
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
     }
 
@@ -381,7 +381,7 @@ export module Plots {
         var positive = originalPositionFn(d, i, dataset) <= scaledBaseline;
         var measurement = measurer.measure(text);
         var color = attrToProjector["fill"](d, i, dataset);
-        var dark = Utils.Colors.contrast("white", color) * 1.6 < Utils.Colors.contrast("black", color);
+        var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
 
@@ -488,7 +488,7 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
-        var numberBarAccessorData = d3.set(Utils.Methods.flatten(this.datasets().map((dataset) => {
+        var numberBarAccessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i, dataset))
                                .filter((d) => d != null)
                                .map((d) => d.valueOf());
@@ -499,16 +499,16 @@ export module Plots {
         var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
-        barPixelWidth = Utils.Methods.min(barAccessorDataPairs, (pair: any[], i: number) => {
+        barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
           return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
         }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
         var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
-        var minScaledDatum = Utils.Methods.min(scaledData, 0);
+        var minScaledDatum = Utils.Math.min(scaledData, 0);
         if (minScaledDatum > 0) {
           barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
         }
-        var maxScaledDatum = Utils.Methods.max(scaledData, 0);
+        var maxScaledDatum = Utils.Math.max(scaledData, 0);
         if ( maxScaledDatum < barWidthDimension) {
           var margin = barWidthDimension - maxScaledDatum;
           barPixelWidth = Math.min(barPixelWidth, margin * 2);
@@ -558,10 +558,10 @@ export module Plots {
       var dataToDraw = new Utils.Map<Dataset, any[]>();
       var attrToProjector = this._generateAttrToProjector();
       this.datasets().forEach((dataset: Dataset) => {
-        var data = dataset.data().filter((d, i) => Utils.Methods.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-                                                   Utils.Methods.isValidNumber(attrToProjector["height"](d, i, dataset)));
+        var data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
+                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;
