@@ -2253,11 +2253,6 @@ describe("Plots", function () {
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
             var mockDrawer = new Plottable.Drawer(dataset);
-            var renderArea = svg.append("g");
-            var circles = renderArea.selectAll("circles").data(data);
-            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            circles.exit().remove();
-            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer.selector = function () { return "circle"; };
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
@@ -2266,9 +2261,19 @@ describe("Plots", function () {
             plot._getDrawer = function () { return mockDrawer; };
             plot.addDataset(dataset);
             plot.renderTo(svg);
+            // replace the renderArea with our own
+            var renderArea = svg.append("g");
+            var dataToPlot = data.filter(function (datum) { return Plottable.Utils.Math.isValidNumber(datum.value); });
+            var circles = renderArea.selectAll("circles").data(dataToPlot);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.renderArea(renderArea);
             var entities = plot.entities();
             assert.lengthOf(entities, 2, "returns Entities for all valid data values");
-            entities.forEach(function (entity) {
+            entities.forEach(function (entity, loopIndex) {
+                assert.strictEqual(entity.datum, data[entity.index], "entity carries the correct data");
+                // use loopIndex because there is no entity for the invalid datum
+                assert.strictEqual(circles[0][loopIndex], entity.selection.node(), "entity's selection is correct");
                 assert.isNumber(entity.position.x, "position X cannot be NaN");
                 assert.isNumber(entity.position.y, "position Y cannot be NaN");
             });
