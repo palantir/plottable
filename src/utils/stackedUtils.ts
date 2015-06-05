@@ -8,7 +8,11 @@ module Plottable {
       offset?: number;
     };
 
+    var nativeMath: Math = (<any>window).Math;
+
     export class Stacked {
+
+
 
       /**
        * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
@@ -23,13 +27,13 @@ module Plottable {
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
           return Stacked.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.max(0, dataMap.get(domainKey).value) || 0 };
+            return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
         var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
           return Stacked.populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: Math.min(dataMap.get(domainKey).value, 0) || 0 };
+            return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
           });
         });
 
@@ -78,7 +82,7 @@ module Plottable {
           }, 0);
         }, 0);
 
-        return [Math.min(minStackExtent, 0), Math.max(0, maxStackExtent)];
+        return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
       }
 
       /**

@@ -604,6 +604,7 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
+        var nativeMath = window.Math;
         var Stacked = (function () {
             function Stacked() {
             }
@@ -618,12 +619,12 @@ var Plottable;
                 var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
                     return Stacked.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Utils.Math.max(0, dataMap.get(domainKey).value) || 0 };
+                        return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
                     return Stacked.populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: Utils.Math.min(dataMap.get(domainKey).value, 0) || 0 };
+                        return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
                 var stackOffsets = Stacked._generateStackOffsets(datasets, Stacked._stack(positiveDataMapArray, domainKeys), Stacked._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
@@ -654,7 +655,7 @@ var Plottable;
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
                     }, 0);
                 }, 0);
-                return [Utils.Math.min(minStackExtent, 0), Utils.Math.max(0, maxStackExtent)];
+                return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             };
             /**
              * Given an array of datasets and the accessor function for the key, computes the
