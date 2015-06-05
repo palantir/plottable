@@ -2310,11 +2310,11 @@ declare module Plottable {
         protected _generateAttrToProjector(): AttributeToProjector;
         renderImmediately(): Plot;
         /**
-         * Returns whether or not the plot will be animated
+         * Returns whether the plot will be animated.
          */
         animated(): boolean;
         /**
-         * Enables or disables animation of the plot.
+         * Enables or disables animation.
          */
         animated(willAnimate: boolean): Plot;
         detach(): Plot;
