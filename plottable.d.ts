@@ -1183,7 +1183,7 @@ declare module Plottable {
          * @param{any[]} data The data to be drawn
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
-        draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
         /**
          * Retrieves the renderArea selection for the drawer
          *

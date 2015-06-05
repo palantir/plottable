@@ -2629,7 +2629,7 @@ var Plottable;
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                 delay += drawStep.animator.getTiming(numberOfIterations);
             });
-            return delay;
+            return this;
         };
         /**
          * Retrieves the renderArea selection for the drawer

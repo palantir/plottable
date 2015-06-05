@@ -103,7 +103,7 @@ export module Drawers {
         delay += drawStep.animator.getTiming(numberOfIterations);
       });
 
-      return delay;
+      return this;
     }
 
     /**
