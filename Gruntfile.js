@@ -147,6 +147,13 @@ module.exports = function(grunt) {
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpJSON,
+    umd: {
+      all: {
+        src: "plottable.js", 
+        objectToExport: "Plottable",
+        amdModuleId: "Plottable",
+      }
+    },
     concat: {
       header: {
         src: ["license_header.txt", "plottable.js"],
@@ -323,6 +330,7 @@ module.exports = function(grunt) {
       "concat:definitions",
       "sed:definitions",
       "sed:private_definitions",
+      "umd:all", 
       "concat:header",
       "sed:version_number",
       "definitions_prod",
