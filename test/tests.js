@@ -3101,6 +3101,13 @@ describe("Plots", function () {
             assert.operator(paths.indexOf(areaSelection), "<", paths.indexOf(lineSelection), "area appended before line");
             svg.remove();
         });
+        it("cleans up correctly when removing Datasets", function () {
+            areaPlot.renderTo(svg);
+            areaPlot.removeDataset(simpleDataset);
+            var paths = areaPlot.content().selectAll("path");
+            assert.strictEqual(paths.size(), 0, "removing a Dataset cleans up all <path>s associated with it");
+            svg.remove();
+        });
         it("correctly handles NaN and undefined x and y values", function () {
             var areaData = [
                 { foo: 0.0, bar: 0.0 },

@@ -108,6 +108,14 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("cleans up correctly when removing Datasets", () => {
+      areaPlot.renderTo(svg);
+      areaPlot.removeDataset(simpleDataset);
+      var paths = areaPlot.content().selectAll("path");
+      assert.strictEqual(paths.size(), 0, "removing a Dataset cleans up all <path>s associated with it");
+      svg.remove();
+    });
+
     it("correctly handles NaN and undefined x and y values", () => {
       var areaData = [
         { foo: 0.0, bar: 0.0 },
