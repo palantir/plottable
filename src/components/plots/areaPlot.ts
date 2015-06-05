@@ -93,6 +93,11 @@ export module Plots {
       return this;
     }
 
+    protected _removeDatasetNodes(dataset: Dataset) {
+      super._removeDatasetNodes(dataset);
+      this._lineDrawers.get(dataset).remove();
+    }
+
     protected _additionalPaint() {
       var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();

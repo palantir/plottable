@@ -7672,6 +7672,10 @@ var Plottable;
                 _super.prototype.addDataset.call(this, dataset);
                 return this;
             };
+            Area.prototype._removeDatasetNodes = function (dataset) {
+                _super.prototype._removeDatasetNodes.call(this, dataset);
+                this._lineDrawers.get(dataset).remove();
+            };
             Area.prototype._additionalPaint = function () {
                 var _this = this;
                 var drawSteps = this._generateLineDrawSteps();
