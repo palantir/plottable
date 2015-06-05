@@ -22,7 +22,7 @@ function run(svg, data, Plottable) {
   hBarRenderer.attr("opacity", 0.75);
   hBarRenderer.x(function(d) { return d.x; }, xScale);
   hBarRenderer.y(function(d) { return d.y; }, yScale);
-  hBarRenderer.animate(doAnimate);
+  hBarRenderer.animated(doAnimate);
 
   var hBarChart = new Plottable.Components.Table([[yAxis, hBarRenderer],
    [null,  xAxis]]);

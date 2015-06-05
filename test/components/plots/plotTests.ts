@@ -451,7 +451,7 @@ describe("Plots", () => {
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar();
-      plot.addDataset(new Plottable.Dataset([])).animate(true);
+      plot.addDataset(new Plottable.Dataset([])).animated(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
@@ -480,6 +480,15 @@ describe("Plots", () => {
 
       assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
       svg.remove();
+    });
+
+    it("animated() getter", () => {
+      var plot = new Plottable.Plot();
+      assert.strictEqual(plot.animated(), false, "by default the plot is not animated");
+      assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
+      assert.strictEqual(plot.animated(), true, "animated toggled on");
+      plot.animated(false);
+      assert.strictEqual(plot.animated(), false, "animated toggled off");
     });
   });
 });
