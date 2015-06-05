@@ -6095,11 +6095,11 @@ var Plottable;
             }
             return this;
         };
-        /**
-         * Enables or disables animation.
-         */
-        Plot.prototype.animate = function (enabled) {
-            this._animate = enabled;
+        Plot.prototype.animated = function (willAnimate) {
+            if (willAnimate == null) {
+                return this._animate;
+            }
+            this._animate = willAnimate;
             return this;
         };
         Plot.prototype.detach = function () {
