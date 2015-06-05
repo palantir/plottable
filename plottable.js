@@ -6234,7 +6234,7 @@ var Plottable;
         Plot.prototype._generateDrawSteps = function () {
             return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
         };
-        Plot.prototype._additionalPaint = function (time) {
+        Plot.prototype._additionalPaint = function () {
             // no-op
         };
         Plot.prototype._getDataToDraw = function () {
@@ -6246,9 +6246,8 @@ var Plottable;
             var drawSteps = this._generateDrawSteps();
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
-            var times = this.datasets().map(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
-            var maxTime = Plottable.Utils.Math.max(times, 0);
-            this._additionalPaint(maxTime);
+            this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
+            this._additionalPaint();
         };
         /**
          * Retrieves Selections of this Plot for the specified Datasets.
@@ -7237,7 +7236,7 @@ var Plottable;
                     qscale.addIncludedValuesProvider(this._baselineValueProvider);
                 }
             };
-            Bar.prototype._additionalPaint = function (time) {
+            Bar.prototype._additionalPaint = function () {
                 var _this = this;
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                 var scaledBaseline = primaryScale.scale(this.baselineValue());
@@ -7250,7 +7249,7 @@ var Plottable;
                 this._getAnimator("baseline").animate(this._baseline, baselineAttr);
                 this.datasets().forEach(function (dataset) { return _this._labelConfig.get(dataset).labelArea.selectAll("g").remove(); });
                 if (this._labelsEnabled) {
-                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                    this._drawLabels();
                 }
             };
             Bar.prototype._drawLabels = function () {

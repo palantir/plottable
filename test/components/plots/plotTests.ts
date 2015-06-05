@@ -443,26 +443,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("additionalPaint timing works properly", () => {
-      var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
-      var x = new Plottable.Scales.Linear();
-      var y = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Bar();
-      plot.addDataset(new Plottable.Dataset([])).animate(true);
-      var recordedTime: number = -1;
-      var additionalPaint = (x: number) => {
-        recordedTime = Math.max(x, recordedTime);
-      };
-      (<any> plot)._additionalPaint = additionalPaint;
-      plot.animator(Plottable.Plots.Animator.MAIN, animator);
-      var svg = TestMethods.generateSVG();
-      plot.x((d: any) => d.x, x);
-      plot.y((d: any) => d.y, y);
-      plot.renderTo(svg);
-      assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
-      svg.remove();
-    });
-
     it("extent calculation done in correct dataset order", () => {
       var categoryScale = new Plottable.Scales.Category();
       var dataset1 = new Plottable.Dataset([{key: "A"}]);

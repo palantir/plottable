@@ -2385,25 +2385,6 @@ describe("Plots", function () {
             assertDomainIsClose(scale1.domain(), [1, 3], "extent shrinks further if we project plot2 away");
             svg.remove();
         });
-        it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
-            var x = new Plottable.Scales.Linear();
-            var y = new Plottable.Scales.Linear();
-            var plot = new Plottable.Plots.Bar();
-            plot.addDataset(new Plottable.Dataset([])).animate(true);
-            var recordedTime = -1;
-            var additionalPaint = function (x) {
-                recordedTime = Math.max(x, recordedTime);
-            };
-            plot._additionalPaint = additionalPaint;
-            plot.animator(Plottable.Plots.Animator.MAIN, animator);
-            var svg = TestMethods.generateSVG();
-            plot.x(function (d) { return d.x; }, x);
-            plot.y(function (d) { return d.y; }, y);
-            plot.renderTo(svg);
-            assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
-            svg.remove();
-        });
         it("extent calculation done in correct dataset order", function () {
             var categoryScale = new Plottable.Scales.Category();
             var dataset1 = new Plottable.Dataset([{ key: "A" }]);
