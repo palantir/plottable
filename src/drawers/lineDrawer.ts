@@ -12,11 +12,17 @@ export module Drawers {
       this._pathSelection.datum(data);
     }
 
-    public setup(line: d3.Selection<void>) {
-      this._pathSelection = line.append("path")
+    public renderArea(): d3.Selection<void>;
+    public renderArea(area: d3.Selection<void>): Drawer;
+    public renderArea(area?: d3.Selection<void>): any {
+      if (area == null) {
+        return super.renderArea();
+      }
+      super.renderArea(area);
+      this._pathSelection = area.append("path")
                                 .classed(Line.PATH_CLASS, true)
                                 .style("fill", "none");
-      super.setup(line);
+      return this;
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {

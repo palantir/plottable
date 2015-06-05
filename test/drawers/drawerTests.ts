@@ -48,7 +48,7 @@ describe("Drawers", () => {
       timings = [];
       svg = TestMethods.generateSVG();
       drawer = new MockDrawer(null);
-      drawer.setup(svg);
+      drawer.renderArea(svg);
     });
 
     afterEach(() => {
@@ -93,7 +93,7 @@ describe("Drawers", () => {
     it("selectionForIndex", () => {
       var svg = TestMethods.generateSVG(300, 300);
       var drawer = new Plottable.Drawer(null);
-      drawer.setup(svg.append("g"));
+      drawer.renderArea(svg.append("g"));
       drawer.selector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
       var circles = drawer.renderArea().selectAll("circle").data(data);

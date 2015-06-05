@@ -1171,7 +1171,17 @@ declare module Plottable {
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         constructor(dataset: Dataset);
-        setup(area: d3.Selection<void>): void;
+        /**
+         * Retrieves the renderArea selection for the Drawer.
+         */
+        renderArea(): d3.Selection<void>;
+        /**
+         * Sets the renderArea selection for the Drawer.
+         *
+         * @param {d3.Selection} Selection containing the <g> to render to.
+         * @returns {Drawer} The calling Drawer.
+         */
+        renderArea(area: d3.Selection<void>): Drawer;
         /**
          * Removes the Drawer and its renderArea
          */
@@ -1197,12 +1207,6 @@ declare module Plottable {
          */
         draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
-         * Retrieves the renderArea selection for the drawer
-         *
-         * @returns {d3.Selection} the renderArea selection
-         */
-        renderArea(): d3.Selection<void>;
-        /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
         selector(): string;
@@ -1219,7 +1223,8 @@ declare module Plottable {
         class Line extends Drawer {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(line: d3.Selection<void>): void;
+            renderArea(): d3.Selection<void>;
+            renderArea(area: d3.Selection<void>): Drawer;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
@@ -1234,7 +1239,8 @@ declare module Plottable {
         class Area extends Line {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(area: d3.Selection<void>): void;
+            renderArea(): d3.Selection<void>;
+            renderArea(area: d3.Selection<void>): Drawer;
             protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
         }

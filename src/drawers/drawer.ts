@@ -34,8 +34,23 @@ export module Drawers {
         this._dataset = dataset;
     }
 
-    public setup(area: d3.Selection<void>) {
+    /**
+     * Retrieves the renderArea selection for the Drawer.
+     */
+    public renderArea(): d3.Selection<void>;
+    /**
+     * Sets the renderArea selection for the Drawer.
+     * 
+     * @param {d3.Selection} Selection containing the <g> to render to.
+     * @returns {Drawer} The calling Drawer.
+     */
+    public renderArea(area: d3.Selection<void>): Drawer;
+    public renderArea(area?: d3.Selection<void>): any {
+      if (area == null) {
+        return this._renderArea;
+      }
       this._renderArea = area;
+      return this;
     }
 
     /**
@@ -104,15 +119,6 @@ export module Drawers {
       });
 
       return delay;
-    }
-
-    /**
-     * Retrieves the renderArea selection for the drawer
-     *
-     * @returns {d3.Selection} the renderArea selection
-     */
-    public renderArea() {
-      return this._renderArea;
     }
 
     /**

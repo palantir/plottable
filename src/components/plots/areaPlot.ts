@@ -27,7 +27,7 @@ export module Plots {
 
     protected _setup() {
       super._setup();
-      this._lineDrawers.forEach((d) => d.setup(this._renderArea.append("g")));
+      this._lineDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -86,7 +86,7 @@ export module Plots {
     public addDataset(dataset: Dataset) {
       var lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
-        lineDrawer.setup(this._renderArea.append("g"));
+        lineDrawer.renderArea(this._renderArea.append("g"));
       }
       this._lineDrawers.set(dataset, lineDrawer);
       super.addDataset(dataset);

@@ -106,7 +106,7 @@ module Plottable {
 
     protected _createNodesForDataset(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
-      drawer.setup(this._renderArea.append("g"));
+      drawer.renderArea(this._renderArea.append("g"));
       return drawer;
     }
 

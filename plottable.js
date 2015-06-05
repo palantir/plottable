@@ -2585,8 +2585,12 @@ var Plottable;
         function Drawer(dataset) {
             this._dataset = dataset;
         }
-        Drawer.prototype.setup = function (area) {
+        Drawer.prototype.renderArea = function (area) {
+            if (area == null) {
+                return this._renderArea;
+            }
             this._renderArea = area;
+            return this;
         };
         /**
          * Removes the Drawer and its renderArea
@@ -2648,14 +2652,6 @@ var Plottable;
             return delay;
         };
         /**
-         * Retrieves the renderArea selection for the drawer
-         *
-         * @returns {d3.Selection} the renderArea selection
-         */
-        Drawer.prototype.renderArea = function () {
-            return this._renderArea;
-        };
-        /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
@@ -2693,9 +2689,13 @@ var Plottable;
                 _super.prototype._enterData.call(this, data);
                 this._pathSelection.datum(data);
             };
-            Line.prototype.setup = function (line) {
-                this._pathSelection = line.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
-                _super.prototype.setup.call(this, line);
+            Line.prototype.renderArea = function (area) {
+                if (area == null) {
+                    return _super.prototype.renderArea.call(this);
+                }
+                _super.prototype.renderArea.call(this, area);
+                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
+                return this;
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
@@ -2737,9 +2737,13 @@ var Plottable;
             Area.prototype._enterData = function (data) {
                 this._areaSelection.datum(data);
             };
-            Area.prototype.setup = function (area) {
-                Plottable.Drawer.prototype.setup.call(this, area);
+            Area.prototype.renderArea = function (area) {
+                if (area == null) {
+                    return _super.prototype.renderArea.call(this);
+                }
+                Plottable.Drawer.prototype.renderArea.call(this, area);
                 this._areaSelection = area.append("path").style("stroke", "none");
+                return this;
             };
             Area.prototype._drawStep = function (step) {
                 var attrToProjector = Plottable.Utils.Methods.copyMap(step.attrToAppliedProjector);
@@ -6036,7 +6040,7 @@ var Plottable;
         };
         Plot.prototype._createNodesForDataset = function (dataset) {
             var drawer = this._datasetToDrawer.get(dataset);
-            drawer.setup(this._renderArea.append("g"));
+            drawer.renderArea(this._renderArea.append("g"));
             return drawer;
         };
         Plot.prototype._getDrawer = function (dataset) {
@@ -7633,7 +7637,7 @@ var Plottable;
             Area.prototype._setup = function () {
                 var _this = this;
                 _super.prototype._setup.call(this);
-                this._lineDrawers.forEach(function (d) { return d.setup(_this._renderArea.append("g")); });
+                this._lineDrawers.forEach(function (d) { return d.renderArea(_this._renderArea.append("g")); });
             };
             Area.prototype.y = function (y, yScale) {
                 if (y == null) {
@@ -7672,7 +7676,7 @@ var Plottable;
             Area.prototype.addDataset = function (dataset) {
                 var lineDrawer = new Plottable.Drawers.Line(dataset);
                 if (this._isSetup) {
-                    lineDrawer.setup(this._renderArea.append("g"));
+                    lineDrawer.renderArea(this._renderArea.append("g"));
                 }
                 this._lineDrawers.set(dataset, lineDrawer);
                 _super.prototype.addDataset.call(this, dataset);
