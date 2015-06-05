@@ -16,11 +16,11 @@ describe("Dispatchers", () => {
       svg.remove();
     });
 
-    it("getLastMousePosition() defaults to a non-null value", () => {
+    it("lastMousePosition() defaults to a non-null value", () => {
       var svg = TestMethods.generateSVG();
 
       var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> svg.node());
-      var p = md.getLastMousePosition();
+      var p = md.lastMousePosition();
       assert.isNotNull(p, "returns a value after initialization");
       assert.isNotNull(p.x, "x value is set");
       assert.isNotNull(p.y, "y value is set");

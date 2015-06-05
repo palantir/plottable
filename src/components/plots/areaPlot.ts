@@ -27,7 +27,7 @@ export module Plots {
 
     protected _setup() {
       super._setup();
-      this._lineDrawers.forEach((d) => d.setup(this._renderArea.append("g")));
+      this._lineDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -86,7 +86,7 @@ export module Plots {
     public addDataset(dataset: Dataset) {
       var lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
-        lineDrawer.setup(this._renderArea.append("g"));
+        lineDrawer.renderArea(this._renderArea.append("g"));
       }
       this._lineDrawers.set(dataset, lineDrawer);
       super.addDataset(dataset);
@@ -179,7 +179,7 @@ export module Plots {
       var allSelections = super.getAllSelections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
-      lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
+      lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
       return d3.selectAll(allSelections);
     }
 

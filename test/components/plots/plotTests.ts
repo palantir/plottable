@@ -158,18 +158,12 @@ describe("Plots", () => {
       var dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
       var dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
 
-      // Create mock drawers with already drawn items
+      // Create mock drawers with functioning selector()
       var mockDrawer1 = new Plottable.Drawer(dataset1);
-      var renderArea1 = svg.append("g");
-      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
-      (<any> mockDrawer1)._getSelector = () => "circle";
+      mockDrawer1.selector = () => "circle";
 
-      var renderArea2 = svg.append("g");
-      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawer(dataset2);
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
-      (<any> mockDrawer2)._getSelector = () => "circle";
+      mockDrawer2.selector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
@@ -183,6 +177,14 @@ describe("Plots", () => {
       plot.addDataset(dataset1);
       plot.addDataset(dataset2);
       plot.renderTo(svg);
+
+      // mock drawn items and replace the renderArea on the mock Drawers
+      var renderArea1 = svg.append("g");
+      renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      mockDrawer1.renderArea(renderArea1);
+      var renderArea2 = svg.append("g");
+      renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      mockDrawer2.renderArea(renderArea2);
 
       var selections = plot.getAllSelections();
       assert.strictEqual(selections.size(), 2, "all circle selections gotten");
@@ -212,18 +214,11 @@ describe("Plots", () => {
       var data1PointConverter = (datum: any, index: number) => data1Points[index];
       var data2PointConverter = (datum: any, index: number) => data2Points[index];
 
-      // Create mock drawers with already drawn items
+      // Create mock drawers with functioning selector()
       var mockDrawer1 = new Plottable.Drawer(dataset1);
-      var renderArea1 = svg.append("g");
-      var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-      (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
-      (<any> mockDrawer1)._getSelector = () => "circle";
-
-      var renderArea2 = svg.append("g");
-      var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      mockDrawer1.selector = () => "circle";
       var mockDrawer2 = new Plottable.Drawer(dataset2);
-      (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
-      (<any> mockDrawer2)._getSelector = () => "circle";
+      mockDrawer2.selector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
@@ -246,6 +241,14 @@ describe("Plots", () => {
       };
 
       plot.renderTo(svg);
+
+      // mock drawn items and replace the renderArea on the mock Drawers
+      var renderArea1 = svg.append("g");
+      var renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      mockDrawer1.renderArea(renderArea1);
+      var renderArea2 = svg.append("g");
+      var renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      mockDrawer2.renderArea(renderArea2);
 
       var entities = plot.entities();
       assert.lengthOf(entities, data1.length + data2.length, "retrieved one Entity for each value on the Plot");
@@ -288,7 +291,7 @@ describe("Plots", () => {
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       circles.exit().remove();
       (<any> mockDrawer).setup = () => (<any> mockDrawer)._renderArea = renderArea;
-      (<any> mockDrawer)._getSelector = () => "circle";
+      mockDrawer.selector = () => "circle";
 
       (<any> plot)._pixelPoint = (datum: any, index: number, dataset: Plottable.Dataset) => {
         return dataPointConverter(datum, index);
@@ -330,13 +333,13 @@ describe("Plots", () => {
       var renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
-      (<any> mockDrawer1)._getSelector = () => "circle";
+     mockDrawer1.selector = () => "circle";
 
       var renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       var mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
-      (<any> mockDrawer2)._getSelector = () => "circle";
+      mockDrawer2.selector = () => "circle";
 
       // Mock _getDrawer to return the mock drawers
       (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
@@ -443,6 +446,27 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    // TODO: delete before merge.
+    it.skip("additionalPaint timing works properly", () => {
+      var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
+      var x = new Plottable.Scales.Linear();
+      var y = new Plottable.Scales.Linear();
+      var plot = new Plottable.Plots.Bar();
+      plot.addDataset(new Plottable.Dataset([])).animated(true);
+      var recordedTime: number = -1;
+      var additionalPaint = (x: number) => {
+        recordedTime = Math.max(x, recordedTime);
+      };
+      (<any> plot)._additionalPaint = additionalPaint;
+      plot.animator(Plottable.Plots.Animator.MAIN, animator);
+      var svg = TestMethods.generateSVG();
+      plot.x((d: any) => d.x, x);
+      plot.y((d: any) => d.y, y);
+      plot.renderTo(svg);
+      assert.strictEqual(recordedTime, 20, "additionalPaint passed appropriate time argument");
+      svg.remove();
+    });
+
     it("extent calculation done in correct dataset order", () => {
       var categoryScale = new Plottable.Scales.Category();
       var dataset1 = new Plottable.Dataset([{key: "A"}]);
@@ -457,6 +481,15 @@ describe("Plots", () => {
 
       assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
       svg.remove();
+    });
+
+    it("animated() getter", () => {
+      var plot = new Plottable.Plot();
+      assert.strictEqual(plot.animated(), false, "by default the plot is not animated");
+      assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
+      assert.strictEqual(plot.animated(), true, "animated toggled on");
+      plot.animated(false);
+      assert.strictEqual(plot.animated(), false, "animated toggled off");
     });
   });
 });

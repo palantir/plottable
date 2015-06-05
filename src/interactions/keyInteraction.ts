@@ -37,7 +37,7 @@ export module Interactions {
     }
 
     private _handleKeyEvent(keyCode: number) {
-      var p = this._translateToComponentSpace(this._positionDispatcher.getLastMousePosition());
+      var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
       if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
         this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
       }

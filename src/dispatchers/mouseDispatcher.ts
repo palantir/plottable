@@ -182,7 +182,7 @@ export module Dispatchers {
       var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
       if (newMousePosition != null) {
         this._lastMousePosition = newMousePosition;
-        callbackSet.callCallbacks(this.getLastMousePosition(), event);
+        callbackSet.callCallbacks(this.lastMousePosition(), event);
       }
     }
 
@@ -191,7 +191,7 @@ export module Dispatchers {
      *
      * @return {Point}
      */
-    public getLastMousePosition() {
+    public lastMousePosition() {
       return this._lastMousePosition;
     }
   }
