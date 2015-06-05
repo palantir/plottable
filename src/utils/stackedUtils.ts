@@ -12,8 +12,6 @@ module Plottable {
 
     export class Stacked {
 
-
-
       /**
        * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
        * for drawing purposes.
