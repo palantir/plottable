@@ -2312,7 +2312,7 @@ declare module Plottable {
         /**
          * Enables or disables animation.
          */
-        animate(enabled: boolean): Plot;
+        animated(enabled: boolean): Plot;
         detach(): Plot;
         /**
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.

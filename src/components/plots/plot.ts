@@ -217,7 +217,7 @@ module Plottable {
     /**
      * Enables or disables animation.
      */
-    public animate(enabled: boolean) {
+    public animated(enabled: boolean) {
       this._animate = enabled;
       return this;
     }

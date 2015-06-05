@@ -2390,7 +2390,7 @@ describe("Plots", function () {
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();
-            plot.addDataset(new Plottable.Dataset([])).animate(true);
+            plot.addDataset(new Plottable.Dataset([])).animated(true);
             var recordedTime = -1;
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
@@ -3220,7 +3220,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
-                barPlot.animate(false);
+                barPlot.animated(false);
                 barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
@@ -3412,7 +3412,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
-                barPlot.animate(false);
+                barPlot.animated(false);
                 barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
@@ -3545,7 +3545,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
                 barPlot.addDataset(dataset);
-                barPlot.animate(false);
+                barPlot.animated(false);
                 barPlot.baselineValue(0);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);

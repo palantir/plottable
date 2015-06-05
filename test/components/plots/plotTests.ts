@@ -448,7 +448,7 @@ describe("Plots", () => {
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar();
-      plot.addDataset(new Plottable.Dataset([])).animate(true);
+      plot.addDataset(new Plottable.Dataset([])).animated(true);
       var recordedTime: number = -1;
       var additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);

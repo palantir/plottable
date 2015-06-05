@@ -6088,7 +6088,7 @@ var Plottable;
         /**
          * Enables or disables animation.
          */
-        Plot.prototype.animate = function (enabled) {
+        Plot.prototype.animated = function (enabled) {
             this._animate = enabled;
             return this;
         };
