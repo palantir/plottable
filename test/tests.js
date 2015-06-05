@@ -398,7 +398,7 @@ describe("Drawers", function () {
             drawer.draw([], steps);
             assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
         });
-        it("selectionForIndex", function () {
+        it("selectionForIndex()", function () {
             var svg = TestMethods.generateSVG(300, 300);
             var drawer = new Plottable.Drawer(null);
             drawer.renderArea(svg.append("g"));

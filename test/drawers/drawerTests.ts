@@ -90,7 +90,7 @@ describe("Drawers", () => {
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
     });
 
-    it("selectionForIndex", () => {
+    it("selectionForIndex()", () => {
       var svg = TestMethods.generateSVG(300, 300);
       var drawer = new Plottable.Drawer(null);
       drawer.renderArea(svg.append("g"));
