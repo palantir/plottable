@@ -2611,6 +2611,14 @@ var Plottable;
             });
             return modifiedAttrToProjector;
         };
+        Drawer.prototype.totalDrawTime = function (data, drawSteps) {
+            var numberOfIterations = this._numberOfAnimationIterations(data);
+            var delay = 0;
+            drawSteps.forEach(function (drawStep, i) {
+                delay += drawStep.animator.totalTime(numberOfIterations);
+            });
+            return delay;
+        };
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
          *
@@ -2633,7 +2641,7 @@ var Plottable;
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
                 delay += drawStep.animator.totalTime(numberOfIterations);
             });
-            return delay;
+            return this;
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
@@ -6256,7 +6264,8 @@ var Plottable;
             var drawSteps = this._generateDrawSteps();
             var dataToDraw = this._getDataToDraw();
             var drawers = this._getDrawersInOrder();
-            var times = this.datasets().map(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
+            this.datasets().forEach(function (ds, i) { return drawers[i].draw(dataToDraw.get(ds), drawSteps); });
+            var times = this.datasets().map(function (ds, i) { return drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps); });
             var maxTime = Plottable.Utils.Math.max(times, 0);
             this._additionalPaint(maxTime);
         };
