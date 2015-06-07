@@ -154,7 +154,7 @@ export module Scales {
       // InterpolatedColorScales do not pad
       var includedValues = this._getAllIncludedValues();
       if (includedValues.length > 0) {
-        this._setDomain([Utils.Methods.min(includedValues, 0), Utils.Methods.max(includedValues, 0)]);
+        this._setDomain([Utils.Math.min(includedValues, 0), Utils.Math.max(includedValues, 0)]);
       }
       return this;
     }

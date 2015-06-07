@@ -4,6 +4,14 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   describe("Linear Scales", () => {
+    it("extentOfValues() filters out invalid numbers", () => {
+      var scale = new Plottable.Scales.Linear();
+      var expectedExtent = [0, 1];
+      var arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, 1];
+      var extent = scale.extentOfValues(arrayWithBadValues);
+      assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+    });
+
     it("autoDomain() defaults to [0, 1]", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
@@ -117,7 +125,7 @@ describe("Scales", () => {
       scale.domain([0, 10]);
       var ticks = scale.ticks();
       assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-      scale.tickGenerator((scale) => scale.getDefaultTicks().filter(tick => tick % 3 === 0));
+      scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
       ticks = scale.ticks();
       assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
     });

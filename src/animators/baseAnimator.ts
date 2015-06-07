@@ -56,7 +56,7 @@ export module Animators {
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
-    public getTiming(numberOfIterations: number) {
+    public totalTime(numberOfIterations: number) {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
       var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();

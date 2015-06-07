@@ -207,13 +207,13 @@ describe("Plots", () => {
 
     it("throws warnings on negative data", () => {
       var message: String;
-      var oldWarn = Plottable.Utils.Methods.warn;
-      Plottable.Utils.Methods.warn = (warn) => message = warn;
+      var oldWarn = Plottable.Utils.Window.warn;
+      Plottable.Utils.Window.warn = (warn) => message = warn;
       piePlot.removeDataset(simpleDataset);
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
       piePlot.addDataset(negativeDataset);
       assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
-      Plottable.Utils.Methods.warn = oldWarn;
+      Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
     });
   });

@@ -111,9 +111,9 @@ describe("Utils.DOM", () => {
       var firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
       var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
 
-      assert.isFalse(Plottable.Utils.Methods.isNaN(firstClipPathIdNumber),
+      assert.isFalse(Plottable.Utils.Math.isNaN(firstClipPathIdNumber),
         "first clip path id should only have a number after the prefix");
-      assert.isFalse(Plottable.Utils.Methods.isNaN(secondClipPathIdNumber),
+      assert.isFalse(Plottable.Utils.Math.isNaN(secondClipPathIdNumber),
         "second clip path id should only have a number after the prefix");
 
       assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber,

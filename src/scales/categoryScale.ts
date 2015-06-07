@@ -23,11 +23,11 @@ export module Scales {
     }
 
     public extentOfValues(values: string[]) {
-      return Utils.Methods.uniq(values);
+      return Utils.Array.uniq(values);
     }
 
     protected _getExtent(): string[] {
-      return Utils.Methods.uniq(this._getAllIncludedValues());
+      return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
     public domain(): string[];

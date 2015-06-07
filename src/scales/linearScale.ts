@@ -48,7 +48,7 @@ export module Scales {
       return this._d3Scale.invert(value);
     }
 
-    public getDefaultTicks(): number[] {
+    public defaultTicks(): number[] {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 

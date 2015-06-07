@@ -3,6 +3,16 @@
 var assert = chai.assert;
 
 describe("TimeScale tests", () => {
+    it.skip("extentOfValues() filters out invalid Dates", () => {
+      var scale = new Plottable.Scales.Time();
+      var expectedExtent = [new Date("2015-06-05"), new Date("2015-06-04")];
+      var arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string",
+        0, new Date("2015-06-05"), new Date("2015-06-04")];
+      var extent = scale.extentOfValues(arrayWithBadValues);
+      assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");
+      assert.strictEqual(extent[1].getTime(), expectedExtent[1].getTime(), "returned correct max");
+    });
+
   it("can be padded", () => {
     var scale = new Plottable.Scales.Time();
     scale.padProportion(0);

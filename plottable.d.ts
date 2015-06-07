@@ -1,7 +1,7 @@
 
 declare module Plottable {
     module Utils {
-        module Methods {
+        module Math {
             /**
              * Checks if x is between a and b.
              *
@@ -20,61 +20,6 @@ declare module Plottable {
              * @return {number} A clamped value in the range [min, max].
              */
             function clamp(x: number, min: number, max: number): number;
-            /** Print a warning message to the console, if it is available.
-             *
-             * @param {string} The warnings to print
-             */
-            function warn(warning: string): void;
-            /**
-             * Takes two arrays of numbers and adds them together
-             *
-             * @param {number[]} alist The first array of numbers
-             * @param {number[]} blist The second array of numbers
-             * @return {number[]} An array of numbers where x[i] = alist[i] + blist[i]
-             */
-            function addArrays(alist: number[], blist: number[]): number[];
-            /**
-             * Populates a map from an array of keys and a transformation function.
-             *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {d3.Map<T>} A map mapping keys to their transformed values.
-             */
-            function populateMap<T>(keys: string[], transform: (key: string, index: number) => T): d3.Map<T>;
-            /**
-             * Take an array of values, and return the unique values.
-             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
-             *
-             * @param {T[]} values The values to find uniqueness for
-             * @return {T[]} The unique values
-             */
-            function uniq<T>(arr: T[]): T[];
-            /**
-             * Creates an array of length `count`, filled with value or (if value is a function), value()
-             *
-             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
-             * @param {number} count The length of the array to generate
-             * @return {any[]}
-             */
-            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
-            /**
-             * @param {T[][]} a The 2D array that will have its elements joined together.
-             * @return {T[]} Every array in a, concatenated together in the order they appear.
-             */
-            function flatten<T>(a: T[][]): T[];
-            /**
-             * Check if two arrays are equal by strict equality.
-             */
-            function arrayEq<T>(a: T[], b: T[]): boolean;
-            /**
-             * @param {any} a Object to check against b for equality.
-             * @param {any} b Object to check against a for equality.
-             *
-             * @returns {boolean} whether or not two objects share the same keys, and
-             *          values associated with those keys. Values will be compared
-             *          with ===.
-             */
-            function objEq(a: any, b: any): boolean;
             /**
              * Applies the accessor, if provided, to each element of `array` and returns the maximum value.
              * If no maximum value can be computed, returns defaultValue.
@@ -96,51 +41,8 @@ declare module Plottable {
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n: any): boolean;
-            /**
-             * Creates shallow copy of map.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied map.
-             */
-            function copyMap<T>(oldMap: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
             function range(start: number, stop: number, step?: number): number[];
-            /** Is like setTimeout, but activates synchronously if time=0
-             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
-             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
-             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
-             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
-             * setTimeout appears out-of-sync with the rest of the plot.
-             */
-            function setTimeout(f: Function, time: number, ...args: any[]): number;
-            function colorTest(colorTester: d3.Selection<void>, className: string): string;
-            function lightenColor(color: string, factor: number): string;
             function distanceSquared(p1: Point, p2: Point): number;
-            function isIE(): boolean;
-            /**
-             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
-             *
-             * @param {number | Range} xValOrRange The x coordinate or Range to test
-             * @param {number | Range} yValOrRange The y coordinate or Range to test
-             * @param {SVGRect} bbox The bbox
-             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
-             * testing intersection
-             *
-             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
-             * contained by bbox, false otherwise.
-             */
-            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
-            /**
-             * Create a Range from a number or an object with "min" and "max" defined.
-             *
-             * @param {any} input The object to parse
-             *
-             * @returns {Range} The generated Range
-             */
-            function parseRange(input: any): Range;
         }
     }
 }
@@ -243,6 +145,19 @@ declare module Plottable {
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
             function getBoundingSVG(elem: SVGElement): SVGElement;
             function getUniqueClipPathId(): string;
+            /**
+             * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+             *
+             * @param {number | Range} xValOrRange The x coordinate or Range to test
+             * @param {number | Range} yValOrRange The y coordinate or Range to test
+             * @param {SVGRect} bbox The bbox
+             * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+             * testing intersection
+             *
+             * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+             * contained by bbox, false otherwise.
+             */
+            function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range, bbox: SVGRect, tolerance?: number): boolean;
         }
     }
 }
@@ -250,7 +165,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        module Colors {
+        module Color {
             /**
              * Return contrast ratio between two colors
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
@@ -259,6 +174,45 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            function lightenColor(color: string, factor: number): string;
+            function colorTest(colorTester: d3.Selection<void>, className: string): string;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Utils {
+        module Array {
+            /**
+             * Takes two arrays of numbers and adds them together
+             *
+             * @param {number[]} aList The first array of numbers
+             * @param {number[]} bList The second array of numbers
+             * @return {number[]} An array of numbers where x[i] = aList[i] + bList[i]
+             */
+            function add(aList: number[], bList: number[]): number[];
+            /**
+             * Take an array of values, and return the unique values.
+             * Will work iff ∀ a, b, a.toString() == b.toString() => a == b; will break on Object inputs
+             *
+             * @param {T[]} values The values to find uniqueness for
+             * @return {T[]} The unique values
+             */
+            function uniq<T>(arr: T[]): T[];
+            /**
+             * @param {T[][]} a The 2D array that will have its elements joined together.
+             * @return {T[]} Every array in a, concatenated together in the order they appear.
+             */
+            function flatten<T>(a: T[][]): T[];
+            /**
+             * Creates an array of length `count`, filled with value or (if value is a function), value()
+             *
+             * @param {T | ((index?: number) => T)} value The value to fill the array with or a value generator (called with index as arg)
+             * @param {number} count The length of the array to generate
+             * @return {any[]}
+             */
+            function createFilledArray<T>(value: T | ((index?: number) => T), count: number): T[];
         }
     }
 }
@@ -306,113 +260,35 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type Formatter = (d: any) => string;
-    var MILLISECONDS_IN_ONE_DAY: number;
-    module Formatters {
-        /**
-         * Creates a formatter for currency values.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 2).
-         * @param {string} [symbol] The currency symbol to use (default "$").
-         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for currency values.
-         */
-        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
-        /**
-         * Creates a formatter that displays exactly [precision] decimal places.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
-         */
-        function fixed(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter that formats numbers to show no more than
-         * [precision] decimal places. All other values are stringified.
-         *
-         * @param {number} [precision] The number of decimal places to show (default 3).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for general values.
-         */
-        function general(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter that stringifies its input.
-         *
-         * @returns {Formatter} A formatter that stringifies its input.
-         */
-        function identity(): (d: any) => string;
-        /**
-         * Creates a formatter for percentage values.
-         * Multiplies the input by 100 and appends "%".
-         *
-         * @param {number} [precision] The number of decimal places to show (default 0).
-         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
-         *
-         * @returns {Formatter} A formatter for percentage values.
-         */
-        function percentage(precision?: number): (d: any) => string;
-        /**
-         * Creates a formatter for values that displays [precision] significant figures
-         * and puts SI notation.
-         *
-         * @param {number} [precision] The number of significant figures to show (default 3).
-         *
-         * @returns {Formatter} A formatter for SI values.
-         */
-        function siSuffix(precision?: number): (d: any) => string;
-        /**
-         * Creates a multi time formatter that displays dates.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function multiTime(): (d: any) => string;
-        /**
-         * Creates a time formatter that displays time/date using given specifier.
-         *
-         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
-         *
-         * @param {string} [specifier] The specifier for the formatter.
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function time(specifier: string): Formatter;
-        /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
-        /**
-         * Creates a formatter for relative dates.
-         *
-         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
-         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
-         * @param {string} label The label to append to the formatted string (default "")
-         *
-         * @returns {Formatter} A formatter for time/date values.
-         */
-        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
-    }
-}
-
-
-declare module Plottable {
-    /**
-     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
-     * and returns a string representing the 'd' attribute of the resultant 'path' element
-     */
-    type SymbolFactory = (symbolSize: number) => string;
-    module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
-        function circle(): SymbolFactory;
-        function square(): SymbolFactory;
-        function cross(): SymbolFactory;
-        function diamond(): SymbolFactory;
-        function triangleUp(): SymbolFactory;
-        function triangleDown(): SymbolFactory;
+    module Utils {
+        module Window {
+            /**
+             * Print a warning message to the console, if it is available.
+             *
+             * @param {string} The warnings to print
+             */
+            function warn(warning: string): void;
+            /**
+             * Is like setTimeout, but activates synchronously if time=0
+             * We special case 0 because of an observed issue where calling setTimeout causes visible flickering.
+             * We believe this is because when requestAnimationFrame calls into the paint function, as soon as that function finishes
+             * evaluating, the results are painted to the screen. As a result, if we want something to occur immediately but call setTimeout
+             * with time=0, then it is pushed to the call stack and rendered in the next frame, so the component that was rendered via
+             * setTimeout appears out-of-sync with the rest of the plot.
+             */
+            function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * Creates shallow copy of the object.
+             * @param {{ [key: string]: any }} oldMap Map to copy
+             *
+             * @returns {[{ [key: string]: any }} coppied object.
+             */
+            function copyObject<T>(oldObject: {
+                [key: string]: T;
+            }): {
+                [key: string]: T;
+            };
+        }
     }
 }
 
@@ -638,6 +514,118 @@ declare module Plottable {
 
 
 declare module Plottable {
+    type Formatter = (d: any) => string;
+    var MILLISECONDS_IN_ONE_DAY: number;
+    module Formatters {
+        /**
+         * Creates a formatter for currency values.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 2).
+         * @param {string} [symbol] The currency symbol to use (default "$").
+         * @param {boolean} [prefix] Whether to prepend or append the currency symbol (default true).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for currency values.
+         */
+        function currency(precision?: number, symbol?: string, prefix?: boolean): (d: any) => string;
+        /**
+         * Creates a formatter that displays exactly [precision] decimal places.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
+         */
+        function fixed(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter that formats numbers to show no more than
+         * [precision] decimal places. All other values are stringified.
+         *
+         * @param {number} [precision] The number of decimal places to show (default 3).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for general values.
+         */
+        function general(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter that stringifies its input.
+         *
+         * @returns {Formatter} A formatter that stringifies its input.
+         */
+        function identity(): (d: any) => string;
+        /**
+         * Creates a formatter for percentage values.
+         * Multiplies the input by 100 and appends "%".
+         *
+         * @param {number} [precision] The number of decimal places to show (default 0).
+         * @param {boolean} [onlyShowUnchanged] Whether to return a value if value changes after formatting (default true).
+         *
+         * @returns {Formatter} A formatter for percentage values.
+         */
+        function percentage(precision?: number): (d: any) => string;
+        /**
+         * Creates a formatter for values that displays [precision] significant figures
+         * and puts SI notation.
+         *
+         * @param {number} [precision] The number of significant figures to show (default 3).
+         *
+         * @returns {Formatter} A formatter for SI values.
+         */
+        function siSuffix(precision?: number): (d: any) => string;
+        /**
+         * Creates a multi time formatter that displays dates.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function multiTime(): (d: any) => string;
+        /**
+         * Creates a time formatter that displays time/date using given specifier.
+         *
+         * List of directives can be found on: https://github.com/mbostock/d3/wiki/Time-Formatting#format
+         *
+         * @param {string} [specifier] The specifier for the formatter.
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function time(specifier: string): Formatter;
+        /**
+         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+         * If the provided TimeInterval is incorrect, the default is d3.time.year
+         */
+        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
+        /**
+         * Creates a formatter for relative dates.
+         *
+         * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
+         * @param {number} increment The unit used in calculating relative date values (default MILLISECONDS_IN_ONE_DAY)
+         * @param {string} label The label to append to the formatted string (default "")
+         *
+         * @returns {Formatter} A formatter for time/date values.
+         */
+        function relativeDate(baseValue?: number, increment?: number, label?: string): (d: any) => string;
+    }
+}
+
+
+declare module Plottable {
+    /**
+     * A SymbolFactory is a function that takes in a symbolSize which is the edge length of the render area
+     * and returns a string representing the 'd' attribute of the resultant 'path' element
+     */
+    type SymbolFactory = (symbolSize: number) => string;
+    module SymbolFactories {
+        type StringAccessor = (datum: any, index: number) => string;
+        function circle(): SymbolFactory;
+        function square(): SymbolFactory;
+        function cross(): SymbolFactory;
+        function diamond(): SymbolFactory;
+        function triangleUp(): SymbolFactory;
+        function triangleDown(): SymbolFactory;
+    }
+}
+
+
+declare module Plottable {
     interface ScaleCallback<S extends Scale<any, any>> {
         (scale: S): any;
     }
@@ -838,7 +826,7 @@ declare module Plottable {
         /**
          * Gets the array of tick values generated by the default algorithm.
          */
-        getDefaultTicks(): D[];
+        defaultTicks(): D[];
         /**
          * Gets an array of tick values spanning the domain.
          *
@@ -881,7 +869,7 @@ declare module Plottable {
             protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             invert(value: number): number;
-            getDefaultTicks(): number[];
+            defaultTicks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
         }
     }
@@ -934,7 +922,7 @@ declare module Plottable {
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             protected _getRange(): number[];
             protected _setRange(values: number[]): void;
-            getDefaultTicks(): number[];
+            defaultTicks(): number[];
         }
     }
 }
@@ -1073,7 +1061,7 @@ declare module Plottable {
             protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             invert(value: number): Date;
-            getDefaultTicks(): Date[];
+            defaultTicks(): Date[];
             protected _niceDomain(domain: Date[]): Date[];
         }
     }
@@ -1178,7 +1166,17 @@ declare module Plottable {
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         constructor(dataset: Dataset);
-        setup(area: d3.Selection<void>): void;
+        /**
+         * Retrieves the renderArea selection for the Drawer.
+         */
+        renderArea(): d3.Selection<void>;
+        /**
+         * Sets the renderArea selection for the Drawer.
+         *
+         * @param {d3.Selection} Selection containing the <g> to render to.
+         * @returns {Drawer} The calling Drawer.
+         */
+        renderArea(area: d3.Selection<void>): Drawer;
         /**
          * Removes the Drawer and its renderArea
          */
@@ -1204,13 +1202,13 @@ declare module Plottable {
          */
         draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
-         * Retrieves the renderArea selection for the drawer
-         *
-         * @returns {d3.Selection} the renderArea selection
+         * Returns the CSS selector for this Drawer's visual elements.
          */
-        _getRenderArea(): d3.Selection<void>;
-        _getSelector(): string;
-        _getSelection(index: number): d3.Selection<any>;
+        selector(): string;
+        /**
+         * Returns the D3 selection corresponding to the datum with the specified index.
+         */
+        selectionForIndex(index: number): d3.Selection<any>;
     }
 }
 
@@ -1220,11 +1218,12 @@ declare module Plottable {
         class Line extends Drawer {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(line: d3.Selection<void>): void;
+            renderArea(): d3.Selection<void>;
+            renderArea(area: d3.Selection<void>): Drawer;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
-            _getSelection(index: number): d3.Selection<void>;
+            selector(): string;
+            selectionForIndex(index: number): d3.Selection<void>;
         }
     }
 }
@@ -1235,9 +1234,10 @@ declare module Plottable {
         class Area extends Line {
             static PATH_CLASS: string;
             protected _enterData(data: any[]): void;
-            setup(area: d3.Selection<void>): void;
+            renderArea(): d3.Selection<void>;
+            renderArea(area: d3.Selection<void>): Drawer;
             protected _drawStep(step: AppliedDrawStep): void;
-            _getSelector(): string;
+            selector(): string;
         }
     }
 }
@@ -1249,7 +1249,7 @@ declare module Plottable {
             protected _svgElement: string;
             protected _drawStep(step: AppliedDrawStep): void;
             protected _enterData(data: any[]): void;
-            _getSelector(): string;
+            selector(): string;
         }
     }
 }
@@ -2325,9 +2325,13 @@ declare module Plottable {
         protected _generateAttrToProjector(): AttributeToProjector;
         renderImmediately(): Plot;
         /**
+         * Returns whether the plot will be animated.
+         */
+        animated(): boolean;
+        /**
          * Enables or disables animation.
          */
-        animate(enabled: boolean): Plot;
+        animated(willAnimate: boolean): Plot;
         detach(): Plot;
         /**
          * Updates the extents associated with each attribute, then autodomains all scales the Plot uses.
@@ -2877,6 +2881,7 @@ declare module Plottable {
             y0(y0: number | Accessor<number>): Area<X>;
             protected _onDatasetUpdate(): void;
             addDataset(dataset: Dataset): Area<X>;
+            protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Area;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -2992,10 +2997,11 @@ declare module Plottable {
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
             /**
              * Given the number of elements, return the total time the animation requires
-             * @param number numberofIterations The number of elements that will be drawn
-             * @returns {any} The time required for the animation
+             *
+             * @param {number} numberofIterations The number of elements that will be drawn
+             * @returns {number}
              */
-            getTiming(numberOfIterations: number): number;
+            totalTime(numberOfIterations: number): number;
         }
         type PlotAnimatorMap = {
             [animatorKey: string]: Plot;
@@ -3011,7 +3017,7 @@ declare module Plottable {
          * immediately set on the selection.
          */
         class Null implements Animators.Plot {
-            getTiming(selection: any): number;
+            totalTime(selection: any): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
         }
     }
@@ -3059,7 +3065,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            getTiming(numberOfIterations: number): number;
+            totalTime(numberOfIterations: number): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
              * Gets the duration of the animation in milliseconds.
@@ -3278,7 +3284,7 @@ declare module Plottable {
              *
              * @return {Point}
              */
-            getLastMousePosition(): {
+            lastMousePosition(): {
                 x: number;
                 y: number;
             };

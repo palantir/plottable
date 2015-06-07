@@ -101,7 +101,7 @@ module Plottable {
 
     protected _createNodesForDataset(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
-      drawer.setup(this._renderArea.append("g"));
+      drawer.renderArea(this._renderArea.append("g"));
       return drawer;
     }
 
@@ -210,10 +210,19 @@ module Plottable {
     }
 
     /**
+     * Returns whether the plot will be animated.
+     */
+    public animated(): boolean;
+    /**
      * Enables or disables animation.
      */
-    public animate(enabled: boolean) {
-      this._animate = enabled;
+    public animated(willAnimate: boolean): Plot;
+    public animated(willAnimate?: boolean): any {
+      if (willAnimate == null) {
+        return this._animate;
+      }
+
+      this._animate = willAnimate;
       return this;
     }
 
@@ -409,7 +418,7 @@ module Plottable {
           dataToDraw.get(ds),
           drawSteps
         ));
-      var maxTime = Utils.Methods.max(times, 0);
+      var maxTime = Utils.Math.max(times, 0);
       this._additionalPaint(maxTime);
     }
 
@@ -426,7 +435,7 @@ module Plottable {
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
+        drawer.renderArea().selectAll(drawer.selector()).each(function() {
           allSelections.push(this);
         });
       });
@@ -455,7 +464,7 @@ module Plottable {
             index: index,
             dataset: dataset,
             position: position,
-            selection: drawer._getSelection(index),
+            selection: drawer.selectionForIndex(index),
             component: this
           });
         });
@@ -477,7 +486,7 @@ module Plottable {
           return;
         }
 
-        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
         if (distanceSquared < closestDistanceSquared) {
           closestDistanceSquared = distanceSquared;
           closest = entity;

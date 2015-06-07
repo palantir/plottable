@@ -176,7 +176,7 @@ export module Components {
       var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
         return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
-      var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
+      var longestUntruncatedRowLength = Utils.Math.max(untruncatedRowLengths, 0);
 
       return {
         minWidth: this._padding + longestUntruncatedRowLength,
