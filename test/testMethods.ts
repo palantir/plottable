@@ -91,7 +91,7 @@ module TestMethods {
     assert.strictEqual(height, String(heightExpected), "height: " + message);
   }
 
-  export function assertEntitiesEqual(actual: Plottable.Plots.Entity, expected: Plottable.Plots.Entity,
+  export function assertPlotEntitiesEqual(actual: Plottable.Plots.PlotEntity, expected: Plottable.Plots.PlotEntity,
       msg: string) {
     assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
     assert.strictEqual(actual.index, expected.index, msg + " (index)");
@@ -102,7 +102,7 @@ module TestMethods {
     actual.selection[0].forEach((element: Element, index: number) => {
       assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
     });
-    assert.strictEqual(actual.plot, expected.plot, msg + " (plot)");
+    assert.strictEqual(actual.component, expected.component, msg + " (plot)");
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {

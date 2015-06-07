@@ -6293,7 +6293,7 @@ var Plottable;
          *
          * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
-         * @return {Plots.Entity[]}
+         * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
@@ -6312,17 +6312,17 @@ var Plottable;
                         dataset: dataset,
                         position: position,
                         selection: drawer._getSelection(index),
-                        plot: _this
+                        component: _this
                     });
                 });
             });
             return entities;
         };
         /**
-         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
@@ -7151,14 +7151,14 @@ var Plottable;
                 }
             };
             /**
-             * Returns the Entity nearest to the query point according to the following algorithm:
-             *   - If the query point is inside a bar, returns the Entity for that bar.
-             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             * Returns the PlotEntity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the PlotEntity for that bar.
+             *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
              *     breaking ties with the secondary direction.
-             * Returns undefined if no Entity can be found.
+             * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Bar.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
@@ -7214,7 +7214,7 @@ var Plottable;
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
             Bar.prototype.entitiesAt = function (p) {
                 return this._entitiesIntersecting(p.x, p.y);
@@ -7544,10 +7544,10 @@ var Plottable;
                 return attrToProjector;
             };
             /**
-             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Line.prototype.entityNearest = function (queryPoint) {
                 var _this = this;

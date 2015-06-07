@@ -258,23 +258,23 @@ describe("Plots", () => {
       });
 
       it("returns nearest Entity", () => {
-        var expected = {
+        var expected: Plottable.Plots.PlotEntity = {
           datum: d0,
           index: 0,
           dataset: dataset2,
           position: d0Px,
           selection: d3.selectAll([lines[0][1]]),
-          plot: linePlot
+          component: linePlot
         };
 
         var closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
-        TestMethods.assertEntitiesEqual(closest, expected, "if above a point, it is closest");
+        TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
 
         closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
-        TestMethods.assertEntitiesEqual(closest, expected, "if below a point, it is closest");
+        TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a point, it is closest");
 
         closest = linePlot.entityNearest({x: d0Px.x + 1, y: d0Px.y + 1});
-        TestMethods.assertEntitiesEqual(closest, expected, "if right of a point, it is closest");
+        TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a point, it is closest");
 
         expected = {
           datum: d1,
@@ -282,11 +282,11 @@ describe("Plots", () => {
           dataset: dataset2,
           position: d1Px,
           selection: d3.selectAll([lines[0][1]]),
-          plot: linePlot
+          component: linePlot
         };
 
         closest = linePlot.entityNearest({x: d1Px.x - 1, y: d1Px.y});
-        TestMethods.assertEntitiesEqual(closest, expected, "if left of a point, it is closest");
+        TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a point, it is closest");
 
         svg.remove();
       });
@@ -294,7 +294,7 @@ describe("Plots", () => {
       it("considers only in-view points", () => {
         xScale.domain([0.25, 1]);
 
-        var expected = {
+        var expected: Plottable.Plots.PlotEntity = {
           datum: d1,
           index: 1,
           dataset: dataset2,
@@ -303,11 +303,11 @@ describe("Plots", () => {
             y: yScale.scale(yAccessor(d1))
           },
           selection: d3.selectAll([lines[0][1]]),
-          plot: linePlot
+          component: linePlot
         };
 
         var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
-        TestMethods.assertEntitiesEqual(closest, expected, "only in-view points are considered");
+        TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
       });

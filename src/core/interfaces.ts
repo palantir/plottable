@@ -46,4 +46,12 @@ module Plottable {
     topLeft: Point;
     bottomRight: Point;
   };
+
+  export interface Entity<C extends Component> {
+    datum: any;
+    index: number;
+    position: Point;
+    selection: d3.Selection<any>;
+    component: C;
+  }
 }
