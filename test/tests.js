@@ -87,17 +87,21 @@ var TestMethods;
         assert.strictEqual(height, String(heightExpected), "height: " + message);
     }
     TestMethods.assertWidthHeight = assertWidthHeight;
-    function assertPlotEntitiesEqual(actual, expected, msg) {
+    function assertEntitiesEqual(actual, expected, msg) {
         assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
         assert.strictEqual(actual.index, expected.index, msg + " (index)");
-        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
         assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
         assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
-        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection contents)");
+        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
         actual.selection[0].forEach(function (element, index) {
             assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
         });
-        assert.strictEqual(actual.component, expected.component, msg + " (plot)");
+        assert.strictEqual(actual.component, expected.component, msg + " (component)");
+    }
+    TestMethods.assertEntitiesEqual = assertEntitiesEqual;
+    function assertPlotEntitiesEqual(actual, expected, msg) {
+        assertEntitiesEqual(actual, expected, msg);
+        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
     }
     TestMethods.assertPlotEntitiesEqual = assertPlotEntitiesEqual;
     function makeLinearSeries(n) {
@@ -1557,6 +1561,7 @@ describe("Legend", function () {
     var color;
     var legend;
     var entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
+    var symbolSelector = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
     var rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = TestMethods.generateSVG(400, 400);
@@ -1739,23 +1744,79 @@ describe("Legend", function () {
         assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth, "won't settle for less width if entries would be truncated");
         svg.remove();
     });
-    it("getEntry() retrieves the correct entry for vertical legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(1);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 10, y: 150 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
-    });
-    it("getEntry() retrieves the correct entry for horizontal legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(Infinity);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 150, y: 10 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
+    describe("entitiesAt()", function () {
+        function computeExpectedSymbolPosition(symbol) {
+            var symbolBCR = symbol.getBoundingClientRect();
+            var legendBCR = legend.background().node().getBoundingClientRect();
+            return {
+                x: (symbolBCR.left + symbolBCR.right) / 2 - legendBCR.left,
+                y: (symbolBCR.top + symbolBCR.bottom) / 2 - legendBCR.top
+            };
+        }
+        it("gets Entities representing the entry at a particular point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var symbols = entries.selectAll(symbolSelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(symbols[0][0]),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 10, y: 30 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(symbols[1][0]),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            legend.detach();
+            entities = legend.entitiesAt({ x: 10, y: 10 });
+            assert.lengthOf(entities, 0, "returns no Entities if not anchored");
+            svg.remove();
+        });
+        it("gets Entities representing the entry at a particular point (maxEntriesPerRow > 1)", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.maxEntriesPerRow(Infinity);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var symbols = entries.selectAll(symbolSelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(symbols[0][0]),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 50, y: 10 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(symbols[1][0]),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            svg.remove();
+        });
+        it("returns an empty array if no Entitites are present at that point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: -100, y: -100 });
+            assert.lengthOf(entities, 0, "no Entities returned if there are no entries at that point");
+            svg.remove();
+        });
     });
     it("comparator() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];

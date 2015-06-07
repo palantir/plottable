@@ -1993,13 +1993,13 @@ declare module Plottable {
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the entry under at given pixel position.
-             * Returns an empty Selection if no entry exists at that pixel position.
+             * Gets the Entities (representing Legend entries) at a particular point.
+             * Returns an empty array if no Entities are present at that location.
              *
-             * @param {Point} position
-             * @returns {d3.Selection}
+             * @param {Point} p
+             * @returns {Entity<Legend>[]}
              */
-            getEntry(position: Point): d3.Selection<void>;
+            entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
              * Gets the SymbolFactory accessor of the Legend.

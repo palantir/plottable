@@ -5073,33 +5073,46 @@ var Plottable;
                 return rows;
             };
             /**
-             * Gets the entry under at given pixel position.
-             * Returns an empty Selection if no entry exists at that pixel position.
+             * Gets the Entities (representing Legend entries) at a particular point.
+             * Returns an empty array if no Entities are present at that location.
              *
-             * @param {Point} position
-             * @returns {d3.Selection}
+             * @param {Point} p
+             * @returns {Entity<Legend>[]}
              */
-            Legend.prototype.getEntry = function (position) {
+            Legend.prototype.entitiesAt = function (p) {
                 if (!this._isSetup) {
-                    return d3.select(null);
+                    return [];
                 }
-                var entry = d3.select(null);
+                var entities = [];
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
+                var domain = this._scale.domain();
+                var legend = this;
                 this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
+                    var symbolY = (lowY + highY) / 2;
                     var lowX = legendPadding;
                     var highX = legendPadding;
                     d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
-                        if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
-                            entry = d3.select(this);
+                        var symbolX = lowX + layout.textHeight / 2;
+                        if (highX >= p.x && lowX <= p.x && highY >= p.y && lowY <= p.y) {
+                            var entrySelection = d3.select(this);
+                            var datum = entrySelection.datum();
+                            var index = domain.indexOf(datum);
+                            entities.push({
+                                datum: datum,
+                                index: index,
+                                position: { x: symbolX, y: symbolY },
+                                selection: entrySelection,
+                                component: legend
+                            });
                         }
                         lowX += layout.entryLengths.get(value);
                     });
                 });
-                return entry;
+                return entities;
             };
             Legend.prototype.renderImmediately = function () {
                 var _this = this;
