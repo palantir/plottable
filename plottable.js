@@ -8177,7 +8177,7 @@ var Plottable;
             Base.prototype.totalTime = function (numberOfIterations) {
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
                 var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
+                var time = adjustedIterativeDelay * (numberOfIterations - 1) + this.delay() + this.duration();
                 return time;
             };
             Base.prototype.animate = function (selection, attrToAppliedProjector) {

@@ -410,6 +410,26 @@ describe("Drawers", function () {
             assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
             svg.remove();
         });
+        it("totalDrawTime()", function () {
+            var svg = TestMethods.generateSVG(300, 300);
+            var drawer = new Plottable.Drawer(null);
+            var dataObjects = 9;
+            var stepDuration = 987;
+            var stepDelay = 133;
+            var startDelay = 245;
+            var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+            var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+            var attrToProjector = null;
+            var animator = new Plottable.Animators.Base();
+            animator.maxTotalDuration(Infinity);
+            animator.duration(stepDuration);
+            animator.maxIterativeDelay(stepDelay);
+            animator.delay(startDelay);
+            var mockDrawStep = [{ attrToProjector: attrToProjector, animator: animator }];
+            var drawTime = drawer.totalDrawTime(data, mockDrawStep);
+            assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
+            svg.remove();
+        });
     });
 });
 
