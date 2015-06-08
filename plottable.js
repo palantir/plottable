@@ -8007,19 +8007,6 @@ var Plottable;
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
-            StackedBar.prototype._getAnimator = function (key) {
-                if (this._animate && this._animateOnNextRender) {
-                    if (this.animator(key)) {
-                        return this.animator(key);
-                    }
-                    else if (key === "stacked-bar") {
-                        var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                        var scaledBaseline = primaryScale.scale(this.baselineValue());
-                        return new Plottable.Animators.Rectangle(scaledBaseline, this._isVertical);
-                    }
-                }
-                return new Plottable.Animators.Null();
-            };
             StackedBar.prototype.x = function (x, xScale) {
                 if (x == null) {
                     return _super.prototype.x.call(this);
@@ -8062,9 +8049,6 @@ var Plottable;
                 var attrFunction = function (d, i, dataset) { return +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset); };
                 attrToProjector[valueAttr] = function (d, i, dataset) { return _this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset); };
                 return attrToProjector;
-            };
-            StackedBar.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
             };
             StackedBar.prototype._onDatasetUpdate = function () {
                 this._updateStackExtentsAndOffsets();
@@ -8246,43 +8230,6 @@ var Plottable;
             return Base;
         })();
         Animators.Base = Base;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        var Rectangle = (function (_super) {
-            __extends(Rectangle, _super);
-            function Rectangle(startPixelValue, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this);
-                this._isVertical = isVertical;
-                this._startPixelValue = startPixelValue;
-            }
-            Rectangle.prototype.animate = function (selection, attrToAppliedProjector) {
-                var _this = this;
-                var startAttrToAppliedProjector = {};
-                Rectangle.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
-                var movingAttribute = this._isVertical ? "y" : "x";
-                startAttrToAppliedProjector[movingAttribute] = function () { return _this._startPixelValue; };
-                var growingAttribute = this._isVertical ? "height" : "width";
-                startAttrToAppliedProjector[growingAttribute] = function () { return 0; };
-                selection.attr(attrToAppliedProjector);
-                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
-            };
-            Rectangle.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
-            return Rectangle;
-        })(Animators.Base);
-        Animators.Rectangle = Rectangle;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 

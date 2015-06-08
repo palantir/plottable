@@ -2959,7 +2959,6 @@ declare module Plottable {
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
-            protected _getAnimator(key: string): Animators.Plot;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedBar<X, Y>;
             x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
@@ -2969,7 +2968,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
@@ -3129,17 +3127,6 @@ declare module Plottable {
              * @returns {Base} The calling Base Animator.
              */
             maxTotalDuration(maxDuration: number): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        class Rectangle extends Base {
-            static ANIMATED_ATTRIBUTES: string[];
-            constructor(startPixelValue: number, isVertical?: boolean);
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
         }
     }
 }
