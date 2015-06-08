@@ -3141,11 +3141,6 @@ declare module Plottable {
          */
         class Rect extends Base {
             static ANIMATED_ATTRIBUTES: string[];
-            isVertical: boolean;
-            /**
-             * The pixel value to move from
-             */
-            startPixelValue: number;
             constructor(startPixelValue: number, isVertical?: boolean);
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
         }

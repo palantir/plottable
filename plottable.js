@@ -8268,16 +8268,16 @@ var Plottable;
             function Rect(startPixelValue, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this);
-                this.isVertical = isVertical;
-                this.startPixelValue = startPixelValue;
+                this._isVertical = isVertical;
+                this._startPixelValue = startPixelValue;
             }
             Rect.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var startAttrToAppliedProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
-                var movingAttribute = this.isVertical ? "y" : "x";
-                startAttrToAppliedProjector[movingAttribute] = function () { return _this.startPixelValue; };
-                var growingAttribute = this.isVertical ? "height" : "width";
+                var movingAttribute = this._isVertical ? "y" : "x";
+                startAttrToAppliedProjector[movingAttribute] = function () { return _this._startPixelValue; };
+                var growingAttribute = this._isVertical ? "height" : "width";
                 startAttrToAppliedProjector[growingAttribute] = function () { return 0; };
                 selection.attr(attrToAppliedProjector);
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
