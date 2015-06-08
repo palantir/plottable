@@ -3,11 +3,21 @@
 var assert = chai.assert;
 
 describe("TimeScale tests", () => {
+    it.skip("extentOfValues() filters out invalid Dates", () => {
+      var scale = new Plottable.Scales.Time();
+      var expectedExtent = [new Date("2015-06-05"), new Date("2015-06-04")];
+      var arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string",
+        0, new Date("2015-06-05"), new Date("2015-06-04")];
+      var extent = scale.extentOfValues(arrayWithBadValues);
+      assert.strictEqual(extent[0].getTime(), expectedExtent[0].getTime(), "returned correct min");
+      assert.strictEqual(extent[1].getTime(), expectedExtent[1].getTime(), "returned correct max");
+    });
+
   it("can be padded", () => {
     var scale = new Plottable.Scales.Time();
     scale.padProportion(0);
     var unpaddedDomain = scale.domain();
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [unpaddedDomain]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => unpaddedDomain);
     scale.padProportion(0.1);
     assert.operator(scale.domain()[0].getTime(), "<", unpaddedDomain[0].getTime(), "left side of domain was padded");
     assert.operator(scale.domain()[1].getTime(), ">", unpaddedDomain[1].getTime(), "right side of domain was padded");
@@ -17,14 +27,13 @@ describe("TimeScale tests", () => {
     var scale = new Plottable.Scales.Time();
     var minValue = new Date(2000, 5, 4);
     var maxValue = new Date(2000, 5, 6);
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [[minValue, maxValue]]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => [minValue, maxValue]);
     scale.padProportion(0.1);
     assert.operator(scale.domain()[0].getTime(), "<", minValue.getTime(), "left side of domain is normally padded");
     assert.operator(scale.domain()[1].getTime(), ">", maxValue.getTime(), "right side of domain is normally padded");
-    var exceptionKey = "unitTests";
-    scale.addPaddingException(exceptionKey, minValue);
+    scale.addPaddingExceptionsProvider(() => [minValue]);
     assert.strictEqual(scale.domain()[0].getTime(), minValue.getTime(), "left side of domain isn't padded if it matches the exception");
-    scale.addPaddingException(exceptionKey, maxValue);
+    scale.addPaddingExceptionsProvider(() => [maxValue]);
     assert.strictEqual(scale.domain()[1].getTime(), maxValue.getTime(), "right side of domain isn't padded if it matches the exception");
   });
 
@@ -34,7 +43,7 @@ describe("TimeScale tests", () => {
     var singleValue = new Date(2000, 5, 5);
     var dayBefore = new Date(2000, 5, 4);
     var dayAfter = new Date(2000, 5, 6);
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [[singleValue, singleValue]]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => [singleValue, singleValue]);
     scale.autoDomain();
     var domain = scale.domain();
     assert.strictEqual(domain[0].getTime(), dayBefore.getTime(), "left side of domain was expaded by one day");
@@ -50,7 +59,7 @@ describe("TimeScale tests", () => {
     var scale = new Plottable.Scales.Time();
     scale.padProportion(0);
     var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain);
 
     var minBelowBottom = new Date("2015-04-01");
     scale.domainMin(minBelowBottom);
@@ -76,7 +85,7 @@ describe("TimeScale tests", () => {
 
     scale.domainMin(minInMiddle);
     var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain2]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain2);
     assert.strictEqual(scale.domain()[0].getTime(), minInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMin()");
   });
 
@@ -84,7 +93,7 @@ describe("TimeScale tests", () => {
     var scale = new Plottable.Scales.Time();
     scale.padProportion(0);
     var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain);
 
     var maxAboveTop = new Date("2015-08-01");
     scale.domainMax(maxAboveTop);
@@ -110,7 +119,7 @@ describe("TimeScale tests", () => {
 
     scale.domainMax(maxInMiddle);
     var requestedDomain2 = [new Date("2014-05-01"), new Date("2016-07-01")];
-    scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain2]);
+    scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain2);
     assert.strictEqual(scale.domain()[1].getTime(), maxInMiddle.getTime(), "adding another ExtentsProvider doesn't change domainMax()");
   });
 
@@ -118,7 +127,7 @@ describe("TimeScale tests", () => {
       var scale = new Plottable.Scales.Time();
       scale.padProportion(0);
     var requestedDomain = [new Date("2015-05-01"), new Date("2015-07-01")];
-      scale.addExtentsProvider((scale: Plottable.Scales.Time) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Time) => requestedDomain);
 
       var desiredMin = new Date("2015-04-01");
       var desiredMax = new Date("2015-08-01");

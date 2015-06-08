@@ -63,12 +63,12 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: D3.Selection): boolean {
+    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
       var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = selection[0][0].getBBox();
+      var bbox = Utils.DOM.getBBox(selection);
       var translatedBbox: SVGRect = {
         x: bbox.x + translation[0],
         y: bbox.y + translation[1],
@@ -76,7 +76,7 @@ export module Plots {
         height: bbox.height
       };
 
-      return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     protected _propertyProjectors(): AttributeToProjector {

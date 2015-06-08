@@ -5,6 +5,7 @@ export module Plots {
   export class Area<X> extends Line<X> {
     private static _Y0_KEY = "y0";
     private _lineDrawers: Utils.Map<Dataset, Drawers.Line>;
+    private _constantBaselineValueProvider: () => number[];
 
     /**
      * An Area Plot draws a filled region (area) between Y and Y0.
@@ -26,7 +27,7 @@ export module Plots {
 
     protected _setup() {
       super._setup();
-      this._lineDrawers.forEach((d) => d.setup(this._renderArea.append("g")));
+      this._lineDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
     }
 
     public y(): Plots.AccessorScaleBinding<number, number>;
@@ -85,20 +86,22 @@ export module Plots {
     public addDataset(dataset: Dataset) {
       var lineDrawer = new Drawers.Line(dataset);
       if (this._isSetup) {
-        lineDrawer.setup(this._renderArea.append("g"));
+        lineDrawer.renderArea(this._renderArea.append("g"));
       }
       this._lineDrawers.set(dataset, lineDrawer);
       super.addDataset(dataset);
       return this;
     }
 
+    protected _removeDatasetNodes(dataset: Dataset) {
+      super._removeDatasetNodes(dataset);
+      this._lineDrawers.get(dataset).remove();
+    }
+
     protected _additionalPaint() {
       var drawSteps = this._generateLineDrawSteps();
       var dataToDraw = this._getDataToDraw();
-      this._datasetKeysInOrder.forEach((k, i) => {
-        var dataset = this._key2PlotDatasetKey.get(k).dataset;
-        this._lineDrawers.get(dataset).draw(dataToDraw.get(k), drawSteps);
-      });
+      this.datasets().forEach((dataset) => this._lineDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
     }
 
     private _generateLineDrawSteps() {
@@ -139,8 +142,8 @@ export module Plots {
 
     protected _updateYScale() {
       var extents = this._propertyExtents.get("y0");
-      var extent = Utils.Methods.flatten<number>(extents);
-      var uniqExtentVals = Utils.Methods.uniq<number>(extent);
+      var extent = Utils.Array.flatten<number>(extents);
+      var uniqExtentVals = Utils.Array.uniq<number>(extent);
       var constantBaseline = uniqExtentVals.length === 1 ? uniqExtentVals[0] : null;
 
       var yBinding = this.y();
@@ -149,10 +152,14 @@ export module Plots {
         return;
       }
 
+      if (this._constantBaselineValueProvider != null) {
+        yScale.removePaddingExceptionsProvider(this._constantBaselineValueProvider);
+        this._constantBaselineValueProvider = null;
+      }
+
       if (constantBaseline != null) {
-        yScale.addPaddingException(this, constantBaseline);
-      } else {
-        yScale.removePaddingException(this);
+        this._constantBaselineValueProvider = () => [constantBaseline];
+        yScale.addPaddingExceptionsProvider(this._constantBaselineValueProvider);
       }
     }
 
@@ -172,15 +179,15 @@ export module Plots {
       var allSelections = super.getAllSelections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
-      lineDrawers.forEach((ld, i) => allSelections.push(ld._getSelection(i).node()));
+      lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
       return d3.selectAll(allSelections);
     }
 
-    protected _constructAreaProjector(xProjector: _Projector, yProjector: _Projector, y0Projector: _Projector) {
+    protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector) {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return Utils.Methods.isValidNumber(positionX) && Utils.Methods.isValidNumber(positionY);
+        return Utils.Math.isValidNumber(positionX) && Utils.Math.isValidNumber(positionY);
       };
       return (datum: any[], index: number, dataset: Dataset) => {
         var areaGenerator = d3.svg.area()
@@ -188,7 +195,7 @@ export module Plots {
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
-        return areaGenerator(datum, index);
+        return areaGenerator(datum);
       };
     }
   }

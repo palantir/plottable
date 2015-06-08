@@ -62,7 +62,7 @@ export module Components {
 
     /**
      * Gets the maximum number of entries per row.
-     * 
+     *
      * @returns {number}
      */
     public maxEntriesPerRow(): number;
@@ -85,7 +85,7 @@ export module Components {
 
     /**
      * Gets the current comparator for the Legend's entries.
-     * 
+     *
      * @returns {(a: string, b: string) => number}
      */
     public comparator(): (a: string, b: string) => number;
@@ -145,8 +145,8 @@ export module Components {
       var entryNames = this._scale.domain().slice();
       entryNames.sort(this.comparator());
 
-      var entryLengths: D3.Map<number> = d3.map();
-      var untruncatedEntryLengths: D3.Map<number> = d3.map();
+      var entryLengths: d3.Map<number> = d3.map<number>();
+      var untruncatedEntryLengths: d3.Map<number> = d3.map<number>();
       entryNames.forEach((entryName) => {
         var untruncatedEntryLength = textHeight + this._measurer.measure(entryName).width + this._padding;
         var entryLength = Math.min(untruncatedEntryLength, availableWidthForEntries);
@@ -176,7 +176,7 @@ export module Components {
       var untruncatedRowLengths = estimatedLayout.rows.map((row) => {
         return d3.sum(row, (entry) => estimatedLayout.untruncatedEntryLengths.get(entry));
       });
-      var longestUntruncatedRowLength = Utils.Methods.max(untruncatedRowLengths, 0);
+      var longestUntruncatedRowLength = Utils.Math.max(untruncatedRowLengths, 0);
 
       return {
         minWidth: this._padding + longestUntruncatedRowLength,
@@ -184,7 +184,7 @@ export module Components {
       };
     }
 
-    private _packRows(availableWidth: number, entries: string[], entryLengths: D3.Map<number>) {
+    private _packRows(availableWidth: number, entries: string[], entryLengths: d3.Map<number>) {
       var rows: string[][] = [];
       var currentRow: string[] = [];
       var spaceLeft = availableWidth;
@@ -210,14 +210,14 @@ export module Components {
      * Returns an empty Selection if no entry exists at that pixel position.
      *
      * @param {Point} position
-     * @returns {D3.Selection}
+     * @returns {d3.Selection}
      */
-    public getEntry(position: Point): D3.Selection {
+    public getEntry(position: Point): d3.Selection<void> {
       if (!this._isSetup) {
-        return d3.select();
+        return d3.select(null);
       }
 
-      var entry = d3.select();
+      var entry = d3.select(null);
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
       this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {

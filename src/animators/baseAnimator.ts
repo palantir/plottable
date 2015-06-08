@@ -56,14 +56,14 @@ export module Animators {
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
-    public getTiming(numberOfIterations: number) {
+    public totalTime(numberOfIterations: number) {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
       var time = adjustedIterativeDelay * numberOfIterations + this.delay() + this.duration();
       return time;
     }
 
-    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Transition.Transition {
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
       var numberOfIterations = selection[0].length;
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
@@ -72,7 +72,7 @@ export module Animators {
         .ease(this.easing())
         .duration(this.duration())
         .delay((d: any, i: number) => this.delay() + adjustedIterativeDelay * i)
-        .attr(attrToProjector);
+        .attr(attrToAppliedProjector);
     }
 
     /**

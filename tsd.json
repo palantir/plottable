@@ -8,13 +8,13 @@
       "commit": "16dd1ab76fb4c65e532ca820dd45c875636521b6"
     },
     "d3/d3.d.ts": {
-      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
+      "commit": "8ebc099072402b1a80d205c3eece59bed963ad87"
     },
     "mocha/mocha.d.ts": {
-      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
+      "commit": "484544d14d400190b20f270341c97b16adc0f1ef"
     },
     "jquery/jquery.d.ts": {
-      "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"
+      "commit": "484544d14d400190b20f270341c97b16adc0f1ef"
     },
     "jquery.simulate/jquery.simulate.d.ts": {
       "commit": "70737c2a2496f7a13c4da63eb00081cad94d19f1"

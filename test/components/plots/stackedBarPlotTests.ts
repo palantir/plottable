@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Stacked Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Category;
@@ -48,7 +48,7 @@ describe("Plots", () => {
       renderer.addDataset(dataset2);
       renderer.x((d) => d.x, xScale);
       renderer.y((d) => d.y, yScale);
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[renderer], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -76,7 +76,7 @@ describe("Plots", () => {
       assert.closeTo(TestMethods.numAttr(bar2, "height"), (400 - axisHeight) / 3 * 2, 0.01, "height is correct for bar2");
       assert.closeTo(TestMethods.numAttr(bar3, "height"), (400 - axisHeight) / 3, 0.01, "height is correct for bar3");
       // check that bar is aligned on the center of the scale
-      var centerX = (selection: D3.Selection) => TestMethods.numAttr(selection, "x") + TestMethods.numAttr(selection, "width") / 2;
+      var centerX = (selection: d3.Selection<void>) => TestMethods.numAttr(selection, "x") + TestMethods.numAttr(selection, "width") / 2;
       assert.closeTo(centerX(bar0), xScale.scale(bar0X), 0.01, "x pos correct for bar0");
       assert.closeTo(centerX(bar1), xScale.scale(bar1X), 0.01, "x pos correct for bar1");
       assert.closeTo(centerX(bar2), xScale.scale(bar2X), 0.01, "x pos correct for bar2");
@@ -135,7 +135,7 @@ describe("Plots", () => {
   });
 
   describe("Stacked Bar Plot Negative Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Category;
     var yScale: Plottable.Scales.Linear;
     var plot: Plottable.Plots.StackedBar<string, number>;
@@ -172,7 +172,7 @@ describe("Plots", () => {
       plot.addDataset(new Plottable.Dataset(data4));
       plot.x((d) => d.x, xScale);
       plot.y((d) => d.y, yScale);
-      plot.baseline(0);
+      plot.baselineValue(0);
       var xAxis = new Plottable.Axes.Category(xScale, "bottom");
       new Plottable.Components.Table([[plot], [xAxis]]).renderTo(svg);
       axisHeight = xAxis.height();
@@ -206,7 +206,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Stacked Bar Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Linear;
@@ -239,7 +239,7 @@ describe("Plots", () => {
       renderer.x((d) => d.y, xScale);
       renderer.addDataset(new Plottable.Dataset(data1));
       renderer.addDataset(new Plottable.Dataset(data2));
-      renderer.baseline(0);
+      renderer.baselineValue(0);
       var yAxis = new Plottable.Axes.Category(yScale, "left");
       new Plottable.Components.Table([[yAxis, renderer]]).renderTo(svg);
       rendererWidth = renderer.width();
@@ -269,7 +269,7 @@ describe("Plots", () => {
       var bar3Y = bar3.data()[0].name;
 
       // check that bar is aligned on the center of the scale
-      var centerY = (selection: D3.Selection) => TestMethods.numAttr(selection, "y") + TestMethods.numAttr(selection, "height") / 2;
+      var centerY = (selection: d3.Selection<void>) => TestMethods.numAttr(selection, "y") + TestMethods.numAttr(selection, "height") / 2;
       assert.closeTo(centerY(bar0), yScale.scale(bar0Y), 0.01, "y pos correct for bar0");
       assert.closeTo(centerY(bar1), yScale.scale(bar1Y), 0.01, "y pos correct for bar1");
       assert.closeTo(centerY(bar2), yScale.scale(bar2Y), 0.01, "y pos correct for bar2");
@@ -284,7 +284,7 @@ describe("Plots", () => {
   });
 
   describe("Stacked Bar Plot Weird Values", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.StackedBar<string, number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -345,7 +345,7 @@ describe("Plots", () => {
   });
 
   describe("Horizontal Stacked Bar Plot Non-Overlapping Datasets", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var plot: Plottable.Plots.StackedBar<number, string>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -430,8 +430,8 @@ describe("Plots", () => {
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
 
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
     });
 
     it("bad values on the primary axis should default to 0 (be ignored)", () => {

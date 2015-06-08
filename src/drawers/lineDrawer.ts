@@ -5,18 +5,24 @@ export module Drawers {
   export class Line extends Drawer {
     public static PATH_CLASS = "line";
 
-    private _pathSelection: D3.Selection;
+    private _pathSelection: d3.Selection<void>;
 
     protected _enterData(data: any[]) {
       super._enterData(data);
       this._pathSelection.datum(data);
     }
 
-    public setup(line: D3.Selection) {
-      this._pathSelection = line.append("path")
+    public renderArea(): d3.Selection<void>;
+    public renderArea(area: d3.Selection<void>): Drawer;
+    public renderArea(area?: d3.Selection<void>): any {
+      if (area == null) {
+        return super.renderArea();
+      }
+      super.renderArea(area);
+      this._pathSelection = area.append("path")
                                 .classed(Line.PATH_CLASS, true)
                                 .style("fill", "none");
-      super.setup(line);
+      return this;
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {
@@ -24,17 +30,17 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <AttributeToAppliedProjector>Utils.Methods.copyMap(step.attrToProjector);
+      var attrToProjector = <AttributeToAppliedProjector>Utils.Window.copyObject(step.attrToAppliedProjector);
       step.animator.animate(this._pathSelection, attrToProjector);
       this._pathSelection.classed(Line.PATH_CLASS, true);
     }
 
-    public _getSelector() {
+    public selector() {
       return "." + Line.PATH_CLASS;
     }
 
-    public _getSelection(index: number): D3.Selection {
-      return this._getRenderArea().select(this._getSelector());
+    public selectionForIndex(index: number) {
+      return this.renderArea().select(this.selector());
     }
   }
 }

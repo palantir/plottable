@@ -9,11 +9,11 @@ export module Animators {
    */
   export class Null implements Animators.Plot {
 
-    public getTiming(selection: any) {
+    public totalTime(selection: any) {
       return 0;
     }
-    public animate(selection: any, attrToProjector: AttributeToProjector): D3.Selection {
-      return selection.attr(attrToProjector);
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+      return selection.attr(attrToAppliedProjector);
     }
   }
 

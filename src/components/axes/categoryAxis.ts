@@ -10,7 +10,7 @@ export module Axes {
 
     /**
      * Constructs a Category Axis.
-     * 
+     *
      * A Category Axis is a visual representation of a Category Scale.
      *
      * @constructor
@@ -84,9 +84,9 @@ export module Axes {
 
     /**
      * Measures the size of the ticks while also writing them to the DOM.
-     * @param {D3.Selection} ticks The tick elements to be written to.
+     * @param {d3.Selection} ticks The tick elements to be written to.
      */
-    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: D3.Selection) {
+    private _drawTicks(axisWidth: number, axisHeight: number, scale: Scales.Category, ticks: d3.Selection<string>) {
       var self = this;
       var xAlign: {[s: string]: string};
       var yAlign: {[s: string]: string};
@@ -159,8 +159,8 @@ export module Axes {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
+      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
+      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);

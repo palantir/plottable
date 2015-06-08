@@ -4,6 +4,14 @@ var assert = chai.assert;
 
 describe("Scales", () => {
   describe("Linear Scales", () => {
+    it("extentOfValues() filters out invalid numbers", () => {
+      var scale = new Plottable.Scales.Linear();
+      var expectedExtent = [0, 1];
+      var arrayWithBadValues: any[] = [null, NaN, undefined, Infinity, -Infinity, "a string", 0, 1];
+      var extent = scale.extentOfValues(arrayWithBadValues);
+      assert.deepEqual(extent, expectedExtent, "invalid values were filtered out");
+    });
+
     it("autoDomain() defaults to [0, 1]", () => {
       var scale = new Plottable.Scales.Linear();
       scale.autoDomain();
@@ -15,7 +23,7 @@ describe("Scales", () => {
     it("autoDomain() expands single value to [value - 1, value + 1]", () => {
       var scale = new Plottable.Scales.Linear();
       var singleValue = 15;
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [[singleValue, singleValue]]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => [singleValue, singleValue]);
       assert.deepEqual(scale.domain(), [singleValue - 1, singleValue + 1], "single-value extent was expanded");
     });
 
@@ -23,7 +31,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var minBelowBottom = -10;
       scale.domainMin(minBelowBottom);
@@ -45,7 +53,7 @@ describe("Scales", () => {
 
       scale.domainMin(minInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
       assert.deepEqual(scale.domain(), [minInMiddle, requestedDomain2[1]], "adding another ExtentsProvider doesn't change domainMin()");
     });
 
@@ -53,7 +61,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var maxAboveTop = 10;
       scale.domainMax(maxAboveTop);
@@ -75,7 +83,7 @@ describe("Scales", () => {
 
       scale.domainMax(maxInMiddle);
       var requestedDomain2 = [-10, 10];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain2]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain2);
       assert.deepEqual(scale.domain(), [requestedDomain2[0], maxInMiddle], "adding another ExtentsProvider doesn't change domainMax()");
     });
 
@@ -83,7 +91,7 @@ describe("Scales", () => {
       var scale = new Plottable.Scales.Linear();
       scale.padProportion(0);
       var requestedDomain = [-5, 5];
-      scale.addExtentsProvider((scale: Plottable.Scales.Linear) => [requestedDomain]);
+      scale.addIncludedValuesProvider((scale: Plottable.Scales.Linear) => requestedDomain);
 
       var desiredMin = -10;
       var desiredMax = 10;
@@ -117,9 +125,67 @@ describe("Scales", () => {
       scale.domain([0, 10]);
       var ticks = scale.ticks();
       assert.closeTo(ticks.length, 10, 1, "ticks were generated correctly with default generator");
-      scale.tickGenerator((scale) => scale.getDefaultTicks().filter(tick => tick % 3 === 0));
+      scale.tickGenerator((scale) => scale.defaultTicks().filter(tick => tick % 3 === 0));
       ticks = scale.ticks();
       assert.deepEqual(ticks, [0, 3, 6, 9], "ticks were generated correctly with custom generator");
+    });
+
+    describe("Padding exceptions", () => {
+      it("addPaddingExceptionsProvider() works as expected on one end", () => {
+        var scale = new Plottable.Scales.Linear();
+        scale.addIncludedValuesProvider(() => [10, 13]);
+        assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is padded");
+
+        scale.addPaddingExceptionsProvider(() => [11]);
+        assert.strictEqual(scale.domain()[0], 9.5, "The left side of the domain is not changed");
+
+        scale.addPaddingExceptionsProvider(() => [10]);
+        assert.strictEqual(scale.domain()[0], 10, "The left side of the domain is no longer padded");
+      });
+
+      it("addPaddingExceptionsProvider() works as expected on both ends", () => {
+        var scale = new Plottable.Scales.Linear();
+        scale.addIncludedValuesProvider(() => [10, 13]);
+        assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+
+        scale.addPaddingExceptionsProvider(() => [0.9, 11, 12, 13.5]);
+        assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain padding has not changed");
+
+        scale.addPaddingExceptionsProvider(() => [13]);
+        assert.deepEqual(scale.domain(), [9.5, 13], "The right side of the domain is no longer padded");
+
+        scale.addPaddingExceptionsProvider(() => [10, 13]);
+        assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+      });
+
+      it("removePaddingExceptionsProvider() works as expected", () => {
+        var scale = new Plottable.Scales.Linear();
+        scale.addIncludedValuesProvider(() => [10, 13]);
+
+        var paddingExceptionProviderLeft = () => [10];
+        var paddingExceptionProviderBoth = () => [10, 13];
+
+        assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded");
+
+        scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+        assert.deepEqual(scale.domain(), [10, 13.5], "The left side of the domain is no longer padded");
+
+        scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+        assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+
+        scale.removePaddingExceptionsProvider(paddingExceptionProviderBoth);
+        assert.deepEqual(scale.domain(), [10, 13.5], "The left side of domain is still padded, right is not");
+
+        scale.removePaddingExceptionsProvider(paddingExceptionProviderLeft);
+        assert.deepEqual(scale.domain(), [9.5, 13.5], "The domain is padded again");
+
+        scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+        scale.addPaddingExceptionsProvider(paddingExceptionProviderBoth);
+        assert.deepEqual(scale.domain(), [10, 13], "The domain is no longer padded");
+
+        scale.addPaddingExceptionsProvider(paddingExceptionProviderLeft);
+        assert.deepEqual(scale.domain(), [10, 13], "The domain is still no longer padded");
+      });
     });
 
     describe("autoranging behavior", () => {
@@ -134,7 +200,7 @@ describe("Scales", () => {
       });
 
       it("scale autoDomain flag is not overwritten without explicitly setting the domain", () => {
-        scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [d3.extent(data, (e) => e.foo)]);
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => d3.extent(data, (e) => e.foo));
         assert.isTrue((<any> scale)._autoDomainAutomatically,
                             "the autoDomain flag is still set after autoranginging and padding and nice-ing");
         scale.domain([0, 5]);
@@ -177,22 +243,22 @@ describe("Scales", () => {
         svg2.remove();
       });
 
-      it("addExtentsProvider()", () => {
-        scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[0, 10]]);
+      it("addIncludedValuesProvider()", () => {
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [0, 10]);
         assert.deepEqual(scale.domain(), [0, 10], "scale domain accounts for first provider");
 
-        scale.addExtentsProvider((scale: Plottable.Scale<number, number>) => [[-10, 0]]);
+        scale.addIncludedValuesProvider((scale: Plottable.Scale<number, number>) => [-10, 0]);
         assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for second provider");
       });
 
-      it("removeExtentsProvider()", () => {
-        var posProvider = (scale: Plottable.Scale<number, number>) => [[0, 10]];
-        scale.addExtentsProvider(posProvider);
-        var negProvider = (scale: Plottable.Scale<number, number>) => [[-10, 0]];
-        scale.addExtentsProvider(negProvider);
+      it("removeIncludedValuesProvider()", () => {
+        var posProvider = (scale: Plottable.Scale<number, number>) => [0, 10];
+        scale.addIncludedValuesProvider(posProvider);
+        var negProvider = (scale: Plottable.Scale<number, number>) => [-10, 0];
+        scale.addIncludedValuesProvider(negProvider);
         assert.deepEqual(scale.domain(), [-10, 10], "scale domain accounts for both providers");
 
-        scale.removeExtentsProvider(negProvider);
+        scale.removeIncludedValuesProvider(negProvider);
         assert.deepEqual(scale.domain(), [0, 10], "scale domain only accounts for remaining provider");
       });
 

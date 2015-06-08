@@ -13,7 +13,7 @@ module Plottable {
       this._detachCallback = (component: Component) => this.remove(component);
     }
 
-    public anchor(selection: D3.Selection) {
+    public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
       this._forEach((c) => c.anchor(this._content));
       return this;
@@ -55,7 +55,7 @@ module Plottable {
     /**
      * Carry out the actual removal of a Component.
      * Implementation dependent on the type of container.
-     * 
+     *
      * @return {boolean} true if the Component was successfully removed, false otherwise.
      */
     protected _remove(component: Component) {

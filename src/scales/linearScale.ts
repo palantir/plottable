@@ -3,7 +3,7 @@
 module Plottable {
 export module Scales {
   export class Linear extends QuantitativeScale<number> {
-    private _d3Scale: D3.Scale.LinearScale;
+    private _d3Scale: d3.scale.Linear<number, number>;
 
     /**
      * @constructor
@@ -48,12 +48,12 @@ export module Scales {
       return this._d3Scale.invert(value);
     }
 
-    public getDefaultTicks(): number[] {
+    public defaultTicks(): number[] {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
 
     protected _niceDomain(domain: number[], count?: number): number[] {
-      return Utils.D3Scale.niceDomain(this._d3Scale, domain, count);
+      return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
   }
 }

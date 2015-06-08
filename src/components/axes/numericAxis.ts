@@ -10,7 +10,7 @@ export module Axes {
 
     /**
      * Constructs a Numeric Axis.
-     * 
+     *
      * A Numeric Axis is a visual representation of a QuantitativeScale.
      *
      * @constructor
@@ -35,7 +35,7 @@ export module Axes {
         return this._measurer.measure(formattedValue).width;
       });
 
-      var maxTextLength = Utils.Methods.max(textLengths, 0);
+      var maxTextLength = Utils.Math.max(textLengths, 0);
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
@@ -89,7 +89,7 @@ export module Axes {
     public renderImmediately() {
       super.renderImmediately();
 
-      var tickLabelAttrHash = {
+      var tickLabelAttrHash: { [key: string]: number | string | ((d: any) => number) } = {
         x: <any> 0,
         y: <any> 0,
         dx: "0em",
@@ -144,24 +144,24 @@ export module Axes {
         case "bottom":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "0.95em";
-          labelGroupTransformY = tickMarkAttrHash["y1"] + labelGroupShiftY;
+          labelGroupTransformY = <number> tickMarkAttrHash["y1"] + labelGroupShiftY;
           break;
 
         case "top":
           tickLabelAttrHash["x"] = tickMarkAttrHash["x1"];
           tickLabelAttrHash["dy"] = "-.25em";
-          labelGroupTransformY = tickMarkAttrHash["y1"] - labelGroupShiftY;
+          labelGroupTransformY = <number> tickMarkAttrHash["y1"] - labelGroupShiftY;
           break;
 
         case "left":
           tickLabelTextAnchor = "end";
-          labelGroupTransformX = tickMarkAttrHash["x1"] - labelGroupShiftX;
+          labelGroupTransformX = <number> tickMarkAttrHash["x1"] - labelGroupShiftX;
           tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
           break;
 
         case "right":
           tickLabelTextAnchor = "start";
-          labelGroupTransformX = tickMarkAttrHash["x1"] + labelGroupShiftX;
+          labelGroupTransformX = <number> tickMarkAttrHash["x1"] + labelGroupShiftX;
           tickLabelAttrHash["y"] = tickMarkAttrHash["y1"];
           break;
       }
@@ -271,16 +271,16 @@ export module Axes {
     }
 
     private _hideEndTickLabels() {
-      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels[0].length === 0) {
         return;
       }
-      var firstTickLabel = tickLabels[0][0];
+      var firstTickLabel = <Element> tickLabels[0][0];
       if (!Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
-      var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
+      var lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
       if (!Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
@@ -288,7 +288,7 @@ export module Axes {
 
     // Responsible for hiding any tick labels that break out of the bounding container
     private _hideOverflowingTickLabels() {
-      var boundingBox = this._boundingBox.node().getBoundingClientRect();
+      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
       if (tickLabels.empty()) {
         return;

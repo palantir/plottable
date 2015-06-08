@@ -2,12 +2,14 @@
 module Plottable {
 export module Utils {
   export module DOM {
+    var nativeMath: Math = (<any>window).Math;
+
     /**
      * Gets the bounding box of an element.
-     * @param {D3.Selection} element
+     * @param {d3.Selection} element
      * @returns {SVGRed} The bounding box.
      */
-    export function getBBox(element: D3.Selection): SVGRect {
+    export function getBBox(element: d3.Selection<any>): SVGRect {
       var bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
@@ -38,7 +40,7 @@ export module Utils {
       return parsedValue;
     }
 
-    export function isSelectionRemovedFromSVG(selection: D3.Selection) {
+    export function isSelectionRemovedFromSVG(selection: d3.Selection<any>) {
       var n = (<Node> selection.node());
       while (n !== null && n.nodeName.toLowerCase() !== "svg") {
         n = n.parentNode;
@@ -46,7 +48,7 @@ export module Utils {
       return (n == null);
     }
 
-    export function getElementWidth(elem: HTMLScriptElement): number {
+    export function getElementWidth(elem: Element): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
@@ -55,7 +57,7 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(elem: HTMLScriptElement): number {
+    export function getElementHeight(elem: Element): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")
@@ -64,14 +66,14 @@ export module Utils {
         + getParsedStyleValue(style, "border-bottom-width");
     }
 
-    export function getSVGPixelWidth(svg: D3.Selection) {
-      var width = svg.node().clientWidth;
+    export function getSVGPixelWidth(svg: d3.Selection<void>) {
+      var width = (<Element> svg.node()).clientWidth;
 
       if (width === 0) { // Firefox bug #874811
         var widthAttr = svg.attr("width");
 
         if (widthAttr.indexOf("%") !== -1) { // percentage
-          var ancestorNode = <Element> svg.node().parentNode;
+          var ancestorNode = <Element> (<Element> svg.node()).parentNode;
           while (ancestorNode != null && ancestorNode.clientWidth === 0) {
             ancestorNode = <Element> ancestorNode.parentNode;
           }
@@ -87,7 +89,9 @@ export module Utils {
       return width;
     }
 
-    export function translate(s: D3.Selection, x?: number, y?: number) {
+    export function translate(s: d3.Selection<any>): d3.Transform;
+    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>
+    export function translate(s: d3.Selection<any>, x?: number, y?: number): any {
       var xform = d3.transform(s.attr("transform"));
       if (x == null) {
         return xform.translate;
@@ -110,10 +114,10 @@ export module Utils {
 
     export function boxIsInside(inner: ClientRect, outer: ClientRect) {
       return (
-        Math.floor(outer.left) <= Math.ceil(inner.left) &&
-        Math.floor(outer.top) <= Math.ceil(inner.top) &&
-        Math.floor(inner.right) <= Math.ceil(outer.right) &&
-        Math.floor(inner.bottom) <= Math.ceil(outer.bottom)
+        nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) &&
+        nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) &&
+        nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) &&
+        nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom)
       );
     }
 
@@ -131,6 +135,48 @@ export module Utils {
     var _latestClipPathId = 0;
     export function getUniqueClipPathId() {
       return "plottableClipPath" + ++_latestClipPathId;
+    }
+
+    /**
+     * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
+     *
+     * @param {number | Range} xValOrRange The x coordinate or Range to test
+     * @param {number | Range} yValOrRange The y coordinate or Range to test
+     * @param {SVGRect} bbox The bbox
+     * @param {number} tolerance Amount by which to expand bbox, in each dimension, before
+     * testing intersection
+     *
+     * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
+     * contained by bbox, false otherwise.
+     */
+    export function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range,
+      bbox: SVGRect, tolerance = 0.5): boolean {
+      var xRange: Range = parseRange(xValOrRange);
+      var yRange: Range = parseRange(yValOrRange);
+
+      // SVGRects are positioned with sub-pixel accuracy (the default unit
+      // for the x, y, height & width attributes), but user selections (e.g. via
+      // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
+      // seems appropriate.
+      return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
+    }
+
+    /**
+     * Create a Range from a number or an object with "min" and "max" defined.
+     *
+     * @param {any} input The object to parse
+     *
+     * @returns {Range} The generated Range
+     */
+    function parseRange(input: any): Range {
+      if (typeof (input) === "number") {
+        return { min: input, max: input };
+      } else if (input instanceof Object && "min" in input && "max" in input) {
+        return <Range> input;
+      } else {
+        throw new Error("input '" + input + "' can't be parsed as an Range");
+      }
     }
   }
 }

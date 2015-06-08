@@ -10,29 +10,19 @@ export module Drawers {
   export type DrawStep = {
     attrToProjector: AttributeToProjector;
     animator: Animators.Plot;
-  }
+  };
 
   export type AppliedDrawStep = {
-    attrToProjector: AttributeToAppliedProjector;
+    attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animators.Plot;
-  }
+  };
 
 }
 
   export class Drawer {
-    private _renderArea: D3.Selection;
+    private _renderArea: d3.Selection<void>;
     protected _className: string;
     protected _dataset: Dataset;
-
-    /**
-     * Sets the class, which needs to be applied to bound elements.
-     *
-     * @param{string} className The class name to be applied.
-     */
-    public setClass(className: string) {
-      this._className = className;
-      return this;
-    }
 
     /**
      * Constructs a Drawer
@@ -44,16 +34,31 @@ export module Drawers {
         this._dataset = dataset;
     }
 
-    public setup(area: D3.Selection) {
+    /**
+     * Retrieves the renderArea selection for the Drawer.
+     */
+    public renderArea(): d3.Selection<void>;
+    /**
+     * Sets the renderArea selection for the Drawer.
+     * 
+     * @param {d3.Selection} Selection containing the <g> to render to.
+     * @returns {Drawer} The calling Drawer.
+     */
+    public renderArea(area: d3.Selection<void>): Drawer;
+    public renderArea(area?: d3.Selection<void>): any {
+      if (area == null) {
+        return this._renderArea;
+      }
       this._renderArea = area;
+      return this;
     }
 
     /**
      * Removes the Drawer and its renderArea
      */
     public remove() {
-      if (this._getRenderArea() != null) {
-        this._getRenderArea().remove();
+      if (this.renderArea() != null) {
+        this.renderArea().remove();
       }
     }
 
@@ -97,9 +102,9 @@ export module Drawers {
      */
     public draw(data: any[], drawSteps: Drawers.DrawStep[]) {
       var appliedDrawSteps: Drawers.AppliedDrawStep[] = drawSteps.map((dr: Drawers.DrawStep) => {
-        var appliedAttrToProjector = this._appliedProjectors(dr.attrToProjector);
+        var attrToAppliedProjector = this._appliedProjectors(dr.attrToProjector);
         return {
-          attrToProjector: appliedAttrToProjector,
+          attrToAppliedProjector: attrToAppliedProjector,
           animator: dr.animator
         };
       });
@@ -109,28 +114,25 @@ export module Drawers {
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
-        Utils.Methods.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.getTiming(numberOfIterations);
+        Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
+        delay += drawStep.animator.totalTime(numberOfIterations);
       });
 
       return delay;
     }
 
     /**
-     * Retrieves the renderArea selection for the drawer
-     *
-     * @returns {D3.Selection} the renderArea selection
+     * Returns the CSS selector for this Drawer's visual elements.
      */
-    public _getRenderArea(): D3.Selection {
-      return this._renderArea;
+    public selector(): string {
+      throw new Error("The base Drawer class has no elements to select");
     }
 
-    public _getSelector(): string {
-      return "";
-    }
-
-    public _getSelection(index: number): D3.Selection {
-      var allSelections = this._getRenderArea().selectAll(this._getSelector());
+    /**
+     * Returns the D3 selection corresponding to the datum with the specified index.
+     */
+    public selectionForIndex(index: number) {
+      var allSelections = this.renderArea().selectAll(this.selector());
       return d3.select(allSelections[0][index]);
     }
 

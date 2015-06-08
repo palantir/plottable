@@ -14,9 +14,9 @@ describe("Plots", () => {
       { x: 4, y: 4, x2: 5, y2: 5 }
     ];
 
-    var VERIFY_CELLS = (cells: D3.Selection) => {
+    var VERIFY_CELLS = (cells: d3.Selection<any>) => {
       assert.strictEqual(cells[0].length, 5);
-      cells.each(function(d: D3.Selection, i: number) {
+      cells.each(function(d: any, i: number) {
         var cell = d3.select(this);
         assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
         assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
@@ -73,13 +73,13 @@ describe("Plots", () => {
 
       rectanglesSelection.each(function(d: any, i: number) {
         var sel = d3.select(this);
-        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("x")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("x")),
           "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
-        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("y")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("y")),
           "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
-        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("height")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("height")),
           "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
-        assert.isFalse(Plottable.Utils.Methods.isNaN(+sel.attr("width")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("width")),
           "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
       });
 

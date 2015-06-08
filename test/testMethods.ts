@@ -2,12 +2,12 @@
 
 module TestMethods {
 
-  export function generateSVG(width = 400, height = 400): D3.Selection {
-    var parent: D3.Selection = TestMethods.getSVGParent();
+  export function generateSVG(width = 400, height = 400): d3.Selection<void> {
+    var parent = TestMethods.getSVGParent();
     return parent.append("svg").attr("width", width).attr("height", height).attr("class", "svg");
   }
 
-  export function getSVGParent(): D3.Selection {
+  export function getSVGParent(): d3.Selection<void> {
     var mocha = d3.select("#mocha-report");
     if (mocha.node() != null) {
       var suites = mocha.selectAll(".suite");
@@ -39,7 +39,7 @@ module TestMethods {
     return fixComponentSize(new Plottable.Component(), fixedWidth, fixedHeight);
   }
 
-  export function getTranslate(element: D3.Selection) {
+  export function getTranslate(element: d3.Selection<void>) {
     return d3.transform(element.attr("transform")).translate;
   }
 
@@ -50,9 +50,9 @@ module TestMethods {
     assert.strictEqual(bbox.height, height, "height: " + message);
   }
 
-  export function assertBBoxInclusion(outerEl: D3.Selection, innerEl: D3.Selection) {
-    var outerBox = outerEl.node().getBoundingClientRect();
-    var innerBox = innerEl.node().getBoundingClientRect();
+  export function assertBBoxInclusion(outerEl: d3.Selection<void>, innerEl: d3.Selection<void>) {
+    var outerBox = (<Element> outerEl.node()).getBoundingClientRect();
+    var innerBox = (<Element> innerEl.node()).getBoundingClientRect();
     assert.operator(Math.floor(outerBox.left), "<=", Math.ceil(innerBox.left) + window.Pixel_CloseTo_Requirement,
       "bounding rect left included");
     assert.operator(Math.floor(outerBox.top), "<=", Math.ceil(innerBox.top) + window.Pixel_CloseTo_Requirement,
@@ -63,9 +63,9 @@ module TestMethods {
       "bounding rect bottom included");
   }
 
-  export function assertBBoxNonIntersection(firstEl: D3.Selection, secondEl: D3.Selection) {
-    var firstBox = firstEl.node().getBoundingClientRect();
-    var secondBox = secondEl.node().getBoundingClientRect();
+  export function assertBBoxNonIntersection(firstEl: d3.Selection<void>, secondEl: d3.Selection<void>) {
+    var firstBox = (<Element> firstEl.node()).getBoundingClientRect();
+    var secondBox = (<Element> secondEl.node()).getBoundingClientRect();
 
     var intersectionBox = {
       left: Math.max(firstBox.left, secondBox.left),
@@ -84,7 +84,7 @@ module TestMethods {
     assert.closeTo(actual.y, expected.y, epsilon, message + " (y)");
   };
 
-  export function assertWidthHeight(el: D3.Selection, widthExpected: number, heightExpected: number, message: string) {
+  export function assertWidthHeight(el: d3.Selection<void>, widthExpected: number, heightExpected: number, message: string) {
     var width = el.attr("width");
     var height = el.attr("height");
     assert.strictEqual(width, String(widthExpected), "width: " + message);
@@ -124,18 +124,18 @@ module TestMethods {
     return pathString.replace(/ *([A-Z]) */g, "$1").replace(/ /g, ",");
   }
 
-  export function numAttr(s: D3.Selection, a: string) {
+  export function numAttr(s: d3.Selection<void>, a: string) {
     return parseFloat(s.attr(a));
   }
 
-  export function triggerFakeUIEvent(type: string, target: D3.Selection) {
+  export function triggerFakeUIEvent(type: string, target: d3.Selection<void>) {
     var e = <UIEvent> document.createEvent("UIEvents");
     e.initUIEvent(type, true, true, window, 1);
     target.node().dispatchEvent(e);
   }
 
-  export function triggerFakeMouseEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, button = 0) {
-    var clientRect = target.node().getBoundingClientRect();
+  export function triggerFakeMouseEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, button = 0) {
+    var clientRect = (<Element> target.node()).getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var e = <MouseEvent> document.createEvent("MouseEvents");
@@ -147,18 +147,23 @@ module TestMethods {
     target.node().dispatchEvent(e);
   }
 
-  export function triggerFakeDragSequence(target: D3.Selection, start: Plottable.Point, end: Plottable.Point) {
+  export function triggerFakeDragSequence(target: d3.Selection<void>, start: Plottable.Point, end: Plottable.Point) {
     triggerFakeMouseEvent("mousedown", target, start.x, start.y);
     triggerFakeMouseEvent("mousemove", target, end.x, end.y);
     triggerFakeMouseEvent("mouseup", target, end.x, end.y);
   }
 
-  export function triggerFakeWheelEvent(type: string, target: D3.Selection, relativeX: number, relativeY: number, deltaY: number) {
-    var clientRect = target.node().getBoundingClientRect();
+  export function isIE() {
+    var userAgent = window.navigator.userAgent;
+    return userAgent.indexOf("MSIE ") > -1 || userAgent.indexOf("Trident/") > -1;
+  }
+
+  export function triggerFakeWheelEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, deltaY: number) {
+    var clientRect = (<Element> target.node()).getBoundingClientRect();
     var xPos = clientRect.left + relativeX;
     var yPos = clientRect.top + relativeY;
     var event: WheelEvent;
-    if (Plottable.Utils.Methods.isIE()) {
+    if (isIE()) {
       event = document.createEvent("WheelEvent");
       event.initWheelEvent("wheel", true, true, window, 1, xPos, yPos, xPos, yPos, 0, null, null, 0, deltaY, 0, 0);
     } else {
@@ -170,8 +175,8 @@ module TestMethods {
     target.node().dispatchEvent(event);
   }
 
-  export function triggerFakeTouchEvent( type: string, target: D3.Selection, touchPoints: Plottable.Point[], ids: number[] = [] ) {
-    var targetNode = target.node();
+  export function triggerFakeTouchEvent(type: string, target: d3.Selection<void>, touchPoints: Plottable.Point[], ids: number[] = [] ) {
+    var targetNode = <Element> target.node();
     var clientRect = targetNode.getBoundingClientRect();
     var e = <TouchEvent> document.createEvent( "UIEvent" );
     e.initUIEvent( type, true, true, window, 1 );

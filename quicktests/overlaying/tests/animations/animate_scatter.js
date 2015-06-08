@@ -22,7 +22,7 @@ function run(svg, data, Plottable) {
                                                                  .x(function(d) { return d.x; }, xScale)
                                                                  .y(function(d) { return d.y; }, yScale)
                                                                  .attr("opacity", 0.75)
-                                                                 .animate(true);
+                                                                 .animated(true);
 
   var circleChart = new Plottable.Components.Table([[yAxis, circleRenderer],
    [null,  xAxis]]);

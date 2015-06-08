@@ -31,7 +31,7 @@ function run(svg, data, Plottable) {
       .labelFormatter(function(text){return text + "!";})
       .addDataset(new Plottable.Dataset(data))
       .animator( "bars", animator)
-      .animate(true);
+      .animated(true);
 
 
     var chart = new Plottable.Components.Table([

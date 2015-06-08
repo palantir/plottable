@@ -2,6 +2,8 @@
 
 module Plottable {
 export module Scales {
+  type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>
+
   export class InterpolatedColor extends Scale<number, string> {
     public static REDS = [
       "#FFFFFF", // white
@@ -45,8 +47,8 @@ export module Scales {
       "#B10026" // red
     ];
     private _colorRange: string[];
-    private _colorScale: D3.Scale.QuantitativeScale<number>;
-    private _d3Scale: D3.Scale.QuantitativeScale<number>;
+    private _colorScale: supportedScale;
+    private _d3Scale: supportedScale;
 
     /**
      * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
@@ -61,25 +63,25 @@ export module Scales {
       this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
-          this._colorScale = d3.scale.linear();
+          this._colorScale = d3.scale.linear<number, string>();
           break;
         case "log":
-          this._colorScale = d3.scale.log();
+          this._colorScale = d3.scale.log<number, string>();
           break;
         case "sqrt":
-          this._colorScale = d3.scale.sqrt();
+          this._colorScale = d3.scale.sqrt<number, string>();
           break;
         case "pow":
-          this._colorScale = d3.scale.pow();
+          this._colorScale = d3.scale.pow<number, string>();
           break;
       }
       if (this._colorScale == null) {
         throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
-      this._d3Scale = this._D3InterpolatedScale();
+      this._d3Scale = this._d3InterpolatedScale();
     }
 
-    public extentOfValues(values: number[]) {
+    public extentOfValues(values: number[]): number[] {
       var extent = d3.extent(values);
       if (extent[0] == null || extent[1] == null) {
         return [];
@@ -90,24 +92,20 @@ export module Scales {
 
     /**
      * Generates the converted QuantitativeScale.
-     *
-     * @returns {D3.Scale.QuantitativeScale} The converted d3 QuantitativeScale
      */
-    private _D3InterpolatedScale(): D3.Scale.QuantitativeScale<number> {
+    private _d3InterpolatedScale() {
       return this._colorScale.range([0, 1]).interpolate(this._interpolateColors());
     }
 
     /**
      * Generates the d3 interpolator for colors.
-     *
-     * @return {D3.Transition.Interpolate} The d3 interpolator for colors.
      */
-    private _interpolateColors(): D3.Transition.Interpolate {
+    private _interpolateColors() {
       var colors = this._colorRange;
       if (colors.length < 2) {
         throw new Error("Color scale arrays must have at least two elements.");
       };
-      return (ignored: any) => {
+      return (a: number, b: number) => {
         return (t: number) => {
           // Clamp t parameter to [0,1]
           t = Math.max(0, Math.min(1, t));
@@ -147,23 +145,22 @@ export module Scales {
     }
 
     private _resetScale(): any {
-      this._d3Scale = this._D3InterpolatedScale();
+      this._d3Scale = this._d3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
       this._dispatchUpdate();
     }
 
     public autoDomain() {
       // InterpolatedColorScales do not pad
-      var extents = this._getAllExtents();
-      if (extents.length > 0) {
-        this._setDomain([Utils.Methods.min(extents, (x) => x[0], 0), Utils.Methods.max(extents, (x) => x[1], 0)]);
+      var includedValues = this._getAllIncludedValues();
+      if (includedValues.length > 0) {
+        this._setDomain([Utils.Math.min(includedValues, 0), Utils.Math.max(includedValues, 0)]);
       }
       return this;
     }
 
     public scale(value: number) {
-      // HACKHACK D3 Quantitative Scales should return their interpolator return type
-      return <string> <any> this._d3Scale(value);
+      return this._d3Scale(value);
     }
 
     protected _getDomain() {

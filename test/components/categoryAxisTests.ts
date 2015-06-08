@@ -140,10 +140,10 @@ describe("Category Axes", () => {
 
   it("axis labels respect tick labels", () => {
 
-    function verifyTickLabelOverlaps(tickLabels: D3.Selection, tickMarks: D3.Selection) {
+    function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
         for (var i = 0; i < tickLabels[0].length; i++) {
-          var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
-          var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
+          var tickLabelBox = (<Element> tickLabels[0][i]).getBoundingClientRect();
+          var tickMarkBox = (<Element> tickMarks[0][i]).getBoundingClientRect();
           assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
         }
     }

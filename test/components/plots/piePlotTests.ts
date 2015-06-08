@@ -17,11 +17,11 @@ describe("Plots", () => {
   });
 
   describe("PiePlot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var simpleDataset: Plottable.Dataset;
     var simpleData: any[];
     var piePlot: Plottable.Plots.Pie;
-    var renderArea: D3.Selection;
+    var renderArea: d3.Selection<void>;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
@@ -207,13 +207,13 @@ describe("Plots", () => {
 
     it("throws warnings on negative data", () => {
       var message: String;
-      var oldWarn = Plottable.Utils.Methods.warn;
-      Plottable.Utils.Methods.warn = (warn) => message = warn;
+      var oldWarn = Plottable.Utils.Window.warn;
+      Plottable.Utils.Window.warn = (warn) => message = warn;
       piePlot.removeDataset(simpleDataset);
       var negativeDataset = new Plottable.Dataset([{value: -5}, {value: 15}]);
       piePlot.addDataset(negativeDataset);
       assert.strictEqual(message, "Negative values will not render correctly in a pie chart.");
-      Plottable.Utils.Methods.warn = oldWarn;
+      Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
     });
   });

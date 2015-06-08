@@ -4,7 +4,7 @@ var assert = chai.assert;
 
 describe("Plots", () => {
   describe("Stacked Area Plot", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;
     var dataset2: Plottable.Dataset;
     var xScale: Plottable.Scales.Linear;
@@ -72,7 +72,7 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot no data", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var renderer: Plottable.Plots.StackedArea<number>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
@@ -116,7 +116,7 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot Stacking", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plots.StackedArea<number>;
@@ -310,8 +310,8 @@ describe("Plots", () => {
 
     it("warning is thrown when datasets are updated with different domains", () => {
       var flag = false;
-      var oldWarn = Plottable.Utils.Methods.warn;
-      (<any> Plottable.Utils.Methods).warn = (msg: string) => {
+      var oldWarn = Plottable.Utils.Window.warn;
+      Plottable.Utils.Window.warn = (msg: string) => {
         if (msg.indexOf("domain") > -1) { flag = true; }
       };
 
@@ -321,7 +321,7 @@ describe("Plots", () => {
       var dataset = new Plottable.Dataset(missingDomainData);
       renderer.addDataset(dataset);
 
-      (<any> Plottable.Utils.Methods).warn = oldWarn;
+      Plottable.Utils.Window.warn = oldWarn;
       assert.isTrue(flag, "warning has been issued about differing domains");
 
       svg.remove();
@@ -329,7 +329,7 @@ describe("Plots", () => {
   });
 
   describe("Stacked Area Plot Project", () => {
-    var svg: D3.Selection;
+    var svg: d3.Selection<void>;
     var xScale: Plottable.Scales.Linear;
     var yScale: Plottable.Scales.Linear;
     var renderer: Plottable.Plots.StackedArea<number>;

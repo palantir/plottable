@@ -44,7 +44,12 @@ function run(svg, data, Plottable) {
             });
           }
 
+          var extentFcnA = function() { return [new Date("2014-08-22"), new Date("2014-08-25")]; };
+          var extentFcnB = function() { return [new Date("2013-08-22"), new Date("2015-08-25")]; };
+
           var xScale = new Plottable.Scales.Time();
+          xScale.addIncludedValuesProvider(extentFcnA);
+
           var xAxis = new Plottable.Axes.Time(xScale, "bottom");
           var xAxisTop = new Plottable.Axes.Time(xScale, "top");
 
@@ -61,7 +66,7 @@ function run(svg, data, Plottable) {
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-          var line_aapl = new Plottable.Plots.Line().animate(true)
+          var line_aapl = new Plottable.Plots.Line().animated(true)
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
@@ -71,7 +76,7 @@ function run(svg, data, Plottable) {
           } else {
             line_aapl.automaticallyAdjustYScaleOverVisiblePoints(true);
           }
-          var line_goog = new Plottable.Plots.Line().animate(true)
+          var line_goog = new Plottable.Plots.Line().animated(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
@@ -93,7 +98,7 @@ function run(svg, data, Plottable) {
           var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plots.Bar("vertical").animate(true)
+          var bar_diff = new Plottable.Plots.Bar("vertical").animated(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["net change"]; }, yScale_diff)

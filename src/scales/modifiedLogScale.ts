@@ -4,7 +4,7 @@ module Plottable {
 export module Scales {
   export class ModifiedLog extends QuantitativeScale<number> {
     private _base: number;
-    private _d3Scale: D3.Scale.LinearScale;
+    private _d3Scale: d3.scale.Linear<number, number>;
     private _pivot: number;
     private _untransformedDomain: number[];
 
@@ -100,8 +100,8 @@ export module Scales {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = Utils.Methods.min(this._untransformedDomain, 0);
-      var max = Utils.Methods.max(this._untransformedDomain, 0);
+      var min = Utils.Math.min(this._untransformedDomain, 0);
+      var max = Utils.Math.max(this._untransformedDomain, 0);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this._pivot);
       var positiveLower = middle(min, max, this._pivot);
@@ -141,9 +141,9 @@ export module Scales {
       var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
       var multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
-      var uniqMultiples = Utils.Methods.uniq(multiples);
+      var uniqMultiples = Utils.Array.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
-      var flattened = Utils.Methods.flatten(clusters);
+      var flattened = Utils.Array.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;
@@ -157,8 +157,8 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this._adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
-      var adjustedMax = this._adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
+      var adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
+      var adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
       var adjustedLower = this._adjustedLog(lower);
       var adjustedUpper = this._adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
@@ -196,7 +196,7 @@ export module Scales {
       this._d3Scale.range(values);
     }
 
-    public getDefaultTicks(): number[] {
+    public defaultTicks(): number[] {
       return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
     }
   }
