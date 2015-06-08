@@ -8265,12 +8265,10 @@ var Plottable;
          */
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(startPixelValue, isVertical, isReverse) {
+            function Rect(startPixelValue, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
-                if (isReverse === void 0) { isReverse = false; }
                 _super.call(this);
                 this.isVertical = isVertical;
-                this.isReverse = isReverse;
                 this.startPixelValue = startPixelValue;
             }
             Rect.prototype.animate = function (selection, attrToAppliedProjector) {

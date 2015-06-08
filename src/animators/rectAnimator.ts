@@ -11,17 +11,15 @@ export module Animators {
     public static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
 
     public isVertical: boolean;
-    public isReverse: boolean;
 
     /**
      * The pixel value to move from
      */
     public startPixelValue: number;
 
-    constructor(startPixelValue: number, isVertical = true, isReverse = false) {
+    constructor(startPixelValue: number, isVertical = true) {
       super();
       this.isVertical = isVertical;
-      this.isReverse = isReverse;
       this.startPixelValue = startPixelValue;
     }
 
