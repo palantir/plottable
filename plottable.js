@@ -8275,16 +8275,12 @@ var Plottable;
                 var _this = this;
                 var startAttrToAppliedProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
-                startAttrToAppliedProjector[this._getMovingAttr()] = function () { return _this.startPixelValue; };
-                startAttrToAppliedProjector[this._getGrowingAttr()] = function () { return 0; };
+                var movingAttribute = this.isVertical ? "y" : "x";
+                startAttrToAppliedProjector[movingAttribute] = function () { return _this.startPixelValue; };
+                var growingAttribute = this.isVertical ? "height" : "width";
+                startAttrToAppliedProjector[growingAttribute] = function () { return 0; };
                 selection.attr(attrToAppliedProjector);
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
-            };
-            Rect.prototype._getGrowingAttr = function () {
-                return this.isVertical ? "height" : "width";
-            };
-            Rect.prototype._getMovingAttr = function () {
-                return this.isVertical ? "y" : "x";
             };
             Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
             return Rect;
