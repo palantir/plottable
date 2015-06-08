@@ -47,6 +47,9 @@ module Plottable {
     bottomRight: Point;
   };
 
+  /**
+   * An object representing a data-backed visual entity inside a Component.
+   */
   export interface Entity<C extends Component> {
     datum: any;
     index: number;

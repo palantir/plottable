@@ -7165,7 +7165,7 @@ var Plottable;
              * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Bar.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
@@ -7554,7 +7554,7 @@ var Plottable;
              * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Line.prototype.entityNearest = function (queryPoint) {
                 var _this = this;

@@ -62,12 +62,12 @@ export module Plots {
      * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+     * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): Plots.PlotEntity {
+    public entityNearest(queryPoint: Point): PlotEntity {
       var minXDist = Infinity;
       var minYDist = Infinity;
-      var closest: Plots.PlotEntity;
+      var closest: PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;

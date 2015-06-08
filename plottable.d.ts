@@ -503,6 +503,9 @@ declare module Plottable {
         topLeft: Point;
         bottomRight: Point;
     };
+    /**
+     * An object representing a data-backed visual entity inside a Component.
+     */
     interface Entity<C extends Component> {
         datum: any;
         index: number;
@@ -2416,7 +2419,7 @@ declare module Plottable {
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Arc;
-            entities(datasets?: Dataset[]): Plots.PlotEntity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.
              */
@@ -2771,7 +2774,7 @@ declare module Plottable {
              * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             entityNearest(queryPoint: Point): PlotEntity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
@@ -2811,7 +2814,7 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            entities(datasets?: Dataset[]): Plots.PlotEntity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
@@ -2841,9 +2844,9 @@ declare module Plottable {
              * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            entityNearest(queryPoint: Point): Plots.PlotEntity;
+            entityNearest(queryPoint: Point): PlotEntity;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;

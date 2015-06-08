@@ -213,7 +213,7 @@ export module Plots {
      * Returns undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
+     * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
     public entityNearest(queryPoint: Point): PlotEntity {
       var minPrimaryDist = Infinity;
@@ -519,7 +519,7 @@ export module Plots {
       return barPixelWidth;
     }
 
-    public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+    public entities(datasets = this.datasets()): PlotEntity[] {
       if (!this._projectorsReady()) {
         return [];
       }

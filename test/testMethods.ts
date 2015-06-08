@@ -92,9 +92,9 @@ module TestMethods {
   }
 
   export function assertEntitiesEqual(
-    actual: Plottable.Entity<Plottable.Component>,
-    expected: Plottable.Entity<Plottable.Component>,
-    msg: string) {
+      actual: Plottable.Entity<Plottable.Component>,
+      expected: Plottable.Entity<Plottable.Component>,
+      msg: string) {
     assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
     assert.strictEqual(actual.index, expected.index, msg + " (index)");
     assertPointsClose(actual.position, expected.position, 0.01, msg);
@@ -106,9 +106,9 @@ module TestMethods {
   }
 
   export function assertPlotEntitiesEqual(
-    actual: Plottable.Plots.PlotEntity,
-    expected: Plottable.Plots.PlotEntity,
-    msg: string) {
+      actual: Plottable.Plots.PlotEntity,
+      expected: Plottable.Plots.PlotEntity,
+      msg: string) {
     assertEntitiesEqual(actual, expected, msg);
     assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
   }
