@@ -229,12 +229,16 @@ describe("Legend", () => {
   });
 
   describe("entitiesAt()", () => {
-    function computeExpectedSymbolPosition(symbol: SVGElement) {
-      var symbolBCR = symbol.getBoundingClientRect();
-      var legendBCR = (<SVGElement> legend.background().node()).getBoundingClientRect();
+    function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
+      var row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
+      var entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
+      var symbol = entry.select(symbolSelector);
+      var rowTranslate = d3.transform(row.attr("transform")).translate;
+      var entryTranslate = d3.transform(entry.attr("transform")).translate;
+      var symbolTranslate = d3.transform(symbol.attr("transform")).translate;
       return {
-        x: (symbolBCR.left + symbolBCR.right) / 2 - legendBCR.left,
-        y: (symbolBCR.top + symbolBCR.bottom) / 2 - legendBCR.top
+        x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
+        y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
       };
     }
 
@@ -244,11 +248,11 @@ describe("Legend", () => {
       legend.renderTo(svg);
       var entities = legend.entitiesAt({x: 10, y: 10});
       var entries = legend.content().selectAll(entrySelector);
-      var symbols = entries.selectAll(symbolSelector);
+
       var expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         index: 0,
-        position: computeExpectedSymbolPosition(<SVGElement> symbols[0][0]),
+        position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
       };
@@ -258,7 +262,7 @@ describe("Legend", () => {
       expectedEntity = {
         datum: "BB",
         index: 1,
-        position: computeExpectedSymbolPosition(<SVGElement> symbols[1][0]),
+        position: computeExpectedSymbolPosition(legend, 1, 0),
         selection: d3.select(entries[0][1]),
         component: legend
       };
@@ -281,7 +285,7 @@ describe("Legend", () => {
       var expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         index: 0,
-        position: computeExpectedSymbolPosition(<SVGElement> symbols[0][0]),
+        position: computeExpectedSymbolPosition(legend, 0, 0),
         selection: d3.select(entries[0][0]),
         component: legend
       };
@@ -291,7 +295,7 @@ describe("Legend", () => {
       expectedEntity = {
         datum: "BB",
         index: 1,
-        position: computeExpectedSymbolPosition(<SVGElement> symbols[1][0]),
+        position: computeExpectedSymbolPosition(legend, 0, 1),
         selection: d3.select(entries[0][1]),
         component: legend
       };

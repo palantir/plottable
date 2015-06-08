@@ -97,8 +97,7 @@ module TestMethods {
     msg: string) {
     assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
     assert.strictEqual(actual.index, expected.index, msg + " (index)");
-    assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
-    assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
+    assertPointsClose(actual.position, expected.position, 0.01, msg);
     assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
     actual.selection[0].forEach((element: Element, index: number) => {
       assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");

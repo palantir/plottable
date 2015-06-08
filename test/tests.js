@@ -90,8 +90,7 @@ var TestMethods;
     function assertEntitiesEqual(actual, expected, msg) {
         assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
         assert.strictEqual(actual.index, expected.index, msg + " (index)");
-        assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
-        assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
+        assertPointsClose(actual.position, expected.position, 0.01, msg);
         assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
         actual.selection[0].forEach(function (element, index) {
             assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
@@ -1750,12 +1749,16 @@ describe("Legend", function () {
         svg.remove();
     });
     describe("entitiesAt()", function () {
-        function computeExpectedSymbolPosition(symbol) {
-            var symbolBCR = symbol.getBoundingClientRect();
-            var legendBCR = legend.background().node().getBoundingClientRect();
+        function computeExpectedSymbolPosition(legend, rowIndex, entryIndexWithinRow) {
+            var row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
+            var entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
+            var symbol = entry.select(symbolSelector);
+            var rowTranslate = d3.transform(row.attr("transform")).translate;
+            var entryTranslate = d3.transform(entry.attr("transform")).translate;
+            var symbolTranslate = d3.transform(symbol.attr("transform")).translate;
             return {
-                x: (symbolBCR.left + symbolBCR.right) / 2 - legendBCR.left,
-                y: (symbolBCR.top + symbolBCR.bottom) / 2 - legendBCR.top
+                x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
+                y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
             };
         }
         it("gets Entities representing the entry at a particular point", function () {
@@ -1764,11 +1767,10 @@ describe("Legend", function () {
             legend.renderTo(svg);
             var entities = legend.entitiesAt({ x: 10, y: 10 });
             var entries = legend.content().selectAll(entrySelector);
-            var symbols = entries.selectAll(symbolSelector);
             var expectedEntity = {
                 datum: "AA",
                 index: 0,
-                position: computeExpectedSymbolPosition(symbols[0][0]),
+                position: computeExpectedSymbolPosition(legend, 0, 0),
                 selection: d3.select(entries[0][0]),
                 component: legend
             };
@@ -1777,7 +1779,7 @@ describe("Legend", function () {
             expectedEntity = {
                 datum: "BB",
                 index: 1,
-                position: computeExpectedSymbolPosition(symbols[1][0]),
+                position: computeExpectedSymbolPosition(legend, 1, 0),
                 selection: d3.select(entries[0][1]),
                 component: legend
             };
@@ -1798,7 +1800,7 @@ describe("Legend", function () {
             var expectedEntity = {
                 datum: "AA",
                 index: 0,
-                position: computeExpectedSymbolPosition(symbols[0][0]),
+                position: computeExpectedSymbolPosition(legend, 0, 0),
                 selection: d3.select(entries[0][0]),
                 component: legend
             };
@@ -1807,7 +1809,7 @@ describe("Legend", function () {
             expectedEntity = {
                 datum: "BB",
                 index: 1,
-                position: computeExpectedSymbolPosition(symbols[1][0]),
+                position: computeExpectedSymbolPosition(legend, 0, 1),
                 selection: d3.select(entries[0][1]),
                 component: legend
             };
