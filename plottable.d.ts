@@ -3143,32 +3143,12 @@ declare module Plottable {
             static ANIMATED_ATTRIBUTES: string[];
             isVertical: boolean;
             isReverse: boolean;
-            constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): (datum: any, index: number) => any;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        class MovingRect extends Rect {
             /**
              * The pixel value to move from
              */
             startPixelValue: number;
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            constructor(startPixelValue: number, isVertical?: boolean);
+            constructor(startPixelValue: number, isVertical?: boolean, isReverse?: boolean);
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): () => number;
         }
     }

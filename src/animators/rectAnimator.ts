@@ -13,10 +13,16 @@ export module Animators {
     public isVertical: boolean;
     public isReverse: boolean;
 
-    constructor(isVertical = true, isReverse = false) {
+    /**
+     * The pixel value to move from
+     */
+    public startPixelValue: number;
+
+    constructor(startPixelValue: number, isVertical = true, isReverse = false) {
       super();
       this.isVertical = isVertical;
       this.isReverse = isReverse;
+      this.startPixelValue = startPixelValue;
     }
 
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
@@ -31,14 +37,7 @@ export module Animators {
     }
 
     protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector) {
-      if (this.isVertical === this.isReverse) {
-        return attrToAppliedProjector[this._getMovingAttr()];
-      }
-      var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
-      var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
-      return (d: any, i: number) => {
-        return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
-      };
+      return d3.functor(this.startPixelValue);
     }
 
     private _getGrowingAttr() {

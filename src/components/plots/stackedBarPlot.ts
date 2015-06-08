@@ -30,7 +30,7 @@ export module Plots {
         } else if (key === "stacked-bar") {
           var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
           var scaledBaseline = primaryScale.scale(this.baselineValue());
-          return new Animators.MovingRect(scaledBaseline, this._isVertical);
+          return new Animators.Rect(scaledBaseline, this._isVertical);
         }
       }
 

@@ -8015,7 +8015,7 @@ var Plottable;
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                         var scaledBaseline = primaryScale.scale(this.baselineValue());
-                        return new Plottable.Animators.MovingRect(scaledBaseline, this._isVertical);
+                        return new Plottable.Animators.Rect(scaledBaseline, this._isVertical);
                     }
                 }
                 return new Plottable.Animators.Null();
@@ -8265,12 +8265,13 @@ var Plottable;
          */
         var Rect = (function (_super) {
             __extends(Rect, _super);
-            function Rect(isVertical, isReverse) {
+            function Rect(startPixelValue, isVertical, isReverse) {
                 if (isVertical === void 0) { isVertical = true; }
                 if (isReverse === void 0) { isReverse = false; }
                 _super.call(this);
                 this.isVertical = isVertical;
                 this.isReverse = isReverse;
+                this.startPixelValue = startPixelValue;
             }
             Rect.prototype.animate = function (selection, attrToAppliedProjector) {
                 var startAttrToAppliedProjector = {};
@@ -8281,14 +8282,7 @@ var Plottable;
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
             Rect.prototype._startMovingProjector = function (attrToAppliedProjector) {
-                if (this.isVertical === this.isReverse) {
-                    return attrToAppliedProjector[this._getMovingAttr()];
-                }
-                var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
-                var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
-                return function (d, i) {
-                    return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
-                };
+                return d3.functor(this.startPixelValue);
             };
             Rect.prototype._getGrowingAttr = function () {
                 return this.isVertical ? "height" : "width";
@@ -8300,43 +8294,6 @@ var Plottable;
             return Rect;
         })(Animators.Base);
         Animators.Rect = Rect;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        var MovingRect = (function (_super) {
-            __extends(MovingRect, _super);
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            function MovingRect(startPixelValue, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, isVertical);
-                this.startPixelValue = startPixelValue;
-            }
-            MovingRect.prototype._startMovingProjector = function (attrToAppliedProjector) {
-                return d3.functor(this.startPixelValue);
-            };
-            return MovingRect;
-        })(Animators.Rect);
-        Animators.MovingRect = MovingRect;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
