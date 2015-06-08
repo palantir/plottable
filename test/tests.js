@@ -1796,7 +1796,6 @@ describe("Legend", function () {
             legend.renderTo(svg);
             var entities = legend.entitiesAt({ x: 10, y: 10 });
             var entries = legend.content().selectAll(entrySelector);
-            var symbols = entries.selectAll(symbolSelector);
             var expectedEntity = {
                 datum: "AA",
                 index: 0,

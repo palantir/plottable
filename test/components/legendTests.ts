@@ -281,7 +281,6 @@ describe("Legend", () => {
       legend.renderTo(svg);
       var entities = legend.entitiesAt({x: 10, y: 10});
       var entries = legend.content().selectAll(entrySelector);
-      var symbols = entries.selectAll(symbolSelector);
       var expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         index: 0,
