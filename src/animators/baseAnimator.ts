@@ -6,13 +6,13 @@ export module Animators {
   /**
    * The base animator implementation with easing, duration, and delay.
    *
-   * The maximum delay between animations can be configured with maxIterativeDelay.
+   * The maximum delay between animations can be configured with iterativeDelay.
    *
    * The maximum total animation duration can be configured with maxTotalDuration.
    * maxTotalDuration does not set actual total animation duration.
    *
    * The actual interval delay is calculated by following formula:
-   * min(maxIterativeDelay(),
+   * min(iterativeDelay(),
    *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
    */
   export class Base implements Animators.Plot {
@@ -40,7 +40,7 @@ export module Animators {
     private _duration: number;
     private _startDelay: number;
     private _easing: string;
-    private _maxIterativeDelay: number;
+    private _iterativeDelay: number;
     private _maxTotalDuration: number;
 
     /**
@@ -52,13 +52,13 @@ export module Animators {
       this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
       this._startDelay = Base.DEFAULT_DELAY_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;
-      this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+      this._iterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
     public totalTime(numberOfIterations: number) {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-      var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+      var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
       var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.duration();
       return time;
     }
@@ -66,7 +66,7 @@ export module Animators {
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
       var numberOfIterations = selection[0].length;
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-      var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+      var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
 
       return selection.transition()
         .ease(this.easing())
@@ -146,19 +146,19 @@ export module Animators {
      *
      * @returns {number} The current maximum iterative delay.
      */
-    public maxIterativeDelay(): number;
+    public iterativeDelay(): number;
     /**
      * Sets the maximum start delay between animations in milliseconds.
      *
      * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
      * @returns {Base} The calling Base Animator.
      */
-    public maxIterativeDelay(maxIterDelay: number): Base;
-    public maxIterativeDelay(maxIterDelay?: number): any {
-      if (maxIterDelay == null) {
-        return this._maxIterativeDelay;
+    public iterativeDelay(iterativeDelay: number): Base;
+    public iterativeDelay(iterativeDelay?: number): any {
+      if (iterativeDelay == null) {
+        return this._iterativeDelay;
       } else {
-        this._maxIterativeDelay = maxIterDelay;
+        this._iterativeDelay = iterativeDelay;
         return this;
       }
     }

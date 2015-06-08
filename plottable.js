@@ -8152,13 +8152,13 @@ var Plottable;
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
+         * The maximum delay between animations can be configured with iterativeDelay.
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
          * maxTotalDuration does not set actual total animation duration.
          *
          * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
+         * min(iterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
         var Base = (function () {
@@ -8171,12 +8171,12 @@ var Plottable;
                 this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
                 this._startDelay = Base.DEFAULT_DELAY_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
-                this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+                this._iterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
             Base.prototype.totalTime = function (numberOfIterations) {
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
                 var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.duration();
                 return time;
             };
@@ -8184,7 +8184,7 @@ var Plottable;
                 var _this = this;
                 var numberOfIterations = selection[0].length;
                 var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
-                var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
                 return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
             Base.prototype.duration = function (duration) {
@@ -8214,12 +8214,12 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.maxIterativeDelay = function (maxIterDelay) {
-                if (maxIterDelay == null) {
-                    return this._maxIterativeDelay;
+            Base.prototype.iterativeDelay = function (iterativeDelay) {
+                if (iterativeDelay == null) {
+                    return this._iterativeDelay;
                 }
                 else {
-                    this._maxIterativeDelay = maxIterDelay;
+                    this._iterativeDelay = iterativeDelay;
                     return this;
                 }
             };

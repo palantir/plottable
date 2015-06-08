@@ -423,7 +423,7 @@ describe("Drawers", function () {
             var animator = new Plottable.Animators.Base();
             animator.maxTotalDuration(Infinity);
             animator.duration(stepDuration);
-            animator.maxIterativeDelay(stepDelay);
+            animator.iterativeDelay(stepDelay);
             animator.startDelay(startDelay);
             var mockDrawStep = [{ attrToProjector: attrToProjector, animator: animator }];
             var drawTime = drawer.totalDrawTime(data, mockDrawStep);
@@ -2408,7 +2408,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animators.Base().startDelay(10).duration(10).maxIterativeDelay(0);
+            var animator = new Plottable.Animators.Base().startDelay(10).duration(10).iterativeDelay(0);
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();

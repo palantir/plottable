@@ -3027,13 +3027,13 @@ declare module Plottable {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
+         * The maximum delay between animations can be configured with iterativeDelay.
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
          * maxTotalDuration does not set actual total animation duration.
          *
          * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
+         * min(iterativeDelay(),
          *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
          */
         class Base implements Animators.Plot {
@@ -3109,14 +3109,14 @@ declare module Plottable {
              *
              * @returns {number} The current maximum iterative delay.
              */
-            maxIterativeDelay(): number;
+            iterativeDelay(): number;
             /**
              * Sets the maximum start delay between animations in milliseconds.
              *
              * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
              * @returns {Base} The calling Base Animator.
              */
-            maxIterativeDelay(maxIterDelay: number): Base;
+            iterativeDelay(iterativeDelay: number): Base;
             /**
              * Gets the maximum total animation duration in milliseconds.
              *
