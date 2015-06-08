@@ -122,7 +122,7 @@ describe("Drawers", () => {
       animator.maxTotalDuration(Infinity);
       animator.duration(stepDuration);
       animator.maxIterativeDelay(stepDelay);
-      animator.delay(startDelay);
+      animator.startDelay(startDelay);
 
       var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
 

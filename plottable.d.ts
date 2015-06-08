@@ -3079,18 +3079,18 @@ declare module Plottable {
              */
             duration(duration: number): Base;
             /**
-             * Gets the delay of the animation in milliseconds.
+             * Gets the start delay of the animation in milliseconds.
              *
-             * @returns {number} The current delay.
+             * @returns {number} The current start delay.
              */
-            delay(): number;
+            startDelay(): number;
             /**
-             * Sets the delay of the animation in milliseconds.
+             * Sets the start delay of the animation in milliseconds.
              *
-             * @param {number} delay The delay in milliseconds.
+             * @param {number} startDelay The start delay in milliseconds.
              * @returns {Default} The calling Default Animator.
              */
-            delay(delay: number): Base;
+            startDelay(startDelay: number): Base;
             /**
              * Gets the current easing of the animation.
              *

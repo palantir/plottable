@@ -38,7 +38,7 @@ export module Animators {
     public static DEFAULT_EASING = "exp-out";
 
     private _duration: number;
-    private _delay: number;
+    private _startDelay: number;
     private _easing: string;
     private _maxIterativeDelay: number;
     private _maxTotalDuration: number;
@@ -50,7 +50,7 @@ export module Animators {
      */
     constructor() {
       this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
-      this._delay = Base.DEFAULT_DELAY_MILLISECONDS;
+      this._startDelay = Base.DEFAULT_DELAY_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;
       this._maxIterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
@@ -59,7 +59,7 @@ export module Animators {
     public totalTime(numberOfIterations: number) {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
       var adjustedIterativeDelay = Math.min(this.maxIterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-      var time = adjustedIterativeDelay * (numberOfIterations - 1) + this.delay() + this.duration();
+      var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.duration();
       return time;
     }
 
@@ -71,7 +71,7 @@ export module Animators {
       return selection.transition()
         .ease(this.easing())
         .duration(this.duration())
-        .delay((d: any, i: number) => this.delay() + adjustedIterativeDelay * i)
+        .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
         .attr(attrToAppliedProjector);
     }
 
@@ -98,23 +98,23 @@ export module Animators {
     }
 
     /**
-     * Gets the delay of the animation in milliseconds.
+     * Gets the start delay of the animation in milliseconds.
      *
-     * @returns {number} The current delay.
+     * @returns {number} The current start delay.
      */
-    public delay(): number;
+    public startDelay(): number;
     /**
-     * Sets the delay of the animation in milliseconds.
+     * Sets the start delay of the animation in milliseconds.
      *
-     * @param {number} delay The delay in milliseconds.
+     * @param {number} startDelay The start delay in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public delay(delay: number): Base;
-    public delay(delay?: number): any {
-      if (delay == null) {
-        return this._delay;
+    public startDelay(startDelay: number): Base;
+    public startDelay(startDelay?: number): any {
+      if (startDelay == null) {
+        return this._startDelay;
       } else {
-        this._delay = delay;
+        this._startDelay = startDelay;
         return this;
       }
     }

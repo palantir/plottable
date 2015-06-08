@@ -16,7 +16,7 @@ export module Plots {
     constructor() {
       super();
       this.classed("scatter-plot", true);
-      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(250).delay(5));
+      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(250).startDelay(5));
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
