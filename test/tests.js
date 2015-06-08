@@ -304,12 +304,6 @@ after(function () {
 });
 
 ///<reference path="../testReference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var MockAnimator = (function () {
     function MockAnimator(time, callback) {
         this._time = time;
@@ -326,16 +320,13 @@ var MockAnimator = (function () {
     };
     return MockAnimator;
 })();
-var MockDrawer = (function (_super) {
-    __extends(MockDrawer, _super);
-    function MockDrawer() {
-        _super.apply(this, arguments);
-    }
-    MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
+function getMockDrawer(dataset) {
+    var drawer = new Plottable.Drawer(dataset);
+    drawer._drawStep = function (step) {
+        step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
     };
-    return MockDrawer;
-})(Plottable.Drawer);
+    return drawer;
+}
 describe("Drawers", function () {
     describe("Abstract Drawer", function () {
         var oldTimeout;
@@ -359,7 +350,7 @@ describe("Drawers", function () {
         beforeEach(function () {
             timings = [];
             svg = TestMethods.generateSVG();
-            drawer = new MockDrawer(null);
+            drawer = getMockDrawer(null);
             drawer.renderArea(svg);
         });
         afterEach(function () {
