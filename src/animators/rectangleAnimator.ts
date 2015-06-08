@@ -3,10 +3,7 @@
 module Plottable {
 export module Animators {
 
-  /**
-   * The default animator implementation with easing, duration, and delay.
-   */
-  export class Rect extends Base {
+  export class Rectangle extends Base {
 
     public static ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
 
@@ -21,7 +18,7 @@ export module Animators {
 
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
       var startAttrToAppliedProjector: AttributeToAppliedProjector = {};
-      Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]);
+      Rectangle.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]);
 
       var movingAttribute = this._isVertical ? "y" : "x";
       startAttrToAppliedProjector[movingAttribute] = () => this._startPixelValue;

@@ -8015,7 +8015,7 @@ var Plottable;
                     else if (key === "stacked-bar") {
                         var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                         var scaledBaseline = primaryScale.scale(this.baselineValue());
-                        return new Plottable.Animators.Rect(scaledBaseline, this._isVertical);
+                        return new Plottable.Animators.Rectangle(scaledBaseline, this._isVertical);
                     }
                 }
                 return new Plottable.Animators.Null();
@@ -8260,21 +8260,18 @@ var Plottable;
 (function (Plottable) {
     var Animators;
     (function (Animators) {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        var Rect = (function (_super) {
-            __extends(Rect, _super);
-            function Rect(startPixelValue, isVertical) {
+        var Rectangle = (function (_super) {
+            __extends(Rectangle, _super);
+            function Rectangle(startPixelValue, isVertical) {
                 if (isVertical === void 0) { isVertical = true; }
                 _super.call(this);
                 this._isVertical = isVertical;
                 this._startPixelValue = startPixelValue;
             }
-            Rect.prototype.animate = function (selection, attrToAppliedProjector) {
+            Rectangle.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var startAttrToAppliedProjector = {};
-                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
+                Rectangle.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
                 var movingAttribute = this._isVertical ? "y" : "x";
                 startAttrToAppliedProjector[movingAttribute] = function () { return _this._startPixelValue; };
                 var growingAttribute = this._isVertical ? "height" : "width";
@@ -8282,10 +8279,10 @@ var Plottable;
                 selection.attr(attrToAppliedProjector);
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
             };
-            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
-            return Rect;
+            Rectangle.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
+            return Rectangle;
         })(Animators.Base);
-        Animators.Rect = Rect;
+        Animators.Rectangle = Rectangle;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 

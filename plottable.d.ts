@@ -3136,10 +3136,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Animators {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        class Rect extends Base {
+        class Rectangle extends Base {
             static ANIMATED_ATTRIBUTES: string[];
             constructor(startPixelValue: number, isVertical?: boolean);
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
