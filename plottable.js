@@ -8272,15 +8272,13 @@ var Plottable;
                 this.startPixelValue = startPixelValue;
             }
             Rect.prototype.animate = function (selection, attrToAppliedProjector) {
+                var _this = this;
                 var startAttrToAppliedProjector = {};
                 Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
-                startAttrToAppliedProjector[this._getMovingAttr()] = this._startMovingProjector(attrToAppliedProjector);
+                startAttrToAppliedProjector[this._getMovingAttr()] = function () { return _this.startPixelValue; };
                 startAttrToAppliedProjector[this._getGrowingAttr()] = function () { return 0; };
                 selection.attr(attrToAppliedProjector);
                 return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
-            };
-            Rect.prototype._startMovingProjector = function (attrToAppliedProjector) {
-                return d3.functor(this.startPixelValue);
             };
             Rect.prototype._getGrowingAttr = function () {
                 return this.isVertical ? "height" : "width";

@@ -27,15 +27,11 @@ export module Animators {
       var startAttrToAppliedProjector: AttributeToAppliedProjector = {};
       Rect.ANIMATED_ATTRIBUTES.forEach((attr: string) => startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]);
 
-      startAttrToAppliedProjector[this._getMovingAttr()] = this._startMovingProjector(attrToAppliedProjector);
+      startAttrToAppliedProjector[this._getMovingAttr()] = () => this.startPixelValue;
       startAttrToAppliedProjector[this._getGrowingAttr()] = () => 0;
 
       selection.attr(attrToAppliedProjector);
       return super.animate(selection, attrToAppliedProjector);
-    }
-
-    protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector) {
-      return d3.functor(this.startPixelValue);
     }
 
     private _getGrowingAttr() {
