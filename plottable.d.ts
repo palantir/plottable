@@ -3066,19 +3066,6 @@ declare module Plottable {
             totalTime(numberOfIterations: number): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
-             * Gets the duration of the animation in milliseconds.
-             *
-             * @returns {number} The current duration.
-             */
-            stepDuration(): number;
-            /**
-             * Sets the duration of the animation in milliseconds.
-             *
-             * @param {number} duration The duration in milliseconds.
-             * @returns {Default} The calling Default Animator.
-             */
-            stepDuration(stepDuration: number): Base;
-            /**
              * Gets the start delay of the animation in milliseconds.
              *
              * @returns {number} The current start delay.
@@ -3092,18 +3079,18 @@ declare module Plottable {
              */
             startDelay(startDelay: number): Base;
             /**
-             * Gets the current easing of the animation.
+             * Gets the duration of the animation in milliseconds.
              *
-             * @returns {string} the current easing mode.
+             * @returns {number} The current duration.
              */
-            easing(): string;
+            stepDuration(): number;
             /**
-             * Sets the easing mode of the animation.
+             * Sets the duration of the animation in milliseconds.
              *
-             * @param {string} easing The desired easing mode.
+             * @param {number} duration The duration in milliseconds.
              * @returns {Default} The calling Default Animator.
              */
-            easing(easing: string): Base;
+            stepDuration(stepDuration: number): Base;
             /**
              * Gets the maximum start delay between animations in milliseconds.
              *
@@ -3130,6 +3117,19 @@ declare module Plottable {
              * @returns {Base} The calling Base Animator.
              */
             maxTotalDuration(maxDuration: number): Base;
+            /**
+             * Gets the current easing of the animation.
+             *
+             * @returns {string} the current easing mode.
+             */
+            easing(): string;
+            /**
+             * Sets the easing mode of the animation.
+             *
+             * @param {string} easing The desired easing mode.
+             * @returns {Default} The calling Default Animator.
+             */
+            easing(easing: string): Base;
         }
     }
 }

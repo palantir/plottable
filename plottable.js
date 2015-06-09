@@ -8187,15 +8187,6 @@ var Plottable;
                 var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
                 return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
-            Base.prototype.stepDuration = function (stepDuration) {
-                if (stepDuration == null) {
-                    return Math.min(this._stepDuration, this._maxTotalDuration);
-                }
-                else {
-                    this._stepDuration = stepDuration;
-                    return this;
-                }
-            };
             Base.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {
                     return this._startDelay;
@@ -8205,12 +8196,12 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.easing = function (easing) {
-                if (easing == null) {
-                    return this._easing;
+            Base.prototype.stepDuration = function (stepDuration) {
+                if (stepDuration == null) {
+                    return Math.min(this._stepDuration, this._maxTotalDuration);
                 }
                 else {
-                    this._easing = easing;
+                    this._stepDuration = stepDuration;
                     return this;
                 }
             };
@@ -8229,6 +8220,15 @@ var Plottable;
                 }
                 else {
                     this._maxTotalDuration = maxDuration;
+                    return this;
+                }
+            };
+            Base.prototype.easing = function (easing) {
+                if (easing == null) {
+                    return this._easing;
+                }
+                else {
+                    this._easing = easing;
                     return this;
                 }
             };

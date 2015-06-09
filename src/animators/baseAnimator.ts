@@ -37,11 +37,11 @@ export module Animators {
      */
     public static DEFAULT_EASING = "exp-out";
 
-    private _stepDuration: number;
     private _startDelay: number;
-    private _easing: string;
+    private _stepDuration: number;
     private _iterativeDelay: number;
     private _maxTotalDuration: number;
+    private _easing: string;
 
     /**
      * Constructs the default animator
@@ -76,28 +76,6 @@ export module Animators {
     }
 
     /**
-     * Gets the duration of the animation in milliseconds.
-     *
-     * @returns {number} The current duration.
-     */
-    public stepDuration(): number;
-    /**
-     * Sets the duration of the animation in milliseconds.
-     *
-     * @param {number} duration The duration in milliseconds.
-     * @returns {Default} The calling Default Animator.
-     */
-    public stepDuration(stepDuration: number): Base;
-    public stepDuration(stepDuration?: number): any {
-      if (stepDuration == null) {
-        return Math.min(this._stepDuration, this._maxTotalDuration);
-      } else {
-        this._stepDuration = stepDuration;
-        return this;
-      }
-    }
-
-    /**
      * Gets the start delay of the animation in milliseconds.
      *
      * @returns {number} The current start delay.
@@ -120,23 +98,23 @@ export module Animators {
     }
 
     /**
-     * Gets the current easing of the animation.
+     * Gets the duration of the animation in milliseconds.
      *
-     * @returns {string} the current easing mode.
+     * @returns {number} The current duration.
      */
-    public easing(): string;
+    public stepDuration(): number;
     /**
-     * Sets the easing mode of the animation.
+     * Sets the duration of the animation in milliseconds.
      *
-     * @param {string} easing The desired easing mode.
+     * @param {number} duration The duration in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public easing(easing: string): Base;
-    public easing(easing?: string): any {
-      if (easing == null) {
-        return this._easing;
+    public stepDuration(stepDuration: number): Base;
+    public stepDuration(stepDuration?: number): any {
+      if (stepDuration == null) {
+        return Math.min(this._stepDuration, this._maxTotalDuration);
       } else {
-        this._easing = easing;
+        this._stepDuration = stepDuration;
         return this;
       }
     }
@@ -184,7 +162,28 @@ export module Animators {
         return this;
       }
     }
-  }
 
+    /**
+     * Gets the current easing of the animation.
+     *
+     * @returns {string} the current easing mode.
+     */
+    public easing(): string;
+    /**
+     * Sets the easing mode of the animation.
+     *
+     * @param {string} easing The desired easing mode.
+     * @returns {Default} The calling Default Animator.
+     */
+    public easing(easing: string): Base;
+    public easing(easing?: string): any {
+      if (easing == null) {
+        return this._easing;
+      } else {
+        this._easing = easing;
+        return this;
+      }
+    }
+  }
 }
 }
