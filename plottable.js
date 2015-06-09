@@ -4961,20 +4961,20 @@ var Plottable;
              * @constructor
              * @param {Scale.Color} scale
              */
-            function Legend(scale) {
+            function Legend(colorScale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
                 this.classed("legend", true);
                 this.maxEntriesPerRow(1);
-                if (scale == null) {
+                if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
                 }
-                this._scale = scale;
+                this._colorScale = colorScale;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
-                this._scale.onUpdate(this._redrawCallback);
+                this._colorScale.onUpdate(this._redrawCallback);
                 this.xAlignment("right").yAlignment("top");
-                this.comparator(function (a, b) { return _this._scale.domain().indexOf(a) - _this._scale.domain().indexOf(b); });
+                this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
             }
             Legend.prototype._setup = function () {
@@ -5006,27 +5006,27 @@ var Plottable;
                     return this;
                 }
             };
-            Legend.prototype.scale = function (scale) {
-                if (scale != null) {
-                    this._scale.offUpdate(this._redrawCallback);
-                    this._scale = scale;
-                    this._scale.onUpdate(this._redrawCallback);
+            Legend.prototype.colorScale = function (colorScale) {
+                if (colorScale != null) {
+                    this._colorScale.offUpdate(this._redrawCallback);
+                    this._colorScale = colorScale;
+                    this._colorScale.onUpdate(this._redrawCallback);
                     this.redraw();
                     return this;
                 }
                 else {
-                    return this._scale;
+                    return this._colorScale;
                 }
             };
             Legend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
-                this._scale.offUpdate(this._redrawCallback);
+                this._colorScale.offUpdate(this._redrawCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
-                var entryNames = this._scale.domain().slice();
+                var entryNames = this._colorScale.domain().slice();
                 entryNames.sort(this.comparator());
                 var entryLengths = d3.map();
                 var untruncatedEntryLengths = d3.map();
@@ -5146,7 +5146,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._scale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results

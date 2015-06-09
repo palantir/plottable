@@ -36,7 +36,7 @@ describe("Legend", () => {
 
   it("legend domain can be updated after initialization, and height updates as well", () => {
     legend.renderTo(svg);
-    legend.scale(color);
+    legend.colorScale(color);
     assert.strictEqual(legend.requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
     var height1 = legend.requestedSpace(400, 400).minHeight;
@@ -112,7 +112,7 @@ describe("Legend", () => {
     var newDomain = ["a", "b", "c"];
     var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(newDomain);
-    legend.scale(newColorScale);
+    legend.colorScale(newColorScale);
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
       assert.strictEqual(d, newDomain[i], "the data is set correctly");
@@ -132,7 +132,7 @@ describe("Legend", () => {
     var tempDomain = ["a", "b", "c"];
     var newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(tempDomain);
-    legend.scale(newColorScale);
+    legend.colorScale(newColorScale);
 
     var newDomain = ["a", "foo", "d"];
     newColorScale.domain(newDomain);
