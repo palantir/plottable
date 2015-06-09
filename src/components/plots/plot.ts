@@ -25,7 +25,7 @@ module Plottable {
   }
 
   export class Plot extends Component {
-    protected static IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS = 600;
+    protected static ANIMATION_MAX_DURATION = 600;
 
     protected _dataChanged = false;
     protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
@@ -60,7 +60,7 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      var mainAnimator = new Animators.Base().maxTotalDuration(Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS);
+      var mainAnimator = new Animators.Base().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, mainAnimator);
       this.animator(Plots.Animator.RESET, new Animators.Null());
     }
