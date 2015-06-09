@@ -12,7 +12,6 @@ export module Plots {
   export class Bar<X, Y> extends XYPlot<X, Y> {
     public static ORIENTATION_VERTICAL = "vertical";
     public static ORIENTATION_HORIZONTAL = "horizontal";
-    protected static _DEFAULT_WIDTH = 10;
     private static _BAR_WIDTH_RATIO = 0.95;
     private static _SINGLE_BAR_DIMENSION_RATIO = 0.4;
     private static _BAR_AREA_CLASS = "bar-area";

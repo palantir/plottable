@@ -2693,7 +2693,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * @constructor
