@@ -31,7 +31,7 @@ export module Animators {
     /**
      * The default maximum total animation duration
      */
-    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
+    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
     /**
      * The default easing of the animation
      */

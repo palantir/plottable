@@ -58,8 +58,8 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      this._animators[Plots.Animator.MAIN] = new Animators.Base();
-      this._animators[Plots.Animator.RESET] = new Animators.Null();
+      this.animator(Plots.Animator.MAIN, new Animators.Base().maxTotalDuration(600));
+      this.animator(Plots.Animator.RESET, new Animators.Null());
     }
 
     public anchor(selection: d3.Selection<void>) {

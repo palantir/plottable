@@ -12,7 +12,11 @@ export module Plots {
     constructor() {
       super();
       this.classed("line-plot", true);
-      this.animator(Plots.Animator.MAIN, new Animators.Base().stepDuration(600).easing("exp-in-out"));
+      var animator = new Animators.Base();
+      animator.stepDuration(600);
+      animator.easing("exp-in-out");
+      animator.maxTotalDuration(600);
+      this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }

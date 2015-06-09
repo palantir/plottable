@@ -5988,8 +5988,8 @@ var Plottable;
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
-            this._animators[Plots.Animator.MAIN] = new Plottable.Animators.Base();
-            this._animators[Plots.Animator.RESET] = new Plottable.Animators.Null();
+            this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().maxTotalDuration(600));
+            this.animator(Plots.Animator.RESET, new Plottable.Animators.Null());
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
@@ -6949,7 +6949,11 @@ var Plottable;
             function Scatter() {
                 _super.call(this);
                 this.classed("scatter-plot", true);
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(250).startDelay(5));
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(5);
+                animator.stepDuration(250);
+                animator.maxTotalDuration(600);
+                this.animator(Plots.Animator.MAIN, animator);
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.size(6);
@@ -7507,7 +7511,11 @@ var Plottable;
             function Line() {
                 _super.call(this);
                 this.classed("line-plot", true);
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(600).easing("exp-in-out"));
+                var animator = new Plottable.Animators.Base();
+                animator.stepDuration(600);
+                animator.easing("exp-in-out");
+                animator.maxTotalDuration(600);
+                this.animator(Plots.Animator.MAIN, animator);
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
@@ -7622,7 +7630,6 @@ var Plottable;
                 _super.call(this);
                 this.classed("area-plot", true);
                 this.y0(0); // default
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(600).easing("exp-in-out"));
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this._lineDrawers = new Plottable.Utils.Map();
@@ -8247,7 +8254,7 @@ var Plottable;
             /**
              * The default maximum total animation duration
              */
-            Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = 600;
+            Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
             /**
              * The default easing of the animation
              */
