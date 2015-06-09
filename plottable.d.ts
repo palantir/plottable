@@ -3038,13 +3038,13 @@ declare module Plottable {
          */
         class Base implements Animators.Plot {
             /**
-             * The default duration of the animation in milliseconds
-             */
-            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
-            /**
              * The default starting delay of the animation in milliseconds
              */
             static DEFAULT_START_DELAY_MILLISECONDS: number;
+            /**
+             * The default duration of the animation in milliseconds
+             */
+            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
             /**
              * The default maximum start delay between each start of an animation
              */

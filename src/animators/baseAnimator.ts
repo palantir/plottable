@@ -17,13 +17,13 @@ export module Animators {
    */
   export class Base implements Animators.Plot {
     /**
-     * The default duration of the animation in milliseconds
-     */
-    public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
-    /**
      * The default starting delay of the animation in milliseconds
      */
     public static DEFAULT_START_DELAY_MILLISECONDS = 0;
+    /**
+     * The default duration of the animation in milliseconds
+     */
+    public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
      * The default maximum start delay between each start of an animation
      */
@@ -49,11 +49,11 @@ export module Animators {
      * @constructor
      */
     constructor() {
-      this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
       this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
-      this._easing = Base.DEFAULT_EASING;
+      this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
       this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+      this._easing = Base.DEFAULT_EASING;
     }
 
     public totalTime(numberOfIterations: number) {
@@ -90,7 +90,7 @@ export module Animators {
     public stepDuration(stepDuration: number): Base;
     public stepDuration(stepDuration?: number): any {
       if (stepDuration == null) {
-        return this._stepDuration;
+        return Math.min(this._stepDuration, this._maxTotalDuration);
       } else {
         this._stepDuration = stepDuration;
         return this;
