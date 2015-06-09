@@ -29,7 +29,7 @@ module Plottable {
     private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
     protected _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 

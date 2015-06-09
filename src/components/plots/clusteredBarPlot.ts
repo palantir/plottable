@@ -49,7 +49,7 @@ export module Plots {
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
       innerScale.domain(this.datasets().map((d, i) => String(i)));
-      var widthProjector = Plot._scaledAccessor(this._attrBindings.get("width"));
+      var widthProjector = Plot._scaledAccessor(this.attr("width"));
       innerScale.range([0, widthProjector(null, 0, null)]);
       return innerScale;
     }

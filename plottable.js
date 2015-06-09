@@ -7808,7 +7808,7 @@ var Plottable;
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scales.Category();
                 innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
-                var widthProjector = Plottable.Plot._scaledAccessor(this._attrBindings.get("width"));
+                var widthProjector = Plottable.Plot._scaledAccessor(this.attr("width"));
                 innerScale.range([0, widthProjector(null, 0, null)]);
                 return innerScale;
             };
