@@ -220,7 +220,6 @@ export module Components {
       var entities: Entity<Legend>[] = [];
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
-      var domain = this._scale.domain();
       var legend = this;
       this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
         var lowY = i * layout.textHeight + legendPadding;
@@ -235,7 +234,6 @@ export module Components {
               highY >= p.y && lowY <= p.y) {
             var entrySelection = d3.select(this);
             var datum = entrySelection.datum();
-            var index = domain.indexOf(datum);
             entities.push({
               datum: datum,
               position: { x: symbolX, y: symbolY },
