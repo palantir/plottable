@@ -258,7 +258,7 @@ var Plottable;
              * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element) {
+            function elementBBox(element) {
                 var bbox;
                 try {
                     bbox = element.node().getBBox();
@@ -268,7 +268,7 @@ var Plottable;
                 }
                 return bbox;
             }
-            DOM.getBBox = getBBox;
+            DOM.elementBBox = elementBBox;
             DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
             function requestAnimationFramePolyfill(fn) {
                 if (window.requestAnimationFrame != null) {
@@ -290,14 +290,14 @@ var Plottable;
             }
             DOM.elementHeight = elementHeight;
             function translate(selection, x, y) {
-                var xform = d3.transform(selection.attr("transform"));
+                var transformMatrix = d3.transform(selection.attr("transform"));
                 if (x == null) {
-                    return xform.translate;
+                    return transformMatrix.translate;
                 }
                 y = (y == null) ? 0 : y;
-                xform.translate[0] = x;
-                xform.translate[1] = y;
-                selection.attr("transform", xform.toString());
+                transformMatrix.translate[0] = x;
+                transformMatrix.translate[1] = y;
+                selection.attr("transform", transformMatrix.toString());
                 return selection;
             }
             DOM.translate = translate;
@@ -6943,7 +6943,7 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = Plottable.Utils.DOM.getBBox(selection);
+                var bbox = Plottable.Utils.DOM.elementBBox(selection);
                 var translatedBbox = {
                     x: bbox.x + translation[0],
                     y: bbox.y + translation[1],
@@ -7136,7 +7136,7 @@ var Plottable;
                     var secondaryDist = 0;
                     var plotPt = entity.position;
                     // if we're inside a bar, distance in both directions should stay 0
-                    var barBBox = Plottable.Utils.DOM.getBBox(entity.selection);
+                    var barBBox = Plottable.Utils.DOM.elementBBox(entity.selection);
                     if (!Plottable.Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                         var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -7164,7 +7164,7 @@ var Plottable;
             Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var barBBox = Plottable.Utils.DOM.getBBox(selection);
+                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
@@ -7193,7 +7193,7 @@ var Plottable;
             Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
                 var intersected = [];
                 this.entities().forEach(function (entity) {
-                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.elementBBox(entity.selection))) {
                         intersected.push(entity);
                     }
                 });

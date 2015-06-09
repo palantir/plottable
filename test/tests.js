@@ -1428,7 +1428,7 @@ describe("Labels", function () {
         var textChildren = content.selectAll("text");
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
@@ -1450,7 +1450,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var textBBox = Plottable.Utils.DOM.getBBox(text);
+        var textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -1462,7 +1462,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var textBBox = Plottable.Utils.DOM.getBBox(text);
+        var textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -1487,7 +1487,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
@@ -1507,7 +1507,7 @@ describe("Labels", function () {
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
-        var textWidth = Plottable.Utils.DOM.getBBox(label._content.select("text")).width;
+        var textWidth = Plottable.Utils.DOM.elementBBox(label._content.select("text")).width;
         assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
@@ -1525,11 +1525,11 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
         label.angle(90);
         text = content.select("text");
-        bbox = Plottable.Utils.DOM.getBBox(text);
+        bbox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
@@ -1622,9 +1622,9 @@ describe("Legend", function () {
     it("a legend with many labels does not overflow vertically", function () {
         color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
         legend.renderTo(svg);
-        var contentBBox = Plottable.Utils.DOM.getBBox(legend._content);
+        var contentBBox = Plottable.Utils.DOM.elementBBox(legend._content);
         var contentBottomEdge = contentBBox.y + contentBBox.height;
-        var bboxBBox = Plottable.Utils.DOM.getBBox(legend._element.select(".bounding-box"));
+        var bboxBBox = Plottable.Utils.DOM.elementBBox(legend._element.select(".bounding-box"));
         var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
@@ -1708,7 +1708,7 @@ describe("Legend", function () {
         function verifySymbolHeight() {
             var text = legend._content.select("text");
             var icon = legend._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
-            var textHeight = Plottable.Utils.DOM.getBBox(text).height;
+            var textHeight = Plottable.Utils.DOM.elementBBox(text).height;
             var symbolHeight = icon.node().getBoundingClientRect().height;
             assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
             assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
@@ -1996,7 +1996,7 @@ describe("SelectionBoxLayer", function () {
         sbl.renderTo(svg);
         function assertCorrectRendering(expectedTL, expectedBR, msg) {
             var selectionBox = svg.select(".selection-box");
-            var bbox = Plottable.Utils.DOM.getBBox(selectionBox);
+            var bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
             assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
             assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
             assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
@@ -6321,7 +6321,7 @@ describe("Component behavior", function () {
         boxStrings.forEach(function (s) {
             var box = boxContainer.select(s);
             assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-            var bb = Plottable.Utils.DOM.getBBox(box);
+            var bb = Plottable.Utils.DOM.elementBBox(box);
             assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
             assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
         });
@@ -6677,7 +6677,7 @@ describe("Tables", function () {
         assert.deepEqual(translates[1], [200, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 200], "third element is located properly");
         assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         bboxes.forEach(function (b) {
             assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
             assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
@@ -6693,7 +6693,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return TestMethods.getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
         assert.deepEqual(translates[1], [210, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -6724,7 +6724,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return TestMethods.getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         // test the translates
         assert.deepEqual(translates[0], [50, 0], "top axis translate");
         assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
@@ -7907,7 +7907,7 @@ describe("Utils.DOM", function () {
             height: 20
         };
         var rect = svg.append("rect").attr(expectedBox);
-        var measuredBox = Plottable.Utils.DOM.getBBox(rect);
+        var measuredBox = Plottable.Utils.DOM.elementBBox(rect);
         assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
         svg.remove();
     });
@@ -7920,10 +7920,10 @@ describe("Utils.DOM", function () {
         };
         var removedSVG = TestMethods.generateSVG().remove();
         var rect = removedSVG.append("rect").attr(expectedBox);
-        Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
         var noneSVG = TestMethods.generateSVG().style("display", "none");
         rect = noneSVG.append("rect").attr(expectedBox);
-        Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
         noneSVG.remove();
     });
     describe("elementWidth(), elementHeight()", function () {

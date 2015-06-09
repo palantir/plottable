@@ -236,7 +236,7 @@ export module Plots {
         var secondaryDist = 0;
         var plotPt = entity.position;
         // if we're inside a bar, distance in both directions should stay 0
-        var barBBox = Utils.DOM.getBBox(entity.selection);
+        var barBBox = Utils.DOM.elementBBox(entity.selection);
         if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
           var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
           primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -268,7 +268,7 @@ export module Plots {
     protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
-      var barBBox = Utils.DOM.getBBox(selection);
+      var barBBox = Utils.DOM.elementBBox(selection);
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
@@ -315,7 +315,7 @@ export module Plots {
     private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
       var intersected: Entity[] = [];
       this.entities().forEach((entity) => {
-        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
           intersected.push(entity);
         }
       });

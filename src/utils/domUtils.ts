@@ -9,7 +9,7 @@ export module Utils {
      * @param {d3.Selection} element
      * @returns {SVGRed} The bounding box.
      */
-    export function getBBox(element: d3.Selection<any>) {
+    export function elementBBox(element: d3.Selection<any>) {
       var bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
@@ -51,15 +51,16 @@ export module Utils {
     export function translate(selection: d3.Selection<any>): d3.Transform;
     export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
     export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
-      var xform = d3.transform(selection.attr("transform"));
+      var transformMatrix = d3.transform(selection.attr("transform"));
+
       if (x == null) {
-        return xform.translate;
+        return transformMatrix.translate;
       }
 
       y = (y == null) ? 0 : y;
-      xform.translate[0] = x;
-      xform.translate[1] = y;
-      selection.attr("transform", xform.toString());
+      transformMatrix.translate[0] = x;
+      transformMatrix.translate[1] = y;
+      selection.attr("transform", transformMatrix.toString());
       return selection;
     }
 

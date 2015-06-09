@@ -16,7 +16,7 @@ describe("Labels", () => {
     assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
 
     var text = content.select("text");
-    var bbox = Plottable.Utils.DOM.getBBox(text);
+    var bbox = Plottable.Utils.DOM.elementBBox(text);
     assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
     assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
     svg.remove();
@@ -40,7 +40,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
-    var textBBox = Plottable.Utils.DOM.getBBox(text);
+    var textBBox = Plottable.Utils.DOM.elementBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -53,7 +53,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
-    var textBBox = Plottable.Utils.DOM.getBBox(text);
+    var textBBox = Plottable.Utils.DOM.elementBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
     assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -80,7 +80,7 @@ describe("Labels", () => {
     label.renderTo(svg);
     var content = (<any> label)._content;
     var text = content.select("text");
-    var bbox = Plottable.Utils.DOM.getBBox(text);
+    var bbox = Plottable.Utils.DOM.elementBBox(text);
     assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
     assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
     svg.remove();
@@ -103,7 +103,7 @@ describe("Labels", () => {
     t.renderTo(svg);
     var textTranslate = d3.transform((<any> label)._content.select("g").attr("transform")).translate;
     var eleTranslate = d3.transform((<any> label)._element.attr("transform")).translate;
-    var textWidth = Plottable.Utils.DOM.getBBox((<any> label)._content.select("text")).width;
+    var textWidth = Plottable.Utils.DOM.elementBBox((<any> label)._content.select("text")).width;
     assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
     svg.remove();
   });
@@ -124,12 +124,12 @@ describe("Labels", () => {
 
     var content = (<any> label)._content;
     var text = content.select("text");
-    var bbox = Plottable.Utils.DOM.getBBox(text);
+    var bbox = Plottable.Utils.DOM.elementBBox(text);
     assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
 
     label.angle(90);
     text = content.select("text");
-    bbox = Plottable.Utils.DOM.getBBox(text);
+    bbox = Plottable.Utils.DOM.elementBBox(text);
     TestMethods.assertBBoxInclusion((<any> label)._element.select(".bounding-box"), text);
     assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
 
