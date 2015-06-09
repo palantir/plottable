@@ -1685,7 +1685,7 @@ var Plottable;
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         QuantitativeScale.prototype.invert = function (value) {
-            throw new Error("Subclasses should override _invert");
+            throw new Error("Subclasses should override invert");
         };
         QuantitativeScale.prototype.domain = function (values) {
             if (values != null) {

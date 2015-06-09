@@ -607,7 +607,6 @@ declare module Plottable {
      */
     type SymbolFactory = (symbolSize: number) => string;
     module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
         function circle(): SymbolFactory;
         function square(): SymbolFactory;
         function cross(): SymbolFactory;
