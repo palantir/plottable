@@ -25,7 +25,7 @@ module Plottable {
   }
 
   export class Plot extends Component {
-    protected _dataChanged = false;
+    private _dataChanged = false;
     protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
@@ -33,7 +33,7 @@ module Plottable {
     protected _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
-    protected _animate: boolean = false;
+    private _animate = false;
     private _animators: {[animator: string]: Animators.Plot} = {};
 
     private _renderCallback: ScaleCallback<Scale<any, any>>;
