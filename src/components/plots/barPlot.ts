@@ -168,15 +168,15 @@ export module Plots {
     /**
      * Gets the Formatter for the labels.
      */
-    public labelFormatter(): Formatter;
+    public labelsFormatter(): Formatter;
     /**
      * Sets the Formatter for the labels.
      *
      * @param {Formatter} formatter
      * @returns {Bar} The calling Bar Plot.
      */
-    public labelFormatter(formatter: Formatter): Bar<X, Y>;
-    public labelFormatter(formatter?: Formatter): any {
+    public labelsFormatter(formatter: Formatter): Bar<X, Y>;
+    public labelsFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._labelFormatter;
       } else {
