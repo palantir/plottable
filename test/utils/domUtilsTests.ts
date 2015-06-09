@@ -37,16 +37,16 @@ describe("Utils.DOM", () => {
     noneSVG.remove();
   });
 
-  describe("getElementWidth, getElementHeight", () => {
+  describe("elementWidth(), elementHeight()", () => {
     it("can get a plain element's size", () => {
       var parent = TestMethods.getSVGParent();
       parent.style("width", "300px");
       parent.style("height", "200px");
       var parentElem = <Element> parent[0][0];
 
-      var width = Plottable.Utils.DOM.getElementWidth(parentElem);
+      var width = Plottable.Utils.DOM.elementWidth(parentElem);
       assert.strictEqual(width, 300, "measured width matches set width");
-      var height = Plottable.Utils.DOM.getElementHeight(parentElem);
+      var height = Plottable.Utils.DOM.elementHeight(parentElem);
       assert.strictEqual(height, 200, "measured height matches set height");
     });
 
@@ -54,9 +54,9 @@ describe("Utils.DOM", () => {
       var svg = TestMethods.generateSVG(450, 120);
       var svgElem = <Element> svg[0][0];
 
-      var width = Plottable.Utils.DOM.getElementWidth(svgElem);
+      var width = Plottable.Utils.DOM.elementWidth(svgElem);
       assert.strictEqual(width, 450, "measured width matches set width");
-      var height = Plottable.Utils.DOM.getElementHeight(svgElem);
+      var height = Plottable.Utils.DOM.elementHeight(svgElem);
       assert.strictEqual(height, 120, "measured height matches set height");
       svg.remove();
     });
@@ -69,23 +69,23 @@ describe("Utils.DOM", () => {
 
       parent.style("width", "200px");
       parent.style("height", "50px");
-      assert.strictEqual(Plottable.Utils.DOM.getElementWidth(parentElem), 200, "width is correct");
-      assert.strictEqual(Plottable.Utils.DOM.getElementHeight(parentElem), 50, "height is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementWidth(parentElem), 200, "width is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementHeight(parentElem), 50, "height is correct");
 
       child.style("width", "20px");
       child.style("height", "10px");
-      assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 20, "width is correct");
-      assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 10, "height is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 20, "width is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 10, "height is correct");
 
       child.style("width", "100%");
       child.style("height", "100%");
-      assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 200, "width is correct");
-      assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 50, "height is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 200, "width is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 50, "height is correct");
 
       child.style("width", "50%");
       child.style("height", "50%");
-      assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 100, "width is correct");
-      assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 25, "height is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 100, "width is correct");
+      assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 25, "height is correct");
 
       // reset test page DOM
       parent.style("width", "auto");

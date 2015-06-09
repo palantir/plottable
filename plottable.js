@@ -284,16 +284,16 @@ var Plottable;
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function getElementWidth(element) {
+            function elementWidth(element) {
                 var style = window.getComputedStyle(element);
                 return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");
             }
-            DOM.getElementWidth = getElementWidth;
-            function getElementHeight(element) {
+            DOM.elementWidth = elementWidth;
+            function elementHeight(element) {
                 var style = window.getComputedStyle(element);
                 return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
             }
-            DOM.getElementHeight = getElementHeight;
+            DOM.elementHeight = elementHeight;
             function translate(selection, x, y) {
                 var xform = d3.transform(selection.attr("transform"));
                 if (x == null) {
@@ -2977,8 +2977,8 @@ var Plottable;
                         this._rootSVG.attr("height", "100%");
                     }
                     var elem = this._rootSVG.node();
-                    availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
-                    availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
+                    availableWidth = Plottable.Utils.DOM.elementWidth(elem);
+                    availableHeight = Plottable.Utils.DOM.elementHeight(elem);
                 }
                 else {
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");

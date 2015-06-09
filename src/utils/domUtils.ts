@@ -32,7 +32,7 @@ export module Utils {
       }
     }
 
-    export function getElementWidth(element: Element) {
+    export function elementWidth(element: Element) {
       var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
@@ -41,7 +41,7 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(element: Element) {
+    export function elementHeight(element: Element) {
       var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")
