@@ -2258,6 +2258,7 @@ declare module Plottable {
         }
     }
     class Plot extends Component {
+        protected static ANIMATION_MAX_DURATION: number;
         protected _dataChanged: boolean;
         protected _renderArea: d3.Selection<void>;
         protected _animate: boolean;
@@ -3010,28 +3011,31 @@ declare module Plottable {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
+         * The delay between animations can be configured with iterativeDelay().
+         * This will be affected if the maxTotalDuration() is used such that the entire animation
+         * fits within the timeframe
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
-         * maxTotalDuration does not set actual total animation duration.
+         * It is guaranteed the animation will not exceed this value,
+         * by first reducing stepDuration, then iterativeDelay
          *
          * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
-         *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
+         * min(iterativeDelay(),
+         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
         class Base implements Animators.Plot {
             /**
-             * The default duration of the animation in milliseconds
-             */
-            static DEFAULT_DURATION_MILLISECONDS: number;
-            /**
              * The default starting delay of the animation in milliseconds
              */
-            static DEFAULT_DELAY_MILLISECONDS: number;
+            static DEFAULT_START_DELAY_MILLISECONDS: number;
             /**
-             * The default maximum start delay between each start of an animation
+             * The default duration of one animation step in milliseconds
              */
-            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
+            /**
+             * The default maximum start delay between each step of an animation
+             */
+            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
              * The default maximum total animation duration
              */
@@ -3046,34 +3050,60 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            totalTime(numberOfIterations: number): number;
+            totalTime(numberOfSteps: number): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
-             * Gets the duration of the animation in milliseconds.
+             * Gets the start delay of the animation in milliseconds.
+             *
+             * @returns {number} The current start delay.
+             */
+            startDelay(): number;
+            /**
+             * Sets the start delay of the animation in milliseconds.
+             *
+             * @param {number} startDelay The start delay in milliseconds.
+             * @returns {Base} The calling Base Animator.
+             */
+            startDelay(startDelay: number): Base;
+            /**
+             * Gets the duration of one animation step in milliseconds.
              *
              * @returns {number} The current duration.
              */
-            duration(): number;
+            stepDuration(): number;
             /**
-             * Sets the duration of the animation in milliseconds.
+             * Sets the duration of one animation step in milliseconds.
              *
-             * @param {number} duration The duration in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @param {number} stepDuration The duration in milliseconds.
+             * @returns {Base} The calling Base Animator.
              */
-            duration(duration: number): Base;
+            stepDuration(stepDuration: number): Base;
             /**
-             * Gets the delay of the animation in milliseconds.
+             * Gets the maximum start delay between animation steps in milliseconds.
              *
-             * @returns {number} The current delay.
+             * @returns {number} The current maximum iterative delay.
              */
-            delay(): number;
+            iterativeDelay(): number;
             /**
-             * Sets the delay of the animation in milliseconds.
+             * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} delay The delay in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
+             * @returns {Base} The calling Base Animator.
              */
-            delay(delay: number): Base;
+            iterativeDelay(iterativeDelay: number): Base;
+            /**
+             * Gets the maximum total animation duration constraint in milliseconds.
+             *
+             * @returns {number} The current maximum total animation duration.
+             */
+            maxTotalDuration(): number;
+            /**
+             * Sets the maximum total animation duration constraint in miliseconds.
+             *
+             * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
+             * @returns {Base} The calling Base Animator.
+             */
+            maxTotalDuration(maxTotalDuration: number): Base;
             /**
              * Gets the current easing of the animation.
              *
@@ -3084,35 +3114,9 @@ declare module Plottable {
              * Sets the easing mode of the animation.
              *
              * @param {string} easing The desired easing mode.
-             * @returns {Default} The calling Default Animator.
+             * @returns {Base} The calling Base Animator.
              */
             easing(easing: string): Base;
-            /**
-             * Gets the maximum start delay between animations in milliseconds.
-             *
-             * @returns {number} The current maximum iterative delay.
-             */
-            maxIterativeDelay(): number;
-            /**
-             * Sets the maximum start delay between animations in milliseconds.
-             *
-             * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
-             */
-            maxIterativeDelay(maxIterDelay: number): Base;
-            /**
-             * Gets the maximum total animation duration in milliseconds.
-             *
-             * @returns {number} The current maximum total animation duration.
-             */
-            maxTotalDuration(): number;
-            /**
-             * Sets the maximum total animation duration in miliseconds.
-             *
-             * @param {number} maxDuration The maximum total animation duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
-             */
-            maxTotalDuration(maxDuration: number): Base;
         }
     }
 }

@@ -122,9 +122,9 @@ describe("Drawers", () => {
 
       var animator = new Plottable.Animators.Base();
       animator.maxTotalDuration(Infinity);
-      animator.duration(stepDuration);
-      animator.maxIterativeDelay(stepDelay);
-      animator.delay(startDelay);
+      animator.stepDuration(stepDuration);
+      animator.iterativeDelay(stepDelay);
+      animator.startDelay(startDelay);
 
       var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
 
