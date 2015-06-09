@@ -9,7 +9,7 @@ export module Utils {
      * @param {d3.Selection} element
      * @returns {SVGRed} The bounding box.
      */
-    export function getBBox(element: d3.Selection<any>): SVGRect {
+    export function getBBox(element: d3.Selection<any>) {
       var bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
@@ -24,7 +24,7 @@ export module Utils {
 
     export var POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
 
-    export function requestAnimationFramePolyfill(fn: () => any): void {
+    export function requestAnimationFramePolyfill(fn: () => any) {
       if (window.requestAnimationFrame != null) {
         window.requestAnimationFrame(fn);
       } else {
@@ -32,7 +32,7 @@ export module Utils {
       }
     }
 
-    export function getElementWidth(element: Element): number {
+    export function getElementWidth(element: Element) {
       var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
@@ -41,7 +41,7 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(element: Element): number {
+    export function getElementHeight(element: Element) {
       var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")
