@@ -34,20 +34,20 @@ export module Utils {
 
     export function elementWidth(element: Element) {
       var style = window.getComputedStyle(element);
-      return getParsedStyleValue(style, "width")
-        + getParsedStyleValue(style, "padding-left")
-        + getParsedStyleValue(style, "padding-right")
-        + getParsedStyleValue(style, "border-left-width")
-        + getParsedStyleValue(style, "border-right-width");
+      return _parseStyleValue(style, "width")
+        + _parseStyleValue(style, "padding-left")
+        + _parseStyleValue(style, "padding-right")
+        + _parseStyleValue(style, "border-left-width")
+        + _parseStyleValue(style, "border-right-width");
     }
 
     export function elementHeight(element: Element) {
       var style = window.getComputedStyle(element);
-      return getParsedStyleValue(style, "height")
-        + getParsedStyleValue(style, "padding-top")
-        + getParsedStyleValue(style, "padding-bottom")
-        + getParsedStyleValue(style, "border-top-width")
-        + getParsedStyleValue(style, "border-bottom-width");
+      return _parseStyleValue(style, "height")
+        + _parseStyleValue(style, "padding-top")
+        + _parseStyleValue(style, "padding-bottom")
+        + _parseStyleValue(style, "border-top-width")
+        + _parseStyleValue(style, "border-bottom-width");
     }
 
     export function translate(selection: d3.Selection<any>): d3.Transform;
@@ -115,8 +115,8 @@ export module Utils {
         yValOrRange: number | Range,
         bbox: SVGRect,
         tolerance = 0.5) {
-      var xRange = parseRange(xValOrRange);
-      var yRange = parseRange(yValOrRange);
+      var xRange = _parseRange(xValOrRange);
+      var yRange = _parseRange(yValOrRange);
 
       // SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
@@ -133,7 +133,7 @@ export module Utils {
      *
      * @returns {Range} The generated Range
      */
-    function parseRange(input: number | Range): Range {
+    function _parseRange(input: number | Range): Range {
       if (typeof (input) === "number") {
         var value = <number>input;
         return { min: value, max: value };
@@ -147,7 +147,7 @@ export module Utils {
       throw new Error("input '" + input + "' can't be parsed as an Range");
     }
 
-    function getParsedStyleValue(style: CSSStyleDeclaration, property: string): number {
+    function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
       var value: any = style.getPropertyValue(property);
       var parsedValue = parseFloat(value);
       if (parsedValue !== parsedValue) {

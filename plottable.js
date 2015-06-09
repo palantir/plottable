@@ -286,12 +286,12 @@ var Plottable;
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
             function elementWidth(element) {
                 var style = window.getComputedStyle(element);
-                return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");
+                return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
             DOM.elementWidth = elementWidth;
             function elementHeight(element) {
                 var style = window.getComputedStyle(element);
-                return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
+                return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
             }
             DOM.elementHeight = elementHeight;
             function translate(selection, x, y) {
@@ -358,8 +358,8 @@ var Plottable;
              */
             function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
                 if (tolerance === void 0) { tolerance = 0.5; }
-                var xRange = parseRange(xValOrRange);
-                var yRange = parseRange(yValOrRange);
+                var xRange = _parseRange(xValOrRange);
+                var yRange = _parseRange(yValOrRange);
                 // SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -374,7 +374,7 @@ var Plottable;
              *
              * @returns {Range} The generated Range
              */
-            function parseRange(input) {
+            function _parseRange(input) {
                 if (typeof (input) === "number") {
                     var value = input;
                     return { min: value, max: value };
@@ -385,7 +385,7 @@ var Plottable;
                 }
                 throw new Error("input '" + input + "' can't be parsed as an Range");
             }
-            function getParsedStyleValue(style, property) {
+            function _parseStyleValue(style, property) {
                 var value = style.getPropertyValue(property);
                 var parsedValue = parseFloat(value);
                 if (parsedValue !== parsedValue) {
