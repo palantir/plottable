@@ -2268,7 +2268,6 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: d3.Selection<void>;
         protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         protected _attrExtents: d3.Map<any[]>;
