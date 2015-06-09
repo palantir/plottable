@@ -9008,7 +9008,7 @@ var Plottable;
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            Key.prototype.onKey = function (keyCode, callback) {
+            Key.prototype.onKeyPress = function (keyCode, callback) {
                 if (!this._keyCodeCallbacks[keyCode]) {
                     this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
@@ -9023,7 +9023,7 @@ var Plottable;
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            Key.prototype.offKey = function (keyCode, callback) {
+            Key.prototype.offKeyPress = function (keyCode, callback) {
                 this._keyCodeCallbacks[keyCode].delete(callback);
                 if (this._keyCodeCallbacks[keyCode].size === 0) {
                     delete this._keyCodeCallbacks[keyCode];
