@@ -3972,7 +3972,7 @@ var Plottable;
                 this._setupDomElements();
             };
             Time.prototype._setupDomElements = function () {
-                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+                this._content.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
@@ -4116,14 +4116,14 @@ var Plottable;
                 var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
+                this._content.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
                     return usedHeight <= availableHeight ? "inherit" : "hidden";
                 });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };

@@ -321,7 +321,7 @@ export module Axes {
     }
 
     private _setupDomElements() {
-      this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+      this._content.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
 
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
@@ -494,7 +494,7 @@ export module Axes {
       var availableHeight = this.height();
       var usedHeight = 0;
 
-      this._element
+      this._content
         .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
         .attr("visibility", (d: any, i: number) => {
           usedHeight += this._tierHeights[i];
@@ -503,7 +503,7 @@ export module Axes {
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {
-      var boundingBox = (<Element> this._element.select(".bounding-box")[0][0]).getBoundingClientRect();
+      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (
