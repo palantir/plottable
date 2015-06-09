@@ -137,7 +137,6 @@ declare module Plottable {
             function requestAnimationFramePolyfill(fn: () => any): void;
             function getElementWidth(elem: Element): number;
             function getElementHeight(elem: Element): number;
-            function getSVGPixelWidth(svg: d3.Selection<void>): number;
             function translate(s: d3.Selection<any>): d3.Transform;
             function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;

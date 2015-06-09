@@ -294,27 +294,6 @@ var Plottable;
                 return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
             }
             DOM.getElementHeight = getElementHeight;
-            function getSVGPixelWidth(svg) {
-                var width = svg.node().clientWidth;
-                if (width === 0) {
-                    var widthAttr = svg.attr("width");
-                    if (widthAttr.indexOf("%") !== -1) {
-                        var ancestorNode = svg.node().parentNode;
-                        while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-                            ancestorNode = ancestorNode.parentNode;
-                        }
-                        if (ancestorNode == null) {
-                            throw new Error("Could not compute width of element");
-                        }
-                        width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-                    }
-                    else {
-                        width = parseFloat(widthAttr);
-                    }
-                }
-                return width;
-            }
-            DOM.getSVGPixelWidth = getSVGPixelWidth;
             function translate(s, x, y) {
                 var xform = d3.transform(s.attr("transform"));
                 if (x == null) {
