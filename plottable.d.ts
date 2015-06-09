@@ -3457,7 +3457,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            onKey(keyCode: number, callback: KeyCallback): Key;
+            onKeyPress(keyCode: number, callback: KeyCallback): Key;
             /**
              * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3466,7 +3466,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            offKey(keyCode: number, callback: KeyCallback): Key;
+            offKeyPress(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }
