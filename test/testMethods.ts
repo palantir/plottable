@@ -96,7 +96,6 @@ module TestMethods {
       expected: Plottable.Entity<Plottable.Component>,
       msg: string) {
     assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
-    assert.strictEqual(actual.index, expected.index, msg + " (index)");
     assertPointsClose(actual.position, expected.position, 0.01, msg);
     assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
     actual.selection[0].forEach((element: Element, index: number) => {
@@ -111,6 +110,7 @@ module TestMethods {
       msg: string) {
     assertEntitiesEqual(actual, expected, msg);
     assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
+    assert.strictEqual(actual.index, expected.index, msg + " (index)");
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {

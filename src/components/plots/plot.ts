@@ -5,6 +5,7 @@ module Plottable {
   export module Plots {
     export interface PlotEntity extends Entity<Plot> {
       dataset: Dataset;
+      index: number;
       component: Plot;
     }
 
