@@ -459,7 +459,7 @@ module Plottable {
       var entities: Plots.Entity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        var loopIndex = 0;
+        var validDatumIndex = 0;
         dataset.data().forEach((datum: any, datasetIndex: number) => {
           var position = this._pixelPoint(datum, datasetIndex, dataset);
           if (position.x !== position.x || position.y !== position.y) {
@@ -470,10 +470,10 @@ module Plottable {
             index: datasetIndex,
             dataset: dataset,
             position: position,
-            selection: drawer.selectionForIndex(loopIndex),
+            selection: drawer.selectionForIndex(validDatumIndex),
             plot: this
           });
-          loopIndex++;
+          validDatumIndex++;
         });
       });
       return entities;

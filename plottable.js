@@ -6295,7 +6295,7 @@ var Plottable;
             var entities = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
-                var loopIndex = 0;
+                var validDatumIndex = 0;
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
                     if (position.x !== position.x || position.y !== position.y) {
@@ -6306,10 +6306,10 @@ var Plottable;
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: drawer.selectionForIndex(loopIndex),
+                        selection: drawer.selectionForIndex(validDatumIndex),
                         plot: _this
                     });
-                    loopIndex++;
+                    validDatumIndex++;
                 });
             });
             return entities;
