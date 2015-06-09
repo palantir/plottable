@@ -540,7 +540,7 @@ describe("Animators", function () {
                 animator.stepDuration(stepDuration);
                 animator.iterativeDelay(iterativeDelay);
                 var actualTotalTime = animator.totalTime(iterationSteps);
-                assert.strictEqual(actualTotalTime, stepDuration, "The total duration constraint is just an upper bound");
+                assert.strictEqual(actualTotalTime, stepDuration, "The total time is just the time for one step");
             });
             it("maxTotalDuration() edge case for 1 step and startDelay", function () {
                 var iterationSteps = 1;
@@ -553,7 +553,27 @@ describe("Animators", function () {
                 animator.stepDuration(stepDuration);
                 animator.iterativeDelay(iterativeDelay);
                 var actualTotalTime = animator.totalTime(iterationSteps);
-                assert.strictEqual(actualTotalTime, expectedTotalTime, "The total duration constraint is just an upper bound");
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Total time is the time for one step, plus waiting for the start delay");
+            });
+            it("_getAdjustedIterativeDelay() works with maxTotalDuration constraint", function () {
+                var iterationSteps = 2;
+                var startDelay = 0;
+                var stepDuration = 1000;
+                var iterativeDelay = 1000000;
+                var maxTotalDuration = 1500;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                animator.maxTotalDuration(maxTotalDuration);
+                var expectedIterativeDelay = 500;
+                // 1 |  ###########
+                // 2 |       ###########
+                //   +------------------------
+                //   |  |    |    |    |    |
+                //     0.0  0.5  1.0  1.5  2.0
+                var actualIterativeDelay = animator._getAdjustedIterativeDelay(iterationSteps);
+                assert.strictEqual(actualIterativeDelay, expectedIterativeDelay, "The total duration constraint is just an upper bound");
             });
         });
     });
