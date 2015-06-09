@@ -320,7 +320,7 @@ var MockAnimator = (function () {
     };
     return MockAnimator;
 })();
-function getMockDrawer(dataset) {
+function createMockDrawer(dataset) {
     var drawer = new Plottable.Drawer(dataset);
     drawer._drawStep = function (step) {
         step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
@@ -350,7 +350,7 @@ describe("Drawers", function () {
         beforeEach(function () {
             timings = [];
             svg = TestMethods.generateSVG();
-            drawer = getMockDrawer(null);
+            drawer = createMockDrawer(null);
             drawer.renderArea(svg);
         });
         afterEach(function () {

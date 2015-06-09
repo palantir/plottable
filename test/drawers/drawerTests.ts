@@ -20,7 +20,7 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-function getMockDrawer(dataset: Plottable.Dataset) {
+function createMockDrawer(dataset: Plottable.Dataset) {
   var drawer = new Plottable.Drawer(dataset);
   (<any> drawer)._drawStep = (step: Plottable.Drawers.AppliedDrawStep) => {
     step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
@@ -49,7 +49,7 @@ describe("Drawers", () => {
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = getMockDrawer(null);
+      drawer = createMockDrawer(null);
       drawer.renderArea(svg);
     });
 
