@@ -30,7 +30,7 @@ function run(svg, data, Plottable) {
       .labelsEnabled(true)
       .labelFormatter(function(text){return text + "!";})
       .addDataset(new Plottable.Dataset(data))
-      .animator("main", animator)
+      .animator(Plots.Animator.MAIN, animator)
       .animated(true);
 
 
