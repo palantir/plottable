@@ -618,12 +618,12 @@ var Plottable;
                 var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
                 var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked.populateMap(domainKeys, function (domainKey) {
+                    return Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked.populateMap(domainKeys, function (domainKey) {
+                    return Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
@@ -683,7 +683,7 @@ var Plottable;
             };
             Stacked._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
                 var dataMapArray = datasets.map(function () {
-                    return Stacked.populateMap(domainKeys, function (domainKey) {
+                    return Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
                     });
                 });
@@ -732,7 +732,7 @@ var Plottable;
              * @param {(string, number) => T} transform A transformation function to apply to the keys.
              * @return {d3.Map<T>} A map mapping keys to their transformed values.
              */
-            Stacked.populateMap = function (keys, transform) {
+            Stacked._populateMap = function (keys, transform) {
                 var map = d3.map();
                 keys.forEach(function (key, i) {
                     map.set(key, transform(key, i));
