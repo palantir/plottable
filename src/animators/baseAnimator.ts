@@ -6,14 +6,17 @@ export module Animators {
   /**
    * The base animator implementation with easing, duration, and delay.
    *
-   * The maximum delay between animations can be configured with iterativeDelay.
+   * The delay between animations can be configured with iterativeDelay().
+   * This will be affected if the maxTotalDuration() is used such that the entire animation
+   * fits within the timeframe
    *
    * The maximum total animation duration can be configured with maxTotalDuration.
-   * maxTotalDuration does not set actual total animation duration.
+   * It is guaranteed the animation will not exceed this value,
+   * by first reducing stepDuration, then iterativeDelay
    *
    * The actual interval delay is calculated by following formula:
    * min(iterativeDelay(),
-   *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
+   *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
    */
   export class Base implements Animators.Plot {
     /**
@@ -59,7 +62,7 @@ export module Animators {
     public totalTime(numberOfIterations: number) {
       var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
       var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-      var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.stepDuration();
+      var time = this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfIterations - 1, 0)) + this.stepDuration();
       return time;
     }
 
