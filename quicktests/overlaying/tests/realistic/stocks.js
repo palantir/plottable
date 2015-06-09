@@ -120,7 +120,7 @@ function run(svg, data, Plottable) {
           var pzi = new Plottable.Interactions.PanZoom(xScale, null);
           pzi.attachTo(plotArea);
           var keyInteraction = new Plottable.Interactions.Key();
-          keyInteraction.onKey(65, function() {
+          keyInteraction.onKeyPress(65, function() {
                                        xScale.autoDomain();
                                        pzi.resetZoom();
                                      });
