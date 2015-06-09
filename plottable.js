@@ -385,8 +385,8 @@ var Plottable;
                 }
                 throw new Error("input '" + input + "' can't be parsed as an Range");
             }
-            function getParsedStyleValue(style, prop) {
-                var value = style.getPropertyValue(prop);
+            function getParsedStyleValue(style, property) {
+                var value = style.getPropertyValue(property);
                 var parsedValue = parseFloat(value);
                 if (parsedValue !== parsedValue) {
                     return 0;

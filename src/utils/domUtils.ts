@@ -147,8 +147,8 @@ export module Utils {
       throw new Error("input '" + input + "' can't be parsed as an Range");
     }
 
-    function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
-      var value: any = style.getPropertyValue(prop);
+    function getParsedStyleValue(style: CSSStyleDeclaration, property: string): number {
+      var value: any = style.getPropertyValue(property);
       var parsedValue = parseFloat(value);
       if (parsedValue !== parsedValue) {
           return 0;
