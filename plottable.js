@@ -8185,16 +8185,14 @@ var Plottable;
                 this._easing = Base.DEFAULT_EASING;
             }
             Base.prototype.totalTime = function (numberOfIterations) {
-                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
-                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
                 var time = this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfIterations - 1, 0)) + this.stepDuration();
                 return time;
             };
             Base.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
-                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
-                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
                 return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
             Base.prototype.startDelay = function (startDelay) {
@@ -8241,6 +8239,11 @@ var Plottable;
                     this._easing = easing;
                     return this;
                 }
+            };
+            Base.prototype._getAdjustedIterativeDelay = function (numberOfIterations) {
+                var stepStartTimeInterval = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
+                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfIterations - 1, 1));
+                return adjustedIterativeDelay;
             };
             /**
              * The default starting delay of the animation in milliseconds
