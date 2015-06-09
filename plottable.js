@@ -7808,16 +7808,8 @@ var Plottable;
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scales.Category();
                 innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
-                if (!this._attrBindings.get("width")) {
-                    innerScale.range([0, this._getBarPixelWidth()]);
-                }
-                else {
-                    var projection = this._attrBindings.get("width");
-                    var accessor = projection.accessor;
-                    var scale = projection.scale;
-                    var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
-                    innerScale.range([0, fn(null, 0, null)]);
-                }
+                var widthProjector = Plottable.Plot._scaledAccessor(this._attrBindings.get("width"));
+                innerScale.range([0, widthProjector(null, 0, null)]);
                 return innerScale;
             };
             ClusteredBar.prototype._getDataToDraw = function () {
