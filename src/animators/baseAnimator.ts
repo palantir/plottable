@@ -191,7 +191,7 @@ export module Animators {
     private _getAdjustedIterativeDelay(numberOfSteps: number) {
       var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
       stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
-      var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1)
+      var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
       return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
     }
   }
