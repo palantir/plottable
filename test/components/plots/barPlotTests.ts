@@ -654,7 +654,7 @@ describe("Plots", () => {
       it("bar labels hide if bars too skinny", () => {
         plot.labelsEnabled(true);
         plot.renderTo(svg);
-        plot.labelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
+        plot.labelsFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "no text drawn");
         svg.remove();
@@ -662,7 +662,7 @@ describe("Plots", () => {
 
       it("formatters are used properly", () => {
         plot.labelsEnabled(true);
-        plot.labelFormatter((n: number) => n.toString() + "%");
+        plot.labelsFormatter((n: number) => n.toString() + "%");
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");

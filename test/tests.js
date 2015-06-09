@@ -3825,14 +3825,14 @@ describe("Plots", function () {
             it("bar labels hide if bars too skinny", function () {
                 plot.labelsEnabled(true);
                 plot.renderTo(svg);
-                plot.labelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                plot.labelsFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 0, "no text drawn");
                 svg.remove();
             });
             it("formatters are used properly", function () {
                 plot.labelsEnabled(true);
-                plot.labelFormatter(function (n) { return n.toString() + "%"; });
+                plot.labelsFormatter(function (n) { return n.toString() + "%"; });
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");

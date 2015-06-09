@@ -28,10 +28,14 @@ function run(svg, data, Plottable) {
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
       .labelsEnabled(true)
-      .labelFormatter(function(text){return text + "!";})
       .addDataset(new Plottable.Dataset(data))
       .animator("main", animator)
       .animated(true);
+   if (typeof vbar.labelsFormatter === "function") {
+     vbar.labelsFormatter(function(text){return text + "!";});
+   } else {
+     vbar.labelFormatter(function(text){return text + "!";});
+   }
 
 
     var chart = new Plottable.Components.Table([
