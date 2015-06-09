@@ -90,17 +90,31 @@ function run(svg, data, Plottable){
   });
 
   var key = new Plottable.Interactions.Key();
-  key.onKeyPress(78, function(keyData){
+  if (typeof key.onKeyPress === "function") {
+    key.onKeyPress(78, function(keyData){
       d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
       dataset.data(d);
-  });
+    });
 
-  key.onKeyPress(68, function(keyData){
+    key.onKeyPress(68, function(keyData){
       if(d.length > 0){
         d.splice(d.length-1,1);
         dataset.data(d);
       }
-  });
+    });
+  } else {
+    key.onKey(78, function(keyData){
+      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(d);
+    });
+
+    key.onKeyPress(68, function(keyData){
+      if(d.length > 0){
+        d.splice(d.length-1,1);
+        dataset.data(d);
+      }
+    });
+  }
 
   pointer.attachTo(plot);
   key.attachTo(plot);
