@@ -461,6 +461,24 @@ describe("Drawers", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Animators", function () {
+    describe("BaseAnimator", function () {
+        describe("Time computations", function () {
+            it("totalTime() defaults", function () {
+                var iterationSteps = 10;
+                var startDelay = Plottable.Animators.Base.DEFAULT_START_DELAY_MILLISECONDS;
+                var stepDuration = Plottable.Animators.Base.DEFAULT_STEP_DURATION_MILLISECONDS;
+                var iterativeDelay = Plottable.Animators.Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                var expectedTotalTime = startDelay + (iterationSteps - 1) * iterativeDelay + stepDuration;
+                var animator = new Plottable.Animators.Base();
+                assert.strictEqual(animator.totalTime(iterationSteps), expectedTotalTime, "Formula for calculating total time should work");
+            });
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("BaseAxis", function () {
     it("orientation", function () {
         var scale = new Plottable.Scales.Linear();
