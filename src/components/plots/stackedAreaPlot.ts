@@ -97,10 +97,6 @@ export module Plots {
       return this;
     }
 
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined", "d"];
-    }
-
     protected _updateExtentsForProperty(property: string) {
       super._updateExtentsForProperty(property);
       if ((property === "x" || property === "y") && this._projectorsReady()) {

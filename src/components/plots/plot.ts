@@ -21,11 +21,11 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+    private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: d3.Map<any[]>;
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;
@@ -67,7 +67,7 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this.content().append("g").classed("render-area", true);
       this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 
@@ -413,11 +413,9 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      var times = this.datasets().map((ds, i) =>
-        drawers[i].draw(
-          dataToDraw.get(ds),
-          drawSteps
-        ));
+      this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+
+      var times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
       var maxTime = Utils.Math.max(times, 0);
       this._additionalPaint(maxTime);
     }
@@ -454,19 +452,21 @@ module Plottable {
       var entities: Plots.PlotEntity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        dataset.data().forEach((datum: any, index: number) => {
-          var position = this._pixelPoint(datum, index, dataset);
+        var validDatumIndex = 0;
+        dataset.data().forEach((datum: any, datasetIndex: number) => {
+          var position = this._pixelPoint(datum, datasetIndex, dataset);
           if (position.x !== position.x || position.y !== position.y) {
             return;
           }
           entities.push({
             datum: datum,
-            index: index,
+            index: datasetIndex,
             dataset: dataset,
             position: position,
-            selection: drawer.selectionForIndex(index),
+            selection: drawer.selectionForIndex(validDatumIndex),
             component: this
           });
+          validDatumIndex++;
         });
       });
       return entities;

@@ -617,7 +617,6 @@ declare module Plottable {
      */
     type SymbolFactory = (symbolSize: number) => string;
     module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
         function circle(): SymbolFactory;
         function square(): SymbolFactory;
         function cross(): SymbolFactory;
@@ -908,19 +907,6 @@ declare module Plottable {
             protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
-            /**
-             * Gets whether or not to generate tick values other than powers of the base.
-             *
-             * @returns {boolean}
-             */
-            showIntermediateTicks(): boolean;
-            /**
-             * Sets whether or not to generate ticks values other than powers of the base.
-             *
-             * @param {boolean} show
-             * @returns {ModifiedLog} The calling ModifiedLog Scale.
-             */
-            showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             protected _getRange(): number[];
@@ -1197,13 +1183,14 @@ declare module Plottable {
          */
         protected _drawStep(step: Drawers.AppliedDrawStep): void;
         protected _numberOfAnimationIterations(data: any[]): number;
+        totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
          *
          * @param{any[]} data The data to be drawn
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
-        draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
@@ -1297,8 +1284,6 @@ declare module Plottable {
         }
     }
     class Component {
-        protected _element: d3.Selection<void>;
-        protected _content: d3.Selection<void>;
         protected _boundingBox: d3.Selection<void>;
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
@@ -2274,10 +2259,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: d3.Selection<void>;
-        protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-        protected _attrExtents: d3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
@@ -2702,7 +2684,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * @constructor
@@ -2941,7 +2922,6 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
             protected _propertyProjectors(): AttributeToProjector;
@@ -2965,7 +2945,6 @@ declare module Plottable {
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
-            protected _getAnimator(key: string): Animators.Plot;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedBar<X, Y>;
             x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
@@ -2975,7 +2954,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
@@ -3135,47 +3113,6 @@ declare module Plottable {
              * @returns {Base} The calling Base Animator.
              */
             maxTotalDuration(maxDuration: number): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        class Rect extends Base {
-            static ANIMATED_ATTRIBUTES: string[];
-            isVertical: boolean;
-            isReverse: boolean;
-            constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): (datum: any, index: number) => any;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        class MovingRect extends Rect {
-            /**
-             * The pixel value to move from
-             */
-            startPixelValue: number;
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            constructor(startPixelValue: number, isVertical?: boolean);
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): () => number;
         }
     }
 }

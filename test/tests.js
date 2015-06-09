@@ -307,12 +307,6 @@ after(function () {
 });
 
 ///<reference path="../testReference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var MockAnimator = (function () {
     function MockAnimator(time, callback) {
         this._time = time;
@@ -329,16 +323,13 @@ var MockAnimator = (function () {
     };
     return MockAnimator;
 })();
-var MockDrawer = (function (_super) {
-    __extends(MockDrawer, _super);
-    function MockDrawer() {
-        _super.apply(this, arguments);
-    }
-    MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
+function createMockDrawer(dataset) {
+    var drawer = new Plottable.Drawer(dataset);
+    drawer._drawStep = function (step) {
+        step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
     };
-    return MockDrawer;
-})(Plottable.Drawer);
+    return drawer;
+}
 describe("Drawers", function () {
     describe("Abstract Drawer", function () {
         var oldTimeout;
@@ -362,7 +353,7 @@ describe("Drawers", function () {
         beforeEach(function () {
             timings = [];
             svg = TestMethods.generateSVG();
-            drawer = new MockDrawer(null);
+            drawer = createMockDrawer(null);
             drawer.renderArea(svg);
         });
         afterEach(function () {
@@ -411,6 +402,26 @@ describe("Drawers", function () {
             circles.enter().append("circle").attr("cx", function (datum) { return datum.one; }).attr("cy", function (datum) { return datum.two; }).attr("r", 10);
             var selection = drawer.selectionForIndex(1);
             assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
+            svg.remove();
+        });
+        it("totalDrawTime()", function () {
+            var svg = TestMethods.generateSVG(300, 300);
+            var drawer = new Plottable.Drawer(null);
+            var dataObjects = 9;
+            var stepDuration = 987;
+            var stepDelay = 133;
+            var startDelay = 245;
+            var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+            var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+            var attrToProjector = null;
+            var animator = new Plottable.Animators.Base();
+            animator.maxTotalDuration(Infinity);
+            animator.duration(stepDuration);
+            animator.maxIterativeDelay(stepDelay);
+            animator.delay(startDelay);
+            var mockDrawStep = [{ attrToProjector: attrToProjector, animator: animator }];
+            var drawTime = drawer.totalDrawTime(data, mockDrawStep);
+            assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
             svg.remove();
         });
     });
@@ -2315,11 +2326,6 @@ describe("Plots", function () {
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
             var mockDrawer = new Plottable.Drawer(dataset);
-            var renderArea = svg.append("g");
-            var circles = renderArea.selectAll("circles").data(data);
-            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            circles.exit().remove();
-            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer.selector = function () { return "circle"; };
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
@@ -2328,9 +2334,19 @@ describe("Plots", function () {
             plot._getDrawer = function () { return mockDrawer; };
             plot.addDataset(dataset);
             plot.renderTo(svg);
+            // replace the renderArea with our own
+            var renderArea = svg.append("g");
+            var dataToPlot = data.filter(function (datum) { return Plottable.Utils.Math.isValidNumber(datum.value); });
+            var circles = renderArea.selectAll("circles").data(dataToPlot);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.renderArea(renderArea);
             var entities = plot.entities();
             assert.lengthOf(entities, 2, "returns Entities for all valid data values");
-            entities.forEach(function (entity) {
+            entities.forEach(function (entity, loopIndex) {
+                assert.strictEqual(entity.datum, data[entity.index], "entity carries the correct data");
+                // use loopIndex because there is no entity for the invalid datum
+                assert.strictEqual(circles[0][loopIndex], entity.selection.node(), "entity's selection is correct");
                 assert.isNumber(entity.position.x, "position X cannot be NaN");
                 assert.isNumber(entity.position.y, "position Y cannot be NaN");
             });

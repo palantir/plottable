@@ -40,7 +40,7 @@ export module Drawers {
     public renderArea(): d3.Selection<void>;
     /**
      * Sets the renderArea selection for the Drawer.
-     * 
+     *
      * @param {d3.Selection} Selection containing the <g> to render to.
      * @returns {Drawer} The calling Drawer.
      */
@@ -94,6 +94,16 @@ export module Drawers {
       return modifiedAttrToProjector;
     }
 
+    public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
+      var numberOfIterations = this._numberOfAnimationIterations(data);
+      var delay = 0;
+      drawSteps.forEach((drawStep, i) => {
+        delay += drawStep.animator.totalTime(numberOfIterations);
+      });
+
+      return delay;
+    }
+
     /**
      * Draws the data into the renderArea using the spefic steps and metadata
      *
@@ -118,7 +128,7 @@ export module Drawers {
         delay += drawStep.animator.totalTime(numberOfIterations);
       });
 
-      return delay;
+      return this;
     }
 
     /**
