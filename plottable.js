@@ -1860,7 +1860,6 @@ var Plottable;
             function ModifiedLog(base) {
                 if (base === void 0) { base = 10; }
                 _super.call(this);
-                this._showIntermediateTicks = false;
                 this._d3Scale = d3.scale.linear();
                 this._base = base;
                 this._pivot = this._base;
@@ -1927,7 +1926,7 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-                var linearTicks = this._showIntermediateTicks ? d3.scale.linear().domain([negativeUpper, positiveLower]).ticks(this._howManyTicks(negativeUpper, positiveLower)) : [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearTicks = [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -1957,8 +1956,7 @@ var Plottable;
                 var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
                 var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
                 var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-                var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-                var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
+                var multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
                 var uniqMultiples = Plottable.Utils.Array.uniq(multiples);
                 var clusters = bases.map(function (b) { return uniqMultiples.map(function (x) { return Math.pow(_this._base, b - 1) * x; }); });
                 var flattened = Plottable.Utils.Array.flatten(clusters);
@@ -1984,14 +1982,6 @@ var Plottable;
             };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
                 return domain;
-            };
-            ModifiedLog.prototype.showIntermediateTicks = function (show) {
-                if (show == null) {
-                    return this._showIntermediateTicks;
-                }
-                else {
-                    this._showIntermediateTicks = show;
-                }
             };
             ModifiedLog.prototype._defaultExtent = function () {
                 return [0, this._base];

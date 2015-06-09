@@ -898,19 +898,6 @@ declare module Plottable {
             protected _setBackingScaleDomain(values: number[]): void;
             ticks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
-            /**
-             * Gets whether or not to generate tick values other than powers of the base.
-             *
-             * @returns {boolean}
-             */
-            showIntermediateTicks(): boolean;
-            /**
-             * Sets whether or not to generate ticks values other than powers of the base.
-             *
-             * @param {boolean} show
-             * @returns {ModifiedLog} The calling ModifiedLog Scale.
-             */
-            showIntermediateTicks(show: boolean): ModifiedLog;
             protected _defaultExtent(): number[];
             protected _expandSingleValueDomain(singleValueDomain: number[]): number[];
             protected _getRange(): number[];
