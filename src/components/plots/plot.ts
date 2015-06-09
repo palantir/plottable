@@ -30,7 +30,7 @@ module Plottable {
 
     protected _renderArea: d3.Selection<void>;
     private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: d3.Map<any[]>;
+    private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;

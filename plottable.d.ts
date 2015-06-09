@@ -2269,7 +2269,6 @@ declare module Plottable {
     class Plot extends Component {
         protected _dataChanged: boolean;
         protected _renderArea: d3.Selection<void>;
-        protected _attrExtents: d3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
