@@ -1026,10 +1026,10 @@ var Plottable;
      */
     var RenderController;
     (function (RenderController) {
-        var _componentsNeedingRender = new Plottable.Utils.Set();
-        var _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-        var _animationRequested = false;
-        var _isCurrentlyFlushing = false;
+        var componentsNeedingRender = new Plottable.Utils.Set();
+        var componentsNeedingComputeLayout = new Plottable.Utils.Set();
+        var animationRequested = false;
+        var isCurrentlyFlushing = false;
         var Policy;
         (function (Policy) {
             Policy.IMMEDIATE = "immediate";
@@ -1059,10 +1059,10 @@ var Plottable;
          * @param {Component} component
          */
         function registerToRender(component) {
-            if (_isCurrentlyFlushing) {
+            if (isCurrentlyFlushing) {
                 Plottable.Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
             }
-            _componentsNeedingRender.add(component);
+            componentsNeedingRender.add(component);
             requestRender();
         }
         RenderController.registerToRender = registerToRender;
@@ -1072,15 +1072,15 @@ var Plottable;
          * @param {Component} component
          */
         function registerToComputeLayout(component) {
-            _componentsNeedingComputeLayout.add(component);
-            _componentsNeedingRender.add(component);
+            componentsNeedingComputeLayout.add(component);
+            componentsNeedingRender.add(component);
             requestRender();
         }
         RenderController.registerToComputeLayout = registerToComputeLayout;
         function requestRender() {
             // Only run or enqueue flush on first request.
-            if (!_animationRequested) {
-                _animationRequested = true;
+            if (!animationRequested) {
+                animationRequested = true;
                 RenderController._renderPolicy.render();
             }
         }
@@ -1091,14 +1091,14 @@ var Plottable;
          * Useful to call when debugging.
          */
         function flush() {
-            if (_animationRequested) {
+            if (animationRequested) {
                 // Layout
-                _componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
+                componentsNeedingComputeLayout.forEach(function (component) { return component.computeLayout(); });
                 // Top level render; Containers will put their children in the toRender queue
-                _componentsNeedingRender.forEach(function (component) { return component.render(); });
-                _isCurrentlyFlushing = true;
+                componentsNeedingRender.forEach(function (component) { return component.render(); });
+                isCurrentlyFlushing = true;
                 var failed = new Plottable.Utils.Set();
-                _componentsNeedingRender.forEach(function (component) {
+                componentsNeedingRender.forEach(function (component) {
                     try {
                         component.renderImmediately();
                     }
@@ -1110,10 +1110,10 @@ var Plottable;
                         failed.add(component);
                     }
                 });
-                _componentsNeedingComputeLayout = new Plottable.Utils.Set();
-                _componentsNeedingRender = failed;
-                _animationRequested = false;
-                _isCurrentlyFlushing = false;
+                componentsNeedingComputeLayout = new Plottable.Utils.Set();
+                componentsNeedingRender = failed;
+                animationRequested = false;
+                isCurrentlyFlushing = false;
             }
         }
         RenderController.flush = flush;
