@@ -238,7 +238,6 @@ export module Components {
             var index = domain.indexOf(datum);
             entities.push({
               datum: datum,
-              index: index,
               position: { x: symbolX, y: symbolY },
               selection: entrySelection,
               component: legend

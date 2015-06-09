@@ -508,7 +508,6 @@ declare module Plottable {
      */
     interface Entity<C extends Component> {
         datum: any;
-        index: number;
         position: Point;
         selection: d3.Selection<any>;
         component: C;
@@ -2246,6 +2245,7 @@ declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;
+            index: number;
             component: Plot;
         }
         interface AccessorScaleBinding<D, R> {
