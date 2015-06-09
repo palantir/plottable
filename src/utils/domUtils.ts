@@ -110,10 +110,13 @@ export module Utils {
      * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
      * contained by bbox, false otherwise.
      */
-    export function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range,
-      bbox: SVGRect, tolerance = 0.5): boolean {
-      var xRange: Range = parseRange(xValOrRange);
-      var yRange: Range = parseRange(yValOrRange);
+    export function intersectsBBox(
+        xValOrRange: number | Range,
+        yValOrRange: number | Range,
+        bbox: SVGRect,
+        tolerance = 0.5) {
+      var xRange = parseRange(xValOrRange);
+      var yRange = parseRange(yValOrRange);
 
       // SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
@@ -130,14 +133,18 @@ export module Utils {
      *
      * @returns {Range} The generated Range
      */
-    function parseRange(input: any): Range {
+    function parseRange(input: number | Range): Range {
       if (typeof (input) === "number") {
-        return { min: input, max: input };
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Range> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Range");
+        var value = <number>input;
+        return { min: value, max: value };
       }
+
+      var range = <Range>input;
+      if (range instanceof Object && "min" in range && "max" in range) {
+        return range;
+      }
+
+      throw new Error("input '" + input + "' can't be parsed as an Range");
     }
 
     function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {

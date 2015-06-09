@@ -376,14 +376,14 @@ var Plottable;
              */
             function parseRange(input) {
                 if (typeof (input) === "number") {
-                    return { min: input, max: input };
+                    var value = input;
+                    return { min: value, max: value };
                 }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
+                var range = input;
+                if (range instanceof Object && "min" in range && "max" in range) {
+                    return range;
                 }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Range");
-                }
+                throw new Error("input '" + input + "' can't be parsed as an Range");
             }
             function getParsedStyleValue(style, prop) {
                 var value = style.getPropertyValue(prop);
