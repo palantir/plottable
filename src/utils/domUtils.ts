@@ -82,7 +82,7 @@ export module Utils {
       );
     }
 
-    export function getBoundingSVG(elem: SVGElement): SVGElement {
+    export function boundingSVG(elem: SVGElement): SVGElement {
       var ownerSVG = elem.ownerSVGElement;
       if (ownerSVG != null) {
         return ownerSVG;

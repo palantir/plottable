@@ -328,7 +328,7 @@ var Plottable;
                 return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
             }
             DOM.boxIsInside = boxIsInside;
-            function getBoundingSVG(elem) {
+            function boundingSVG(elem) {
                 var ownerSVG = elem.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
@@ -338,7 +338,7 @@ var Plottable;
                 }
                 return null; // not in the DOM
             }
-            DOM.getBoundingSVG = getBoundingSVG;
+            DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
             function getUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
@@ -798,7 +798,7 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
             }
             ClientToSVGTranslator.getTranslator = function (elem) {
-                var svg = Utils.DOM.getBoundingSVG(elem);
+                var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
                 if (translator == null) {
                     translator = new ClientToSVGTranslator(svg);
@@ -8403,7 +8403,7 @@ var Plottable;
              * @return {Dispatchers.Mouse}
              */
             Mouse.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Mouse._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Mouse(svg);
@@ -8578,7 +8578,7 @@ var Plottable;
              * @return {Dispatchers.Touch}
              */
             Touch.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Touch._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Touch(svg);

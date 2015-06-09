@@ -141,7 +141,7 @@ declare module Plottable {
             function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
-            function getBoundingSVG(elem: SVGElement): SVGElement;
+            function boundingSVG(elem: SVGElement): SVGElement;
             function getUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.

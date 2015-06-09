@@ -8,7 +8,7 @@ export module Utils {
     private _measureRect: SVGElement;
 
     public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
       if (translator == null) {
