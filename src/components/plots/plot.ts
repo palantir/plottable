@@ -457,19 +457,21 @@ module Plottable {
       var entities: Plots.Entity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        dataset.data().forEach((datum: any, index: number) => {
-          var position = this._pixelPoint(datum, index, dataset);
+        var validDatumIndex = 0;
+        dataset.data().forEach((datum: any, datasetIndex: number) => {
+          var position = this._pixelPoint(datum, datasetIndex, dataset);
           if (position.x !== position.x || position.y !== position.y) {
             return;
           }
           entities.push({
             datum: datum,
-            index: index,
+            index: datasetIndex,
             dataset: dataset,
             position: position,
-            selection: drawer.selectionForIndex(index),
+            selection: drawer.selectionForIndex(validDatumIndex),
             plot: this
           });
+          validDatumIndex++;
         });
       });
       return entities;

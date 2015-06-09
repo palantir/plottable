@@ -6310,19 +6310,21 @@ var Plottable;
             var entities = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
-                dataset.data().forEach(function (datum, index) {
-                    var position = _this._pixelPoint(datum, index, dataset);
+                var validDatumIndex = 0;
+                dataset.data().forEach(function (datum, datasetIndex) {
+                    var position = _this._pixelPoint(datum, datasetIndex, dataset);
                     if (position.x !== position.x || position.y !== position.y) {
                         return;
                     }
                     entities.push({
                         datum: datum,
-                        index: index,
+                        index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: drawer.selectionForIndex(index),
+                        selection: drawer.selectionForIndex(validDatumIndex),
                         plot: _this
                     });
+                    validDatumIndex++;
                 });
             });
             return entities;
