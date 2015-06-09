@@ -19,15 +19,15 @@ export module Animators {
     /**
      * The default duration of the animation in milliseconds
      */
-    public static DEFAULT_DURATION_MILLISECONDS = 300;
+    public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
      * The default starting delay of the animation in milliseconds
      */
-    public static DEFAULT_DELAY_MILLISECONDS = 0;
+    public static DEFAULT_START_DELAY_MILLISECONDS = 0;
     /**
      * The default maximum start delay between each start of an animation
      */
-    public static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
+    public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
     /**
      * The default maximum total animation duration
      */
@@ -37,7 +37,7 @@ export module Animators {
      */
     public static DEFAULT_EASING = "exp-out";
 
-    private _duration: number;
+    private _stepDuration: number;
     private _startDelay: number;
     private _easing: string;
     private _iterativeDelay: number;
@@ -49,28 +49,28 @@ export module Animators {
      * @constructor
      */
     constructor() {
-      this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
-      this._startDelay = Base.DEFAULT_DELAY_MILLISECONDS;
+      this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
+      this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;
-      this._iterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+      this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
     }
 
     public totalTime(numberOfIterations: number) {
-      var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+      var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
       var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-      var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.duration();
+      var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.stepDuration();
       return time;
     }
 
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
       var numberOfIterations = selection[0].length;
-      var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+      var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
       var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
 
       return selection.transition()
         .ease(this.easing())
-        .duration(this.duration())
+        .duration(this.stepDuration())
         .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
         .attr(attrToAppliedProjector);
     }
@@ -80,19 +80,19 @@ export module Animators {
      *
      * @returns {number} The current duration.
      */
-    public duration(): number;
+    public stepDuration(): number;
     /**
      * Sets the duration of the animation in milliseconds.
      *
      * @param {number} duration The duration in milliseconds.
      * @returns {Default} The calling Default Animator.
      */
-    public duration(duration: number): Base;
-    public duration(duration?: number): any {
-      if (duration == null) {
-        return this._duration;
+    public stepDuration(stepDuration: number): Base;
+    public stepDuration(stepDuration?: number): any {
+      if (stepDuration == null) {
+        return this._stepDuration;
       } else {
-        this._duration = duration;
+        this._stepDuration = stepDuration;
         return this;
       }
     }

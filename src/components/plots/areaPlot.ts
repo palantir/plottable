@@ -18,7 +18,7 @@ export module Plots {
       super();
       this.classed("area-plot", true);
       this.y0(0); // default
-      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
+      this.animator(Plots.Animator.MAIN, new Animators.Base().stepDuration(600).easing("exp-in-out"));
       this.attr("fill-opacity", 0.25);
       this.attr("fill", new Scales.Color().range()[0]);
 

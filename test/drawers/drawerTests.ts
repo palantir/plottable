@@ -120,7 +120,7 @@ describe("Drawers", () => {
 
       var animator = new Plottable.Animators.Base();
       animator.maxTotalDuration(Infinity);
-      animator.duration(stepDuration);
+      animator.stepDuration(stepDuration);
       animator.iterativeDelay(stepDelay);
       animator.startDelay(startDelay);
 

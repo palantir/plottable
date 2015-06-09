@@ -6949,7 +6949,7 @@ var Plottable;
             function Scatter() {
                 _super.call(this);
                 this.classed("scatter-plot", true);
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(250).startDelay(5));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(250).startDelay(5));
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this.size(6);
@@ -7507,7 +7507,7 @@ var Plottable;
             function Line() {
                 _super.call(this);
                 this.classed("line-plot", true);
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(600).easing("exp-in-out"));
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
@@ -7622,7 +7622,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("area-plot", true);
                 this.y0(0); // default
-                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().duration(600).easing("exp-in-out"));
+                this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().stepDuration(600).easing("exp-in-out"));
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
                 this._lineDrawers = new Plottable.Utils.Map();
@@ -8168,31 +8168,31 @@ var Plottable;
              * @constructor
              */
             function Base() {
-                this._duration = Base.DEFAULT_DURATION_MILLISECONDS;
-                this._startDelay = Base.DEFAULT_DELAY_MILLISECONDS;
+                this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
+                this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
-                this._iterativeDelay = Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS;
+                this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
             }
             Base.prototype.totalTime = function (numberOfIterations) {
-                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
                 var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.duration();
+                var time = this.startDelay() + adjustedIterativeDelay * (numberOfIterations - 1) + this.stepDuration();
                 return time;
             };
             Base.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var numberOfIterations = selection[0].length;
-                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.duration(), 0);
+                var maxDelayForLastIteration = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
                 var adjustedIterativeDelay = Math.min(this.iterativeDelay(), maxDelayForLastIteration / Math.max(numberOfIterations - 1, 1));
-                return selection.transition().ease(this.easing()).duration(this.duration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
+                return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
-            Base.prototype.duration = function (duration) {
-                if (duration == null) {
-                    return this._duration;
+            Base.prototype.stepDuration = function (stepDuration) {
+                if (stepDuration == null) {
+                    return this._stepDuration;
                 }
                 else {
-                    this._duration = duration;
+                    this._stepDuration = stepDuration;
                     return this;
                 }
             };
@@ -8235,15 +8235,15 @@ var Plottable;
             /**
              * The default duration of the animation in milliseconds
              */
-            Base.DEFAULT_DURATION_MILLISECONDS = 300;
+            Base.DEFAULT_STEP_DURATION_MILLISECONDS = 300;
             /**
              * The default starting delay of the animation in milliseconds
              */
-            Base.DEFAULT_DELAY_MILLISECONDS = 0;
+            Base.DEFAULT_START_DELAY_MILLISECONDS = 0;
             /**
              * The default maximum start delay between each start of an animation
              */
-            Base.DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS = 15;
+            Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
              * The default maximum total animation duration
              */

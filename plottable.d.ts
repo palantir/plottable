@@ -3040,15 +3040,15 @@ declare module Plottable {
             /**
              * The default duration of the animation in milliseconds
              */
-            static DEFAULT_DURATION_MILLISECONDS: number;
+            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
             /**
              * The default starting delay of the animation in milliseconds
              */
-            static DEFAULT_DELAY_MILLISECONDS: number;
+            static DEFAULT_START_DELAY_MILLISECONDS: number;
             /**
              * The default maximum start delay between each start of an animation
              */
-            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
              * The default maximum total animation duration
              */
@@ -3070,14 +3070,14 @@ declare module Plottable {
              *
              * @returns {number} The current duration.
              */
-            duration(): number;
+            stepDuration(): number;
             /**
              * Sets the duration of the animation in milliseconds.
              *
              * @param {number} duration The duration in milliseconds.
              * @returns {Default} The calling Default Animator.
              */
-            duration(duration: number): Base;
+            stepDuration(stepDuration: number): Base;
             /**
              * Gets the start delay of the animation in milliseconds.
              *
