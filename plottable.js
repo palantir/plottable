@@ -284,14 +284,6 @@ var Plottable;
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function getParsedStyleValue(style, prop) {
-                var value = style.getPropertyValue(prop);
-                var parsedValue = parseFloat(value);
-                if (parsedValue !== parsedValue) {
-                    return 0;
-                }
-                return parsedValue;
-            }
             function isSelectionRemovedFromSVG(selection) {
                 var n = selection.node();
                 while (n !== null && n.nodeName.toLowerCase() !== "svg") {
@@ -421,6 +413,14 @@ var Plottable;
                 else {
                     throw new Error("input '" + input + "' can't be parsed as an Range");
                 }
+            }
+            function getParsedStyleValue(style, prop) {
+                var value = style.getPropertyValue(prop);
+                var parsedValue = parseFloat(value);
+                if (parsedValue !== parsedValue) {
+                    return 0;
+                }
+                return parsedValue;
             }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
@@ -994,7 +994,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);

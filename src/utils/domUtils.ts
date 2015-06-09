@@ -22,22 +22,14 @@ export module Utils {
       return bbox;
     }
 
-    export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+    export var POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+
     export function requestAnimationFramePolyfill(fn: () => any): void {
       if (window.requestAnimationFrame != null) {
         window.requestAnimationFrame(fn);
       } else {
-        setTimeout(fn, POLYFILL_TIMEOUT_MSEC);
+        setTimeout(fn, POLYFILL_TIMEOUT_MILLISECONDS);
       }
-    }
-
-    function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
-      var value: any = style.getPropertyValue(prop);
-      var parsedValue = parseFloat(value);
-      if (parsedValue !== parsedValue) {
-          return 0;
-      }
-      return parsedValue;
     }
 
     export function isSelectionRemovedFromSVG(selection: d3.Selection<any>) {
@@ -90,7 +82,7 @@ export module Utils {
     }
 
     export function translate(s: d3.Selection<any>): d3.Transform;
-    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>
+    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
     export function translate(s: d3.Selection<any>, x?: number, y?: number): any {
       var xform = d3.transform(s.attr("transform"));
       if (x == null) {
@@ -177,6 +169,15 @@ export module Utils {
       } else {
         throw new Error("input '" + input + "' can't be parsed as an Range");
       }
+    }
+
+    function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
+      var value: any = style.getPropertyValue(prop);
+      var parsedValue = parseFloat(value);
+      if (parsedValue !== parsedValue) {
+          return 0;
+      }
+      return parsedValue;
     }
   }
 }
