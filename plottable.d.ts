@@ -1287,8 +1287,6 @@ declare module Plottable {
         }
     }
     class Component {
-        protected _element: d3.Selection<void>;
-        protected _content: d3.Selection<void>;
         protected _boundingBox: d3.Selection<void>;
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;

@@ -125,12 +125,12 @@ export module Components {
     protected _setup() {
       super._setup();
 
-      this._swatchContainer = this._content.append("g").classed("swatch-container", true);
-      this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
-      this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-      this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this._swatchContainer = this.content().append("g").classed("swatch-container", true);
+      this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
+      this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._content);
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }

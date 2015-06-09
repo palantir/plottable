@@ -72,7 +72,7 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this.content().append("g").classed("render-area", true);
       this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 

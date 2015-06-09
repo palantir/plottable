@@ -48,8 +48,8 @@ export module Components {
 
     protected _setup() {
       super._setup();
-      this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
-      this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
+      this._xLinesContainer = this.content().append("g").classed("x-gridlines", true);
+      this._yLinesContainer = this.content().append("g").classed("y-gridlines", true);
     }
 
     public renderImmediately() {

@@ -40,7 +40,7 @@ export module Components {
 
     protected _setup() {
       super._setup();
-      this._textContainer = this._content.append("g");
+      this._textContainer = this.content().append("g");
       this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);

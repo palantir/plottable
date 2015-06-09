@@ -52,7 +52,7 @@ export module Components {
 
     protected _setup() {
       super._setup();
-      var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+      var fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
       fakeLegendEntry.append("text");
       this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
@@ -220,7 +220,7 @@ export module Components {
       var entry = d3.select(null);
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
-      this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
+      this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
         var lowY = i * layout.textHeight + legendPadding;
         var highY = (i + 1) * layout.textHeight + legendPadding;
         var lowX = legendPadding;
@@ -244,7 +244,7 @@ export module Components {
       var layout = this._calculateLayoutInfo(this.width(), this.height());
 
       var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-      var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+      var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
       rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
       rows.exit().remove();
 
