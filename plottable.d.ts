@@ -1187,13 +1187,14 @@ declare module Plottable {
          */
         protected _drawStep(step: Drawers.AppliedDrawStep): void;
         protected _numberOfAnimationIterations(data: any[]): number;
+        totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
          *
          * @param{any[]} data The data to be drawn
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
-        draw(data: any[], drawSteps: Drawers.DrawStep[]): number;
+        draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
