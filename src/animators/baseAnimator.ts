@@ -185,10 +185,14 @@ export module Animators {
       }
     }
 
+    /**
+     * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
+     */
     private _getAdjustedIterativeDelay(numberOfSteps: number) {
-      var stepStartTimeInterval = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
-      var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfSteps - 1, 1));
-      return adjustedIterativeDelay;
+      var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
+      stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
+      var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1)
+      return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
     }
   }
 }
