@@ -284,18 +284,18 @@ var Plottable;
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function getElementWidth(elem) {
-                var style = window.getComputedStyle(elem);
+            function getElementWidth(element) {
+                var style = window.getComputedStyle(element);
                 return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");
             }
             DOM.getElementWidth = getElementWidth;
-            function getElementHeight(elem) {
-                var style = window.getComputedStyle(elem);
+            function getElementHeight(element) {
+                var style = window.getComputedStyle(element);
                 return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
             }
             DOM.getElementHeight = getElementHeight;
-            function translate(s, x, y) {
-                var xform = d3.transform(s.attr("transform"));
+            function translate(selection, x, y) {
+                var xform = d3.transform(selection.attr("transform"));
                 if (x == null) {
                     return xform.translate;
                 }
@@ -303,8 +303,8 @@ var Plottable;
                     y = (y == null) ? 0 : y;
                     xform.translate[0] = x;
                     xform.translate[1] = y;
-                    s.attr("transform", xform.toString());
-                    return s;
+                    selection.attr("transform", xform.toString());
+                    return selection;
                 }
             }
             DOM.translate = translate;

@@ -32,8 +32,8 @@ export module Utils {
       }
     }
 
-    export function getElementWidth(elem: Element): number {
-      var style = window.getComputedStyle(elem);
+    export function getElementWidth(element: Element): number {
+      var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "width")
         + getParsedStyleValue(style, "padding-left")
         + getParsedStyleValue(style, "padding-right")
@@ -41,8 +41,8 @@ export module Utils {
         + getParsedStyleValue(style, "border-right-width");
     }
 
-    export function getElementHeight(elem: Element): number {
-      var style = window.getComputedStyle(elem);
+    export function getElementHeight(element: Element): number {
+      var style = window.getComputedStyle(element);
       return getParsedStyleValue(style, "height")
         + getParsedStyleValue(style, "padding-top")
         + getParsedStyleValue(style, "padding-bottom")
@@ -50,18 +50,18 @@ export module Utils {
         + getParsedStyleValue(style, "border-bottom-width");
     }
 
-    export function translate(s: d3.Selection<any>): d3.Transform;
-    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-    export function translate(s: d3.Selection<any>, x?: number, y?: number): any {
-      var xform = d3.transform(s.attr("transform"));
+    export function translate(selection: d3.Selection<any>): d3.Transform;
+    export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
+    export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
+      var xform = d3.transform(selection.attr("transform"));
       if (x == null) {
         return xform.translate;
       } else {
         y = (y == null) ? 0 : y;
         xform.translate[0] = x;
         xform.translate[1] = y;
-        s.attr("transform", xform.toString());
-        return s;
+        selection.attr("transform", xform.toString());
+        return selection;
       }
     }
 
