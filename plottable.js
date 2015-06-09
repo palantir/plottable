@@ -8022,19 +8022,6 @@ var Plottable;
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
-            StackedBar.prototype._getAnimator = function (key) {
-                if (this._animate && this._animateOnNextRender) {
-                    if (this.animator(key)) {
-                        return this.animator(key);
-                    }
-                    else if (key === "stacked-bar") {
-                        var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
-                        var scaledBaseline = primaryScale.scale(this.baselineValue());
-                        return new Plottable.Animators.MovingRect(scaledBaseline, this._isVertical);
-                    }
-                }
-                return new Plottable.Animators.Null();
-            };
             StackedBar.prototype.x = function (x, xScale) {
                 if (x == null) {
                     return _super.prototype.x.call(this);
@@ -8077,9 +8064,6 @@ var Plottable;
                 var attrFunction = function (d, i, dataset) { return +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset); };
                 attrToProjector[valueAttr] = function (d, i, dataset) { return _this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset); };
                 return attrToProjector;
-            };
-            StackedBar.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar") }];
             };
             StackedBar.prototype._onDatasetUpdate = function () {
                 this._updateStackExtentsAndOffsets();
@@ -8261,97 +8245,6 @@ var Plottable;
             return Base;
         })();
         Animators.Base = Base;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        var Rect = (function (_super) {
-            __extends(Rect, _super);
-            function Rect(isVertical, isReverse) {
-                if (isVertical === void 0) { isVertical = true; }
-                if (isReverse === void 0) { isReverse = false; }
-                _super.call(this);
-                this.isVertical = isVertical;
-                this.isReverse = isReverse;
-            }
-            Rect.prototype.animate = function (selection, attrToAppliedProjector) {
-                var startAttrToAppliedProjector = {};
-                Rect.ANIMATED_ATTRIBUTES.forEach(function (attr) { return startAttrToAppliedProjector[attr] = attrToAppliedProjector[attr]; });
-                startAttrToAppliedProjector[this._getMovingAttr()] = this._startMovingProjector(attrToAppliedProjector);
-                startAttrToAppliedProjector[this._getGrowingAttr()] = function () { return 0; };
-                selection.attr(attrToAppliedProjector);
-                return _super.prototype.animate.call(this, selection, attrToAppliedProjector);
-            };
-            Rect.prototype._startMovingProjector = function (attrToAppliedProjector) {
-                if (this.isVertical === this.isReverse) {
-                    return attrToAppliedProjector[this._getMovingAttr()];
-                }
-                var movingAppliedProjector = attrToAppliedProjector[this._getMovingAttr()];
-                var growingAppliedProjector = attrToAppliedProjector[this._getGrowingAttr()];
-                return function (d, i) {
-                    return movingAppliedProjector(d, i) + growingAppliedProjector(d, i);
-                };
-            };
-            Rect.prototype._getGrowingAttr = function () {
-                return this.isVertical ? "height" : "width";
-            };
-            Rect.prototype._getMovingAttr = function () {
-                return this.isVertical ? "y" : "x";
-            };
-            Rect.ANIMATED_ATTRIBUTES = ["height", "width", "x", "y", "fill"];
-            return Rect;
-        })(Animators.Base);
-        Animators.Rect = Rect;
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        var MovingRect = (function (_super) {
-            __extends(MovingRect, _super);
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            function MovingRect(startPixelValue, isVertical) {
-                if (isVertical === void 0) { isVertical = true; }
-                _super.call(this, isVertical);
-                this.startPixelValue = startPixelValue;
-            }
-            MovingRect.prototype._startMovingProjector = function (attrToAppliedProjector) {
-                return d3.functor(this.startPixelValue);
-            };
-            return MovingRect;
-        })(Animators.Rect);
-        Animators.MovingRect = MovingRect;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 

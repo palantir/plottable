@@ -2947,7 +2947,6 @@ declare module Plottable {
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
-            protected _getAnimator(key: string): Animators.Plot;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedBar<X, Y>;
             x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
@@ -2957,7 +2956,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
@@ -3117,47 +3115,6 @@ declare module Plottable {
              * @returns {Base} The calling Base Animator.
              */
             maxTotalDuration(maxDuration: number): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        class Rect extends Base {
-            static ANIMATED_ATTRIBUTES: string[];
-            isVertical: boolean;
-            isReverse: boolean;
-            constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): (datum: any, index: number) => any;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        class MovingRect extends Rect {
-            /**
-             * The pixel value to move from
-             */
-            startPixelValue: number;
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            constructor(startPixelValue: number, isVertical?: boolean);
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): () => number;
         }
     }
 }
