@@ -134,7 +134,7 @@ declare module Plottable {
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
             var POLYFILL_TIMEOUT_MILLISECONDS: number;
-            function requestAnimationFramePolyfill(fn: () => any): void;
+            function requestAnimationFramePolyfill(fn: () => void): void;
             function elementWidth(element: Element): number;
             function elementHeight(element: Element): number;
             function translate(selection: d3.Selection<any>): d3.Transform;

@@ -22,7 +22,7 @@ export module Utils {
 
     export var POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
 
-    export function requestAnimationFramePolyfill(fn: () => any) {
+    export function requestAnimationFramePolyfill(fn: () => void) {
       if (window.requestAnimationFrame != null) {
         window.requestAnimationFrame(fn);
       } else {
