@@ -7906,9 +7906,6 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 return this;
             };
-            StackedArea.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined", "d"];
-            };
             StackedArea.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
                 if ((property === "x" || property === "y") && this._projectorsReady()) {
