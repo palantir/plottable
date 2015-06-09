@@ -206,36 +206,49 @@ export module Components {
     }
 
     /**
-     * Gets the entry under at given pixel position.
-     * Returns an empty Selection if no entry exists at that pixel position.
-     *
-     * @param {Point} position
-     * @returns {d3.Selection}
+     * Gets the Entities (representing Legend entries) at a particular point. 
+     * Returns an empty array if no Entities are present at that location.
+     * 
+     * @param {Point} p
+     * @returns {Entity<Legend>[]}
      */
-    public getEntry(position: Point): d3.Selection<void> {
+    public entitiesAt(p: Point) {
       if (!this._isSetup) {
-        return d3.select(null);
+        return [];
       }
 
-      var entry = d3.select(null);
+      var entities: Entity<Legend>[] = [];
       var layout = this._calculateLayoutInfo(this.width(), this.height());
       var legendPadding = this._padding;
+      var domain = this._scale.domain();
+      var legend = this;
       this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function(d: any, i: number) {
         var lowY = i * layout.textHeight + legendPadding;
         var highY = (i + 1) * layout.textHeight + legendPadding;
+        var symbolY = (lowY + highY) / 2;
         var lowX = legendPadding;
         var highX = legendPadding;
         d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function(value: string) {
           highX += layout.entryLengths.get(value);
-          if (highX >= position.x && lowX <= position.x &&
-              highY >= position.y && lowY <= position.y) {
-            entry = d3.select(this);
+          var symbolX = lowX + layout.textHeight / 2;
+          if (highX >= p.x && lowX <= p.x &&
+              highY >= p.y && lowY <= p.y) {
+            var entrySelection = d3.select(this);
+            var datum = entrySelection.datum();
+            var index = domain.indexOf(datum);
+            entities.push({
+              datum: datum,
+              index: index,
+              position: { x: symbolX, y: symbolY },
+              selection: entrySelection,
+              component: legend
+            });
           }
           lowX += layout.entryLengths.get(value);
         });
       });
 
-      return entry;
+      return entities;
     }
 
     public renderImmediately() {

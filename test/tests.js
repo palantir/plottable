@@ -90,16 +90,19 @@ var TestMethods;
     function assertEntitiesEqual(actual, expected, msg) {
         assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
         assert.strictEqual(actual.index, expected.index, msg + " (index)");
-        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
-        assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
-        assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
-        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection contents)");
+        assertPointsClose(actual.position, expected.position, 0.01, msg);
+        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
         actual.selection[0].forEach(function (element, index) {
             assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
         });
-        assert.strictEqual(actual.plot, expected.plot, msg + " (plot)");
+        assert.strictEqual(actual.component, expected.component, msg + " (component)");
     }
     TestMethods.assertEntitiesEqual = assertEntitiesEqual;
+    function assertPlotEntitiesEqual(actual, expected, msg) {
+        assertEntitiesEqual(actual, expected, msg);
+        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
+    }
+    TestMethods.assertPlotEntitiesEqual = assertPlotEntitiesEqual;
     function makeLinearSeries(n) {
         function makePoint(x) {
             return { x: x, y: x };
@@ -1573,6 +1576,7 @@ describe("Legend", function () {
     var color;
     var legend;
     var entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
+    var symbolSelector = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
     var rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = TestMethods.generateSVG(400, 400);
@@ -1755,23 +1759,81 @@ describe("Legend", function () {
         assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth, "won't settle for less width if entries would be truncated");
         svg.remove();
     });
-    it("getEntry() retrieves the correct entry for vertical legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(1);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 10, y: 150 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
-    });
-    it("getEntry() retrieves the correct entry for horizontal legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(Infinity);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 150, y: 10 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
+    describe("entitiesAt()", function () {
+        function computeExpectedSymbolPosition(legend, rowIndex, entryIndexWithinRow) {
+            var row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
+            var entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
+            var symbol = entry.select(symbolSelector);
+            var rowTranslate = d3.transform(row.attr("transform")).translate;
+            var entryTranslate = d3.transform(entry.attr("transform")).translate;
+            var symbolTranslate = d3.transform(symbol.attr("transform")).translate;
+            return {
+                x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
+                y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
+            };
+        }
+        it("gets Entities representing the entry at a particular point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(legend, 0, 0),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 10, y: 30 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(legend, 1, 0),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            legend.detach();
+            entities = legend.entitiesAt({ x: 10, y: 10 });
+            assert.lengthOf(entities, 0, "returns no Entities if not anchored");
+            svg.remove();
+        });
+        it("gets Entities representing the entry at a particular point (maxEntriesPerRow > 1)", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.maxEntriesPerRow(Infinity);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(legend, 0, 0),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 50, y: 10 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(legend, 0, 1),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            svg.remove();
+        });
+        it("returns an empty array if no Entitites are present at that point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: -100, y: -100 });
+            assert.lengthOf(entities, 0, "no Entities returned if there are no entries at that point");
+            svg.remove();
+        });
     });
     it("comparator() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
@@ -2976,24 +3038,24 @@ describe("Plots", function () {
                     dataset: dataset2,
                     position: d0Px,
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if above a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
                 closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if below a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a point, it is closest");
                 closest = linePlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if right of a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a point, it is closest");
                 expected = {
                     datum: d1,
                     index: 1,
                     dataset: dataset2,
                     position: d1Px,
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 closest = linePlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
-                TestMethods.assertEntitiesEqual(closest, expected, "if left of a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a point, it is closest");
                 svg.remove();
             });
             it("considers only in-view points", function () {
@@ -3007,10 +3069,10 @@ describe("Plots", function () {
                         y: yScale.scale(yAccessor(d1))
                     },
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
-                TestMethods.assertEntitiesEqual(closest, expected, "only in-view points are considered");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
                 svg.remove();
             });
             it("returns undefined if no Entities are visible", function () {
@@ -3374,28 +3436,28 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d0Px,
                         selection: d3.selectAll([bars[0][0]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: 0, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
                     expected = {
                         datum: d1,
                         index: 1,
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y - 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
                     closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
                     svg.remove();
                 });
                 it("considers only in-view bars", function () {
@@ -3411,10 +3473,10 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "nearest Entity is the visible one");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "nearest Entity is the visible one");
                     svg.remove();
                 });
                 it("returns undefined if no Entities are visible", function () {
@@ -3681,28 +3743,28 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d0Px,
                         selection: d3.selectAll([bars[0][0]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: 0 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if above the first bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if above the first bar, it is closest");
                     expected = {
                         datum: d1,
                         index: 1,
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     closest = barPlot.entityNearest({ x: d1Px.x + 1, y: d1Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
                     closest = barPlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
                     svg.remove();
                 });
                 it("considers only in-view bars", function () {
@@ -3719,10 +3781,10 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(expected, closest, "closest plot data is on-plot data");
+                    TestMethods.assertPlotEntitiesEqual(expected, closest, "closest plot data is on-plot data");
                     svg.remove();
                 });
             });
@@ -4191,10 +4253,10 @@ describe("Plots", function () {
                 dataset: dataset,
                 position: d0Px,
                 selection: d3.selectAll([points[0][0]]),
-                plot: plot
+                component: plot
             };
             var closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "it selects the closest data point");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "it selects the closest data point");
             yScale.domain([0, 1.9]);
             var d1 = dataset.data()[1];
             var d1Px = {
@@ -4207,10 +4269,10 @@ describe("Plots", function () {
                 dataset: dataset,
                 position: d1Px,
                 selection: d3.selectAll([points[0][1]]),
-                plot: plot
+                component: plot
             };
             closest = plot.entityNearest({ x: d1Px.x, y: 0 });
-            TestMethods.assertEntitiesEqual(closest, expected, "it ignores off-plot data points");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "it ignores off-plot data points");
             svg.remove();
         });
         it("correctly handles NaN and undefined x and y values", function () {
@@ -5213,20 +5275,20 @@ describe("Plots", function () {
                 dataset: dataset1,
                 position: d0Px,
                 selection: d3.selectAll([bars[0][0]]),
-                plot: renderer
+                component: renderer
             };
             var closest = renderer.entityNearest({ x: 0, y: d0Px.y + 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
             expected = {
                 datum: d1,
                 index: 0,
                 dataset: dataset2,
                 position: d1Px,
                 selection: d3.selectAll([bars[0][2]]),
-                plot: renderer
+                component: renderer
             };
             closest = renderer.entityNearest({ x: 0, y: d0Px.y - 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "top bar is closest when within its range");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "top bar is closest when within its range");
             svg.remove();
         });
     });

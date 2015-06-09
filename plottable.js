@@ -5081,33 +5081,46 @@ var Plottable;
                 return rows;
             };
             /**
-             * Gets the entry under at given pixel position.
-             * Returns an empty Selection if no entry exists at that pixel position.
+             * Gets the Entities (representing Legend entries) at a particular point.
+             * Returns an empty array if no Entities are present at that location.
              *
-             * @param {Point} position
-             * @returns {d3.Selection}
+             * @param {Point} p
+             * @returns {Entity<Legend>[]}
              */
-            Legend.prototype.getEntry = function (position) {
+            Legend.prototype.entitiesAt = function (p) {
                 if (!this._isSetup) {
-                    return d3.select(null);
+                    return [];
                 }
-                var entry = d3.select(null);
+                var entities = [];
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
+                var domain = this._scale.domain();
+                var legend = this;
                 this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
+                    var symbolY = (lowY + highY) / 2;
                     var lowX = legendPadding;
                     var highX = legendPadding;
                     d3.select(this).selectAll("g." + Legend.LEGEND_ENTRY_CLASS).each(function (value) {
                         highX += layout.entryLengths.get(value);
-                        if (highX >= position.x && lowX <= position.x && highY >= position.y && lowY <= position.y) {
-                            entry = d3.select(this);
+                        var symbolX = lowX + layout.textHeight / 2;
+                        if (highX >= p.x && lowX <= p.x && highY >= p.y && lowY <= p.y) {
+                            var entrySelection = d3.select(this);
+                            var datum = entrySelection.datum();
+                            var index = domain.indexOf(datum);
+                            entities.push({
+                                datum: datum,
+                                index: index,
+                                position: { x: symbolX, y: symbolY },
+                                selection: entrySelection,
+                                component: legend
+                            });
                         }
                         lowX += layout.entryLengths.get(value);
                     });
                 });
-                return entry;
+                return entities;
             };
             Legend.prototype.renderImmediately = function () {
                 var _this = this;
@@ -6302,7 +6315,7 @@ var Plottable;
          *
          * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
-         * @return {Plots.Entity[]}
+         * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
             var _this = this;
@@ -6322,7 +6335,7 @@ var Plottable;
                         dataset: dataset,
                         position: position,
                         selection: drawer.selectionForIndex(validDatumIndex),
-                        plot: _this
+                        component: _this
                     });
                     validDatumIndex++;
                 });
@@ -6330,10 +6343,10 @@ var Plottable;
             return entities;
         };
         /**
-         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
@@ -7162,14 +7175,14 @@ var Plottable;
                 }
             };
             /**
-             * Returns the Entity nearest to the query point according to the following algorithm:
-             *   - If the query point is inside a bar, returns the Entity for that bar.
-             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             * Returns the PlotEntity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the PlotEntity for that bar.
+             *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
              *     breaking ties with the secondary direction.
-             * Returns undefined if no Entity can be found.
+             * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Bar.prototype.entityNearest = function (queryPoint) {
                 var _this = this;
@@ -7225,7 +7238,7 @@ var Plottable;
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
             Bar.prototype.entitiesAt = function (p) {
                 return this._entitiesIntersecting(p.x, p.y);
@@ -7554,10 +7567,10 @@ var Plottable;
                 return attrToProjector;
             };
             /**
-             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             Line.prototype.entityNearest = function (queryPoint) {
                 var _this = this;

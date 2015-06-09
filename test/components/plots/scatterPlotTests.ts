@@ -107,17 +107,17 @@ describe("Plots", () => {
         y: yScale.scale(d0.y)
       };
 
-      var expected = {
+      var expected: Plottable.Plots.PlotEntity = {
         datum: d0,
         index: 0,
         dataset: dataset,
         position: d0Px,
         selection: d3.selectAll([points[0][0]]),
-        plot: plot
+        component: plot
       };
 
       var closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
-      TestMethods.assertEntitiesEqual(closest, expected, "it selects the closest data point");
+      TestMethods.assertPlotEntitiesEqual(closest, expected, "it selects the closest data point");
 
       yScale.domain([0, 1.9]);
 
@@ -133,11 +133,11 @@ describe("Plots", () => {
         dataset: dataset,
         position: d1Px,
         selection: d3.selectAll([points[0][1]]),
-        plot: plot
+        component: plot
       };
 
       closest = plot.entityNearest({ x: d1Px.x, y: 0 });
-      TestMethods.assertEntitiesEqual(closest, expected, "it ignores off-plot data points");
+      TestMethods.assertPlotEntitiesEqual(closest, expected, "it ignores off-plot data points");
 
       svg.remove();
     });

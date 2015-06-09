@@ -503,6 +503,16 @@ declare module Plottable {
         topLeft: Point;
         bottomRight: Point;
     };
+    /**
+     * An object representing a data-backed visual entity inside a Component.
+     */
+    interface Entity<C extends Component> {
+        datum: any;
+        index: number;
+        position: Point;
+        selection: d3.Selection<any>;
+        component: C;
+    }
 }
 
 
@@ -1971,13 +1981,13 @@ declare module Plottable {
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the entry under at given pixel position.
-             * Returns an empty Selection if no entry exists at that pixel position.
+             * Gets the Entities (representing Legend entries) at a particular point.
+             * Returns an empty array if no Entities are present at that location.
              *
-             * @param {Point} position
-             * @returns {d3.Selection}
+             * @param {Point} p
+             * @returns {Entity<Legend>[]}
              */
-            getEntry(position: Point): d3.Selection<void>;
+            entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
              * Gets the SymbolFactory accessor of the Legend.
@@ -2234,14 +2244,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        type Entity = {
-            datum: any;
-            index: number;
+        interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;
-            position: Point;
-            selection: d3.Selection<any>;
-            plot: Plot;
-        };
+            component: Plot;
+        }
         interface AccessorScaleBinding<D, R> {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
@@ -2363,16 +2369,16 @@ declare module Plottable {
          *
          * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
-         * @return {Plots.Entity[]}
+         * @return {Plots.PlotEntity[]}
          */
-        entities(datasets?: Dataset[]): Plots.Entity[];
+        entities(datasets?: Dataset[]): Plots.PlotEntity[];
         /**
-         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
-        entityNearest(queryPoint: Point): Plots.Entity;
+        entityNearest(queryPoint: Point): Plots.PlotEntity;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2395,7 +2401,7 @@ declare module Plottable {
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Arc;
-            entities(datasets?: Dataset[]): Plots.Entity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.
              */
@@ -2742,39 +2748,39 @@ declare module Plottable {
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**
-             * Returns the Entity nearest to the query point according to the following algorithm:
-             *   - If the query point is inside a bar, returns the Entity for that bar.
-             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             * Returns the PlotEntity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the PlotEntity for that bar.
+             *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
              *     breaking ties with the secondary direction.
-             * Returns undefined if no Entity can be found.
+             * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            entityNearest(queryPoint: Point): Plots.Entity;
+            entityNearest(queryPoint: Point): PlotEntity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesAt(p: Point): Entity[];
+            entitiesAt(p: Point): PlotEntity[];
             /**
              * Gets the Entities that intersect the Bounds.
              *
              * @param {Bounds} bounds
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesIn(bounds: Bounds): Entity[];
+            entitiesIn(bounds: Bounds): PlotEntity[];
             /**
              * Gets the Entities that intersect the area defined by the ranges.
              *
              * @param {Range} xRange
              * @param {Range} yRange
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesIn(xRange: Range, yRange: Range): Entity[];
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -2789,7 +2795,7 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            entities(datasets?: Dataset[]): Plots.Entity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
@@ -2816,12 +2822,12 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
-             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            entityNearest(queryPoint: Point): Plots.Entity;
+            entityNearest(queryPoint: Point): PlotEntity;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;

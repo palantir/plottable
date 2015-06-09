@@ -91,18 +91,26 @@ module TestMethods {
     assert.strictEqual(height, String(heightExpected), "height: " + message);
   }
 
-  export function assertEntitiesEqual(actual: Plottable.Plots.Entity, expected: Plottable.Plots.Entity,
+  export function assertEntitiesEqual(
+      actual: Plottable.Entity<Plottable.Component>,
+      expected: Plottable.Entity<Plottable.Component>,
       msg: string) {
     assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
     assert.strictEqual(actual.index, expected.index, msg + " (index)");
-    assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
-    assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
-    assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
-    assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection contents)");
+    assertPointsClose(actual.position, expected.position, 0.01, msg);
+    assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
     actual.selection[0].forEach((element: Element, index: number) => {
       assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
     });
-    assert.strictEqual(actual.plot, expected.plot, msg + " (plot)");
+    assert.strictEqual(actual.component, expected.component, msg + " (component)");
+  }
+
+  export function assertPlotEntitiesEqual(
+      actual: Plottable.Plots.PlotEntity,
+      expected: Plottable.Plots.PlotEntity,
+      msg: string) {
+    assertEntitiesEqual(actual, expected, msg);
+    assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
   }
 
   export function makeLinearSeries(n: number): { x: number; y: number }[] {

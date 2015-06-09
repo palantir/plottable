@@ -205,16 +205,16 @@ export module Plots {
     }
 
     /**
-     * Returns the Entity nearest to the query point according to the following algorithm:
-     *   - If the query point is inside a bar, returns the Entity for that bar.
-     *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+     * Returns the PlotEntity nearest to the query point according to the following algorithm:
+     *   - If the query point is inside a bar, returns the PlotEntity for that bar.
+     *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
      *     breaking ties with the secondary direction.
-     * Returns undefined if no Entity can be found.
+     * Returns undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): Plots.Entity {
+    public entityNearest(queryPoint: Point): PlotEntity {
       var minPrimaryDist = Infinity;
       var minSecondaryDist = Infinity;
 
@@ -226,7 +226,7 @@ export module Plots {
       // mouse events) usually have pixel accuracy. We add a tolerance of 0.5 pixels.
       var tolerance = 0.5;
 
-      var closest: Plots.Entity;
+      var closest: PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
@@ -276,9 +276,9 @@ export module Plots {
      * Gets the Entities at a particular Point.
      *
      * @param {Point} p
-     * @returns {Entity[]}
+     * @returns {PlotEntity[]}
      */
-    public entitiesAt(p: Point): Entity[] {
+    public entitiesAt(p: Point) {
       return this._entitiesIntersecting(p.x, p.y);
     }
 
@@ -286,18 +286,18 @@ export module Plots {
      * Gets the Entities that intersect the Bounds.
      *
      * @param {Bounds} bounds
-     * @returns {Entity[]}
+     * @returns {PlotEntity[]}
      */
-    public entitiesIn(bounds: Bounds): Entity[];
+    public entitiesIn(bounds: Bounds): PlotEntity[];
     /**
      * Gets the Entities that intersect the area defined by the ranges.
      *
      * @param {Range} xRange
      * @param {Range} yRange
-     * @returns {Entity[]}
+     * @returns {PlotEntity[]}
      */
-    public entitiesIn(xRange: Range, yRange: Range): Entity[];
-    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): Entity[] {
+    public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
       var dataXRange: Range;
       var dataYRange: Range;
       if (yRange == null) {
@@ -311,8 +311,8 @@ export module Plots {
       return this._entitiesIntersecting(dataXRange, dataYRange);
     }
 
-    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): Entity[] {
-      var intersected: Entity[] = [];
+    private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
+      var intersected: PlotEntity[] = [];
       this.entities().forEach((entity) => {
         if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
           intersected.push(entity);
@@ -518,7 +518,7 @@ export module Plots {
       return barPixelWidth;
     }
 
-    public entities(datasets = this.datasets()): Plots.Entity[] {
+    public entities(datasets = this.datasets()): PlotEntity[] {
       if (!this._projectorsReady()) {
         return [];
       }

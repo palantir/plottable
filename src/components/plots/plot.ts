@@ -3,15 +3,10 @@
 module Plottable {
 
   export module Plots {
-
-    export type Entity = {
-      datum: any;
-      index: number;
+    export interface PlotEntity extends Entity<Plot> {
       dataset: Dataset;
-      position: Point;
-      selection: d3.Selection<any>;
-      plot: Plot;
-    };
+      component: Plot;
+    }
 
     export interface AccessorScaleBinding<D, R> {
       accessor: Accessor<any>;
@@ -451,10 +446,10 @@ module Plottable {
      *
      * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
      *   If not provided, returns defaults to all Datasets on the Plot.
-     * @return {Plots.Entity[]}
+     * @return {Plots.PlotEntity[]}
      */
-    public entities(datasets = this.datasets()): Plots.Entity[] {
-      var entities: Plots.Entity[] = [];
+    public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+      var entities: Plots.PlotEntity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         var validDatumIndex = 0;
@@ -469,7 +464,7 @@ module Plottable {
             dataset: dataset,
             position: position,
             selection: drawer.selectionForIndex(validDatumIndex),
-            plot: this
+            component: this
           });
           validDatumIndex++;
         });
@@ -478,14 +473,14 @@ module Plottable {
     }
 
     /**
-     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+     * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): Plots.Entity {
+    public entityNearest(queryPoint: Point): Plots.PlotEntity {
       var closestDistanceSquared = Infinity;
-      var closest: Plots.Entity;
+      var closest: Plots.PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
