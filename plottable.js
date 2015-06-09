@@ -8221,12 +8221,12 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.maxTotalDuration = function (maxDuration) {
-                if (maxDuration == null) {
+            Base.prototype.maxTotalDuration = function (maxTotalDuration) {
+                if (maxTotalDuration == null) {
                     return this._maxTotalDuration;
                 }
                 else {
-                    this._maxTotalDuration = maxDuration;
+                    this._maxTotalDuration = maxTotalDuration;
                     return this;
                 }
             };
@@ -8253,11 +8253,11 @@ var Plottable;
              */
             Base.DEFAULT_START_DELAY_MILLISECONDS = 0;
             /**
-             * The default duration of the animation in milliseconds
+             * The default duration of one animation step in milliseconds
              */
             Base.DEFAULT_STEP_DURATION_MILLISECONDS = 300;
             /**
-             * The default maximum start delay between each start of an animation
+             * The default maximum start delay between each step of an animation
              */
             Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**

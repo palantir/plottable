@@ -24,11 +24,11 @@ export module Animators {
      */
     public static DEFAULT_START_DELAY_MILLISECONDS = 0;
     /**
-     * The default duration of the animation in milliseconds
+     * The default duration of one animation step in milliseconds
      */
     public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
-     * The default maximum start delay between each start of an animation
+     * The default maximum start delay between each step of an animation
      */
     public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
     /**
@@ -85,7 +85,7 @@ export module Animators {
      * Sets the start delay of the animation in milliseconds.
      *
      * @param {number} startDelay The start delay in milliseconds.
-     * @returns {Default} The calling Default Animator.
+     * @returns {Base} The calling Base Animator.
      */
     public startDelay(startDelay: number): Base;
     public startDelay(startDelay?: number): any {
@@ -98,16 +98,16 @@ export module Animators {
     }
 
     /**
-     * Gets the duration of the animation in milliseconds.
+     * Gets the duration of one animation step in milliseconds.
      *
      * @returns {number} The current duration.
      */
     public stepDuration(): number;
     /**
-     * Sets the duration of the animation in milliseconds.
+     * Sets the duration of one animation step in milliseconds.
      *
-     * @param {number} duration The duration in milliseconds.
-     * @returns {Default} The calling Default Animator.
+     * @param {number} stepDuration The duration in milliseconds.
+     * @returns {Base} The calling Base Animator.
      */
     public stepDuration(stepDuration: number): Base;
     public stepDuration(stepDuration?: number): any {
@@ -120,15 +120,15 @@ export module Animators {
     }
 
     /**
-     * Gets the maximum start delay between animations in milliseconds.
+     * Gets the maximum start delay between animation steps in milliseconds.
      *
      * @returns {number} The current maximum iterative delay.
      */
     public iterativeDelay(): number;
     /**
-     * Sets the maximum start delay between animations in milliseconds.
+     * Sets the maximum start delay between animation steps in milliseconds.
      *
-     * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
+     * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
      * @returns {Base} The calling Base Animator.
      */
     public iterativeDelay(iterativeDelay: number): Base;
@@ -142,23 +142,23 @@ export module Animators {
     }
 
     /**
-     * Gets the maximum total animation duration in milliseconds.
+     * Gets the maximum total animation duration constraint in milliseconds.
      *
      * @returns {number} The current maximum total animation duration.
      */
     public maxTotalDuration(): number;
     /**
-     * Sets the maximum total animation duration in miliseconds.
+     * Sets the maximum total animation duration constraint in miliseconds.
      *
-     * @param {number} maxDuration The maximum total animation duration in milliseconds.
+     * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
      * @returns {Base} The calling Base Animator.
      */
-    public maxTotalDuration(maxDuration: number): Base;
-    public maxTotalDuration(maxDuration?: number): any {
-      if (maxDuration == null) {
+    public maxTotalDuration(maxTotalDuration: number): Base;
+    public maxTotalDuration(maxTotalDuration?: number): any {
+      if (maxTotalDuration == null) {
         return this._maxTotalDuration;
       } else {
-        this._maxTotalDuration = maxDuration;
+        this._maxTotalDuration = maxTotalDuration;
         return this;
       }
     }
@@ -173,7 +173,7 @@ export module Animators {
      * Sets the easing mode of the animation.
      *
      * @param {string} easing The desired easing mode.
-     * @returns {Default} The calling Default Animator.
+     * @returns {Base} The calling Base Animator.
      */
     public easing(easing: string): Base;
     public easing(easing?: string): any {

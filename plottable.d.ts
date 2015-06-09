@@ -3045,11 +3045,11 @@ declare module Plottable {
              */
             static DEFAULT_START_DELAY_MILLISECONDS: number;
             /**
-             * The default duration of the animation in milliseconds
+             * The default duration of one animation step in milliseconds
              */
             static DEFAULT_STEP_DURATION_MILLISECONDS: number;
             /**
-             * The default maximum start delay between each start of an animation
+             * The default maximum start delay between each step of an animation
              */
             static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
@@ -3078,48 +3078,48 @@ declare module Plottable {
              * Sets the start delay of the animation in milliseconds.
              *
              * @param {number} startDelay The start delay in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @returns {Base} The calling Base Animator.
              */
             startDelay(startDelay: number): Base;
             /**
-             * Gets the duration of the animation in milliseconds.
+             * Gets the duration of one animation step in milliseconds.
              *
              * @returns {number} The current duration.
              */
             stepDuration(): number;
             /**
-             * Sets the duration of the animation in milliseconds.
+             * Sets the duration of one animation step in milliseconds.
              *
-             * @param {number} duration The duration in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @param {number} stepDuration The duration in milliseconds.
+             * @returns {Base} The calling Base Animator.
              */
             stepDuration(stepDuration: number): Base;
             /**
-             * Gets the maximum start delay between animations in milliseconds.
+             * Gets the maximum start delay between animation steps in milliseconds.
              *
              * @returns {number} The current maximum iterative delay.
              */
             iterativeDelay(): number;
             /**
-             * Sets the maximum start delay between animations in milliseconds.
+             * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
+             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
              * @returns {Base} The calling Base Animator.
              */
             iterativeDelay(iterativeDelay: number): Base;
             /**
-             * Gets the maximum total animation duration in milliseconds.
+             * Gets the maximum total animation duration constraint in milliseconds.
              *
              * @returns {number} The current maximum total animation duration.
              */
             maxTotalDuration(): number;
             /**
-             * Sets the maximum total animation duration in miliseconds.
+             * Sets the maximum total animation duration constraint in miliseconds.
              *
-             * @param {number} maxDuration The maximum total animation duration in milliseconds.
+             * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
              * @returns {Base} The calling Base Animator.
              */
-            maxTotalDuration(maxDuration: number): Base;
+            maxTotalDuration(maxTotalDuration: number): Base;
             /**
              * Gets the current easing of the animation.
              *
@@ -3130,7 +3130,7 @@ declare module Plottable {
              * Sets the easing mode of the animation.
              *
              * @param {string} easing The desired easing mode.
-             * @returns {Default} The calling Default Animator.
+             * @returns {Base} The calling Base Animator.
              */
             easing(easing: string): Base;
         }
