@@ -1929,7 +1929,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale.Color} scale
              */
-            constructor(scale: Scales.Color);
+            constructor(colorScale: Scales.Color);
             protected _setup(): void;
             /**
              * Gets the maximum number of entries per row.
@@ -1963,14 +1963,14 @@ declare module Plottable {
              *
              * @returns {Scales.Color}
              */
-            scale(): Scales.Color;
+            colorScale(): Scales.Color;
             /**
              * Sets the Color Scale.
              *
              * @param {Scales.Color} scale
              * @returns {Legend} The calling Legend.
              */
-            scale(scale: Scales.Color): Legend;
+            colorScale(colorScale: Scales.Color): Legend;
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**

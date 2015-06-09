@@ -17,7 +17,7 @@ export module Components {
     public static LEGEND_SYMBOL_CLASS = "legend-symbol";
 
     private _padding = 5;
-    private _scale: Scales.Color;
+    private _colorScale: Scales.Color;
     private _maxEntriesPerRow: number;
     private _comparator: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
@@ -32,21 +32,21 @@ export module Components {
      * @constructor
      * @param {Scale.Color} scale
      */
-    constructor(scale: Scales.Color) {
+    constructor(colorScale: Scales.Color) {
       super();
       this.classed("legend", true);
       this.maxEntriesPerRow(1);
 
-      if (scale == null ) {
+      if (colorScale == null ) {
         throw new Error("Legend requires a colorScale");
       }
 
-      this._scale = scale;
+      this._colorScale = colorScale;
       this._redrawCallback = (scale) => this.redraw();
-      this._scale.onUpdate(this._redrawCallback);
+      this._colorScale.onUpdate(this._redrawCallback);
 
       this.xAlignment("right").yAlignment("top");
-      this.comparator((a: string, b: string) => this._scale.domain().indexOf(a) - this._scale.domain().indexOf(b));
+      this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
     }
 
@@ -112,29 +112,29 @@ export module Components {
      *
      * @returns {Scales.Color}
      */
-    public scale(): Scales.Color;
+    public colorScale(): Scales.Color;
     /**
      * Sets the Color Scale.
      *
      * @param {Scales.Color} scale
      * @returns {Legend} The calling Legend.
      */
-    public scale(scale: Scales.Color): Legend;
-    public scale(scale?: Scales.Color): any {
-      if (scale != null) {
-        this._scale.offUpdate(this._redrawCallback);
-        this._scale = scale;
-        this._scale.onUpdate(this._redrawCallback);
+    public colorScale(colorScale: Scales.Color): Legend;
+    public colorScale(colorScale?: Scales.Color): any {
+      if (colorScale != null) {
+        this._colorScale.offUpdate(this._redrawCallback);
+        this._colorScale = colorScale;
+        this._colorScale.onUpdate(this._redrawCallback);
         this.redraw();
         return this;
       } else {
-        return this._scale;
+        return this._colorScale;
       }
     }
 
     public destroy() {
       super.destroy();
-      this._scale.offUpdate(this._redrawCallback);
+      this._colorScale.offUpdate(this._redrawCallback);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {
@@ -142,7 +142,7 @@ export module Components {
 
       var availableWidthForEntries = Math.max(0, (availableWidth - this._padding));
 
-      var entryNames = this._scale.domain().slice();
+      var entryNames = this._colorScale.domain().slice();
       entryNames.sort(this.comparator());
 
       var entryLengths: d3.Map<number> = d3.map<number>();
@@ -269,7 +269,7 @@ export module Components {
 
       entries.select("path").attr("d", (d: any, i: number) => this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
-                            .attr("fill", (value: string) => this._scale.scale(value) )
+                            .attr("fill", (value: string) => this._colorScale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
