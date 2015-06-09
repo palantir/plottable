@@ -93,9 +93,9 @@ describe("Utils.DOM", () => {
       child.remove();
     });
 
-    it("getUniqueClipPathId works as expected", () => {
-      var firstClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
-      var secondClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+    it("generateUniqueClipPathId()", () => {
+      var firstClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
+      var secondClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
 
       var firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
       var secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
@@ -117,7 +117,7 @@ describe("Utils.DOM", () => {
         "second clip path id should only have a number after the prefix");
 
       assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber,
-        "Consecutive calls to getUniqueClipPathId should give consecutive numbers after the prefix");
+        "Consecutive calls to generateUniqueClipPathId should give consecutive numbers after the prefix");
     });
   });
 });

@@ -142,7 +142,7 @@ declare module Plottable {
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
             function boundingSVG(elem: SVGElement): SVGElement;
-            function getUniqueClipPathId(): string;
+            function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *

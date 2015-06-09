@@ -94,7 +94,7 @@ export module Utils {
     }
 
     var _latestClipPathId = 0;
-    export function getUniqueClipPathId() {
+    export function generateUniqueClipPathId() {
       return "plottableClipPath" + ++_latestClipPathId;
     }
 
