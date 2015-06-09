@@ -3066,7 +3066,7 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            totalTime(numberOfIterations: number): number;
+            totalTime(numberOfSteps: number): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
              * Gets the start delay of the animation in milliseconds.

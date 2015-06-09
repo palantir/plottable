@@ -8184,15 +8184,14 @@ var Plottable;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
             }
-            Base.prototype.totalTime = function (numberOfIterations) {
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
-                var time = this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfIterations - 1, 0)) + this.stepDuration();
-                return time;
+            Base.prototype.totalTime = function (numberOfSteps) {
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+                return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
             Base.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
-                var numberOfIterations = selection[0].length;
-                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
+                var numberOfSteps = selection[0].length;
+                var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
             Base.prototype.startDelay = function (startDelay) {
@@ -8240,9 +8239,9 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype._getAdjustedIterativeDelay = function (numberOfIterations) {
+            Base.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
                 var stepStartTimeInterval = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
-                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfIterations - 1, 1));
+                var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfSteps - 1, 1));
                 return adjustedIterativeDelay;
             };
             /**

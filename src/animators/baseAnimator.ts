@@ -59,15 +59,14 @@ export module Animators {
       this._easing = Base.DEFAULT_EASING;
     }
 
-    public totalTime(numberOfIterations: number) {
-      var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
-      var time = this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfIterations - 1, 0)) + this.stepDuration();
-      return time;
+    public totalTime(numberOfSteps: number) {
+      var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
+      return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
     public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
-      var numberOfIterations = selection[0].length;
-      var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfIterations);
+      var numberOfSteps = selection[0].length;
+      var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
       return selection.transition()
         .ease(this.easing())
@@ -186,13 +185,11 @@ export module Animators {
       }
     }
 
-    private _getAdjustedIterativeDelay(numberOfIterations: number) {
+    private _getAdjustedIterativeDelay(numberOfSteps: number) {
       var stepStartTimeInterval = Math.max(this.maxTotalDuration() - this.stepDuration(), 0);
-      var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfIterations - 1, 1));
+      var adjustedIterativeDelay = Math.min(this.iterativeDelay(), stepStartTimeInterval / Math.max(numberOfSteps - 1, 1));
       return adjustedIterativeDelay;
     }
-
-
   }
 }
 }
