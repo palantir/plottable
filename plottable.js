@@ -7514,7 +7514,7 @@ var Plottable;
                 _super.call(this);
                 this.classed("line-plot", true);
                 var animator = new Plottable.Animators.Base();
-                animator.stepDuration(600);
+                animator.stepDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
                 animator.easing("exp-in-out");
                 animator.maxTotalDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
                 this.animator(Plots.Animator.MAIN, animator);
