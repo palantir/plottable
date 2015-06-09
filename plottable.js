@@ -5988,7 +5988,8 @@ var Plottable;
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
-            this.animator(Plots.Animator.MAIN, new Plottable.Animators.Base().maxTotalDuration(600));
+            var mainAnimator = new Plottable.Animators.Base().maxTotalDuration(Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS);
+            this.animator(Plots.Animator.MAIN, mainAnimator);
             this.animator(Plots.Animator.RESET, new Plottable.Animators.Null());
         }
         Plot.prototype.anchor = function (selection) {
@@ -6363,6 +6364,7 @@ var Plottable;
         Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
         };
+        Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS = 600;
         return Plot;
     })(Plottable.Component);
     Plottable.Plot = Plot;
@@ -6952,7 +6954,7 @@ var Plottable;
                 var animator = new Plottable.Animators.Base();
                 animator.startDelay(5);
                 animator.stepDuration(250);
-                animator.maxTotalDuration(600);
+                animator.maxTotalDuration(Plottable.Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS);
                 this.animator(Plots.Animator.MAIN, animator);
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -7514,7 +7516,7 @@ var Plottable;
                 var animator = new Plottable.Animators.Base();
                 animator.stepDuration(600);
                 animator.easing("exp-in-out");
-                animator.maxTotalDuration(600);
+                animator.maxTotalDuration(Plottable.Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS);
                 this.animator(Plots.Animator.MAIN, animator);
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");

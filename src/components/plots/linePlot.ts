@@ -15,7 +15,7 @@ export module Plots {
       var animator = new Animators.Base();
       animator.stepDuration(600);
       animator.easing("exp-in-out");
-      animator.maxTotalDuration(600);
+      animator.maxTotalDuration(Plot.IDEAL_ANIMATION_MAX_TOTAL_DURATION_MILLISECONDS);
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
