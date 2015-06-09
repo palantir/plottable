@@ -299,13 +299,11 @@ var Plottable;
                 if (x == null) {
                     return xform.translate;
                 }
-                else {
-                    y = (y == null) ? 0 : y;
-                    xform.translate[0] = x;
-                    xform.translate[1] = y;
-                    selection.attr("transform", xform.toString());
-                    return selection;
-                }
+                y = (y == null) ? 0 : y;
+                xform.translate[0] = x;
+                xform.translate[1] = y;
+                selection.attr("transform", xform.toString());
+                return selection;
             }
             DOM.translate = translate;
             function boxesOverlap(boxA, boxB) {

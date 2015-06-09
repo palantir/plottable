@@ -56,13 +56,13 @@ export module Utils {
       var xform = d3.transform(selection.attr("transform"));
       if (x == null) {
         return xform.translate;
-      } else {
-        y = (y == null) ? 0 : y;
-        xform.translate[0] = x;
-        xform.translate[1] = y;
-        selection.attr("transform", xform.toString());
-        return selection;
       }
+
+      y = (y == null) ? 0 : y;
+      xform.translate[0] = x;
+      xform.translate[1] = y;
+      selection.attr("transform", xform.toString());
+      return selection;
     }
 
     export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
@@ -122,8 +122,10 @@ export module Utils {
       // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate.
-      return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance &&
-        bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
+      return bbox.x + bbox.width >= xRange.min - tolerance &&
+        bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance &&
+        bbox.y <= yRange.max + tolerance;
     }
 
     /**
@@ -148,7 +150,7 @@ export module Utils {
     }
 
     function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
-      var value: any = style.getPropertyValue(property);
+      var value = style.getPropertyValue(property);
       var parsedValue = parseFloat(value);
       if (parsedValue !== parsedValue) {
           return 0;
