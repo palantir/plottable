@@ -19,7 +19,7 @@ export module Components {
     protected _setup() {
       super._setup();
 
-      this._box = this._content.append("g").classed("selection-box", true).remove();
+      this._box = this.content().append("g").classed("selection-box", true).remove();
       this._boxArea = this._box.append("rect").classed("selection-area", true);
     }
 
@@ -76,7 +76,7 @@ export module Components {
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
         });
-        (<Node> this._content.node()).appendChild(<Node> this._box.node());
+        (<Node> this.content().node()).appendChild(<Node> this._box.node());
       } else {
         this._box.remove();
       }

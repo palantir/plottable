@@ -607,7 +607,6 @@ declare module Plottable {
      */
     type SymbolFactory = (symbolSize: number) => string;
     module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
         function circle(): SymbolFactory;
         function square(): SymbolFactory;
         function cross(): SymbolFactory;
@@ -1275,8 +1274,6 @@ declare module Plottable {
         }
     }
     class Component {
-        protected _element: d3.Selection<void>;
-        protected _content: d3.Selection<void>;
         protected _boundingBox: d3.Selection<void>;
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
@@ -2256,10 +2253,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected _dataChanged: boolean;
-        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
         protected _renderArea: d3.Selection<void>;
-        protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-        protected _attrExtents: d3.Map<any[]>;
         protected _animate: boolean;
         protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
@@ -2684,7 +2678,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * @constructor
@@ -2923,7 +2916,6 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
             protected _propertyProjectors(): AttributeToProjector;

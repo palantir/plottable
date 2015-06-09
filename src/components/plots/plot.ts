@@ -26,11 +26,11 @@ module Plottable {
 
   export class Plot extends Component {
     protected _dataChanged = false;
-    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+    private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: d3.Map<any[]>;
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     protected _animate: boolean = false;
@@ -72,7 +72,7 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this.content().append("g").classed("render-area", true);
       this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 

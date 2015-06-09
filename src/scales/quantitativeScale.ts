@@ -165,9 +165,8 @@ module Plottable {
      * @param {number} value: A value from the Scale's range.
      * @returns {D} The domain value corresponding to the supplied range value.
      */
-
     public invert(value: number): D {
-      throw new Error("Subclasses should override _invert");
+      throw new Error("Subclasses should override invert");
     }
 
     public domain(): D[];

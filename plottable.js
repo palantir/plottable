@@ -1701,7 +1701,7 @@ var Plottable;
          * @returns {D} The domain value corresponding to the supplied range value.
          */
         QuantitativeScale.prototype.invert = function (value) {
-            throw new Error("Subclasses should override _invert");
+            throw new Error("Subclasses should override invert");
         };
         QuantitativeScale.prototype.domain = function (values) {
             if (values != null) {
@@ -3374,7 +3374,7 @@ var Plottable;
         ComponentContainer.prototype.anchor = function (selection) {
             var _this = this;
             _super.prototype.anchor.call(this, selection);
-            this._forEach(function (c) { return c.anchor(_this._content); });
+            this._forEach(function (c) { return c.anchor(_this.content()); });
             return this;
         };
         ComponentContainer.prototype.render = function () {
@@ -3391,7 +3391,7 @@ var Plottable;
             component.parent(this);
             component.onDetach(this._detachCallback);
             if (this._isAnchored) {
-                component.anchor(this._content);
+                component.anchor(this.content());
             }
         };
         /**
@@ -3633,9 +3633,9 @@ var Plottable;
         };
         Axis.prototype._setup = function () {
             _super.prototype._setup.call(this);
-            this._tickMarkContainer = this._content.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
-            this._tickLabelContainer = this._content.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
-            this._baseline = this._content.append("line").classed("baseline", true);
+            this._tickMarkContainer = this.content().append("g").classed(Axis.TICK_MARK_CLASS + "-container", true);
+            this._tickLabelContainer = this.content().append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true);
+            this._baseline = this.content().append("line").classed("baseline", true);
         };
         /*
          * Function for generating tick values in data-space (as opposed to pixel values).
@@ -3986,14 +3986,14 @@ var Plottable;
                 this._setupDomElements();
             };
             Time.prototype._setupDomElements = function () {
-                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+                this.content().selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
                 this._tierLabelContainers = [];
                 this._tierMarkContainers = [];
                 this._tierBaselines = [];
                 this._tickLabelContainer.remove();
                 this._baseline.remove();
                 for (var i = 0; i < this._numTiers; ++i) {
-                    var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
+                    var tierContainer = this.content().append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
                     this._tierLabelContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_LABEL_CLASS + "-container", true));
                     this._tierMarkContainers.push(tierContainer.append("g").classed(Plottable.Axis.TICK_MARK_CLASS + "-container", true));
                     this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -4130,14 +4130,14 @@ var Plottable;
                 var _this = this;
                 var availableHeight = this.height();
                 var usedHeight = 0;
-                this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
+                this.content().selectAll("." + Time.TIME_AXIS_TIER_CLASS).attr("visibility", function (d, i) {
                     usedHeight += _this._tierHeights[i];
                     return usedHeight <= availableHeight ? "inherit" : "hidden";
                 });
             };
             Time.prototype._hideOverlappingAndCutOffLabels = function (index) {
                 var _this = this;
-                var boundingBox = this._element.select(".bounding-box")[0][0].getBoundingClientRect();
+                var boundingBox = this._boundingBox.node().getBoundingClientRect();
                 var isInsideBBox = function (tickBox) {
                     return (Math.floor(boundingBox.left) <= Math.ceil(tickBox.left) && Math.floor(boundingBox.top) <= Math.ceil(tickBox.top) && Math.floor(tickBox.right) <= Math.ceil(boundingBox.left + _this.width()) && Math.floor(tickBox.bottom) <= Math.ceil(boundingBox.top + _this.height()));
                 };
@@ -4829,7 +4829,7 @@ var Plottable;
             };
             Label.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._textContainer = this._content.append("g");
+                this._textContainer = this.content().append("g");
                 this._measurer = new SVGTypewriter.Measurers.Measurer(this._textContainer);
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
@@ -4979,7 +4979,7 @@ var Plottable;
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                var fakeLegendRow = this._content.append("g").classed(Legend.LEGEND_ROW_CLASS, true);
+                var fakeLegendRow = this.content().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 var fakeLegendEntry = fakeLegendRow.append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
                 fakeLegendEntry.append("text");
                 this._measurer = new SVGTypewriter.Measurers.Measurer(fakeLegendRow);
@@ -5094,7 +5094,7 @@ var Plottable;
                 var entry = d3.select(null);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var legendPadding = this._padding;
-                this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
+                this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).each(function (d, i) {
                     var lowY = i * layout.textHeight + legendPadding;
                     var highY = (i + 1) * layout.textHeight + legendPadding;
                     var lowX = legendPadding;
@@ -5114,7 +5114,7 @@ var Plottable;
                 _super.prototype.renderImmediately.call(this);
                 var layout = this._calculateLayoutInfo(this.width(), this.height());
                 var rowsToDraw = layout.rows.slice(0, layout.numRowsToDraw);
-                var rows = this._content.selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
+                var rows = this.content().selectAll("g." + Legend.LEGEND_ROW_CLASS).data(rowsToDraw);
                 rows.enter().append("g").classed(Legend.LEGEND_ROW_CLASS, true);
                 rows.exit().remove();
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
@@ -5276,11 +5276,11 @@ var Plottable;
             };
             InterpolatedColorLegend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._swatchContainer = this._content.append("g").classed("swatch-container", true);
-                this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
-                this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-                this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-                this._measurer = new SVGTypewriter.Measurers.Measurer(this._content);
+                this._swatchContainer = this.content().append("g").classed("swatch-container", true);
+                this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
+                this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+                this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+                this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
@@ -5465,8 +5465,8 @@ var Plottable;
             };
             Gridlines.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._xLinesContainer = this._content.append("g").classed("x-gridlines", true);
-                this._yLinesContainer = this._content.append("g").classed("y-gridlines", true);
+                this._xLinesContainer = this.content().append("g").classed("x-gridlines", true);
+                this._yLinesContainer = this.content().append("g").classed("y-gridlines", true);
             };
             Gridlines.prototype.renderImmediately = function () {
                 _super.prototype.renderImmediately.call(this);
@@ -5885,7 +5885,7 @@ var Plottable;
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
-                this._box = this._content.append("g").classed("selection-box", true).remove();
+                this._box = this.content().append("g").classed("selection-box", true).remove();
                 this._boxArea = this._box.append("rect").classed("selection-area", true);
             };
             SelectionBoxLayer.prototype._getSize = function (availableWidth, availableHeight) {
@@ -5928,7 +5928,7 @@ var Plottable;
                         width: r - l,
                         height: b - t
                     });
-                    this._content.node().appendChild(this._box.node());
+                    this.content().node().appendChild(this._box.node());
                 }
                 else {
                     this._box.remove();
@@ -6007,7 +6007,7 @@ var Plottable;
         Plot.prototype._setup = function () {
             var _this = this;
             _super.prototype._setup.call(this);
-            this._renderArea = this._content.append("g").classed("render-area", true);
+            this._renderArea = this.content().append("g").classed("render-area", true);
             this.datasets().forEach(function (dataset) { return _this._createNodesForDataset(dataset); });
         };
         Plot.prototype.destroy = function () {
@@ -7481,7 +7481,6 @@ var Plottable;
             };
             Bar.ORIENTATION_VERTICAL = "vertical";
             Bar.ORIENTATION_HORIZONTAL = "horizontal";
-            Bar._DEFAULT_WIDTH = 10;
             Bar._BAR_WIDTH_RATIO = 0.95;
             Bar._SINGLE_BAR_DIMENSION_RATIO = 0.4;
             Bar._BAR_AREA_CLASS = "bar-area";
@@ -7825,16 +7824,8 @@ var Plottable;
             ClusteredBar.prototype._makeInnerScale = function () {
                 var innerScale = new Plottable.Scales.Category();
                 innerScale.domain(this.datasets().map(function (d, i) { return String(i); }));
-                if (!this._attrBindings.get("width")) {
-                    innerScale.range([0, this._getBarPixelWidth()]);
-                }
-                else {
-                    var projection = this._attrBindings.get("width");
-                    var accessor = projection.accessor;
-                    var scale = projection.scale;
-                    var fn = scale ? function (d, i, dataset) { return scale.scale(accessor(d, i, dataset)); } : accessor;
-                    innerScale.range([0, fn(null, 0, null)]);
-                }
+                var widthProjector = Plottable.Plot._scaledAccessor(this.attr("width"));
+                innerScale.range([0, widthProjector(null, 0, null)]);
                 return innerScale;
             };
             ClusteredBar.prototype._getDataToDraw = function () {
@@ -7931,9 +7922,6 @@ var Plottable;
                 this._updateStackExtentsAndOffsets();
                 _super.prototype._onDatasetUpdate.call(this);
                 return this;
-            };
-            StackedArea.prototype._wholeDatumAttributes = function () {
-                return ["x", "y", "defined", "d"];
             };
             StackedArea.prototype._updateExtentsForProperty = function (property) {
                 _super.prototype._updateExtentsForProperty.call(this, property);
