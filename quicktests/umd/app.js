@@ -1,6 +1,10 @@
+/*jshint strict:false */
+
+var require;
+
 require.config({
   paths: {
-    d3: "lib/d3",
+    d3: "../../bower_components/d3/d3",
     plottable: "../../plottable" 
   }
 });
@@ -20,8 +24,8 @@ require(["d3"], function(d3) {
   
     var plot = new Plottable.Plots.Bar("vertical");
     plot.addDataset(dataset1);
-    plot.x(function(d) { return d["name"]; }, xScale);
-    plot.y(function(d) { return d["value"]; }, yScale);
+    plot.x(function(d) { return d.name; }, xScale);
+    plot.y(function(d) { return d.value; }, yScale);
     
     var chart = new Plottable.Components.Table([
       [yAxis, plot],
