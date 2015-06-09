@@ -36,7 +36,6 @@ module Plottable {
     protected _animate: boolean = false;
     private _animators: {[animator: string]: Animators.Plot} = {};
 
-    protected _animateOnNextRender = true;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -64,7 +63,6 @@ module Plottable {
 
     public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateExtents();
       return this;
@@ -124,7 +122,6 @@ module Plottable {
 
     protected _onDatasetUpdate() {
       this._updateExtents();
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this.render();
     }
@@ -208,8 +205,6 @@ module Plottable {
     public renderImmediately() {
       if (this._isAnchored) {
         this._paint();
-        this._dataChanged = false;
-        this._animateOnNextRender = false;
       }
       return this;
     }
@@ -526,6 +521,10 @@ module Plottable {
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       return { x: 0, y: 0 };
+    }
+
+    protected _animateOnNextRender() {
+      return this._animate && this._dataChanged;
     }
   }
 }

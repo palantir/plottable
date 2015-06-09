@@ -24,7 +24,7 @@ export module Plots {
     }
 
     protected _getAnimator(key: string): Animators.Plot {
-      if (this._animate && this._animateOnNextRender) {
+      if (this._animateOnNextRender()) {
         if (this.animator(key)) {
           return this.animator(key);
         } else if (key === "stacked-bar") {

@@ -5967,7 +5967,6 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._animators = {};
-            this._animateOnNextRender = true;
             this._clipPathEnabled = true;
             this.classed("plot", true);
             this._datasetToDrawer = new Plottable.Utils.Map();
@@ -5983,7 +5982,6 @@ var Plottable;
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this._updateExtents();
             return this;
@@ -6038,7 +6036,6 @@ var Plottable;
         };
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this.render();
         };
@@ -6088,8 +6085,6 @@ var Plottable;
         Plot.prototype.renderImmediately = function () {
             if (this._isAnchored) {
                 this._paint();
-                this._dataChanged = false;
-                this._animateOnNextRender = false;
             }
             return this;
         };
@@ -6352,6 +6347,9 @@ var Plottable;
         };
         Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
+        };
+        Plot.prototype._animateOnNextRender = function () {
+            return this._animate && this._dataChanged;
         };
         return Plot;
     })(Plottable.Component);
@@ -8007,7 +8005,7 @@ var Plottable;
                 this._stackedExtent = [];
             }
             StackedBar.prototype._getAnimator = function (key) {
-                if (this._animate && this._animateOnNextRender) {
+                if (this._animateOnNextRender()) {
                     if (this.animator(key)) {
                         return this.animator(key);
                     }
