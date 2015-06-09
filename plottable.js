@@ -274,24 +274,16 @@ var Plottable;
                 return bbox;
             }
             DOM.getBBox = getBBox;
-            DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+            DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
             function requestAnimationFramePolyfill(fn) {
                 if (window.requestAnimationFrame != null) {
                     window.requestAnimationFrame(fn);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MSEC);
+                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function isSelectionRemovedFromSVG(selection) {
-                var n = selection.node();
-                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-                    n = n.parentNode;
-                }
-                return (n == null);
-            }
-            DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
             function getElementWidth(elem) {
                 var style = window.getComputedStyle(elem);
                 return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");

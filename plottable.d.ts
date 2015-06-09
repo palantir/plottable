@@ -133,9 +133,8 @@ declare module Plottable {
              * @returns {SVGRed} The bounding box.
              */
             function getBBox(element: d3.Selection<any>): SVGRect;
-            var POLYFILL_TIMEOUT_MSEC: number;
+            var POLYFILL_TIMEOUT_MILLISECONDS: number;
             function requestAnimationFramePolyfill(fn: () => any): void;
-            function isSelectionRemovedFromSVG(selection: d3.Selection<any>): boolean;
             function getElementWidth(elem: Element): number;
             function getElementHeight(elem: Element): number;
             function getSVGPixelWidth(svg: d3.Selection<void>): number;

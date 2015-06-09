@@ -32,14 +32,6 @@ export module Utils {
       }
     }
 
-    export function isSelectionRemovedFromSVG(selection: d3.Selection<any>) {
-      var n = (<Node> selection.node());
-      while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-        n = n.parentNode;
-      }
-      return (n == null);
-    }
-
     export function getElementWidth(elem: Element): number {
       var style: CSSStyleDeclaration = window.getComputedStyle(elem);
       return getParsedStyleValue(style, "width")
