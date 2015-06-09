@@ -151,7 +151,7 @@ module.exports = function(grunt) {
       all: {
         src: "plottable.js", 
         objectToExport: "Plottable",
-        amdModuleId: "Plottable",
+//        amdModuleId: "Plottable",
       }
     },
     concat: {

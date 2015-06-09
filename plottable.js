@@ -7,7 +7,7 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 (function (root, factory) {
   if (typeof define === 'function' && define.amd) {
     // AMD. Register as an anonymous module unless amdModuleId is set
-    define('Plottable', [], function () {
+    define([], function () {
       return (root['Plottable'] = factory());
     });
   } else if (typeof exports === 'object') {
