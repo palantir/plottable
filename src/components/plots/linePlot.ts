@@ -12,7 +12,7 @@ export module Plots {
     constructor() {
       super();
       this.classed("line-plot", true);
-      var animator = new Animators.Base();
+      var animator = new Animators.Easing();
       animator.stepDuration(Plot.ANIMATION_MAX_DURATION);
       animator.easingMode("exp-in-out");
       animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);

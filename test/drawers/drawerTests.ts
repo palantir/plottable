@@ -120,7 +120,7 @@ describe("Drawers", () => {
 
       var attrToProjector: Plottable.AttributeToProjector = null;
 
-      var animator = new Plottable.Animators.Base();
+      var animator = new Plottable.Animators.Easing();
       animator.maxTotalDuration(Infinity);
       animator.stepDuration(stepDuration);
       animator.stepDelay(stepDelay);

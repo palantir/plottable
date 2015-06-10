@@ -17,7 +17,7 @@ function run(svg, data, Plottable) {
 
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
-    var animator = new Plottable.Animators.Base();
+    var animator = new Plottable.Animators.Easing();
         animator.stepDuration(1000);
         animator.maxTotalDuration(2000);
         animator.iterativeDelay(100);

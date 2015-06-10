@@ -414,7 +414,7 @@ describe("Drawers", function () {
             var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
             var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
             var attrToProjector = null;
-            var animator = new Plottable.Animators.Base();
+            var animator = new Plottable.Animators.Easing();
             animator.maxTotalDuration(Infinity);
             animator.stepDuration(stepDuration);
             animator.stepDelay(stepDelay);
@@ -464,7 +464,7 @@ describe("Animators", function () {
                 var stepDuration = 300;
                 var stepDelay = 15;
                 var expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Formula for calculating total time should work");
             });
@@ -474,7 +474,7 @@ describe("Animators", function () {
                 var stepDuration = 453;
                 var stepDelay = 265;
                 var expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -487,7 +487,7 @@ describe("Animators", function () {
                 var stepDuration = 100;
                 var stepDelay = 1000;
                 var expectedTotalTime = 2000;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -501,7 +501,7 @@ describe("Animators", function () {
                 var stepDuration = 10000;
                 var stepDelay = 100;
                 var expectedTotalTime = 2000;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -516,7 +516,7 @@ describe("Animators", function () {
                 var stepDelay = 100;
                 var maxTotalDuration = 5000;
                 var expectedTotalTime = 200;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -529,7 +529,7 @@ describe("Animators", function () {
                 var startDelay = 0;
                 var stepDuration = 333;
                 var stepDelay = 432;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -542,7 +542,7 @@ describe("Animators", function () {
                 var stepDuration = 333;
                 var stepDelay = 432;
                 var expectedTotalTime = startDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -555,7 +555,7 @@ describe("Animators", function () {
                 var stepDuration = 1000;
                 var stepDelay = 1000000;
                 var maxTotalDuration = 1500;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
                 animator.stepDelay(stepDelay);
@@ -2586,7 +2586,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animators.Base().startDelay(10).stepDuration(10).stepDelay(0);
+            var animator = new Plottable.Animators.Easing().startDelay(10).stepDuration(10).stepDelay(0);
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();

@@ -18,7 +18,7 @@ export module Animators {
    * min(stepDelay(),
    *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
    */
-  export class Base implements Animator {
+  export class Easing implements Animator {
     /**
      * The default starting delay of the animation in milliseconds
      */
@@ -52,11 +52,11 @@ export module Animators {
      * @constructor
      */
     constructor() {
-      this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
-      this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-      this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-      this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easingMode = Base.DEFAULT_EASING_MODE;
+      this._startDelay = Easing.DEFAULT_START_DELAY_MILLISECONDS;
+      this._stepDuration = Easing.DEFAULT_STEP_DURATION_MILLISECONDS;
+      this._stepDelay = Easing.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+      this._maxTotalDuration = Easing.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+      this._easingMode = Easing.DEFAULT_EASING_MODE;
     }
 
     public totalTime(numberOfSteps: number) {
@@ -85,9 +85,9 @@ export module Animators {
      * Sets the start delay of the animation in milliseconds.
      *
      * @param {number} startDelay The start delay in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public startDelay(startDelay: number): Base;
+    public startDelay(startDelay: number): Easing;
     public startDelay(startDelay?: number): any {
       if (startDelay == null) {
         return this._startDelay;
@@ -107,9 +107,9 @@ export module Animators {
      * Sets the duration of one animation step in milliseconds.
      *
      * @param {number} stepDuration The duration in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public stepDuration(stepDuration: number): Base;
+    public stepDuration(stepDuration: number): Easing;
     public stepDuration(stepDuration?: number): any {
       if (stepDuration == null) {
         return Math.min(this._stepDuration, this._maxTotalDuration);
@@ -129,9 +129,9 @@ export module Animators {
      * Sets the maximum start delay between animation steps in milliseconds.
      *
      * @param {number} stepDelay The maximum iterative delay in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public stepDelay(stepDelay: number): Base;
+    public stepDelay(stepDelay: number): Easing;
     public stepDelay(stepDelay?: number): any {
       if (stepDelay == null) {
         return this._stepDelay;
@@ -151,9 +151,9 @@ export module Animators {
      * Sets the maximum total animation duration constraint in miliseconds.
      *
      * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public maxTotalDuration(maxTotalDuration: number): Base;
+    public maxTotalDuration(maxTotalDuration: number): Easing;
     public maxTotalDuration(maxTotalDuration?: number): any {
       if (maxTotalDuration == null) {
         return this._maxTotalDuration;
@@ -173,9 +173,9 @@ export module Animators {
      * Sets the easing mode of the animation.
      *
      * @param {string} easingMode The desired easing mode.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public easingMode(easingMode: string): Base;
+    public easingMode(easingMode: string): Easing;
     public easingMode(easingMode?: string): any {
       if (easingMode == null) {
         return this._easingMode;

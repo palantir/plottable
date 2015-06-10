@@ -3016,7 +3016,7 @@ declare module Plottable {
          * min(stepDelay(),
          *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
-        class Base implements Animator {
+        class Easing implements Animator {
             /**
              * Constructs the default animator
              *
@@ -3035,9 +3035,9 @@ declare module Plottable {
              * Sets the start delay of the animation in milliseconds.
              *
              * @param {number} startDelay The start delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            startDelay(startDelay: number): Base;
+            startDelay(startDelay: number): Easing;
             /**
              * Gets the duration of one animation step in milliseconds.
              *
@@ -3048,9 +3048,9 @@ declare module Plottable {
              * Sets the duration of one animation step in milliseconds.
              *
              * @param {number} stepDuration The duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            stepDuration(stepDuration: number): Base;
+            stepDuration(stepDuration: number): Easing;
             /**
              * Gets the maximum start delay between animation steps in milliseconds.
              *
@@ -3061,9 +3061,9 @@ declare module Plottable {
              * Sets the maximum start delay between animation steps in milliseconds.
              *
              * @param {number} stepDelay The maximum iterative delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            stepDelay(stepDelay: number): Base;
+            stepDelay(stepDelay: number): Easing;
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
              *
@@ -3074,9 +3074,9 @@ declare module Plottable {
              * Sets the maximum total animation duration constraint in miliseconds.
              *
              * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            maxTotalDuration(maxTotalDuration: number): Base;
+            maxTotalDuration(maxTotalDuration: number): Easing;
             /**
              * Gets the current easing mode of the animation.
              *
@@ -3087,9 +3087,9 @@ declare module Plottable {
              * Sets the easing mode of the animation.
              *
              * @param {string} easingMode The desired easing mode.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            easingMode(easingMode: string): Base;
+            easingMode(easingMode: string): Easing;
         }
     }
 }
