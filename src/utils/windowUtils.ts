@@ -10,9 +10,6 @@ module Plottable {
        * @param {string} The warnings to print
        */
       export function warn(warning: string) {
-        if (!Configs.SHOW_WARNINGS) {
-          return;
-        }
         /* tslint:disable:no-console */
         if ((<any> window).console != null) {
           if ((<any> window).console.warn != null) {

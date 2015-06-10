@@ -738,9 +738,6 @@ var Plottable;
              * @param {string} The warnings to print
              */
             function warn(warning) {
-                if (!Plottable.Configs.SHOW_WARNINGS) {
-                    return;
-                }
                 /* tslint:disable:no-console */
                 if (window.console != null) {
                     if (window.console.warn != null) {
@@ -852,18 +849,6 @@ var Plottable;
         })();
         Utils.ClientToSVGTranslator = ClientToSVGTranslator;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Configs;
-    (function (Configs) {
-        /**
-         * Specifies if Plottable should show warnings.
-         */
-        Configs.SHOW_WARNINGS = true;
-    })(Configs = Plottable.Configs || (Plottable.Configs = {}));
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
