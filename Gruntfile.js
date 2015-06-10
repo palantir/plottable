@@ -150,8 +150,8 @@ module.exports = function(grunt) {
     umd: {
       all: {
         src: "plottable.js", 
+        template: "unit",
         objectToExport: "Plottable",
-//        amdModuleId: "Plottable",
       }
     },
     concat: {
