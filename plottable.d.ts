@@ -3224,10 +3224,7 @@ declare module Plottable {
              *
              * @return {Point}
              */
-            lastMousePosition(): {
-                x: number;
-                y: number;
-            };
+            lastMousePosition(): Point;
         }
     }
 }
