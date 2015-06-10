@@ -16,7 +16,6 @@ export module Axes {
      * @constructor
      * @param {Scales.Category} scale
      * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.identity()]
      */
     constructor(scale: Scales.Category, orientation: string) {
       super(scale, orientation);

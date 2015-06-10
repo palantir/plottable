@@ -3494,7 +3494,6 @@ var Plottable;
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         function Axis(scale, orientation) {
             var _this = this;
@@ -3688,7 +3687,7 @@ var Plottable;
             }
         };
         Axis.prototype.formatter = function (formatter) {
-            if (formatter === undefined) {
+            if (formatter == null) {
                 return this._formatter;
             }
             this._formatter = formatter;
@@ -4254,7 +4253,6 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             function Numeric(scale, orientation) {
                 _super.call(this, scale, orientation);
@@ -4562,7 +4560,6 @@ var Plottable;
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
             function Category(scale, orientation) {
                 _super.call(this, scale, orientation);

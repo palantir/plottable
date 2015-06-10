@@ -16,7 +16,6 @@ export module Axes {
      * @constructor
      * @param {QuantitativeScale} scale
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: QuantitativeScale<number>, orientation: string) {
       super(scale, orientation);

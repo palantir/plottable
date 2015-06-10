@@ -1567,7 +1567,6 @@ declare module Plottable {
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
         constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
@@ -1769,7 +1768,6 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
             constructor(scale: QuantitativeScale<number>, orientation: string);
             protected _setup(): void;
@@ -1808,7 +1806,6 @@ declare module Plottable {
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
             constructor(scale: Scales.Category, orientation: string);
             protected _setup(): void;

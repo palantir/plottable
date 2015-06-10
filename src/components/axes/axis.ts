@@ -36,7 +36,6 @@ module Plottable {
      * @constructor
      * @param {Scale} scale
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
      */
     constructor(scale: Scale<D, number>, orientation: string) {
       super();
@@ -269,7 +268,7 @@ module Plottable {
      */
     public formatter(formatter: Formatter): Axis<D>;
     public formatter(formatter?: Formatter): any {
-      if (formatter === undefined) {
+      if (formatter == null) {
         return this._formatter;
       }
       this._formatter = formatter;
