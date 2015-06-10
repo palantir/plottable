@@ -414,10 +414,10 @@ describe("Drawers", function () {
             var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
             var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
             var attrToProjector = null;
-            var animator = new Plottable.Animators.Base();
+            var animator = new Plottable.Animators.Easing();
             animator.maxTotalDuration(Infinity);
             animator.stepDuration(stepDuration);
-            animator.iterativeDelay(stepDelay);
+            animator.stepDelay(stepDelay);
             animator.startDelay(startDelay);
             var mockDrawStep = [{ attrToProjector: attrToProjector, animator: animator }];
             var drawTime = drawer.totalDrawTime(data, mockDrawStep);
@@ -456,15 +456,15 @@ describe("Drawers", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Animators", function () {
-    describe("BaseAnimator", function () {
+    describe("EasingAnimator", function () {
         describe("Time computations", function () {
             it("totalTime() defaults", function () {
                 var iterationSteps = 10;
-                var startDelay = Plottable.Animators.Base.DEFAULT_START_DELAY_MILLISECONDS;
-                var stepDuration = Plottable.Animators.Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-                var iterativeDelay = Plottable.Animators.Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-                var expectedTotalTime = startDelay + (iterationSteps - 1) * iterativeDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var startDelay = 0;
+                var stepDuration = 300;
+                var stepDelay = 15;
+                var expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
+                var animator = new Plottable.Animators.Easing();
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Formula for calculating total time should work");
             });
@@ -472,12 +472,12 @@ describe("Animators", function () {
                 var iterationSteps = 17;
                 var startDelay = 135;
                 var stepDuration = 453;
-                var iterativeDelay = 265;
-                var expectedTotalTime = startDelay + (iterationSteps - 1) * iterativeDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var stepDelay = 265;
+                var expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Setters should work");
             });
@@ -485,12 +485,12 @@ describe("Animators", function () {
                 var iterationSteps = 10000;
                 var startDelay = 0;
                 var stepDuration = 100;
-                var iterativeDelay = 1000;
+                var stepDelay = 1000;
                 var expectedTotalTime = 2000;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 animator.maxTotalDuration(expectedTotalTime);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Animation should not exceed the maxTotalDuration time constraint when presented with lots of iteration steps");
@@ -499,12 +499,12 @@ describe("Animators", function () {
                 var iterationSteps = 2;
                 var startDelay = 0;
                 var stepDuration = 10000;
-                var iterativeDelay = 100;
+                var stepDelay = 100;
                 var expectedTotalTime = 2000;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 animator.maxTotalDuration(expectedTotalTime);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Animation should not exceed the maxTotalDuration time constraint when step duration set too high");
@@ -513,13 +513,13 @@ describe("Animators", function () {
                 var iterationSteps = 2;
                 var startDelay = 0;
                 var stepDuration = 100;
-                var iterativeDelay = 100;
+                var stepDelay = 100;
                 var maxTotalDuration = 5000;
                 var expectedTotalTime = 200;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 animator.maxTotalDuration(maxTotalDuration);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "The total duration constraint is just an upper bound");
@@ -528,11 +528,11 @@ describe("Animators", function () {
                 var iterationSteps = 1;
                 var startDelay = 0;
                 var stepDuration = 333;
-                var iterativeDelay = 432;
-                var animator = new Plottable.Animators.Base();
+                var stepDelay = 432;
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, stepDuration, "The total time is just the time for one step");
             });
@@ -540,12 +540,12 @@ describe("Animators", function () {
                 var iterationSteps = 1;
                 var startDelay = 213;
                 var stepDuration = 333;
-                var iterativeDelay = 432;
+                var stepDelay = 432;
                 var expectedTotalTime = startDelay + stepDuration;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 var actualTotalTime = animator.totalTime(iterationSteps);
                 assert.strictEqual(actualTotalTime, expectedTotalTime, "Total time is the time for one step, plus waiting for the start delay");
             });
@@ -553,12 +553,12 @@ describe("Animators", function () {
                 var iterationSteps = 2;
                 var startDelay = 0;
                 var stepDuration = 1000;
-                var iterativeDelay = 1000000;
+                var stepDelay = 1000000;
                 var maxTotalDuration = 1500;
-                var animator = new Plottable.Animators.Base();
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(startDelay);
                 animator.stepDuration(stepDuration);
-                animator.iterativeDelay(iterativeDelay);
+                animator.stepDelay(stepDelay);
                 animator.maxTotalDuration(maxTotalDuration);
                 var expectedIterativeDelay = 500;
                 // 1 |  ###########
@@ -2598,7 +2598,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animators.Base().startDelay(10).stepDuration(10).iterativeDelay(0);
+            var animator = new Plottable.Animators.Easing().startDelay(10).stepDuration(10).stepDelay(0);
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();

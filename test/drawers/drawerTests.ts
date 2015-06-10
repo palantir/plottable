@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animators.Plot {
+class MockAnimator implements Plottable.Animator {
   private _time: number;
   private _callback: Function;
   constructor(time: number, callback?: Function) {
@@ -120,10 +120,10 @@ describe("Drawers", () => {
 
       var attrToProjector: Plottable.AttributeToProjector = null;
 
-      var animator = new Plottable.Animators.Base();
+      var animator = new Plottable.Animators.Easing();
       animator.maxTotalDuration(Infinity);
       animator.stepDuration(stepDuration);
-      animator.iterativeDelay(stepDelay);
+      animator.stepDelay(stepDelay);
       animator.startDelay(startDelay);
 
       var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];

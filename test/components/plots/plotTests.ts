@@ -453,10 +453,10 @@ describe("Plots", () => {
     });
 
     it("additionalPaint timing works properly", () => {
-      var animator = new Plottable.Animators.Base()
+      var animator = new Plottable.Animators.Easing()
         .startDelay(10)
         .stepDuration(10)
-        .iterativeDelay(0);
+        .stepDelay(0);
       var x = new Plottable.Scales.Linear();
       var y = new Plottable.Scales.Linear();
       var plot = new Plottable.Plots.Bar();
