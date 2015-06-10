@@ -12,7 +12,6 @@
 /// <reference path="utils/windowUtils.ts" />
 /// <reference path="utils/clientToSVGTranslator.ts" />
 
-/// <reference path="core/config.ts" />
 /// <reference path="core/version.ts" />
 
 /// <reference path="core/dataset.ts" />

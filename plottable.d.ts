@@ -306,16 +306,6 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Configs {
-        /**
-         * Specifies if Plottable should show warnings.
-         */
-        var SHOW_WARNINGS: boolean;
-    }
-}
-
-
-declare module Plottable {
     var version: string;
 }
 
