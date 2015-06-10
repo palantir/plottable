@@ -2325,16 +2325,12 @@ var Plottable;
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @constructor
-             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-             *   ("#FFFFFF") or keywords ("white").
              * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
-            function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
+            function InterpolatedColor(scaleType) {
                 if (scaleType === void 0) { scaleType = "linear"; }
                 _super.call(this);
-                this._colorRange = colorRange;
+                this._colorRange = InterpolatedColor.REDS;
                 switch (scaleType) {
                     case "linear":
                         this._colorScale = d3.scale.linear();

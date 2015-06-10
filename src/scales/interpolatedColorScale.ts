@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>
+  type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
   export class InterpolatedColor extends Scale<number, string> {
     public static REDS = [
@@ -53,14 +53,11 @@ export module Scales {
     /**
      * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
      *
-     * @constructor
-     * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-     *   ("#FFFFFF") or keywords ("white").
      * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
      */
-    constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
+    constructor(scaleType = "linear") {
       super();
-      this._colorRange = colorRange;
+      this._colorRange = InterpolatedColor.REDS;
       switch (scaleType) {
         case "linear":
           this._colorScale = d3.scale.linear<number, string>();

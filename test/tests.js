@@ -4148,7 +4148,8 @@ describe("Plots", function () {
         it("renders correctly", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.colorRange(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
@@ -4160,7 +4161,8 @@ describe("Plots", function () {
         it("renders correctly when data is set after construction", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.colorRange(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Rectangle();
@@ -4175,7 +4177,8 @@ describe("Plots", function () {
             var CELL_WIDTH = 100;
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.colorRange(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Rectangle();
@@ -4202,7 +4205,8 @@ describe("Plots", function () {
         it("can invert y axis correctly", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.colorRange(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
@@ -4233,7 +4237,8 @@ describe("Plots", function () {
             it("retrieves all selections with no args", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.colorRange(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
@@ -4247,7 +4252,8 @@ describe("Plots", function () {
             it("retrieves correct selections", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.colorRange(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
@@ -4263,7 +4269,8 @@ describe("Plots", function () {
             it("skips invalid Datasets", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.colorRange(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
@@ -7388,21 +7395,24 @@ describe("Scales", function () {
             assert.strictEqual("#d9151f", scale.scale(0.9));
         });
         it("accepts array types with color hex values", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["#000", "#FFF"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.colorRange(["#000", "#FFF"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
             assert.strictEqual("#777777", scale.scale(8));
         });
         it("accepts array types with color names", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.colorRange(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
             assert.strictEqual("#777777", scale.scale(8));
         });
         it("overflow scale values clamp to range", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.colorRange(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
@@ -7410,7 +7420,8 @@ describe("Scales", function () {
             assert.strictEqual("#ffffff", scale.scale(100));
         });
         it("can be converted to a different range", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.colorRange(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));

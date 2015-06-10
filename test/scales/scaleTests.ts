@@ -195,7 +195,8 @@ describe("Scales", () => {
     });
 
     it("accepts array types with color hex values", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["#000", "#FFF"]);
+      var scale = new Plottable.Scales.InterpolatedColor();
+      scale.colorRange(["#000", "#FFF"]);
       scale.domain([0, 16]);
       assert.strictEqual("#000000", scale.scale(0));
       assert.strictEqual("#ffffff", scale.scale(16));
@@ -203,7 +204,8 @@ describe("Scales", () => {
     });
 
     it("accepts array types with color names", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor();
+      scale.colorRange(["black", "white"]);
       scale.domain([0, 16]);
       assert.strictEqual("#000000", scale.scale(0));
       assert.strictEqual("#ffffff", scale.scale(16));
@@ -211,7 +213,8 @@ describe("Scales", () => {
     });
 
     it("overflow scale values clamp to range", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor();
+      scale.colorRange(["black", "white"]);
       scale.domain([0, 16]);
       assert.strictEqual("#000000", scale.scale(0));
       assert.strictEqual("#ffffff", scale.scale(16));
@@ -220,7 +223,8 @@ describe("Scales", () => {
     });
 
     it("can be converted to a different range", () => {
-      var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+      var scale = new Plottable.Scales.InterpolatedColor();
+      scale.colorRange(["black", "white"]);
       scale.domain([0, 16]);
       assert.strictEqual("#000000", scale.scale(0));
       assert.strictEqual("#ffffff", scale.scale(16));
