@@ -8234,7 +8234,7 @@ var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {
         function Dispatcher() {
-            this._event2Callback = {};
+            this._eventToCallback = {};
             this._callbacks = [];
             this._connected = false;
         }
@@ -8246,8 +8246,8 @@ var Plottable;
             if (this._connected) {
                 return;
             }
-            Object.keys(this._event2Callback).forEach(function (event) {
-                var callback = _this._event2Callback[event];
+            Object.keys(this._eventToCallback).forEach(function (event) {
+                var callback = _this._eventToCallback[event];
                 document.addEventListener(event, callback);
             });
             this._connected = true;
@@ -8255,8 +8255,8 @@ var Plottable;
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
             if (this._connected && this._hasNoListeners()) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
+                Object.keys(this._eventToCallback).forEach(function (event) {
+                    var callback = _this._eventToCallback[event];
                     document.removeEventListener(event, callback);
                 });
                 this._connected = false;
@@ -8306,13 +8306,13 @@ var Plottable;
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
                 var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
-                this._event2Callback["mouseover"] = processMoveCallback;
-                this._event2Callback["mousemove"] = processMoveCallback;
-                this._event2Callback["mouseout"] = processMoveCallback;
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
+                this._eventToCallback["mouseover"] = processMoveCallback;
+                this._eventToCallback["mousemove"] = processMoveCallback;
+                this._eventToCallback["mouseout"] = processMoveCallback;
+                this._eventToCallback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
+                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._eventToCallback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
+                this._eventToCallback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
             /**
              * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -8484,10 +8484,10 @@ var Plottable;
                 this._endCallbacks = new Plottable.Utils.CallbackSet();
                 this._cancelCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
-                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
+                this._eventToCallback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
+                this._eventToCallback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                this._eventToCallback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
+                this._eventToCallback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
             }
             /**
              * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -8635,7 +8635,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
+                this._eventToCallback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._keydownCallbacks];
             }
