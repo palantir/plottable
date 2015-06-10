@@ -161,7 +161,7 @@ export module Interactions {
     }
 
     private _setupDragInteraction() {
-      this._dragInteraction.constrainToComponent(false);
+      this._dragInteraction.constrainedToComponent(false);
 
       var lastDragPoint: Point;
       this._dragInteraction.onDragStart(() => lastDragPoint = null);
