@@ -5177,13 +5177,9 @@ var Plottable;
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
-            function InterpolatedColorLegend(interpolatedColorScale, orientation, formatter) {
+            function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
-                if (orientation === void 0) { orientation = "horizontal"; }
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this);
                 this._padding = 5;
                 this._numSwatches = 10;
@@ -5193,8 +5189,8 @@ var Plottable;
                 this._scale = interpolatedColorScale;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
-                this._formatter = formatter;
-                this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+                this._formatter = Plottable.Formatters.general();
+                this._orientation = "horizontal";
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
             InterpolatedColorLegend.prototype.destroy = function () {

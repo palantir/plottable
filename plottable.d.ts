@@ -2021,10 +2021,8 @@ declare module Plottable {
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
-            constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            constructor(interpolatedColorScale: Scales.InterpolatedColor);
             destroy(): void;
             /**
              * Gets the Formatter for the labels.
