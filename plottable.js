@@ -7496,7 +7496,7 @@ var Plottable;
                 this.classed("line-plot", true);
                 var animator = new Plottable.Animators.Base();
                 animator.stepDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
-                animator.easing("exp-in-out");
+                animator.easingFunction("exp-in-out");
                 animator.maxTotalDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
                 this.animator(Plots.Animator.MAIN, animator);
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
@@ -8138,7 +8138,7 @@ var Plottable;
                 this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
                 this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-                this._easing = Base.DEFAULT_EASING;
+                this._easingFunction = Base.DEFAULT_EASING;
             }
             Base.prototype.totalTime = function (numberOfSteps) {
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
@@ -8148,7 +8148,7 @@ var Plottable;
                 var _this = this;
                 var numberOfSteps = selection[0].length;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
+                return selection.transition().ease(this.easingFunction()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
             Base.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {
@@ -8186,12 +8186,12 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.easing = function (easing) {
-                if (easing == null) {
-                    return this._easing;
+            Base.prototype.easingFunction = function (easingFunction) {
+                if (easingFunction == null) {
+                    return this._easingFunction;
                 }
                 else {
-                    this._easing = easing;
+                    this._easingFunction = easingFunction;
                     return this;
                 }
             };

@@ -44,7 +44,7 @@ export module Animators {
     private _stepDuration: number;
     private _stepDelay: number;
     private _maxTotalDuration: number;
-    private _easing: string;
+    private _easingFunction: string;
 
     /**
      * Constructs the default animator
@@ -56,7 +56,7 @@ export module Animators {
       this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
       this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easing = Base.DEFAULT_EASING;
+      this._easingFunction = Base.DEFAULT_EASING;
     }
 
     public totalTime(numberOfSteps: number) {
@@ -69,7 +69,7 @@ export module Animators {
       var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
       return selection.transition()
-        .ease(this.easing())
+        .ease(this.easingFunction())
         .duration(this.stepDuration())
         .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
         .attr(attrToAppliedProjector);
@@ -164,23 +164,23 @@ export module Animators {
     }
 
     /**
-     * Gets the current easing of the animation.
+     * Gets the current easing function of the animation.
      *
-     * @returns {string} the current easing mode.
+     * @returns {string} the current easing function.
      */
-    public easing(): string;
+    public easingFunction(): string;
     /**
-     * Sets the easing mode of the animation.
+     * Sets the easing function of the animation.
      *
-     * @param {string} easing The desired easing mode.
+     * @param {string} easingFunction The desired easing function.
      * @returns {Base} The calling Base Animator.
      */
-    public easing(easing: string): Base;
-    public easing(easing?: string): any {
-      if (easing == null) {
-        return this._easing;
+    public easingFunction(easingFunction: string): Base;
+    public easingFunction(easingFunction?: string): any {
+      if (easingFunction == null) {
+        return this._easingFunction;
       } else {
-        this._easing = easing;
+        this._easingFunction = easingFunction;
         return this;
       }
     }
