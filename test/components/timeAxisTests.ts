@@ -156,7 +156,7 @@ describe("TimeAxis", () => {
     var xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axes.Time(xScale, "bottom");
-    xAxis.gutter(0);
+    xAxis.margin(0);
 
     xAxis.axisConfigurations([
         [
@@ -198,7 +198,7 @@ describe("TimeAxis", () => {
     var xScale = new Plottable.Scales.Time();
     xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
     var xAxis = new Plottable.Axes.Time(xScale, "bottom");
-    xAxis.gutter(0);
+    xAxis.margin(0);
 
     xAxis.renderTo(svg);
 

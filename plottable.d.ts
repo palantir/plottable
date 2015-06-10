@@ -1638,18 +1638,18 @@ declare module Plottable {
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Gets the size of the margin in pixels.
+         * The margin is the extra space between the tick labels and the outer edge of the Axis.
          */
-        gutter(): number;
+        margin(): number;
         /**
-         * Sets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Sets the size of the margin in pixels.
+         * The margin is the extra space between the tick labels and the outer edge of the Axis.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
          */
-        gutter(size: number): Axis<D>;
+        margin(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
          */

@@ -3503,7 +3503,7 @@ var Plottable;
             this._endTickLength = 5;
             this._tickLength = 5;
             this._tickLabelPadding = 10;
-            this._gutter = 15;
+            this._margin = 15;
             this._showEndTickLabels = false;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
@@ -3546,13 +3546,13 @@ var Plottable;
                 if (this._computedHeight == null) {
                     this._computeHeight();
                 }
-                requestedHeight = this._computedHeight + this._gutter;
+                requestedHeight = this._computedHeight + this._margin;
             }
             else {
                 if (this._computedWidth == null) {
                     this._computeWidth();
                 }
-                requestedWidth = this._computedWidth + this._gutter;
+                requestedWidth = this._computedWidth + this._margin;
             }
             return {
                 minWidth: requestedWidth,
@@ -3743,15 +3743,15 @@ var Plottable;
                 return this;
             }
         };
-        Axis.prototype.gutter = function (size) {
+        Axis.prototype.margin = function (size) {
             if (size == null) {
-                return this._gutter;
+                return this._margin;
             }
             else {
                 if (size < 0) {
-                    throw new Error("gutter size must be positive");
+                    throw new Error("margin size must be positive");
                 }
-                this._gutter = size;
+                this._margin = size;
                 this.redraw();
                 return this;
             }
@@ -4311,7 +4311,7 @@ var Plottable;
                 }
                 if (!this._isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
-                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
                         this.redraw();
                         return;
                     }
@@ -4581,8 +4581,8 @@ var Plottable;
                 return this.redraw();
             };
             Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
                         minWidth: 0,

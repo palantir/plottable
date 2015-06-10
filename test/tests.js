@@ -471,37 +471,37 @@ describe("BaseAxis", function () {
         var baseAxis = new Plottable.Axis(scale, "bottom");
         assert.throws(function () { return baseAxis.tickLabelPadding(-1); }, "must be positive");
     });
-    it("gutter() rejects negative values", function () {
+    it("margin() rejects negative values", function () {
         var scale = new Plottable.Scales.Linear();
         var axis = new Plottable.Axis(scale, "right");
-        assert.throws(function () { return axis.gutter(-1); }, "must be positive");
+        assert.throws(function () { return axis.margin(-1); }, "must be positive");
     });
-    it("width() + gutter()", function () {
+    it("width() + margin()", function () {
         var SVG_WIDTH = 100;
         var SVG_HEIGHT = 500;
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scales.Linear();
         var verticalAxis = new Plottable.Axis(scale, "right");
         verticalAxis.renderTo(svg);
-        var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
+        var expectedWidth = verticalAxis.tickLength() + verticalAxis.margin(); // tick length and margin by default
         assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
-        verticalAxis.gutter(20);
-        expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
-        assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
+        verticalAxis.margin(20);
+        expectedWidth = verticalAxis.tickLength() + verticalAxis.margin();
+        assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the margin size updates the width");
         svg.remove();
     });
-    it("height() + gutter()", function () {
+    it("height() + margin()", function () {
         var SVG_WIDTH = 500;
         var SVG_HEIGHT = 100;
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var scale = new Plottable.Scales.Linear();
         var horizontalAxis = new Plottable.Axis(scale, "bottom");
         horizontalAxis.renderTo(svg);
-        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
+        var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin(); // tick length and margin by default
         assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
-        horizontalAxis.gutter(20);
-        expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
-        assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
+        horizontalAxis.margin(20);
+        expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin();
+        assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the margin size updates the height");
         svg.remove();
     });
     it("draws ticks and baseline (horizontal)", function () {
@@ -614,14 +614,14 @@ describe("BaseAxis", function () {
         var baseAxis = new Plottable.Axis(scale, "bottom");
         baseAxis.showEndTickLabels(true);
         baseAxis.renderTo(svg);
-        var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
+        var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.margin();
         assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
         baseAxis.tickLength(20);
-        assert.strictEqual(baseAxis.height(), 20 + baseAxis.gutter(), "height should increase to tick length");
+        assert.strictEqual(baseAxis.height(), 20 + baseAxis.margin(), "height should increase to tick length");
         baseAxis.endTickLength(30);
-        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should increase to end tick length");
         baseAxis.tickLength(10);
-        assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
+        assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should not decrease");
         svg.remove();
     });
     it("default alignment based on orientation", function () {
@@ -773,7 +773,7 @@ describe("TimeAxis", function () {
         var xScale = new Plottable.Scales.Time();
         xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
         var xAxis = new Plottable.Axes.Time(xScale, "bottom");
-        xAxis.gutter(0);
+        xAxis.margin(0);
         xAxis.axisConfigurations([
             [
                 { interval: Plottable.TimeInterval.day, step: 2, formatter: Plottable.Formatters.time("%a %e") }
@@ -803,7 +803,7 @@ describe("TimeAxis", function () {
         var xScale = new Plottable.Scales.Time();
         xScale.domain([new Date("2013-03-23 12:00"), new Date("2013-04-03 0:00")]);
         var xAxis = new Plottable.Axes.Time(xScale, "bottom");
-        xAxis.gutter(0);
+        xAxis.margin(0);
         xAxis.renderTo(svg);
         xAxis.axisConfigurations([
             [
@@ -1272,7 +1272,7 @@ describe("Category Axes", function () {
         });
         svg.remove();
     });
-    it("width accounts for gutter. ticklength, and padding on vertical axes", function () {
+    it("width accounts for margin. ticklength, and padding on vertical axes", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axes.Category(xScale, "left");
@@ -1281,14 +1281,14 @@ describe("Category Axes", function () {
         ca.tickLabelPadding(ca.tickLabelPadding() + 5);
         assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLabelPadding increases width");
         axisWidth = ca.width();
-        ca.gutter(ca.gutter() + 5);
-        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing gutter increases width");
+        ca.margin(ca.margin() + 5);
+        assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing margin increases width");
         axisWidth = ca.width();
         ca.tickLength(ca.tickLength() + 5);
         assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
         svg.remove();
     });
-    it("height accounts for gutter. ticklength, and padding on horizontal axes", function () {
+    it("height accounts for margin. ticklength, and padding on horizontal axes", function () {
         var svg = TestMethods.generateSVG(400, 400);
         var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
         var ca = new Plottable.Axes.Category(xScale, "bottom");
@@ -1297,8 +1297,8 @@ describe("Category Axes", function () {
         ca.tickLabelPadding(ca.tickLabelPadding() + 5);
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing tickLabelPadding increases height");
         axisHeight = ca.height();
-        ca.gutter(ca.gutter() + 5);
-        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing gutter increases height");
+        ca.margin(ca.margin() + 5);
+        assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing margin increases height");
         axisHeight = ca.height();
         ca.tickLength(ca.tickLength() + 5);
         assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");

@@ -77,7 +77,7 @@ export module Axes {
 
       if (!this._isHorizontal()) {
         var reComputedWidth = this._computeWidth();
-        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
           this.redraw();
           return;
         }
