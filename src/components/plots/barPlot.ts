@@ -423,7 +423,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
         var scaledBaseline = primaryScale.scale(this.baselineValue());

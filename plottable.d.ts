@@ -1573,9 +1573,8 @@ declare module Plottable {
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
+        constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
@@ -1644,18 +1643,18 @@ declare module Plottable {
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Gets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          */
-        gutter(): number;
+        margin(): number;
         /**
-         * Sets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Sets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
          */
-        gutter(size: number): Axis<D>;
+        margin(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
          */
@@ -1775,9 +1774,8 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: QuantitativeScale<number>, orientation: string);
             protected _setup(): void;
             protected _computeWidth(): number;
             protected _computeHeight(): number;
@@ -1814,9 +1812,8 @@ declare module Plottable {
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
-            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -1944,10 +1941,10 @@ declare module Plottable {
             /**
              * Sets the maximum number of entries perrow.
              *
-             * @param {number} numEntries
+             * @param {number} maxEntriesPerRow
              * @returns {Legend} The calling Legend.
              */
-            maxEntriesPerRow(numEntries: number): Legend;
+            maxEntriesPerRow(maxEntriesPerRow: number): Legend;
             /**
              * Gets the current comparator for the Legend's entries.
              *
@@ -2257,10 +2254,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected static ANIMATION_MAX_DURATION: number;
-        protected _dataChanged: boolean;
         protected _renderArea: d3.Selection<void>;
-        protected _animate: boolean;
-        protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2384,6 +2378,7 @@ declare module Plottable {
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _animateOnNextRender(): boolean;
     }
 }
 
@@ -3097,7 +3092,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Dispatcher {
-        protected _event2Callback: {
+        protected _eventToCallback: {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];
@@ -3201,10 +3196,7 @@ declare module Plottable {
              *
              * @return {Point}
              */
-            lastMousePosition(): {
-                x: number;
-                y: number;
-            };
+            lastMousePosition(): Point;
         }
     }
 }
@@ -3502,10 +3494,6 @@ declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
             /**
-             * The number of pixels occupied in a line.
-             */
-            static PIXELS_PER_LINE: number;
-            /**
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
              *
@@ -3537,7 +3525,7 @@ declare module Plottable {
              *
              * @return {boolean}
              */
-            constrainToComponent(): boolean;
+            constrainedToComponent(): boolean;
             /**
              * Sets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -3549,7 +3537,7 @@ declare module Plottable {
              * @param {boolean}
              * @return {Interactions.Drag} The calling Drag Interaction.
              */
-            constrainToComponent(constrain: boolean): Drag;
+            constrainedToComponent(constrainedToComponent: boolean): Drag;
             /**
              * Adds a callback to be called when dragging starts.
              *

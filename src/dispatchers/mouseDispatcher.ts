@@ -55,13 +55,13 @@ export module Dispatchers {
                          this._dblClickCallbacks];
 
       var processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks);
-      this._event2Callback["mouseover"] = processMoveCallback;
-      this._event2Callback["mousemove"] = processMoveCallback;
-      this._event2Callback["mouseout"] = processMoveCallback;
-      this._event2Callback["mousedown"] = (e: MouseEvent) => this._measureAndDispatch(e, this._downCallbacks);
-      this._event2Callback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks);
-      this._event2Callback["wheel"] = (e: WheelEvent) => this._measureAndDispatch(e, this._wheelCallbacks);
-      this._event2Callback["dblclick"] = (e: MouseEvent) => this._measureAndDispatch(e, this._dblClickCallbacks);
+      this._eventToCallback["mouseover"] = processMoveCallback;
+      this._eventToCallback["mousemove"] = processMoveCallback;
+      this._eventToCallback["mouseout"] = processMoveCallback;
+      this._eventToCallback["mousedown"] = (e: MouseEvent) => this._measureAndDispatch(e, this._downCallbacks);
+      this._eventToCallback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks);
+      this._eventToCallback["wheel"] = (e: WheelEvent) => this._measureAndDispatch(e, this._wheelCallbacks);
+      this._eventToCallback["dblclick"] = (e: MouseEvent) => this._measureAndDispatch(e, this._dblClickCallbacks);
     }
 
     /**
@@ -191,7 +191,7 @@ export module Dispatchers {
      *
      * @return {Point}
      */
-    public lastMousePosition() {
+    public lastMousePosition(): Point {
       return this._lastMousePosition;
     }
   }

@@ -39,7 +39,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});

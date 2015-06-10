@@ -23,7 +23,7 @@ module Plottable {
   export class Plot extends Component {
     protected static ANIMATION_MAX_DURATION = 600;
 
-    protected _dataChanged = false;
+    private _dataChanged = false;
     private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
@@ -31,10 +31,9 @@ module Plottable {
     private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
-    protected _animate: boolean = false;
+    private _animate = false;
     private _animators: {[animator: string]: Animator} = {};
 
-    protected _animateOnNextRender = true;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -63,7 +62,6 @@ module Plottable {
 
     public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateExtents();
       return this;
@@ -113,8 +111,13 @@ module Plottable {
       return new Drawer(dataset);
     }
 
+<<<<<<< HEAD
     protected _getAnimator(key: string): Animator {
       if (this._animate && this._animateOnNextRender) {
+=======
+    protected _getAnimator(key: string): Animators.Plot {
+      if (this._animateOnNextRender()) {
+>>>>>>> origin/develop
         return this._animators[key] || new Animators.Null();
       } else {
         return new Animators.Null();
@@ -123,7 +126,6 @@ module Plottable {
 
     protected _onDatasetUpdate() {
       this._updateExtents();
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this.render();
     }
@@ -208,7 +210,6 @@ module Plottable {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
-        this._animateOnNextRender = false;
       }
       return this;
     }
@@ -527,6 +528,10 @@ module Plottable {
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       return { x: 0, y: 0 };
+    }
+
+    protected _animateOnNextRender() {
+      return this._animate && this._dataChanged;
     }
   }
 }
