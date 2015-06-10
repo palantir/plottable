@@ -503,6 +503,15 @@ declare module Plottable {
         topLeft: Point;
         bottomRight: Point;
     };
+    /**
+     * An object representing a data-backed visual entity inside a Component.
+     */
+    interface Entity<C extends Component> {
+        datum: any;
+        position: Point;
+        selection: d3.Selection<any>;
+        component: C;
+    }
 }
 
 
@@ -607,7 +616,6 @@ declare module Plottable {
      */
     type SymbolFactory = (symbolSize: number) => string;
     module SymbolFactories {
-        type StringAccessor = (datum: any, index: number) => string;
         function circle(): SymbolFactory;
         function square(): SymbolFactory;
         function cross(): SymbolFactory;
@@ -1275,8 +1283,6 @@ declare module Plottable {
         }
     }
     class Component {
-        protected _element: d3.Selection<void>;
-        protected _content: d3.Selection<void>;
         protected _boundingBox: d3.Selection<void>;
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
@@ -1929,7 +1935,7 @@ declare module Plottable {
              * @constructor
              * @param {Scale.Color} scale
              */
-            constructor(scale: Scales.Color);
+            constructor(colorScale: Scales.Color);
             protected _setup(): void;
             /**
              * Gets the maximum number of entries per row.
@@ -1963,24 +1969,24 @@ declare module Plottable {
              *
              * @returns {Scales.Color}
              */
-            scale(): Scales.Color;
+            colorScale(): Scales.Color;
             /**
              * Sets the Color Scale.
              *
              * @param {Scales.Color} scale
              * @returns {Legend} The calling Legend.
              */
-            scale(scale: Scales.Color): Legend;
+            colorScale(colorScale: Scales.Color): Legend;
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**
-             * Gets the entry under at given pixel position.
-             * Returns an empty Selection if no entry exists at that pixel position.
+             * Gets the Entities (representing Legend entries) at a particular point.
+             * Returns an empty array if no Entities are present at that location.
              *
-             * @param {Point} position
-             * @returns {d3.Selection}
+             * @param {Point} p
+             * @returns {Entity<Legend>[]}
              */
-            getEntry(position: Point): d3.Selection<void>;
+            entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
              * Gets the SymbolFactory accessor of the Legend.
@@ -2237,14 +2243,11 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        type Entity = {
-            datum: any;
-            index: number;
+        interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;
-            position: Point;
-            selection: d3.Selection<any>;
-            plot: Plot;
-        };
+            index: number;
+            component: Plot;
+        }
         interface AccessorScaleBinding<D, R> {
             accessor: Accessor<any>;
             scale?: Scale<D, R>;
@@ -2255,10 +2258,8 @@ declare module Plottable {
         }
     }
     class Plot extends Component {
-        protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+        protected static ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
-        protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-        protected _attrExtents: d3.Map<any[]>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2366,16 +2367,16 @@ declare module Plottable {
          *
          * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
          *   If not provided, returns defaults to all Datasets on the Plot.
-         * @return {Plots.Entity[]}
+         * @return {Plots.PlotEntity[]}
          */
-        entities(datasets?: Dataset[]): Plots.Entity[];
+        entities(datasets?: Dataset[]): Plots.PlotEntity[];
         /**
-         * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+         * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
          *
          * @param {Point} queryPoint
-         * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+         * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
-        entityNearest(queryPoint: Point): Plots.Entity;
+        entityNearest(queryPoint: Point): Plots.PlotEntity;
         protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
@@ -2399,7 +2400,7 @@ declare module Plottable {
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
             protected _getDrawer(dataset: Dataset): Drawers.Arc;
-            entities(datasets?: Dataset[]): Plots.Entity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.
              */
@@ -2682,7 +2683,6 @@ declare module Plottable {
         class Bar<X, Y> extends XYPlot<X, Y> {
             static ORIENTATION_VERTICAL: string;
             static ORIENTATION_HORIZONTAL: string;
-            protected static _DEFAULT_WIDTH: number;
             protected _isVertical: boolean;
             /**
              * @constructor
@@ -2736,50 +2736,50 @@ declare module Plottable {
             /**
              * Gets the Formatter for the labels.
              */
-            labelFormatter(): Formatter;
+            labelsFormatter(): Formatter;
             /**
              * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
              */
-            labelFormatter(formatter: Formatter): Bar<X, Y>;
+            labelsFormatter(formatter: Formatter): Bar<X, Y>;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**
-             * Returns the Entity nearest to the query point according to the following algorithm:
-             *   - If the query point is inside a bar, returns the Entity for that bar.
-             *   - Otherwise, gets the nearest Entity by the primary direction (X for vertical, Y for horizontal),
+             * Returns the PlotEntity nearest to the query point according to the following algorithm:
+             *   - If the query point is inside a bar, returns the PlotEntity for that bar.
+             *   - Otherwise, gets the nearest PlotEntity by the primary direction (X for vertical, Y for horizontal),
              *     breaking ties with the secondary direction.
-             * Returns undefined if no Entity can be found.
+             * Returns undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            entityNearest(queryPoint: Point): Plots.Entity;
+            entityNearest(queryPoint: Point): PlotEntity;
             protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesAt(p: Point): Entity[];
+            entitiesAt(p: Point): PlotEntity[];
             /**
              * Gets the Entities that intersect the Bounds.
              *
              * @param {Bounds} bounds
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesIn(bounds: Bounds): Entity[];
+            entitiesIn(bounds: Bounds): PlotEntity[];
             /**
              * Gets the Entities that intersect the area defined by the ranges.
              *
              * @param {Range} xRange
              * @param {Range} yRange
-             * @returns {Entity[]}
+             * @returns {PlotEntity[]}
              */
-            entitiesIn(xRange: Range, yRange: Range): Entity[];
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -2794,7 +2794,7 @@ declare module Plottable {
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
             protected _getBarPixelWidth(): number;
-            entities(datasets?: Dataset[]): Plots.Entity[];
+            entities(datasets?: Dataset[]): PlotEntity[];
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
                 y: any;
@@ -2821,12 +2821,12 @@ declare module Plottable {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
-             * Returns the Entity nearest to the query point by X then by Y, or undefined if no Entity can be found.
+             * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
              *
              * @param {Point} queryPoint
-             * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+             * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
-            entityNearest(queryPoint: Point): Plots.Entity;
+            entityNearest(queryPoint: Point): PlotEntity;
             protected _propertyProjectors(): AttributeToProjector;
             protected _constructLineProjector(xProjector: Projector, yProjector: Projector): (datum: any, index: number, dataset: Dataset) => string;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
@@ -2921,7 +2921,6 @@ declare module Plottable {
             protected _additionalPaint(): void;
             protected _updateYScale(): void;
             protected _onDatasetUpdate(): StackedArea<X>;
-            protected _wholeDatumAttributes(): string[];
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
             protected _propertyProjectors(): AttributeToProjector;
@@ -2945,7 +2944,6 @@ declare module Plottable {
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
-            protected _getAnimator(key: string): Animators.Plot;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedBar<X, Y>;
             x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
@@ -2955,7 +2953,6 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
@@ -3012,28 +3009,31 @@ declare module Plottable {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The maximum delay between animations can be configured with maxIterativeDelay.
+         * The delay between animations can be configured with iterativeDelay().
+         * This will be affected if the maxTotalDuration() is used such that the entire animation
+         * fits within the timeframe
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
-         * maxTotalDuration does not set actual total animation duration.
+         * It is guaranteed the animation will not exceed this value,
+         * by first reducing stepDuration, then iterativeDelay
          *
          * The actual interval delay is calculated by following formula:
-         * min(maxIterativeDelay(),
-         *   max(maxTotalDuration() - duration(), 0) / <number of iterations>)
+         * min(iterativeDelay(),
+         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
         class Base implements Animators.Plot {
             /**
-             * The default duration of the animation in milliseconds
-             */
-            static DEFAULT_DURATION_MILLISECONDS: number;
-            /**
              * The default starting delay of the animation in milliseconds
              */
-            static DEFAULT_DELAY_MILLISECONDS: number;
+            static DEFAULT_START_DELAY_MILLISECONDS: number;
             /**
-             * The default maximum start delay between each start of an animation
+             * The default duration of one animation step in milliseconds
              */
-            static DEFAULT_MAX_ITERATIVE_DELAY_MILLISECONDS: number;
+            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
+            /**
+             * The default maximum start delay between each step of an animation
+             */
+            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
             /**
              * The default maximum total animation duration
              */
@@ -3048,34 +3048,60 @@ declare module Plottable {
              * @constructor
              */
             constructor();
-            totalTime(numberOfIterations: number): number;
+            totalTime(numberOfSteps: number): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
             /**
-             * Gets the duration of the animation in milliseconds.
+             * Gets the start delay of the animation in milliseconds.
+             *
+             * @returns {number} The current start delay.
+             */
+            startDelay(): number;
+            /**
+             * Sets the start delay of the animation in milliseconds.
+             *
+             * @param {number} startDelay The start delay in milliseconds.
+             * @returns {Base} The calling Base Animator.
+             */
+            startDelay(startDelay: number): Base;
+            /**
+             * Gets the duration of one animation step in milliseconds.
              *
              * @returns {number} The current duration.
              */
-            duration(): number;
+            stepDuration(): number;
             /**
-             * Sets the duration of the animation in milliseconds.
+             * Sets the duration of one animation step in milliseconds.
              *
-             * @param {number} duration The duration in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @param {number} stepDuration The duration in milliseconds.
+             * @returns {Base} The calling Base Animator.
              */
-            duration(duration: number): Base;
+            stepDuration(stepDuration: number): Base;
             /**
-             * Gets the delay of the animation in milliseconds.
+             * Gets the maximum start delay between animation steps in milliseconds.
              *
-             * @returns {number} The current delay.
+             * @returns {number} The current maximum iterative delay.
              */
-            delay(): number;
+            iterativeDelay(): number;
             /**
-             * Sets the delay of the animation in milliseconds.
+             * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} delay The delay in milliseconds.
-             * @returns {Default} The calling Default Animator.
+             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
+             * @returns {Base} The calling Base Animator.
              */
-            delay(delay: number): Base;
+            iterativeDelay(iterativeDelay: number): Base;
+            /**
+             * Gets the maximum total animation duration constraint in milliseconds.
+             *
+             * @returns {number} The current maximum total animation duration.
+             */
+            maxTotalDuration(): number;
+            /**
+             * Sets the maximum total animation duration constraint in miliseconds.
+             *
+             * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
+             * @returns {Base} The calling Base Animator.
+             */
+            maxTotalDuration(maxTotalDuration: number): Base;
             /**
              * Gets the current easing of the animation.
              *
@@ -3086,76 +3112,9 @@ declare module Plottable {
              * Sets the easing mode of the animation.
              *
              * @param {string} easing The desired easing mode.
-             * @returns {Default} The calling Default Animator.
+             * @returns {Base} The calling Base Animator.
              */
             easing(easing: string): Base;
-            /**
-             * Gets the maximum start delay between animations in milliseconds.
-             *
-             * @returns {number} The current maximum iterative delay.
-             */
-            maxIterativeDelay(): number;
-            /**
-             * Sets the maximum start delay between animations in milliseconds.
-             *
-             * @param {number} maxIterDelay The maximum iterative delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
-             */
-            maxIterativeDelay(maxIterDelay: number): Base;
-            /**
-             * Gets the maximum total animation duration in milliseconds.
-             *
-             * @returns {number} The current maximum total animation duration.
-             */
-            maxTotalDuration(): number;
-            /**
-             * Sets the maximum total animation duration in miliseconds.
-             *
-             * @param {number} maxDuration The maximum total animation duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
-             */
-            maxTotalDuration(maxDuration: number): Base;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * The default animator implementation with easing, duration, and delay.
-         */
-        class Rect extends Base {
-            static ANIMATED_ATTRIBUTES: string[];
-            isVertical: boolean;
-            isReverse: boolean;
-            constructor(isVertical?: boolean, isReverse?: boolean);
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): (datum: any, index: number) => any;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Animators {
-        /**
-         * A child class of RectAnimator that will move the rectangle
-         * as well as animate its growth.
-         */
-        class MovingRect extends Rect {
-            /**
-             * The pixel value to move from
-             */
-            startPixelValue: number;
-            /**
-             * Constructs a MovingRectAnimator
-             *
-             * @param {number} basePixel The pixel value to start moving from
-             * @param {boolean} isVertical If the movement/animation is vertical
-             */
-            constructor(startPixelValue: number, isVertical?: boolean);
-            protected _startMovingProjector(attrToAppliedProjector: AttributeToAppliedProjector): () => number;
         }
     }
 }

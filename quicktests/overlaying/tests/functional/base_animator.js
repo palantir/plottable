@@ -18,9 +18,9 @@ function run(svg, data, Plottable) {
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
     var animator = new Plottable.Animators.Base();
-        animator.duration(1000);
+        animator.stepDuration(1000);
         animator.maxTotalDuration(2000);
-        animator.maxIterativeDelay(100);
+        animator.iterativeDelay(100);
 
 
     var vbar = new Plottable.Plots.Bar()
@@ -28,10 +28,14 @@ function run(svg, data, Plottable) {
       .y(function(d) { return d.y; }, yScale)
       .attr("fill", function(d) { return d.type; }, colorScale)
       .labelsEnabled(true)
-      .labelFormatter(function(text){return text + "!";})
       .addDataset(new Plottable.Dataset(data))
-      .animator("main", animator)
+      .animator(Plottable.Plots.Animator.MAIN, animator)
       .animated(true);
+   if (typeof vbar.labelsFormatter === "function") {
+     vbar.labelsFormatter(function(text){return text + "!";});
+   } else {
+     vbar.labelFormatter(function(text){return text + "!";});
+   }
 
 
     var chart = new Plottable.Components.Table([

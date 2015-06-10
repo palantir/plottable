@@ -18,7 +18,6 @@ export module Plots {
       super();
       this.classed("area-plot", true);
       this.y0(0); // default
-      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(600).easing("exp-in-out"));
       this.attr("fill-opacity", 0.25);
       this.attr("fill", new Scales.Color().range()[0]);
 
@@ -109,9 +108,9 @@ export module Plots {
       if (this._animateOnNextRender()) {
         var attrToProjector = this._generateLineAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
-      drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this._generateLineAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
       return drawSteps;
     }
 
@@ -132,10 +131,10 @@ export module Plots {
         attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
                                                             this._getResetYFunction(),
                                                             Plot._scaledAccessor(this.y0()));
-        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator("reset")});
+        drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
       }
 
-      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("main")});
+      drawSteps.push({attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)});
 
       return drawSteps;
     }

@@ -20,10 +20,12 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-class MockDrawer extends Plottable.Drawer {
-  public _drawStep(step: Plottable.Drawers.AppliedDrawStep) {
-    step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
-  }
+function createMockDrawer(dataset: Plottable.Dataset) {
+  var drawer = new Plottable.Drawer(dataset);
+  (<any> drawer)._drawStep = (step: Plottable.Drawers.AppliedDrawStep) => {
+    step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
+  };
+  return drawer;
 }
 
 describe("Drawers", () => {
@@ -31,7 +33,7 @@ describe("Drawers", () => {
     var oldTimeout: any;
     var timings: number[] = [];
     var svg: d3.Selection<void>;
-    var drawer: MockDrawer;
+    var drawer: Plottable.Drawer;
     before(() => {
       oldTimeout = Plottable.Utils.Window.setTimeout;
       Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
@@ -47,7 +49,7 @@ describe("Drawers", () => {
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = new MockDrawer(null);
+      drawer = createMockDrawer(null);
       drawer.renderArea(svg);
     });
 
@@ -120,9 +122,9 @@ describe("Drawers", () => {
 
       var animator = new Plottable.Animators.Base();
       animator.maxTotalDuration(Infinity);
-      animator.duration(stepDuration);
-      animator.maxIterativeDelay(stepDelay);
-      animator.delay(startDelay);
+      animator.stepDuration(stepDuration);
+      animator.iterativeDelay(stepDelay);
+      animator.startDelay(startDelay);
 
       var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
 

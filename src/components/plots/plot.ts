@@ -3,15 +3,11 @@
 module Plottable {
 
   export module Plots {
-
-    export type Entity = {
-      datum: any;
-      index: number;
+    export interface PlotEntity extends Entity<Plot> {
       dataset: Dataset;
-      position: Point;
-      selection: d3.Selection<any>;
-      plot: Plot;
-    };
+      index: number;
+      component: Plot;
+    }
 
     export interface AccessorScaleBinding<D, R> {
       accessor: Accessor<any>;
@@ -25,12 +21,14 @@ module Plottable {
   }
 
   export class Plot extends Component {
+    protected static ANIMATION_MAX_DURATION = 600;
+
     private _dataChanged = false;
-    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+    private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: d3.Map<any[]>;
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     private _animate = false;
@@ -57,8 +55,9 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      this._animators[Plots.Animator.MAIN] = new Animators.Base();
-      this._animators[Plots.Animator.RESET] = new Animators.Null();
+      var mainAnimator = new Animators.Base().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      this.animator(Plots.Animator.MAIN, mainAnimator);
+      this.animator(Plots.Animator.RESET, new Animators.Null());
     }
 
     public anchor(selection: d3.Selection<void>) {
@@ -70,7 +69,7 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this.content().append("g").classed("render-area", true);
       this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 
@@ -446,39 +445,41 @@ module Plottable {
      *
      * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
      *   If not provided, returns defaults to all Datasets on the Plot.
-     * @return {Plots.Entity[]}
+     * @return {Plots.PlotEntity[]}
      */
-    public entities(datasets = this.datasets()): Plots.Entity[] {
-      var entities: Plots.Entity[] = [];
+    public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+      var entities: Plots.PlotEntity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        dataset.data().forEach((datum: any, index: number) => {
-          var position = this._pixelPoint(datum, index, dataset);
+        var validDatumIndex = 0;
+        dataset.data().forEach((datum: any, datasetIndex: number) => {
+          var position = this._pixelPoint(datum, datasetIndex, dataset);
           if (position.x !== position.x || position.y !== position.y) {
             return;
           }
           entities.push({
             datum: datum,
-            index: index,
+            index: datasetIndex,
             dataset: dataset,
             position: position,
-            selection: drawer.selectionForIndex(index),
-            plot: this
+            selection: drawer.selectionForIndex(validDatumIndex),
+            component: this
           });
+          validDatumIndex++;
         });
       });
       return entities;
     }
 
     /**
-     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+     * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): Plots.Entity {
+    public entityNearest(queryPoint: Point): Plots.PlotEntity {
       var closestDistanceSquared = Infinity;
-      var closest: Plots.Entity;
+      var closest: Plots.PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;

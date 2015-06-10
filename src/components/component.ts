@@ -14,8 +14,8 @@ module Plottable {
     }
   }
   export class Component {
-    protected _element: d3.Selection<void>;
-    protected _content: d3.Selection<void>;
+    private _element: d3.Selection<void>;
+    private _content: d3.Selection<void>;
     protected _boundingBox: d3.Selection<void>;
     private _backgroundContainer: d3.Selection<void>;
     private _foregroundContainer: d3.Selection<void>;
