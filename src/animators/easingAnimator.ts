@@ -22,23 +22,23 @@ export module Animators {
     /**
      * The default starting delay of the animation in milliseconds
      */
-    private static DEFAULT_START_DELAY_MILLISECONDS = 0;
+    private static _DEFAULT_START_DELAY_MILLISECONDS = 0;
     /**
      * The default duration of one animation step in milliseconds
      */
-    private static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+    private static _DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
      * The default maximum start delay between each step of an animation
      */
-    private static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+    private static _DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
     /**
      * The default maximum total animation duration
      */
-    private static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+    private static _DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
     /**
      * The default easing of the animation
      */
-    private static DEFAULT_EASING_MODE = "exp-out";
+    private static _DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;
@@ -52,11 +52,11 @@ export module Animators {
      * @constructor
      */
     constructor() {
-      this._startDelay = Easing.DEFAULT_START_DELAY_MILLISECONDS;
-      this._stepDuration = Easing.DEFAULT_STEP_DURATION_MILLISECONDS;
-      this._stepDelay = Easing.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-      this._maxTotalDuration = Easing.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easingMode = Easing.DEFAULT_EASING_MODE;
+      this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
+      this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
+      this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+      this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+      this._easingMode = Easing._DEFAULT_EASING_MODE;
     }
 
     public totalTime(numberOfSteps: number) {

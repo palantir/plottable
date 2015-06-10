@@ -8122,11 +8122,11 @@ var Plottable;
              * @constructor
              */
             function Easing() {
-                this._startDelay = Easing.DEFAULT_START_DELAY_MILLISECONDS;
-                this._stepDuration = Easing.DEFAULT_STEP_DURATION_MILLISECONDS;
-                this._stepDelay = Easing.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-                this._maxTotalDuration = Easing.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-                this._easingMode = Easing.DEFAULT_EASING_MODE;
+                this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
+                this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
+                this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+                this._easingMode = Easing._DEFAULT_EASING_MODE;
             }
             Easing.prototype.totalTime = function (numberOfSteps) {
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
@@ -8195,23 +8195,23 @@ var Plottable;
             /**
              * The default starting delay of the animation in milliseconds
              */
-            Easing.DEFAULT_START_DELAY_MILLISECONDS = 0;
+            Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
             /**
              * The default duration of one animation step in milliseconds
              */
-            Easing.DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+            Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
             /**
              * The default maximum start delay between each step of an animation
              */
-            Easing.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
              * The default maximum total animation duration
              */
-            Easing.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+            Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
             /**
              * The default easing of the animation
              */
-            Easing.DEFAULT_EASING_MODE = "exp-out";
+            Easing._DEFAULT_EASING_MODE = "exp-out";
             return Easing;
         })();
         Animators.Easing = Easing;
