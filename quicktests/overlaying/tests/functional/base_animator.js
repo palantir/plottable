@@ -17,11 +17,17 @@ function run(svg, data, Plottable) {
 
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+    if (Plottable.Animators.Base === undefined) {
     var animator = new Plottable.Animators.Easing();
-        animator.stepDuration(1000);
-        animator.maxTotalDuration(2000);
-        animator.stepDelay(100);
-
+    animator.stepDuration(1000);
+    animator.maxTotalDuration(2000);
+    animator.stepDelay(100);
+    } else {
+    var animator = new Plottable.Animators.Base();
+    animator.stepDuration(1000);
+    animator.maxTotalDuration(2000);
+    animator.iterativeDelay(100);
+    }
 
     var vbar = new Plottable.Plots.Bar()
       .x(function(d) { return d.x; }, xScale)
