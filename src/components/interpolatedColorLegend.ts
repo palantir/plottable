@@ -32,10 +32,8 @@ export module Components {
      *
      * @constructor
      * @param {Scales.InterpolatedColor} interpolatedColorScale
-     * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
      */
-    constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
+    constructor(interpolatedColorScale: Scales.InterpolatedColor) {
       super();
       if (interpolatedColorScale == null ) {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
@@ -43,8 +41,8 @@ export module Components {
       this._scale = interpolatedColorScale;
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
-      this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+      this._formatter = Formatters.general();
+      this._orientation = "horizontal";
 
       this.classed("legend", true).classed("interpolated-color-legend", true);
     }
@@ -125,12 +123,12 @@ export module Components {
     protected _setup() {
       super._setup();
 
-      this._swatchContainer = this._content.append("g").classed("swatch-container", true);
-      this._swatchBoundingBox = this._content.append("rect").classed("swatch-bounding-box", true);
-      this._lowerLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-      this._upperLabel = this._content.append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this._swatchContainer = this.content().append("g").classed("swatch-container", true);
+      this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
+      this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
 
-      this._measurer = new SVGTypewriter.Measurers.Measurer(this._content);
+      this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
       this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
     }
@@ -147,7 +145,7 @@ export module Components {
       var desiredHeight: number;
       var desiredWidth: number;
       if (this._isVertical()) {
-        var longestWidth = Utils.Methods.max(labelWidths, 0);
+        var longestWidth = Utils.Math.max(labelWidths, 0);
         desiredWidth = this._padding + textHeight + this._padding + longestWidth + this._padding;
         desiredHeight = this._padding + numSwatches * textHeight + this._padding;
       } else {

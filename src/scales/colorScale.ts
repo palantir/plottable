@@ -53,22 +53,22 @@ export module Scales {
     }
 
     public extentOfValues(values: string[]) {
-      return Utils.Methods.uniq(values);
+      return Utils.Array.uniq(values);
     }
 
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
-      return Utils.Methods.uniq(this._getAllIncludedValues());
+      return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
     private static _getPlottableColors(): string[] {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 
-      var defaultColorHex: string = Utils.Methods.colorTest(colorTester, "");
+      var defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = Utils.Methods.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
+      while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
               i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
@@ -92,7 +92,7 @@ export module Scales {
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
       var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-      return Utils.Methods.lightenColor(color, modifyFactor);
+      return Utils.Color.lightenColor(color, modifyFactor);
     }
 
     protected _getDomain() {

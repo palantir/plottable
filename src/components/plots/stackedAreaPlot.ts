@@ -24,7 +24,7 @@ export module Plots {
       this._baselineValueProvider = () => [this._baselineValue];
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
+    protected _getAnimator(key: string): Animator {
       return new Animators.Null();
     }
 
@@ -97,10 +97,6 @@ export module Plots {
       return this;
     }
 
-    protected _wholeDatumAttributes() {
-      return ["x", "y", "defined", "d"];
-    }
-
     protected _updateExtentsForProperty(property: string) {
       super._updateExtentsForProperty(property);
       if ((property === "x" || property === "y") && this._projectorsReady()) {
@@ -139,7 +135,7 @@ export module Plots {
       var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
-        Utils.Methods.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
+        Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
     }
 

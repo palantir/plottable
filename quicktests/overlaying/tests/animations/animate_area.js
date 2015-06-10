@@ -24,7 +24,7 @@ function run(svg, data, Plottable) {
             .attr("opacity", 0.75)
             .x(function(d) { return d.x; }, xScale)
             .y(function(d) { return d.y; }, yScale)
-            .animate(doAnimate);
+            .animated(doAnimate);
 
   var areaChart = new Plottable.Components.Table([[yAxis, areaRenderer],
    [null,  xAxis]]);

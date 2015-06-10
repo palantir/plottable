@@ -24,7 +24,7 @@ export module Scales {
     public tickInterval(interval: string, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
       var tempScale = d3.time.scale();
-      var d3Interval = Formatters.timeIntervalToD3Time(interval);
+      var d3Interval = Time.timeIntervalToD3Time(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
       return tempScale.ticks(d3Interval, step);
@@ -76,13 +76,39 @@ export module Scales {
       return this._d3Scale.invert(value);
     }
 
-    public getDefaultTicks(): Date[] {
-      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    public defaultTicks(): Date[] {
+      return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
     }
 
     protected _niceDomain(domain: Date[]) {
       return this._d3Scale.copy().domain(domain).nice().domain();
     }
+
+    /**
+     * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+     * If the provided TimeInterval is incorrect, the default is d3.time.year
+     */
+    public static timeIntervalToD3Time(timeInterval: string) {
+      switch (timeInterval) {
+      case TimeInterval.second:
+        return d3.time.second;
+      case TimeInterval.minute:
+        return d3.time.minute;
+      case TimeInterval.hour:
+        return d3.time.hour;
+      case TimeInterval.day:
+        return d3.time.day;
+      case TimeInterval.week:
+        return d3.time.week;
+      case TimeInterval.month:
+        return d3.time.month;
+      case TimeInterval.year:
+        return d3.time.year;
+      default:
+        throw Error("TimeInterval specified does not exist: " + timeInterval);
+      }
+    }
+
   }
 }
 }

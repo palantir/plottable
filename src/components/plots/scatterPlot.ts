@@ -16,7 +16,11 @@ export module Plots {
     constructor() {
       super();
       this.classed("scatter-plot", true);
-      this.animator(Plots.Animator.MAIN, new Animators.Base().duration(250).delay(5));
+      var animator = new Animators.Easing();
+      animator.startDelay(5);
+      animator.stepDuration(250);
+      animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      this.animator(Plots.Animator.MAIN, animator);
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
       this.size(6);
@@ -53,7 +57,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["d"] = () => "";
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
@@ -68,7 +72,7 @@ export module Plots {
       var yRange = { min: 0, max: this.height() };
 
       var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = Utils.DOM.getBBox(selection);
+      var bbox = Utils.DOM.elementBBox(selection);
       var translatedBbox: SVGRect = {
         x: bbox.x + translation[0],
         y: bbox.y + translation[1],
@@ -76,7 +80,7 @@ export module Plots {
         height: bbox.height
       };
 
-      return Utils.Methods.intersectsBBox(xRange, yRange, translatedBbox);
+      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
     protected _propertyProjectors(): AttributeToProjector {

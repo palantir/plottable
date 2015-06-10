@@ -220,7 +220,7 @@ export module Axes {
         return this._possibleTimeAxisConfigurations;
       }
       this._possibleTimeAxisConfigurations = configurations;
-      this._numTiers = Utils.Methods.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
+      this._numTiers = Utils.Math.max(this._possibleTimeAxisConfigurations.map((config: TimeAxisConfiguration) => config.length), 0);
 
       if (this._isAnchored) {
         this._setupDomElements();
@@ -250,7 +250,7 @@ export module Axes {
       });
 
       if (mostPreciseIndex === this._possibleTimeAxisConfigurations.length) {
-        Utils.Methods.warn("zoomed out too far: could not find suitable interval to display labels");
+        Utils.Window.warn("zoomed out too far: could not find suitable interval to display labels");
         --mostPreciseIndex;
       }
 
@@ -281,7 +281,7 @@ export module Axes {
 
     private _getIntervalLength(config: TimeAxisTierConfiguration) {
       var startDate = this._scale.domain()[0];
-      var d3Interval = Formatters.timeIntervalToD3Time(config.interval);
+      var d3Interval = Scales.Time.timeIntervalToD3Time(config.interval);
       var endDate = d3Interval.offset(startDate, config.step);
       if (endDate > this._scale.domain()[1]) {
         // this offset is too large, so just return available width
@@ -321,7 +321,7 @@ export module Axes {
     }
 
     private _setupDomElements() {
-      this._element.selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
+      this.content().selectAll("." + Time.TIME_AXIS_TIER_CLASS).remove();
 
       this._tierLabelContainers = [];
       this._tierMarkContainers = [];
@@ -330,7 +330,7 @@ export module Axes {
       this._baseline.remove();
 
       for (var i = 0; i < this._numTiers; ++i) {
-        var tierContainer = this._content.append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
+        var tierContainer = this.content().append("g").classed(Time.TIME_AXIS_TIER_CLASS, true);
         this._tierLabelContainers.push(tierContainer.append("g").classed(Axis.TICK_LABEL_CLASS + "-container", true));
         this._tierMarkContainers.push(tierContainer.append("g").classed(Axis.TICK_MARK_CLASS + "-container", true));
         this._tierBaselines.push(tierContainer.append("line").classed("baseline", true));
@@ -494,7 +494,7 @@ export module Axes {
       var availableHeight = this.height();
       var usedHeight = 0;
 
-      this._element
+      this.content()
         .selectAll("." + Time.TIME_AXIS_TIER_CLASS)
         .attr("visibility", (d: any, i: number) => {
           usedHeight += this._tierHeights[i];
@@ -503,7 +503,7 @@ export module Axes {
     }
 
     private _hideOverlappingAndCutOffLabels(index: number) {
-      var boundingBox = (<Element> this._element.select(".bounding-box")[0][0]).getBoundingClientRect();
+      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
 
       var isInsideBBox = (tickBox: ClientRect) => {
         return (

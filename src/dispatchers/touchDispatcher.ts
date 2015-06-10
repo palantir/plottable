@@ -20,7 +20,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
@@ -47,10 +47,10 @@ export module Dispatchers {
       this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
-      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
+      this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
+      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
+      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
+      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
     }
 
     /**

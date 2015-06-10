@@ -16,10 +16,9 @@ export module Axes {
      * @constructor
      * @param {Scales.Category} scale
      * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.identity()]
      */
-    constructor(scale: Scales.Category, orientation: string, formatter = Formatters.identity()) {
-      super(scale, orientation, formatter);
+    constructor(scale: Scales.Category, orientation: string) {
+      super(scale, orientation);
       this.classed("category-axis", true);
     }
 
@@ -35,8 +34,8 @@ export module Axes {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
-      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
+      var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
+      var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
 
       if (this._scale.domain().length === 0) {
         return {
@@ -159,8 +158,8 @@ export module Axes {
       });
 
       // HACKHACK: https://github.com/palantir/svg-typewriter/issues/25
-      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Methods.max;
-      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Methods.max : d3.sum;
+      var widthFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? d3.sum : Utils.Math.max;
+      var heightFn = (this._isHorizontal() && this._tickLabelAngle === 0) ? Utils.Math.max : d3.sum;
 
       var textFits = wrappingResults.every((t: SVGTypewriter.Wrappers.WrappingResult) =>
                     !SVGTypewriter.Utils.StringMethods.isNotEmptyString(t.truncatedText) && t.noLines === 1);

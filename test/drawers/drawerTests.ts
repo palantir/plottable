@@ -1,13 +1,14 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animators.Plot {
+class MockAnimator implements Plottable.Animator {
   private _time: number;
   private _callback: Function;
   constructor(time: number, callback?: Function) {
     this._time = time;
     this._callback = callback;
   }
-  public getTiming(selection: any) {
+
+  public totalTime(numberOfIterations: number) {
     return this._time;
   }
 
@@ -19,10 +20,12 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-class MockDrawer extends Plottable.Drawer {
-  public _drawStep(step: Plottable.Drawers.AppliedDrawStep) {
-    step.animator.animate(this._getRenderArea(), step.attrToAppliedProjector);
-  }
+function createMockDrawer(dataset: Plottable.Dataset) {
+  var drawer = new Plottable.Drawer(dataset);
+  (<any> drawer)._drawStep = (step: Plottable.Drawers.AppliedDrawStep) => {
+    step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
+  };
+  return drawer;
 }
 
 describe("Drawers", () => {
@@ -30,24 +33,24 @@ describe("Drawers", () => {
     var oldTimeout: any;
     var timings: number[] = [];
     var svg: d3.Selection<void>;
-    var drawer: MockDrawer;
+    var drawer: Plottable.Drawer;
     before(() => {
-      oldTimeout = Plottable.Utils.Methods.setTimeout;
-      Plottable.Utils.Methods.setTimeout = function(f: Function, time: number, ...args: any[]) {
+      oldTimeout = Plottable.Utils.Window.setTimeout;
+      Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
         timings.push(time);
         return oldTimeout(f, time, args);
       };
     });
 
     after(() => {
-      Plottable.Utils.Methods.setTimeout = oldTimeout;
+      Plottable.Utils.Window.setTimeout = oldTimeout;
     });
 
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = new MockDrawer(null);
-      drawer.setup(svg);
+      drawer = createMockDrawer(null);
+      drawer.renderArea(svg);
     });
 
     afterEach(() => {
@@ -89,17 +92,48 @@ describe("Drawers", () => {
       assert.deepEqual(timings, [0, 20, 30], "setTimeout called with appropriate times");
     });
 
-    it("_getSelection", () => {
+    it("selectionForIndex()", () => {
       var svg = TestMethods.generateSVG(300, 300);
       var drawer = new Plottable.Drawer(null);
-      drawer.setup(svg.append("g"));
-      (<any> drawer)._getSelector = () => "circle";
+      drawer.renderArea(svg.append("g"));
+      drawer.selector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
-      var circles = drawer._getRenderArea().selectAll("circle").data(data);
+      var circles = drawer.renderArea().selectAll("circle").data(data);
       circles.enter().append("circle").attr("cx", (datum: any) => datum.one).attr("cy", (datum: any) => datum.two).attr("r", 10);
-      var selection = drawer._getSelection(1);
+      var selection = drawer.selectionForIndex(1);
       assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
       svg.remove();
+    });
+
+    it("totalDrawTime()", () => {
+      var svg = TestMethods.generateSVG(300, 300);
+      var drawer = new Plottable.Drawer(null);
+
+      var dataObjects = 9;
+      var stepDuration = 987;
+      var stepDelay = 133;
+      var startDelay = 245;
+
+      var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+
+      var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+
+      var attrToProjector: Plottable.AttributeToProjector = null;
+
+      var animator = new Plottable.Animators.Easing();
+      animator.maxTotalDuration(Infinity);
+      animator.stepDuration(stepDuration);
+      animator.stepDelay(stepDelay);
+      animator.startDelay(startDelay);
+
+      var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
+
+      var drawTime = drawer.totalDrawTime(data, mockDrawStep);
+
+      assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
+
+      svg.remove();
+
     });
   });
 });

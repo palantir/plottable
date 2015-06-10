@@ -107,17 +107,17 @@ describe("Plots", () => {
         y: 0 // d1 is stacked above d0
       };
 
-      var expected = {
+      var expected: Plottable.Plots.PlotEntity = {
         datum: d0,
         index: 0,
         dataset: dataset1,
         position: d0Px,
         selection: d3.selectAll([bars[0][0]]),
-        plot: renderer
+        component: renderer
       };
 
       var closest = renderer.entityNearest({ x: 0, y: d0Px.y + 1 });
-      TestMethods.assertEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
+      TestMethods.assertPlotEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
 
       expected = {
         datum: d1,
@@ -125,10 +125,10 @@ describe("Plots", () => {
         dataset: dataset2,
         position: d1Px,
         selection: d3.selectAll([bars[0][2]]),
-        plot: renderer
+        component: renderer
       };
       closest = renderer.entityNearest({ x: 0, y: d0Px.y - 1 });
-      TestMethods.assertEntitiesEqual(closest, expected, "top bar is closest when within its range");
+      TestMethods.assertPlotEntitiesEqual(closest, expected, "top bar is closest when within its range");
 
       svg.remove();
     });
@@ -430,8 +430,8 @@ describe("Plots", () => {
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
 
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
-      assert.isFalse(Plottable.Utils.Methods.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
+      assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
     });
 
     it("bad values on the primary axis should default to 0 (be ignored)", () => {

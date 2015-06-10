@@ -45,8 +45,13 @@ function run(svg, data, Plottable) {
     .addDataset(dataset4)
     .addDataset(dataset5)
     .labelsEnabled(true)
-    .labelFormatter(Plottable.Formatters.siSuffix())
-    .animate(true);
+    .animated(true);
+
+  if (typeof verticalPlot.labelsFormatter === "function") {
+    verticalPlot.labelsFormatter(Plottable.Formatters.siSuffix());
+  } else {
+    verticalPlot.labelFormatter(Plottable.Formatters.siSuffix());
+  }
 
   var horizontalPlot = new Plottable.Plots.StackedBar("horizontal");
   horizontalPlot.x(function(d) { return d.earnings; }, xScale2)
@@ -58,8 +63,13 @@ function run(svg, data, Plottable) {
     .addDataset(dataset4)
     .addDataset(dataset5)
     .labelsEnabled(true)
-    .labelFormatter(Plottable.Formatters.siSuffix())
-    .animate(true);
+    .animated(true);
+
+  if (typeof verticalPlot.labelsFormatter === "function") {
+    horizontalPlot.labelsFormatter(Plottable.Formatters.siSuffix());
+  } else {
+    horizontalPlot.labelFormatter(Plottable.Formatters.siSuffix());
+  }
 
   var chart1 = new Plottable.Components.Table([
     [yAxis1, verticalPlot], [null, xAxis1]

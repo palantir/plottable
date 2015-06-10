@@ -27,10 +27,15 @@ module Plottable {
       export var ANIMATION_FRAME = "animationframe";
       export var TIMEOUT = "timeout";
     }
-    export var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
+    var _renderPolicy: RenderPolicies.RenderPolicy = new RenderPolicies.AnimationFrame();
 
-    export function setRenderPolicy(policy: string) {
-      switch (policy.toLowerCase()) {
+    export function renderPolicy(): RenderPolicies.RenderPolicy;
+    export function renderPolicy(renderPolicy: string): void;
+    export function renderPolicy(renderPolicy?: string): any {
+      if (renderPolicy == null) {
+        return _renderPolicy;
+      }
+      switch (renderPolicy.toLowerCase()) {
         case Policy.IMMEDIATE:
           _renderPolicy = new RenderPolicies.Immediate();
           break;
@@ -41,7 +46,7 @@ module Plottable {
           _renderPolicy = new RenderPolicies.Timeout();
           break;
         default:
-          Utils.Methods.warn("Unrecognized renderPolicy: " + policy);
+          Utils.Window.warn("Unrecognized renderPolicy: " + renderPolicy);
       }
     }
 
@@ -52,7 +57,7 @@ module Plottable {
      */
     export function registerToRender(component: Component) {
       if (_isCurrentlyFlushing) {
-        Utils.Methods.warn("Registered to render while other components are flushing: request may be ignored");
+        Utils.Window.warn("Registered to render while other components are flushing: request may be ignored");
       }
       _componentsNeedingRender.add(component);
       requestRender();

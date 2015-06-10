@@ -55,7 +55,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
-        barPlot.animate(false);
+        barPlot.animated(false);
         barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
@@ -191,26 +191,26 @@ describe("Plots", () => {
         });
 
         it("returns nearest Entity", () => {
-          var expected = {
+          var expected: Plottable.Plots.PlotEntity = {
             datum: d0,
             index: 0,
             dataset: dataset,
             position: d0Px,
             selection: d3.selectAll([bars[0][0]]),
-            plot: barPlot
+            component: barPlot
           };
 
           var closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
 
           closest = barPlot.entityNearest({ x: 0, y: d0Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
 
           expected = {
             datum: d1,
@@ -218,13 +218,13 @@ describe("Plots", () => {
             dataset: dataset,
             position: d1Px,
             selection: d3.selectAll([bars[0][1]]),
-            plot: barPlot
+            component: barPlot
           };
           closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y - 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y + 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
 
           svg.remove();
         });
@@ -237,17 +237,17 @@ describe("Plots", () => {
             y: yScale.scale(d1.y)
           };
 
-          var expected = {
+          var expected: Plottable.Plots.PlotEntity = {
             datum: d1,
             index: 1,
             dataset: dataset,
             position: d1Px,
             selection: d3.selectAll([bars[0][1]]),
-            plot: barPlot
+            component: barPlot
           };
 
           var closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-          TestMethods.assertEntitiesEqual(closest, expected, "nearest Entity is the visible one");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "nearest Entity is the visible one");
 
           svg.remove();
         });
@@ -282,7 +282,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
-        barPlot.animate(false);
+        barPlot.animated(false);
         barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
@@ -440,7 +440,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
-        barPlot.animate(false);
+        barPlot.animated(false);
         barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);
@@ -549,26 +549,26 @@ describe("Plots", () => {
         });
 
         it("returns nearest Entity", () => {
-          var expected = {
+          var expected: Plottable.Plots.PlotEntity = {
             datum: d0,
             index: 0,
             dataset: dataset,
             position: d0Px,
             selection: d3.selectAll([bars[0][0]]),
-            plot: barPlot
+            component: barPlot
           };
 
           var closest = barPlot.entityNearest({ x: d0Px.x - 1, y: d0Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
 
           closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d0Px.x, y: 0 });
-          TestMethods.assertEntitiesEqual(closest, expected, "if above the first bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if above the first bar, it is closest");
 
           expected = {
             datum: d1,
@@ -576,14 +576,14 @@ describe("Plots", () => {
             dataset: dataset,
             position: d1Px,
             selection: d3.selectAll([bars[0][1]]),
-            plot: barPlot
+            component: barPlot
           };
 
           closest = barPlot.entityNearest({ x: d1Px.x + 1, y: d1Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
 
           closest = barPlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
-          TestMethods.assertEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
+          TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
 
           svg.remove();
         });
@@ -596,17 +596,17 @@ describe("Plots", () => {
             x: xScale.scale(d1.x),
             y: yScale.scale(d1.y)
           };
-          var expected = {
+          var expected: Plottable.Plots.PlotEntity = {
             datum: d1,
             index: 1,
             dataset: dataset,
             position: d1Px,
             selection: d3.selectAll([bars[0][1]]),
-            plot: barPlot
+            component: barPlot
           };
 
           var closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-          TestMethods.assertEntitiesEqual(expected, closest, "closest plot data is on-plot data");
+          TestMethods.assertPlotEntitiesEqual(expected, closest, "closest plot data is on-plot data");
 
           svg.remove();
         });

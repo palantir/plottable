@@ -3,15 +3,11 @@
 module Plottable {
 
   export module Plots {
-
-    export type Entity = {
-      datum: any;
-      index: number;
+    export interface PlotEntity extends Entity<Plot> {
       dataset: Dataset;
-      position: Point;
-      selection: d3.Selection<any>;
-      plot: Plot;
-    };
+      index: number;
+      component: Plot;
+    }
 
     export interface AccessorScaleBinding<D, R> {
       accessor: Accessor<any>;
@@ -25,18 +21,19 @@ module Plottable {
   }
 
   export class Plot extends Component {
-    protected _dataChanged = false;
-    protected _datasetToDrawer: Utils.Map<Dataset, Drawer>;
+    protected static ANIMATION_MAX_DURATION = 600;
+
+    private _dataChanged = false;
+    private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
-    protected _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
-    protected _attrExtents: d3.Map<any[]>;
+    private _attrBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
+    private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
-    protected _animate: boolean = false;
-    private _animators: {[animator: string]: Animators.Plot} = {};
+    private _animate = false;
+    private _animators: {[animator: string]: Animator} = {};
 
-    protected _animateOnNextRender = true;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -58,13 +55,13 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      this._animators[Plots.Animator.MAIN] = new Animators.Base();
-      this._animators[Plots.Animator.RESET] = new Animators.Null();
+      var mainAnimator = new Animators.Easing().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      this.animator(Plots.Animator.MAIN, mainAnimator);
+      this.animator(Plots.Animator.RESET, new Animators.Null());
     }
 
     public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateExtents();
       return this;
@@ -72,7 +69,7 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._renderArea = this._content.append("g").classed("render-area", true);
+      this._renderArea = this.content().append("g").classed("render-area", true);
       this.datasets().forEach((dataset) => this._createNodesForDataset(dataset));
     }
 
@@ -106,7 +103,7 @@ module Plottable {
 
     protected _createNodesForDataset(dataset: Dataset) {
       var drawer = this._datasetToDrawer.get(dataset);
-      drawer.setup(this._renderArea.append("g"));
+      drawer.renderArea(this._renderArea.append("g"));
       return drawer;
     }
 
@@ -114,8 +111,8 @@ module Plottable {
       return new Drawer(dataset);
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
-      if (this._animate && this._animateOnNextRender) {
+    protected _getAnimator(key: string): Animator {
+      if (this._animateOnNextRender()) {
         return this._animators[key] || new Animators.Null();
       } else {
         return new Animators.Null();
@@ -124,7 +121,6 @@ module Plottable {
 
     protected _onDatasetUpdate() {
       this._updateExtents();
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this.render();
     }
@@ -209,16 +205,24 @@ module Plottable {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
-        this._animateOnNextRender = false;
       }
       return this;
     }
 
     /**
+     * Returns whether the plot will be animated.
+     */
+    public animated(): boolean;
+    /**
      * Enables or disables animation.
      */
-    public animate(enabled: boolean) {
-      this._animate = enabled;
+    public animated(willAnimate: boolean): Plot;
+    public animated(willAnimate?: boolean): any {
+      if (willAnimate == null) {
+        return this._animate;
+      }
+
+      this._animate = willAnimate;
       return this;
     }
 
@@ -332,18 +336,18 @@ module Plottable {
     /**
      * Get the Animator associated with the specified Animator key.
      *
-     * @return {Animators.Plot}
+     * @return {Animator}
      */
-    public animator(animatorKey: string): Animators.Plot;
+    public animator(animatorKey: string): Animator;
     /**
      * Set the Animator associated with the specified Animator key.
      *
      * @param {string} animatorKey
-     * @param {Animators.Plot} animator
+     * @param {Animator} animator
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.Plot): Plot;
-    public animator(animatorKey: string, animator?: Animators.Plot): any {
+    public animator(animatorKey: string, animator: Animator): Plot;
+    public animator(animatorKey: string, animator?: Animator): any {
       if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
@@ -409,12 +413,10 @@ module Plottable {
       var dataToDraw = this._getDataToDraw();
       var drawers = this._getDrawersInOrder();
 
-      var times = this.datasets().map((ds, i) =>
-        drawers[i].draw(
-          dataToDraw.get(ds),
-          drawSteps
-        ));
-      var maxTime = Utils.Methods.max(times, 0);
+      this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
+
+      var times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+      var maxTime = Utils.Math.max(times, 0);
       this._additionalPaint(maxTime);
     }
 
@@ -431,7 +433,7 @@ module Plottable {
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
-        drawer._getRenderArea().selectAll(drawer._getSelector()).each(function() {
+        drawer.renderArea().selectAll(drawer.selector()).each(function() {
           allSelections.push(this);
         });
       });
@@ -444,45 +446,47 @@ module Plottable {
      *
      * @param {dataset[]} datasets The Datasets to retrieve the Entities for.
      *   If not provided, returns defaults to all Datasets on the Plot.
-     * @return {Plots.Entity[]}
+     * @return {Plots.PlotEntity[]}
      */
-    public entities(datasets = this.datasets()): Plots.Entity[] {
-      var entities: Plots.Entity[] = [];
+    public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+      var entities: Plots.PlotEntity[] = [];
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
-        dataset.data().forEach((datum: any, index: number) => {
-          var position = this._pixelPoint(datum, index, dataset);
+        var validDatumIndex = 0;
+        dataset.data().forEach((datum: any, datasetIndex: number) => {
+          var position = this._pixelPoint(datum, datasetIndex, dataset);
           if (position.x !== position.x || position.y !== position.y) {
             return;
           }
           entities.push({
             datum: datum,
-            index: index,
+            index: datasetIndex,
             dataset: dataset,
             position: position,
-            selection: drawer._getSelection(index),
-            plot: this
+            selection: drawer.selectionForIndex(validDatumIndex),
+            component: this
           });
+          validDatumIndex++;
         });
       });
       return entities;
     }
 
     /**
-     * Returns the Entity nearest to the query point by the Euclidian norm, or undefined if no Entity can be found.
+     * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
      *
      * @param {Point} queryPoint
-     * @returns {Plots.Entity} The nearest Entity, or undefined if no Entity can be found.
+     * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
      */
-    public entityNearest(queryPoint: Point): Plots.Entity {
+    public entityNearest(queryPoint: Point): Plots.PlotEntity {
       var closestDistanceSquared = Infinity;
-      var closest: Plots.Entity;
+      var closest: Plots.PlotEntity;
       this.entities().forEach((entity) => {
         if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
-        var distanceSquared = Utils.Methods.distanceSquared(entity.position, queryPoint);
+        var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
         if (distanceSquared < closestDistanceSquared) {
           closestDistanceSquared = distanceSquared;
           closest = entity;
@@ -519,6 +523,10 @@ module Plottable {
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       return { x: 0, y: 0 };
+    }
+
+    protected _animateOnNextRender() {
+      return this._animate && this._dataChanged;
     }
   }
 }

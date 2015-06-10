@@ -8,7 +8,7 @@ describe("Dispatchers", () => {
       var dispatcher = new Plottable.Dispatcher();
 
       var callbackCalls = 0;
-      (<any> dispatcher)._event2Callback["click"] = () => callbackCalls++;
+      (<any> dispatcher)._eventToCallback["click"] = () => callbackCalls++;
 
       var d3document = d3.select(document);
       (<any> dispatcher)._connect();
@@ -30,7 +30,7 @@ describe("Dispatchers", () => {
       var dispatcher = new Plottable.Dispatcher();
 
       var callbackWasCalled = false;
-      (<any> dispatcher)._event2Callback["click"] = () => callbackWasCalled = true;
+      (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
 
       var callback = () => null;
       var callbackSet = new Plottable.Utils.CallbackSet<Function>();

@@ -7,7 +7,6 @@ export module Scales {
     private _d3Scale: d3.scale.Linear<number, number>;
     private _pivot: number;
     private _untransformedDomain: number[];
-    private _showIntermediateTicks = false;
 
     /**
      * A ModifiedLog Scale acts as a regular log scale for large numbers.
@@ -101,8 +100,8 @@ export module Scales {
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
       var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = Utils.Methods.min(this._untransformedDomain, 0);
-      var max = Utils.Methods.max(this._untransformedDomain, 0);
+      var min = Utils.Math.min(this._untransformedDomain, 0);
+      var max = Utils.Math.max(this._untransformedDomain, 0);
       var negativeLower = min;
       var negativeUpper = middle(min, max, -this._pivot);
       var positiveLower = middle(min, max, this._pivot);
@@ -110,15 +109,12 @@ export module Scales {
 
       var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
       var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-      var linearTicks = this._showIntermediateTicks ?
-                                d3.scale.linear().domain([negativeUpper, positiveLower])
-                                        .ticks(this._howManyTicks(negativeUpper, positiveLower)) :
-                                [-this._pivot, 0, this._pivot].filter((x) => min <= x && x <= max);
+      var linearTicks = [-this._pivot, 0, this._pivot].filter((x) => min <= x && x <= max);
 
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
       if (ticks.length <= 1) {
-        ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
+        ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
       }
       return ticks;
     }
@@ -144,11 +140,10 @@ export module Scales {
       var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
       var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
       var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-      var nMultiples = this._showIntermediateTicks ? Math.floor(nTicks / bases.length) : 1;
-      var multiples = d3.range(this._base, 1, -(this._base - 1) / nMultiples).map(Math.floor);
-      var uniqMultiples = Utils.Methods.uniq(multiples);
+      var multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
+      var uniqMultiples = Utils.Array.uniq(multiples);
       var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
-      var flattened = Utils.Methods.flatten(clusters);
+      var flattened = Utils.Array.flatten(clusters);
       var filtered = flattened.filter((x) => lower <= x && x <= upper);
       var sorted = filtered.sort((x, y) => x - y);
       return sorted;
@@ -162,38 +157,17 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this._adjustedLog(Utils.Methods.min(this._untransformedDomain, 0));
-      var adjustedMax = this._adjustedLog(Utils.Methods.max(this._untransformedDomain, 0));
+      var adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
+      var adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
       var adjustedLower = this._adjustedLog(lower);
       var adjustedUpper = this._adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
+      var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
       return ticks;
     }
 
     protected _niceDomain(domain: number[], count?: number): number[] {
       return domain;
-    }
-
-    /**
-     * Gets whether or not to generate tick values other than powers of the base.
-     *
-     * @returns {boolean}
-     */
-    public showIntermediateTicks(): boolean;
-    /**
-     * Sets whether or not to generate ticks values other than powers of the base.
-     *
-     * @param {boolean} show
-     * @returns {ModifiedLog} The calling ModifiedLog Scale.
-     */
-    public showIntermediateTicks(show: boolean): ModifiedLog;
-    public showIntermediateTicks(show?: boolean): any {
-      if (show == null) {
-        return this._showIntermediateTicks;
-      } else {
-        this._showIntermediateTicks = show;
-      }
     }
 
     protected _defaultExtent(): number[] {
@@ -222,8 +196,8 @@ export module Scales {
       this._d3Scale.range(values);
     }
 
-    public getDefaultTicks(): number[] {
-      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+    public defaultTicks(): number[] {
+      return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
   }
 }
