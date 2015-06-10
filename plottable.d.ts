@@ -275,17 +275,6 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject<T>(oldObject: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
         }
     }
 }
@@ -2729,14 +2718,14 @@ declare module Plottable {
             /**
              * Gets the Formatter for the labels.
              */
-            labelsFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
              */
-            labelsFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**

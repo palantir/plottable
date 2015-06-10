@@ -41,18 +41,6 @@ module Plottable {
         }
       }
 
-      /**
-       * Creates shallow copy of the object.
-       * @param {{ [key: string]: any }} oldMap Map to copy
-       *
-       * @returns {[{ [key: string]: any }} coppied object.
-       */
-      export function copyObject<T>(oldObject: { [key: string]: T }): { [key: string]: T } {
-        var newObject: { [key: string]: any } = {};
-        Object.keys(oldObject).forEach(key => newObject[key] = oldObject[key]);
-        return newObject;
-      }
-
     }
   }
 }
