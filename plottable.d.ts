@@ -1067,25 +1067,12 @@ declare module Plottable {
              */
             constructor(scaleType?: string);
             extentOfValues(values: number[]): number[];
-            /**
-             * Gets the color range.
-             *
-             * @returns {string[]}
-             */
-            colorRange(): string[];
-            /**
-             * Sets the color range.
-             *
-             * @param {string[]} colorRange
-             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
-             */
-            colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
             protected _getDomain(): number[];
             protected _setBackingScaleDomain(values: number[]): void;
             protected _getRange(): string[];
-            protected _setRange(values: string[]): void;
+            protected _setRange(range: string[]): void;
         }
     }
 }

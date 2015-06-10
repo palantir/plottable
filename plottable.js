@@ -2388,14 +2388,6 @@ var Plottable;
                     };
                 };
             };
-            InterpolatedColor.prototype.colorRange = function (colorRange) {
-                if (colorRange == null) {
-                    return this._colorRange;
-                }
-                this._colorRange = colorRange;
-                this._resetScale();
-                return this;
-            };
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = this._d3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
@@ -2419,10 +2411,11 @@ var Plottable;
                 this._d3Scale.domain(values);
             };
             InterpolatedColor.prototype._getRange = function () {
-                return this.colorRange();
+                return this._colorRange;
             };
-            InterpolatedColor.prototype._setRange = function (values) {
-                this.colorRange(values);
+            InterpolatedColor.prototype._setRange = function (range) {
+                this._colorRange = range;
+                this._resetScale();
             };
             InterpolatedColor.REDS = [
                 "#FFFFFF",

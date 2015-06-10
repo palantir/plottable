@@ -134,7 +134,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor();
-      colorScale.colorRange(["black", "white"]);
+      colorScale.range(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
@@ -150,7 +150,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor();
-      colorScale.colorRange(["black", "white"]);
+      colorScale.range(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
       var gridPlot = new Plottable.Plots.Rectangle();
@@ -170,7 +170,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor();
-      colorScale.colorRange(["black", "white"]);
+      colorScale.range(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset();
       var gridPlot = new Plottable.Plots.Rectangle();
@@ -202,7 +202,7 @@ describe("Plots", () => {
       var xScale = new Plottable.Scales.Category();
       var yScale = new Plottable.Scales.Category();
       var colorScale = new Plottable.Scales.InterpolatedColor();
-      colorScale.colorRange(["black", "white"]);
+      colorScale.range(["black", "white"]);
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
@@ -245,7 +245,7 @@ describe("Plots", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.colorRange(["black", "white"]);
+        colorScale.range(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);
@@ -265,7 +265,7 @@ describe("Plots", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.colorRange(["black", "white"]);
+        colorScale.range(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);
@@ -287,7 +287,7 @@ describe("Plots", () => {
         var xScale = new Plottable.Scales.Category();
         var yScale = new Plottable.Scales.Category();
         var colorScale = new Plottable.Scales.InterpolatedColor();
-        colorScale.colorRange(["black", "white"]);
+        colorScale.range(["black", "white"]);
         var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         var gridPlot = new Plottable.Plots.Rectangle();
         var dataset = new Plottable.Dataset(DATA);

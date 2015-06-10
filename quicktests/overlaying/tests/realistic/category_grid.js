@@ -57,7 +57,7 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Category();
   var yScale = new Plottable.Scales.Category();
   var cs = new Plottable.Scales.InterpolatedColor();
-  cs.colorRange(["#ADD8E6", "#67818A"]);
+  cs.range(["#ADD8E6", "#67818A"]);
 
   var xAxis = new Plottable.Axes.Category(xScale, "top");
   var yAxis = new Plottable.Axes.Category(yScale, "left");

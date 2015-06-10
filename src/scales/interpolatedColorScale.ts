@@ -119,28 +119,6 @@ export module Scales {
       };
     }
 
-    /**
-     * Gets the color range.
-     *
-     * @returns {string[]}
-     */
-    public colorRange(): string[];
-    /**
-     * Sets the color range.
-     *
-     * @param {string[]} colorRange
-     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
-     */
-    public colorRange(colorRange: string[]): InterpolatedColor;
-    public colorRange(colorRange?: string[]): any {
-      if (colorRange == null) {
-        return this._colorRange;
-      }
-      this._colorRange = colorRange;
-      this._resetScale();
-      return this;
-    }
-
     private _resetScale(): any {
       this._d3Scale = this._d3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
@@ -169,11 +147,12 @@ export module Scales {
     }
 
     protected _getRange() {
-      return this.colorRange();
+      return this._colorRange;
     }
 
-    protected _setRange(values: string[]) {
-      this.colorRange(values);
+    protected _setRange(range: string[]) {
+      this._colorRange = range;
+      this._resetScale();
     }
   }
 }
