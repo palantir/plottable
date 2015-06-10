@@ -433,8 +433,8 @@ declare module Plottable {
             var ANIMATION_FRAME: string;
             var TIMEOUT: string;
         }
-        var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string): void;
+        function renderPolicy(): RenderPolicies.RenderPolicy;
+        function renderPolicy(renderPolicy: string): void;
         /**
          * Enqueues the Component for rendering.
          *

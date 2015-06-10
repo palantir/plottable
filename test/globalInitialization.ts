@@ -7,7 +7,7 @@ interface Window {
 
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
-  Plottable.RenderController.setRenderPolicy("immediate");
+  Plottable.RenderController.renderPolicy("immediate");
   // Taken from https://stackoverflow.com/questions/9847580/how-to-detect-safari-chrome-ie-firefox-and-opera-browser
   var isFirefox = navigator.userAgent.indexOf("Firefox") !== -1;
   if (window.PHANTOMJS) {

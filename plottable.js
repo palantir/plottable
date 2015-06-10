@@ -1016,23 +1016,26 @@ var Plottable;
             Policy.ANIMATION_FRAME = "animationframe";
             Policy.TIMEOUT = "timeout";
         })(Policy = RenderController.Policy || (RenderController.Policy = {}));
-        RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
-        function setRenderPolicy(policy) {
-            switch (policy.toLowerCase()) {
+        var _renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+        function renderPolicy(renderPolicy) {
+            if (renderPolicy == null) {
+                return _renderPolicy;
+            }
+            switch (renderPolicy.toLowerCase()) {
                 case Policy.IMMEDIATE:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.Immediate();
+                    _renderPolicy = new Plottable.RenderPolicies.Immediate();
                     break;
                 case Policy.ANIMATION_FRAME:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+                    _renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
                     break;
                 case Policy.TIMEOUT:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.Timeout();
+                    _renderPolicy = new Plottable.RenderPolicies.Timeout();
                     break;
                 default:
-                    Plottable.Utils.Window.warn("Unrecognized renderPolicy: " + policy);
+                    Plottable.Utils.Window.warn("Unrecognized renderPolicy: " + renderPolicy);
             }
         }
-        RenderController.setRenderPolicy = setRenderPolicy;
+        RenderController.renderPolicy = renderPolicy;
         /**
          * Enqueues the Component for rendering.
          *
@@ -1061,7 +1064,7 @@ var Plottable;
             // Only run or enqueue flush on first request.
             if (!_animationRequested) {
                 _animationRequested = true;
-                RenderController._renderPolicy.render();
+                _renderPolicy.render();
             }
         }
         /**
