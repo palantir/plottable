@@ -8,9 +8,9 @@ describe("Animators", () => {
 
       it("totalTime() defaults", () => {
         var iterationSteps = 10;
-        var startDelay = Plottable.Animators.Base.DEFAULT_START_DELAY_MILLISECONDS;
-        var stepDuration = Plottable.Animators.Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-        var stepDelay = Plottable.Animators.Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+        var startDelay = 0;
+        var stepDuration = 300;
+        var stepDelay = 15;
         var expectedTotalTime = startDelay + (iterationSteps - 1) * stepDelay + stepDuration;
 
         var animator = new Plottable.Animators.Base();

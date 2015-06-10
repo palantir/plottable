@@ -22,23 +22,23 @@ export module Animators {
     /**
      * The default starting delay of the animation in milliseconds
      */
-    public static DEFAULT_START_DELAY_MILLISECONDS = 0;
+    private static DEFAULT_START_DELAY_MILLISECONDS = 0;
     /**
      * The default duration of one animation step in milliseconds
      */
-    public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+    private static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
      * The default maximum start delay between each step of an animation
      */
-    public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+    private static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
     /**
      * The default maximum total animation duration
      */
-    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+    private static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
     /**
      * The default easing of the animation
      */
-    public static DEFAULT_EASING_MODE = "exp-out";
+    private static DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;

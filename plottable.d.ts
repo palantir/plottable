@@ -3018,26 +3018,6 @@ declare module Plottable {
          */
         class Base implements Animator {
             /**
-             * The default starting delay of the animation in milliseconds
-             */
-            static DEFAULT_START_DELAY_MILLISECONDS: number;
-            /**
-             * The default duration of one animation step in milliseconds
-             */
-            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
-            /**
-             * The default maximum start delay between each step of an animation
-             */
-            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
-            /**
-             * The default maximum total animation duration
-             */
-            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
-            /**
-             * The default easing of the animation
-             */
-            static DEFAULT_EASING_MODE: string;
-            /**
              * Constructs the default animator
              *
              * @constructor
