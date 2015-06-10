@@ -11,6 +11,10 @@ require.config({
 
 require(["d3"], function(d3) {
   require(["plottable"], function(Plottable) {
+    var output = d3.select("#output");
+    output.text(String(window.Plottable));
+    output.style("background-color", window.Plottable ? "#F00" : "#0F0");
+
     var dataset1 = new Plottable.Dataset([
       { name: "A", value: 2 },
       { name: "B", value: 5 },
