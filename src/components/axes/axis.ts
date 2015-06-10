@@ -38,7 +38,7 @@ module Plottable {
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
      */
-    constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scale<D, number>, orientation: string) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
@@ -51,7 +51,7 @@ module Plottable {
         this.classed("y-axis", true);
       }
 
-      this.formatter(formatter);
+      this.formatter(Formatters.identity());
 
       this._rescaleCallback = (scale) => this._rescale();
       this._scale.onUpdate(this._rescaleCallback);

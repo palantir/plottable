@@ -1569,7 +1569,7 @@ declare module Plottable {
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
          * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
+        constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
@@ -1771,7 +1771,7 @@ declare module Plottable {
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: QuantitativeScale<number>, orientation: string);
             protected _setup(): void;
             protected _computeWidth(): number;
             protected _computeHeight(): number;
@@ -1810,7 +1810,7 @@ declare module Plottable {
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.identity()]
              */
-            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;

@@ -3496,9 +3496,8 @@ var Plottable;
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
          * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        function Axis(scale, orientation, formatter) {
+        function Axis(scale, orientation) {
             var _this = this;
-            if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
             _super.call(this);
             this._endTickLength = 5;
             this._tickLength = 5;
@@ -3518,7 +3517,7 @@ var Plottable;
             else {
                 this.classed("y-axis", true);
             }
-            this.formatter(formatter);
+            this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
@@ -4257,10 +4256,10 @@ var Plottable;
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
-                _super.call(this, scale, orientation, formatter);
+            function Numeric(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
+                this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4565,9 +4564,8 @@ var Plottable;
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
              * @param {Formatter} [formatter=Formatters.identity()]
              */
-            function Category(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
-                _super.call(this, scale, orientation, formatter);
+            function Category(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
                 this.classed("category-axis", true);
             }

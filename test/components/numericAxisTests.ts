@@ -134,7 +134,8 @@ describe("NumericAxis", () => {
 
     var formatter = Plottable.Formatters.fixed(2);
 
-    var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
+    var numericAxis = new Plottable.Axes.Numeric(scale, "left");
+    numericAxis.formatter(formatter);
     numericAxis.renderTo(svg);
 
     var tickLabels = (<any> numericAxis)._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
@@ -207,7 +208,8 @@ describe("NumericAxis", () => {
       return String(d);
     };
 
-    var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
+    var numericAxis = new Plottable.Axes.Numeric(scale, "left");
+    numericAxis.formatter(formatter);
     numericAxis.renderTo(svg);
 
     var visibleTickLabels = (<any> numericAxis)._element
@@ -247,7 +249,8 @@ describe("NumericAxis", () => {
 
     var formatter = Plottable.Formatters.fixed(2);
 
-    var numericAxis = new Plottable.Axes.Numeric(scale, "bottom", formatter);
+    var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
+    numericAxis.formatter(formatter);
     numericAxis.renderTo(svg);
 
     var visibleTickLabels = (<any> numericAxis)._element

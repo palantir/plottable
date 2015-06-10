@@ -18,8 +18,9 @@ export module Axes {
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
      * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
-    constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
-      super(scale, orientation, formatter);
+    constructor(scale: QuantitativeScale<number>, orientation: string) {
+      super(scale, orientation);
+      this.formatter(Formatters.general());
     }
 
     protected _setup() {

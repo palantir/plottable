@@ -993,7 +993,8 @@ describe("NumericAxis", function () {
         var scale = new Plottable.Scales.Linear();
         scale.range([0, SVG_HEIGHT]);
         var formatter = Plottable.Formatters.fixed(2);
-        var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
+        var numericAxis = new Plottable.Axes.Numeric(scale, "left");
+        numericAxis.formatter(formatter);
         numericAxis.renderTo(svg);
         var tickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS);
         tickLabels.each(function (d, i) {
@@ -1051,7 +1052,8 @@ describe("NumericAxis", function () {
             }
             return String(d);
         };
-        var numericAxis = new Plottable.Axes.Numeric(scale, "left", formatter);
+        var numericAxis = new Plottable.Axes.Numeric(scale, "left");
+        numericAxis.formatter(formatter);
         numericAxis.renderTo(svg);
         var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
@@ -1081,7 +1083,8 @@ describe("NumericAxis", function () {
         scale.domain([5, -5]);
         scale.range([0, SVG_WIDTH]);
         var formatter = Plottable.Formatters.fixed(2);
-        var numericAxis = new Plottable.Axes.Numeric(scale, "bottom", formatter);
+        var numericAxis = new Plottable.Axes.Numeric(scale, "bottom");
+        numericAxis.formatter(formatter);
         numericAxis.renderTo(svg);
         var visibleTickLabels = numericAxis._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).filter(function (d, i) {
             return d3.select(this).style("visibility") === "visible";
