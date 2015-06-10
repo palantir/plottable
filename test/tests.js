@@ -2015,9 +2015,9 @@ describe("InterpolatedColorLegend", function () {
         var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
         var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
         var boundingBoxBCR = swatchBoundingBox.node().getBoundingClientRect();
-        assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR), "bounding box contains all swatches");
+        assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, boundingBoxBCR), "bounding box contains all swatches");
         var elementBCR = legendElement.node().getBoundingClientRect();
-        assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, elementBCR), "swatches are drawn within the legend's element");
+        assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, elementBCR), "swatches are drawn within the legend's element");
         var formattedDomainValues = scaleDomain.map(legend._formatter);
         var labels = legendElement.selectAll("text");
         var labelTexts = labels[0].map(function (textNode) { return textNode.textContent; });

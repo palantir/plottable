@@ -72,7 +72,7 @@ export module Utils {
       return true;
     }
 
-    export function boxIsInside(inner: ClientRect, outer: ClientRect) {
+    export function clientRectInside(inner: ClientRect, outer: ClientRect) {
       return (
         nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) &&
         nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) &&

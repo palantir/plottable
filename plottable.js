@@ -331,10 +331,10 @@ var Plottable;
                 return true;
             }
             DOM.clientRectOverlap = clientRectOverlap;
-            function boxIsInside(inner, outer) {
+            function clientRectInside(inner, outer) {
                 return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
             }
-            DOM.boxIsInside = boxIsInside;
+            DOM.clientRectInside = clientRectInside;
             function boundingSVG(elem) {
                 var ownerSVG = elem.ownerSVGElement;
                 if (ownerSVG != null) {
@@ -4480,11 +4480,11 @@ var Plottable;
                     return;
                 }
                 var firstTickLabel = tickLabels[0][0];
-                if (!Plottable.Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!Plottable.Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4496,7 +4496,7 @@ var Plottable;
                     return;
                 }
                 tickLabels.each(function (d, i) {
-                    if (!Plottable.Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });
