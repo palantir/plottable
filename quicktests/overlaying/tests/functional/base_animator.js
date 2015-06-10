@@ -17,13 +17,14 @@ function run(svg, data, Plottable) {
 
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
+    var animator;
     if (Plottable.Animators.Base === undefined) {
-    var animator = new Plottable.Animators.Easing();
+    animator = new Plottable.Animators.Easing();
     animator.stepDuration(1000);
     animator.maxTotalDuration(2000);
     animator.stepDelay(100);
     } else {
-    var animator = new Plottable.Animators.Base();
+    animator = new Plottable.Animators.Base();
     animator.stepDuration(1000);
     animator.maxTotalDuration(2000);
     animator.iterativeDelay(100);
