@@ -7104,7 +7104,7 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.labelsFormatter = function (formatter) {
+            Bar.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
                     return this._labelFormatter;
                 }

@@ -2729,14 +2729,14 @@ declare module Plottable {
             /**
              * Gets the Formatter for the labels.
              */
-            labelsFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
              */
-            labelsFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**
