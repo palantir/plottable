@@ -1135,11 +1135,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
         type AppliedDrawStep = {
             attrToAppliedProjector: AttributeToAppliedProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
     }
     class Drawer {
@@ -2279,7 +2279,7 @@ declare module Plottable {
         addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _getDrawer(dataset: Dataset): Drawer;
-        protected _getAnimator(key: string): Animators.Plot;
+        protected _getAnimator(key: string): Animator;
         protected _onDatasetUpdate(): void;
         /**
          * Gets the AccessorScaleBinding for a particular attribute.
@@ -2330,17 +2330,17 @@ declare module Plottable {
         /**
          * Get the Animator associated with the specified Animator key.
          *
-         * @return {Animators.Plot}
+         * @return {Animator}
          */
-        animator(animatorKey: string): Animators.Plot;
+        animator(animatorKey: string): Animator;
         /**
          * Set the Animator associated with the specified Animator key.
          *
          * @param {string} animatorKey
-         * @param {Animators.Plot} animator
+         * @param {Animator} animator
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.Plot): Plot;
+        animator(animatorKey: string, animator: Animator): Plot;
         /**
          * Removes a Dataset from the Plot.
          *
@@ -2910,7 +2910,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getAnimator(key: string): Animators.Plot;
+            protected _getAnimator(key: string): Animator;
             protected _setup(): void;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedArea<X>;
@@ -2962,30 +2962,25 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animators {
-        interface Plot {
-            /**
-             * Applies the supplied attributes to a d3.Selection with some animation.
-             *
-             * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
-             * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
-             *     AppliedProjectors that we will use to set attributes on the selection.
-             * @return {any} Animators should return the selection or
-             *     transition object so that plots may chain the transitions between
-             *     animators.
-             */
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
-            /**
-             * Given the number of elements, return the total time the animation requires
-             *
-             * @param {number} numberofIterations The number of elements that will be drawn
-             * @returns {number}
-             */
-            totalTime(numberOfIterations: number): number;
-        }
-        type PlotAnimatorMap = {
-            [animatorKey: string]: Plot;
-        };
+    interface Animator {
+        /**
+         * Applies the supplied attributes to a d3.Selection with some animation.
+         *
+         * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+         * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+         *     AppliedProjectors that we will use to set attributes on the selection.
+         * @return {any} Animators should return the selection or
+         *     transition object so that plots may chain the transitions between
+         *     animators.
+         */
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Given the number of elements, return the total time the animation requires
+         *
+         * @param {number} numberofIterations The number of elements that will be drawn
+         * @returns {number}
+         */
+        totalTime(numberOfIterations: number): number;
     }
 }
 
@@ -2996,7 +2991,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements Animators.Plot {
+        class Null implements Animator {
             totalTime(selection: any): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
         }
@@ -3021,7 +3016,7 @@ declare module Plottable {
          * min(stepDelay(),
          *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
-        class Base implements Animators.Plot {
+        class Base implements Animator {
             /**
              * The default starting delay of the animation in milliseconds
              */

@@ -18,7 +18,7 @@ export module Animators {
    * min(stepDelay(),
    *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
    */
-  export class Base implements Animators.Plot {
+  export class Base implements Animator {
     /**
      * The default starting delay of the animation in milliseconds
      */
