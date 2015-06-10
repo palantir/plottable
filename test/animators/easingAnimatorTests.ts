@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Animators", () => {
-  describe("BaseAnimator", () => {
+  describe("EasingAnimator", () => {
     describe("Time computations", () => {
 
       it("totalTime() defaults", () => {

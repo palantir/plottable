@@ -456,7 +456,7 @@ describe("Drawers", function () {
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
 describe("Animators", function () {
-    describe("BaseAnimator", function () {
+    describe("EasingAnimator", function () {
         describe("Time computations", function () {
             it("totalTime() defaults", function () {
                 var iterationSteps = 10;

@@ -13,7 +13,7 @@
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
-///<reference path="animators/baseAnimatorTests.ts" />
+///<reference path="animators/easingAnimatorTests.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/timeAxisTests.ts" />
