@@ -111,13 +111,8 @@ module Plottable {
       return new Drawer(dataset);
     }
 
-<<<<<<< HEAD
     protected _getAnimator(key: string): Animator {
-      if (this._animate && this._animateOnNextRender) {
-=======
-    protected _getAnimator(key: string): Animators.Plot {
       if (this._animateOnNextRender()) {
->>>>>>> origin/develop
         return this._animators[key] || new Animators.Null();
       } else {
         return new Animators.Null();
