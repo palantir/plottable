@@ -20,13 +20,13 @@ export module Utils {
       return bbox;
     }
 
-    export var POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+    export var REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
 
     export function requestAnimationFramePolyfill(fn: () => void) {
       if (window.requestAnimationFrame != null) {
         window.requestAnimationFrame(fn);
       } else {
-        setTimeout(fn, POLYFILL_TIMEOUT_MILLISECONDS);
+        setTimeout(fn, REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS);
       }
     }
 

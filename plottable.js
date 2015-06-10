@@ -283,13 +283,13 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+            DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
             function requestAnimationFramePolyfill(fn) {
                 if (window.requestAnimationFrame != null) {
                     window.requestAnimationFrame(fn);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MILLISECONDS);
+                    setTimeout(fn, DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
@@ -972,7 +972,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MILLISECONDS;
+                this._timeoutMsec = Plottable.Utils.DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
