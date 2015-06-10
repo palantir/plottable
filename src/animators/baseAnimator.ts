@@ -6,16 +6,16 @@ export module Animators {
   /**
    * The base animator implementation with easing, duration, and delay.
    *
-   * The delay between animations can be configured with iterativeDelay().
+   * The delay between animations can be configured with stepDelay().
    * This will be affected if the maxTotalDuration() is used such that the entire animation
    * fits within the timeframe
    *
    * The maximum total animation duration can be configured with maxTotalDuration.
    * It is guaranteed the animation will not exceed this value,
-   * by first reducing stepDuration, then iterativeDelay
+   * by first reducing stepDuration, then stepDelay
    *
    * The actual interval delay is calculated by following formula:
-   * min(iterativeDelay(),
+   * min(stepDelay(),
    *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
    */
   export class Base implements Animators.Plot {
@@ -42,7 +42,7 @@ export module Animators {
 
     private _startDelay: number;
     private _stepDuration: number;
-    private _iterativeDelay: number;
+    private _stepDelay: number;
     private _maxTotalDuration: number;
     private _easing: string;
 
@@ -54,7 +54,7 @@ export module Animators {
     constructor() {
       this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
       this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-      this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+      this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
       this._easing = Base.DEFAULT_EASING;
     }
@@ -124,19 +124,19 @@ export module Animators {
      *
      * @returns {number} The current maximum iterative delay.
      */
-    public iterativeDelay(): number;
+    public stepDelay(): number;
     /**
      * Sets the maximum start delay between animation steps in milliseconds.
      *
-     * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
+     * @param {number} stepDelay The maximum iterative delay in milliseconds.
      * @returns {Base} The calling Base Animator.
      */
-    public iterativeDelay(iterativeDelay: number): Base;
-    public iterativeDelay(iterativeDelay?: number): any {
-      if (iterativeDelay == null) {
-        return this._iterativeDelay;
+    public stepDelay(stepDelay: number): Base;
+    public stepDelay(stepDelay?: number): any {
+      if (stepDelay == null) {
+        return this._stepDelay;
       } else {
-        this._iterativeDelay = iterativeDelay;
+        this._stepDelay = stepDelay;
         return this;
       }
     }
@@ -192,7 +192,7 @@ export module Animators {
       var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
       stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
       var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
-      return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
+      return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
 }

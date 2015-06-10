@@ -8115,16 +8115,16 @@ var Plottable;
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The delay between animations can be configured with iterativeDelay().
+         * The delay between animations can be configured with stepDelay().
          * This will be affected if the maxTotalDuration() is used such that the entire animation
          * fits within the timeframe
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
          * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then iterativeDelay
+         * by first reducing stepDuration, then stepDelay
          *
          * The actual interval delay is calculated by following formula:
-         * min(iterativeDelay(),
+         * min(stepDelay(),
          *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
         var Base = (function () {
@@ -8136,7 +8136,7 @@ var Plottable;
             function Base() {
                 this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
                 this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-                this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
                 this._easing = Base.DEFAULT_EASING;
             }
@@ -8168,12 +8168,12 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.iterativeDelay = function (iterativeDelay) {
-                if (iterativeDelay == null) {
-                    return this._iterativeDelay;
+            Base.prototype.stepDelay = function (stepDelay) {
+                if (stepDelay == null) {
+                    return this._stepDelay;
                 }
                 else {
-                    this._iterativeDelay = iterativeDelay;
+                    this._stepDelay = stepDelay;
                     return this;
                 }
             };
@@ -8202,7 +8202,7 @@ var Plottable;
                 var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
                 stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
                 var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
-                return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
+                return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
             };
             /**
              * The default starting delay of the animation in milliseconds

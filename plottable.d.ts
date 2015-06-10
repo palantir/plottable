@@ -3009,16 +3009,16 @@ declare module Plottable {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The delay between animations can be configured with iterativeDelay().
+         * The delay between animations can be configured with stepDelay().
          * This will be affected if the maxTotalDuration() is used such that the entire animation
          * fits within the timeframe
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
          * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then iterativeDelay
+         * by first reducing stepDuration, then stepDelay
          *
          * The actual interval delay is calculated by following formula:
-         * min(iterativeDelay(),
+         * min(stepDelay(),
          *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
         class Base implements Animators.Plot {
@@ -3081,14 +3081,14 @@ declare module Plottable {
              *
              * @returns {number} The current maximum iterative delay.
              */
-            iterativeDelay(): number;
+            stepDelay(): number;
             /**
              * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
+             * @param {number} stepDelay The maximum iterative delay in milliseconds.
              * @returns {Base} The calling Base Animator.
              */
-            iterativeDelay(iterativeDelay: number): Base;
+            stepDelay(stepDelay: number): Base;
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
              *
