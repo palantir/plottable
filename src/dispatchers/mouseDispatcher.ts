@@ -191,7 +191,7 @@ export module Dispatchers {
      *
      * @return {Point}
      */
-    public lastMousePosition() {
+    public lastMousePosition(): Point {
       return this._lastMousePosition;
     }
   }
