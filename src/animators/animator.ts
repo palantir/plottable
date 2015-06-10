@@ -1,9 +1,8 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Animators {
 
-  export interface Plot {
+  export interface Animator {
     /**
      * Applies the supplied attributes to a d3.Selection with some animation.
      *
@@ -18,13 +17,11 @@ export module Animators {
 
     /**
      * Given the number of elements, return the total time the animation requires
-     * 
+     *
      * @param {number} numberofIterations The number of elements that will be drawn
      * @returns {number}
      */
     totalTime(numberOfIterations: number): number;
   }
 
-  export type PlotAnimatorMap = { [animatorKey: string]: Plot; };
-}
 }

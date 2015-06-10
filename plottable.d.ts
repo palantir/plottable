@@ -1135,11 +1135,11 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
         type AppliedDrawStep = {
             attrToAppliedProjector: AttributeToAppliedProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
     }
     class Drawer {
@@ -2271,7 +2271,7 @@ declare module Plottable {
         addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
         protected _getDrawer(dataset: Dataset): Drawer;
-        protected _getAnimator(key: string): Animators.Plot;
+        protected _getAnimator(key: string): Animator;
         protected _onDatasetUpdate(): void;
         /**
          * Gets the AccessorScaleBinding for a particular attribute.
@@ -2322,17 +2322,17 @@ declare module Plottable {
         /**
          * Get the Animator associated with the specified Animator key.
          *
-         * @return {Animators.Plot}
+         * @return {Animator}
          */
-        animator(animatorKey: string): Animators.Plot;
+        animator(animatorKey: string): Animator;
         /**
          * Set the Animator associated with the specified Animator key.
          *
          * @param {string} animatorKey
-         * @param {Animators.Plot} animator
+         * @param {Animator} animator
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.Plot): Plot;
+        animator(animatorKey: string, animator: Animator): Plot;
         /**
          * Removes a Dataset from the Plot.
          *
@@ -2903,7 +2903,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getAnimator(key: string): Animators.Plot;
+            protected _getAnimator(key: string): Animator;
             protected _setup(): void;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedArea<X>;
@@ -2955,30 +2955,25 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animators {
-        interface Plot {
-            /**
-             * Applies the supplied attributes to a d3.Selection with some animation.
-             *
-             * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
-             * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
-             *     AppliedProjectors that we will use to set attributes on the selection.
-             * @return {any} Animators should return the selection or
-             *     transition object so that plots may chain the transitions between
-             *     animators.
-             */
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
-            /**
-             * Given the number of elements, return the total time the animation requires
-             *
-             * @param {number} numberofIterations The number of elements that will be drawn
-             * @returns {number}
-             */
-            totalTime(numberOfIterations: number): number;
-        }
-        type PlotAnimatorMap = {
-            [animatorKey: string]: Plot;
-        };
+    interface Animator {
+        /**
+         * Applies the supplied attributes to a d3.Selection with some animation.
+         *
+         * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+         * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+         *     AppliedProjectors that we will use to set attributes on the selection.
+         * @return {any} Animators should return the selection or
+         *     transition object so that plots may chain the transitions between
+         *     animators.
+         */
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Given the number of elements, return the total time the animation requires
+         *
+         * @param {number} numberofIterations The number of elements that will be drawn
+         * @returns {number}
+         */
+        totalTime(numberOfIterations: number): number;
     }
 }
 
@@ -2989,7 +2984,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements Animators.Plot {
+        class Null implements Animator {
             totalTime(selection: any): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
         }
@@ -3002,39 +2997,19 @@ declare module Plottable {
         /**
          * The base animator implementation with easing, duration, and delay.
          *
-         * The delay between animations can be configured with iterativeDelay().
+         * The delay between animations can be configured with stepDelay().
          * This will be affected if the maxTotalDuration() is used such that the entire animation
          * fits within the timeframe
          *
          * The maximum total animation duration can be configured with maxTotalDuration.
          * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then iterativeDelay
+         * by first reducing stepDuration, then stepDelay
          *
          * The actual interval delay is calculated by following formula:
-         * min(iterativeDelay(),
+         * min(stepDelay(),
          *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
          */
-        class Base implements Animators.Plot {
-            /**
-             * The default starting delay of the animation in milliseconds
-             */
-            static DEFAULT_START_DELAY_MILLISECONDS: number;
-            /**
-             * The default duration of one animation step in milliseconds
-             */
-            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
-            /**
-             * The default maximum start delay between each step of an animation
-             */
-            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
-            /**
-             * The default maximum total animation duration
-             */
-            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
-            /**
-             * The default easing of the animation
-             */
-            static DEFAULT_EASING: string;
+        class Easing implements Animator {
             /**
              * Constructs the default animator
              *
@@ -3053,9 +3028,9 @@ declare module Plottable {
              * Sets the start delay of the animation in milliseconds.
              *
              * @param {number} startDelay The start delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            startDelay(startDelay: number): Base;
+            startDelay(startDelay: number): Easing;
             /**
              * Gets the duration of one animation step in milliseconds.
              *
@@ -3066,22 +3041,22 @@ declare module Plottable {
              * Sets the duration of one animation step in milliseconds.
              *
              * @param {number} stepDuration The duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            stepDuration(stepDuration: number): Base;
+            stepDuration(stepDuration: number): Easing;
             /**
              * Gets the maximum start delay between animation steps in milliseconds.
              *
              * @returns {number} The current maximum iterative delay.
              */
-            iterativeDelay(): number;
+            stepDelay(): number;
             /**
              * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @param {number} stepDelay The maximum iterative delay in milliseconds.
+             * @returns {Easing} The calling Easing Animator.
              */
-            iterativeDelay(iterativeDelay: number): Base;
+            stepDelay(stepDelay: number): Easing;
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
              *
@@ -3092,22 +3067,22 @@ declare module Plottable {
              * Sets the maximum total animation duration constraint in miliseconds.
              *
              * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            maxTotalDuration(maxTotalDuration: number): Base;
+            maxTotalDuration(maxTotalDuration: number): Easing;
             /**
-             * Gets the current easing of the animation.
+             * Gets the current easing mode of the animation.
              *
              * @returns {string} the current easing mode.
              */
-            easing(): string;
+            easingMode(): string;
             /**
              * Sets the easing mode of the animation.
              *
-             * @param {string} easing The desired easing mode.
-             * @returns {Base} The calling Base Animator.
+             * @param {string} easingMode The desired easing mode.
+             * @returns {Easing} The calling Easing Animator.
              */
-            easing(easing: string): Base;
+            easingMode(easingMode: string): Easing;
         }
     }
 }

@@ -24,7 +24,7 @@ export module Plots {
       this._baselineValueProvider = () => [this._baselineValue];
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
+    protected _getAnimator(key: string): Animator {
       return new Animators.Null();
     }
 

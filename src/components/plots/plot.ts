@@ -32,7 +32,7 @@ module Plottable {
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
     private _animate = false;
-    private _animators: {[animator: string]: Animators.Plot} = {};
+    private _animators: {[animator: string]: Animator} = {};
 
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
@@ -55,7 +55,7 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      var mainAnimator = new Animators.Base().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      var mainAnimator = new Animators.Easing().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, mainAnimator);
       this.animator(Plots.Animator.RESET, new Animators.Null());
     }
@@ -111,7 +111,7 @@ module Plottable {
       return new Drawer(dataset);
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
+    protected _getAnimator(key: string): Animator {
       if (this._animateOnNextRender()) {
         return this._animators[key] || new Animators.Null();
       } else {
@@ -336,18 +336,18 @@ module Plottable {
     /**
      * Get the Animator associated with the specified Animator key.
      *
-     * @return {Animators.Plot}
+     * @return {Animator}
      */
-    public animator(animatorKey: string): Animators.Plot;
+    public animator(animatorKey: string): Animator;
     /**
      * Set the Animator associated with the specified Animator key.
      *
      * @param {string} animatorKey
-     * @param {Animators.Plot} animator
+     * @param {Animator} animator
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.Plot): Plot;
-    public animator(animatorKey: string, animator?: Animators.Plot): any {
+    public animator(animatorKey: string, animator: Animator): Plot;
+    public animator(animatorKey: string, animator?: Animator): any {
       if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
