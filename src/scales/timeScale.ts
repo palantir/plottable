@@ -77,7 +77,7 @@ export module Scales {
     }
 
     public defaultTicks(): Date[] {
-      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+      return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
     }
 
     protected _niceDomain(domain: Date[]) {

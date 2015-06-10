@@ -1795,7 +1795,7 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Linear.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Linear._DEFAULT_NUM_TICKS);
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
@@ -1910,7 +1910,7 @@ var Plottable;
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 }
                 return ticks;
             };
@@ -1957,7 +1957,7 @@ var Plottable;
                 var adjustedLower = this._adjustedLog(lower);
                 var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
+                var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
             };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
@@ -1988,7 +1988,7 @@ var Plottable;
                 this._d3Scale.range(values);
             };
             ModifiedLog.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2298,7 +2298,7 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Time.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
             };
             Time.prototype._niceDomain = function (domain) {
                 return this._d3Scale.copy().domain(domain).nice().domain();
