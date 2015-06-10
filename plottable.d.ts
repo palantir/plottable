@@ -3527,10 +3527,6 @@ declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
             /**
-             * The number of pixels occupied in a line.
-             */
-            static PIXELS_PER_LINE: number;
-            /**
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
              *
