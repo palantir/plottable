@@ -112,7 +112,7 @@ module Plottable {
     }
 
     protected _getAnimator(key: string): Animators.Plot {
-      if (this._animate && this._animateOnNextRender) {
+      if (this._animateOnNextRender()) {
         return this._animators[key] || new Animators.Null();
       } else {
         return new Animators.Null();
@@ -204,6 +204,7 @@ module Plottable {
     public renderImmediately() {
       if (this._isAnchored) {
         this._paint();
+        this._dataChanged = false;
       }
       return this;
     }

@@ -6018,7 +6018,7 @@ var Plottable;
             return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
-            if (this._animate && this._animateOnNextRender) {
+            if (this._animateOnNextRender()) {
                 return this._animators[key] || new Plottable.Animators.Null();
             }
             else {
@@ -6076,6 +6076,7 @@ var Plottable;
         Plot.prototype.renderImmediately = function () {
             if (this._isAnchored) {
                 this._paint();
+                this._dataChanged = false;
             }
             return this;
         };
