@@ -83,21 +83,6 @@ describe("Utils.Methods", () => {
     });
   });
 
-  it("isNaN()", () => {
-    var isNaN = Plottable.Utils.Math.isNaN;
-
-    assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
-
-    assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
-    assert.isFalse(isNaN(null), "null should fail the isNaN check");
-    assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
-    assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
-    assert.isFalse(isNaN(0), "0 should fail the isNaN check");
-    assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
-    assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
-    assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
-  });
-
   it("isValidNumber()", () => {
     var isValidNumber = Plottable.Utils.Math.isValidNumber;
 

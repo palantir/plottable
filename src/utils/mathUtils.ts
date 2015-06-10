@@ -61,18 +61,11 @@ export module Utils {
     }
 
     /**
-     * Returns true **only** if x is NaN
-     */
-    export function isNaN(n: any) {
-      return n !== n;
-    }
-
-    /**
      * Returns true if the argument is a number, which is not NaN
      * Numbers represented as strings do not pass this function
      */
     export function isValidNumber(n: any) {
-      return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
+      return typeof n === "number" && n === n && isFinite(n);
     }
 
     export function range(start: number, stop: number, step = 1): number[] {

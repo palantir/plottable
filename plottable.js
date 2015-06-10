@@ -69,18 +69,11 @@ var Plottable;
             }
             Math.min = min;
             /**
-             * Returns true **only** if x is NaN
-             */
-            function isNaN(n) {
-                return n !== n;
-            }
-            Math.isNaN = isNaN;
-            /**
              * Returns true if the argument is a number, which is not NaN
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n) {
-                return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
+                return typeof n === "number" && n === n && isFinite(n);
             }
             Math.isValidNumber = isValidNumber;
             function range(start, stop, step) {
