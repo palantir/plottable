@@ -1289,31 +1289,6 @@ var Plottable;
         }
         Formatters.time = time;
         /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval) {
-            switch (timeInterval) {
-                case Plottable.TimeInterval.second:
-                    return d3.time.second;
-                case Plottable.TimeInterval.minute:
-                    return d3.time.minute;
-                case Plottable.TimeInterval.hour:
-                    return d3.time.hour;
-                case Plottable.TimeInterval.day:
-                    return d3.time.day;
-                case Plottable.TimeInterval.week:
-                    return d3.time.week;
-                case Plottable.TimeInterval.month:
-                    return d3.time.month;
-                case Plottable.TimeInterval.year:
-                    return d3.time.year;
-                default:
-                    throw Error("TimeInterval specified does not exist: " + timeInterval);
-            }
-        }
-        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
-        /**
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -2255,7 +2230,7 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(interval);
+                var d3Interval = Time.timeIntervalToD3Time(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
                 return tempScale.ticks(d3Interval, step);
@@ -2302,6 +2277,30 @@ var Plottable;
             };
             Time.prototype._niceDomain = function (domain) {
                 return this._d3Scale.copy().domain(domain).nice().domain();
+            };
+            /**
+             * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+             * If the provided TimeInterval is incorrect, the default is d3.time.year
+             */
+            Time.timeIntervalToD3Time = function (timeInterval) {
+                switch (timeInterval) {
+                    case Plottable.TimeInterval.second:
+                        return d3.time.second;
+                    case Plottable.TimeInterval.minute:
+                        return d3.time.minute;
+                    case Plottable.TimeInterval.hour:
+                        return d3.time.hour;
+                    case Plottable.TimeInterval.day:
+                        return d3.time.day;
+                    case Plottable.TimeInterval.week:
+                        return d3.time.week;
+                    case Plottable.TimeInterval.month:
+                        return d3.time.month;
+                    case Plottable.TimeInterval.year:
+                        return d3.time.year;
+                    default:
+                        throw Error("TimeInterval specified does not exist: " + timeInterval);
+                }
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -3916,7 +3915,7 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(config.interval);
+                var d3Interval = Plottable.Scales.Time.timeIntervalToD3Time(config.interval);
                 var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
