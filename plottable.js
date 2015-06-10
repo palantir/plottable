@@ -4950,12 +4950,12 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
             };
-            Legend.prototype.maxEntriesPerRow = function (numEntries) {
-                if (numEntries == null) {
+            Legend.prototype.maxEntriesPerRow = function (maxEntriesPerRow) {
+                if (maxEntriesPerRow == null) {
                     return this._maxEntriesPerRow;
                 }
                 else {
-                    this._maxEntriesPerRow = numEntries;
+                    this._maxEntriesPerRow = maxEntriesPerRow;
                     this.redraw();
                     return this;
                 }
