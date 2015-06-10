@@ -6,7 +6,7 @@ export module Interactions {
     /**
      * The number of pixels occupied in a line.
      */
-    public static PIXELS_PER_LINE = 120;
+    private static _PIXELS_PER_LINE = 120;
 
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
@@ -149,7 +149,7 @@ export module Interactions {
       if (this._isInsideComponent(translatedP)) {
         e.preventDefault();
 
-        var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
+        var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
           PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);

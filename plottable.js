@@ -9270,7 +9270,7 @@ var Plottable;
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
                     e.preventDefault();
-                    var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
+                    var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
                         PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
@@ -9303,7 +9303,7 @@ var Plottable;
             /**
              * The number of pixels occupied in a line.
              */
-            PanZoom.PIXELS_PER_LINE = 120;
+            PanZoom._PIXELS_PER_LINE = 120;
             return PanZoom;
         })(Plottable.Interaction);
         Interactions.PanZoom = PanZoom;
