@@ -773,18 +773,6 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject(oldObject) {
-                var newObject = {};
-                Object.keys(oldObject).forEach(function (key) { return newObject[key] = oldObject[key]; });
-                return newObject;
-            }
-            Window.copyObject = copyObject;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -2651,8 +2639,7 @@ var Plottable;
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
-                step.animator.animate(this._pathSelection, attrToProjector);
+                step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
                 this._pathSelection.classed(Line.PATH_CLASS, true);
             };
             Line.prototype.selector = function () {
@@ -2696,8 +2683,7 @@ var Plottable;
                 return this;
             };
             Area.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
-                step.animator.animate(this._areaSelection, attrToProjector);
+                step.animator.animate(this._areaSelection, step.attrToAppliedProjector);
                 this._areaSelection.classed(Area.PATH_CLASS, true);
             };
             Area.prototype.selector = function () {

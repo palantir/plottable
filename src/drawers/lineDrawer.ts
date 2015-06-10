@@ -30,8 +30,7 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      var attrToProjector = <AttributeToAppliedProjector>Utils.Window.copyObject(step.attrToAppliedProjector);
-      step.animator.animate(this._pathSelection, attrToProjector);
+      step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
       this._pathSelection.classed(Line.PATH_CLASS, true);
     }
 

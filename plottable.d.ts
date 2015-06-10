@@ -275,17 +275,6 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject<T>(oldObject: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
         }
     }
 }
