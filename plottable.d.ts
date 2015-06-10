@@ -1637,13 +1637,13 @@ declare module Plottable {
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the margin in pixels.
-         * The margin is the extra space between the tick labels and the outer edge of the Axis.
+         * Gets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          */
         margin(): number;
         /**
-         * Sets the size of the margin in pixels.
-         * The margin is the extra space between the tick labels and the outer edge of the Axis.
+         * Sets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
