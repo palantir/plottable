@@ -2007,7 +2007,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Components {
-        class InterpolatedColorLegend extends Component {
+        class InterpolatedLegend extends Component {
             /**
              * The css class applied to the legend labels.
              */
@@ -2034,7 +2034,7 @@ declare module Plottable {
              * @param {Formatter} formatter
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            formatter(formatter: Formatter): InterpolatedColorLegend;
+            formatter(formatter: Formatter): InterpolatedLegend;
             /**
              * Gets the orientation.
              */
@@ -2045,12 +2045,12 @@ declare module Plottable {
              * @param {string} orientation One of "horizontal"/"left"/"right".
              * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
              */
-            orientation(orientation: string): InterpolatedColorLegend;
+            orientation(orientation: string): InterpolatedLegend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
             protected _setup(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
-            renderImmediately(): InterpolatedColorLegend;
+            renderImmediately(): InterpolatedLegend;
         }
     }
 }
@@ -2729,14 +2729,14 @@ declare module Plottable {
             /**
              * Gets the Formatter for the labels.
              */
-            labelsFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
              */
-            labelsFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**

@@ -2,7 +2,7 @@
 
 var assert = chai.assert;
 
-describe("InterpolatedColorLegend", () => {
+describe("InterpolatedLegend", () => {
   var svg: d3.Selection<void>;
   var colorScale: Plottable.Scales.InterpolatedColor;
 
@@ -11,7 +11,7 @@ describe("InterpolatedColorLegend", () => {
     colorScale = new Plottable.Scales.InterpolatedColor();
   });
 
-  function assertBasicRendering(legend: Plottable.Components.InterpolatedColorLegend) {
+  function assertBasicRendering(legend: Plottable.Components.InterpolatedLegend) {
     var scaleDomain = colorScale.domain();
     var legendElement: d3.Selection<void> = (<any> legend)._element;
 
@@ -41,7 +41,7 @@ describe("InterpolatedColorLegend", () => {
   }
 
   it("renders correctly (orientation: horizontal)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.renderTo(svg);
 
     assertBasicRendering(legend);
@@ -60,7 +60,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("renders correctly (orientation: right)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
 
@@ -81,7 +81,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("renders correctly (orientation: left)", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
 
@@ -102,7 +102,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("re-renders when scale domain updates", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
 
@@ -113,7 +113,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("orientation() input-checking", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
 
     legend.orientation("horizontal"); // should work
     legend.orientation("right"); // should work
@@ -124,7 +124,7 @@ describe("InterpolatedColorLegend", () => {
   });
 
   it("orient() triggers layout computation", () => {
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.renderTo(svg);
 
     var widthBefore = legend.width();
@@ -138,7 +138,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: horizontal)", () => {
     svg.attr("width", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -147,7 +147,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: horizontal)", () => {
     svg.attr("height", 20);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("horizontal");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -156,7 +156,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: right)", () => {
     svg.attr("width", 30);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -165,7 +165,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: right)", () => {
     svg.attr("height", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("right");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -174,7 +174,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when width is constrained (orientation: left)", () => {
     svg.attr("width", 30);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);
@@ -183,7 +183,7 @@ describe("InterpolatedColorLegend", () => {
 
   it("renders correctly when height is constrained (orientation: left)", () => {
     svg.attr("height", 100);
-    var legend = new Plottable.Components.InterpolatedColorLegend(colorScale);
+    var legend = new Plottable.Components.InterpolatedLegend(colorScale);
     legend.orientation("left");
     legend.renderTo(svg);
     assertBasicRendering(legend);
