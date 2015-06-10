@@ -274,91 +274,47 @@ var Plottable;
              * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element) {
+            function elementBBox(element) {
                 var bbox;
                 try {
                     bbox = element.node().getBBox();
                 }
                 catch (err) {
-                    bbox = {
-                        x: 0,
-                        y: 0,
-                        width: 0,
-                        height: 0
-                    };
+                    bbox = { x: 0, y: 0, width: 0, height: 0 };
                 }
                 return bbox;
             }
-            DOM.getBBox = getBBox;
-            DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
+            DOM.elementBBox = elementBBox;
+            DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
             function requestAnimationFramePolyfill(fn) {
                 if (window.requestAnimationFrame != null) {
                     window.requestAnimationFrame(fn);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MSEC);
+                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function getParsedStyleValue(style, prop) {
-                var value = style.getPropertyValue(prop);
-                var parsedValue = parseFloat(value);
-                if (parsedValue !== parsedValue) {
-                    return 0;
-                }
-                return parsedValue;
+            function elementWidth(element) {
+                var style = window.getComputedStyle(element);
+                return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
-            function isSelectionRemovedFromSVG(selection) {
-                var n = selection.node();
-                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-                    n = n.parentNode;
-                }
-                return (n == null);
+            DOM.elementWidth = elementWidth;
+            function elementHeight(element) {
+                var style = window.getComputedStyle(element);
+                return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
             }
-            DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
-            function getElementWidth(elem) {
-                var style = window.getComputedStyle(elem);
-                return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");
-            }
-            DOM.getElementWidth = getElementWidth;
-            function getElementHeight(elem) {
-                var style = window.getComputedStyle(elem);
-                return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
-            }
-            DOM.getElementHeight = getElementHeight;
-            function getSVGPixelWidth(svg) {
-                var width = svg.node().clientWidth;
-                if (width === 0) {
-                    var widthAttr = svg.attr("width");
-                    if (widthAttr.indexOf("%") !== -1) {
-                        var ancestorNode = svg.node().parentNode;
-                        while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-                            ancestorNode = ancestorNode.parentNode;
-                        }
-                        if (ancestorNode == null) {
-                            throw new Error("Could not compute width of element");
-                        }
-                        width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-                    }
-                    else {
-                        width = parseFloat(widthAttr);
-                    }
-                }
-                return width;
-            }
-            DOM.getSVGPixelWidth = getSVGPixelWidth;
-            function translate(s, x, y) {
-                var xform = d3.transform(s.attr("transform"));
+            DOM.elementHeight = elementHeight;
+            function translate(selection, x, y) {
+                var transformMatrix = d3.transform(selection.attr("transform"));
                 if (x == null) {
-                    return xform.translate;
+                    return transformMatrix.translate;
                 }
-                else {
-                    y = (y == null) ? 0 : y;
-                    xform.translate[0] = x;
-                    xform.translate[1] = y;
-                    s.attr("transform", xform.toString());
-                    return s;
-                }
+                y = (y == null) ? 0 : y;
+                transformMatrix.translate[0] = x;
+                transformMatrix.translate[1] = y;
+                selection.attr("transform", transformMatrix.toString());
+                return selection;
             }
             DOM.translate = translate;
             function boxesOverlap(boxA, boxB) {
@@ -381,7 +337,7 @@ var Plottable;
                 return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
             }
             DOM.boxIsInside = boxIsInside;
-            function getBoundingSVG(elem) {
+            function boundingSVG(elem) {
                 var ownerSVG = elem.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
@@ -391,12 +347,12 @@ var Plottable;
                 }
                 return null; // not in the DOM
             }
-            DOM.getBoundingSVG = getBoundingSVG;
+            DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
-            function getUniqueClipPathId() {
+            function generateUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
             }
-            DOM.getUniqueClipPathId = getUniqueClipPathId;
+            DOM.generateUniqueClipPathId = generateUniqueClipPathId;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
@@ -411,8 +367,8 @@ var Plottable;
              */
             function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
                 if (tolerance === void 0) { tolerance = 0.5; }
-                var xRange = parseRange(xValOrRange);
-                var yRange = parseRange(yValOrRange);
+                var xRange = _parseRange(xValOrRange);
+                var yRange = _parseRange(yValOrRange);
                 // SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -427,16 +383,24 @@ var Plottable;
              *
              * @returns {Range} The generated Range
              */
-            function parseRange(input) {
+            function _parseRange(input) {
                 if (typeof (input) === "number") {
-                    return { min: input, max: input };
+                    var value = input;
+                    return { min: value, max: value };
                 }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
+                var range = input;
+                if (range instanceof Object && "min" in range && "max" in range) {
+                    return range;
                 }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Range");
+                throw new Error("input '" + input + "' can't be parsed as an Range");
+            }
+            function _parseStyleValue(style, property) {
+                var value = style.getPropertyValue(property);
+                var parsedValue = parseFloat(value);
+                if (parsedValue !== parsedValue) {
+                    return 0;
                 }
+                return parsedValue;
             }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
@@ -843,7 +807,7 @@ var Plottable;
                 this._svg.appendChild(this._measureRect);
             }
             ClientToSVGTranslator.getTranslator = function (elem) {
-                var svg = Utils.DOM.getBoundingSVG(elem);
+                var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
                 if (translator == null) {
                     translator = new ClientToSVGTranslator(svg);
@@ -1010,7 +974,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
@@ -3022,8 +2986,8 @@ var Plottable;
                         this._rootSVG.attr("height", "100%");
                     }
                     var elem = this._rootSVG.node();
-                    availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
-                    availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
+                    availableWidth = Plottable.Utils.DOM.elementWidth(elem);
+                    availableHeight = Plottable.Utils.DOM.elementHeight(elem);
                 }
                 else {
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
@@ -3163,7 +3127,7 @@ var Plottable;
             // They don't need the current URL in the clip path reference.
             var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
             prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-            var clipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var clipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
             this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
             var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
@@ -7013,7 +6977,7 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = Plottable.Utils.DOM.getBBox(selection);
+                var bbox = Plottable.Utils.DOM.elementBBox(selection);
                 var translatedBbox = {
                     x: bbox.x + translation[0],
                     y: bbox.y + translation[1],
@@ -7206,7 +7170,7 @@ var Plottable;
                     var secondaryDist = 0;
                     var plotPt = entity.position;
                     // if we're inside a bar, distance in both directions should stay 0
-                    var barBBox = Plottable.Utils.DOM.getBBox(entity.selection);
+                    var barBBox = Plottable.Utils.DOM.elementBBox(entity.selection);
                     if (!Plottable.Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                         var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -7234,7 +7198,7 @@ var Plottable;
             Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var barBBox = Plottable.Utils.DOM.getBBox(selection);
+                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
@@ -7263,7 +7227,7 @@ var Plottable;
             Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
                 var intersected = [];
                 this.entities().forEach(function (entity) {
-                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.elementBBox(entity.selection))) {
                         intersected.push(entity);
                     }
                 });
@@ -8359,7 +8323,7 @@ var Plottable;
              * @return {Dispatchers.Mouse}
              */
             Mouse.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Mouse._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Mouse(svg);
@@ -8534,7 +8498,7 @@ var Plottable;
              * @return {Dispatchers.Touch}
              */
             Touch.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Touch._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Touch(svg);

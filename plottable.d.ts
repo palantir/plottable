@@ -132,19 +132,17 @@ declare module Plottable {
              * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element: d3.Selection<any>): SVGRect;
-            var POLYFILL_TIMEOUT_MSEC: number;
-            function requestAnimationFramePolyfill(fn: () => any): void;
-            function isSelectionRemovedFromSVG(selection: d3.Selection<any>): boolean;
-            function getElementWidth(elem: Element): number;
-            function getElementHeight(elem: Element): number;
-            function getSVGPixelWidth(svg: d3.Selection<void>): number;
-            function translate(s: d3.Selection<any>): d3.Transform;
-            function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
+            function elementBBox(element: d3.Selection<any>): SVGRect;
+            var POLYFILL_TIMEOUT_MILLISECONDS: number;
+            function requestAnimationFramePolyfill(fn: () => void): void;
+            function elementWidth(element: Element): number;
+            function elementHeight(element: Element): number;
+            function translate(selection: d3.Selection<any>): d3.Transform;
+            function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
             function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
-            function getBoundingSVG(elem: SVGElement): SVGElement;
-            function getUniqueClipPathId(): string;
+            function boundingSVG(elem: SVGElement): SVGElement;
+            function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *

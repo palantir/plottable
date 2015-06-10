@@ -23,7 +23,7 @@ export module Dispatchers {
      * @return {Dispatchers.Mouse}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Mouse {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var dispatcher: Mouse = (<any> svg)[Mouse._DISPATCHER_KEY];
       if (dispatcher == null) {
