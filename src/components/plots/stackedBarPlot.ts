@@ -23,20 +23,6 @@ export module Plots {
       this._stackedExtent = [];
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
-      if (this._animate && this._animateOnNextRender) {
-        if (this.animator(key)) {
-          return this.animator(key);
-        } else if (key === "stacked-bar") {
-          var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
-          var scaledBaseline = primaryScale.scale(this.baselineValue());
-          return new Animators.MovingRect(scaledBaseline, this._isVertical);
-        }
-      }
-
-      return new Animators.Null();
-    }
-
     public x(): Plots.AccessorScaleBinding<X, number>;
     public x(x: number | Accessor<number>): StackedBar<X, Y>;
     public x(x: X | Accessor<X>, xScale: Scale<X, number>): StackedBar<X, Y>;
@@ -95,11 +81,6 @@ export module Plots {
 
       return attrToProjector;
     }
-
-    protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("stacked-bar")}];
-    }
-
     protected _onDatasetUpdate() {
       this._updateStackExtentsAndOffsets();
       super._onDatasetUpdate();

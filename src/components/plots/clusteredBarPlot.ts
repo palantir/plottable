@@ -49,15 +49,8 @@ export module Plots {
     private _makeInnerScale() {
       var innerScale = new Scales.Category();
       innerScale.domain(this.datasets().map((d, i) => String(i)));
-      if (!this._attrBindings.get("width")) {
-        innerScale.range([0, this._getBarPixelWidth()]);
-      } else {
-        var projection = this._attrBindings.get("width");
-        var accessor = projection.accessor;
-        var scale = projection.scale;
-        var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
-        innerScale.range([0, fn(null, 0, null)]);
-      }
+      var widthProjector = Plot._scaledAccessor(this.attr("width"));
+      innerScale.range([0, widthProjector(null, 0, null)]);
       return innerScale;
     }
 

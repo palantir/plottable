@@ -20,10 +20,12 @@ class MockAnimator implements Plottable.Animators.Plot {
   }
 }
 
-class MockDrawer extends Plottable.Drawer {
-  public _drawStep(step: Plottable.Drawers.AppliedDrawStep) {
-    step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
-  }
+function createMockDrawer(dataset: Plottable.Dataset) {
+  var drawer = new Plottable.Drawer(dataset);
+  (<any> drawer)._drawStep = (step: Plottable.Drawers.AppliedDrawStep) => {
+    step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
+  };
+  return drawer;
 }
 
 describe("Drawers", () => {
@@ -31,7 +33,7 @@ describe("Drawers", () => {
     var oldTimeout: any;
     var timings: number[] = [];
     var svg: d3.Selection<void>;
-    var drawer: MockDrawer;
+    var drawer: Plottable.Drawer;
     before(() => {
       oldTimeout = Plottable.Utils.Window.setTimeout;
       Plottable.Utils.Window.setTimeout = function(f: Function, time: number, ...args: any[]) {
@@ -47,7 +49,7 @@ describe("Drawers", () => {
     beforeEach(() => {
       timings = [];
       svg = TestMethods.generateSVG();
-      drawer = new MockDrawer(null);
+      drawer = createMockDrawer(null);
       drawer.renderArea(svg);
     });
 
@@ -101,6 +103,37 @@ describe("Drawers", () => {
       var selection = drawer.selectionForIndex(1);
       assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
       svg.remove();
+    });
+
+    it("totalDrawTime()", () => {
+      var svg = TestMethods.generateSVG(300, 300);
+      var drawer = new Plottable.Drawer(null);
+
+      var dataObjects = 9;
+      var stepDuration = 987;
+      var stepDelay = 133;
+      var startDelay = 245;
+
+      var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+
+      var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+
+      var attrToProjector: Plottable.AttributeToProjector = null;
+
+      var animator = new Plottable.Animators.Base();
+      animator.maxTotalDuration(Infinity);
+      animator.stepDuration(stepDuration);
+      animator.iterativeDelay(stepDelay);
+      animator.startDelay(startDelay);
+
+      var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];
+
+      var drawTime = drawer.totalDrawTime(data, mockDrawStep);
+
+      assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
+
+      svg.remove();
+
     });
   });
 });

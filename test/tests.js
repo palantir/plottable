@@ -89,17 +89,20 @@ var TestMethods;
     TestMethods.assertWidthHeight = assertWidthHeight;
     function assertEntitiesEqual(actual, expected, msg) {
         assert.deepEqual(actual.datum, expected.datum, msg + " (datum)");
-        assert.strictEqual(actual.index, expected.index, msg + " (index)");
-        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
-        assert.closeTo(actual.position.x, expected.position.x, 0.01, msg + " (position x)");
-        assert.closeTo(actual.position.y, expected.position.y, 0.01, msg + " (position y)");
-        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection contents)");
+        assertPointsClose(actual.position, expected.position, 0.01, msg);
+        assert.strictEqual(actual.selection.size(), expected.selection.size(), msg + " (selection length)");
         actual.selection[0].forEach(function (element, index) {
             assert.strictEqual(element, expected.selection[0][index], msg + " (selection contents)");
         });
-        assert.strictEqual(actual.plot, expected.plot, msg + " (plot)");
+        assert.strictEqual(actual.component, expected.component, msg + " (component)");
     }
     TestMethods.assertEntitiesEqual = assertEntitiesEqual;
+    function assertPlotEntitiesEqual(actual, expected, msg) {
+        assertEntitiesEqual(actual, expected, msg);
+        assert.strictEqual(actual.dataset, expected.dataset, msg + " (dataset)");
+        assert.strictEqual(actual.index, expected.index, msg + " (index)");
+    }
+    TestMethods.assertPlotEntitiesEqual = assertPlotEntitiesEqual;
     function makeLinearSeries(n) {
         function makePoint(x) {
             return { x: x, y: x };
@@ -304,12 +307,6 @@ after(function () {
 });
 
 ///<reference path="../testReference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
 var MockAnimator = (function () {
     function MockAnimator(time, callback) {
         this._time = time;
@@ -326,16 +323,13 @@ var MockAnimator = (function () {
     };
     return MockAnimator;
 })();
-var MockDrawer = (function (_super) {
-    __extends(MockDrawer, _super);
-    function MockDrawer() {
-        _super.apply(this, arguments);
-    }
-    MockDrawer.prototype._drawStep = function (step) {
-        step.animator.animate(this.renderArea(), step.attrToAppliedProjector);
+function createMockDrawer(dataset) {
+    var drawer = new Plottable.Drawer(dataset);
+    drawer._drawStep = function (step) {
+        step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
     };
-    return MockDrawer;
-})(Plottable.Drawer);
+    return drawer;
+}
 describe("Drawers", function () {
     describe("Abstract Drawer", function () {
         var oldTimeout;
@@ -359,7 +353,7 @@ describe("Drawers", function () {
         beforeEach(function () {
             timings = [];
             svg = TestMethods.generateSVG();
-            drawer = new MockDrawer(null);
+            drawer = createMockDrawer(null);
             drawer.renderArea(svg);
         });
         afterEach(function () {
@@ -410,6 +404,26 @@ describe("Drawers", function () {
             assert.strictEqual(selection.node(), circles[0][1], "correct selection gotten");
             svg.remove();
         });
+        it("totalDrawTime()", function () {
+            var svg = TestMethods.generateSVG(300, 300);
+            var drawer = new Plottable.Drawer(null);
+            var dataObjects = 9;
+            var stepDuration = 987;
+            var stepDelay = 133;
+            var startDelay = 245;
+            var expectedAnimationDuration = startDelay + (dataObjects - 1) * stepDelay + stepDuration;
+            var data = Plottable.Utils.Array.createFilledArray({}, dataObjects);
+            var attrToProjector = null;
+            var animator = new Plottable.Animators.Base();
+            animator.maxTotalDuration(Infinity);
+            animator.stepDuration(stepDuration);
+            animator.iterativeDelay(stepDelay);
+            animator.startDelay(startDelay);
+            var mockDrawStep = [{ attrToProjector: attrToProjector, animator: animator }];
+            var drawTime = drawer.totalDrawTime(data, mockDrawStep);
+            assert.strictEqual(drawTime, expectedAnimationDuration, "Total Draw time");
+            svg.remove();
+        });
     });
 });
 
@@ -435,6 +449,126 @@ describe("Drawers", function () {
                 assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
             });
             svg.remove();
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Animators", function () {
+    describe("BaseAnimator", function () {
+        describe("Time computations", function () {
+            it("totalTime() defaults", function () {
+                var iterationSteps = 10;
+                var startDelay = Plottable.Animators.Base.DEFAULT_START_DELAY_MILLISECONDS;
+                var stepDuration = Plottable.Animators.Base.DEFAULT_STEP_DURATION_MILLISECONDS;
+                var iterativeDelay = Plottable.Animators.Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                var expectedTotalTime = startDelay + (iterationSteps - 1) * iterativeDelay + stepDuration;
+                var animator = new Plottable.Animators.Base();
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Formula for calculating total time should work");
+            });
+            it("totalTime() takes setters into account", function () {
+                var iterationSteps = 17;
+                var startDelay = 135;
+                var stepDuration = 453;
+                var iterativeDelay = 265;
+                var expectedTotalTime = startDelay + (iterationSteps - 1) * iterativeDelay + stepDuration;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Setters should work");
+            });
+            it("maxTotalDuration() with many steps", function () {
+                var iterationSteps = 10000;
+                var startDelay = 0;
+                var stepDuration = 100;
+                var iterativeDelay = 1000;
+                var expectedTotalTime = 2000;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                animator.maxTotalDuration(expectedTotalTime);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Animation should not exceed the maxTotalDuration time constraint when presented with lots of iteration steps");
+            });
+            it("maxTotalDuration() long steps", function () {
+                var iterationSteps = 2;
+                var startDelay = 0;
+                var stepDuration = 10000;
+                var iterativeDelay = 100;
+                var expectedTotalTime = 2000;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                animator.maxTotalDuration(expectedTotalTime);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Animation should not exceed the maxTotalDuration time constraint when step duration set too high");
+            });
+            it("maxTotalDuration() is just a constraint", function () {
+                var iterationSteps = 2;
+                var startDelay = 0;
+                var stepDuration = 100;
+                var iterativeDelay = 100;
+                var maxTotalDuration = 5000;
+                var expectedTotalTime = 200;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                animator.maxTotalDuration(maxTotalDuration);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "The total duration constraint is just an upper bound");
+            });
+            it("maxTotalDuration() edge case for 1 step", function () {
+                var iterationSteps = 1;
+                var startDelay = 0;
+                var stepDuration = 333;
+                var iterativeDelay = 432;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, stepDuration, "The total time is just the time for one step");
+            });
+            it("maxTotalDuration() edge case for 1 step and startDelay", function () {
+                var iterationSteps = 1;
+                var startDelay = 213;
+                var stepDuration = 333;
+                var iterativeDelay = 432;
+                var expectedTotalTime = startDelay + stepDuration;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                var actualTotalTime = animator.totalTime(iterationSteps);
+                assert.strictEqual(actualTotalTime, expectedTotalTime, "Total time is the time for one step, plus waiting for the start delay");
+            });
+            it("_getAdjustedIterativeDelay() works with maxTotalDuration constraint", function () {
+                var iterationSteps = 2;
+                var startDelay = 0;
+                var stepDuration = 1000;
+                var iterativeDelay = 1000000;
+                var maxTotalDuration = 1500;
+                var animator = new Plottable.Animators.Base();
+                animator.startDelay(startDelay);
+                animator.stepDuration(stepDuration);
+                animator.iterativeDelay(iterativeDelay);
+                animator.maxTotalDuration(maxTotalDuration);
+                var expectedIterativeDelay = 500;
+                // 1 |  ###########
+                // 2 |       ###########
+                //   +------------------------
+                //   |  |    |    |    |    |
+                //     0.0  0.5  1.0  1.5  2.0
+                var actualIterativeDelay = animator._getAdjustedIterativeDelay(iterationSteps);
+                assert.strictEqual(actualIterativeDelay, expectedIterativeDelay, "The total duration constraint is just an upper bound");
+            });
         });
     });
 });
@@ -1562,6 +1696,7 @@ describe("Legend", function () {
     var color;
     var legend;
     var entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
+    var symbolSelector = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
     var rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
     beforeEach(function () {
         svg = TestMethods.generateSVG(400, 400);
@@ -1585,7 +1720,7 @@ describe("Legend", function () {
     });
     it("legend domain can be updated after initialization, and height updates as well", function () {
         legend.renderTo(svg);
-        legend.scale(color);
+        legend.colorScale(color);
         assert.strictEqual(legend.requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
         color.domain(["foo", "bar"]);
         var height1 = legend.requestedSpace(400, 400).minHeight;
@@ -1652,7 +1787,7 @@ describe("Legend", function () {
         var newDomain = ["a", "b", "c"];
         var newColorScale = new Plottable.Scales.Color("20");
         newColorScale.domain(newDomain);
-        legend.scale(newColorScale);
+        legend.colorScale(newColorScale);
         legend._content.selectAll(entrySelector).each(function (d, i) {
             assert.strictEqual(d, newDomain[i], "the data is set correctly");
             var text = d3.select(this).select("text").text();
@@ -1668,7 +1803,7 @@ describe("Legend", function () {
         var tempDomain = ["a", "b", "c"];
         var newColorScale = new Plottable.Scales.Color("20");
         newColorScale.domain(tempDomain);
-        legend.scale(newColorScale);
+        legend.colorScale(newColorScale);
         var newDomain = ["a", "foo", "d"];
         newColorScale.domain(newDomain);
         legend._content.selectAll(entrySelector).each(function (d, i) {
@@ -1744,23 +1879,81 @@ describe("Legend", function () {
         assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth, "won't settle for less width if entries would be truncated");
         svg.remove();
     });
-    it("getEntry() retrieves the correct entry for vertical legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(1);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 10, y: 30 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 10, y: 150 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
-    });
-    it("getEntry() retrieves the correct entry for horizontal legends", function () {
-        color.domain(["AA", "BB", "CC"]);
-        legend.maxEntriesPerRow(Infinity);
-        legend.renderTo(svg);
-        assert.deepEqual(legend.getEntry({ x: 10, y: 10 }).data(), ["AA"], "get first entry");
-        assert.deepEqual(legend.getEntry({ x: 50, y: 10 }).data(), ["BB"], "get second entry");
-        assert.strictEqual(legend.getEntry({ x: 150, y: 10 }).size(), 0, "no entries at location outside legend");
-        svg.remove();
+    describe("entitiesAt()", function () {
+        function computeExpectedSymbolPosition(legend, rowIndex, entryIndexWithinRow) {
+            var row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
+            var entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
+            var symbol = entry.select(symbolSelector);
+            var rowTranslate = d3.transform(row.attr("transform")).translate;
+            var entryTranslate = d3.transform(entry.attr("transform")).translate;
+            var symbolTranslate = d3.transform(symbol.attr("transform")).translate;
+            return {
+                x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
+                y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
+            };
+        }
+        it("gets Entities representing the entry at a particular point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(legend, 0, 0),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 10, y: 30 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(legend, 1, 0),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            legend.detach();
+            entities = legend.entitiesAt({ x: 10, y: 10 });
+            assert.lengthOf(entities, 0, "returns no Entities if not anchored");
+            svg.remove();
+        });
+        it("gets Entities representing the entry at a particular point (maxEntriesPerRow > 1)", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.maxEntriesPerRow(Infinity);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: 10, y: 10 });
+            var entries = legend.content().selectAll(entrySelector);
+            var expectedEntity = {
+                datum: "AA",
+                index: 0,
+                position: computeExpectedSymbolPosition(legend, 0, 0),
+                selection: d3.select(entries[0][0]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to first entry");
+            entities = legend.entitiesAt({ x: 50, y: 10 });
+            expectedEntity = {
+                datum: "BB",
+                index: 1,
+                position: computeExpectedSymbolPosition(legend, 0, 1),
+                selection: d3.select(entries[0][1]),
+                component: legend
+            };
+            TestMethods.assertEntitiesEqual(entities[0], expectedEntity, "returned Entity corresponding to second entry");
+            svg.remove();
+        });
+        it("returns an empty array if no Entitites are present at that point", function () {
+            var domain = ["AA", "BB", "CC"];
+            color.domain(domain);
+            legend.renderTo(svg);
+            var entities = legend.entitiesAt({ x: -100, y: -100 });
+            assert.lengthOf(entities, 0, "no Entities returned if there are no entries at that point");
+            svg.remove();
+        });
     });
     it("comparator() works as expected", function () {
         var newDomain = ["F", "E", "D", "C", "B", "A"];
@@ -2253,11 +2446,6 @@ describe("Plots", function () {
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
             var mockDrawer = new Plottable.Drawer(dataset);
-            var renderArea = svg.append("g");
-            var circles = renderArea.selectAll("circles").data(data);
-            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
-            circles.exit().remove();
-            mockDrawer.setup = function () { return mockDrawer._renderArea = renderArea; };
             mockDrawer.selector = function () { return "circle"; };
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
@@ -2266,9 +2454,19 @@ describe("Plots", function () {
             plot._getDrawer = function () { return mockDrawer; };
             plot.addDataset(dataset);
             plot.renderTo(svg);
+            // replace the renderArea with our own
+            var renderArea = svg.append("g");
+            var dataToPlot = data.filter(function (datum) { return Plottable.Utils.Math.isValidNumber(datum.value); });
+            var circles = renderArea.selectAll("circles").data(dataToPlot);
+            circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+            circles.exit().remove();
+            mockDrawer.renderArea(renderArea);
             var entities = plot.entities();
             assert.lengthOf(entities, 2, "returns Entities for all valid data values");
-            entities.forEach(function (entity) {
+            entities.forEach(function (entity, loopIndex) {
+                assert.strictEqual(entity.datum, data[entity.index], "entity carries the correct data");
+                // use loopIndex because there is no entity for the invalid datum
+                assert.strictEqual(circles[0][loopIndex], entity.selection.node(), "entity's selection is correct");
                 assert.isNumber(entity.position.x, "position X cannot be NaN");
                 assert.isNumber(entity.position.y, "position Y cannot be NaN");
             });
@@ -2388,7 +2586,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("additionalPaint timing works properly", function () {
-            var animator = new Plottable.Animators.Base().delay(10).duration(10).maxIterativeDelay(0);
+            var animator = new Plottable.Animators.Base().startDelay(10).stepDuration(10).iterativeDelay(0);
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();
@@ -2960,24 +3158,24 @@ describe("Plots", function () {
                     dataset: dataset2,
                     position: d0Px,
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if above a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
                 closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if below a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a point, it is closest");
                 closest = linePlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
-                TestMethods.assertEntitiesEqual(closest, expected, "if right of a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a point, it is closest");
                 expected = {
                     datum: d1,
                     index: 1,
                     dataset: dataset2,
                     position: d1Px,
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 closest = linePlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
-                TestMethods.assertEntitiesEqual(closest, expected, "if left of a point, it is closest");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a point, it is closest");
                 svg.remove();
             });
             it("considers only in-view points", function () {
@@ -2991,10 +3189,10 @@ describe("Plots", function () {
                         y: yScale.scale(yAccessor(d1))
                     },
                     selection: d3.selectAll([lines[0][1]]),
-                    plot: linePlot
+                    component: linePlot
                 };
                 var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
-                TestMethods.assertEntitiesEqual(closest, expected, "only in-view points are considered");
+                TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
                 svg.remove();
             });
             it("returns undefined if no Entities are visible", function () {
@@ -3358,28 +3556,28 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d0Px,
                         selection: d3.selectAll([bars[0][0]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y - 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: 0, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if to the right of the first bar, it is closest");
                     expected = {
                         datum: d1,
                         index: 1,
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y - 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
                     closest = barPlot.entityNearest({ x: d1Px.x, y: d1Px.y + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if below a negative bar, it is closest");
                     svg.remove();
                 });
                 it("considers only in-view bars", function () {
@@ -3395,10 +3593,10 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "nearest Entity is the visible one");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "nearest Entity is the visible one");
                     svg.remove();
                 });
                 it("returns undefined if no Entities are visible", function () {
@@ -3665,28 +3863,28 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d0Px,
                         selection: d3.selectAll([bars[0][0]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: d0Px.x - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x + 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if right of a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a positive bar, it is closest");
                     closest = barPlot.entityNearest({ x: d0Px.x, y: 0 });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if above the first bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if above the first bar, it is closest");
                     expected = {
                         datum: d1,
                         index: 1,
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     closest = barPlot.entityNearest({ x: d1Px.x + 1, y: d1Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if inside a negative bar, it is closest");
                     closest = barPlot.entityNearest({ x: d1Px.x - 1, y: d1Px.y });
-                    TestMethods.assertEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
+                    TestMethods.assertPlotEntitiesEqual(closest, expected, "if left of a negative bar, it is closest");
                     svg.remove();
                 });
                 it("considers only in-view bars", function () {
@@ -3703,10 +3901,10 @@ describe("Plots", function () {
                         dataset: dataset,
                         position: d1Px,
                         selection: d3.selectAll([bars[0][1]]),
-                        plot: barPlot
+                        component: barPlot
                     };
                     var closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
-                    TestMethods.assertEntitiesEqual(expected, closest, "closest plot data is on-plot data");
+                    TestMethods.assertPlotEntitiesEqual(expected, closest, "closest plot data is on-plot data");
                     svg.remove();
                 });
             });
@@ -3747,14 +3945,14 @@ describe("Plots", function () {
             it("bar labels hide if bars too skinny", function () {
                 plot.labelsEnabled(true);
                 plot.renderTo(svg);
-                plot.labelFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
+                plot.labelsFormatter(function (n) { return n.toString() + (n === 12345 ? "looong" : ""); });
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 0, "no text drawn");
                 svg.remove();
             });
             it("formatters are used properly", function () {
                 plot.labelsEnabled(true);
-                plot.labelFormatter(function (n) { return n.toString() + "%"; });
+                plot.labelsFormatter(function (n) { return n.toString() + "%"; });
                 plot.renderTo(svg);
                 var texts = svg.selectAll("text")[0].map(function (n) { return d3.select(n).text(); });
                 assert.lengthOf(texts, 2, "both texts drawn");
@@ -4175,10 +4373,10 @@ describe("Plots", function () {
                 dataset: dataset,
                 position: d0Px,
                 selection: d3.selectAll([points[0][0]]),
-                plot: plot
+                component: plot
             };
             var closest = plot.entityNearest({ x: d0Px.x + 1, y: d0Px.y + 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "it selects the closest data point");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "it selects the closest data point");
             yScale.domain([0, 1.9]);
             var d1 = dataset.data()[1];
             var d1Px = {
@@ -4191,10 +4389,10 @@ describe("Plots", function () {
                 dataset: dataset,
                 position: d1Px,
                 selection: d3.selectAll([points[0][1]]),
-                plot: plot
+                component: plot
             };
             closest = plot.entityNearest({ x: d1Px.x, y: 0 });
-            TestMethods.assertEntitiesEqual(closest, expected, "it ignores off-plot data points");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "it ignores off-plot data points");
             svg.remove();
         });
         it("correctly handles NaN and undefined x and y values", function () {
@@ -5197,20 +5395,20 @@ describe("Plots", function () {
                 dataset: dataset1,
                 position: d0Px,
                 selection: d3.selectAll([bars[0][0]]),
-                plot: renderer
+                component: renderer
             };
             var closest = renderer.entityNearest({ x: 0, y: d0Px.y + 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "bottom bar is closest when within its range");
             expected = {
                 datum: d1,
                 index: 0,
                 dataset: dataset2,
                 position: d1Px,
                 selection: d3.selectAll([bars[0][2]]),
-                plot: renderer
+                component: renderer
             };
             closest = renderer.entityNearest({ x: 0, y: d0Px.y - 1 });
-            TestMethods.assertEntitiesEqual(closest, expected, "top bar is closest when within its range");
+            TestMethods.assertPlotEntitiesEqual(closest, expected, "top bar is closest when within its range");
             svg.remove();
         });
     });
