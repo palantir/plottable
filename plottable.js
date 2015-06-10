@@ -3510,16 +3510,14 @@ var Plottable;
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        function Axis(scale, orientation, formatter) {
+        function Axis(scale, orientation) {
             var _this = this;
-            if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
             _super.call(this);
             this._endTickLength = 5;
             this._tickLength = 5;
             this._tickLabelPadding = 10;
-            this._gutter = 15;
+            this._margin = 15;
             this._showEndTickLabels = false;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
@@ -3534,7 +3532,7 @@ var Plottable;
             else {
                 this.classed("y-axis", true);
             }
-            this.formatter(formatter);
+            this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
@@ -3562,13 +3560,13 @@ var Plottable;
                 if (this._computedHeight == null) {
                     this._computeHeight();
                 }
-                requestedHeight = this._computedHeight + this._gutter;
+                requestedHeight = this._computedHeight + this._margin;
             }
             else {
                 if (this._computedWidth == null) {
                     this._computeWidth();
                 }
-                requestedWidth = this._computedWidth + this._gutter;
+                requestedWidth = this._computedWidth + this._margin;
             }
             return {
                 minWidth: requestedWidth,
@@ -3705,7 +3703,7 @@ var Plottable;
             }
         };
         Axis.prototype.formatter = function (formatter) {
-            if (formatter === undefined) {
+            if (formatter == null) {
                 return this._formatter;
             }
             this._formatter = formatter;
@@ -3759,15 +3757,15 @@ var Plottable;
                 return this;
             }
         };
-        Axis.prototype.gutter = function (size) {
+        Axis.prototype.margin = function (size) {
             if (size == null) {
-                return this._gutter;
+                return this._margin;
             }
             else {
                 if (size < 0) {
-                    throw new Error("gutter size must be positive");
+                    throw new Error("margin size must be positive");
                 }
-                this._gutter = size;
+                this._margin = size;
                 this.redraw();
                 return this;
             }
@@ -4271,12 +4269,11 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
-                _super.call(this, scale, orientation, formatter);
+            function Numeric(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
+                this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4327,7 +4324,7 @@ var Plottable;
                 }
                 if (!this._isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
-                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
                         this.redraw();
                         return;
                     }
@@ -4579,11 +4576,9 @@ var Plottable;
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
-            function Category(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
-                _super.call(this, scale, orientation, formatter);
+            function Category(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
                 this.classed("category-axis", true);
             }
@@ -4597,8 +4592,8 @@ var Plottable;
                 return this.redraw();
             };
             Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
                         minWidth: 0,
