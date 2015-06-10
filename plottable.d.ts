@@ -1944,10 +1944,10 @@ declare module Plottable {
             /**
              * Sets the maximum number of entries perrow.
              *
-             * @param {number} numEntries
+             * @param {number} maxEntriesPerRow
              * @returns {Legend} The calling Legend.
              */
-            maxEntriesPerRow(numEntries: number): Legend;
+            maxEntriesPerRow(maxEntriesPerRow: number): Legend;
             /**
              * Gets the current comparator for the Legend's entries.
              *

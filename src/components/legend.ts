@@ -69,15 +69,15 @@ export module Components {
     /**
      * Sets the maximum number of entries perrow.
      *
-     * @param {number} numEntries
+     * @param {number} maxEntriesPerRow
      * @returns {Legend} The calling Legend.
      */
-    public maxEntriesPerRow(numEntries: number): Legend;
-    public maxEntriesPerRow(numEntries?: number): any {
-      if (numEntries == null) {
+    public maxEntriesPerRow(maxEntriesPerRow: number): Legend;
+    public maxEntriesPerRow(maxEntriesPerRow?: number): any {
+      if (maxEntriesPerRow == null) {
         return this._maxEntriesPerRow;
       } else {
-        this._maxEntriesPerRow = numEntries;
+        this._maxEntriesPerRow = maxEntriesPerRow;
         this.redraw();
         return this;
       }
