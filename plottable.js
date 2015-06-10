@@ -1771,7 +1771,7 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Linear.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Linear._DEFAULT_NUM_TICKS);
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
@@ -1886,7 +1886,7 @@ var Plottable;
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 }
                 return ticks;
             };
@@ -1933,7 +1933,7 @@ var Plottable;
                 var adjustedLower = this._adjustedLog(lower);
                 var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
+                var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
             };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
@@ -1964,7 +1964,7 @@ var Plottable;
                 this._d3Scale.range(values);
             };
             ModifiedLog.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2274,7 +2274,7 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Time.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
             };
             Time.prototype._niceDomain = function (domain) {
                 return this._d3Scale.copy().domain(domain).nice().domain();
@@ -2325,16 +2325,11 @@ var Plottable;
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @constructor
-             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-             *   ("#FFFFFF") or keywords ("white").
              * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
-            function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
+            function InterpolatedColor(scaleType) {
                 if (scaleType === void 0) { scaleType = "linear"; }
                 _super.call(this);
-                this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
                         this._colorScale = d3.scale.linear();
@@ -2352,7 +2347,7 @@ var Plottable;
                 if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                this._d3Scale = this._d3InterpolatedScale();
+                this.range(InterpolatedColor.REDS);
             }
             InterpolatedColor.prototype.extentOfValues = function (values) {
                 var extent = d3.extent(values);
@@ -2392,14 +2387,6 @@ var Plottable;
                     };
                 };
             };
-            InterpolatedColor.prototype.colorRange = function (colorRange) {
-                if (colorRange == null) {
-                    return this._colorRange;
-                }
-                this._colorRange = colorRange;
-                this._resetScale();
-                return this;
-            };
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = this._d3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
@@ -2423,10 +2410,11 @@ var Plottable;
                 this._d3Scale.domain(values);
             };
             InterpolatedColor.prototype._getRange = function () {
-                return this.colorRange();
+                return this._colorRange;
             };
-            InterpolatedColor.prototype._setRange = function (values) {
-                this.colorRange(values);
+            InterpolatedColor.prototype._setRange = function (range) {
+                this._colorRange = range;
+                this._resetScale();
             };
             InterpolatedColor.REDS = [
                 "#FFFFFF",

@@ -49,7 +49,7 @@ export module Scales {
     }
 
     public defaultTicks(): number[] {
-      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+      return this._d3Scale.ticks(Scales.Linear._DEFAULT_NUM_TICKS);
     }
 
     protected _niceDomain(domain: number[], count?: number): number[] {

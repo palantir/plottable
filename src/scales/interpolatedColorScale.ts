@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Scales {
-  type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>
+  type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;
 
   export class InterpolatedColor extends Scale<number, string> {
     public static REDS = [
@@ -53,14 +53,10 @@ export module Scales {
     /**
      * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
      *
-     * @constructor
-     * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-     *   ("#FFFFFF") or keywords ("white").
      * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
      */
-    constructor(colorRange = InterpolatedColor.REDS, scaleType = "linear") {
+    constructor(scaleType = "linear") {
       super();
-      this._colorRange = colorRange;
       switch (scaleType) {
         case "linear":
           this._colorScale = d3.scale.linear<number, string>();
@@ -78,7 +74,7 @@ export module Scales {
       if (this._colorScale == null) {
         throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
-      this._d3Scale = this._d3InterpolatedScale();
+      this.range(InterpolatedColor.REDS);
     }
 
     public extentOfValues(values: number[]): number[] {
@@ -122,28 +118,6 @@ export module Scales {
       };
     }
 
-    /**
-     * Gets the color range.
-     *
-     * @returns {string[]}
-     */
-    public colorRange(): string[];
-    /**
-     * Sets the color range.
-     *
-     * @param {string[]} colorRange
-     * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
-     */
-    public colorRange(colorRange: string[]): InterpolatedColor;
-    public colorRange(colorRange?: string[]): any {
-      if (colorRange == null) {
-        return this._colorRange;
-      }
-      this._colorRange = colorRange;
-      this._resetScale();
-      return this;
-    }
-
     private _resetScale(): any {
       this._d3Scale = this._d3InterpolatedScale();
       this._autoDomainIfAutomaticMode();
@@ -172,11 +146,12 @@ export module Scales {
     }
 
     protected _getRange() {
-      return this.colorRange();
+      return this._colorRange;
     }
 
-    protected _setRange(values: string[]) {
-      this.colorRange(values);
+    protected _setRange(range: string[]) {
+      this._colorRange = range;
+      this._resetScale();
     }
   }
 }
