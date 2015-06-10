@@ -2330,7 +2330,6 @@ var Plottable;
             function InterpolatedColor(scaleType) {
                 if (scaleType === void 0) { scaleType = "linear"; }
                 _super.call(this);
-                this._colorRange = InterpolatedColor.REDS;
                 switch (scaleType) {
                     case "linear":
                         this._colorScale = d3.scale.linear();
@@ -2348,7 +2347,7 @@ var Plottable;
                 if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                this._d3Scale = this._d3InterpolatedScale();
+                this.range(InterpolatedColor.REDS);
             }
             InterpolatedColor.prototype.extentOfValues = function (values) {
                 var extent = d3.extent(values);

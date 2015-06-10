@@ -57,7 +57,6 @@ export module Scales {
      */
     constructor(scaleType = "linear") {
       super();
-      this._colorRange = InterpolatedColor.REDS;
       switch (scaleType) {
         case "linear":
           this._colorScale = d3.scale.linear<number, string>();
@@ -75,7 +74,7 @@ export module Scales {
       if (this._colorScale == null) {
         throw new Error("unknown QuantitativeScale scale type " + scaleType);
       }
-      this._d3Scale = this._d3InterpolatedScale();
+      this.range(InterpolatedColor.REDS);
     }
 
     public extentOfValues(values: number[]): number[] {
