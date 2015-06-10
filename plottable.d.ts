@@ -3098,18 +3098,18 @@ declare module Plottable {
              */
             maxTotalDuration(maxTotalDuration: number): Base;
             /**
-             * Gets the current easing function of the animation.
+             * Gets the current easing mode of the animation.
              *
-             * @returns {string} the current easing function.
+             * @returns {string} the current easing mode.
              */
-            easingFunction(): string;
+            easingMode(): string;
             /**
-             * Sets the easing function of the animation.
+             * Sets the easing mode of the animation.
              *
-             * @param {string} easingFunction The desired easing function.
+             * @param {string} easingMode The desired easing mode.
              * @returns {Base} The calling Base Animator.
              */
-            easingFunction(easingFunction: string): Base;
+            easingMode(easingMode: string): Base;
         }
     }
 }

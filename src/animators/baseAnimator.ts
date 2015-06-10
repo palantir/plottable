@@ -44,7 +44,7 @@ export module Animators {
     private _stepDuration: number;
     private _stepDelay: number;
     private _maxTotalDuration: number;
-    private _easingFunction: string;
+    private _easingMode: string;
 
     /**
      * Constructs the default animator
@@ -56,7 +56,7 @@ export module Animators {
       this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
       this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easingFunction = Base.DEFAULT_EASING_MODE;
+      this._easingMode = Base.DEFAULT_EASING_MODE;
     }
 
     public totalTime(numberOfSteps: number) {
@@ -69,7 +69,7 @@ export module Animators {
       var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
       return selection.transition()
-        .ease(this.easingFunction())
+        .ease(this.easingMode())
         .duration(this.stepDuration())
         .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
         .attr(attrToAppliedProjector);
@@ -164,23 +164,23 @@ export module Animators {
     }
 
     /**
-     * Gets the current easing function of the animation.
+     * Gets the current easing mode of the animation.
      *
-     * @returns {string} the current easing function.
+     * @returns {string} the current easing mode.
      */
-    public easingFunction(): string;
+    public easingMode(): string;
     /**
-     * Sets the easing function of the animation.
+     * Sets the easing mode of the animation.
      *
-     * @param {string} easingFunction The desired easing function.
+     * @param {string} easingMode The desired easing mode.
      * @returns {Base} The calling Base Animator.
      */
-    public easingFunction(easingFunction: string): Base;
-    public easingFunction(easingFunction?: string): any {
-      if (easingFunction == null) {
-        return this._easingFunction;
+    public easingMode(easingMode: string): Base;
+    public easingMode(easingMode?: string): any {
+      if (easingMode == null) {
+        return this._easingMode;
       } else {
-        this._easingFunction = easingFunction;
+        this._easingMode = easingMode;
         return this;
       }
     }
