@@ -20,7 +20,7 @@ function run(svg, data, Plottable) {
     var animator = new Plottable.Animators.Easing();
         animator.stepDuration(1000);
         animator.maxTotalDuration(2000);
-        animator.iterativeDelay(100);
+        animator.stepDelay(100);
 
 
     var vbar = new Plottable.Plots.Bar()
