@@ -64,7 +64,7 @@ export module Utils {
       return selection;
     }
 
-    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
+    export function clientRectOverlap(boxA: ClientRect, boxB: ClientRect) {
       if (boxA.right < boxB.left) { return false; }
       if (boxA.left > boxB.right) { return false; }
       if (boxA.bottom < boxB.top) { return false; }

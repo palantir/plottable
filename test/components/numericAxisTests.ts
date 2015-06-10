@@ -163,14 +163,14 @@ describe("NumericAxis", () => {
                                 return d3.select(this).style("visibility") === "visible";
                               });
     var numLabels = visibleTickLabels[0].length;
-    var box1: ClientRect;
-    var box2: ClientRect;
+    var clientRect1: ClientRect;
+    var clientRect2: ClientRect;
     for (var i = 0; i < numLabels; i++) {
       for (var j = i + 1; j < numLabels; j++) {
-        box1 = visibleTickLabels[0][i].getBoundingClientRect();
-        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+        clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
+        clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
       }
     }
 
@@ -183,10 +183,10 @@ describe("NumericAxis", () => {
     numLabels = visibleTickLabels[0].length;
     for (i = 0; i < numLabels; i++) {
       for (j = i + 1; j < numLabels; j++) {
-        box1 = visibleTickLabels[0][i].getBoundingClientRect();
-        box2 = visibleTickLabels[0][j].getBoundingClientRect();
+        clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
+        clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
       }
     }
 
@@ -419,11 +419,11 @@ describe("NumericAxis", () => {
         });
 
     tickLabels.each(function() {
-      var tickLabelBox = this.getBoundingClientRect();
+      var tickLabelRect = this.getBoundingClientRect();
 
       tickMarks.each(function() {
-        var tickMarkBox = this.getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox),
+        var tickMarkRect = this.getBoundingClientRect();
+          assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect),
             "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
       });
     });

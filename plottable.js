@@ -315,7 +315,7 @@ var Plottable;
                 return selection;
             }
             DOM.translate = translate;
-            function boxesOverlap(boxA, boxB) {
+            function clientRectOverlap(boxA, boxB) {
                 if (boxA.right < boxB.left) {
                     return false;
                 }
@@ -330,7 +330,7 @@ var Plottable;
                 }
                 return true;
             }
-            DOM.boxesOverlap = boxesOverlap;
+            DOM.clientRectOverlap = clientRectOverlap;
             function boxIsInside(inner, outer) {
                 return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
             }
@@ -4119,7 +4119,7 @@ var Plottable;
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {

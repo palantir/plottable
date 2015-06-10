@@ -142,9 +142,9 @@ describe("Category Axes", () => {
 
     function verifyTickLabelOverlaps(tickLabels: d3.Selection<void>, tickMarks: d3.Selection<void>) {
         for (var i = 0; i < tickLabels[0].length; i++) {
-          var tickLabelBox = (<Element> tickLabels[0][i]).getBoundingClientRect();
-          var tickMarkBox = (<Element> tickMarks[0][i]).getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
+          var tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
+          var tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
+          assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
         }
     }
 
