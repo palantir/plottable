@@ -4,22 +4,20 @@ Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module unless amdModuleId is set
-    define([], function () {
-      return (root['Plottable'] = factory());
-    });
-  } else if (typeof exports === 'object') {
-    // Node. Does not work with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory();
-  } else {
-    root['Plottable'] = factory();
-  }
-}(this, function () {
-
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -10813,5 +10811,4 @@ var SVGTypewriter;
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 return Plottable;
-
 }));
