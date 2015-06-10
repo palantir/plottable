@@ -24,13 +24,13 @@ module Plottable {
         var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Stacked.populateMap(domainKeys, (domainKey) => {
+          return Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
         var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Stacked.populateMap(domainKeys, (domainKey) => {
+          return Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
           });
         });
@@ -123,7 +123,7 @@ module Plottable {
           domainKeys: string[]) {
 
         var dataMapArray = datasets.map(() => {
-          return Stacked.populateMap(domainKeys, (domainKey) => {
+          return Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: 0 };
           });
         });
@@ -184,7 +184,7 @@ module Plottable {
        * @param {(string, number) => T} transform A transformation function to apply to the keys.
        * @return {d3.Map<T>} A map mapping keys to their transformed values.
        */
-      private static populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
+      private static _populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
         var map = d3.map<T>();
         keys.forEach((key: string, i: number) => {
           map.set(key, transform(key, i));

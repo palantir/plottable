@@ -19,8 +19,8 @@ describe("Interactions", () => {
       var bCallbackCalled = false;
       var bCallback = () => bCallbackCalled = true;
 
-      keyInteraction.onKey(aCode, aCallback);
-      keyInteraction.onKey(bCode, bCallback);
+      keyInteraction.onKeyPress(aCode, aCallback);
+      keyInteraction.onKeyPress(bCode, bCallback);
       keyInteraction.attachTo(component);
 
       var $target = $(component.background().node());
@@ -58,7 +58,7 @@ describe("Interactions", () => {
         assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
       };
 
-      keyInteraction.onKey(bCode, bCallback);
+      keyInteraction.onKeyPress(bCode, bCallback);
 
       keyInteraction.attachTo(component);
 
@@ -83,7 +83,7 @@ describe("Interactions", () => {
         var aCallbackCalled = false;
         var aCallback = () => aCallbackCalled = true;
 
-        keyInteraction.onKey(aCode, aCallback);
+        keyInteraction.onKeyPress(aCode, aCallback);
 
         keyInteraction.attachTo(component);
 
@@ -93,12 +93,12 @@ describe("Interactions", () => {
         $target.simulate("keydown", { keyCode: aCode });
         assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
 
-        keyInteraction.offKey(aCode, aCallback);
+        keyInteraction.offKeyPress(aCode, aCallback);
         aCallbackCalled = false;
         $target.simulate("keydown", { keyCode: aCode });
         assert.isFalse(aCallbackCalled, "callback for \"a\" was disconnected from the interaction");
 
-        keyInteraction.onKey(aCode, aCallback);
+        keyInteraction.onKeyPress(aCode, aCallback);
         $target.simulate("keydown", { keyCode: aCode });
         assert.isTrue(aCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
 
@@ -119,8 +119,8 @@ describe("Interactions", () => {
         var aCallback2Called = false;
         var aCallback2 = () => aCallback2Called = true;
 
-        keyInteraction.onKey(aCode, aCallback1);
-        keyInteraction.onKey(aCode, aCallback2);
+        keyInteraction.onKeyPress(aCode, aCallback1);
+        keyInteraction.onKeyPress(aCode, aCallback2);
         keyInteraction.attachTo(component);
 
         var $target = $(component.background().node());
@@ -130,7 +130,7 @@ describe("Interactions", () => {
         assert.isTrue(aCallback1Called, "callback 1 for \"a\" was called when \"a\" key was pressed");
         assert.isTrue(aCallback1Called, "callback 2 for \"b\" was called when \"a\" key was pressed");
 
-        keyInteraction.offKey(aCode, aCallback1);
+        keyInteraction.offKeyPress(aCode, aCallback1);
         aCallback1Called = false;
         aCallback2Called = false;
         $target.simulate("keydown", { keyCode: aCode });

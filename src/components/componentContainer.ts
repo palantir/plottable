@@ -15,7 +15,7 @@ module Plottable {
 
     public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
-      this._forEach((c) => c.anchor(this._content));
+      this._forEach((c) => c.anchor(this.content()));
       return this;
     }
 
@@ -35,7 +35,7 @@ module Plottable {
       component.parent(this);
       component.onDetach(this._detachCallback);
       if (this._isAnchored) {
-        component.anchor(this._content);
+        component.anchor(this.content());
       }
     }
 

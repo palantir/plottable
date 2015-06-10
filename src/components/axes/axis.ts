@@ -124,11 +124,11 @@ module Plottable {
 
     protected _setup() {
       super._setup();
-      this._tickMarkContainer = this._content.append("g")
+      this._tickMarkContainer = this.content().append("g")
                                             .classed(Axis.TICK_MARK_CLASS + "-container", true);
-      this._tickLabelContainer = this._content.append("g")
+      this._tickLabelContainer = this.content().append("g")
                                              .classed(Axis.TICK_LABEL_CLASS + "-container", true);
-      this._baseline = this._content.append("line").classed("baseline", true);
+      this._baseline = this.content().append("line").classed("baseline", true);
     }
 
     /*

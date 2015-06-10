@@ -60,7 +60,7 @@ export module Plots {
       return new Plottable.Drawers.Arc(dataset);
     }
 
-    public entities(datasets = this.datasets()): Plots.Entity[] {
+    public entities(datasets = this.datasets()): PlotEntity[] {
       var entities = super.entities(datasets);
       entities.forEach((entity) => {
         entity.position.x += this.width() / 2;

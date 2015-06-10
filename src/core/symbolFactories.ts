@@ -10,8 +10,6 @@ module Plottable {
 
   export module SymbolFactories {
 
-    export type StringAccessor = (datum: any, index: number) => string;
-
     export function circle(): SymbolFactory {
       return (symbolSize: number) => d3.svg.symbol().type("circle").size(Math.PI * Math.pow(symbolSize / 2, 2))(null);
     }
