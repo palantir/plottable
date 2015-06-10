@@ -5957,7 +5957,6 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._animators = {};
-            this._animateOnNextRender = true;
             this._clipPathEnabled = true;
             this.classed("plot", true);
             this._datasetToDrawer = new Plottable.Utils.Map();
@@ -5974,7 +5973,6 @@ var Plottable;
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this._updateExtents();
             return this;
@@ -6020,7 +6018,7 @@ var Plottable;
             return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
-            if (this._animate && this._animateOnNextRender) {
+            if (this._animateOnNextRender()) {
                 return this._animators[key] || new Plottable.Animators.Null();
             }
             else {
@@ -6029,7 +6027,6 @@ var Plottable;
         };
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this.render();
         };
@@ -6080,7 +6077,6 @@ var Plottable;
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
-                this._animateOnNextRender = false;
             }
             return this;
         };
@@ -6345,6 +6341,9 @@ var Plottable;
         };
         Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
+        };
+        Plot.prototype._animateOnNextRender = function () {
+            return this._animate && this._dataChanged;
         };
         Plot.ANIMATION_MAX_DURATION = 600;
         return Plot;
@@ -6965,7 +6964,7 @@ var Plottable;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["d"] = function () { return ""; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7333,7 +7332,7 @@ var Plottable;
             };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                     var scaledBaseline = primaryScale.scale(this.baselineValue());
@@ -7518,7 +7517,7 @@ var Plottable;
             };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7677,7 +7676,7 @@ var Plottable;
             };
             Area.prototype._generateLineDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateLineAttrToProjector();
                     attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7695,7 +7694,7 @@ var Plottable;
             };
             Area.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction(), Plottable.Plot._scaledAccessor(this.y0()));
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });

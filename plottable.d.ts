@@ -2257,10 +2257,7 @@ declare module Plottable {
     }
     class Plot extends Component {
         protected static ANIMATION_MAX_DURATION: number;
-        protected _dataChanged: boolean;
         protected _renderArea: d3.Selection<void>;
-        protected _animate: boolean;
-        protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2384,6 +2381,7 @@ declare module Plottable {
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _animateOnNextRender(): boolean;
     }
 }
 
