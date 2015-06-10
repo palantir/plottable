@@ -9281,7 +9281,7 @@ var Plottable;
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
-                this._dragInteraction.constrainToComponent(false);
+                this._dragInteraction.constrainedToComponent(false);
                 var lastDragPoint;
                 this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
                 this._dragInteraction.onDrag(function (startPoint, endPoint) {
@@ -9326,7 +9326,7 @@ var Plottable;
                 var _this = this;
                 _super.apply(this, arguments);
                 this._dragging = false;
-                this._constrain = true;
+                this._constrainedToComponent = true;
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
@@ -9361,7 +9361,7 @@ var Plottable;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (!this._constrain) {
+                if (!this._constrainedToComponent) {
                     return translatedP;
                 }
                 return {
@@ -9395,11 +9395,11 @@ var Plottable;
                     this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
-            Drag.prototype.constrainToComponent = function (constrain) {
-                if (constrain == null) {
-                    return this._constrain;
+            Drag.prototype.constrainedToComponent = function (constrainedToComponent) {
+                if (constrainedToComponent == null) {
+                    return this._constrainedToComponent;
                 }
-                this._constrain = constrain;
+                this._constrainedToComponent = constrainedToComponent;
                 return this;
             };
             /**

@@ -7,7 +7,7 @@ export type DragCallback = (start: Point, end: Point) => void;
 export module Interactions {
   export class Drag extends Interaction {
     private _dragging = false;
-    private _constrain = true;
+    private _constrainedToComponent = true;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
     private _dragOrigin: Point;
@@ -50,7 +50,7 @@ export module Interactions {
 
     private _translateAndConstrain(p: Point) {
       var translatedP = this._translateToComponentSpace(p);
-      if (!this._constrain) {
+      if (!this._constrainedToComponent) {
         return translatedP;
       }
 
@@ -99,7 +99,7 @@ export module Interactions {
      *
      * @return {boolean}
      */
-    public constrainToComponent(): boolean;
+    public constrainedToComponent(): boolean;
     /**
      * Sets whether the Drag Interaction constrains Points passed to its
      * callbacks to lie inside its Component.
@@ -111,12 +111,12 @@ export module Interactions {
      * @param {boolean}
      * @return {Interactions.Drag} The calling Drag Interaction.
      */
-    public constrainToComponent(constrain: boolean): Drag;
-    public constrainToComponent(constrain?: boolean): any {
-      if (constrain == null) {
-        return this._constrain;
+    public constrainedToComponent(constrainedToComponent: boolean): Drag;
+    public constrainedToComponent(constrainedToComponent?: boolean): any {
+      if (constrainedToComponent == null) {
+        return this._constrainedToComponent;
       }
-      this._constrain = constrain;
+      this._constrainedToComponent = constrainedToComponent;
       return this;
     }
 
