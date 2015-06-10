@@ -38,7 +38,7 @@ export module Animators {
     /**
      * The default easing of the animation
      */
-    public static DEFAULT_EASING = "exp-out";
+    public static DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;
@@ -56,7 +56,7 @@ export module Animators {
       this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
       this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
       this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easingFunction = Base.DEFAULT_EASING;
+      this._easingFunction = Base.DEFAULT_EASING_MODE;
     }
 
     public totalTime(numberOfSteps: number) {

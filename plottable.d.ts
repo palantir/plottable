@@ -3036,7 +3036,7 @@ declare module Plottable {
             /**
              * The default easing of the animation
              */
-            static DEFAULT_EASING: string;
+            static DEFAULT_EASING_MODE: string;
             /**
              * Constructs the default animator
              *

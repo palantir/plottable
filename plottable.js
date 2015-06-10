@@ -8132,7 +8132,7 @@ var Plottable;
                 this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
                 this._stepDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
                 this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-                this._easingFunction = Base.DEFAULT_EASING;
+                this._easingFunction = Base.DEFAULT_EASING_MODE;
             }
             Base.prototype.totalTime = function (numberOfSteps) {
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
@@ -8217,7 +8217,7 @@ var Plottable;
             /**
              * The default easing of the animation
              */
-            Base.DEFAULT_EASING = "exp-out";
+            Base.DEFAULT_EASING_MODE = "exp-out";
             return Base;
         })();
         Animators.Base = Base;
