@@ -3122,7 +3122,7 @@ declare module Plottable {
 
 declare module Plottable {
     class Dispatcher {
-        protected _event2Callback: {
+        protected _eventToCallback: {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];

@@ -31,7 +31,7 @@ export module Dispatchers {
     constructor() {
       super();
 
-      this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
+      this._eventToCallback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
       this._keydownCallbacks = new Utils.CallbackSet<KeyCallback>();
       this._callbacks = [this._keydownCallbacks];

@@ -9740,7 +9740,7 @@ describe("Dispatchers", function () {
         it("_connect() and _disconnect()", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackCalls = 0;
-            dispatcher._event2Callback["click"] = function () { return callbackCalls++; };
+            dispatcher._eventToCallback["click"] = function () { return callbackCalls++; };
             var d3document = d3.select(document);
             dispatcher._connect();
             TestMethods.triggerFakeUIEvent("click", d3document);
@@ -9757,7 +9757,7 @@ describe("Dispatchers", function () {
         it("won't _disconnect() if dispatcher still have listeners", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackWasCalled = false;
-            dispatcher._event2Callback["click"] = function () { return callbackWasCalled = true; };
+            dispatcher._eventToCallback["click"] = function () { return callbackWasCalled = true; };
             var callback = function () { return null; };
             var callbackSet = new Plottable.Utils.CallbackSet();
             callbackSet.add(callback);
