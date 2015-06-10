@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Components {
-  export class InterpolatedColorLegend extends Component {
+  export class InterpolatedLegend extends Component {
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
@@ -62,7 +62,7 @@ export module Components {
      * @param {Formatter} formatter
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public formatter(formatter: Formatter): InterpolatedColorLegend;
+    public formatter(formatter: Formatter): InterpolatedLegend;
     public formatter(formatter?: Formatter): any {
       if (formatter === undefined) {
         return this._formatter;
@@ -91,12 +91,12 @@ export module Components {
      * @param {string} orientation One of "horizontal"/"left"/"right".
      * @returns {InterpolatedColorLegend} The calling InterpolatedColorLegend.
      */
-    public orientation(orientation: string): InterpolatedColorLegend;
+    public orientation(orientation: string): InterpolatedLegend;
     public orientation(orientation?: string): any {
       if (orientation == null) {
         return this._orientation;
       } else {
-        this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+        this._orientation = InterpolatedLegend._ensureOrientation(orientation);
         this.redraw();
         return this;
       }
@@ -125,8 +125,8 @@ export module Components {
 
       this._swatchContainer = this.content().append("g").classed("swatch-container", true);
       this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
-      this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-      this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+      this._lowerLabel = this.content().append("g").classed(InterpolatedLegend.LEGEND_LABEL_CLASS, true);
+      this._upperLabel = this.content().append("g").classed(InterpolatedLegend.LEGEND_LABEL_CLASS, true);
 
       this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
       this._wrapper = new SVGTypewriter.Wrappers.Wrapper();

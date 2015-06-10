@@ -5154,8 +5154,8 @@ var Plottable;
 (function (Plottable) {
     var Components;
     (function (Components) {
-        var InterpolatedColorLegend = (function (_super) {
-            __extends(InterpolatedColorLegend, _super);
+        var InterpolatedLegend = (function (_super) {
+            __extends(InterpolatedLegend, _super);
             /**
              * Creates an InterpolatedColorLegend.
              *
@@ -5166,7 +5166,7 @@ var Plottable;
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
              */
-            function InterpolatedColorLegend(interpolatedColorScale) {
+            function InterpolatedLegend(interpolatedColorScale) {
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
@@ -5181,11 +5181,11 @@ var Plottable;
                 this._orientation = "horizontal";
                 this.classed("legend", true).classed("interpolated-color-legend", true);
             }
-            InterpolatedColorLegend.prototype.destroy = function () {
+            InterpolatedLegend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
                 this._scale.offUpdate(this._redrawCallback);
             };
-            InterpolatedColorLegend.prototype.formatter = function (formatter) {
+            InterpolatedLegend.prototype.formatter = function (formatter) {
                 if (formatter === undefined) {
                     return this._formatter;
                 }
@@ -5193,7 +5193,7 @@ var Plottable;
                 this.redraw();
                 return this;
             };
-            InterpolatedColorLegend._ensureOrientation = function (orientation) {
+            InterpolatedLegend._ensureOrientation = function (orientation) {
                 orientation = orientation.toLowerCase();
                 if (orientation === "horizontal" || orientation === "left" || orientation === "right") {
                     return orientation;
@@ -5202,23 +5202,23 @@ var Plottable;
                     throw new Error("\"" + orientation + "\" is not a valid orientation for InterpolatedColorLegend");
                 }
             };
-            InterpolatedColorLegend.prototype.orientation = function (orientation) {
+            InterpolatedLegend.prototype.orientation = function (orientation) {
                 if (orientation == null) {
                     return this._orientation;
                 }
                 else {
-                    this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+                    this._orientation = InterpolatedLegend._ensureOrientation(orientation);
                     this.redraw();
                     return this;
                 }
             };
-            InterpolatedColorLegend.prototype.fixedWidth = function () {
+            InterpolatedLegend.prototype.fixedWidth = function () {
                 return true;
             };
-            InterpolatedColorLegend.prototype.fixedHeight = function () {
+            InterpolatedLegend.prototype.fixedHeight = function () {
                 return true;
             };
-            InterpolatedColorLegend.prototype._generateTicks = function () {
+            InterpolatedLegend.prototype._generateTicks = function () {
                 var domain = this._scale.domain();
                 var slope = (domain[1] - domain[0]) / this._numSwatches;
                 var ticks = [];
@@ -5227,17 +5227,17 @@ var Plottable;
                 }
                 return ticks;
             };
-            InterpolatedColorLegend.prototype._setup = function () {
+            InterpolatedLegend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._swatchContainer = this.content().append("g").classed("swatch-container", true);
                 this._swatchBoundingBox = this.content().append("rect").classed("swatch-bounding-box", true);
-                this._lowerLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
-                this._upperLabel = this.content().append("g").classed(InterpolatedColorLegend.LEGEND_LABEL_CLASS, true);
+                this._lowerLabel = this.content().append("g").classed(InterpolatedLegend.LEGEND_LABEL_CLASS, true);
+                this._upperLabel = this.content().append("g").classed(InterpolatedLegend.LEGEND_LABEL_CLASS, true);
                 this._measurer = new SVGTypewriter.Measurers.Measurer(this.content());
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper();
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
             };
-            InterpolatedColorLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
+            InterpolatedLegend.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
                 var _this = this;
                 var textHeight = this._measurer.measure().height;
                 var ticks = this._generateTicks();
@@ -5260,10 +5260,10 @@ var Plottable;
                     minHeight: desiredHeight
                 };
             };
-            InterpolatedColorLegend.prototype._isVertical = function () {
+            InterpolatedLegend.prototype._isVertical = function () {
                 return this._orientation !== "horizontal";
             };
-            InterpolatedColorLegend.prototype.renderImmediately = function () {
+            InterpolatedLegend.prototype.renderImmediately = function () {
                 var _this = this;
                 _super.prototype.renderImmediately.call(this);
                 var domain = this._scale.domain();
@@ -5361,10 +5361,10 @@ var Plottable;
             /**
              * The css class applied to the legend labels.
              */
-            InterpolatedColorLegend.LEGEND_LABEL_CLASS = "legend-label";
-            return InterpolatedColorLegend;
+            InterpolatedLegend.LEGEND_LABEL_CLASS = "legend-label";
+            return InterpolatedLegend;
         })(Plottable.Component);
-        Components.InterpolatedColorLegend = InterpolatedColorLegend;
+        Components.InterpolatedLegend = InterpolatedLegend;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
