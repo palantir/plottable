@@ -173,8 +173,8 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth = Utils.DOM.getElementWidth(elem);
-          availableHeight = Utils.DOM.getElementHeight(elem);
+          availableWidth = Utils.DOM.elementWidth(elem);
+          availableHeight = Utils.DOM.elementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
@@ -344,7 +344,7 @@ module Plottable {
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      var clipPathId = Utils.DOM.getUniqueClipPathId();
+      var clipPathId = Utils.DOM.generateUniqueClipPathId();
       this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
                                              .attr("id", clipPathId);

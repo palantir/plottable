@@ -72,7 +72,7 @@ export module Plots {
       var yRange = { min: 0, max: this.height() };
 
       var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = Utils.DOM.getBBox(selection);
+      var bbox = Utils.DOM.elementBBox(selection);
       var translatedBbox: SVGRect = {
         x: bbox.x + translation[0],
         y: bbox.y + translation[1],

@@ -1542,7 +1542,7 @@ describe("Labels", function () {
         var textChildren = content.selectAll("text");
         assert.lengthOf(textChildren, 1, "There is one text node in the parent element");
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.closeTo(bbox.height, label.height(), 0.5, "text height === label.minimumHeight()");
         assert.strictEqual(text.node().textContent, "A CHART TITLE", "node's text content is as expected");
         svg.remove();
@@ -1564,7 +1564,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var textBBox = Plottable.Utils.DOM.getBBox(text);
+        var textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -1576,7 +1576,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var textBBox = Plottable.Utils.DOM.getBBox(text);
+        var textBBox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(textBBox.height, label.width(), window.Pixel_CloseTo_Requirement, "text height");
         assert.closeTo(textBBox.width, label.height(), window.Pixel_CloseTo_Requirement, "text width");
@@ -1601,7 +1601,7 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.strictEqual(bbox.height, label.height(), "text height === label.minimumHeight()");
         assert.operator(bbox.width, "<=", svgWidth, "the text is not wider than the SVG width");
         svg.remove();
@@ -1621,7 +1621,7 @@ describe("Labels", function () {
         t.renderTo(svg);
         var textTranslate = d3.transform(label._content.select("g").attr("transform")).translate;
         var eleTranslate = d3.transform(label._element.attr("transform")).translate;
-        var textWidth = Plottable.Utils.DOM.getBBox(label._content.select("text")).width;
+        var textWidth = Plottable.Utils.DOM.elementBBox(label._content.select("text")).width;
         assert.closeTo(eleTranslate[0] + textTranslate[0] + textWidth / 2, 200, 5, "label is centered");
         svg.remove();
     });
@@ -1639,11 +1639,11 @@ describe("Labels", function () {
         label.renderTo(svg);
         var content = label._content;
         var text = content.select("text");
-        var bbox = Plottable.Utils.DOM.getBBox(text);
+        var bbox = Plottable.Utils.DOM.elementBBox(text);
         assert.closeTo(bbox.height, label.height(), 1, "label is in horizontal position");
         label.angle(90);
         text = content.select("text");
-        bbox = Plottable.Utils.DOM.getBBox(text);
+        bbox = Plottable.Utils.DOM.elementBBox(text);
         TestMethods.assertBBoxInclusion(label._element.select(".bounding-box"), text);
         assert.closeTo(bbox.height, label.width(), window.Pixel_CloseTo_Requirement, "label is in vertical position");
         svg.remove();
@@ -1737,9 +1737,9 @@ describe("Legend", function () {
     it("a legend with many labels does not overflow vertically", function () {
         color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
         legend.renderTo(svg);
-        var contentBBox = Plottable.Utils.DOM.getBBox(legend._content);
+        var contentBBox = Plottable.Utils.DOM.elementBBox(legend._content);
         var contentBottomEdge = contentBBox.y + contentBBox.height;
-        var bboxBBox = Plottable.Utils.DOM.getBBox(legend._element.select(".bounding-box"));
+        var bboxBBox = Plottable.Utils.DOM.elementBBox(legend._element.select(".bounding-box"));
         var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
         assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
         svg.remove();
@@ -1823,7 +1823,7 @@ describe("Legend", function () {
         function verifySymbolHeight() {
             var text = legend._content.select("text");
             var icon = legend._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
-            var textHeight = Plottable.Utils.DOM.getBBox(text).height;
+            var textHeight = Plottable.Utils.DOM.elementBBox(text).height;
             var symbolHeight = icon.node().getBoundingClientRect().height;
             assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
             assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
@@ -2169,7 +2169,7 @@ describe("SelectionBoxLayer", function () {
         sbl.renderTo(svg);
         function assertCorrectRendering(expectedTL, expectedBR, msg) {
             var selectionBox = svg.select(".selection-box");
-            var bbox = Plottable.Utils.DOM.getBBox(selectionBox);
+            var bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
             assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
             assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
             assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
@@ -6499,7 +6499,7 @@ describe("Component behavior", function () {
         boxStrings.forEach(function (s) {
             var box = boxContainer.select(s);
             assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-            var bb = Plottable.Utils.DOM.getBBox(box);
+            var bb = Plottable.Utils.DOM.elementBBox(box);
             assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
             assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
         });
@@ -6855,7 +6855,7 @@ describe("Tables", function () {
         assert.deepEqual(translates[1], [200, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 200], "third element is located properly");
         assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         bboxes.forEach(function (b) {
             assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
             assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
@@ -6871,7 +6871,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return TestMethods.getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
         assert.deepEqual(translates[1], [210, 0], "second element is located properly");
         assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -6902,7 +6902,7 @@ describe("Tables", function () {
         table.renderTo(svg);
         var elements = components.map(function (r) { return r._element; });
         var translates = elements.map(function (e) { return TestMethods.getTranslate(e); });
-        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.getBBox(e); });
+        var bboxes = elements.map(function (e) { return Plottable.Utils.DOM.elementBBox(e); });
         // test the translates
         assert.deepEqual(translates[0], [50, 0], "top axis translate");
         assert.deepEqual(translates[4], [50, 370], "bottom axis translate");
@@ -8085,7 +8085,7 @@ describe("Utils.DOM", function () {
             height: 20
         };
         var rect = svg.append("rect").attr(expectedBox);
-        var measuredBox = Plottable.Utils.DOM.getBBox(rect);
+        var measuredBox = Plottable.Utils.DOM.elementBBox(rect);
         assert.deepEqual(measuredBox, expectedBox, "getBBox measures correctly");
         svg.remove();
     });
@@ -8098,29 +8098,29 @@ describe("Utils.DOM", function () {
         };
         var removedSVG = TestMethods.generateSVG().remove();
         var rect = removedSVG.append("rect").attr(expectedBox);
-        Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
         var noneSVG = TestMethods.generateSVG().style("display", "none");
         rect = noneSVG.append("rect").attr(expectedBox);
-        Plottable.Utils.DOM.getBBox(rect); // could throw NS_ERROR on FF
+        Plottable.Utils.DOM.elementBBox(rect); // could throw NS_ERROR on FF
         noneSVG.remove();
     });
-    describe("getElementWidth, getElementHeight", function () {
+    describe("elementWidth(), elementHeight()", function () {
         it("can get a plain element's size", function () {
             var parent = TestMethods.getSVGParent();
             parent.style("width", "300px");
             parent.style("height", "200px");
             var parentElem = parent[0][0];
-            var width = Plottable.Utils.DOM.getElementWidth(parentElem);
+            var width = Plottable.Utils.DOM.elementWidth(parentElem);
             assert.strictEqual(width, 300, "measured width matches set width");
-            var height = Plottable.Utils.DOM.getElementHeight(parentElem);
+            var height = Plottable.Utils.DOM.elementHeight(parentElem);
             assert.strictEqual(height, 200, "measured height matches set height");
         });
         it("can get the svg's size", function () {
             var svg = TestMethods.generateSVG(450, 120);
             var svgElem = svg[0][0];
-            var width = Plottable.Utils.DOM.getElementWidth(svgElem);
+            var width = Plottable.Utils.DOM.elementWidth(svgElem);
             assert.strictEqual(width, 450, "measured width matches set width");
-            var height = Plottable.Utils.DOM.getElementHeight(svgElem);
+            var height = Plottable.Utils.DOM.elementHeight(svgElem);
             assert.strictEqual(height, 120, "measured height matches set height");
             svg.remove();
         });
@@ -8131,28 +8131,28 @@ describe("Utils.DOM", function () {
             var childElem = child[0][0];
             parent.style("width", "200px");
             parent.style("height", "50px");
-            assert.strictEqual(Plottable.Utils.DOM.getElementWidth(parentElem), 200, "width is correct");
-            assert.strictEqual(Plottable.Utils.DOM.getElementHeight(parentElem), 50, "height is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementWidth(parentElem), 200, "width is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementHeight(parentElem), 50, "height is correct");
             child.style("width", "20px");
             child.style("height", "10px");
-            assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 20, "width is correct");
-            assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 10, "height is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 20, "width is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 10, "height is correct");
             child.style("width", "100%");
             child.style("height", "100%");
-            assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 200, "width is correct");
-            assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 50, "height is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 200, "width is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 50, "height is correct");
             child.style("width", "50%");
             child.style("height", "50%");
-            assert.strictEqual(Plottable.Utils.DOM.getElementWidth(childElem), 100, "width is correct");
-            assert.strictEqual(Plottable.Utils.DOM.getElementHeight(childElem), 25, "height is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementWidth(childElem), 100, "width is correct");
+            assert.strictEqual(Plottable.Utils.DOM.elementHeight(childElem), 25, "height is correct");
             // reset test page DOM
             parent.style("width", "auto");
             parent.style("height", "auto");
             child.remove();
         });
-        it("getUniqueClipPathId works as expected", function () {
-            var firstClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
-            var secondClipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+        it("generateUniqueClipPathId()", function () {
+            var firstClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
+            var secondClipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
             var firstClipPathIDPrefix = firstClipPathId.split(/\d/)[0];
             var secondClipPathIDPrefix = secondClipPathId.split(/\d/)[0];
             assert.strictEqual(firstClipPathIDPrefix, secondClipPathIDPrefix, "clip path ids should have the same prefix");
@@ -8162,7 +8162,7 @@ describe("Utils.DOM", function () {
             var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
             assert.isFalse(Plottable.Utils.Math.isNaN(firstClipPathIdNumber), "first clip path id should only have a number after the prefix");
             assert.isFalse(Plottable.Utils.Math.isNaN(secondClipPathIdNumber), "second clip path id should only have a number after the prefix");
-            assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber, "Consecutive calls to getUniqueClipPathId should give consecutive numbers after the prefix");
+            assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber, "Consecutive calls to generateUniqueClipPathId should give consecutive numbers after the prefix");
         });
     });
 });
@@ -8829,8 +8829,8 @@ describe("Interactions", function () {
             var aCallback = function () { return aCallbackCalled = true; };
             var bCallbackCalled = false;
             var bCallback = function () { return bCallbackCalled = true; };
-            keyInteraction.onKey(aCode, aCallback);
-            keyInteraction.onKey(bCode, bCallback);
+            keyInteraction.onKeyPress(aCode, aCallback);
+            keyInteraction.onKeyPress(bCode, bCallback);
             keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
@@ -8858,7 +8858,7 @@ describe("Interactions", function () {
                 bCallbackCalled = true;
                 assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
             };
-            keyInteraction.onKey(bCode, bCallback);
+            keyInteraction.onKeyPress(bCode, bCallback);
             keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
@@ -8874,17 +8874,17 @@ describe("Interactions", function () {
             var aCode = 65; // "a" key
             var aCallbackCalled = false;
             var aCallback = function () { return aCallbackCalled = true; };
-            keyInteraction.onKey(aCode, aCallback);
+            keyInteraction.onKeyPress(aCode, aCallback);
             keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
-            keyInteraction.offKey(aCode, aCallback);
+            keyInteraction.offKeyPress(aCode, aCallback);
             aCallbackCalled = false;
             $target.simulate("keydown", { keyCode: aCode });
             assert.isFalse(aCallbackCalled, "callback for \"a\" was disconnected from the interaction");
-            keyInteraction.onKey(aCode, aCallback);
+            keyInteraction.onKeyPress(aCode, aCallback);
             $target.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallbackCalled, "callback for \"a\" was properly connected back to the interaction");
             svg.remove();
@@ -8899,15 +8899,15 @@ describe("Interactions", function () {
             var aCallback1 = function () { return aCallback1Called = true; };
             var aCallback2Called = false;
             var aCallback2 = function () { return aCallback2Called = true; };
-            keyInteraction.onKey(aCode, aCallback1);
-            keyInteraction.onKey(aCode, aCallback2);
+            keyInteraction.onKeyPress(aCode, aCallback1);
+            keyInteraction.onKeyPress(aCode, aCallback2);
             keyInteraction.attachTo(component);
             var $target = $(component.background().node());
             TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
             $target.simulate("keydown", { keyCode: aCode });
             assert.isTrue(aCallback1Called, "callback 1 for \"a\" was called when \"a\" key was pressed");
             assert.isTrue(aCallback1Called, "callback 2 for \"b\" was called when \"a\" key was pressed");
-            keyInteraction.offKey(aCode, aCallback1);
+            keyInteraction.offKeyPress(aCode, aCallback1);
             aCallback1Called = false;
             aCallback2Called = false;
             $target.simulate("keydown", { keyCode: aCode });

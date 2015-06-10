@@ -117,7 +117,7 @@ describe("Tables", () => {
     assert.deepEqual(translates[1], [200, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 200], "third element is located properly");
     assert.deepEqual(translates[3], [200, 200], "fourth element is located properly");
-    var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
     bboxes.forEach((b) => {
       assert.strictEqual(b.width, 200, "bbox is 200 pixels wide");
       assert.strictEqual(b.height, 200, "bbox is 200 pixels tall");
@@ -136,7 +136,7 @@ describe("Tables", () => {
 
     var elements = components.map((r) => (<any> r)._element);
     var translates = elements.map((e) => TestMethods.getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
     assert.deepEqual(translates[0], [0, 0], "first element is centered properly");
     assert.deepEqual(translates[1], [210, 0], "second element is located properly");
     assert.deepEqual(translates[2], [0, 210], "third element is located properly");
@@ -170,7 +170,7 @@ describe("Tables", () => {
 
     var elements = components.map((r) => (<any> r)._element);
     var translates = elements.map((e) => TestMethods.getTranslate(e));
-    var bboxes = elements.map((e) => Plottable.Utils.DOM.getBBox(e));
+    var bboxes = elements.map((e) => Plottable.Utils.DOM.elementBBox(e));
     // test the translates
     assert.deepEqual(translates[0], [50, 0] , "top axis translate");
     assert.deepEqual(translates[4], [50, 370], "bottom axis translate");

@@ -51,7 +51,7 @@ export module Interactions {
      * @param {KeyCallback} callback
      * @returns {Interactions.Key} The calling Key Interaction.
      */
-    public onKey(keyCode: number, callback: KeyCallback) {
+    public onKeyPress(keyCode: number, callback: KeyCallback) {
       if (!this._keyCodeCallbacks[keyCode]) {
         this._keyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
@@ -67,7 +67,7 @@ export module Interactions {
      * @param {KeyCallback} callback
      * @returns {Interactions.Key} The calling Key Interaction.
      */
-    public offKey(keyCode: number, callback: KeyCallback) {
+    public offKeyPress(keyCode: number, callback: KeyCallback) {
       this._keyCodeCallbacks[keyCode].delete(callback);
       if (this._keyCodeCallbacks[keyCode].size === 0) {
         delete this._keyCodeCallbacks[keyCode];

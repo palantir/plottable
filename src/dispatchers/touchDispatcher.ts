@@ -20,7 +20,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
