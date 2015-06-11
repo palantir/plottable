@@ -2,7 +2,7 @@
 
 module Plottable {
   export module Utils {
-    type StackedDatum = {
+    export type StackedDatum = {
       key: any;
       value: number;
       offset?: number;
@@ -53,7 +53,7 @@ module Plottable {
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>,
-          stackOffsets: Utils.Map<Dataset, d3.Map<number>>,
+          stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>,
           filter: Accessor<boolean>) {
 
         var maxStackExtent = Utils.Math.max<Dataset, number>(datasets, (dataset: Dataset) => {
@@ -63,7 +63,7 @@ module Plottable {
           }
           return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
-              stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
+              stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
           }, 0);
         }, 0);
 
@@ -74,7 +74,7 @@ module Plottable {
           }
           return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
-              stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
+              stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
           }, 0);
         }, 0);
 
@@ -146,21 +146,22 @@ module Plottable {
           positiveDataStack: d3.Map<StackedDatum>[],
           negativeDataStack: d3.Map<StackedDatum>[]) {
 
-        var stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
+        var stackOffsets = new Utils.Map<Dataset, d3.Map<StackedDatum>>();
         datasets.forEach((dataset, index) => {
-          var datasetOffsets = d3.map<number>();
+          var datasetOffsets = d3.map<StackedDatum>();
           var positiveDataMap = positiveDataStack[index];
           var negativeDataMap = negativeDataStack[index];
 
-          positiveDataMap.forEach((key: string, positiveStackedDatum: d3.Map<StackedDatum>) => {
+          positiveDataMap.forEach((key: string, positiveStackedDatum: StackedDatum) => {
             var negativeStackedDatum = negativeDataMap.get(key);
 
             if (positiveStackedDatum.value !== 0) {
-              datasetOffsets.set(key, positiveStackedDatum.offset);
+              datasetOffsets.set(key, positiveStackedDatum);
             } else if (negativeStackedDatum.value !== 0) {
-              datasetOffsets.set(key, negativeStackedDatum.offset);
+              datasetOffsets.set(key, negativeStackedDatum);
             } else { // illegal value / undefined / null / etc
-              datasetOffsets.set(key, positiveStackedDatum.offset);
+              positiveStackedDatum.value = 0; //TODO: remove
+              datasetOffsets.set(key, positiveStackedDatum);
             }
           });
           stackOffsets.set(dataset, datasetOffsets);

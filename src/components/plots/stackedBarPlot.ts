@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
+    private _stackOffsets: Utils.Map<Dataset, d3.Map<Utils.StackedDatum>>;
     private _stackedExtent: number[];
 
     /**
@@ -19,7 +19,7 @@ export module Plots {
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
       this.classed("stacked-bar-plot", true);
-      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
+      this._stackOffsets = new Utils.Map<Dataset, d3.Map<Utils.StackedDatum>>();
       this._stackedExtent = [];
     }
 
@@ -66,9 +66,9 @@ export module Plots {
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
       var getStart = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)).offset);
       var getEnd = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)).offset);
 
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
