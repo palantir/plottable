@@ -4758,6 +4758,7 @@ describe("Plots", function () {
             ]);
         });
         it("auto scales correctly on stacked area", function () {
+            console.log(1);
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
@@ -4798,6 +4799,7 @@ describe("Plots", function () {
             ]);
         });
         it("auto scales correctly on stacked bar", function () {
+            console.log(22);
             var plot = new Plottable.Plots.StackedBar();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");

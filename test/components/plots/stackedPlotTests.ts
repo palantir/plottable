@@ -270,6 +270,8 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
+      console.log(1);
+
       var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
@@ -322,6 +324,8 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
+      console.log(22);
+
       var plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
