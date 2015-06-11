@@ -351,47 +351,11 @@ module Plottable {
       this._addBox("clip-rect", clipPathParent);
     }
 
-    // /**
-    //  * Checks if the Component has a given CSS class.
-    //  *
-    //  * @param {string} cssClass The CSS class to check for.
-    //  */
-    // public classed(cssClass: string): boolean;
-    // /**
-    //  * Adds/removes a given CSS class to/from the Component.
-    //  *
-    //  * @param {string} cssClass The CSS class to add or remove.
-    //  * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
-    //  * @returns {Component} The calling Component.
-    //  */
-    // public classed(cssClass: string, addClass: boolean): Component;
-    // public classed(cssClass: string, addClass?: boolean): any {
-    //   if (addClass == null) {
-    //     if (cssClass == null) {
-    //       return false;
-    //     } else if (this._element == null) {
-    //       return (this._cssClasses.indexOf(cssClass) !== -1);
-    //     } else {
-    //       return this._element.classed(cssClass);
-    //     }
-    //   } else {
-    //     if (cssClass == null) {
-    //       return this;
-    //     }
-    //     if (this._element == null) {
-    //       var classIndex = this._cssClasses.indexOf(cssClass);
-    //       if (addClass && classIndex === -1) {
-    //         this._cssClasses.push(cssClass);
-    //       } else if (!addClass && classIndex !== -1) {
-    //         this._cssClasses.splice(classIndex, 1);
-    //       }
-    //     } else {
-    //       this._element.classed(cssClass, addClass);
-    //     }
-    //     return this;
-    //   }
-    // }
-
+    /**
+     * Checks if the Component has a given CSS class.
+     *
+     * @param {string} cssClass The CSS class to check for.
+     */
     public hasClass(cssClass: string) {
       if (cssClass == null) {
         return false;
@@ -402,6 +366,12 @@ module Plottable {
       }
     }
 
+    /**
+     * Adds a given CSS class to the Component.
+     *
+     * @param {string} cssClass The CSS class to add.
+     * @returns {Component} The calling Component.
+     */
     public addClass(cssClass: string) {
       if (cssClass == null) {
         return this;
@@ -419,6 +389,12 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Removes a given CSS class from the Component.
+     *
+     * @param {string} cssClass The CSS class to remove.
+     * @returns {Component} The calling Component.
+     */
     public removeClass(cssClass: string) {
       if (cssClass == null) {
         return this;

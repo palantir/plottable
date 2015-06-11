@@ -1348,8 +1348,25 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         yAlignment(yAlignment: string): Component;
+        /**
+         * Checks if the Component has a given CSS class.
+         *
+         * @param {string} cssClass The CSS class to check for.
+         */
         hasClass(cssClass: string): boolean;
+        /**
+         * Adds a given CSS class to the Component.
+         *
+         * @param {string} cssClass The CSS class to add.
+         * @returns {Component} The calling Component.
+         */
         addClass(cssClass: string): Component;
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
         removeClass(cssClass: string): Component;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
