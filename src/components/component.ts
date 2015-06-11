@@ -179,7 +179,7 @@ module Plottable {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
-      var size = this._getSize(availableWidth, availableHeight);
+      var size = this._sizeFromOffer(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
       var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
@@ -193,7 +193,7 @@ module Plottable {
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
         width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,

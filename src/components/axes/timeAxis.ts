@@ -304,11 +304,11 @@ export module Axes {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected finalSizeFromOffer(availableWidth: number, availableHeight: number) {
       // Makes sure that the size it requires is a multiple of tier sizes, such that
       // we have no leftover tiers
 
-      var size = super._getSize(availableWidth, availableHeight);
+      var size = super.finalSizeFromOffer(availableWidth, availableHeight);
       size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
