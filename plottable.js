@@ -686,10 +686,12 @@ var Plottable;
                     var datasetOffsets = d3.map();
                     var positiveDataMap = positiveDataStack[index];
                     var negativeDataMap = negativeDataStack[index];
-                    positiveDataMap.forEach(function (key, val) {
-                        var value = positiveDataMap.get(key).value || negativeDataMap.get(key).value;
-                        var positiveOffset = positiveDataMap.get(key).offset;
-                        var negativeOffset = negativeDataMap.get(key).offset;
+                    positiveDataMap.forEach(function (key) {
+                        var positiveStackedDatum = positiveDataMap.get(key);
+                        var negativeStackedDatum = negativeDataMap.get(key);
+                        var value = positiveStackedDatum.value || negativeStackedDatum.value;
+                        var positiveOffset = positiveStackedDatum.offset;
+                        var negativeOffset = negativeStackedDatum.offset;
                         var offset;
                         if (!+value) {
                             offset = positiveOffset;

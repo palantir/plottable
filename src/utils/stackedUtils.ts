@@ -156,11 +156,15 @@ module Plottable {
           var positiveDataMap = positiveDataStack[index];
           var negativeDataMap = negativeDataStack[index];
 
-          positiveDataMap.forEach((key: string, val: StackedDatum) => {
-            var value = positiveDataMap.get(key).value || negativeDataMap.get(key).value;
+          positiveDataMap.forEach((key: string) => {
 
-            var positiveOffset = positiveDataMap.get(key).offset;
-            var negativeOffset = negativeDataMap.get(key).offset;
+            var positiveStackedDatum = positiveDataMap.get(key);
+            var negativeStackedDatum = negativeDataMap.get(key);
+
+            var value = positiveStackedDatum.value || negativeStackedDatum.value;
+
+            var positiveOffset = positiveStackedDatum.offset;
+            var negativeOffset = negativeStackedDatum.offset;
 
             var offset: number;
             if (!+value) {
