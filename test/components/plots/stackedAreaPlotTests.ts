@@ -424,9 +424,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
-      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
-      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2).offset;
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2).offset;
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2).offset;
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) sh1uld have no offset on middle point");
@@ -465,9 +465,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2);
-      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2);
-      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2);
+      var ds0Point2Offset = (<any> plot)._stackOffsets.get(dataset0).get(2).offset;
+      var ds1Point2Offset = (<any> plot)._stackOffsets.get(dataset1).get(2).offset;
+      var ds2Point2Offset = (<any> plot)._stackOffsets.get(dataset2).get(2).offset;
 
       assert.strictEqual(ds0Point2Offset, 0,
         "dataset0 (blue) should have no offset on middle point");

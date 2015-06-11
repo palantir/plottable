@@ -58,11 +58,11 @@ describe("Utils", () => {
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
       var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
-      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred"), 0, "Offset 1 = 0");
-      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred"), 1, "Offset 2 = 0 + 1");
-      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred"), 2, "Offset 3 = 0 + 1 + 1");
-      assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred"), 5, "Offset 5 = 0 + 1 + 1 + 3");
-      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred"), 5, "Offset 5 = 0 + 1 + 1 + 3 + 0");
+      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
+      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
+      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred").offset, 2, "Offset 3 = 0 + 1 + 1");
+      assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred").offset, 5, "Offset 5 = 0 + 1 + 1 + 3");
+      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred").offset, 5, "Offset 5 = 0 + 1 + 1 + 3 + 0");
     });
 
     it("computeStackOffsets() works as expected with negative values", () => {
@@ -75,10 +75,10 @@ describe("Utils", () => {
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
       var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
-      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred"), 0, "Offset 1 = 0");
-      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred"), -1, "Offset 2 = 0 - 1");
-      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred"), -2, "Offset 3 = 0 - 1 - 1");
-      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred"), -5, "Offset 5 = 0 - 1 - 1 - 3 - 0");
+      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
+      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, -1, "Offset 2 = 0 - 1");
+      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred").offset, -2, "Offset 3 = 0 - 1 - 1");
+      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred").offset, -5, "Offset 5 = 0 - 1 - 1 - 3 - 0");
     });
 
     it("computeStackOffsets() works as expected with positive and negative values", () => {
@@ -92,12 +92,12 @@ describe("Utils", () => {
       var datasets = createDatasets([data1, data2, data3, data4, data5, data6]);
       var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
-      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred"), 0, "Offset 1 = 0");
-      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred"), 1, "Offset 2 = 0 + 1");
-      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred"), 0, "Offset 3 = 0");
-      assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred"), -2, "Offset 4 = 0 - 2");
-      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred"), 3, "Offset 5 = 0 + 1 + 2");
-      assert.strictEqual(stackOffsets.get(datasets[5]).get("Fred"), -5, "Offset 6 = 0 - 2 - 3");
+      assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
+      assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
+      assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred").offset, 0, "Offset 3 = 0");
+      assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred").offset, -2, "Offset 4 = 0 - 2");
+      assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred").offset, 3, "Offset 5 = 0 + 1 + 2");
+      assert.strictEqual(stackOffsets.get(datasets[5]).get("Fred").offset, -5, "Offset 6 = 0 - 2 - 3");
     });
 
     it("computeStackExtent() works as expected with positive values", () => {
