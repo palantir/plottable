@@ -464,12 +464,6 @@ declare module Plottable {
     type AttributeToProjector = {
         [attrToSet: string]: Projector;
     };
-    /**
-     * Mapping from attributes to functions that set them based on datum and index.
-     */
-    type AttributeToAppliedProjector = {
-        [attrToSet: string]: (datum: any, index: number) => any;
-    };
     type SpaceRequest = {
         minWidth: number;
         minHeight: number;
@@ -1113,7 +1107,9 @@ declare module Plottable {
             animator: Animator;
         };
         type AppliedDrawStep = {
-            attrToAppliedProjector: AttributeToAppliedProjector;
+            attrToAppliedProjector: {
+                [attr: string]: (datum: any, index: number) => any;
+            };
             animator: Animator;
         };
     }
@@ -2942,13 +2938,15 @@ declare module Plottable {
          * Applies the supplied attributes to a d3.Selection with some animation.
          *
          * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
-         * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
-         *     AppliedProjectors that we will use to set attributes on the selection.
-         * @return {any} Animators should return the selection or
-         *     transition object so that plots may chain the transitions between
-         *     animators.
+         * @param {{ [attr: string]: (datum: any, index: number) => any; })} attrToAppliedProjector
+         *     An object that maps attributes to functions that generate attribute values.
+         * @return {any} Animators should return the Selection or
+         *     Transition object so that plots may chain the transitions between
+         *     Animators.
          */
-        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: {
+            [attr: string]: (datum: any, index: number) => any;
+        }): d3.Selection<any> | d3.Transition<any>;
         /**
          * Given the number of elements, return the total time the animation requires
          *
@@ -2968,7 +2966,9 @@ declare module Plottable {
          */
         class Null implements Animator {
             totalTime(selection: any): number;
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: {
+                [attr: string]: (datum: any, index: number) => any;
+            }): d3.Selection<any>;
         }
     }
 }
@@ -2999,7 +2999,9 @@ declare module Plottable {
              */
             constructor();
             totalTime(numberOfSteps: number): number;
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Transition<any>;
+            animate(selection: d3.Selection<any>, attrToAppliedProjector: {
+                [attr: string]: (datum: any, index: number) => any;
+            }): d3.Transition<any>;
             /**
              * Gets the start delay of the animation in milliseconds.
              *

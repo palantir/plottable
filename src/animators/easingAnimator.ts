@@ -64,7 +64,7 @@ export module Animators {
       return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
     }
 
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: { [attr: string]: (datum: any, index: number) => any; }) {
       var numberOfSteps = selection[0].length;
       var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 

@@ -17,11 +17,6 @@ module Plottable {
    */
   export type AttributeToProjector = { [attrToSet: string]: Projector; };
 
-  /**
-   * Mapping from attributes to functions that set them based on datum and index.
-   */
-  export type AttributeToAppliedProjector = { [attrToSet: string]: (datum: any, index: number) => any; };
-
   export type SpaceRequest = {
     minWidth: number;
     minHeight: number;

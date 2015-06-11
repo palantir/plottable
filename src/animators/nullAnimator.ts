@@ -12,7 +12,7 @@ export module Animators {
     public totalTime(selection: any) {
       return 0;
     }
-    public animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector) {
+    public animate(selection: d3.Selection<any>, attrToAppliedProjector: { [attr: string]: (datum: any, index: number) => any; }) {
       return selection.attr(attrToAppliedProjector);
     }
   }
