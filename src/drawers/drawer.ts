@@ -12,6 +12,9 @@ export module Drawers {
     animator: Animator;
   };
 
+  /**
+   * A DrawStep that carries an AttributeToAppliedProjector map.
+   */
   export type AppliedDrawStep = {
     attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animator;

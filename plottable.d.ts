@@ -1110,6 +1110,9 @@ declare module Plottable {
             attrToProjector: AttributeToProjector;
             animator: Animator;
         };
+        /**
+         * A DrawStep that carries an AttributeToAppliedProjector map.
+         */
         type AppliedDrawStep = {
             attrToAppliedProjector: AttributeToAppliedProjector;
             animator: Animator;
