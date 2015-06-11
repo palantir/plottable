@@ -175,7 +175,7 @@ describe("Plots", () => {
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = barPlot.getAllSelections();
+          bars = barPlot.selections();
           zeroY = yScale.scale(0);
 
           d0 = dataset.data()[0];
@@ -533,7 +533,7 @@ describe("Plots", () => {
         var d0Px: Plottable.Point, d1Px: Plottable.Point;
 
         beforeEach(() => {
-          bars = barPlot.getAllSelections();
+          bars = barPlot.selections();
           zeroX = xScale.scale(0);
 
           d0 = dataset.data()[0];
@@ -694,7 +694,7 @@ describe("Plots", () => {
       });
     });
 
-    describe("getAllSelections", () => {
+    describe("selections()", () => {
       var verticalBarPlot: Plottable.Plots.Bar<string, number>;
       var dataset: Plottable.Dataset;
       var svg: d3.Selection<void>;
@@ -714,7 +714,7 @@ describe("Plots", () => {
         verticalBarPlot.addDataset(new Plottable.Dataset(barData));
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections();
+        var allBars = verticalBarPlot.selections();
         assert.strictEqual(allBars.size(), 3, "retrieved all bars");
 
         svg.remove();
@@ -727,7 +727,7 @@ describe("Plots", () => {
         verticalBarPlot.addDataset(dataset2);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections([dataset1]);
+        var allBars = verticalBarPlot.selections([dataset1]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
         assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
@@ -741,7 +741,7 @@ describe("Plots", () => {
         verticalBarPlot.addDataset(dataset1);
         verticalBarPlot.renderTo(svg);
 
-        var allBars = verticalBarPlot.getAllSelections([dataset1, notAddedDataset]);
+        var allBars = verticalBarPlot.selections([dataset1, notAddedDataset]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
         var selectionData = allBars.data();
         assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
@@ -765,7 +765,7 @@ describe("Plots", () => {
           .renderTo(svg);
       xScale.domain(["b", "c"]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.autorange("y");
+      plot.autorangeMode("y");
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
       svg.remove();
     });

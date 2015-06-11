@@ -11,7 +11,7 @@ export module Plots {
      */
     constructor() {
       super();
-      this.classed("line-plot", true);
+      this.addClass("line-plot");
       var animator = new Animators.Easing();
       animator.stepDuration(Plot.ANIMATION_MAX_DURATION);
       animator.easingMode("exp-in-out");
@@ -99,8 +99,8 @@ export module Plots {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
+        return positionX != null && !Utils.Math.isNaN(positionX) &&
+               positionY != null && !Utils.Math.isNaN(positionY);
       };
       return (datum: any, index: number, dataset: Dataset) => {
         return d3.svg.line()

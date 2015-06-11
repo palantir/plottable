@@ -33,7 +33,7 @@ describe("Plots", () => {
                                   .y(yAccessor);
       plot.addDataset(dataset);
       plot.renderTo(svg);
-      var symbols = plot.getAllSelections();
+      var symbols = plot.selections();
       var c1 = d3.select(symbols[0][0]);
       var c2 = d3.select(symbols[0][1]);
       var c1Position = d3.transform(c1.attr("transform")).translate;
@@ -65,7 +65,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("getAllSelections()", () => {
+    it("selections()", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
@@ -77,7 +77,7 @@ describe("Plots", () => {
                                    .addDataset(new Plottable.Dataset(data))
                                    .addDataset(new Plottable.Dataset(data2));
       plot.renderTo(svg);
-      var allCircles = plot.getAllSelections();
+      var allCircles = plot.selections();
       assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
       var selectionData = allCircles.data();
       assert.includeMembers(selectionData, data, "first dataset data in selection data");
@@ -163,15 +163,15 @@ describe("Plots", () => {
       var dataWithNaN = data.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       dataset.data(dataWithNaN);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw NaN point");
+      assert.strictEqual(plot.selections().size(), 4, "does not draw NaN point");
 
       var dataWithUndefined = data.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       dataset.data(dataWithUndefined);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+      assert.strictEqual(plot.selections().size(), 4, "does not draw undefined point");
       dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
       dataset.data(dataWithUndefined);
-      assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+      assert.strictEqual(plot.selections().size(), 4, "does not draw undefined point");
 
       svg.remove();
     });
@@ -231,7 +231,7 @@ describe("Plots", () => {
       it("setup is handled properly", () => {
         assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
         assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-        circlePlot.getAllSelections().each(getCirclePlotVerifier());
+        circlePlot.selections().each(getCirclePlotVerifier());
         assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -239,7 +239,7 @@ describe("Plots", () => {
       it("rendering is idempotent", () => {
         circlePlot.render();
         circlePlot.render();
-        circlePlot.getAllSelections().each(getCirclePlotVerifier());
+        circlePlot.selections().each(getCirclePlotVerifier());
         assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
         svg.remove();
       });
@@ -253,7 +253,7 @@ describe("Plots", () => {
         });
 
         it("the circles re-rendered properly", () => {
-          var circles = circlePlot.getAllSelections();
+          var circles = circlePlot.selections();
           circles.each(getCirclePlotVerifier());
           assert.strictEqual(circlesInArea, 4, "four circles were found in the render area");
           svg.remove();

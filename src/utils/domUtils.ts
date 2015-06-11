@@ -152,10 +152,7 @@ export module Utils {
     function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
       var value = style.getPropertyValue(property);
       var parsedValue = parseFloat(value);
-      if (parsedValue !== parsedValue) {
-          return 0;
-      }
-      return parsedValue;
+      return parsedValue || 0;
     }
   }
 }

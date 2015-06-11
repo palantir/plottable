@@ -379,7 +379,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = plot.getAllSelections();
+      var bars = plot.selections();
 
       assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
 

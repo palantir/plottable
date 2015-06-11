@@ -54,7 +54,6 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/colorUtilsTests.ts" />
-///<reference path="utils/windowUtilsTests.ts" />
 ///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />

@@ -114,7 +114,7 @@ export module Scales {
       var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
       // If you only have 1 tick, you can't tell how big the scale is.
       if (ticks.length <= 1) {
-        ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
+        ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
       }
       return ticks;
     }
@@ -162,7 +162,7 @@ export module Scales {
       var adjustedLower = this._adjustedLog(lower);
       var adjustedUpper = this._adjustedLog(upper);
       var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
+      var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
       return ticks;
     }
 
@@ -197,7 +197,7 @@ export module Scales {
     }
 
     public defaultTicks(): number[] {
-      return this._d3Scale.ticks(QuantitativeScale._DEFAULT_NUM_TICKS);
+      return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
   }
 }

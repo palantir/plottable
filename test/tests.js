@@ -443,7 +443,7 @@ describe("Drawers", function () {
             linePlot.x(function (d) { return d.a; }, xScale);
             linePlot.y(function (d) { return d.b; }, yScale);
             linePlot.renderTo(svg);
-            var lineSelection = linePlot.getAllSelections();
+            var lineSelection = linePlot.selections();
             data.forEach(function (datum, index) {
                 var selection = drawer.selectionForIndex(index);
                 assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
@@ -2341,7 +2341,7 @@ describe("Plots", function () {
             svg1.remove();
             svg2.remove();
         });
-        it("getAllSelections() with dataset retrieval", function () {
+        it("selections() with dataset retrieval", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var plot = new Plottable.Plot();
             var dataset1 = new Plottable.Dataset([{ value: 0 }, { value: 1 }, { value: 2 }]);
@@ -2370,12 +2370,12 @@ describe("Plots", function () {
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             mockDrawer2.renderArea(renderArea2);
-            var selections = plot.getAllSelections();
+            var selections = plot.selections();
             assert.strictEqual(selections.size(), 2, "all circle selections gotten");
-            var oneSelection = plot.getAllSelections([dataset1]);
+            var oneSelection = plot.selections([dataset1]);
             assert.strictEqual(oneSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
-            var oneElementSelection = plot.getAllSelections([dataset2]);
+            var oneElementSelection = plot.selections([dataset2]);
             assert.strictEqual(oneElementSelection.size(), 1);
             assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
             svg.remove();
@@ -2664,38 +2664,38 @@ describe("Plots", function () {
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
-        it("autorange() getter", function () {
-            assert.strictEqual(plot.autorange(), "none");
-            assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
-            assert.strictEqual(plot.autorange(), "x");
-            plot.autorange("y");
-            assert.strictEqual(plot.autorange(), "y");
-            plot.autorange("none");
-            assert.strictEqual(plot.autorange(), "none");
+        it("autorangeMode() getter", function () {
+            assert.strictEqual(plot.autorangeMode(), "none");
+            assert.strictEqual(plot.autorangeMode("x"), plot, "autorangeMode() setter did not return the original object");
+            assert.strictEqual(plot.autorangeMode(), "x");
+            plot.autorangeMode("y");
+            assert.strictEqual(plot.autorangeMode(), "y");
+            plot.autorangeMode("none");
+            assert.strictEqual(plot.autorangeMode(), "none");
             svg.remove();
         });
-        it("autorange() invalid inputs", function () {
+        it("autorangeMode() invalid inputs", function () {
             assert.throws(function () {
-                plot.autorange("foobar");
+                plot.autorangeMode("foobar");
             });
             svg.remove();
         });
         it("automatically adjusting Y domain over visible points", function () {
             xScale.domain([-3, 3]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.autorange("y");
+            plot.autorangeMode("y");
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-            plot.autorange("none");
+            plot.autorangeMode("none");
             svg.remove();
         });
         it("automatically adjusting Y domain when no points are visible", function () {
-            plot.autorange("y");
+            plot.autorangeMode("y");
             xScale.domain([-0.5, 0.5]);
             assert.deepEqual(yScale.domain(), [0, 1], "scale uses default domain");
             svg.remove();
         });
         it("automatically adjusting Y domain when X scale is replaced", function () {
-            plot.autorange("y");
+            plot.autorangeMode("y");
             var newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
             plot.x(xAccessor, newXScale);
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
@@ -2706,19 +2706,19 @@ describe("Plots", function () {
         it("automatically adjusting X domain over visible points", function () {
             yScale.domain([-3, 3]);
             assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.autorange("x");
+            plot.autorangeMode("x");
             assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-            plot.autorange("none");
+            plot.autorangeMode("none");
             svg.remove();
         });
         it("automatically adjusting X domain when no points are visible", function () {
-            plot.autorange("x");
+            plot.autorangeMode("x");
             yScale.domain([-0.5, 0.5]);
             assert.deepEqual(xScale.domain(), [0, 1], "scale uses default domain");
             svg.remove();
         });
         it("automatically adjusting X domain when Y scale is replaced", function () {
-            plot.autorange("x");
+            plot.autorangeMode("x");
             var newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
             plot.y(yAccessor, newYScale);
             assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
@@ -2727,7 +2727,7 @@ describe("Plots", function () {
             svg.remove();
         });
         it("showAllData()", function () {
-            plot.autorange("y");
+            plot.autorangeMode("y");
             xScale.domain([-0.5, 0.5]);
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -2735,16 +2735,16 @@ describe("Plots", function () {
             svg.remove();
         });
         it("show all data without auto adjust domain", function () {
-            plot.autorange("y");
+            plot.autorangeMode("y");
             xScale.domain([-0.5, 0.5]);
-            plot.autorange("none");
+            plot.autorangeMode("none");
             plot.showAllData();
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
             svg.remove();
         });
         it("listeners are deregistered after removal", function () {
-            plot.autorange("y");
+            plot.autorangeMode("y");
             plot.destroy();
             assert.strictEqual(xScale._callbacks.size, 0, "the plot is no longer attached to xScale");
             assert.strictEqual(yScale._callbacks.size, 0, "the plot is no longer attached to yScale");
@@ -2866,20 +2866,20 @@ describe("Plots", function () {
             piePlot.outerRadius(function () { return 250; });
             svg.remove();
         });
-        describe("getAllSelections", function () {
+        describe("selections", function () {
             it("retrieves all dataset selections with no args", function () {
-                var allSectors = piePlot.getAllSelections();
+                var allSectors = piePlot.selections();
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 svg.remove();
             });
             it("retrieves correct selections", function () {
-                var allSectors = piePlot.getAllSelections([simpleDataset]);
+                var allSectors = piePlot.selections([simpleDataset]);
                 assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
                 assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
                 svg.remove();
             });
             it("skips invalid Datsets", function () {
-                var allSectors = piePlot.getAllSelections([new Plottable.Dataset([])]);
+                var allSectors = piePlot.selections([new Plottable.Dataset([])]);
                 assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
                 svg.remove();
             });
@@ -3085,14 +3085,14 @@ describe("Plots", function () {
             assertCorrectPathSplitting("x=undefined");
             svg.remove();
         });
-        describe("getAllSelections()", function () {
+        describe("selections()", function () {
             it("retrieves all dataset selections with no args", function () {
                 var dataset3 = new Plottable.Dataset([
                     { foo: 0, bar: 1 },
                     { foo: 1, bar: 0.95 }
                 ]);
                 linePlot.addDataset(dataset3);
-                var allLines = linePlot.getAllSelections();
+                var allLines = linePlot.selections();
                 assert.strictEqual(allLines.size(), 2, "all lines retrieved");
                 svg.remove();
             });
@@ -3102,7 +3102,7 @@ describe("Plots", function () {
                     { foo: 1, bar: 0.95 }
                 ]);
                 linePlot.addDataset(dataset3);
-                var allLines = linePlot.getAllSelections([dataset3]);
+                var allLines = linePlot.selections([dataset3]);
                 assert.strictEqual(allLines.size(), 1, "all lines retrieved");
                 var selectionData = allLines.data();
                 assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
@@ -3115,7 +3115,7 @@ describe("Plots", function () {
                 ]);
                 linePlot.addDataset(dataset3);
                 var dummyDataset = new Plottable.Dataset([]);
-                var allLines = linePlot.getAllSelections([dataset3, dummyDataset]);
+                var allLines = linePlot.selections([dataset3, dummyDataset]);
                 assert.strictEqual(allLines.size(), 1, "all lines retrieved");
                 var selectionData = allLines.data();
                 assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
@@ -3358,11 +3358,11 @@ describe("Plots", function () {
             TestMethods.assertAreaPathCloseTo(areaPathString, expectedPath, 0.1, "area d was set correctly (x=undefined case)");
             svg.remove();
         });
-        describe("getAllSelections()", function () {
+        describe("selections()", function () {
             it("retrieves all selections with no args", function () {
                 var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
                 areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
-                var allAreas = areaPlot.getAllSelections();
+                var allAreas = areaPlot.selections();
                 assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
                 assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
                 svg.remove();
@@ -3370,7 +3370,7 @@ describe("Plots", function () {
             it("retrieves correct selections", function () {
                 var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
                 areaPlot.addDataset(twoPointDataset);
-                var allAreas = areaPlot.getAllSelections([twoPointDataset]);
+                var allAreas = areaPlot.selections([twoPointDataset]);
                 assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
                 assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
@@ -3380,7 +3380,7 @@ describe("Plots", function () {
                 var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
                 areaPlot.addDataset(twoPointDataset);
                 var dummyDataset = new Plottable.Dataset([]);
-                var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
+                var allAreas = areaPlot.selections([twoPointDataset, dummyDataset]);
                 assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
                 var selectionData = allAreas.data();
                 assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
@@ -3548,7 +3548,7 @@ describe("Plots", function () {
                 var d0, d1;
                 var d0Px, d1Px;
                 beforeEach(function () {
-                    bars = barPlot.getAllSelections();
+                    bars = barPlot.selections();
                     zeroY = yScale.scale(0);
                     d0 = dataset.data()[0];
                     d0Px = {
@@ -3855,7 +3855,7 @@ describe("Plots", function () {
                 var d0, d1;
                 var d0Px, d1Px;
                 beforeEach(function () {
-                    bars = barPlot.getAllSelections();
+                    bars = barPlot.selections();
                     zeroX = xScale.scale(0);
                     d0 = dataset.data()[0];
                     d0Px = {
@@ -3994,7 +3994,7 @@ describe("Plots", function () {
                 assert.lengthOf(texts, 0, "texts were immediately removed");
             });
         });
-        describe("getAllSelections", function () {
+        describe("selections()", function () {
             var verticalBarPlot;
             var dataset;
             var svg;
@@ -4011,7 +4011,7 @@ describe("Plots", function () {
                 var barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
                 verticalBarPlot.addDataset(new Plottable.Dataset(barData));
                 verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections();
+                var allBars = verticalBarPlot.selections();
                 assert.strictEqual(allBars.size(), 3, "retrieved all bars");
                 svg.remove();
             });
@@ -4021,7 +4021,7 @@ describe("Plots", function () {
                 verticalBarPlot.addDataset(dataset1);
                 verticalBarPlot.addDataset(dataset2);
                 verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections([dataset1]);
+                var allBars = verticalBarPlot.selections([dataset1]);
                 assert.strictEqual(allBars.size(), 3, "all bars retrieved");
                 var selectionData = allBars.data();
                 assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
@@ -4032,7 +4032,7 @@ describe("Plots", function () {
                 var notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
                 verticalBarPlot.addDataset(dataset1);
                 verticalBarPlot.renderTo(svg);
-                var allBars = verticalBarPlot.getAllSelections([dataset1, notAddedDataset]);
+                var allBars = verticalBarPlot.selections([dataset1, notAddedDataset]);
                 assert.strictEqual(allBars.size(), 3, "all bars retrieved");
                 var selectionData = allBars.data();
                 assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
@@ -4051,7 +4051,7 @@ describe("Plots", function () {
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
             xScale.domain(["b", "c"]);
             assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-            plot.autorange("y");
+            plot.autorangeMode("y");
             assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
             svg.remove();
         });
@@ -4109,7 +4109,7 @@ describe("Plots", function () {
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).y2(function (d) { return d.y2; });
             plot.addDataset(new Plottable.Dataset(data1));
             plot.renderTo(svg);
-            var rectanglesSelection = plot.getAllSelections();
+            var rectanglesSelection = plot.selections();
             assert.strictEqual(rectanglesSelection.size(), 5, "only 5 rectangles should be displayed");
             rectanglesSelection.each(function (d, i) {
                 var sel = d3.select(this);
@@ -4160,7 +4160,8 @@ describe("Plots", function () {
         it("renders correctly", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.range(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
@@ -4172,7 +4173,8 @@ describe("Plots", function () {
         it("renders correctly when data is set after construction", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.range(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Rectangle();
@@ -4187,7 +4189,8 @@ describe("Plots", function () {
             var CELL_WIDTH = 100;
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.range(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var dataset = new Plottable.Dataset();
             var gridPlot = new Plottable.Plots.Rectangle();
@@ -4214,7 +4217,8 @@ describe("Plots", function () {
         it("can invert y axis correctly", function () {
             var xScale = new Plottable.Scales.Category();
             var yScale = new Plottable.Scales.Category();
-            var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var colorScale = new Plottable.Scales.InterpolatedColor();
+            colorScale.range(["black", "white"]);
             var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var gridPlot = new Plottable.Plots.Rectangle();
             gridPlot.addDataset(new Plottable.Dataset(DATA)).attr("fill", function (d) { return d.magnitude; }, colorScale);
@@ -4241,32 +4245,34 @@ describe("Plots", function () {
             cellAV.attr("y", "100");
             svg.remove();
         });
-        describe("getAllSelections()", function () {
+        describe("selections()", function () {
             it("retrieves all selections with no args", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.range(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
                 gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
-                var allCells = gridPlot.getAllSelections();
+                var allCells = gridPlot.selections();
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 svg.remove();
             });
             it("retrieves correct selections", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.range(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
                 gridPlot.addDataset(dataset).attr("fill", function (d) { return d.magnitude; }, colorScale);
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
-                var allCells = gridPlot.getAllSelections([dataset]);
+                var allCells = gridPlot.selections([dataset]);
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 var selectionData = allCells.data();
                 assert.includeMembers(selectionData, DATA, "data in selection data");
@@ -4275,7 +4281,8 @@ describe("Plots", function () {
             it("skips invalid Datasets", function () {
                 var xScale = new Plottable.Scales.Category();
                 var yScale = new Plottable.Scales.Category();
-                var colorScale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+                var colorScale = new Plottable.Scales.InterpolatedColor();
+                colorScale.range(["black", "white"]);
                 var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
                 var gridPlot = new Plottable.Plots.Rectangle();
                 var dataset = new Plottable.Dataset(DATA);
@@ -4283,7 +4290,7 @@ describe("Plots", function () {
                 gridPlot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
                 gridPlot.renderTo(svg);
                 var dummyDataset = new Plottable.Dataset([]);
-                var allCells = gridPlot.getAllSelections([dataset, dummyDataset]);
+                var allCells = gridPlot.selections([dataset, dummyDataset]);
                 assert.strictEqual(allCells.size(), 4, "all cells retrieved");
                 var selectionData = allCells.data();
                 assert.includeMembers(selectionData, DATA, "data in selection data");
@@ -4323,7 +4330,7 @@ describe("Plots", function () {
             var plot = new Plottable.Plots.Scatter().x(xAccessor).y(yAccessor);
             plot.addDataset(dataset);
             plot.renderTo(svg);
-            var symbols = plot.getAllSelections();
+            var symbols = plot.selections();
             var c1 = d3.select(symbols[0][0]);
             var c2 = d3.select(symbols[0][1]);
             var c1Position = d3.transform(c1.attr("transform")).translate;
@@ -4350,7 +4357,7 @@ describe("Plots", function () {
             assert.closeTo(c2Position[1], 0, 0.01, "second symbol cy is correct after metadata change");
             svg.remove();
         });
-        it("getAllSelections()", function () {
+        it("selections()", function () {
             var svg = TestMethods.generateSVG(400, 400);
             var xScale = new Plottable.Scales.Linear();
             var yScale = new Plottable.Scales.Linear();
@@ -4358,7 +4365,7 @@ describe("Plots", function () {
             var data2 = [{ x: 1, y: 2 }, { x: 3, y: 4 }];
             var plot = new Plottable.Plots.Scatter().x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).addDataset(new Plottable.Dataset(data)).addDataset(new Plottable.Dataset(data2));
             plot.renderTo(svg);
-            var allCircles = plot.getAllSelections();
+            var allCircles = plot.selections();
             assert.strictEqual(allCircles.size(), 4, "all circles retrieved");
             var selectionData = allCircles.data();
             assert.includeMembers(selectionData, data, "first dataset data in selection data");
@@ -4426,14 +4433,14 @@ describe("Plots", function () {
             var dataWithNaN = data.slice();
             dataWithNaN[2] = { foo: 0.4, bar: NaN };
             dataset.data(dataWithNaN);
-            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw NaN point");
+            assert.strictEqual(plot.selections().size(), 4, "does not draw NaN point");
             var dataWithUndefined = data.slice();
             dataWithUndefined[2] = { foo: 0.4, bar: undefined };
             dataset.data(dataWithUndefined);
-            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+            assert.strictEqual(plot.selections().size(), 4, "does not draw undefined point");
             dataWithUndefined[2] = { foo: undefined, bar: 0.4 };
             dataset.data(dataWithUndefined);
-            assert.strictEqual(plot.getAllSelections().size(), 4, "does not draw undefined point");
+            assert.strictEqual(plot.selections().size(), 4, "does not draw undefined point");
             svg.remove();
         });
         describe("Example ScatterPlot with quadratic series", function () {
@@ -4489,14 +4496,14 @@ describe("Plots", function () {
             it("setup is handled properly", function () {
                 assert.deepEqual(xScale.range(), [0, SVG_WIDTH], "xScale range was set by the renderer");
                 assert.deepEqual(yScale.range(), [SVG_HEIGHT, 0], "yScale range was set by the renderer");
-                circlePlot.getAllSelections().each(getCirclePlotVerifier());
+                circlePlot.selections().each(getCirclePlotVerifier());
                 assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
             });
             it("rendering is idempotent", function () {
                 circlePlot.render();
                 circlePlot.render();
-                circlePlot.getAllSelections().each(getCirclePlotVerifier());
+                circlePlot.selections().each(getCirclePlotVerifier());
                 assert.strictEqual(circlesInArea, 10, "10 circles were drawn");
                 svg.remove();
             });
@@ -4508,7 +4515,7 @@ describe("Plots", function () {
                     dataAreaPart = { xMin: 1, xMax: 3, yMin: 6, yMax: 3 };
                 });
                 it("the circles re-rendered properly", function () {
-                    var circles = circlePlot.getAllSelections();
+                    var circles = circlePlot.selections();
                     circles.each(getCirclePlotVerifier());
                     assert.strictEqual(circlesInArea, 4, "four circles were found in the render area");
                     svg.remove();
@@ -4804,7 +4811,7 @@ describe("Plots", function () {
         it("auto scales correctly on stacked area", function () {
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4812,7 +4819,7 @@ describe("Plots", function () {
         it("auto scales correctly on stacked bar", function () {
             var plot = new Plottable.Plots.StackedBar();
             plot.addDataset(dataset1).addDataset(dataset2);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4844,7 +4851,7 @@ describe("Plots", function () {
         it("auto scales correctly on stacked bar", function () {
             var plot = new Plottable.Plots.StackedBar();
             plot.addDataset(dataset1).addDataset(dataset2);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -4852,7 +4859,7 @@ describe("Plots", function () {
         it("auto scales correctly on stacked area", function () {
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
-            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorange("y");
+            plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
             plot.renderTo(svg);
             assert.deepEqual(yScale.domain(), [0, 4.5], "auto scales takes stacking into account");
             svg.remove();
@@ -5637,7 +5644,7 @@ describe("Plots", function () {
             plot.renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot.getAllSelections();
+            var bars = plot.selections();
             assert.strictEqual(bars.size(), 7, "draws a bar for each datum");
             var aBars = [d3.select(bars[0][0]), d3.select(bars[0][3])];
             var bBars = [d3.select(bars[0][1]), d3.select(bars[0][4]), d3.select(bars[0][5])];
@@ -5935,7 +5942,7 @@ describe("Plots", function () {
             plot.renderTo(svg);
         });
         it("renders correctly", function () {
-            var bars = plot.getAllSelections();
+            var bars = plot.selections();
             assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
             var aBar0 = d3.select(bars[0][0]);
             var aBar1 = d3.select(bars[0][3]);
@@ -5981,7 +5988,7 @@ describe("Metadata", function () {
         var plot = new Plottable.Plots.Scatter().x(xAccessor, xScale).y(yAccessor, yScale);
         plot.addDataset(dataset);
         plot.renderTo(svg);
-        var circles = plot.getAllSelections();
+        var circles = plot.selections();
         var c1 = d3.select(circles[0][0]);
         var c2 = d3.select(circles[0][1]);
         var c1Position = d3.transform(c1.attr("transform")).translate;
@@ -6012,7 +6019,7 @@ describe("Metadata", function () {
         plot.addDataset(dataset1);
         plot.addDataset(dataset2);
         plot.renderTo(svg);
-        var circles = plot.getAllSelections();
+        var circles = plot.selections();
         var c1 = d3.select(circles[0][0]);
         var c2 = d3.select(circles[0][1]);
         var c3 = d3.select(circles[0][2]);
@@ -6192,8 +6199,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach()", function () {
-        var c1 = new Plottable.Component().classed("component-1", true);
-        var c2 = new Plottable.Component().classed("component-2", true);
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = TestMethods.generateSVG(200, 200);
         cg.renderTo(svg);
@@ -6216,6 +6223,17 @@ describe("ComponentGroups", function () {
         c1Node = svg.select(".component-1").node();
         assert.isNotNull(cgNode, "component group was added back to the DOM");
         assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
+        svg.remove();
+    });
+    it("destroy()s its Components when destroy()ed", function () {
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
+        var cg = new Plottable.Components.Group([c1, c2]);
+        var svg = TestMethods.generateSVG(200, 200);
+        cg.renderTo(svg);
+        cg.destroy();
+        assert.throws(function () { return c1.renderTo(svg); }, Error);
+        assert.throws(function () { return c2.renderTo(svg); }, Error);
         svg.remove();
     });
     describe("requests space based on contents, but occupies total offered space", function () {
@@ -6523,23 +6541,23 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("css classing works as expected", function () {
-        assert.isFalse(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-KEEP", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-REMOVE", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
-        c.classed("CSS-PREANCHOR-REMOVE", false);
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-KEEP");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-REMOVE");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        c.removeClass("CSS-PREANCHOR-REMOVE");
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
         c.anchor(svg);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", true);
-        assert.isTrue(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", false);
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-        assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        c.addClass("CSS-POSTANCHOR");
+        assert.isTrue(c.hasClass("CSS-POSTANCHOR"));
+        c.removeClass("CSS-POSTANCHOR");
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        assert.isFalse(c.hasClass(undefined), "returns false when hasClass called w/ undefined");
+        assert.strictEqual(c.addClass(undefined), c, "returns this when hasClass called w/ undefined and true");
         svg.remove();
     });
     it("can't reuse component if it's been destroy()-ed", function () {
@@ -6782,7 +6800,7 @@ function generateBasicTable(nRows, nCols) {
 describe("Tables", function () {
     it("tables are classed properly", function () {
         var table = new Plottable.Components.Table();
-        assert.isTrue(table.classed("table"));
+        assert.isTrue(table.hasClass("table"));
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Components.Table();
@@ -7400,21 +7418,24 @@ describe("Scales", function () {
             assert.strictEqual("#d9151f", scale.scale(0.9));
         });
         it("accepts array types with color hex values", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["#000", "#FFF"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.range(["#000", "#FFF"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
             assert.strictEqual("#777777", scale.scale(8));
         });
         it("accepts array types with color names", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.range(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
             assert.strictEqual("#777777", scale.scale(8));
         });
         it("overflow scale values clamp to range", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.range(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
@@ -7422,11 +7443,12 @@ describe("Scales", function () {
             assert.strictEqual("#ffffff", scale.scale(100));
         });
         it("can be converted to a different range", function () {
-            var scale = new Plottable.Scales.InterpolatedColor(["black", "white"]);
+            var scale = new Plottable.Scales.InterpolatedColor();
+            scale.range(["black", "white"]);
             scale.domain([0, 16]);
             assert.strictEqual("#000000", scale.scale(0));
             assert.strictEqual("#ffffff", scale.scale(16));
-            scale.colorRange(Plottable.Scales.InterpolatedColor.REDS);
+            scale.range(Plottable.Scales.InterpolatedColor.REDS);
             assert.strictEqual("#b10026", scale.scale(16));
         });
     });
@@ -8201,28 +8223,6 @@ describe("Utils.Color", function () {
         var nullHexcode = Plottable.Utils.Color.colorTest(colorTester, "plottable-colors-11");
         assert.strictEqual(nullHexcode, null, "null hexcode returned");
         colorTester.remove();
-    });
-});
-
-///<reference path="../testReference.ts" />
-var assert = chai.assert;
-describe("Utils", function () {
-    describe("WindowUtils", function () {
-        it("copyObject()", function () {
-            var oldMap = {};
-            oldMap["a"] = 1;
-            oldMap["b"] = 2;
-            oldMap["c"] = 3;
-            oldMap["undefined"] = undefined;
-            oldMap["null"] = null;
-            oldMap["fun"] = function (d) { return d; };
-            oldMap["NaN"] = 0 / 0;
-            oldMap["inf"] = 1 / 0;
-            var map = Plottable.Utils.Window.copyObject(oldMap);
-            assert.deepEqual(map, oldMap, "All values were copied.");
-            map = Plottable.Utils.Window.copyObject({});
-            assert.deepEqual(map, {}, "No values were added.");
-        });
     });
 });
 

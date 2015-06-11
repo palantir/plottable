@@ -275,17 +275,6 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject<T>(oldObject: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
         }
     }
 }
@@ -1063,32 +1052,16 @@ declare module Plottable {
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @constructor
-             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-             *   ("#FFFFFF") or keywords ("white").
              * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
-            constructor(colorRange?: string[], scaleType?: string);
+            constructor(scaleType?: string);
             extentOfValues(values: number[]): number[];
-            /**
-             * Gets the color range.
-             *
-             * @returns {string[]}
-             */
-            colorRange(): string[];
-            /**
-             * Sets the color range.
-             *
-             * @param {string[]} colorRange
-             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
-             */
-            colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
             protected _getDomain(): number[];
             protected _setBackingScaleDomain(values: number[]): void;
             protected _getRange(): string[];
-            protected _setRange(values: string[]): void;
+            protected _setRange(range: string[]): void;
         }
     }
 }
@@ -1285,6 +1258,7 @@ declare module Plottable {
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
          *
@@ -1326,7 +1300,7 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
-        protected _getSize(availableWidth: number, availableHeight: number): {
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
         };
@@ -1380,15 +1354,21 @@ declare module Plottable {
          *
          * @param {string} cssClass The CSS class to check for.
          */
-        classed(cssClass: string): boolean;
+        hasClass(cssClass: string): boolean;
         /**
-         * Adds/removes a given CSS class to/from the Component.
+         * Adds a given CSS class to the Component.
          *
-         * @param {string} cssClass The CSS class to add or remove.
-         * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+         * @param {string} cssClass The CSS class to add.
          * @returns {Component} The calling Component.
          */
-        classed(cssClass: string, addClass: boolean): Component;
+        addClass(cssClass: string): Component;
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        removeClass(cssClass: string): Component;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
@@ -1529,7 +1509,7 @@ declare module Plottable {
             has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -1751,7 +1731,7 @@ declare module Plottable {
             orientation(): string;
             orientation(orientation: string): Time;
             protected _computeHeight(): number;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2199,7 +2179,7 @@ declare module Plottable {
             protected _box: d3.Selection<void>;
             constructor();
             protected _setup(): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2354,7 +2334,7 @@ declare module Plottable {
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+        selections(datasets?: Dataset[]): d3.Selection<any>;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2522,20 +2502,20 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Gets the automatic domain adjustment setting for visible points.
+         * Gets the automatic domain adjustment mode for visible points.
          */
-        autorange(): string;
+        autorangeMode(): string;
         /**
-         * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+         * Sets the automatic domain adjustment mode for visible points to operate against the X Scale, Y Scale, or neither.
          * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * @param {string} scaleName One of "x"/"y"/"none".
+         * @param {string} autorangeMode One of "x"/"y"/"none".
          *   "x" will adjust the x Scale in relation to changes in the y domain.
          *   "y" will adjust the y Scale in relation to changes in the x domain.
          *   "none" means neither Scale will change automatically.
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorange(scaleName: string): XYPlot<X, Y>;
+        autorangeMode(autorangeMode: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts the domains of both X and Y scales to show all data.
@@ -2864,7 +2844,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }

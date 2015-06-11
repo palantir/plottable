@@ -162,7 +162,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("getAllSelections()", () => {
+    describe("selections()", () => {
       it("retrieves all dataset selections with no args", () => {
         var dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
@@ -170,7 +170,7 @@ describe("Plots", () => {
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.getAllSelections();
+        var allLines = linePlot.selections();
         assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         svg.remove();
@@ -183,7 +183,7 @@ describe("Plots", () => {
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.getAllSelections([dataset3]);
+        var allLines = linePlot.selections([dataset3]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         var selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
@@ -199,7 +199,7 @@ describe("Plots", () => {
         linePlot.addDataset(dataset3);
         var dummyDataset = new Plottable.Dataset([]);
 
-        var allLines = linePlot.getAllSelections([dataset3, dummyDataset]);
+        var allLines = linePlot.selections([dataset3, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
         var selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");

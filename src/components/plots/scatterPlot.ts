@@ -15,7 +15,7 @@ export module Plots {
      */
     constructor() {
       super();
-      this.classed("scatter-plot", true);
+      this.addClass("scatter-plot");
       var animator = new Animators.Easing();
       animator.startDelay(5);
       animator.stepDuration(250);

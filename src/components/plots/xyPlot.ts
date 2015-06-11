@@ -18,7 +18,7 @@ module Plottable {
      */
     constructor() {
       super();
-      this.classed("xy-plot", true);
+      this.addClass("xy-plot");
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
@@ -149,22 +149,22 @@ module Plottable {
     }
 
     /**
-     * Gets the automatic domain adjustment setting for visible points.
+     * Gets the automatic domain adjustment mode for visible points.
      */
-    public autorange(): string;
+    public autorangeMode(): string;
     /**
-     * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+     * Sets the automatic domain adjustment mode for visible points to operate against the X Scale, Y Scale, or neither.
      * If "x" or "y" is specified the adjustment is immediately performed.
      *
-     * @param {string} scaleName One of "x"/"y"/"none".
+     * @param {string} autorangeMode One of "x"/"y"/"none".
      *   "x" will adjust the x Scale in relation to changes in the y domain.
      *   "y" will adjust the y Scale in relation to changes in the x domain.
      *   "none" means neither Scale will change automatically.
      * @returns {XYPlot} The calling XYPlot.
      */
-    public autorange(scaleName: string): XYPlot<X, Y>;
-    public autorange(scaleName?: string): any {
-      if (scaleName == null) {
+    public autorangeMode(autorangeMode: string): XYPlot<X, Y>;
+    public autorangeMode(autorangeMode?: string): any {
+      if (autorangeMode == null) {
         if (this._autoAdjustXScaleDomain) {
           return "x";
         }
@@ -173,7 +173,7 @@ module Plottable {
         }
         return "none";
       }
-      switch (scaleName) {
+      switch (autorangeMode) {
         case "x":
           this._autoAdjustXScaleDomain = true;
           this._autoAdjustYScaleDomain = false;
@@ -189,7 +189,7 @@ module Plottable {
           this._autoAdjustYScaleDomain = false;
           break;
         default:
-          throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+          throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
       }
       return this;
     }

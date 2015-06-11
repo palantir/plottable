@@ -265,7 +265,7 @@ describe("Plots", () => {
     });
 
     it("renders correctly", () => {
-      var bars = plot.getAllSelections();
+      var bars = plot.selections();
 
       assert.strictEqual(bars.size(), 7, "Number of bars should be equivalent to number of datum");
 
