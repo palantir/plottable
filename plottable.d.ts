@@ -2327,7 +2327,7 @@ declare module Plottable {
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+        selections(datasets?: Dataset[]): d3.Selection<any>;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2837,7 +2837,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }

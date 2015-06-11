@@ -174,8 +174,8 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    public getAllSelections(datasets = this.datasets()) {
-      var allSelections = super.getAllSelections(datasets)[0];
+    public selections(datasets = this.datasets()) {
+      var allSelections = super.selections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
       lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));
