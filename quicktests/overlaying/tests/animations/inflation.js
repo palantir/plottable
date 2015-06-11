@@ -45,7 +45,8 @@ function run(svg, data, Plottable) {
               .addDataset(dataset)
               .x(function(d, i) { return d.x + y*12; }, xScale)
               .y(function(d) { return d.y; }, yScale)
-              .attr("stroke", "#000000");
+              .attr("stroke", "#000000")
+              .animated(true);
     plot_array.push(lineRenderer); 
   };
 
@@ -62,7 +63,8 @@ function run(svg, data, Plottable) {
               .addDataset(avg_ds)
               .x(function(d, i) { return d.x; }, xScale)
               .y(function(d) { return d.y; }, yScale)
-              .attr("stroke", "#FF0000");
+              .attr("stroke", "#FF0000")
+              .animated(true);
     plot_array.push(lineRenderer);     
   };
 
