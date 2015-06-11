@@ -392,6 +392,16 @@ module Plottable {
       }
     }
 
+    public hasClass(cssClass: string) {
+      if (cssClass == null) {
+        return false;
+      } else if (this._element == null) {
+        return (this._cssClasses.indexOf(cssClass) !== -1);
+      } else {
+        return this._element.classed(cssClass);
+      }
+    }
+
     public addClass(cssClass: string) {
       if (cssClass == null) {
         return this;
@@ -424,16 +434,6 @@ module Plottable {
       }
 
       return this;
-    }
-
-    public hasClass(cssClass: string) {
-      if (cssClass == null) {
-        return false;
-      } else if (this._element == null) {
-        return (this._cssClasses.indexOf(cssClass) !== -1);
-      } else {
-        return this._element.classed(cssClass);
-      }
     }
 
     /**
