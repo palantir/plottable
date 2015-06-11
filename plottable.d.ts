@@ -1190,8 +1190,8 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Element extends Drawer {
-            protected _svgElement: string;
+        class Rectangle extends Drawer {
+            constructor(dataset: Dataset);
             selector(): string;
         }
     }
@@ -1200,8 +1200,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Rectangle extends Element {
+        class Arc extends Drawer {
             constructor(dataset: Dataset);
+            selector(): string;
         }
     }
 }
@@ -1209,17 +1210,9 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc extends Element {
+        class Symbol extends Drawer {
             constructor(dataset: Dataset);
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Drawers {
-        class Symbol extends Element {
-            constructor(dataset: Dataset);
+            selector(): string;
         }
     }
 }

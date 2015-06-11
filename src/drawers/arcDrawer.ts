@@ -2,12 +2,16 @@
 
 module Plottable {
 export module Drawers {
-  export class Arc extends Element {
+  export class Arc extends Drawer {
 
     constructor(dataset: Dataset) {
       super(dataset);
       this._className = "arc";
-      this._svgElement = "path";
+      this._svgElementName = "path";
+    }
+
+    public selector() {
+      return "path";
     }
 
   }

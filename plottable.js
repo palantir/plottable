@@ -2694,39 +2694,17 @@ var Plottable;
 (function (Plottable) {
     var Drawers;
     (function (Drawers) {
-        var Element = (function (_super) {
-            __extends(Element, _super);
-            function Element() {
-                _super.apply(this, arguments);
-            }
-            Element.prototype.selector = function () {
-                return this._svgElement;
-            };
-            return Element;
-        })(Plottable.Drawer);
-        Drawers.Element = Element;
-    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Drawers;
-    (function (Drawers) {
         var Rectangle = (function (_super) {
             __extends(Rectangle, _super);
             function Rectangle(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "rect";
+                this._svgElementName = "rect";
             }
+            Rectangle.prototype.selector = function () {
+                return "rect";
+            };
             return Rectangle;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2747,10 +2725,13 @@ var Plottable;
             function Arc(dataset) {
                 _super.call(this, dataset);
                 this._className = "arc";
-                this._svgElement = "path";
+                this._svgElementName = "path";
             }
+            Arc.prototype.selector = function () {
+                return "path";
+            };
             return Arc;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2770,11 +2751,14 @@ var Plottable;
             __extends(Symbol, _super);
             function Symbol(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "path";
+                this._svgElementName = "path";
                 this._className = "symbol";
             }
+            Symbol.prototype.selector = function () {
+                return "path";
+            };
             return Symbol;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
