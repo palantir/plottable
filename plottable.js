@@ -2839,10 +2839,11 @@ var Plottable;
             this._isAnchored = false;
             this._boxes = [];
             this._isTopLevelComponent = false;
-            this._cssClasses = ["component"];
+            this._cssClasses = new Plottable.Utils.Set();
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
+            this._cssClasses.add("component");
         }
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -2912,7 +2913,7 @@ var Plottable;
             this._cssClasses.forEach(function (cssClass) {
                 _this._element.classed(cssClass, true);
             });
-            this._cssClasses = null;
+            this._cssClasses = new Plottable.Utils.Set();
             this._backgroundContainer = this._element.append("g").classed("background-container", true);
             this._addBox("background-fill", this._backgroundContainer);
             this._content = this._element.append("g").classed("content", true);
@@ -3115,7 +3116,7 @@ var Plottable;
                 return false;
             }
             else if (this._element == null) {
-                return (this._cssClasses.indexOf(cssClass) !== -1);
+                return this._cssClasses.has(cssClass);
             }
             else {
                 return this._element.classed(cssClass);
@@ -3132,10 +3133,7 @@ var Plottable;
                 return this;
             }
             if (this._element == null) {
-                var classIndex = this._cssClasses.indexOf(cssClass);
-                if (classIndex === -1) {
-                    this._cssClasses.push(cssClass);
-                }
+                this._cssClasses.add(cssClass);
             }
             else {
                 this._element.classed(cssClass, true);
@@ -3153,10 +3151,7 @@ var Plottable;
                 return this;
             }
             if (this._element == null) {
-                var classIndex = this._cssClasses.indexOf(cssClass);
-                if (classIndex !== -1) {
-                    this._cssClasses.splice(classIndex, 1);
-                }
+                this._cssClasses.delete(cssClass);
             }
             else {
                 this._element.classed(cssClass, false);

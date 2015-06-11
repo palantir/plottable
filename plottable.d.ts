@@ -1258,6 +1258,7 @@ declare module Plottable {
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
          *

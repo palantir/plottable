@@ -44,10 +44,15 @@ module Plottable {
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _cssClasses: string[] = ["component"];
+    private _cssClasses = new Utils.Set<string>();
     private _destroyed = false;
     private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+
+
+    public constructor() {
+      this._cssClasses.add("component");
+    }
 
     /**
      * Attaches the Component as a child of a given d3 Selection.
@@ -120,7 +125,7 @@ module Plottable {
       this._cssClasses.forEach((cssClass: string) => {
         this._element.classed(cssClass, true);
       });
-      this._cssClasses = null;
+      this._cssClasses = new Utils.Set<string>();
 
       this._backgroundContainer = this._element.append("g").classed("background-container", true);
       this._addBox("background-fill", this._backgroundContainer);
@@ -360,7 +365,7 @@ module Plottable {
       if (cssClass == null) {
         return false;
       } else if (this._element == null) {
-        return (this._cssClasses.indexOf(cssClass) !== -1);
+        return this._cssClasses.has(cssClass);
       } else {
         return this._element.classed(cssClass);
       }
@@ -378,10 +383,7 @@ module Plottable {
       }
 
       if (this._element == null) {
-        var classIndex = this._cssClasses.indexOf(cssClass);
-        if (classIndex === -1) {
-          this._cssClasses.push(cssClass);
-        }
+        this._cssClasses.add(cssClass);
       } else {
         this._element.classed(cssClass, true);
       }
@@ -401,10 +403,7 @@ module Plottable {
       }
 
       if (this._element == null) {
-        var classIndex = this._cssClasses.indexOf(cssClass);
-        if (classIndex !== -1) {
-          this._cssClasses.splice(classIndex, 1);
-        }
+        this._cssClasses.delete(cssClass);
       } else {
         this._element.classed(cssClass, false);
       }
