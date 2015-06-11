@@ -1299,7 +1299,7 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
-        protected _getSize(availableWidth: number, availableHeight: number): {
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
         };
@@ -1502,7 +1502,7 @@ declare module Plottable {
             has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -1724,7 +1724,7 @@ declare module Plottable {
             orientation(): string;
             orientation(orientation: string): Time;
             protected _computeHeight(): number;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2172,7 +2172,7 @@ declare module Plottable {
             protected _box: d3.Selection<void>;
             constructor();
             protected _setup(): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
