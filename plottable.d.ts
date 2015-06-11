@@ -2513,13 +2513,13 @@ declare module Plottable {
          * Sets the automatic domain adjustment mode for visible points to operate against the X Scale, Y Scale, or neither.
          * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * @param {string} mode One of "x"/"y"/"none".
+         * @param {string} autorangeMode One of "x"/"y"/"none".
          *   "x" will adjust the x Scale in relation to changes in the y domain.
          *   "y" will adjust the y Scale in relation to changes in the x domain.
          *   "none" means neither Scale will change automatically.
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorangeMode(mode: string): XYPlot<X, Y>;
+        autorangeMode(autorangeMode: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts the domains of both X and Y scales to show all data.
