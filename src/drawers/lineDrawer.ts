@@ -5,11 +5,9 @@ export module Drawers {
   export class Line extends Drawer {
     public static PATH_CLASS = "line";
 
-    private _pathSelection: d3.Selection<void>;
-
     protected _enterData(data: any[]) {
       super._enterData(data);
-      this._pathSelection.data(data);
+      this._selection().data(data);
     }
 
     public renderArea(): d3.Selection<void>;
@@ -19,9 +17,8 @@ export module Drawers {
         return super.renderArea();
       }
       super.renderArea(area);
-      this._pathSelection = area.append("path")
-                                .classed(Line.PATH_CLASS, true)
-                                .style("fill", "none");
+      area.append("path").classed(Line.PATH_CLASS, true)
+                         .style("fill", "none");
       return this;
     }
 
@@ -30,12 +27,12 @@ export module Drawers {
     }
 
     protected _drawStep(step: AppliedDrawStep) {
-      step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
-      this._pathSelection.classed(Line.PATH_CLASS, true);
+      step.animator.animate(this._selection(), step.attrToAppliedProjector);
+      this._selection().classed(Line.PATH_CLASS, true);
     }
 
     public selector() {
-      return "." + Line.PATH_CLASS;
+      return "path";
     }
 
     public selectionForIndex(index: number) {

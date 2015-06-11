@@ -21,6 +21,7 @@ export module Drawers {
 
   export class Drawer {
     private _renderArea: d3.Selection<void>;
+    protected _svgElementName: string;
     protected _className: string;
     protected _dataset: Dataset;
 
@@ -129,6 +130,10 @@ export module Drawers {
       });
 
       return this;
+    }
+
+    protected _selection() {
+      return this.renderArea().selectAll(this.selector());
     }
 
     /**

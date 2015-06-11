@@ -5,13 +5,9 @@ export module Drawers {
   export class Element extends Drawer {
     protected _svgElement: string;
 
-    private _getDrawSelection() {
-      return this.renderArea().selectAll(this._svgElement);
-    }
-
     protected _drawStep(step: AppliedDrawStep) {
       super._drawStep(step);
-      var drawSelection = this._getDrawSelection();
+      var drawSelection = this._selection();
       if (step.attrToAppliedProjector["fill"]) {
         drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
       }
@@ -20,7 +16,7 @@ export module Drawers {
 
     protected _enterData(data: any[]) {
       super._enterData(data);
-      var dataElements = this._getDrawSelection().data(data);
+      var dataElements = this._selection().data(data);
       dataElements.enter().append(this._svgElement);
       if (this._className != null) {
         dataElements.classed(this._className, true);

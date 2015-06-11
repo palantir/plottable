@@ -2586,6 +2586,9 @@ var Plottable;
             });
             return this;
         };
+        Drawer.prototype._selection = function () {
+            return this.renderArea().selectAll(this.selector());
+        };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
@@ -2622,25 +2625,25 @@ var Plottable;
             }
             Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
-                this._pathSelection.data(data);
+                this._selection().data(data);
             };
             Line.prototype.renderArea = function (area) {
                 if (area == null) {
                     return _super.prototype.renderArea.call(this);
                 }
                 _super.prototype.renderArea.call(this, area);
-                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
+                area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
                 return this;
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
             };
             Line.prototype._drawStep = function (step) {
-                step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
-                this._pathSelection.classed(Line.PATH_CLASS, true);
+                step.animator.animate(this._selection(), step.attrToAppliedProjector);
+                this._selection().classed(Line.PATH_CLASS, true);
             };
             Line.prototype.selector = function () {
-                return "." + Line.PATH_CLASS;
+                return "path";
             };
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
@@ -2669,19 +2672,19 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Area.prototype._enterData = function (data) {
-                this._areaSelection.data(data);
+                this._selection().data(data);
             };
             Area.prototype.renderArea = function (area) {
                 if (area == null) {
                     return _super.prototype.renderArea.call(this);
                 }
                 Plottable.Drawer.prototype.renderArea.call(this, area);
-                this._areaSelection = area.append("path").style("stroke", "none");
+                area.append("path").style("stroke", "none");
                 return this;
             };
             Area.prototype._drawStep = function (step) {
-                step.animator.animate(this._areaSelection, step.attrToAppliedProjector);
-                this._areaSelection.classed(Area.PATH_CLASS, true);
+                step.animator.animate(this._selection(), step.attrToAppliedProjector);
+                this._selection().classed(Area.PATH_CLASS, true);
             };
             Area.prototype.selector = function () {
                 return "path";
@@ -2709,12 +2712,9 @@ var Plottable;
             function Element() {
                 _super.apply(this, arguments);
             }
-            Element.prototype._getDrawSelection = function () {
-                return this.renderArea().selectAll(this._svgElement);
-            };
             Element.prototype._drawStep = function (step) {
                 _super.prototype._drawStep.call(this, step);
-                var drawSelection = this._getDrawSelection();
+                var drawSelection = this._selection();
                 if (step.attrToAppliedProjector["fill"]) {
                     drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
                 }
@@ -2722,7 +2722,7 @@ var Plottable;
             };
             Element.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
+                var dataElements = this._selection().data(data);
                 dataElements.enter().append(this._svgElement);
                 if (this._className != null) {
                     dataElements.classed(this._className, true);
