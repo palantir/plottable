@@ -4575,32 +4575,6 @@ describe("Plots", function () {
             assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
             assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
         });
-        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
-            var data0 = [
-                { x: 1, y: -2 }
-            ];
-            var data1 = [
-                { x: 1, y: 0 }
-            ];
-            var data2 = [
-                { x: 1, y: -1 }
-            ];
-            var data3 = [
-                { x: 1, y: 0 }
-            ];
-            var ds0 = new Plottable.Dataset(data0);
-            var ds1 = new Plottable.Dataset(data1);
-            var ds2 = new Plottable.Dataset(data2);
-            var ds3 = new Plottable.Dataset(data3);
-            stackedPlot.addDataset(ds0);
-            stackedPlot.addDataset(ds1);
-            stackedPlot.addDataset(ds2);
-            stackedPlot.addDataset(ds3);
-            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
-            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
-            assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
-            assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
-        });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
                 { x: 1, y: "-2" }
@@ -4702,32 +4676,6 @@ describe("Plots", function () {
             var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
             assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
             assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
-        });
-        it("uses negative offset on stacking the 0 value on all negative/0 valued data", function () {
-            var data0 = [
-                { x: 1, y: -2 }
-            ];
-            var data1 = [
-                { x: 1, y: 0 }
-            ];
-            var data2 = [
-                { x: 1, y: -1 }
-            ];
-            var data3 = [
-                { x: 1, y: 0 }
-            ];
-            var ds0 = new Plottable.Dataset(data0);
-            var ds1 = new Plottable.Dataset(data1);
-            var ds2 = new Plottable.Dataset(data2);
-            var ds3 = new Plottable.Dataset(data3);
-            stackedPlot.addDataset(ds0);
-            stackedPlot.addDataset(ds1);
-            stackedPlot.addDataset(ds2);
-            stackedPlot.addDataset(ds3);
-            var stackOffset1 = stackedPlot._stackOffsets.get(ds1);
-            var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
-            assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
-            assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
         });
         it("strings are coerced to numbers for stacking", function () {
             var data0 = [
@@ -8619,6 +8567,7 @@ describe("Utils", function () {
             assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred"), 0, "Offset 1 = 0");
             assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred"), 1, "Offset 2 = 0 + 1");
             assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred"), 2, "Offset 3 = 0 + 1 + 1");
+            assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred"), 5, "Offset 5 = 0 + 1 + 1 + 3");
             assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred"), 5, "Offset 5 = 0 + 1 + 1 + 3 + 0");
         });
         it("computeStackOffsets() works as expected with negative values", function () {
@@ -8632,7 +8581,6 @@ describe("Utils", function () {
             assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred"), 0, "Offset 1 = 0");
             assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred"), -1, "Offset 2 = 0 - 1");
             assert.strictEqual(stackOffsets.get(datasets[2]).get("Fred"), -2, "Offset 3 = 0 - 1 - 1");
-            assert.strictEqual(stackOffsets.get(datasets[3]).get("Fred"), -5, "Offset 5 = 0 - 1 - 1 - 3");
             assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred"), -5, "Offset 5 = 0 - 1 - 1 - 3 - 0");
         });
         it("computeStackOffsets() works as expected with positive and negative values", function () {

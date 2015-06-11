@@ -57,35 +57,6 @@ describe("Plots", () => {
       assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
     });
 
-    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
-      var data0 = [
-        {x: 1, y: -2}
-      ];
-      var data1 = [
-        {x: 1, y: 0}
-      ];
-      var data2 = [
-        {x: 1, y: -1}
-      ];
-      var data3 = [
-        {x: 1, y: 0}
-      ];
-
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      stackedPlot.addDataset(ds0);
-      stackedPlot.addDataset(ds1);
-      stackedPlot.addDataset(ds2);
-      stackedPlot.addDataset(ds3);
-
-      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
-      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
-      assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
-      assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
-    });
-
     it("strings are coerced to numbers for stacking", () => {
       var data0 = [
         { x: 1, y: "-2" }
@@ -201,35 +172,6 @@ describe("Plots", () => {
       var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
       assert.strictEqual(stackOffset1.get("1"), 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1"), 2, "positive offset was used");
-    });
-
-    it("uses negative offset on stacking the 0 value on all negative/0 valued data", () => {
-      var data0 = [
-        { x: 1, y: -2 }
-      ];
-      var data1 = [
-        { x: 1, y: 0 }
-      ];
-      var data2 = [
-        { x: 1, y: -1 }
-      ];
-      var data3 = [
-        { x: 1, y: 0 }
-      ];
-
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      stackedPlot.addDataset(ds0);
-      stackedPlot.addDataset(ds1);
-      stackedPlot.addDataset(ds2);
-      stackedPlot.addDataset(ds3);
-
-      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
-      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
-      assert.strictEqual(stackOffset1.get("1"), -2, "positive offset was used");
-      assert.strictEqual(stackOffset3.get("1"), -3, "positive offset was used");
     });
 
     it("strings are coerced to numbers for stacking", () => {
