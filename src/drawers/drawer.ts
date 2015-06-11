@@ -33,7 +33,6 @@ export module Drawers {
      */
     constructor(dataset: Dataset) {
       this._dataset = dataset;
-      this._svgElementName = "g";
     }
 
     /**
@@ -96,7 +95,9 @@ export module Drawers {
         }
       });
       step.animator.animate(selection, step.attrToAppliedProjector);
-      this._selection().classed(this._className, true);
+      if (this._className != null) {
+        this._selection().classed(this._className, true);
+      }
     }
 
     private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
@@ -159,8 +160,7 @@ export module Drawers {
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     public selectionForIndex(index: number) {
-      var allSelections = this.renderArea().selectAll(this.selector());
-      return d3.select(allSelections[0][index]);
+      return d3.select(this._selection()[0][index]);
     }
 
   }

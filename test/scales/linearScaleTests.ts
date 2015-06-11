@@ -209,10 +209,11 @@ describe("Scales", () => {
 
       it("scale autorange works as expected with single dataset", () => {
         var svg = TestMethods.generateSVG(100, 100);
-        new Plottable.Plot()
-          .addDataset(dataset)
-          .attr("x", (d) => d.foo, scale)
-          .renderTo(svg);
+        var plot = new Plottable.Plot();
+        (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        plot.addDataset(dataset)
+            .attr("x", (d) => d.foo, scale)
+            .renderTo(svg);
         assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
         data.push({foo: 100, bar: 200});
         dataset.data(data);
@@ -223,13 +224,13 @@ describe("Scales", () => {
       it("scale reference counting works as expected", () => {
         var svg1 = TestMethods.generateSVG(100, 100);
         var svg2 = TestMethods.generateSVG(100, 100);
-        var renderer1 = new Plottable.Plot()
-                            .addDataset(dataset)
-                            .attr("x", (d) => d.foo, scale);
+        var renderer1 = new Plottable.Plot();
+        (<any> renderer1)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        renderer1.addDataset(dataset).attr("x", (d) => d.foo, scale);
         renderer1.renderTo(svg1);
-        var renderer2 = new Plottable.Plot()
-                            .addDataset(dataset)
-                            .attr("x", (d) => d.foo, scale);
+        var renderer2 = new Plottable.Plot();
+        (<any> renderer2)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+        renderer2.addDataset(dataset).attr("x", (d) => d.foo, scale);
         renderer2.renderTo(svg2);
         var otherScale = new Plottable.Scales.Linear();
         renderer1.attr("x", (d) => d.foo, otherScale);

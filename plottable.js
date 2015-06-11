@@ -2511,7 +2511,6 @@ var Plottable;
          */
         function Drawer(dataset) {
             this._dataset = dataset;
-            this._svgElementName = "g";
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -2558,7 +2557,9 @@ var Plottable;
                 }
             });
             step.animator.animate(selection, step.attrToAppliedProjector);
-            this._selection().classed(this._className, true);
+            if (this._className != null) {
+                this._selection().classed(this._className, true);
+            }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
@@ -2611,8 +2612,7 @@ var Plottable;
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            var allSelections = this.renderArea().selectAll(this.selector());
-            return d3.select(allSelections[0][index]);
+            return d3.select(this._selection()[0][index]);
         };
         return Drawer;
     })();
