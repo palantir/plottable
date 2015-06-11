@@ -1459,7 +1459,7 @@ var Plottable;
          * Adds an IncludedValuesProvider to the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.add(provider);
@@ -1470,7 +1470,7 @@ var Plottable;
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.delete(provider);
