@@ -395,7 +395,7 @@ var Plottable;
             function _parseStyleValue(style, property) {
                 var value = style.getPropertyValue(property);
                 var parsedValue = parseFloat(value);
-                return Utils.Math.isNaN(parsedValue) ? 0 : parsedValue;
+                return parsedValue || 0;
             }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));

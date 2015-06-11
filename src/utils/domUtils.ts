@@ -151,7 +151,7 @@ export module Utils {
     function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
       var value = style.getPropertyValue(property);
       var parsedValue = parseFloat(value);
-      return Utils.Math.isNaN(parsedValue) ? 0 : parsedValue;
+      return parsedValue || 0;
     }
   }
 }
