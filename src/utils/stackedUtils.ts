@@ -56,7 +56,7 @@ module Plottable {
           stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>,
           filter: (value: number) => boolean) {
 
-        var maxStackExtent = Utils.Math.max<Dataset, number>(datasets, (dataset: Dataset) => {
+        var positiveExtents = datasets.map((dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             console.log(filter);
@@ -69,9 +69,10 @@ module Plottable {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
           }, 0);
-        }, 0);
+        });
+        var maxStackExtent = Utils.Math.max(positiveExtents, 0);
 
-        var minStackExtent = Utils.Math.min<Dataset, number>(datasets, (dataset: Dataset) => {
+        var negativeExtents = datasets.map((dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
             data = data.filter((d, i) => {
@@ -82,7 +83,8 @@ module Plottable {
             return +valueAccessor(datum, i, dataset) +
               stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
           }, 0);
-        }, 0);
+        });
+        var minStackExtent = Utils.Math.min(negativeExtents, 0);
 
         return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
       }

@@ -614,7 +614,7 @@ var Plottable;
              * @return {[number]} The extent that spans all the stacked data
              */
             Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
-                var maxStackExtent = Utils.Math.max(datasets, function (dataset) {
+                var positiveExtents = datasets.map(function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
                         console.log(filter);
@@ -625,8 +625,9 @@ var Plottable;
                     return Utils.Math.max(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
                     }, 0);
-                }, 0);
-                var minStackExtent = Utils.Math.min(datasets, function (dataset) {
+                });
+                var maxStackExtent = Utils.Math.max(positiveExtents, 0);
+                var negativeExtents = datasets.map(function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
                         data = data.filter(function (d, i) {
@@ -636,7 +637,8 @@ var Plottable;
                     return Utils.Math.min(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
                     }, 0);
-                }, 0);
+                });
+                var minStackExtent = Utils.Math.min(negativeExtents, 0);
                 return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             };
             /**
