@@ -392,16 +392,48 @@ module Plottable {
       }
     }
 
-    public addClass(cssClass) {
+    public addClass(cssClass: string) {
+      if (cssClass == null) {
+        return this;
+      }
+
+      if (this._element == null) {
+        var classIndex = this._cssClasses.indexOf(cssClass);
+        if (classIndex === -1) {
+          this._cssClasses.push(cssClass);
+        }
+      } else {
+        this._element.classed(cssClass, true);
+      }
+
       return this;
     }
 
-    public removeClass(cssClass) {
+    public removeClass(cssClass: string) {
+      if (cssClass == null) {
+        return this;
+      }
+
+      if (this._element == null) {
+        var classIndex = this._cssClasses.indexOf(cssClass);
+        if (classIndex !== -1) {
+          this._cssClasses.splice(classIndex, 1);
+        }
+      } else {
+        this._element.classed(cssClass, false);
+      }
+
       return this;
     }
 
-    public hasClass(cssClass) {
-      return this;
+    public hasClass(cssClass: string) {
+      if (cssClass == null) {
+        return false;
+      } else if (this._element == null) {
+        return (this._cssClasses.indexOf(cssClass) !== -1);
+      } else {
+        return this._element.classed(cssClass);
+      }
     }
 
     /**

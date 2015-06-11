@@ -1362,6 +1362,9 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         classed(cssClass: string, addClass: boolean): Component;
+        addClass(cssClass: string): Component;
+        removeClass(cssClass: string): Component;
+        hasClass(cssClass: string): boolean;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
