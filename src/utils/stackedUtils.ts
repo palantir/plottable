@@ -59,11 +59,7 @@ module Plottable {
         var positiveExtents = datasets.map((dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
-            console.log(filter);
-
-            data = data.filter((d, i) => {
-              return filter(keyAccessor(d, i, dataset))
-            });
+            data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
           }
           return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +
@@ -75,9 +71,7 @@ module Plottable {
         var negativeExtents = datasets.map((dataset: Dataset) => {
           var data = dataset.data();
           if (filter != null) {
-            data = data.filter((d, i) => {
-              return filter(keyAccessor(d, i, dataset))
-            });
+            data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
           }
           return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
             return +valueAccessor(datum, i, dataset) +

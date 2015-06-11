@@ -617,10 +617,7 @@ var Plottable;
                 var positiveExtents = datasets.map(function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
-                        console.log(filter);
-                        data = data.filter(function (d, i) {
-                            return filter(keyAccessor(d, i, dataset));
-                        });
+                        data = data.filter(function (d, i) { return filter(keyAccessor(d, i, dataset)); });
                     }
                     return Utils.Math.max(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
@@ -630,9 +627,7 @@ var Plottable;
                 var negativeExtents = datasets.map(function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
-                        data = data.filter(function (d, i) {
-                            return filter(keyAccessor(d, i, dataset));
-                        });
+                        data = data.filter(function (d, i) { return filter(keyAccessor(d, i, dataset)); });
                     }
                     return Utils.Math.min(data, function (datum, i) {
                         return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
