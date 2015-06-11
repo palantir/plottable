@@ -133,7 +133,7 @@ declare module Plottable {
              * @returns {SVGRed} The bounding box.
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
-            var REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS: number;
+            var SCREEN_REFRESH_RATE_MILLISECONDS: number;
             function requestAnimationFramePolyfill(fn: () => void): void;
             function elementWidth(element: Element): number;
             function elementHeight(element: Element): number;

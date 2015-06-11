@@ -20,13 +20,14 @@ export module Utils {
       return bbox;
     }
 
-    export var REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+    // Screen refresh rate assumed to be 60fps
+    export var SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
 
     export function requestAnimationFramePolyfill(fn: () => void) {
       if (window.requestAnimationFrame != null) {
         window.requestAnimationFrame(fn);
       } else {
-        setTimeout(fn, REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS);
+        setTimeout(fn, SCREEN_REFRESH_RATE_MILLISECONDS);
       }
     }
 

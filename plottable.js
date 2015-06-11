@@ -283,13 +283,14 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+            // Screen refresh rate assumed to be 60fps
+            DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
             function requestAnimationFramePolyfill(fn) {
                 if (window.requestAnimationFrame != null) {
                     window.requestAnimationFrame(fn);
                 }
                 else {
-                    setTimeout(fn, DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS);
+                    setTimeout(fn, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
@@ -972,7 +973,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.REQUEST_ANIMATION_FRAME_TIMEOUT_MILLISECONDS;
+                this._timeoutMsec = Plottable.Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
