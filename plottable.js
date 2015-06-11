@@ -2639,7 +2639,7 @@ var Plottable;
             }
             Line.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);
-                selection.classed(Line.PATH_CLASS, true).style("fill", "none");
+                selection.style("fill", "none");
             };
             Line.prototype.selector = function () {
                 return "path";
@@ -2647,7 +2647,6 @@ var Plottable;
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
-            Line.PATH_CLASS = "line";
             return Line;
         })(Plottable.Drawer);
         Drawers.Line = Line;
@@ -2674,7 +2673,7 @@ var Plottable;
             }
             Area.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);
-                selection.classed(Area.PATH_CLASS, true).style("stroke", "none");
+                selection.style("stroke", "none");
             };
             Area.prototype.selector = function () {
                 return "path";
@@ -2682,7 +2681,6 @@ var Plottable;
             Area.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
-            Area.PATH_CLASS = "area";
             return Area;
         })(Plottable.Drawer);
         Drawers.Area = Area;

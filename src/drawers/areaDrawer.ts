@@ -3,7 +3,6 @@
 module Plottable {
 export module Drawers {
   export class Area extends Drawer {
-    public static PATH_CLASS = "area";
 
     constructor(dataset: Dataset) {
       super(dataset);
@@ -13,8 +12,7 @@ export module Drawers {
 
     protected _setDefaultAttributes(selection: d3.Selection<any>) {
       super._setDefaultAttributes(selection);
-      selection.classed(Area.PATH_CLASS, true)
-               .style("stroke", "none");
+      selection.style("stroke", "none");
     }
 
     public selector(): string {

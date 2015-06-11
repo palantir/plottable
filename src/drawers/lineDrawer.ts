@@ -3,7 +3,6 @@
 module Plottable {
 export module Drawers {
   export class Line extends Drawer {
-    public static PATH_CLASS = "line";
 
     constructor(dataset: Dataset) {
       super(dataset);
@@ -13,8 +12,7 @@ export module Drawers {
 
     protected _setDefaultAttributes(selection: d3.Selection<any>) {
       super._setDefaultAttributes(selection);
-      selection.classed(Line.PATH_CLASS, true)
-                         .style("fill", "none");
+      selection.style("fill", "none");
     }
 
     public selector() {

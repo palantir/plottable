@@ -3017,13 +3017,13 @@ describe("Plots", function () {
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
             svg.remove();
         });
         it("attributes set appropriately from accessor", function () {
-            var areaPath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var areaPath = renderArea.select(".line");
             assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
             svg.remove();
         });
@@ -3031,7 +3031,7 @@ describe("Plots", function () {
             var newColorAccessor = function () { return "pink"; };
             linePlot.attr("stroke", newColorAccessor);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
             svg.remove();
         });
@@ -3042,7 +3042,7 @@ describe("Plots", function () {
             });
             simpleDataset.data(data);
             linePlot.attr("stroke", function (d) { return d.stroke; });
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
             simpleDataset.data(data);
@@ -3058,7 +3058,7 @@ describe("Plots", function () {
                 { foo: 0.8, bar: 0.8 }
             ];
             simpleDataset.data(lineData);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             var d_original = TestMethods.normalizePath(linePath.attr("d"));
             function assertCorrectPathSplitting(msgPrefix) {
                 var d = TestMethods.normalizePath(linePath.attr("d"));
@@ -3218,9 +3218,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             linePlot.attr("class", newClassProjector);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
-            assert.isTrue(linePath.classed("pink"));
-            assert.isTrue(linePath.classed(Plottable.Drawers.Line.PATH_CLASS));
+            var linePath = renderArea.select(".line");
+            assert.isTrue(linePath.classed("pink"), "'pink' class is applied");
+            assert.isTrue(linePath.classed("line"), "'line' class is retained");
             svg.remove();
         });
     });
@@ -3391,9 +3391,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             areaPlot.attr("class", newClassProjector);
             areaPlot.renderTo(svg);
-            var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
+            var areaPath = renderArea.select(".area");
             assert.isTrue(areaPath.classed("pink"));
-            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
+            assert.isTrue(areaPath.classed("area"));
             svg.remove();
         });
     });

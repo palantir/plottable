@@ -1164,7 +1164,6 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Line extends Drawer {
-            static PATH_CLASS: string;
             constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
             selector(): string;
@@ -1177,7 +1176,6 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Area extends Drawer {
-            static PATH_CLASS: string;
             constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
             selector(): string;
