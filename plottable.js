@@ -614,16 +614,33 @@ var Plottable;
              * @return {[number]} The extent that spans all the stacked data
              */
             Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
-                var positiveExtents = datasets.map(function (dataset) {
-                    var data = dataset.data();
-                    if (filter != null) {
-                        data = data.filter(function (d, i) { return filter(keyAccessor(d, i, dataset)); });
-                    }
-                    return Utils.Math.max(data, function (datum, i) {
-                        return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
-                    }, 0);
+                var positiveExtents = [];
+                stackOffsets.forEach(function (stackedDatumMap, dataset) {
+                    var stackingData = [];
+                    stackedDatumMap.forEach(function (key, stackedDatum) {
+                        if (filter != null) {
+                            if (filter(stackedDatum.key)) {
+                                stackingData.push(stackedDatum.value + stackedDatum.offset);
+                            }
+                        }
+                        else {
+                            stackingData.push(stackedDatum.value + stackedDatum.offset);
+                        }
+                    });
+                    positiveExtents.push(Utils.Math.max(stackingData, 0));
                 });
                 var maxStackExtent = Utils.Math.max(positiveExtents, 0);
+                // var positiveExtents = datasets.map((dataset: Dataset) => {
+                //   var data = dataset.data();
+                //   if (filter != null) {
+                //     data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
+                //   }
+                //   return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
+                //     return +stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).value +
+                //       stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
+                //   }, 0);
+                // });
+                // var maxStackExtent = Utils.Math.max(positiveExtents, 0);
                 var negativeExtents = datasets.map(function (dataset) {
                     var data = dataset.data();
                     if (filter != null) {
