@@ -2836,10 +2836,11 @@ var Plottable;
             this._isAnchored = false;
             this._boxes = [];
             this._isTopLevelComponent = false;
-            this._cssClasses = ["component"];
+            this._cssClasses = new Plottable.Utils.Set();
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
+            this._cssClasses.add("component");
         }
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -2909,7 +2910,7 @@ var Plottable;
             this._cssClasses.forEach(function (cssClass) {
                 _this._element.classed(cssClass, true);
             });
-            this._cssClasses = null;
+            this._cssClasses = new Plottable.Utils.Set();
             this._backgroundContainer = this._element.append("g").classed("background-container", true);
             this._addBox("background-fill", this._backgroundContainer);
             this._content = this._element.append("g").classed("content", true);
@@ -3044,8 +3045,7 @@ var Plottable;
                 this.anchor(selection);
             }
             if (this._element == null) {
-                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " + "or a d3.Selection, or a selector string");
             }
             this.computeLayout();
             this.render();
@@ -3103,36 +3103,57 @@ var Plottable;
             var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
         };
-        Component.prototype.classed = function (cssClass, addClass) {
-            if (addClass == null) {
-                if (cssClass == null) {
-                    return false;
-                }
-                else if (this._element == null) {
-                    return (this._cssClasses.indexOf(cssClass) !== -1);
-                }
-                else {
-                    return this._element.classed(cssClass);
-                }
+        /**
+         * Checks if the Component has a given CSS class.
+         *
+         * @param {string} cssClass The CSS class to check for.
+         */
+        Component.prototype.hasClass = function (cssClass) {
+            if (cssClass == null) {
+                return false;
+            }
+            if (this._element == null) {
+                return this._cssClasses.has(cssClass);
             }
             else {
-                if (cssClass == null) {
-                    return this;
-                }
-                if (this._element == null) {
-                    var classIndex = this._cssClasses.indexOf(cssClass);
-                    if (addClass && classIndex === -1) {
-                        this._cssClasses.push(cssClass);
-                    }
-                    else if (!addClass && classIndex !== -1) {
-                        this._cssClasses.splice(classIndex, 1);
-                    }
-                }
-                else {
-                    this._element.classed(cssClass, addClass);
-                }
+                return this._element.classed(cssClass);
+            }
+        };
+        /**
+         * Adds a given CSS class to the Component.
+         *
+         * @param {string} cssClass The CSS class to add.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.addClass = function (cssClass) {
+            if (cssClass == null) {
                 return this;
             }
+            if (this._element == null) {
+                this._cssClasses.add(cssClass);
+            }
+            else {
+                this._element.classed(cssClass, true);
+            }
+            return this;
+        };
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.removeClass = function (cssClass) {
+            if (cssClass == null) {
+                return this;
+            }
+            if (this._element == null) {
+                this._cssClasses.delete(cssClass);
+            }
+            else {
+                this._element.classed(cssClass, false);
+            }
+            return this;
         };
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
@@ -3395,7 +3416,7 @@ var Plottable;
                 if (components === void 0) { components = []; }
                 _super.call(this);
                 this._components = [];
-                this.classed("component-group", true);
+                this.addClass("component-group");
                 components.forEach(function (c) { return _this.append(c); });
             }
             Group.prototype._forEach = function (callback) {
@@ -3496,12 +3517,12 @@ var Plottable;
             this._scale = scale;
             this.orientation(orientation);
             this._setDefaultAlignment();
-            this.classed("axis", true);
+            this.addClass("axis");
             if (this._isHorizontal()) {
-                this.classed("x-axis", true);
+                this.addClass("x-axis");
             }
             else {
-                this.classed("y-axis", true);
+                this.addClass("y-axis");
             }
             this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
@@ -3816,7 +3837,7 @@ var Plottable;
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tierLabelPositions = [];
-                this.classed("time-axis", true);
+                this.addClass("time-axis");
                 this.tickLabelPadding(5);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
@@ -4551,7 +4572,7 @@ var Plottable;
             function Category(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
-                this.classed("category-axis", true);
+                this.addClass("category-axis");
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4742,7 +4763,7 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (angle === void 0) { angle = 0; }
                 _super.call(this);
-                this.classed("label", true);
+                this.addClass("label");
                 this.text(displayText);
                 this.angle(angle);
                 this.xAlignment("center").yAlignment("center");
@@ -4848,7 +4869,7 @@ var Plottable;
              */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
-                this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
+                this.addClass(TitleLabel.TITLE_LABEL_CLASS);
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
             return TitleLabel;
@@ -4863,7 +4884,7 @@ var Plottable;
              */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
-                this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
+                this.addClass(AxisLabel.AXIS_LABEL_CLASS);
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";
             return AxisLabel;
@@ -4895,7 +4916,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
-                this.classed("legend", true);
+                this.addClass("legend");
                 this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
@@ -5162,7 +5183,8 @@ var Plottable;
                 this._scale.onUpdate(this._redrawCallback);
                 this._formatter = Plottable.Formatters.general();
                 this._orientation = "horizontal";
-                this.classed("legend", true).classed("interpolated-color-legend", true);
+                this.addClass("legend");
+                this.addClass("interpolated-color-legend");
             }
             InterpolatedColorLegend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
@@ -5378,7 +5400,7 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
                 }
                 _super.call(this);
-                this.classed("gridlines", true);
+                this.addClass("gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._renderCallback = function (scale) { return _this.render(); };
@@ -5475,7 +5497,7 @@ var Plottable;
                 this._nRows = 0;
                 this._nCols = 0;
                 this._calculatedLayout = null;
-                this.classed("table", true);
+                this.addClass("table");
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
@@ -5817,7 +5839,7 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
-                this.classed("selection-box-layer", true);
+                this.addClass("selection-box-layer");
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5920,7 +5942,7 @@ var Plottable;
             this._animate = false;
             this._animators = {};
             this._clipPathEnabled = true;
-            this.classed("plot", true);
+            this.addClass("plot");
             this._datasetToDrawer = new Plottable.Utils.Map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
@@ -6334,7 +6356,7 @@ var Plottable;
                 _super.call(this);
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
-                this.classed("pie-plot", true);
+                this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -6488,7 +6510,7 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            this.classed("xy-plot", true);
+            this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
         }
@@ -6710,7 +6732,7 @@ var Plottable;
             function Rectangle() {
                 _super.call(this);
                 this.animator("rectangles", new Plottable.Animators.Null());
-                this.classed("rectangle-plot", true);
+                this.addClass("rectangle-plot");
             }
             Rectangle.prototype._getDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
@@ -6893,7 +6915,7 @@ var Plottable;
              */
             function Scatter() {
                 _super.call(this);
-                this.classed("scatter-plot", true);
+                this.addClass("scatter-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.startDelay(5);
                 animator.stepDuration(250);
@@ -6991,7 +7013,7 @@ var Plottable;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
-                this.classed("bar-plot", true);
+                this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
                 }
@@ -7454,7 +7476,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
-                this.classed("line-plot", true);
+                this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
                 animator.easingMode("exp-in-out");
@@ -7572,7 +7594,7 @@ var Plottable;
              */
             function Area() {
                 _super.call(this);
-                this.classed("area-plot", true);
+                this.addClass("area-plot");
                 this.y0(0); // default
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -7804,7 +7826,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._baselineValue = 0;
-                this.classed("stacked-area-plot", true);
+                this.addClass("stacked-area-plot");
                 this.attr("fill-opacity", 1);
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
@@ -7952,7 +7974,7 @@ var Plottable;
             function StackedBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, orientation);
-                this.classed("stacked-bar-plot", true);
+                this.addClass("stacked-bar-plot");
                 this._stackOffsets = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
@@ -9458,7 +9480,7 @@ var Plottable;
                  * wouldn't be able to grab the edges or corners for resizing.
                  */
                 this._clipPathEnabled = true;
-                this.classed("drag-box-layer", true);
+                this.addClass("drag-box-layer");
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
                 this._dragInteraction.attachTo(this);
@@ -9637,8 +9659,14 @@ var Plottable;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
             DragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("x-resizable", canResize);
-                this.classed("y-resizable", canResize);
+                if (canResize) {
+                    this.addClass("x-resizable");
+                    this.addClass("y-resizable");
+                }
+                else {
+                    this.removeClass("x-resizable");
+                    this.removeClass("y-resizable");
+                }
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -9733,7 +9761,7 @@ var Plottable;
              */
             function XDragBoxLayer() {
                 _super.call(this);
-                this.classed("x-drag-box-layer", true);
+                this.addClass("x-drag-box-layer");
                 this._hasCorners = false;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -9748,7 +9776,12 @@ var Plottable;
                 });
             };
             XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("x-resizable", canResize);
+                if (canResize) {
+                    this.addClass("x-resizable");
+                }
+                else {
+                    this.removeClass("x-resizable");
+                }
             };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
@@ -9777,7 +9810,7 @@ var Plottable;
              */
             function YDragBoxLayer() {
                 _super.call(this);
-                this.classed("y-drag-box-layer", true);
+                this.addClass("y-drag-box-layer");
                 this._hasCorners = false;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -9792,7 +9825,12 @@ var Plottable;
                 });
             };
             YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("y-resizable", canResize);
+                if (canResize) {
+                    this.addClass("y-resizable");
+                }
+                else {
+                    this.removeClass("y-resizable");
+                }
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);

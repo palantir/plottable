@@ -43,11 +43,11 @@ module Plottable {
       this._scale = scale;
       this.orientation(orientation);
       this._setDefaultAlignment();
-      this.classed("axis", true);
+      this.addClass("axis");
       if (this._isHorizontal()) {
-        this.classed("x-axis", true);
+        this.addClass("x-axis");
       } else {
-        this.classed("y-axis", true);
+        this.addClass("y-axis");
       }
 
       this.formatter(Formatters.identity());

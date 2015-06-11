@@ -13,7 +13,7 @@ export module Components {
 
     constructor() {
       super();
-      this.classed("selection-box-layer", true);
+      this.addClass("selection-box-layer");
     }
 
     protected _setup() {

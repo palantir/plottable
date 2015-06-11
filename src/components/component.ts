@@ -44,10 +44,14 @@ module Plottable {
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _cssClasses: string[] = ["component"];
+    private _cssClasses = new Utils.Set<string>();
     private _destroyed = false;
     private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+
+    public constructor() {
+      this._cssClasses.add("component");
+    }
 
     /**
      * Attaches the Component as a child of a given d3 Selection.
@@ -120,7 +124,7 @@ module Plottable {
       this._cssClasses.forEach((cssClass: string) => {
         this._element.classed(cssClass, true);
       });
-      this._cssClasses = null;
+      this._cssClasses = new Utils.Set<string>();
 
       this._backgroundContainer = this._element.append("g").classed("background-container", true);
       this._addBox("background-fill", this._backgroundContainer);
@@ -263,8 +267,8 @@ module Plottable {
         this.anchor(selection);
       }
       if (this._element == null) {
-        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
+          "or a d3.Selection, or a selector string");
       }
       this.computeLayout();
       this.render();
@@ -356,40 +360,56 @@ module Plottable {
      *
      * @param {string} cssClass The CSS class to check for.
      */
-    public classed(cssClass: string): boolean;
+    public hasClass(cssClass: string) {
+      if (cssClass == null) {
+        return false;
+      }
+
+      if (this._element == null) {
+        return this._cssClasses.has(cssClass);
+      } else {
+        return this._element.classed(cssClass);
+      }
+    }
+
     /**
-     * Adds/removes a given CSS class to/from the Component.
+     * Adds a given CSS class to the Component.
      *
-     * @param {string} cssClass The CSS class to add or remove.
-     * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+     * @param {string} cssClass The CSS class to add.
      * @returns {Component} The calling Component.
      */
-    public classed(cssClass: string, addClass: boolean): Component;
-    public classed(cssClass: string, addClass?: boolean): any {
-      if (addClass == null) {
-        if (cssClass == null) {
-          return false;
-        } else if (this._element == null) {
-          return (this._cssClasses.indexOf(cssClass) !== -1);
-        } else {
-          return this._element.classed(cssClass);
-        }
-      } else {
-        if (cssClass == null) {
-          return this;
-        }
-        if (this._element == null) {
-          var classIndex = this._cssClasses.indexOf(cssClass);
-          if (addClass && classIndex === -1) {
-            this._cssClasses.push(cssClass);
-          } else if (!addClass && classIndex !== -1) {
-            this._cssClasses.splice(classIndex, 1);
-          }
-        } else {
-          this._element.classed(cssClass, addClass);
-        }
+    public addClass(cssClass: string) {
+      if (cssClass == null) {
         return this;
       }
+
+      if (this._element == null) {
+        this._cssClasses.add(cssClass);
+      } else {
+        this._element.classed(cssClass, true);
+      }
+
+      return this;
+    }
+
+    /**
+     * Removes a given CSS class from the Component.
+     *
+     * @param {string} cssClass The CSS class to remove.
+     * @returns {Component} The calling Component.
+     */
+    public removeClass(cssClass: string) {
+      if (cssClass == null) {
+        return this;
+      }
+
+      if (this._element == null) {
+        this._cssClasses.delete(cssClass);
+      } else {
+        this._element.classed(cssClass, false);
+      }
+
+      return this;
     }
 
     /**

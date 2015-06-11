@@ -1258,6 +1258,7 @@ declare module Plottable {
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
          *
@@ -1353,15 +1354,21 @@ declare module Plottable {
          *
          * @param {string} cssClass The CSS class to check for.
          */
-        classed(cssClass: string): boolean;
+        hasClass(cssClass: string): boolean;
         /**
-         * Adds/removes a given CSS class to/from the Component.
+         * Adds a given CSS class to the Component.
          *
-         * @param {string} cssClass The CSS class to add or remove.
-         * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+         * @param {string} cssClass The CSS class to add.
          * @returns {Component} The calling Component.
          */
-        classed(cssClass: string, addClass: boolean): Component;
+        addClass(cssClass: string): Component;
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        removeClass(cssClass: string): Component;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.

@@ -19,7 +19,7 @@ export module Axes {
      */
     constructor(scale: Scales.Category, orientation: string) {
       super(scale, orientation);
-      this.classed("category-axis", true);
+      this.addClass("category-axis");
     }
 
     protected _setup() {

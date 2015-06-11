@@ -46,7 +46,7 @@ module Plottable {
     constructor() {
       super();
       this._clipPathEnabled = true;
-      this.classed("plot", true);
+      this.addClass("plot");
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._attrExtents = d3.map<any[]>();

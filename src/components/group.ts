@@ -16,7 +16,7 @@ export module Components {
      */
     constructor(components: Component[] = []) {
       super();
-      this.classed("component-group", true);
+      this.addClass("component-group");
       components.forEach((c: Component) => this.append(c));
     }
 
