@@ -1317,6 +1317,9 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         render(): Component;
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         renderImmediately(): Component;
         /**
          * Causes the Component to re-layout and render.

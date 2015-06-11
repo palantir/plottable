@@ -230,6 +230,9 @@ module Plottable {
       }
     }
 
+    /**
+     * Renders the Component without waiting for the next frame.
+     */
     public renderImmediately() {
       return this;
     }

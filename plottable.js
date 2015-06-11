@@ -3008,6 +3008,9 @@ var Plottable;
                 Plottable.RenderController.registerToComputeLayout(this);
             }
         };
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         Component.prototype.renderImmediately = function () {
             return this;
         };
