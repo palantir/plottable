@@ -2551,9 +2551,6 @@ var Plottable;
         Drawer.prototype._drawStep = function (step) {
             // no-op
         };
-        Drawer.prototype._numberOfAnimationIterations = function (data) {
-            return data.length;
-        };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
             var modifiedAttrToProjector = {};
@@ -2563,10 +2560,9 @@ var Plottable;
             return modifiedAttrToProjector;
         };
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-            var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return delay;
         };
@@ -2586,11 +2582,10 @@ var Plottable;
                 };
             });
             this._enterData(data);
-            var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return this;
         };
@@ -2634,9 +2629,6 @@ var Plottable;
             Line.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);
                 selection.classed(Line.PATH_CLASS, true).style("fill", "none");
-            };
-            Line.prototype._numberOfAnimationIterations = function (data) {
-                return 1;
             };
             Line.prototype._drawStep = function (step) {
                 step.animator.animate(this._selection(), step.attrToAppliedProjector);

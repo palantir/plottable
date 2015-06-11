@@ -1148,7 +1148,6 @@ declare module Plottable {
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         protected _drawStep(step: Drawers.AppliedDrawStep): void;
-        protected _numberOfAnimationIterations(data: any[]): number;
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
@@ -1175,7 +1174,6 @@ declare module Plottable {
         class Line extends Drawer {
             static PATH_CLASS: string;
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-            protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
             selectionForIndex(index: number): d3.Selection<void>;

@@ -11,10 +11,6 @@ export module Drawers {
                          .style("fill", "none");
     }
 
-    protected _numberOfAnimationIterations(data: any[]): number {
-      return 1;
-    }
-
     protected _drawStep(step: AppliedDrawStep) {
       step.animator.animate(this._selection(), step.attrToAppliedProjector);
       this._selection().classed(Line.PATH_CLASS, true);

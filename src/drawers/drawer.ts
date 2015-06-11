@@ -90,10 +90,6 @@ export module Drawers {
       // no-op
     }
 
-    protected _numberOfAnimationIterations(data: any[]): number {
-      return data.length;
-    }
-
     private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
       var modifiedAttrToProjector: AttributeToAppliedProjector = {};
       Object.keys(attrToProjector).forEach((attr: string) => {
@@ -105,10 +101,9 @@ export module Drawers {
     }
 
     public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
-      var numberOfIterations = this._numberOfAnimationIterations(data);
       var delay = 0;
       drawSteps.forEach((drawStep, i) => {
-        delay += drawStep.animator.totalTime(numberOfIterations);
+        delay += drawStep.animator.totalTime(data.length);
       });
 
       return delay;
@@ -130,12 +125,11 @@ export module Drawers {
       });
 
       this._enterData(data);
-      var numberOfIterations = this._numberOfAnimationIterations(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
         Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.totalTime(numberOfIterations);
+        delay += drawStep.animator.totalTime(data.length);
       });
 
       return this;
