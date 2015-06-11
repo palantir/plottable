@@ -2964,7 +2964,7 @@ var Plottable;
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
                 }
             }
-            var size = this._getSize(availableWidth, availableHeight);
+            var size = this._sizeFromOffer(availableWidth, availableHeight);
             this._width = size.width;
             this._height = size.height;
             var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
@@ -2977,7 +2977,7 @@ var Plottable;
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             return this;
         };
-        Component.prototype._getSize = function (availableWidth, availableHeight) {
+        Component.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
             var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
             return {
                 width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
@@ -3422,7 +3422,7 @@ var Plottable;
                 });
                 return this;
             };
-            Group.prototype._getSize = function (availableWidth, availableHeight) {
+            Group.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 return {
                     width: availableWidth,
                     height: availableHeight
@@ -3905,10 +3905,10 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
-            Time.prototype._getSize = function (availableWidth, availableHeight) {
+            Time.prototype.finalSizeFromOffer = function (availableWidth, availableHeight) {
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
-                var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
+                var size = _super.prototype.finalSizeFromOffer.call(this, availableWidth, availableHeight);
                 size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
@@ -5824,7 +5824,7 @@ var Plottable;
                 this._box = this.content().append("g").classed("selection-box", true).remove();
                 this._boxArea = this._box.append("rect").classed("selection-area", true);
             };
-            SelectionBoxLayer.prototype._getSize = function (availableWidth, availableHeight) {
+            SelectionBoxLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 return {
                     width: availableWidth,
                     height: availableHeight

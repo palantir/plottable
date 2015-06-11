@@ -47,7 +47,7 @@ export module Components {
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight
