@@ -6199,8 +6199,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach()", function () {
-        var c1 = new Plottable.Component().classed("component-1", true);
-        var c2 = new Plottable.Component().classed("component-2", true);
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = TestMethods.generateSVG(200, 200);
         cg.renderTo(svg);
@@ -6530,23 +6530,23 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("css classing works as expected", function () {
-        assert.isFalse(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-KEEP", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-REMOVE", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
-        c.classed("CSS-PREANCHOR-REMOVE", false);
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-KEEP");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-REMOVE");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        c.removeClass("CSS-PREANCHOR-REMOVE");
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
         c.anchor(svg);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", true);
-        assert.isTrue(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", false);
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-        assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        c.addClass("CSS-POSTANCHOR");
+        assert.isTrue(c.hasClass("CSS-POSTANCHOR"));
+        c.removeClass("CSS-POSTANCHOR");
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        assert.isFalse(c.hasClass(undefined), "returns false when classed called w/ undefined");
+        assert.strictEqual(c.addClass(undefined), c, "returns this when classed called w/ undefined and true");
         svg.remove();
     });
     it("can't reuse component if it's been destroy()-ed", function () {
@@ -6789,7 +6789,7 @@ function generateBasicTable(nRows, nCols) {
 describe("Tables", function () {
     it("tables are classed properly", function () {
         var table = new Plottable.Components.Table();
-        assert.isTrue(table.classed("table"));
+        assert.isTrue(table.hasClass("table"));
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Components.Table();
