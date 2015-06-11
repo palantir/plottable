@@ -613,7 +613,7 @@ var Plottable;
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
+            Stacked.computeStackExtent = function (stackOffsets, filter) {
                 var positiveExtents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
                     var stackingData = [];
@@ -646,28 +646,6 @@ var Plottable;
                     negativeExtents.push(Utils.Math.min(stackingData, 0));
                 });
                 var minStackExtent = Utils.Math.min(negativeExtents, 0);
-                // var positiveExtents = datasets.map((dataset: Dataset) => {
-                //   var data = dataset.data();
-                //   if (filter != null) {
-                //     data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
-                //   }
-                //   return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
-                //     return +stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).value +
-                //       stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
-                //   }, 0);
-                // });
-                // var maxStackExtent = Utils.Math.max(positiveExtents, 0);
-                // var negativeExtents = datasets.map((dataset: Dataset) => {
-                //   var data = dataset.data();
-                //   if (filter != null) {
-                //     data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
-                //   }
-                //   return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
-                //     return +valueAccessor(datum, i, dataset) +
-                //       stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
-                //   }, 0);
-                // });
-                // var minStackExtent = Utils.Math.min(negativeExtents, 0);
                 return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             };
             /**
@@ -7952,7 +7930,7 @@ var Plottable;
                 var filter = this._hackedFilterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
@@ -8089,7 +8067,7 @@ var Plottable;
                 // var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 var filter = this._hackedFilterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
             };
             return StackedBar;
         })(Plots.Bar);

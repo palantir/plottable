@@ -126,7 +126,7 @@ export module Plots {
 
       this._checkSameDomain(datasets, keyAccessor);
       this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
     }
 
     private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {

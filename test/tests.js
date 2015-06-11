@@ -8610,7 +8610,7 @@ describe("Utils", function () {
             var datasets = createDatasets([data1, data2, data3, data4]);
             var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
             filter = null;
-            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, filter);
             var expectedStackExtents = [0, 303];
             assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack up and the sum of their values is 303");
         });
@@ -8621,7 +8621,7 @@ describe("Utils", function () {
             var datasets = createDatasets([data1, data2, data3]);
             var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
             filter = null;
-            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, filter);
             var expectedStackExtents = [-301, 0];
             assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
         });
@@ -8634,7 +8634,7 @@ describe("Utils", function () {
             var datasets = createDatasets([data1, data2, data3, data4, data5]);
             var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
             filter = null;
-            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, filter);
             var expectedStackExtents = [-10, 120];
             assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
         });
@@ -8654,7 +8654,7 @@ describe("Utils", function () {
             var datasets = createDatasets([data1, data2, data3]);
             var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
             filter = null;
-            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, stackOffsets, filter);
+            var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, filter);
             var expectedStackExtents = [-50, 100];
             assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Barney has the smallest minimum stack (-50)");
             assert.deepEqual(stackExtents[1], expectedStackExtents[1], "Fred has the largest maximum stack (100)");

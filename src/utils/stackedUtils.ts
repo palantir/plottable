@@ -50,12 +50,8 @@ module Plottable {
        * @return {[number]} The extent that spans all the stacked data
        */
       public static computeStackExtent(
-          datasets: Dataset[],
-          keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<number>,
           stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>,
           filter: (value: number) => boolean) {
-
 
         var positiveExtents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
@@ -90,31 +86,6 @@ module Plottable {
           negativeExtents.push(Utils.Math.min(stackingData, 0));
         });
         var minStackExtent = Utils.Math.min(negativeExtents, 0);
-
-        // var positiveExtents = datasets.map((dataset: Dataset) => {
-        //   var data = dataset.data();
-        //   if (filter != null) {
-        //     data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
-        //   }
-
-        //   return Utils.Math.max<any, number>(data, (datum: any, i: number) => {
-        //     return +stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).value +
-        //       stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
-        //   }, 0);
-        // });
-        // var maxStackExtent = Utils.Math.max(positiveExtents, 0);
-
-        // var negativeExtents = datasets.map((dataset: Dataset) => {
-        //   var data = dataset.data();
-        //   if (filter != null) {
-        //     data = data.filter((d, i) => filter(keyAccessor(d, i, dataset)));
-        //   }
-        //   return Utils.Math.min<any, number>(data, (datum: any, i: number) => {
-        //     return +valueAccessor(datum, i, dataset) +
-        //       stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset))).offset;
-        //   }, 0);
-        // });
-        // var minStackExtent = Utils.Math.min(negativeExtents, 0);
 
         return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
       }
