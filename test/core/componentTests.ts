@@ -314,8 +314,8 @@ describe("Component behavior", () => {
     assert.isTrue(c.hasClass("CSS-POSTANCHOR"));
     c.removeClass("CSS-POSTANCHOR");
     assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
-    assert.isFalse(c.hasClass(undefined), "returns false when classed called w/ undefined");
-    assert.strictEqual(c.addClass(undefined), c, "returns this when classed called w/ undefined and true");
+    assert.isFalse(c.hasClass(undefined), "returns false when hasClass called w/ undefined");
+    assert.strictEqual(c.addClass(undefined), c, "returns this when hasClass called w/ undefined and true");
     svg.remove();
   });
 
