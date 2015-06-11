@@ -6226,8 +6226,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("destroy()s its Components when destroy()ed", function () {
-        var c1 = new Plottable.Component().classed("component-1", true);
-        var c2 = new Plottable.Component().classed("component-2", true);
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = TestMethods.generateSVG(200, 200);
         cg.renderTo(svg);
