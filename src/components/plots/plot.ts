@@ -455,7 +455,7 @@ module Plottable {
         var validDatumIndex = 0;
         dataset.data().forEach((datum: any, datasetIndex: number) => {
           var position = this._pixelPoint(datum, datasetIndex, dataset);
-          if (position.x !== position.x || position.y !== position.y) {
+          if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
             return;
           }
           entities.push({
