@@ -2532,7 +2532,7 @@ var Plottable;
          *
          * @param{any[]} data The data to be drawn
          */
-        Drawer.prototype._enterData = function (data) {
+        Drawer.prototype._setSelectionData = function (data) {
             var dataElements = this._selection().data(data);
             dataElements.enter().append(this.selector());
             dataElements.exit().remove();
@@ -2589,7 +2589,7 @@ var Plottable;
                     animator: dr.animator
                 };
             });
-            this._enterData(data);
+            this._setSelectionData(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);

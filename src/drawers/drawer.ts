@@ -68,7 +68,7 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      */
-    private _enterData(data: any[]) {
+    private _setSelectionData(data: any[]) {
       var dataElements = this._selection().data(data);
       dataElements.enter().append(this.selector());
       dataElements.exit().remove();
@@ -132,7 +132,7 @@ export module Drawers {
         };
       });
 
-      this._enterData(data);
+      this._setSelectionData(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
