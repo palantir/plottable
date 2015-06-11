@@ -6580,8 +6580,8 @@ var Plottable;
             }
             return this;
         };
-        XYPlot.prototype.autorange = function (scaleName) {
-            if (scaleName == null) {
+        XYPlot.prototype.autorangeMode = function (mode) {
+            if (mode == null) {
                 if (this._autoAdjustXScaleDomain) {
                     return "x";
                 }
@@ -6590,7 +6590,7 @@ var Plottable;
                 }
                 return "none";
             }
-            switch (scaleName) {
+            switch (mode) {
                 case "x":
                     this._autoAdjustXScaleDomain = true;
                     this._autoAdjustYScaleDomain = false;
@@ -6606,7 +6606,7 @@ var Plottable;
                     this._autoAdjustYScaleDomain = false;
                     break;
                 default:
-                    throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+                    throw new Error("Invalid scale name '" + mode + "', must be 'x', 'y' or 'none'");
             }
             return this;
         };
