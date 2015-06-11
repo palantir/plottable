@@ -49,7 +49,6 @@ module Plottable {
     private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
-
     public constructor() {
       this._cssClasses.add("component");
     }
@@ -364,7 +363,9 @@ module Plottable {
     public hasClass(cssClass: string) {
       if (cssClass == null) {
         return false;
-      } else if (this._element == null) {
+      }
+
+      if (this._element == null) {
         return this._cssClasses.has(cssClass);
       } else {
         return this._element.classed(cssClass);

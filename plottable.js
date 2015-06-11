@@ -3115,7 +3115,7 @@ var Plottable;
             if (cssClass == null) {
                 return false;
             }
-            else if (this._element == null) {
+            if (this._element == null) {
                 return this._cssClasses.has(cssClass);
             }
             else {
