@@ -134,14 +134,69 @@ declare module Plottable {
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
             var SCREEN_REFRESH_RATE_MILLISECONDS: number;
-            function requestAnimationFramePolyfill(fn: () => void): void;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback: () => void): void;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
             function elementWidth(element: Element): number;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
             function elementHeight(element: Element): number;
-            function translate(selection: d3.Selection<any>): d3.Transform;
+            /**
+             * Retrieves the number array representing the translation for the selection
+             *
+             * @param {d3.Selection<any>} selection The selection to query
+             * @returns {[number, number]} The number array representing the translation
+             */
+            function translate(selection: d3.Selection<any>): [number, number];
+            /**
+             * Translates the given selection by the input x / y pixel amounts.
+             *
+             * @param {d3.Selection<any>} selection The selection to translate
+             * @param {number} x The amount to translate in the x direction
+             * @param {number} y The amount to translate in the y direction
+             * @returns {d3.Selection<any>} The input selection
+             */
             function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-            function clientRectsOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
-            function clientRectInside(inner: ClientRect, outer: ClientRect): boolean;
-            function boundingSVG(elem: SVGElement): SVGElement;
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
+            /**
+             * Checks if the first ClientRect is inside the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the first ClientRect is inside the second.
+             */
+            function clientRectInside(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element: SVGElement): SVGElement;
             function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.

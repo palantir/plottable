@@ -283,22 +283,43 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            // Screen refresh rate assumed to be 60fps
+            // Screen refresh rate which is assumed to be 60fps
             DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
-            function requestAnimationFramePolyfill(fn) {
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback) {
                 if (window.requestAnimationFrame != null) {
-                    window.requestAnimationFrame(fn);
+                    window.requestAnimationFrame(callback);
                 }
                 else {
-                    setTimeout(fn, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
+                    setTimeout(callback, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
             function elementWidth(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
             DOM.elementWidth = elementWidth;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
             function elementHeight(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
@@ -316,33 +337,53 @@ var Plottable;
                 return selection;
             }
             DOM.translate = translate;
-            function clientRectsOverlap(boxA, boxB) {
-                if (boxA.right < boxB.left) {
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA, clientRectB) {
+                if (clientRectA.right < clientRectB.left) {
                     return false;
                 }
-                if (boxA.left > boxB.right) {
+                if (clientRectA.left > clientRectB.right) {
                     return false;
                 }
-                if (boxA.bottom < boxB.top) {
+                if (clientRectA.bottom < clientRectB.top) {
                     return false;
                 }
-                if (boxA.top > boxB.bottom) {
+                if (clientRectA.top > clientRectB.bottom) {
                     return false;
                 }
                 return true;
             }
             DOM.clientRectsOverlap = clientRectsOverlap;
-            function clientRectInside(inner, outer) {
-                return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
+            /**
+             * Checks if the first ClientRect is inside the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the first ClientRect is inside the second.
+             */
+            function clientRectInside(clientRectA, clientRectB) {
+                return (nativeMath.floor(clientRectB.left) <= nativeMath.ceil(clientRectA.left) && nativeMath.floor(clientRectB.top) <= nativeMath.ceil(clientRectA.top) && nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.right) && nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.bottom));
             }
             DOM.clientRectInside = clientRectInside;
-            function boundingSVG(elem) {
-                var ownerSVG = elem.ownerSVGElement;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element) {
+                var ownerSVG = element.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
                 }
-                if (elem.nodeName.toLowerCase() === "svg") {
-                    return elem;
+                if (element.nodeName.toLowerCase() === "svg") {
+                    return element;
                 }
                 return null; // not in the DOM
             }
