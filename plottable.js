@@ -6215,20 +6215,20 @@ var Plottable;
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        Plot.prototype.getAllSelections = function (datasets) {
+        Plot.prototype.selections = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var allSelections = [];
+            var selections = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 if (drawer == null) {
                     return;
                 }
                 drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                    allSelections.push(this);
+                    selections.push(this);
                 });
             });
-            return d3.selectAll(allSelections);
+            return d3.selectAll(selections);
         };
         /**
          * Gets the Entities associated with the specified Datasets.
@@ -7691,10 +7691,10 @@ var Plottable;
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()), Plottable.Plot._scaledAccessor(this.y0()));
                 return propertyToProjectors;
             };
-            Area.prototype.getAllSelections = function (datasets) {
+            Area.prototype.selections = function (datasets) {
                 var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
-                var allSelections = _super.prototype.getAllSelections.call(this, datasets)[0];
+                var allSelections = _super.prototype.selections.call(this, datasets)[0];
                 var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
                 lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
                 return d3.selectAll(allSelections);

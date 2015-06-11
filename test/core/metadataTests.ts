@@ -25,7 +25,7 @@ describe("Metadata", () => {
                                   .y(yAccessor, yScale);
     plot.addDataset(dataset);
     plot.renderTo(svg);
-    var circles = plot.getAllSelections();
+    var circles = plot.selections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c1Position = d3.transform(c1.attr("transform")).translate;
@@ -62,7 +62,7 @@ describe("Metadata", () => {
     plot.addDataset(dataset1);
     plot.addDataset(dataset2);
     plot.renderTo(svg);
-    var circles = plot.getAllSelections();
+    var circles = plot.selections();
     var c1 = d3.select(circles[0][0]);
     var c2 = d3.select(circles[0][1]);
     var c3 = d3.select(circles[0][2]);

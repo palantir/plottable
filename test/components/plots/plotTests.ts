@@ -151,7 +151,7 @@ describe("Plots", () => {
       svg2.remove();
     });
 
-    it("getAllSelections() with dataset retrieval", () => {
+    it("selections() with dataset retrieval", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var plot = new Plottable.Plot();
 
@@ -186,14 +186,14 @@ describe("Plots", () => {
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       mockDrawer2.renderArea(renderArea2);
 
-      var selections = plot.getAllSelections();
+      var selections = plot.selections();
       assert.strictEqual(selections.size(), 2, "all circle selections gotten");
 
-      var oneSelection = plot.getAllSelections([dataset1]);
+      var oneSelection = plot.selections([dataset1]);
       assert.strictEqual(oneSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
 
-      var oneElementSelection = plot.getAllSelections([dataset2]);
+      var oneElementSelection = plot.selections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
       svg.remove();
