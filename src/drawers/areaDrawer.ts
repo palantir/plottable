@@ -8,6 +8,7 @@ export module Drawers {
     constructor(dataset: Dataset) {
       super(dataset);
       this._className = "area";
+      this._svgElementName = "path";
     }
 
     protected _setDefaultAttributes(selection: d3.Selection<any>) {

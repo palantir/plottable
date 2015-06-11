@@ -2511,6 +2511,7 @@ var Plottable;
          */
         function Drawer(dataset) {
             this._dataset = dataset;
+            this._svgElementName = "g";
         }
         Drawer.prototype.renderArea = function (area) {
             if (area == null) {
@@ -2534,7 +2535,7 @@ var Plottable;
          */
         Drawer.prototype._setSelectionData = function (data) {
             var dataElements = this._selection().data(data);
-            dataElements.enter().append(this.selector());
+            dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
             this._setDefaultAttributes(dataElements);
         };
@@ -2634,6 +2635,7 @@ var Plottable;
             function Line(dataset) {
                 _super.call(this, dataset);
                 this._className = "line";
+                this._svgElementName = "path";
             }
             Line.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);
@@ -2668,6 +2670,7 @@ var Plottable;
             function Area(dataset) {
                 _super.call(this, dataset);
                 this._className = "area";
+                this._svgElementName = "path";
             }
             Area.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);

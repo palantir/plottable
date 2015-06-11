@@ -33,6 +33,7 @@ export module Drawers {
      */
     constructor(dataset: Dataset) {
       this._dataset = dataset;
+      this._svgElementName = "g";
     }
 
     /**
@@ -70,7 +71,7 @@ export module Drawers {
      */
     private _setSelectionData(data: any[]) {
       var dataElements = this._selection().data(data);
-      dataElements.enter().append(this.selector());
+      dataElements.enter().append(this._svgElementName);
       dataElements.exit().remove();
       this._setDefaultAttributes(dataElements);
     }
