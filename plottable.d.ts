@@ -33,6 +33,10 @@ declare module Plottable {
             function min<C>(array: C[], defaultValue: C): C;
             function min<T, C>(array: T[], accessor: (t?: T, i?: number) => C, defaultValue: C): C;
             /**
+             * Returns true **only** if x is NaN
+             */
+            function isNaN(n: any): boolean;
+            /**
              * Returns true if the argument is a number, which is not NaN
              * Numbers represented as strings do not pass this function
              */

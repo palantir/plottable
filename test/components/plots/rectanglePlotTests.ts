@@ -73,13 +73,13 @@ describe("Plots", () => {
 
       rectanglesSelection.each(function(d: any, i: number) {
         var sel = d3.select(this);
-        assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("x")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("x")),
           "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
-        assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("y")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("y")),
           "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
-        assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("height")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("height")),
           "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
-        assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("width")),
+        assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("width")),
           "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
       });
 

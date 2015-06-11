@@ -4113,10 +4113,10 @@ describe("Plots", function () {
             assert.strictEqual(rectanglesSelection.size(), 5, "only 5 rectangles should be displayed");
             rectanglesSelection.each(function (d, i) {
                 var sel = d3.select(this);
-                assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("x")), "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
-                assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("y")), "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
-                assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("height")), "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
-                assert.isTrue(Plottable.Utils.Math.isValidNumber(+sel.attr("width")), "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
+                assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("x")), "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
+                assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("y")), "y attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("y"));
+                assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("height")), "height attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("height"));
+                assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("width")), "width attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("width"));
             });
             svg.remove();
         });
@@ -5674,8 +5674,8 @@ describe("Plots", function () {
             var ds2FirstColumnOffset = plot._stackOffsets.get(ds2).get("A");
             assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
             assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
-            assert.isTrue(Plottable.Utils.Math.isValidNumber(ds1FirstColumnOffset), "ds0 offset should not be NaN");
-            assert.isTrue(Plottable.Utils.Math.isValidNumber(ds1FirstColumnOffset), "ds1 offset should not be NaN");
+            assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds0 offset should not be NaN");
+            assert.isFalse(Plottable.Utils.Math.isNaN(ds1FirstColumnOffset), "ds1 offset should not be NaN");
         });
         it("bad values on the primary axis should default to 0 (be ignored)", function () {
             var data1 = [
@@ -8172,8 +8172,8 @@ describe("Utils.DOM", function () {
             assert.isTrue(/plottable/.test(prefix), "the prefix should contain the word plottable to avoid collisions");
             var firstClipPathIdNumber = +firstClipPathId.replace(prefix, "");
             var secondClipPathIdNumber = +secondClipPathId.replace(prefix, "");
-            assert.isTrue(Plottable.Utils.Math.isValidNumber(firstClipPathIdNumber), "first clip path id should only have a number after the prefix");
-            assert.isTrue(Plottable.Utils.Math.isValidNumber(secondClipPathIdNumber), "second clip path id should only have a number after the prefix");
+            assert.isFalse(Plottable.Utils.Math.isNaN(firstClipPathIdNumber), "first clip path id should only have a number after the prefix");
+            assert.isFalse(Plottable.Utils.Math.isNaN(secondClipPathIdNumber), "second clip path id should only have a number after the prefix");
             assert.strictEqual(firstClipPathIdNumber + 1, secondClipPathIdNumber, "Consecutive calls to generateUniqueClipPathId should give consecutive numbers after the prefix");
         });
     });
@@ -8472,6 +8472,18 @@ describe("Utils.Methods", function () {
             assert.deepEqual(max([null], today), today, "returns default value if passed array of null values");
             assert.deepEqual(max([], today), today, "returns default value if passed empty");
         });
+    });
+    it("isNaN()", function () {
+        var isNaN = Plottable.Utils.Math.isNaN;
+        assert.isTrue(isNaN(NaN), "Only NaN should pass the isNaN check");
+        assert.isFalse(isNaN(undefined), "undefined should fail the isNaN check");
+        assert.isFalse(isNaN(null), "null should fail the isNaN check");
+        assert.isFalse(isNaN(Infinity), "Infinity should fail the isNaN check");
+        assert.isFalse(isNaN(1), "numbers should fail the isNaN check");
+        assert.isFalse(isNaN(0), "0 should fail the isNaN check");
+        assert.isFalse(isNaN("foo"), "strings should fail the isNaN check");
+        assert.isFalse(isNaN(""), "empty strings should fail the isNaN check");
+        assert.isFalse(isNaN({}), "empty Objects should fail the isNaN check");
     });
     it("isValidNumber()", function () {
         var isValidNumber = Plottable.Utils.Math.isValidNumber;
