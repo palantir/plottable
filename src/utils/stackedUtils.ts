@@ -35,12 +35,20 @@ module Plottable {
           });
         });
 
+        var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
+        var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
+
         var stackOffsets = Stacked._generateStackOffsets(
           datasets,
-          Stacked._stack(positiveDataMapArray, domainKeys),
-          Stacked._stack(negativeDataMapArray, domainKeys),
+          posStack,
+          negStack,
           keyAccessor,
           valueAccessor);
+
+        // console.log(posStack);
+        // console.log(negStack);
+
+
 
         return stackOffsets;
       }
@@ -145,16 +153,24 @@ module Plottable {
        */
       private static _generateStackOffsets(
           datasets: Dataset[],
-          positiveDataMapArray: d3.Map<StackedDatum>[],
-          negativeDataMapArray: d3.Map<StackedDatum>[],
+          positiveDataStack: d3.Map<StackedDatum>[],
+          negativeDataStack: d3.Map<StackedDatum>[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>) {
+
+        if (positiveDataStack.length !== negativeDataStack.length) {
+          throw new Error("Positive and Negative data stacks should stay on same data");
+        }
+
+        // if (positiveDataStack.length !== datasets.length) {
+        //   throw new Error("WTF");
+        // }
 
         var stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
         datasets.forEach((dataset, index) => {
           var datasetOffsets = d3.map<number>();
-          var positiveDataMap = positiveDataMapArray[index];
-          var negativeDataMap = negativeDataMapArray[index];
+          var positiveDataMap = positiveDataStack[index];
+          var negativeDataMap = negativeDataStack[index];
           var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);
 
           dataset.data().forEach((datum: any, datumIndex: number) => {

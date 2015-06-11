@@ -602,7 +602,11 @@ var Plottable;
                         return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
-                var stackOffsets = Stacked._generateStackOffsets(datasets, Stacked._stack(positiveDataMapArray, domainKeys), Stacked._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
+                var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
+                var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
+                var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack, keyAccessor, valueAccessor);
+                // console.log(posStack);
+                // console.log(negStack);
                 return stackOffsets;
             };
             /**
@@ -675,12 +679,18 @@ var Plottable;
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            Stacked._generateStackOffsets = function (datasets, positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor) {
+            Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack, keyAccessor, valueAccessor) {
+                if (positiveDataStack.length !== negativeDataStack.length) {
+                    throw new Error("Positive and Negative data stacks should stay on same data");
+                }
+                // if (positiveDataStack.length !== datasets.length) {
+                //   throw new Error("WTF");
+                // }
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
                     var datasetOffsets = d3.map();
-                    var positiveDataMap = positiveDataMapArray[index];
-                    var negativeDataMap = negativeDataMapArray[index];
+                    var positiveDataMap = positiveDataStack[index];
+                    var negativeDataMap = negativeDataStack[index];
                     var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset) <= 0; });
                     dataset.data().forEach(function (datum, datumIndex) {
                         var key = String(keyAccessor(datum, datumIndex, dataset));
