@@ -2622,7 +2622,7 @@ var Plottable;
             }
             Line.prototype._enterData = function (data) {
                 _super.prototype._enterData.call(this, data);
-                this._pathSelection.datum(data);
+                this._pathSelection.data(data);
             };
             Line.prototype.renderArea = function (area) {
                 if (area == null) {
@@ -2669,7 +2669,7 @@ var Plottable;
                 _super.apply(this, arguments);
             }
             Area.prototype._enterData = function (data) {
-                this._areaSelection.datum(data);
+                this._areaSelection.data(data);
             };
             Area.prototype.renderArea = function (area) {
                 if (area == null) {
@@ -7541,7 +7541,7 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
                 return dataToDraw;
             };
             return Line;

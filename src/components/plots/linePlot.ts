@@ -112,7 +112,7 @@ export module Plots {
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
   }

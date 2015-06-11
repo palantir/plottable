@@ -9,7 +9,7 @@ export module Drawers {
 
     protected _enterData(data: any[]) {
       super._enterData(data);
-      this._pathSelection.datum(data);
+      this._pathSelection.data(data);
     }
 
     public renderArea(): d3.Selection<void>;

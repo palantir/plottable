@@ -8,7 +8,7 @@ export module Drawers {
     private _areaSelection: d3.Selection<void>;
 
     protected _enterData(data: any[]) {
-      this._areaSelection.datum(data);
+      this._areaSelection.data(data);
     }
 
     public renderArea(): d3.Selection<void>;
