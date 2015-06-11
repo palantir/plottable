@@ -3468,6 +3468,10 @@ var Plottable;
             Group.prototype.components = function () {
                 return this._components.slice();
             };
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered on top of Components already in the Group.
+             */
             Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();

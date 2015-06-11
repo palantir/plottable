@@ -69,6 +69,10 @@ export module Components {
       return this._components.slice();
     }
 
+    /**
+     * Adds a Component to this Group.
+     * The added Component will be rendered on top of Components already in the Group.
+     */
     public append(component: Component) {
       if (component != null && !this.has(component)) {
         component.detach();

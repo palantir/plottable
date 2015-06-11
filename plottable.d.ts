@@ -1533,6 +1533,10 @@ declare module Plottable {
              * @return {Component[]} The Components in this Group.
              */
             components(): Component[];
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered on top of Components already in the Group.
+             */
             append(component: Component): Group;
             protected _remove(component: Component): boolean;
         }
