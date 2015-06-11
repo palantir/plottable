@@ -152,9 +152,7 @@ module Plottable {
           var positiveDataMap = positiveDataStack[index];
           var negativeDataMap = negativeDataStack[index];
 
-          positiveDataMap.forEach((key: string) => {
-
-            var positiveStackedDatum = positiveDataMap.get(key);
+          positiveDataMap.forEach((key: string, positiveStackedDatum: d3.Map<StackedDatum>) => {
             var negativeStackedDatum = negativeDataMap.get(key);
 
             if (positiveStackedDatum.value !== 0) {
