@@ -144,7 +144,7 @@ describe("Category Axes", () => {
         for (var i = 0; i < tickLabels[0].length; i++) {
           var tickLabelRect = (<Element> tickLabels[0][i]).getBoundingClientRect();
           var tickMarkRect = (<Element> tickMarks[0][i]).getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
         }
     }
 

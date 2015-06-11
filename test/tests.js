@@ -797,7 +797,7 @@ describe("TimeAxis", function () {
                     for (var j = i + 1; j < numLabels; j++) {
                         clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
                         clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
-                        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+                        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
                     }
                 }
             }
@@ -877,7 +877,7 @@ describe("TimeAxis", function () {
         })[0].map(function (label) { return label.getBoundingClientRect(); });
         labelRects.forEach(function (labelRect) {
             tickRects.forEach(function (tickRect) {
-                assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
             });
         });
         svg.remove();
@@ -1136,7 +1136,7 @@ describe("NumericAxis", function () {
             for (var j = i + 1; j < numLabels; j++) {
                 clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
                 clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
             }
         }
         numericAxis.orientation("bottom");
@@ -1148,7 +1148,7 @@ describe("NumericAxis", function () {
             for (j = i + 1; j < numLabels; j++) {
                 clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
                 clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
             }
         }
         svg.remove();
@@ -1334,7 +1334,7 @@ describe("NumericAxis", function () {
             var tickLabelRect = this.getBoundingClientRect();
             tickMarks.each(function () {
                 var tickMarkRect = this.getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect), "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
             });
         });
         svg.remove();
@@ -1464,7 +1464,7 @@ describe("Category Axes", function () {
             for (var i = 0; i < tickLabels[0].length; i++) {
                 var tickLabelRect = tickLabels[0][i].getBoundingClientRect();
                 var tickMarkRect = tickMarks[0][i].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
             }
         }
         var svg = TestMethods.generateSVG(400, 300);

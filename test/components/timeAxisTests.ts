@@ -58,7 +58,7 @@ describe("TimeAxis", () => {
             clientRect1 = (<Element> visibleTickLabels[0][i]).getBoundingClientRect();
             clientRect2 = (<Element> visibleTickLabels[0][j]).getBoundingClientRect();
 
-            assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+            assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
           }
         }
       }
@@ -145,7 +145,7 @@ describe("TimeAxis", () => {
         })[0].map((label: Element) => label.getBoundingClientRect());
     labelRects.forEach(function(labelRect: ClientRect) {
       tickRects.forEach(function(tickRect: ClientRect) {
-        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
       });
     });
     svg.remove();

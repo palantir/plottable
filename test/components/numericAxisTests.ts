@@ -170,7 +170,7 @@ describe("NumericAxis", () => {
         clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
         clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
       }
     }
 
@@ -186,7 +186,7 @@ describe("NumericAxis", () => {
         clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
         clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
 
-        assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(clientRect1, clientRect2), "tick labels don't overlap");
+        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
       }
     }
 
@@ -423,7 +423,7 @@ describe("NumericAxis", () => {
 
       tickMarks.each(function() {
         var tickMarkRect = this.getBoundingClientRect();
-          assert.isFalse(Plottable.Utils.DOM.clientRectOverlap(tickLabelRect, tickMarkRect),
+          assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect),
             "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
       });
     });

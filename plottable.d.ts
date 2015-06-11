@@ -139,7 +139,7 @@ declare module Plottable {
             function elementHeight(element: Element): number;
             function translate(selection: d3.Selection<any>): d3.Transform;
             function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-            function clientRectOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
+            function clientRectsOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
             function clientRectInside(inner: ClientRect, outer: ClientRect): boolean;
             function boundingSVG(elem: SVGElement): SVGElement;
             function generateUniqueClipPathId(): string;
