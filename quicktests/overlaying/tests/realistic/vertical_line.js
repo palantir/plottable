@@ -21,7 +21,7 @@ function run(svg, data, Plottable) {
   if (typeof plot.autorange === "function") {
     plot.autorange("x");
   } else {
-    plot.automaticallyAdjustXScaleOverVisiblePoints(true);
+    plot.autorangeMode("x");
   }
 
   var table = new Plottable.Components.Table([[yAxis, plot],
