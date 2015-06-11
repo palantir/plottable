@@ -13,7 +13,7 @@ export module Drawers {
   };
 
   export type AppliedDrawStep = {
-    attrToAppliedProjector: AttributeToAppliedProjector;
+    attrToAppliedProjector: { [attr: string]: (datum: any, index: number) => any; };
     animator: Animator;
   };
 
@@ -84,8 +84,8 @@ export module Drawers {
       return data.length;
     }
 
-    private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
-      var modifiedAttrToProjector: AttributeToAppliedProjector = {};
+    private _appliedProjectors(attrToProjector: AttributeToProjector): { [attr: string]: (datum: any, index: number) => any; } {
+      var modifiedAttrToProjector: { [attr: string]: (datum: any, index: number) => any; } = {};
       Object.keys(attrToProjector).forEach((attr: string) => {
         modifiedAttrToProjector[attr] =
           (datum: any, index: number) => attrToProjector[attr](datum, index, this._dataset);

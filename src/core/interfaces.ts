@@ -11,15 +11,11 @@ module Plottable {
    */
   export type Projector = (datum: any, index: number, dataset: Dataset) => any;
 
-  export type AppliedProjector = (datum: any, index: number) => any;
-
   /**
    * A mapping from attributes ("x", "fill", etc.) to the functions that get
    * that information out of the data.
    */
   export type AttributeToProjector = { [attrToSet: string]: Projector; };
-
-  export type AttributeToAppliedProjector = { [attrToSet: string]: AppliedProjector; };
 
   export type SpaceRequest = {
     minWidth: number;
