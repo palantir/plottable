@@ -45,10 +45,8 @@ module Plottable {
           keyAccessor,
           valueAccessor);
 
-        // console.log(posStack);
-        // console.log(negStack);
-
-
+        console.log(posStack);
+        console.log(negStack);
 
         return stackOffsets;
       }
@@ -159,29 +157,28 @@ module Plottable {
           valueAccessor: Accessor<number>) {
 
         if (positiveDataStack.length !== negativeDataStack.length) {
-          throw new Error("Positive and Negative data stacks should stay on same data");
+          throw new Error("Positive and Negative data stacks should span the same datasets");
         }
-
-        // if (positiveDataStack.length !== datasets.length) {
-        //   throw new Error("WTF");
-        // }
 
         var stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
         datasets.forEach((dataset, index) => {
           var datasetOffsets = d3.map<number>();
           var positiveDataMap = positiveDataStack[index];
           var negativeDataMap = negativeDataStack[index];
-          var isAllNegativeValues = dataset.data().every((datum, i) => valueAccessor(datum, i, dataset) <= 0);
+
+          // console.log(positiveDataMap);
+          // console.log(negativeDataMap);
 
           dataset.data().forEach((datum: any, datumIndex: number) => {
             var key = String(keyAccessor(datum, datumIndex, dataset));
+            var value = valueAccessor(datum, datumIndex, dataset);
+
             var positiveOffset = positiveDataMap.get(key).offset;
             var negativeOffset = negativeDataMap.get(key).offset;
 
-            var value = valueAccessor(datum, datumIndex, dataset);
             var offset: number;
             if (!+value) {
-              offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+              offset = positiveOffset;
             } else {
               offset = value > 0 ? positiveOffset : negativeOffset;
             }

@@ -605,8 +605,8 @@ var Plottable;
                 var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
                 var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
                 var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack, keyAccessor, valueAccessor);
-                // console.log(posStack);
-                // console.log(negStack);
+                console.log(posStack);
+                console.log(negStack);
                 return stackOffsets;
             };
             /**
@@ -681,25 +681,23 @@ var Plottable;
              */
             Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack, keyAccessor, valueAccessor) {
                 if (positiveDataStack.length !== negativeDataStack.length) {
-                    throw new Error("Positive and Negative data stacks should stay on same data");
+                    throw new Error("Positive and Negative data stacks should span the same datasets");
                 }
-                // if (positiveDataStack.length !== datasets.length) {
-                //   throw new Error("WTF");
-                // }
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
                     var datasetOffsets = d3.map();
                     var positiveDataMap = positiveDataStack[index];
                     var negativeDataMap = negativeDataStack[index];
-                    var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset) <= 0; });
+                    // console.log(positiveDataMap);
+                    // console.log(negativeDataMap);
                     dataset.data().forEach(function (datum, datumIndex) {
                         var key = String(keyAccessor(datum, datumIndex, dataset));
+                        var value = valueAccessor(datum, datumIndex, dataset);
                         var positiveOffset = positiveDataMap.get(key).offset;
                         var negativeOffset = negativeDataMap.get(key).offset;
-                        var value = valueAccessor(datum, datumIndex, dataset);
                         var offset;
                         if (!+value) {
-                            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+                            offset = positiveOffset;
                         }
                         else {
                             offset = value > 0 ? positiveOffset : negativeOffset;
