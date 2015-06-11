@@ -73,10 +73,10 @@ export module Drawers {
       var dataElements = this._selection().data(data);
       dataElements.enter().append(this._svgElementName);
       dataElements.exit().remove();
-      this._setDefaultAttributes(dataElements);
+      this._applyDefaultAttributes(dataElements);
     }
 
-    protected _setDefaultAttributes(selection: d3.Selection<any>) {
+    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
       if (this._className != null) {
         selection.classed(this._className, true);
       }

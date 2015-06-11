@@ -10,8 +10,8 @@ export module Drawers {
       this._svgElementName = "path";
     }
 
-    protected _setDefaultAttributes(selection: d3.Selection<any>) {
-      super._setDefaultAttributes(selection);
+    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+      super._applyDefaultAttributes(selection);
       selection.style("fill", "none");
     }
 

@@ -1140,7 +1140,7 @@ declare module Plottable {
          * Removes the Drawer and its renderArea
          */
         remove(): void;
-        protected _setDefaultAttributes(selection: d3.Selection<any>): void;
+        protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
@@ -1165,7 +1165,7 @@ declare module Plottable {
     module Drawers {
         class Line extends Drawer {
             constructor(dataset: Dataset);
-            protected _setDefaultAttributes(selection: d3.Selection<any>): void;
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }
@@ -1176,7 +1176,7 @@ declare module Plottable {
     module Drawers {
         class Area extends Drawer {
             constructor(dataset: Dataset);
-            protected _setDefaultAttributes(selection: d3.Selection<any>): void;
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }

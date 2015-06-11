@@ -2537,9 +2537,9 @@ var Plottable;
             var dataElements = this._selection().data(data);
             dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
-            this._setDefaultAttributes(dataElements);
+            this._applyDefaultAttributes(dataElements);
         };
-        Drawer.prototype._setDefaultAttributes = function (selection) {
+        Drawer.prototype._applyDefaultAttributes = function (selection) {
             if (this._className != null) {
                 selection.classed(this._className, true);
             }
@@ -2637,8 +2637,8 @@ var Plottable;
                 this._className = "line";
                 this._svgElementName = "path";
             }
-            Line.prototype._setDefaultAttributes = function (selection) {
-                _super.prototype._setDefaultAttributes.call(this, selection);
+            Line.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
                 selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
@@ -2668,8 +2668,8 @@ var Plottable;
                 this._className = "area";
                 this._svgElementName = "path";
             }
-            Area.prototype._setDefaultAttributes = function (selection) {
-                _super.prototype._setDefaultAttributes.call(this, selection);
+            Area.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
                 selection.style("stroke", "none");
             };
             Area.prototype.selectionForIndex = function (index) {
