@@ -2978,19 +2978,7 @@ declare module Plottable {
 declare module Plottable {
     module Animators {
         /**
-         * The base animator implementation with easing, duration, and delay.
-         *
-         * The delay between animations can be configured with stepDelay().
-         * This will be affected if the maxTotalDuration() is used such that the entire animation
-         * fits within the timeframe
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then stepDelay
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(stepDelay(),
-         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+         * An Animator with easing and configurable durations and delays.
          */
         class Easing implements Animator {
             /**
@@ -3043,11 +3031,19 @@ declare module Plottable {
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
              *
+             * If the animation time would exceed the specified time, the duration of each step
+             * and the delay between each step will be reduced until the animation fits within
+             * the specified time.
+             *
              * @returns {number} The current maximum total animation duration.
              */
             maxTotalDuration(): number;
             /**
              * Sets the maximum total animation duration constraint in miliseconds.
+             *
+             * If the animation time would exceed the specified time, the duration of each step
+             * and the delay between each step will be reduced until the animation fits within
+             * the specified time.
              *
              * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
              * @returns {Easing} The calling Easing Animator.
