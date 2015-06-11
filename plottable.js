@@ -678,9 +678,6 @@ var Plottable;
              * to be determined correctly on the overall datasets
              */
             Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack) {
-                if (positiveDataStack.length !== negativeDataStack.length) {
-                    throw new Error("Positive and Negative data stacks should span the same datasets");
-                }
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
                     var datasetOffsets = d3.map();
@@ -689,17 +686,15 @@ var Plottable;
                     positiveDataMap.forEach(function (key) {
                         var positiveStackedDatum = positiveDataMap.get(key);
                         var negativeStackedDatum = negativeDataMap.get(key);
-                        var value = positiveStackedDatum.value || negativeStackedDatum.value;
-                        var positiveOffset = positiveStackedDatum.offset;
-                        var negativeOffset = negativeStackedDatum.offset;
-                        var offset;
-                        if (!+value) {
-                            offset = positiveOffset;
+                        if (positiveStackedDatum.value !== 0) {
+                            datasetOffsets.set(key, positiveStackedDatum.offset);
+                        }
+                        else if (negativeStackedDatum.value !== 0) {
+                            datasetOffsets.set(key, negativeStackedDatum.offset);
                         }
                         else {
-                            offset = value > 0 ? positiveOffset : negativeOffset;
+                            datasetOffsets.set(key, positiveStackedDatum.offset);
                         }
-                        datasetOffsets.set(key, offset);
                     });
                     stackOffsets.set(dataset, datasetOffsets);
                 });

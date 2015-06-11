@@ -146,10 +146,6 @@ module Plottable {
           positiveDataStack: d3.Map<StackedDatum>[],
           negativeDataStack: d3.Map<StackedDatum>[]) {
 
-        if (positiveDataStack.length !== negativeDataStack.length) {
-          throw new Error("Positive and Negative data stacks should span the same datasets");
-        }
-
         var stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
         datasets.forEach((dataset, index) => {
           var datasetOffsets = d3.map<number>();
@@ -161,20 +157,14 @@ module Plottable {
             var positiveStackedDatum = positiveDataMap.get(key);
             var negativeStackedDatum = negativeDataMap.get(key);
 
-            var value = positiveStackedDatum.value || negativeStackedDatum.value;
-
-            var positiveOffset = positiveStackedDatum.offset;
-            var negativeOffset = negativeStackedDatum.offset;
-
-            var offset: number;
-            if (!+value) {
-              offset = positiveOffset;
-            } else {
-              offset = value > 0 ? positiveOffset : negativeOffset;
+            if (positiveStackedDatum.value !== 0) {
+              datasetOffsets.set(key, positiveStackedDatum.offset);
+            } else if (negativeStackedDatum.value !== 0) {
+              datasetOffsets.set(key, negativeStackedDatum.offset);
+            } else { // illegal value / undefined / null / etc
+              datasetOffsets.set(key, positiveStackedDatum.offset);
             }
-            datasetOffsets.set(key, offset);
           });
-
           stackOffsets.set(dataset, datasetOffsets);
         });
         return stackOffsets;
