@@ -13,9 +13,6 @@ describe("Plots", () => {
       stackedPlot = new Plottable.Plots.StackedBar<number, number>();
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
-
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
-      (<any> stackedPlot)._isVertical = true;
     });
 
     it("uses positive offset on stacking the 0 value", () => {
@@ -159,9 +156,6 @@ describe("Plots", () => {
       stackedPlot = new Plottable.Plots.StackedArea<number>();
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
-
-      (<any> stackedPlot)._getDrawer = (dataset: Plottable.Dataset) => new Plottable.Drawer(dataset);
-      (<any> stackedPlot)._isVertical = true;
     });
 
     it("uses positive offset on stacking the 0 value", () => {

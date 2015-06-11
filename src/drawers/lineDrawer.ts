@@ -5,21 +5,10 @@ export module Drawers {
   export class Line extends Drawer {
     public static PATH_CLASS = "line";
 
-    protected _enterData(data: any[]) {
-      super._enterData(data);
-      this._selection().data(data);
-    }
-
-    public renderArea(): d3.Selection<void>;
-    public renderArea(area: d3.Selection<void>): Drawer;
-    public renderArea(area?: d3.Selection<void>): any {
-      if (area == null) {
-        return super.renderArea();
-      }
-      super.renderArea(area);
-      area.append("path").classed(Line.PATH_CLASS, true)
+    protected _setDefaultAttributes(selection: d3.Selection<any>) {
+      super._setDefaultAttributes(selection);
+      selection.classed(Line.PATH_CLASS, true)
                          .style("fill", "none");
-      return this;
     }
 
     protected _numberOfAnimationIterations(data: any[]): number {

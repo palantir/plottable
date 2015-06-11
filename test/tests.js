@@ -4536,8 +4536,6 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedBar();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
-            stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
             var data0 = [
@@ -4664,8 +4662,6 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedArea();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
-            stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
             var data0 = [

@@ -68,8 +68,17 @@ export module Drawers {
      *
      * @param{any[]} data The data to be drawn
      */
-    protected _enterData(data: any[]) {
-      // no-op
+    private _enterData(data: any[]) {
+      var dataElements = this._selection().data(data);
+      dataElements.enter().append(this.selector());
+      dataElements.exit().remove();
+      this._setDefaultAttributes(dataElements);
+    }
+
+    protected _setDefaultAttributes(selection: d3.Selection<any>) {
+      if (this._className != null) {
+        selection.classed(this._className, true);
+      }
     }
 
     /**
@@ -140,7 +149,7 @@ export module Drawers {
      * Returns the CSS selector for this Drawer's visual elements.
      */
     public selector(): string {
-      throw new Error("The base Drawer class has no elements to select");
+      return "g";
     }
 
     /**

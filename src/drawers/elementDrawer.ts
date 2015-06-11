@@ -14,16 +14,6 @@ export module Drawers {
       step.animator.animate(drawSelection, step.attrToAppliedProjector);
     }
 
-    protected _enterData(data: any[]) {
-      super._enterData(data);
-      var dataElements = this._selection().data(data);
-      dataElements.enter().append(this._svgElement);
-      if (this._className != null) {
-        dataElements.classed(this._className, true);
-      }
-      dataElements.exit().remove();
-    }
-
     public selector(): string {
       return this._svgElement;
     }

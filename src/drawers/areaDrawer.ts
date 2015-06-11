@@ -5,19 +5,10 @@ export module Drawers {
   export class Area extends Line {
     public static PATH_CLASS = "area";
 
-    protected _enterData(data: any[]) {
-      this._selection().data(data);
-    }
-
-    public renderArea(): d3.Selection<void>;
-    public renderArea(area: d3.Selection<void>): Drawer;
-    public renderArea(area?: d3.Selection<void>): any {
-      if (area == null) {
-        return super.renderArea();
-      }
-      Drawer.prototype.renderArea.call(this, area);
-      area.append("path").style("stroke", "none");
-      return this;
+    protected _setDefaultAttributes(selection: d3.Selection<any>) {
+      (<any> Drawer).prototype._setDefaultAttributes(selection);
+      selection.classed(Area.PATH_CLASS, true)
+               .style("stroke", "none");
     }
 
     protected _drawStep(step: AppliedDrawStep) {

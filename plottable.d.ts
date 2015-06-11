@@ -1141,12 +1141,7 @@ declare module Plottable {
          * Removes the Drawer and its renderArea
          */
         remove(): void;
-        /**
-         * Enter new data to render area and creates binding
-         *
-         * @param{any[]} data The data to be drawn
-         */
-        protected _enterData(data: any[]): void;
+        protected _setDefaultAttributes(selection: d3.Selection<any>): void;
         /**
          * Draws data using one step
          *
@@ -1179,9 +1174,7 @@ declare module Plottable {
     module Drawers {
         class Line extends Drawer {
             static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
+            protected _setDefaultAttributes(selection: d3.Selection<any>): void;
             protected _numberOfAnimationIterations(data: any[]): number;
             protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
@@ -1195,9 +1188,7 @@ declare module Plottable {
     module Drawers {
         class Area extends Line {
             static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
+            protected _setDefaultAttributes(selection: d3.Selection<any>): void;
             protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
         }
@@ -1210,7 +1201,6 @@ declare module Plottable {
         class Element extends Drawer {
             protected _svgElement: string;
             protected _drawStep(step: AppliedDrawStep): void;
-            protected _enterData(data: any[]): void;
             selector(): string;
         }
     }

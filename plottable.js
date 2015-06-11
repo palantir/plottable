@@ -2533,7 +2533,15 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._enterData = function (data) {
-            // no-op
+            var dataElements = this._selection().data(data);
+            dataElements.enter().append(this.selector());
+            dataElements.exit().remove();
+            this._setDefaultAttributes(dataElements);
+        };
+        Drawer.prototype._setDefaultAttributes = function (selection) {
+            if (this._className != null) {
+                selection.classed(this._className, true);
+            }
         };
         /**
          * Draws data using one step
@@ -2593,7 +2601,7 @@ var Plottable;
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            throw new Error("The base Drawer class has no elements to select");
+            return "g";
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
@@ -2623,17 +2631,9 @@ var Plottable;
             function Line() {
                 _super.apply(this, arguments);
             }
-            Line.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                this._selection().data(data);
-            };
-            Line.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                _super.prototype.renderArea.call(this, area);
-                area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
-                return this;
+            Line.prototype._setDefaultAttributes = function (selection) {
+                _super.prototype._setDefaultAttributes.call(this, selection);
+                selection.classed(Line.PATH_CLASS, true).style("fill", "none");
             };
             Line.prototype._numberOfAnimationIterations = function (data) {
                 return 1;
@@ -2671,16 +2671,9 @@ var Plottable;
             function Area() {
                 _super.apply(this, arguments);
             }
-            Area.prototype._enterData = function (data) {
-                this._selection().data(data);
-            };
-            Area.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                Plottable.Drawer.prototype.renderArea.call(this, area);
-                area.append("path").style("stroke", "none");
-                return this;
+            Area.prototype._setDefaultAttributes = function (selection) {
+                Plottable.Drawer.prototype._setDefaultAttributes(selection);
+                selection.classed(Area.PATH_CLASS, true).style("stroke", "none");
             };
             Area.prototype._drawStep = function (step) {
                 step.animator.animate(this._selection(), step.attrToAppliedProjector);
@@ -2719,15 +2712,6 @@ var Plottable;
                     drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
                 }
                 step.animator.animate(drawSelection, step.attrToAppliedProjector);
-            };
-            Element.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._selection().data(data);
-                dataElements.enter().append(this._svgElement);
-                if (this._className != null) {
-                    dataElements.classed(this._className, true);
-                }
-                dataElements.exit().remove();
             };
             Element.prototype.selector = function () {
                 return this._svgElement;
