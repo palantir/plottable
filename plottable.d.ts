@@ -183,13 +183,13 @@ declare module Plottable {
              */
             function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
             /**
-             * Checks if the first ClientRect is inside the second.
+             * Returns true if and only if innerClientRect is inside outerClientRect.
              *
-             * @param {ClientRect} clientRectA The first ClientRect
-             * @param {ClientRect} clientRectB The second ClientRect
-             * @returns {boolean} If the first ClientRect is inside the second.
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
              */
-            function clientRectInside(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
+            function clientRectInside(innerClientRect: ClientRect, outerClientRect: ClientRect): boolean;
             /**
              * Retrieves the bounding svg of the input element
              *

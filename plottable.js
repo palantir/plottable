@@ -361,14 +361,14 @@ var Plottable;
             }
             DOM.clientRectsOverlap = clientRectsOverlap;
             /**
-             * Checks if the first ClientRect is inside the second.
+             * Returns true if and only if innerClientRect is inside outerClientRect.
              *
-             * @param {ClientRect} clientRectA The first ClientRect
-             * @param {ClientRect} clientRectB The second ClientRect
-             * @returns {boolean} If the first ClientRect is inside the second.
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
              */
-            function clientRectInside(clientRectA, clientRectB) {
-                return (nativeMath.floor(clientRectB.left) <= nativeMath.ceil(clientRectA.left) && nativeMath.floor(clientRectB.top) <= nativeMath.ceil(clientRectA.top) && nativeMath.floor(clientRectA.right) <= nativeMath.ceil(clientRectB.right) && nativeMath.floor(clientRectA.bottom) <= nativeMath.ceil(clientRectB.bottom));
+            function clientRectInside(innerClientRect, outerClientRect) {
+                return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) && nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) && nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) && nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
             }
             DOM.clientRectInside = clientRectInside;
             /**
