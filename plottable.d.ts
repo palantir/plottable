@@ -457,7 +457,6 @@ declare module Plottable {
      * Retrieves scaled datum property.
      */
     type Projector = (datum: any, index: number, dataset: Dataset) => any;
-    type AppliedProjector = (datum: any, index: number) => any;
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
@@ -465,8 +464,11 @@ declare module Plottable {
     type AttributeToProjector = {
         [attrToSet: string]: Projector;
     };
+    /**
+     * Mapping from attributes to functions that set them based on datum and index.
+     */
     type AttributeToAppliedProjector = {
-        [attrToSet: string]: AppliedProjector;
+        [attrToSet: string]: (datum: any, index: number) => any;
     };
     type SpaceRequest = {
         minWidth: number;
