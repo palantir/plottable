@@ -174,7 +174,7 @@ export module Axes {
      */
     constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
-      this.classed("time-axis", true);
+      this.addClass("time-axis");
       this.tickLabelPadding(5);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
