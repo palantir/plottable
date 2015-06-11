@@ -1288,6 +1288,13 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes and sets the size, position, and alignment of the Component from the specified values.
@@ -1402,7 +1409,14 @@ declare module Plottable {
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
+        /**
+         * Gets the parent ComponentContainer for this Component.
+         */
         parent(): ComponentContainer;
+        /**
+         * Sets the parent ComponentContainer for this Component.
+         * The call will fail if the parent does not contain this Component.
+         */
         parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects all listeners.

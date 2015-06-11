@@ -2923,6 +2923,13 @@ var Plottable;
             this._boundingBox = this._addBox("bounding-box");
             this._isSetup = true;
         };
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: 0,

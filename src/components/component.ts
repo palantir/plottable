@@ -141,6 +141,13 @@ module Plottable {
       this._isSetup = true;
     }
 
+    /**
+     * Given available space in pixels, returns the minimum width and height this Component will need.
+     * 
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {SpaceRequest}
+     */
     public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {
         minWidth: 0,
@@ -470,7 +477,14 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Gets the parent ComponentContainer for this Component.
+     */
     public parent(): ComponentContainer;
+    /**
+     * Sets the parent ComponentContainer for this Component.
+     * The call will fail if the parent does not contain this Component.
+     */
     public parent(parent: ComponentContainer): Component;
     public parent(parent?: ComponentContainer): any {
       if (parent === undefined) {
