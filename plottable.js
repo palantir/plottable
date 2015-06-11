@@ -690,9 +690,8 @@ var Plottable;
                     var negativeDataMap = negativeDataStack[index];
                     // console.log(positiveDataMap);
                     // console.log(negativeDataMap);
-                    dataset.data().forEach(function (datum, datumIndex) {
-                        var key = String(keyAccessor(datum, datumIndex, dataset));
-                        var value = valueAccessor(datum, datumIndex, dataset);
+                    positiveDataMap.forEach(function (key, val) {
+                        var value = positiveDataMap.get(key).value || negativeDataMap.get(key).value;
                         var positiveOffset = positiveDataMap.get(key).offset;
                         var negativeOffset = negativeDataMap.get(key).offset;
                         var offset;

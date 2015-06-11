@@ -169,9 +169,8 @@ module Plottable {
           // console.log(positiveDataMap);
           // console.log(negativeDataMap);
 
-          dataset.data().forEach((datum: any, datumIndex: number) => {
-            var key = String(keyAccessor(datum, datumIndex, dataset));
-            var value = valueAccessor(datum, datumIndex, dataset);
+          positiveDataMap.forEach((key: string, val: any) => {
+            var value = positiveDataMap.get(key).value || negativeDataMap.get(key).value;
 
             var positiveOffset = positiveDataMap.get(key).offset;
             var negativeOffset = negativeDataMap.get(key).offset;
