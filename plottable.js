@@ -604,9 +604,7 @@ var Plottable;
                 });
                 var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
                 var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
-                var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack, keyAccessor, valueAccessor);
-                console.log(posStack);
-                console.log(negStack);
+                var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack);
                 return stackOffsets;
             };
             /**
@@ -679,7 +677,7 @@ var Plottable;
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack, keyAccessor, valueAccessor) {
+            Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack) {
                 if (positiveDataStack.length !== negativeDataStack.length) {
                     throw new Error("Positive and Negative data stacks should span the same datasets");
                 }
@@ -688,8 +686,6 @@ var Plottable;
                     var datasetOffsets = d3.map();
                     var positiveDataMap = positiveDataStack[index];
                     var negativeDataMap = negativeDataStack[index];
-                    // console.log(positiveDataMap);
-                    // console.log(negativeDataMap);
                     positiveDataMap.forEach(function (key, val) {
                         var value = positiveDataMap.get(key).value || negativeDataMap.get(key).value;
                         var positiveOffset = positiveDataMap.get(key).offset;
