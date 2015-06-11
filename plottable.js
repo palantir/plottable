@@ -2529,11 +2529,11 @@ var Plottable;
             }
         };
         /**
-         * Enter new data to render area and creates binding
+         * Binds data to selection
          *
          * @param{any[]} data The data to be drawn
          */
-        Drawer.prototype._setSelectionData = function (data) {
+        Drawer.prototype._bindSelectionData = function (data) {
             var dataElements = this._selection().data(data);
             dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
@@ -2590,7 +2590,7 @@ var Plottable;
                     animator: dr.animator
                 };
             });
-            this._setSelectionData(data);
+            this._bindSelectionData(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);

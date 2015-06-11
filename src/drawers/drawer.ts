@@ -65,11 +65,11 @@ export module Drawers {
     }
 
     /**
-     * Enter new data to render area and creates binding
+     * Binds data to selection
      *
      * @param{any[]} data The data to be drawn
      */
-    private _setSelectionData(data: any[]) {
+    private _bindSelectionData(data: any[]) {
       var dataElements = this._selection().data(data);
       dataElements.enter().append(this._svgElementName);
       dataElements.exit().remove();
@@ -133,7 +133,7 @@ export module Drawers {
         };
       });
 
-      this._setSelectionData(data);
+      this._bindSelectionData(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
