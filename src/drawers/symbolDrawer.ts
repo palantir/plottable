@@ -10,10 +10,6 @@ export module Drawers {
       this._className = "symbol";
     }
 
-    public selector() {
-      return "path";
-    }
-
   }
 }
 }

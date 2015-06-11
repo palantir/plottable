@@ -2605,7 +2605,7 @@ var Plottable;
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            return "g";
+            return this._svgElementName;
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
@@ -2641,9 +2641,6 @@ var Plottable;
                 _super.prototype._setDefaultAttributes.call(this, selection);
                 selection.style("fill", "none");
             };
-            Line.prototype.selector = function () {
-                return "path";
-            };
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
@@ -2675,9 +2672,6 @@ var Plottable;
                 _super.prototype._setDefaultAttributes.call(this, selection);
                 selection.style("stroke", "none");
             };
-            Area.prototype.selector = function () {
-                return "path";
-            };
             Area.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
@@ -2704,9 +2698,6 @@ var Plottable;
                 _super.call(this, dataset);
                 this._svgElementName = "rect";
             }
-            Rectangle.prototype.selector = function () {
-                return "rect";
-            };
             return Rectangle;
         })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
@@ -2731,9 +2722,6 @@ var Plottable;
                 this._className = "arc";
                 this._svgElementName = "path";
             }
-            Arc.prototype.selector = function () {
-                return "path";
-            };
             return Arc;
         })(Plottable.Drawer);
         Drawers.Arc = Arc;
@@ -2758,9 +2746,6 @@ var Plottable;
                 this._svgElementName = "path";
                 this._className = "symbol";
             }
-            Symbol.prototype.selector = function () {
-                return "path";
-            };
             return Symbol;
         })(Plottable.Drawer);
         Drawers.Symbol = Symbol;

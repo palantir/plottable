@@ -15,10 +15,6 @@ export module Drawers {
       selection.style("stroke", "none");
     }
 
-    public selector(): string {
-      return "path";
-    }
-
     public selectionForIndex(index: number) {
       return this.renderArea().select(this.selector());
     }

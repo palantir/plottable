@@ -1166,7 +1166,6 @@ declare module Plottable {
         class Line extends Drawer {
             constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-            selector(): string;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }
@@ -1178,7 +1177,6 @@ declare module Plottable {
         class Area extends Drawer {
             constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-            selector(): string;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }
@@ -1189,7 +1187,6 @@ declare module Plottable {
     module Drawers {
         class Rectangle extends Drawer {
             constructor(dataset: Dataset);
-            selector(): string;
         }
     }
 }
@@ -1199,7 +1196,6 @@ declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
             constructor(dataset: Dataset);
-            selector(): string;
         }
     }
 }
@@ -1209,7 +1205,6 @@ declare module Plottable {
     module Drawers {
         class Symbol extends Drawer {
             constructor(dataset: Dataset);
-            selector(): string;
         }
     }
 }

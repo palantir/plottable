@@ -152,7 +152,7 @@ export module Drawers {
      * Returns the CSS selector for this Drawer's visual elements.
      */
     public selector(): string {
-      return "g";
+      return this._svgElementName;
     }
 
     /**

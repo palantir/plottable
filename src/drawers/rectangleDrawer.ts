@@ -9,10 +9,6 @@ export module Drawers {
       this._svgElementName = "rect";
     }
 
-    public selector() {
-      return "rect";
-    }
-
   }
 }
 }

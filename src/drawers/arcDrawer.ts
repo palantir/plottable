@@ -10,10 +10,6 @@ export module Drawers {
       this._svgElementName = "path";
     }
 
-    public selector() {
-      return "path";
-    }
-
   }
 }
 }
