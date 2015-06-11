@@ -125,7 +125,7 @@ var Plottable;
              * @return {Map} The Map object
              */
             Map.prototype.set = function (key, value) {
-                if (key !== key) {
+                if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
@@ -395,10 +395,7 @@ var Plottable;
             function _parseStyleValue(style, property) {
                 var value = style.getPropertyValue(property);
                 var parsedValue = parseFloat(value);
-                if (parsedValue !== parsedValue) {
-                    return 0;
-                }
-                return parsedValue;
+                return parsedValue || 0;
             }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
@@ -1665,7 +1662,7 @@ var Plottable;
             }
         };
         QuantitativeScale.prototype._setDomain = function (values) {
-            var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
+            var isNaNOrInfinity = function (x) { return Plottable.Utils.Math.isNaN(x) || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
                 Plottable.Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
@@ -6249,7 +6246,7 @@ var Plottable;
                 var validDatumIndex = 0;
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
-                    if (position.x !== position.x || position.y !== position.y) {
+                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
                     entities.push({
@@ -7536,7 +7533,7 @@ var Plottable;
                 var definedProjector = function (d, i, dataset) {
                     var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                     var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                    return positionX != null && !Plottable.Utils.Math.isNaN(positionX) && positionY != null && !Plottable.Utils.Math.isNaN(positionY);
                 };
                 return function (datum, index, dataset) {
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);

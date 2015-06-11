@@ -17,7 +17,7 @@ export module Utils {
      * @return {Map} The Map object
      */
     public set(key: K, value: V) {
-      if (key !== key) {
+      if (Utils.Math.isNaN(key)) {
         throw new Error("NaN may not be used as a key to the Map");
       }
       for (var i = 0; i < this._keyValuePairs.length; i++) {
