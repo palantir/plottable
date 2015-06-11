@@ -21,7 +21,7 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _getDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
     }
 

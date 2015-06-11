@@ -2670,15 +2670,18 @@ var Plottable;
                 this._className = "area";
             }
             Area.prototype._setDefaultAttributes = function (selection) {
-                Plottable.Drawer.prototype._setDefaultAttributes(selection);
+                _super.prototype._setDefaultAttributes.call(this, selection);
                 selection.classed(Area.PATH_CLASS, true).style("stroke", "none");
             };
             Area.prototype.selector = function () {
                 return "path";
             };
+            Area.prototype.selectionForIndex = function (index) {
+                return this.renderArea().select(this.selector());
+            };
             Area.PATH_CLASS = "area";
             return Area;
-        })(Drawers.Line);
+        })(Plottable.Drawer);
         Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));

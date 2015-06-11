@@ -1178,11 +1178,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Area extends Line {
+        class Area extends Drawer {
             static PATH_CLASS: string;
             constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
             selector(): string;
+            selectionForIndex(index: number): d3.Selection<void>;
         }
     }
 }
@@ -2756,7 +2757,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Line;
+            protected _getDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
