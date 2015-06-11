@@ -263,8 +263,8 @@ module Plottable {
         this.anchor(selection);
       }
       if (this._element == null) {
-        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
+          "or a d3.Selection, or a selector string");
       }
       this.computeLayout();
       this.render();
@@ -390,6 +390,18 @@ module Plottable {
         }
         return this;
       }
+    }
+
+    public addClass(cssClass) {
+      return this;
+    }
+
+    public removeClass(cssClass) {
+      return this;
+    }
+
+    public hasClass(cssClass) {
+      return this;
     }
 
     /**

@@ -3047,8 +3047,7 @@ var Plottable;
                 this.anchor(selection);
             }
             if (this._element == null) {
-                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " + "or a d3.Selection, or a selector string");
             }
             this.computeLayout();
             this.render();
@@ -3136,6 +3135,15 @@ var Plottable;
                 }
                 return this;
             }
+        };
+        Component.prototype.addClass = function (cssClass) {
+            return this;
+        };
+        Component.prototype.removeClass = function (cssClass) {
+            return this;
+        };
+        Component.prototype.hasClass = function (cssClass) {
+            return this;
         };
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
