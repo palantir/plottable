@@ -32,7 +32,7 @@ export module Drawers {
      * @param {Dataset} dataset The dataset associated with this Drawer
      */
     constructor(dataset: Dataset) {
-        this._dataset = dataset;
+      this._dataset = dataset;
     }
 
     /**
@@ -86,8 +86,16 @@ export module Drawers {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    protected _drawStep(step: Drawers.AppliedDrawStep) {
-      // no-op
+    private _drawStep(step: Drawers.AppliedDrawStep) {
+      var selection = this._selection();
+      var colorAttributes = ["fill", "stroke"];
+      colorAttributes.forEach((colorAttribute) => {
+        if (step.attrToAppliedProjector[colorAttribute] != null) {
+          selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+        }
+      });
+      step.animator.animate(selection, step.attrToAppliedProjector);
+      this._selection().classed(this._className, true);
     }
 
     private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {

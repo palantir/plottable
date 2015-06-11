@@ -2549,7 +2549,15 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            // no-op
+            var selection = this._selection();
+            var colorAttributes = ["fill", "stroke"];
+            colorAttributes.forEach(function (colorAttribute) {
+                if (step.attrToAppliedProjector[colorAttribute] != null) {
+                    selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+                }
+            });
+            step.animator.animate(selection, step.attrToAppliedProjector);
+            this._selection().classed(this._className, true);
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
@@ -2623,16 +2631,13 @@ var Plottable;
     (function (Drawers) {
         var Line = (function (_super) {
             __extends(Line, _super);
-            function Line() {
-                _super.apply(this, arguments);
+            function Line(dataset) {
+                _super.call(this, dataset);
+                this._className = "line";
             }
             Line.prototype._setDefaultAttributes = function (selection) {
                 _super.prototype._setDefaultAttributes.call(this, selection);
                 selection.classed(Line.PATH_CLASS, true).style("fill", "none");
-            };
-            Line.prototype._drawStep = function (step) {
-                step.animator.animate(this._selection(), step.attrToAppliedProjector);
-                this._selection().classed(Line.PATH_CLASS, true);
             };
             Line.prototype.selector = function () {
                 return "path";
@@ -2660,16 +2665,13 @@ var Plottable;
     (function (Drawers) {
         var Area = (function (_super) {
             __extends(Area, _super);
-            function Area() {
-                _super.apply(this, arguments);
+            function Area(dataset) {
+                _super.call(this, dataset);
+                this._className = "area";
             }
             Area.prototype._setDefaultAttributes = function (selection) {
                 Plottable.Drawer.prototype._setDefaultAttributes(selection);
                 selection.classed(Area.PATH_CLASS, true).style("stroke", "none");
-            };
-            Area.prototype._drawStep = function (step) {
-                step.animator.animate(this._selection(), step.attrToAppliedProjector);
-                this._selection().classed(Area.PATH_CLASS, true);
             };
             Area.prototype.selector = function () {
                 return "path";
@@ -2697,14 +2699,6 @@ var Plottable;
             function Element() {
                 _super.apply(this, arguments);
             }
-            Element.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var drawSelection = this._selection();
-                if (step.attrToAppliedProjector["fill"]) {
-                    drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, step.attrToAppliedProjector);
-            };
             Element.prototype.selector = function () {
                 return this._svgElement;
             };

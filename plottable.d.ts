@@ -1142,12 +1142,6 @@ declare module Plottable {
          */
         remove(): void;
         protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-        /**
-         * Draws data using one step
-         *
-         * @param{AppliedDrawStep} step The step, how data should be drawn.
-         */
-        protected _drawStep(step: Drawers.AppliedDrawStep): void;
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
@@ -1173,8 +1167,8 @@ declare module Plottable {
     module Drawers {
         class Line extends Drawer {
             static PATH_CLASS: string;
+            constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-            protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
             selectionForIndex(index: number): d3.Selection<void>;
         }
@@ -1186,8 +1180,8 @@ declare module Plottable {
     module Drawers {
         class Area extends Line {
             static PATH_CLASS: string;
+            constructor(dataset: Dataset);
             protected _setDefaultAttributes(selection: d3.Selection<any>): void;
-            protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
         }
     }
@@ -1198,7 +1192,6 @@ declare module Plottable {
     module Drawers {
         class Element extends Drawer {
             protected _svgElement: string;
-            protected _drawStep(step: AppliedDrawStep): void;
             selector(): string;
         }
     }
