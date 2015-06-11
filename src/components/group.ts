@@ -21,7 +21,7 @@ export module Components {
     }
 
     protected _forEach(callback: (component: Component) => any) {
-      this._components.forEach(callback);
+      this.components().forEach(callback);
     }
 
     /**

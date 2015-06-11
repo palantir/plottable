@@ -6225,6 +6225,17 @@ describe("ComponentGroups", function () {
         assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
         svg.remove();
     });
+    it("destroy()s its Components when destroy()ed", function () {
+        var c1 = new Plottable.Component().classed("component-1", true);
+        var c2 = new Plottable.Component().classed("component-2", true);
+        var cg = new Plottable.Components.Group([c1, c2]);
+        var svg = TestMethods.generateSVG(200, 200);
+        cg.renderTo(svg);
+        cg.destroy();
+        assert.throws(function () { return c1.renderTo(svg); }, Error);
+        assert.throws(function () { return c2.renderTo(svg); }, Error);
+        svg.remove();
+    });
     describe("requests space based on contents, but occupies total offered space", function () {
         var SVG_WIDTH = 400;
         var SVG_HEIGHT = 400;

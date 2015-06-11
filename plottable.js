@@ -3399,7 +3399,7 @@ var Plottable;
                 components.forEach(function (c) { return _this.append(c); });
             }
             Group.prototype._forEach = function (callback) {
-                this._components.forEach(callback);
+                this.components().forEach(callback);
             };
             /**
              * Checks whether the specified Component is in the Group.
