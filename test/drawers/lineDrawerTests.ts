@@ -18,7 +18,7 @@ describe("Drawers", () => {
       linePlot.y((d: any) => d.b, yScale);
       linePlot.renderTo(svg);
 
-      var lineSelection = linePlot.getAllSelections();
+      var lineSelection = linePlot.selections();
       data.forEach((datum: any, index: number) => {
         var selection = drawer.selectionForIndex(index);
         assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");

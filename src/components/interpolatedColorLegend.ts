@@ -44,7 +44,8 @@ export module Components {
       this._formatter = Formatters.general();
       this._orientation = "horizontal";
 
-      this.classed("legend", true).classed("interpolated-color-legend", true);
+      this.addClass("legend");
+      this.addClass("interpolated-color-legend");
     }
 
     public destroy() {

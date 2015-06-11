@@ -11,7 +11,7 @@ export module Components {
      */
     constructor() {
       super();
-      this.classed("y-drag-box-layer", true);
+      this.addClass("y-drag-box-layer");
       this._hasCorners = false;
     }
 
@@ -29,7 +29,11 @@ export module Components {
     }
 
     protected _setResizableClasses(canResize: boolean) {
-      this.classed("y-resizable", canResize);
+      if (canResize) {
+        this.addClass("y-resizable");
+      } else {
+        this.removeClass("y-resizable");
+      }
     }
   }
 }

@@ -35,7 +35,7 @@ export module Plots {
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super();
-      this.classed("bar-plot", true);
+      this.addClass("bar-plot");
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
       }

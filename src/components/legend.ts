@@ -34,7 +34,7 @@ export module Components {
      */
     constructor(colorScale: Scales.Color) {
       super();
-      this.classed("legend", true);
+      this.addClass("legend");
       this.maxEntriesPerRow(1);
 
       if (colorScale == null ) {
@@ -206,9 +206,9 @@ export module Components {
     }
 
     /**
-     * Gets the Entities (representing Legend entries) at a particular point. 
+     * Gets the Entities (representing Legend entries) at a particular point.
      * Returns an empty array if no Entities are present at that location.
-     * 
+     *
      * @param {Point} p
      * @returns {Entity<Legend>[]}
      */

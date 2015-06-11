@@ -152,8 +152,8 @@ describe("ComponentGroups", () => {
   });
 
   it("detach()", () => {
-    var c1 = new Plottable.Component().classed("component-1", true);
-    var c2 = new Plottable.Component().classed("component-2", true);
+    var c1 = new Plottable.Component().addClass("component-1");
+    var c2 = new Plottable.Component().addClass("component-2");
     var cg = new Plottable.Components.Group([c1, c2]);
 
     var svg = TestMethods.generateSVG(200, 200);
@@ -186,6 +186,21 @@ describe("ComponentGroups", () => {
 
     assert.isNotNull(cgNode, "component group was added back to the DOM");
     assert.isNotNull(c1Node, "componet 1 was also added back to the DOM");
+
+    svg.remove();
+  });
+
+  it("destroy()s its Components when destroy()ed", () => {
+    var c1 = new Plottable.Component().classed("component-1", true);
+    var c2 = new Plottable.Component().classed("component-2", true);
+    var cg = new Plottable.Components.Group([c1, c2]);
+
+    var svg = TestMethods.generateSVG(200, 200);
+    cg.renderTo(svg);
+
+    cg.destroy();
+    assert.throws(() => c1.renderTo(svg), Error);
+    assert.throws(() => c2.renderTo(svg), Error);
 
     svg.remove();
   });

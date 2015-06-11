@@ -46,7 +46,7 @@ module Plottable {
     constructor() {
       super();
       this._clipPathEnabled = true;
-      this.classed("plot", true);
+      this.addClass("plot");
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._attrExtents = d3.map<any[]>();
@@ -427,18 +427,18 @@ module Plottable {
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
      * @returns {d3.Selection}
      */
-    public getAllSelections(datasets = this.datasets()): d3.Selection<any> {
-      var allSelections: Element[] = [];
+    public selections(datasets = this.datasets()): d3.Selection<any> {
+      var selections: Element[] = [];
 
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
         drawer.renderArea().selectAll(drawer.selector()).each(function() {
-          allSelections.push(this);
+          selections.push(this);
         });
       });
 
-      return d3.selectAll(allSelections);
+      return d3.selectAll(selections);
     }
 
     /**

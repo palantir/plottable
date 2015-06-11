@@ -23,7 +23,7 @@ export module Components {
         throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
       }
       super();
-      this.classed("gridlines", true);
+      this.addClass("gridlines");
       this._xScale = xScale;
       this._yScale = yScale;
       this._renderCallback = (scale) => this.render();

@@ -142,16 +142,16 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("getAllSelections", () => {
+    describe("selections", () => {
       it("retrieves all dataset selections with no args", () => {
-        var allSectors = piePlot.getAllSelections();
+        var allSectors = piePlot.selections();
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
 
         svg.remove();
       });
 
       it("retrieves correct selections", () => {
-        var allSectors = piePlot.getAllSelections([simpleDataset]);
+        var allSectors = piePlot.selections([simpleDataset]);
         assert.strictEqual(allSectors.size(), 2, "all sectors retrieved");
         assert.includeMembers(allSectors.data(), simpleData, "dataset data in selection data");
 
@@ -159,7 +159,7 @@ describe("Plots", () => {
       });
 
       it("skips invalid Datsets", () => {
-        var allSectors = piePlot.getAllSelections([new Plottable.Dataset([])]);
+        var allSectors = piePlot.selections([new Plottable.Dataset([])]);
         assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
 
         svg.remove();

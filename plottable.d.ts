@@ -1226,6 +1226,7 @@ declare module Plottable {
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
          *
@@ -1267,7 +1268,7 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
-        protected _getSize(availableWidth: number, availableHeight: number): {
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
         };
@@ -1321,15 +1322,21 @@ declare module Plottable {
          *
          * @param {string} cssClass The CSS class to check for.
          */
-        classed(cssClass: string): boolean;
+        hasClass(cssClass: string): boolean;
         /**
-         * Adds/removes a given CSS class to/from the Component.
+         * Adds a given CSS class to the Component.
          *
-         * @param {string} cssClass The CSS class to add or remove.
-         * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+         * @param {string} cssClass The CSS class to add.
          * @returns {Component} The calling Component.
          */
-        classed(cssClass: string, addClass: boolean): Component;
+        addClass(cssClass: string): Component;
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        removeClass(cssClass: string): Component;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
@@ -1470,7 +1477,7 @@ declare module Plottable {
             has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -1692,7 +1699,7 @@ declare module Plottable {
             orientation(): string;
             orientation(orientation: string): Time;
             protected _computeHeight(): number;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2140,7 +2147,7 @@ declare module Plottable {
             protected _box: d3.Selection<void>;
             constructor();
             protected _setup(): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2295,7 +2302,7 @@ declare module Plottable {
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+        selections(datasets?: Dataset[]): d3.Selection<any>;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2805,7 +2812,7 @@ declare module Plottable {
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
