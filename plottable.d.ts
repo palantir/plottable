@@ -133,15 +133,70 @@ declare module Plottable {
              * @returns {SVGRed} The bounding box.
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
-            var POLYFILL_TIMEOUT_MILLISECONDS: number;
-            function requestAnimationFramePolyfill(fn: () => void): void;
+            var SCREEN_REFRESH_RATE_MILLISECONDS: number;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback: () => void): void;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
             function elementWidth(element: Element): number;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
             function elementHeight(element: Element): number;
-            function translate(selection: d3.Selection<any>): d3.Transform;
+            /**
+             * Retrieves the number array representing the translation for the selection
+             *
+             * @param {d3.Selection<any>} selection The selection to query
+             * @returns {[number, number]} The number array representing the translation
+             */
+            function translate(selection: d3.Selection<any>): [number, number];
+            /**
+             * Translates the given selection by the input x / y pixel amounts.
+             *
+             * @param {d3.Selection<any>} selection The selection to translate
+             * @param {number} x The amount to translate in the x direction
+             * @param {number} y The amount to translate in the y direction
+             * @returns {d3.Selection<any>} The input selection
+             */
             function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-            function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
-            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
-            function boundingSVG(elem: SVGElement): SVGElement;
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
+            /**
+             * Returns true if and only if innerClientRect is inside outerClientRect.
+             *
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+             */
+            function clientRectInside(innerClientRect: ClientRect, outerClientRect: ClientRect): boolean;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element: SVGElement): SVGElement;
             function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
@@ -1932,20 +1987,18 @@ declare module Plottable {
             entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
-             * Gets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Gets the function determining the symbols of the Legend.
              *
              * @returns {(datum: any, index: number) => symbolFactory}
              */
-            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
+            symbol(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Sets the function determining the symbols of the Legend.
              *
-             * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
+             * @param {(datum: any, index: number) => SymbolFactory} symbol
              * @returns {Legend} The calling Legend
              */
-            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }

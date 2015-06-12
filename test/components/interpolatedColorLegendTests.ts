@@ -27,11 +27,11 @@ describe("InterpolatedColorLegend", () => {
     var swatchContainerBCR = (<Element> swatchContainer.node()).getBoundingClientRect();
     var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
     var boundingBoxBCR = (<Element> swatchBoundingBox.node()).getBoundingClientRect();
-    assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR),
+    assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, boundingBoxBCR),
                   "bounding box contains all swatches");
 
     var elementBCR = (<Element> legendElement.node()).getBoundingClientRect();
-    assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, elementBCR),
+    assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, elementBCR),
                   "swatches are drawn within the legend's element");
 
     var formattedDomainValues = scaleDomain.map((<any> legend)._formatter);

@@ -20,16 +20,31 @@ export module Utils {
       return bbox;
     }
 
-    export var POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
+    // Screen refresh rate which is assumed to be 60fps
+    export var SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
 
-    export function requestAnimationFramePolyfill(fn: () => void) {
+    /**
+     * Polyfill for `window.requestAnimationFrame`.
+     * If the function exists, then we use the function directly.
+     * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+     * 
+     * @param {() => void} callback The callback to call in the next animation frame
+     */
+    export function requestAnimationFramePolyfill(callback: () => void) {
       if (window.requestAnimationFrame != null) {
-        window.requestAnimationFrame(fn);
+        window.requestAnimationFrame(callback);
       } else {
-        setTimeout(fn, POLYFILL_TIMEOUT_MILLISECONDS);
+        setTimeout(callback, SCREEN_REFRESH_RATE_MILLISECONDS);
       }
     }
 
+    /**
+     * Calculates the width of the element.
+     * The width includes the padding and the border on the element's left and right sides.
+     * 
+     * @param {Element} element The element to query
+     * @returns {number} The width of the element.
+     */
     export function elementWidth(element: Element) {
       var style = window.getComputedStyle(element);
       return _parseStyleValue(style, "width")
@@ -39,6 +54,13 @@ export module Utils {
         + _parseStyleValue(style, "border-right-width");
     }
 
+    /**
+     * Calculates the height of the element.
+     * The height includes the padding the and the border on the element's top and bottom sides.
+     * 
+     * @param {Element} element The element to query
+     * @returns {number} The height of the element
+     */
     export function elementHeight(element: Element) {
       var style = window.getComputedStyle(element);
       return _parseStyleValue(style, "height")
@@ -48,7 +70,21 @@ export module Utils {
         + _parseStyleValue(style, "border-bottom-width");
     }
 
-    export function translate(selection: d3.Selection<any>): d3.Transform;
+    /**
+     * Retrieves the number array representing the translation for the selection
+     * 
+     * @param {d3.Selection<any>} selection The selection to query
+     * @returns {[number, number]} The number array representing the translation
+     */
+    export function translate(selection: d3.Selection<any>): [number, number];
+    /**
+     * Translates the given selection by the input x / y pixel amounts.
+     * 
+     * @param {d3.Selection<any>} selection The selection to translate
+     * @param {number} x The amount to translate in the x direction
+     * @param {number} y The amount to translate in the y direction
+     * @returns {d3.Selection<any>} The input selection
+     */
     export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
     export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
       var transformMatrix = d3.transform(selection.attr("transform"));
@@ -64,30 +100,50 @@ export module Utils {
       return selection;
     }
 
-    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-      if (boxA.right < boxB.left) { return false; }
-      if (boxA.left > boxB.right) { return false; }
-      if (boxA.bottom < boxB.top) { return false; }
-      if (boxA.top > boxB.bottom) { return false; }
+    /**
+     * Checks if the first ClientRect overlaps the second.
+     * 
+     * @param {ClientRect} clientRectA The first ClientRect
+     * @param {ClientRect} clientRectB The second ClientRect
+     * @returns {boolean} If the ClientRects overlap each other.
+     */
+    export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
+      if (clientRectA.right < clientRectB.left) { return false; }
+      if (clientRectA.left > clientRectB.right) { return false; }
+      if (clientRectA.bottom < clientRectB.top) { return false; }
+      if (clientRectA.top > clientRectB.bottom) { return false; }
       return true;
     }
 
-    export function boxIsInside(inner: ClientRect, outer: ClientRect) {
+    /**
+     * Returns true if and only if innerClientRect is inside outerClientRect.
+     * 
+     * @param {ClientRect} innerClientRect The first ClientRect
+     * @param {ClientRect} outerClientRect The second ClientRect
+     * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+     */
+    export function clientRectInside(innerClientRect: ClientRect, outerClientRect: ClientRect) {
       return (
-        nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) &&
-        nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) &&
-        nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) &&
-        nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom)
+        nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
+        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
+        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
+        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom)
       );
     }
 
-    export function boundingSVG(elem: SVGElement): SVGElement {
-      var ownerSVG = elem.ownerSVGElement;
+    /**
+     * Retrieves the bounding svg of the input element
+     * 
+     * @param {SVGElement} element The element to query
+     * @returns {SVGElement} The bounding svg
+     */
+    export function boundingSVG(element: SVGElement): SVGElement {
+      var ownerSVG = element.ownerSVGElement;
       if (ownerSVG != null) {
         return ownerSVG;
       }
-      if (elem.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
-        return elem;
+      if (element.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
+        return element;
       }
       return null; // not in the DOM
     }
