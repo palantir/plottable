@@ -292,7 +292,6 @@ declare module Plottable {
                 value: number;
                 offset: number;
             };
-            function normalizeKey(key: any): string;
             function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
                 value: number;
                 offset: number;
@@ -303,6 +302,7 @@ declare module Plottable {
              * set reunion (no duplicates) of the domain of each dataset.
              */
             function domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            function normalizeKey(key: any): string;
         }
     }
 }

@@ -11,10 +11,6 @@ module Plottable {
 
       var nativeMath: Math = (<any>window).Math;
 
-      export function normalizeKey(key: any) {
-        return String(key);
-      }
-
       export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
@@ -77,6 +73,10 @@ module Plottable {
         });
 
         return domainKeys.values();
+      }
+
+      export function normalizeKey(key: any) {
+        return String(key);
       }
 
     }

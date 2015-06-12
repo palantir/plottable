@@ -624,10 +624,6 @@ var Plottable;
         var Stacked;
         (function (Stacked) {
             var nativeMath = window.Math;
-            function normalizeKey(key) {
-                return String(key);
-            }
-            Stacked.normalizeKey = normalizeKey;
             function computeStackOffsets(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
                 var negativeOffsets = d3.map();
@@ -687,6 +683,10 @@ var Plottable;
                 return domainKeys.values();
             }
             Stacked.domainKeys = domainKeys;
+            function normalizeKey(key) {
+                return String(key);
+            }
+            Stacked.normalizeKey = normalizeKey;
         })(Stacked = Utils.Stacked || (Utils.Stacked = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
