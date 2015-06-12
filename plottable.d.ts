@@ -44,7 +44,6 @@ declare module Plottable {
             /**
              * Generates an array of consecutive, strictly increasing numbers
              * in the range [start, stop) at a step distance of each other
-             *
              */
             function range(start: number, stop: number, step?: number): number[];
             /**

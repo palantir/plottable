@@ -86,7 +86,6 @@ var Plottable;
             /**
              * Generates an array of consecutive, strictly increasing numbers
              * in the range [start, stop) at a step distance of each other
-             *
              */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
