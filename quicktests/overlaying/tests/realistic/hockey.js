@@ -28,13 +28,16 @@ function run(svg, data, Plottable) {
       .y(function(d){ return d.A; }, yScale)
       .size(function(d){ return 6 + d.Rk/10; })
       .attr("fill", function(d){
-        var slope = d.A/d.G;
+        var A = +d.A;
+        var G = +d.G;
+
+        var slope = A/G;
         var slope_offset = 0;
         if (slope > 80/33.14 ) { slope_offset = 3; }
         else if (slope > 1 ) { slope_offset = 2; }
         else if (slope > 33.14/80 ) {slope_offset = 1; }
 
-        var zone = +d.A + +d.G;
+        var zone = A + G;
         var zone_offset = 0;
         if (zone > 20) { zone_offset = 1; }
         if (zone > 40) { zone_offset = 2; }
@@ -55,7 +58,7 @@ function run(svg, data, Plottable) {
   var styleLinePlot = function(plot){
     plot.x(x, xScale).y(y, yScale)
     .attr("stroke", "#dddddd").attr("stroke-dasharray", 4);
-  }
+  };
 
   var linePlot20 = new Plottable.Plots.Line(xScale, yScale);
   linePlot20.addDataset(new Plottable.Dataset([{x: 20, y: 0}, {x: 0, y: 20}]));
