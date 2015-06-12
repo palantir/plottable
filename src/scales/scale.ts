@@ -196,7 +196,7 @@ module Plottable {
      * Adds an IncludedValuesProvider to the Scale.
      *
      * @param {Scales.IncludedValuesProvider} provider
-     * @returns {Sclae} The calling Scale.
+     * @returns {Scale} The calling Scale.
      */
     public addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
       this._includedValuesProviders.add(provider);
@@ -208,7 +208,7 @@ module Plottable {
      * Removes the IncludedValuesProvider from the Scale.
      *
      * @param {Scales.IncludedValuesProvider} provider
-     * @returns {Sclae} The calling Scale.
+     * @returns {Scale} The calling Scale.
      */
     public removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>) {
       this._includedValuesProviders.delete(provider);

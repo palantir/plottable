@@ -12,6 +12,9 @@ export module Drawers {
     animator: Animator;
   };
 
+  /**
+   * A DrawStep that carries an AttributeToAppliedProjector map.
+   */
   export type AppliedDrawStep = {
     attrToAppliedProjector: AttributeToAppliedProjector;
     animator: Animator;
@@ -26,7 +29,7 @@ export module Drawers {
     private _dataset: Dataset;
 
     /**
-     * Constructs a Drawer
+     * A Drawer draws svg elements based on the input Dataset.
      *
      * @constructor
      * @param {Dataset} dataset The dataset associated with this Drawer
@@ -110,6 +113,13 @@ export module Drawers {
       return modifiedAttrToProjector;
     }
 
+    /**
+     * Calculates the total time it takes to use the input drawSteps to draw the input data
+     * 
+     * @param {any[]} data The data that would have been drawn
+     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+     * @returns {number} The total time it takes to draw
+     */
     public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
       var delay = 0;
       drawSteps.forEach((drawStep, i) => {

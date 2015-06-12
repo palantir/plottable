@@ -83,6 +83,10 @@ var Plottable;
                 return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
             }
             Math.isValidNumber = isValidNumber;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) separeted by step
+             */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -96,6 +100,13 @@ var Plottable;
                 return range;
             }
             Math.range = range;
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
+             */
             function distanceSquared(p1, p2) {
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
@@ -117,13 +128,6 @@ var Plottable;
             function Map() {
                 this._keyValuePairs = [];
             }
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             Map.prototype.set = function (key, value) {
                 if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
@@ -137,12 +141,6 @@ var Plottable;
                 this._keyValuePairs.push({ key: key, value: value });
                 return this;
             };
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -151,15 +149,6 @@ var Plottable;
                 }
                 return undefined;
             };
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -168,25 +157,12 @@ var Plottable;
                 }
                 return false;
             };
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
             };
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -232,26 +208,22 @@ var Plottable;
                 }
                 return false;
             };
-            Set.prototype._updateSize = function () {
-                Object.defineProperty(this, "size", {
-                    value: this._values.length,
-                    configurable: true
-                });
-            };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
+                });
+            };
+            /**
+             * Updates the value of the read-only parameter size
+             */
+            Set.prototype._updateSize = function () {
+                Object.defineProperty(this, "size", {
+                    value: this._values.length,
+                    configurable: true
                 });
             };
             return Set;
@@ -283,7 +255,9 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            // Screen refresh rate which is assumed to be 60fps
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
             DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
             /**
              * Polyfill for `window.requestAnimationFrame`.
@@ -389,6 +363,9 @@ var Plottable;
             }
             DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
             function generateUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
             }
@@ -464,11 +441,23 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color, factor) {
                 var hsl = d3.hsl(color).brighter(factor);
                 return hsl.rgb().toString();
             }
             Color.lightenColor = lightenColor;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester, className) {
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
@@ -768,6 +757,10 @@ var Plottable;
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
             }
+            /**
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+             */
             ClientToSVGTranslator.getTranslator = function (elem) {
                 var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
@@ -1438,7 +1431,7 @@ var Plottable;
          * Adds an IncludedValuesProvider to the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.add(provider);
@@ -1449,7 +1442,7 @@ var Plottable;
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.delete(provider);
@@ -2483,7 +2476,7 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
     var Drawer = (function () {
         /**
-         * Constructs a Drawer
+         * A Drawer draws svg elements based on the input Dataset.
          *
          * @constructor
          * @param {Dataset} dataset The dataset associated with this Drawer
@@ -2548,6 +2541,13 @@ var Plottable;
             });
             return modifiedAttrToProjector;
         };
+        /**
+         * Calculates the total time it takes to use the input drawSteps to draw the input data
+         *
+         * @param {any[]} data The data that would have been drawn
+         * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+         * @returns {number} The total time it takes to draw
+         */
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
@@ -2845,6 +2845,13 @@ var Plottable;
             this._boundingBox = this._addBox("bounding-box");
             this._isSetup = true;
         };
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: 0,
@@ -2923,6 +2930,9 @@ var Plottable;
                 Plottable.RenderController.registerToComputeLayout(this);
             }
         };
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         Component.prototype.renderImmediately = function () {
             return this;
         };
@@ -3328,7 +3338,7 @@ var Plottable;
              * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
-             * Components added later will be rendered on top of Components already in the Group.
+             * Components added later will be rendered above Components already in the Group.
              *
              * @constructor
              * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -3383,6 +3393,10 @@ var Plottable;
             Group.prototype.components = function () {
                 return this._components.slice();
             };
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered above Components already in the Group.
+             */
             Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();
@@ -5855,6 +5869,8 @@ var Plottable;
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         function Plot() {
@@ -6829,11 +6845,9 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             function Scatter() {
                 _super.call(this);
@@ -6923,9 +6937,9 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function Bar(orientation) {
@@ -7392,9 +7406,9 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Line() {
                 _super.call(this);
@@ -7511,8 +7525,6 @@ var Plottable;
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Area() {
                 _super.call(this);
@@ -7681,8 +7693,6 @@ var Plottable;
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function ClusteredBar(orientation) {
@@ -7741,8 +7751,6 @@ var Plottable;
             __extends(StackedArea, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
                 var _this = this;
@@ -8036,19 +8044,7 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * The base animator implementation with easing, duration, and delay.
-         *
-         * The delay between animations can be configured with stepDelay().
-         * This will be affected if the maxTotalDuration() is used such that the entire animation
-         * fits within the timeframe
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then stepDelay
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(stepDelay(),
-         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+         * An Animator with easing and configurable durations and delays.
          */
         var Easing = (function () {
             /**

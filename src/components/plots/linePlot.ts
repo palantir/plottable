@@ -5,9 +5,9 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
     /**
+     * A Line Plot draws line segments starting from the first data point to the next.
+     * 
      * @constructor
-     * @param {QuantitativeScale} xScale
-     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();
