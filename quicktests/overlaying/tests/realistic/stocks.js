@@ -123,12 +123,10 @@ function run(svg, data, Plottable) {
           if (typeof keyInteraction.onKeyPress === "function") {
             keyInteraction.onKeyPress(65, function() {
                                        xScale.autoDomain();
-                                       pzi.resetZoom();
                                      });
           } else {
             keyInteraction.onKey(65, function() {
                                        xScale.autoDomain();
-                                       pzi.resetZoom();
                                      });
           }
           keyInteraction.attachTo(plotArea);
