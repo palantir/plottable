@@ -283,21 +283,43 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
-            function requestAnimationFramePolyfill(fn) {
+            // Screen refresh rate which is assumed to be 60fps
+            DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback) {
                 if (window.requestAnimationFrame != null) {
-                    window.requestAnimationFrame(fn);
+                    window.requestAnimationFrame(callback);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MILLISECONDS);
+                    setTimeout(callback, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
             function elementWidth(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
             DOM.elementWidth = elementWidth;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
             function elementHeight(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
@@ -315,33 +337,53 @@ var Plottable;
                 return selection;
             }
             DOM.translate = translate;
-            function boxesOverlap(boxA, boxB) {
-                if (boxA.right < boxB.left) {
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA, clientRectB) {
+                if (clientRectA.right < clientRectB.left) {
                     return false;
                 }
-                if (boxA.left > boxB.right) {
+                if (clientRectA.left > clientRectB.right) {
                     return false;
                 }
-                if (boxA.bottom < boxB.top) {
+                if (clientRectA.bottom < clientRectB.top) {
                     return false;
                 }
-                if (boxA.top > boxB.bottom) {
+                if (clientRectA.top > clientRectB.bottom) {
                     return false;
                 }
                 return true;
             }
-            DOM.boxesOverlap = boxesOverlap;
-            function boxIsInside(inner, outer) {
-                return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
+            DOM.clientRectsOverlap = clientRectsOverlap;
+            /**
+             * Returns true if and only if innerClientRect is inside outerClientRect.
+             *
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+             */
+            function clientRectInside(innerClientRect, outerClientRect) {
+                return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) && nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) && nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) && nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
             }
-            DOM.boxIsInside = boxIsInside;
-            function boundingSVG(elem) {
-                var ownerSVG = elem.ownerSVGElement;
+            DOM.clientRectInside = clientRectInside;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element) {
+                var ownerSVG = element.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
                 }
-                if (elem.nodeName.toLowerCase() === "svg") {
-                    return elem;
+                if (element.nodeName.toLowerCase() === "svg") {
+                    return element;
                 }
                 return null; // not in the DOM
             }
@@ -957,7 +999,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MILLISECONDS;
+                this._timeoutMsec = Plottable.Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
@@ -4111,7 +4153,7 @@ var Plottable;
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -4472,11 +4514,11 @@ var Plottable;
                     return;
                 }
                 var firstTickLabel = tickLabels[0][0];
-                if (!Plottable.Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!Plottable.Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4488,7 +4530,7 @@ var Plottable;
                     return;
                 }
                 tickLabels.each(function (d, i) {
-                    if (!Plottable.Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });
