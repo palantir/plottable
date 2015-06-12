@@ -67,7 +67,7 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 

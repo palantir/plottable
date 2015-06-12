@@ -73,7 +73,7 @@ export module Plots {
       var minYDist = Infinity;
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
         var xDist = Math.abs(queryPoint.x - entity.position.x);
