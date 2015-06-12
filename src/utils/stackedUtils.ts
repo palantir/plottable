@@ -46,23 +46,24 @@ module Plottable {
         return datasetToKeyToStackedDatum;
       }
 
-      /**
-       * Calculates an extent across all datasets. The extent is a <number> interval that
-       * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
-       *
-       * @return {[number]} The extent that spans all the Utils.stacked data
-       */
       export function computeStackExtent(
           stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>,
-          filter: (value: string) => boolean) {
+          keyAccessor: Accessor<any>,
+          filter: Accessor<boolean>) {
+
+        var getKey = (datum: any, index: number, dataset: Dataset) => {
+          return String(keyAccessor(datum, index, dataset));
+        };
+
         var extents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
-          stackedDatumMap.forEach((stackedDatum: StackedDatum) => {
-            if (filter != null && !filter(stackedDatum.key)) {
+          dataset.data().forEach((datum, index) => {
+            if (filter != null && !filter(datum, index, dataset)) {
               return;
             }
+            var stackedDatum = stackedDatumMap.get(getKey(datum, index, dataset));
             extents.push(stackedDatum.value + stackedDatum.offset);
-          });
+          })
         });
         var maxStackExtent = Utils.Math.max(extents, 0);
         var minStackExtent = Utils.Math.min(extents, 0);

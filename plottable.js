@@ -657,19 +657,17 @@ var Plottable;
                 return datasetToKeyToStackedDatum;
             }
             Stacked.computeStackOffsets = computeStackOffsets;
-            /**
-             * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
-             *
-             * @return {[number]} The extent that spans all the Utils.stacked data
-             */
-            function computeStackExtent(stackOffsets, filter) {
+            function computeStackExtent(stackOffsets, keyAccessor, filter) {
+                var getKey = function (datum, index, dataset) {
+                    return String(keyAccessor(datum, index, dataset));
+                };
                 var extents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
-                    stackedDatumMap.forEach(function (stackedDatum) {
-                        if (filter != null && !filter(stackedDatum.key)) {
+                    dataset.data().forEach(function (datum, index) {
+                        if (filter != null && !filter(datum, index, dataset)) {
                             return;
                         }
+                        var stackedDatum = stackedDatumMap.get(getKey(datum, index, dataset));
                         extents.push(stackedDatum.value + stackedDatum.offset);
                     });
                 });
@@ -6470,26 +6468,6 @@ var Plottable;
             }
             return null;
         };
-        XYPlot.prototype._valueFilterForProperty = function (property) {
-            if (property === "x" && !this._autoAdjustXScaleDomain) {
-                return null;
-            }
-            if (property === "y" && !this._autoAdjustYScaleDomain) {
-                return null;
-            }
-            var binding = this._propertyBindings.get(property === "x" ? "y" : "x");
-            if (binding == null) {
-                return null;
-            }
-            var scale = binding.scale;
-            if (scale == null) {
-                return null;
-            }
-            return function (value) {
-                var range = scale.range();
-                return Plottable.Utils.Math.inRange(scale.scale(value), range[0], range[1]);
-            };
-        };
         XYPlot.prototype._makeFilterByProperty = function (property) {
             var binding = this._propertyBindings.get(property);
             if (binding != null) {
@@ -7850,10 +7828,10 @@ var Plottable;
                 var datasets = this.datasets();
                 var keyAccessor = this.x().accessor;
                 var valueAccessor = this.y().accessor;
-                var filter = this._valueFilterForProperty("y");
+                var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
@@ -7987,9 +7965,9 @@ var Plottable;
                 var datasets = this.datasets();
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-                var filter = this._valueFilterForProperty(this._isVertical ? "y" : "x");
+                var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
+                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
             };
             return StackedBar;
         })(Plots.Bar);

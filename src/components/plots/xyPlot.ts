@@ -108,29 +108,6 @@ module Plottable {
       return null;
     }
 
-    protected _valueFilterForProperty(property: string) {
-      if (property === "x" && !this._autoAdjustXScaleDomain) {
-        return null;
-      }
-
-      if (property === "y" && !this._autoAdjustYScaleDomain) {
-        return null;
-      }
-
-      var binding = this._propertyBindings.get(property === "x" ? "y" : "x");
-      if (binding == null) {
-        return null;
-      }
-      var scale = binding.scale;
-      if (scale == null) {
-        return null;
-      }
-      return (value: string) => {
-        var range = scale.range();
-        return Utils.Math.inRange(scale.scale(value), range[0], range[1]);
-      };
-    }
-
     private _makeFilterByProperty(property: string) {
       var binding = this._propertyBindings.get(property);
       if (binding != null) {

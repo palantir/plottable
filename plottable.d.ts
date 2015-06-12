@@ -298,13 +298,7 @@ declare module Plottable {
                 value: number;
                 offset?: number;
             }>>;
-            /**
-             * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
-             *
-             * @return {[number]} The extent that spans all the Utils.stacked data
-             */
-            function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, filter: (value: string) => boolean): number[];
+            function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
@@ -2522,7 +2516,6 @@ declare module Plottable {
          */
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
-        protected _valueFilterForProperty(property: string): (value: string) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
