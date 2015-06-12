@@ -110,7 +110,6 @@ export module Scales {
       return hexCode;
     }
 
-
     /**
      * Returns the color-string corresponding to a given string.
      * If there are not enough colors in the range(), a lightened version of an existing color will be used.
@@ -123,7 +122,16 @@ export module Scales {
       var index = this.domain().indexOf(value);
       var numLooped = Math.floor(index / this.range().length);
       var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-      return Utils.Color.lightenColor(color, modifyFactor);
+      return this._lightenColor(color, modifyFactor);
+    }
+
+    /**
+     * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+     * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+     */
+    private _lightenColor(color: string, factor: number) {
+      var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
+      return hsl.rgb().toString();
     }
 
     protected _getDomain() {

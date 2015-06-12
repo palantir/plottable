@@ -19,15 +19,6 @@ export module Utils {
     }
 
     /**
-     * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
-     * Channel values are capped at the maximum value of 255, and the minimum value of 30.
-     */
-    export function lightenColor(color: string, factor: number) {
-      var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
-      return hsl.rgb().toString();
-    }
-
-    /**
      * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
      * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
      * chroma.js may be found here: https://github.com/gka/chroma.js

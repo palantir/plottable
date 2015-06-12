@@ -202,11 +202,6 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
-            /**
-             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
-             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
-             */
-            function lightenColor(color: string, factor: number): string;
         }
     }
 }

@@ -442,15 +442,6 @@ var Plottable;
             }
             Color.contrast = contrast;
             /**
-             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
-             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
-             */
-            function lightenColor(color, factor) {
-                var hsl = d3.hsl(color).brighter(factor);
-                return hsl.rgb().toString();
-            }
-            Color.lightenColor = lightenColor;
-            /**
              * Return relative luminance (defined here: http://www.w3.org/TR/2008/REC-WCAG20-20081211/#relativeluminancedef)
              * Based on implementation from chroma.js by Gregor Aisch (gka) (licensed under BSD)
              * chroma.js may be found here: https://github.com/gka/chroma.js
@@ -2195,7 +2186,15 @@ var Plottable;
                 var index = this.domain().indexOf(value);
                 var numLooped = Math.floor(index / this.range().length);
                 var modifyFactor = Math.log(numLooped * Color._LOOP_LIGHTEN_FACTOR + 1);
-                return Plottable.Utils.Color.lightenColor(color, modifyFactor);
+                return this._lightenColor(color, modifyFactor);
+            };
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
+            Color.prototype._lightenColor = function (color, factor) {
+                var hsl = d3.hsl(color).brighter(factor);
+                return hsl.rgb().toString();
             };
             Color.prototype._getDomain = function () {
                 return this._d3Scale.domain();
