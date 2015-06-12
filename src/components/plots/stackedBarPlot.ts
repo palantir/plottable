@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackInformation: Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>;
+    private _stackInformation: Utils.Stacking.StackInformation;
     private _stackedExtent: number[];
 
     /**
