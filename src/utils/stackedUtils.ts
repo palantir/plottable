@@ -56,7 +56,7 @@ module Plottable {
             }
             var stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
             extents.push(stackedDatum.value + stackedDatum.offset);
-          })
+          });
         });
         var maxStackExtent = Utils.Math.max(extents, 0);
         var minStackExtent = Utils.Math.min(extents, 0);
