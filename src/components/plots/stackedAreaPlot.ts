@@ -11,8 +11,6 @@ export module Plots {
     private _baselineValueProvider: () => number[];
 
     /**
-     * A StackedArea Plot draws Areas stacked on top of each other.
-     * 
      * @constructor
      */
     constructor() {

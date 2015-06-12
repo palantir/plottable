@@ -6350,8 +6350,6 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             /**
-             * A Pie Plot draws a circle separated into sectors in accordance with the sector values in the data.
-             *
              * @constructor
              */
             function Pie() {
@@ -7815,8 +7813,6 @@ var Plottable;
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
             /**
-             * A StackedArea Plot draws Areas stacked on top of each other.
-             *
              * @constructor
              */
             function StackedArea() {
