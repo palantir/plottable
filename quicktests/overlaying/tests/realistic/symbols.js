@@ -117,7 +117,7 @@ function run(svg, data, Plottable){
       dataset.data(d);
     });
 
-    key.onKeyPress(68, function(keyData){
+    key.onKey(68, function(keyData){
       if(d.length > 0){
         d.splice(d.length-1,1);
         dataset.data(d);

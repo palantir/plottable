@@ -13,7 +13,7 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
   var defaultTitleText = "Hover over points";
-  var title = new Plottable.Components.Label(defaultTitleText).addClass("title-label");
+  var title = new Plottable.Components.TitleLabel(defaultTitleText);
 
   var ds1 = new Plottable.Dataset(data[0], { color: "blue", size: 20 });
   var ds2 = new Plottable.Dataset(data[1], { color: "red", size: 30 });
