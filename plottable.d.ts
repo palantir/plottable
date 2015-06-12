@@ -41,7 +41,19 @@ declare module Plottable {
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n: any): boolean;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) at a step distance of each other
+             *
+             */
             function range(start: number, stop: number, step?: number): number[];
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param p1
+             * @param p2
+             * @return dist(p1, p2)^2
+             */
             function distanceSquared(p1: Point, p2: Point): number;
         }
     }

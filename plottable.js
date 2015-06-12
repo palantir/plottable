@@ -83,6 +83,11 @@ var Plottable;
                 return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
             }
             Math.isValidNumber = isValidNumber;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) at a step distance of each other
+             *
+             */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -96,6 +101,13 @@ var Plottable;
                 return range;
             }
             Math.range = range;
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param p1
+             * @param p2
+             * @return dist(p1, p2)^2
+             */
             function distanceSquared(p1, p2) {
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
