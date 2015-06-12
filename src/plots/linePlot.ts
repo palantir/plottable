@@ -1,4 +1,4 @@
-///<reference path="../../reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
 export module Plots {
@@ -6,7 +6,7 @@ export module Plots {
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
-     * 
+     *
      * @constructor
      */
     constructor() {

@@ -1,4 +1,4 @@
-///<reference path="../../reference.ts" />
+///<reference path="../reference.ts" />
 
 module Plottable {
 
@@ -29,7 +29,7 @@ export module Plots {
 
     /**
      * A Bar Plot draws bars growing out from a baseline to some value
-     * 
+     *
      * @constructor
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
