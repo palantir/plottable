@@ -2500,7 +2500,7 @@ declare module Plottable {
          */
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
-        protected _hackedFilterForProperty(property: string): (value: string) => boolean;
+        protected _valueFilterForProperty(property: string): (value: string) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;

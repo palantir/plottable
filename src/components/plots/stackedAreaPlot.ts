@@ -121,8 +121,7 @@ export module Plots {
       var datasets = this.datasets();
       var keyAccessor = this.x().accessor;
       var valueAccessor = this.y().accessor;
-      // var filter = this._filterForProperty("y");
-      var filter = this._hackedFilterForProperty("y");
+      var filter = this._valueFilterForProperty("y");
 
       this._checkSameDomain(datasets, keyAccessor);
       this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);

@@ -108,7 +108,7 @@ module Plottable {
       return null;
     }
 
-    protected _hackedFilterForProperty(property: string) {
+    protected _valueFilterForProperty(property: string) {
       if (property === "x" && !this._autoAdjustXScaleDomain) {
         return null;
       }

@@ -6521,7 +6521,7 @@ var Plottable;
             }
             return null;
         };
-        XYPlot.prototype._hackedFilterForProperty = function (property) {
+        XYPlot.prototype._valueFilterForProperty = function (property) {
             if (property === "x" && !this._autoAdjustXScaleDomain) {
                 return null;
             }
@@ -7901,8 +7901,7 @@ var Plottable;
                 var datasets = this.datasets();
                 var keyAccessor = this.x().accessor;
                 var valueAccessor = this.y().accessor;
-                // var filter = this._filterForProperty("y");
-                var filter = this._hackedFilterForProperty("y");
+                var filter = this._valueFilterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
@@ -8039,8 +8038,7 @@ var Plottable;
                 var datasets = this.datasets();
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-                // var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                var filter = this._hackedFilterForProperty(this._isVertical ? "y" : "x");
+                var filter = this._valueFilterForProperty(this._isVertical ? "y" : "x");
                 this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
             };
