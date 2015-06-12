@@ -2300,6 +2300,8 @@ declare module Plottable {
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         constructor();

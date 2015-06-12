@@ -5932,6 +5932,8 @@ var Plottable;
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         function Plot() {
