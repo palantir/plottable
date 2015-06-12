@@ -6,7 +6,7 @@ module Plottable {
 
       export type StackedDatum = {
         value: number;
-        offset?: number;
+        offset: number;
       };
 
       var nativeMath: Math = (<any>window).Math;

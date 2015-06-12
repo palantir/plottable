@@ -290,12 +290,12 @@ declare module Plottable {
         module Stacked {
             type StackedDatum = {
                 value: number;
-                offset?: number;
+                offset: number;
             };
             function normalizeKey(key: any): string;
             function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
                 value: number;
-                offset?: number;
+                offset: number;
             }>>;
             function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
