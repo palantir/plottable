@@ -7470,8 +7470,6 @@ var Plottable;
             __extends(Line, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Line() {
                 _super.call(this);
@@ -7756,8 +7754,6 @@ var Plottable;
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function ClusteredBar(orientation) {

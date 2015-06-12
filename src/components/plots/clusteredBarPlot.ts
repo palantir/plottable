@@ -12,8 +12,6 @@ export module Plots {
      *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
      *
      * @constructor
-     * @param {Scale} xScale
-     * @param {Scale} yScale
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {

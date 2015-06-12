@@ -6,8 +6,6 @@ export module Plots {
 
     /**
      * @constructor
-     * @param {QuantitativeScale} xScale
-     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();

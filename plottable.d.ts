@@ -2847,8 +2847,6 @@ declare module Plottable {
         class Line<X> extends XYPlot<X, number> {
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _createDrawer(dataset: Dataset): Drawer;
@@ -2922,8 +2920,6 @@ declare module Plottable {
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
