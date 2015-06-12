@@ -614,38 +614,18 @@ var Plottable;
              * @return {[number]} The extent that spans all the stacked data
              */
             Stacked.computeStackExtent = function (stackOffsets, filter) {
-                var positiveExtents = [];
+                var extents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
                     var stackingData = [];
                     stackedDatumMap.forEach(function (key, stackedDatum) {
-                        if (filter != null) {
-                            if (filter(stackedDatum.key)) {
-                                stackingData.push(stackedDatum.value + stackedDatum.offset);
-                            }
+                        if (filter != null && !filter(stackedDatum.key)) {
+                            return;
                         }
-                        else {
-                            stackingData.push(stackedDatum.value + stackedDatum.offset);
-                        }
+                        extents.push(stackedDatum.value + stackedDatum.offset);
                     });
-                    positiveExtents.push(Utils.Math.max(stackingData, 0));
                 });
-                var maxStackExtent = Utils.Math.max(positiveExtents, 0);
-                var negativeExtents = [];
-                stackOffsets.forEach(function (stackedDatumMap, dataset) {
-                    var stackingData = [];
-                    stackedDatumMap.forEach(function (key, stackedDatum) {
-                        if (filter != null) {
-                            if (filter(stackedDatum.key)) {
-                                stackingData.push(stackedDatum.value + stackedDatum.offset);
-                            }
-                        }
-                        else {
-                            stackingData.push(stackedDatum.value + stackedDatum.offset);
-                        }
-                    });
-                    negativeExtents.push(Utils.Math.min(stackingData, 0));
-                });
-                var minStackExtent = Utils.Math.min(negativeExtents, 0);
+                var maxStackExtent = Utils.Math.max(extents, 0);
+                var minStackExtent = Utils.Math.min(extents, 0);
                 return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             };
             /**

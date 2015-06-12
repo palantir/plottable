@@ -53,39 +53,19 @@ module Plottable {
           stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>,
           filter: (value: number) => boolean) {
 
-        var positiveExtents: number[] = [];
+        var extents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
 
           var stackingData: number[] = [];
           stackedDatumMap.forEach((key: string, stackedDatum: StackedDatum) => {
-            if (filter != null) {
-              if (filter(stackedDatum.key)) {
-                stackingData.push(stackedDatum.value + stackedDatum.offset);
-              }
-            } else {
-              stackingData.push(stackedDatum.value + stackedDatum.offset);
+            if (filter != null && !filter(stackedDatum.key)) {
+              return;
             }
+            extents.push(stackedDatum.value + stackedDatum.offset);
           });
-          positiveExtents.push(Utils.Math.max(stackingData, 0));
         });
-        var maxStackExtent = Utils.Math.max(positiveExtents, 0);
-
-        var negativeExtents: number[] = [];
-        stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
-
-          var stackingData: number[] = [];
-          stackedDatumMap.forEach((key: string, stackedDatum: StackedDatum) => {
-            if (filter != null) {
-              if (filter(stackedDatum.key)) {
-                stackingData.push(stackedDatum.value + stackedDatum.offset);
-              }
-            } else {
-              stackingData.push(stackedDatum.value + stackedDatum.offset);
-            }
-          });
-          negativeExtents.push(Utils.Math.min(stackingData, 0));
-        });
-        var minStackExtent = Utils.Math.min(negativeExtents, 0);
+        var maxStackExtent = Utils.Math.max(extents, 0);
+        var minStackExtent = Utils.Math.min(extents, 0);
 
         return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
       }
