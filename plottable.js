@@ -6910,11 +6910,9 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             function Scatter() {
                 _super.call(this);
