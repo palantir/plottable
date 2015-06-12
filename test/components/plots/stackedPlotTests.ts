@@ -48,8 +48,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
-      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      var stackOffset1 = (<any> stackedPlot)._stackInformation.get(ds1);
+      var stackOffset4 = (<any> stackedPlot)._stackInformation.get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
@@ -87,10 +87,10 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      var stackOffset2 = (<any> stackedPlot)._stackOffsets.get(ds2);
-      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
-      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
-      var stackOffset5 = (<any> stackedPlot)._stackOffsets.get(ds5);
+      var stackOffset2 = (<any> stackedPlot)._stackInformation.get(ds2);
+      var stackOffset3 = (<any> stackedPlot)._stackInformation.get(ds3);
+      var stackOffset4 = (<any> stackedPlot)._stackInformation.get(ds4);
+      var stackOffset5 = (<any> stackedPlot)._stackInformation.get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
@@ -162,8 +162,8 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      var stackOffset1 = (<any> stackedPlot)._stackOffsets.get(ds1);
-      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
+      var stackOffset1 = (<any> stackedPlot)._stackInformation.get(ds1);
+      var stackOffset4 = (<any> stackedPlot)._stackInformation.get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
@@ -201,10 +201,10 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      var stackOffset2 = (<any> stackedPlot)._stackOffsets.get(ds2);
-      var stackOffset3 = (<any> stackedPlot)._stackOffsets.get(ds3);
-      var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
-      var stackOffset5 = (<any> stackedPlot)._stackOffsets.get(ds5);
+      var stackOffset2 = (<any> stackedPlot)._stackInformation.get(ds2);
+      var stackOffset3 = (<any> stackedPlot)._stackInformation.get(ds3);
+      var stackOffset4 = (<any> stackedPlot)._stackInformation.get(ds4);
+      var stackOffset5 = (<any> stackedPlot)._stackInformation.get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");

@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackOffsets: Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>;
+    private _stackInformation: Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>;
     private _stackedExtent: number[];
 
     private _baseline: d3.Selection<void>;
@@ -19,7 +19,7 @@ export module Plots {
       super();
       this.addClass("stacked-area-plot");
       this.attr("fill-opacity", 1);
-      this._stackOffsets = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
+      this._stackInformation = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
     }
@@ -124,8 +124,8 @@ export module Plots {
       var filter = this._filterForProperty("y");
 
       this._checkSameDomain(datasets, keyAccessor);
-      this._stackOffsets = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackOffsets, keyAccessor, filter);
+      this._stackInformation = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackInformation, keyAccessor, filter);
     }
 
     private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {
@@ -147,9 +147,9 @@ export module Plots {
         return Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
       };
       var stackYProjector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
       var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+        this.y().scale.scale(this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
 
       propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
       return propertyToProjectors;
@@ -159,7 +159,7 @@ export module Plots {
       var pixelPoint = super._pixelPoint(datum, index, dataset);
       var xValue = this.x().accessor(datum, index, dataset);
       var yValue = this.y().accessor(datum, index, dataset);
-      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackInformation.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
 
