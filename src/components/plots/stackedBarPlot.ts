@@ -68,7 +68,8 @@ export module Plots {
       var getStart = (d: any, i: number, dataset: Dataset) =>
         primaryScale.scale(this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset);
       var getEnd = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset);
+        primaryScale.scale(+primaryAccessor(d, i, dataset) +
+          this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset);
 
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
