@@ -7,6 +7,9 @@ module Plottable {
      * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
      */
     export class Set<T> {
+      /**
+       * The size of the set. The value is read-only.
+       */
       public size: number;
 
       private _values: T[];
@@ -34,13 +37,6 @@ module Plottable {
         return false;
       }
 
-      private _updateSize() {
-        Object.defineProperty(this, "size", {
-          value: this._values.length,
-          configurable: true
-        });
-      }
-
       public has(value: T) {
         return this._values.indexOf(value) !== -1;
       }
@@ -55,6 +51,16 @@ module Plottable {
       public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
         this._values.forEach((value: T) => {
           callback.call(thisArg, value, value, this);
+        });
+      }
+
+      /**
+       * Updates the value of the read-only parameter size
+       */
+      private _updateSize() {
+        Object.defineProperty(this, "size", {
+          value: this._values.length,
+          configurable: true
         });
       }
     }

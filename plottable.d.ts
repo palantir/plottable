@@ -118,6 +118,9 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
          */
         class Set<T> {
+            /**
+             * The size of the set. The value is read-only.
+             */
             size: number;
             constructor();
             add(value: T): Set<T>;

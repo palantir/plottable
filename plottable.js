@@ -243,12 +243,6 @@ var Plottable;
                 }
                 return false;
             };
-            Set.prototype._updateSize = function () {
-                Object.defineProperty(this, "size", {
-                    value: this._values.length,
-                    configurable: true
-                });
-            };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
@@ -263,6 +257,15 @@ var Plottable;
                 var _this = this;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
+                });
+            };
+            /**
+             * Updates the value of the read-only parameter size
+             */
+            Set.prototype._updateSize = function () {
+                Object.defineProperty(this, "size", {
+                    value: this._values.length,
+                    configurable: true
                 });
             };
             return Set;
