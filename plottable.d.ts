@@ -232,12 +232,12 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        type StackedDatum = {
-            key: any;
-            value: number;
-            offset?: number;
-        };
         module Stacked {
+            type StackedDatum = {
+                key: any;
+                value: number;
+                offset?: number;
+            };
             /**
              * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
              * for drawing purposes.

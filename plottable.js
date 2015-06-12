@@ -579,9 +579,9 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var nativeMath = window.Math;
         var Stacked;
         (function (Stacked) {
+            var nativeMath = window.Math;
             /**
              * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
              * for drawing purposes.

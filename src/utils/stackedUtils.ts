@@ -2,15 +2,15 @@
 
 module Plottable {
   export module Utils {
-    export type StackedDatum = {
-      key: any;
-      value: number;
-      offset?: number;
-    };
-
-    var nativeMath: Math = (<any>window).Math;
-
     export module Stacked {
+
+      export type StackedDatum = {
+        key: any;
+        value: number;
+        offset?: number;
+      };
+
+      var nativeMath: Math = (<any>window).Math;
 
       /**
        * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
