@@ -95,9 +95,6 @@ describe("Plots", () => {
       var stackOffset4 = (<any> stackedPlot)._stackOffsets.get(ds4);
       var stackOffset5 = (<any> stackedPlot)._stackOffsets.get(ds5);
 
-      console.log(1);
-
-
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
       assert.strictEqual(stackOffset4.get("1").offset, 8, "stacking on data1 + data3 numerical y values");
@@ -270,8 +267,6 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      console.log(1);
-
       var plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
@@ -324,8 +319,6 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      console.log(22);
-
       var plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);

@@ -10,7 +10,7 @@ module Plottable {
 
     var nativeMath: Math = (<any>window).Math;
 
-    export class Stacked {
+    export module Stacked {
 
       /**
        * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
@@ -18,25 +18,25 @@ module Plottable {
        *
        * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
-      public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
+      export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
-        var dataMapArray = Utils.Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+        var dataMapArray = _generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
+          return _populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
         var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
+          return _populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
           });
         });
 
-        var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
-        var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
-        return Utils.Stacked._combineDataStacks(datasets, positiveDataStack, negativeDataStack);
+        var positiveDataStack = _stack(positiveDataMapArray, domainKeys);
+        var negativeDataStack = _stack(negativeDataMapArray, domainKeys);
+        return _combineDataStacks(datasets, positiveDataStack, negativeDataStack);
       }
 
       /**
@@ -45,7 +45,7 @@ module Plottable {
        *
        * @return {[number]} The extent that spans all the Utils.stacked data
        */
-      public static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean) {
+      export function computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean) {
         var extents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
           stackedDatumMap.forEach((key: string, stackedDatum: StackedDatum) => {
@@ -65,7 +65,7 @@ module Plottable {
        * Given an array of datasets and the accessor function for the key, computes the
        * set reunion (no duplicates) of the domain of each dataset.
        */
-      public static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
+      export function domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
         var domainKeys = d3.set();
         datasets.forEach((dataset) => {
           dataset.data().forEach((datum, index) => {
@@ -80,7 +80,7 @@ module Plottable {
        * Feeds the data through d3's stack layout function which will calculate
        * the stack offsets and use the the function declared in .out to set the offsets on the data.
        */
-      private static _stack(dataArray: d3.Map<StackedDatum>[], domainKeys: string[]) {
+      function _stack(dataArray: d3.Map<StackedDatum>[], domainKeys: string[]) {
         var outFunction = (d: StackedDatum, y0: number, y: number) => {
           d.offset = y0;
         };
@@ -94,14 +94,14 @@ module Plottable {
         return dataArray;
       }
 
-      private static _generateDefaultMapArray(
+      function _generateDefaultMapArray(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>,
           domainKeys: string[]) {
 
         var dataMapArray = datasets.map(() => {
-          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
+          return _populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: 0 };
           });
         });
@@ -121,7 +121,7 @@ module Plottable {
        * After the stack offsets have been determined on each separate dataset, the offsets need
        * to be determined correctly on the overall datasets
        */
-      private static _combineDataStacks(
+      function _combineDataStacks(
           datasets: Dataset[],
           positiveDataStack: d3.Map<StackedDatum>[],
           negativeDataStack: d3.Map<StackedDatum>[]) {
@@ -140,7 +140,7 @@ module Plottable {
             } else if (negativeStackedDatum.value !== 0) {
               datasetOffsets.set(key, negativeStackedDatum);
             } else { // illegal value / undefined / null / etc
-              positiveStackedDatum.value = 0; //TODO: remove
+              positiveStackedDatum.value = 0;
               datasetOffsets.set(key, positiveStackedDatum);
             }
           });
@@ -156,7 +156,7 @@ module Plottable {
        * @param {(string, number) => T} transform A transformation function to apply to the keys.
        * @return {d3.Map<T>} A map mapping keys to their transformed values.
        */
-      private static _populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
+      function _populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
         var map = d3.map<T>();
         keys.forEach((key: string, i: number) => {
           map.set(key, transform(key, i));

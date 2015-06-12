@@ -4610,7 +4610,6 @@ describe("Plots", function () {
             var stackOffset3 = stackedPlot._stackOffsets.get(ds3);
             var stackOffset4 = stackedPlot._stackOffsets.get(ds4);
             var stackOffset5 = stackedPlot._stackOffsets.get(ds5);
-            console.log(1);
             assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
             assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
             assert.strictEqual(stackOffset4.get("1").offset, 8, "stacking on data1 + data3 numerical y values");
@@ -4758,7 +4757,6 @@ describe("Plots", function () {
             ]);
         });
         it("auto scales correctly on stacked area", function () {
-            console.log(1);
             var plot = new Plottable.Plots.StackedArea();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
@@ -4799,7 +4797,6 @@ describe("Plots", function () {
             ]);
         });
         it("auto scales correctly on stacked bar", function () {
-            console.log(22);
             var plot = new Plottable.Plots.StackedBar();
             plot.addDataset(dataset1).addDataset(dataset2);
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale).autorangeMode("y");
