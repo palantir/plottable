@@ -120,7 +120,7 @@ export module Plots {
       return lineAttrToProjector;
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Area(dataset);
     }
 

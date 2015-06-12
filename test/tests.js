@@ -436,7 +436,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line();
             var drawer = new Plottable.Drawers.Line(dataset);
-            linePlot._getDrawer = function () { return drawer; };
+            linePlot._createDrawer = function () { return drawer; };
             linePlot.addDataset(dataset);
             linePlot.x(function (d) { return d.a; }, xScale);
             linePlot.y(function (d) { return d.b; }, yScale);
@@ -2226,7 +2226,7 @@ var CountingPlot = (function (_super) {
         ++this.renders;
         return _super.prototype.render.call(this);
     };
-    CountingPlot.prototype._getDrawer = function (dataset) {
+    CountingPlot.prototype._createDrawer = function (dataset) {
         var drawer = new Plottable.Drawer(dataset);
         drawer._svgElement = "g";
         return drawer;
@@ -2238,7 +2238,7 @@ describe("Plots", function () {
         it("Plots default correctly", function () {
             var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
-            r._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.renderTo(svg);
             TestMethods.verifyClipPath(r);
             svg.remove();
@@ -2246,7 +2246,7 @@ describe("Plots", function () {
         it("Base Plot functionality works", function () {
             var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
-            r._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.anchor(svg);
             r.computeLayout();
             var renderArea = r._content.select(".render-area");
@@ -2276,7 +2276,7 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([]);
             var dataset2 = new Plottable.Dataset([]);
             var plot = new Plottable.Plot();
-            plot._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(dataset1);
             plot.addDataset(dataset2);
             assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
@@ -2291,7 +2291,7 @@ describe("Plots", function () {
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
             var r = new Plottable.Plot();
-            r._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.addDataset(d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
@@ -2328,7 +2328,7 @@ describe("Plots", function () {
         });
         it("Plot.project works as intended", function () {
             var r = new Plottable.Plot();
-            r._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
             r.attr("attr", function (d) { return d.a; }, s);
             var attrToProjector = r._generateAttrToProjector();
@@ -2342,10 +2342,10 @@ describe("Plots", function () {
             var svg1 = TestMethods.generateSVG(100, 100);
             var svg2 = TestMethods.generateSVG(100, 100);
             var plot1 = new Plottable.Plot();
-            plot1._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot1.addDataset(ds1).attr("x", function (x) { return x; }, s).renderTo(svg1);
             var plot2 = new Plottable.Plot();
-            plot2._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot2.addDataset(ds2).attr("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
@@ -2365,8 +2365,8 @@ describe("Plots", function () {
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2416,8 +2416,8 @@ describe("Plots", function () {
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2479,8 +2479,8 @@ describe("Plots", function () {
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
             };
-            // Mock _getDrawer to return the mock drawer
-            plot._getDrawer = function () { return mockDrawer; };
+            // Mock _createDrawer to return the mock drawer
+            plot._createDrawer = function () { return mockDrawer; };
             plot.addDataset(dataset);
             plot.renderTo(svg);
             // replace the renderArea with our own
@@ -2529,8 +2529,8 @@ describe("Plots", function () {
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
             mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2595,8 +2595,8 @@ describe("Plots", function () {
             var plot1 = new Plottable.Plot();
             var plot2 = new Plottable.Plot();
             var svg = TestMethods.generateSVG(400, 400);
-            plot1._getDrawer = function (dataset) { return createMockDrawer(dataset); };
-            plot2._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot1.attr("null", id, scale1);
             plot2.attr("null", id, scale1);
             plot1.renderTo(svg);
@@ -2642,7 +2642,7 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([{ key: "A" }]);
             var dataset2 = new Plottable.Dataset([{ key: "B" }]);
             var plot = new Plottable.Plot();
-            plot._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(dataset2);
             plot.addDataset(dataset1);
             plot.attr("key", function (d) { return d.key; }, categoryScale);
@@ -2683,7 +2683,7 @@ describe("Plots", function () {
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
             plot = new Plottable.XYPlot();
-            plot._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
@@ -7678,7 +7678,7 @@ describe("Scales", function () {
             it("scale autorange works as expected with single dataset", function () {
                 var svg = TestMethods.generateSVG(100, 100);
                 var plot = new Plottable.Plot();
-                plot._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+                plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
                 plot.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale).renderTo(svg);
                 assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
                 data.push({ foo: 100, bar: 200 });
@@ -7690,11 +7690,11 @@ describe("Scales", function () {
                 var svg1 = TestMethods.generateSVG(100, 100);
                 var svg2 = TestMethods.generateSVG(100, 100);
                 var renderer1 = new Plottable.Plot();
-                renderer1._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+                renderer1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
                 renderer1.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
                 renderer1.renderTo(svg1);
                 var renderer2 = new Plottable.Plot();
-                renderer2._getDrawer = function (dataset) { return createMockDrawer(dataset); };
+                renderer2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
                 renderer2.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
                 renderer2.renderTo(svg2);
                 var otherScale = new Plottable.Scales.Linear();

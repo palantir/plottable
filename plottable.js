@@ -5927,7 +5927,7 @@ var Plottable;
                 this.removeDataset(dataset);
             }
             ;
-            var drawer = this._getDrawer(dataset);
+            var drawer = this._createDrawer(dataset);
             this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
                 this._createNodesForDataset(dataset);
@@ -5941,7 +5941,7 @@ var Plottable;
             drawer.renderArea(this._renderArea.append("g"));
             return drawer;
         };
-        Plot.prototype._getDrawer = function (dataset) {
+        Plot.prototype._createDrawer = function (dataset) {
             return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
@@ -6333,7 +6333,7 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
             };
-            Pie.prototype._getDrawer = function (dataset) {
+            Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
             };
             Pie.prototype.entities = function (datasets) {
@@ -6677,7 +6677,7 @@ var Plottable;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
-            Rectangle.prototype._getDrawer = function (dataset) {
+            Rectangle.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
@@ -6870,7 +6870,7 @@ var Plottable;
                 var circleSymbolFactory = Plottable.SymbolFactories.circle();
                 this.symbol(function () { return circleSymbolFactory; });
             }
-            Scatter.prototype._getDrawer = function (dataset) {
+            Scatter.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Symbol(dataset);
             };
             Scatter.prototype.size = function (size, scale) {
@@ -7001,7 +7001,7 @@ var Plottable;
             Bar.prototype.orientation = function () {
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
             };
-            Bar.prototype._getDrawer = function (dataset) {
+            Bar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Bar.prototype._setup = function () {
@@ -7428,7 +7428,7 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
-            Line.prototype._getDrawer = function (dataset) {
+            Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
             Line.prototype._getResetYFunction = function () {
@@ -7616,7 +7616,7 @@ var Plottable;
                 lineAttrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
                 return lineAttrToProjector;
             };
-            Area.prototype._getDrawer = function (dataset) {
+            Area.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Area(dataset);
             };
             Area.prototype._generateDrawSteps = function () {

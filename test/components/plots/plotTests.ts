@@ -9,7 +9,7 @@ class CountingPlot extends Plottable.Plot {
     return super.render();
   }
 
-  protected _getDrawer(dataset: Plottable.Dataset) {
+  protected _createDrawer(dataset: Plottable.Dataset) {
     var drawer = new Plottable.Drawer(dataset);
     (<any> drawer)._svgElement = "g";
     return drawer;
@@ -21,7 +21,7 @@ describe("Plots", () => {
     it("Plots default correctly", () => {
       var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot();
-      (<any> r)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.renderTo(svg);
       TestMethods.verifyClipPath(r);
       svg.remove();
@@ -30,7 +30,7 @@ describe("Plots", () => {
     it("Base Plot functionality works", () => {
       var svg = TestMethods.generateSVG(400, 300);
       var r = new Plottable.Plot();
-      (<any> r)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.anchor(svg);
       r.computeLayout();
       var renderArea = (<any> r)._content.select(".render-area");
@@ -69,7 +69,7 @@ describe("Plots", () => {
       var dataset2 = new Plottable.Dataset([]);
 
       var plot = new Plottable.Plot();
-      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(dataset1);
       plot.addDataset(dataset2);
       assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
@@ -88,7 +88,7 @@ describe("Plots", () => {
     it("Updates its projectors when the Dataset is changed", () => {
       var d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
       var r = new Plottable.Plot();
-      (<any> r)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.addDataset(d1);
 
       var xScaleCalls: number = 0;
@@ -133,7 +133,7 @@ describe("Plots", () => {
 
     it("Plot.project works as intended", () => {
       var r = new Plottable.Plot();
-      (<any> r)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.attr("attr", (d) => d.a, s);
       var attrToProjector = (<any> r)._generateAttrToProjector();
@@ -148,12 +148,12 @@ describe("Plots", () => {
       var svg1 = TestMethods.generateSVG(100, 100);
       var svg2 = TestMethods.generateSVG(100, 100);
       var plot1 = new Plottable.Plot();
-      (<any> plot1)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot1.addDataset(ds1)
            .attr("x", (x: number) => x, s)
            .renderTo(svg1);
       var plot2 = new Plottable.Plot();
-      (<any> plot2)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot2.addDataset(ds2)
            .attr("x", (x: number) => x, s)
            .renderTo(svg2);
@@ -180,8 +180,8 @@ describe("Plots", () => {
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+      // Mock _createDrawer to return the mock drawers
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => {
         if (dataset === dataset1) {
           return mockDrawer1;
         } else {
@@ -237,8 +237,8 @@ describe("Plots", () => {
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+      // Mock _createDrawer to return the mock drawers
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => {
         if (dataset === dataset1) {
           return mockDrawer1;
         } else {
@@ -310,8 +310,8 @@ describe("Plots", () => {
         return dataPointConverter(datum, index);
       };
 
-      // Mock _getDrawer to return the mock drawer
-      (<any> plot)._getDrawer = () => mockDrawer;
+      // Mock _createDrawer to return the mock drawer
+      (<any> plot)._createDrawer = () => mockDrawer;
 
       plot.addDataset(dataset);
       plot.renderTo(svg);
@@ -367,8 +367,8 @@ describe("Plots", () => {
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
 
-      // Mock _getDrawer to return the mock drawers
-      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => {
+      // Mock _createDrawer to return the mock drawers
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => {
         if (dataset === dataset1) {
           return mockDrawer1;
         } else {
@@ -443,8 +443,8 @@ describe("Plots", () => {
       var plot1 = new Plottable.Plot();
       var plot2 = new Plottable.Plot();
       var svg = TestMethods.generateSVG(400, 400);
-      (<any> plot1)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      (<any> plot2)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot1.attr("null", id, scale1);
       plot2.attr("null", id, scale1);
       plot1.renderTo(svg);
@@ -502,7 +502,7 @@ describe("Plots", () => {
       var dataset1 = new Plottable.Dataset([{key: "A"}]);
       var dataset2 = new Plottable.Dataset([{key: "B"}]);
       var plot = new Plottable.Plot();
-      (<any> plot)._getDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(dataset2);
       plot.addDataset(dataset1);
       plot.attr("key", (d) => d.key, categoryScale);
