@@ -6522,27 +6522,24 @@ var Plottable;
             return null;
         };
         XYPlot.prototype._hackedFilterForProperty = function (property) {
-            if (property === "x" && this._autoAdjustXScaleDomain) {
-                return this._wtf("y");
+            if (property === "x" && !this._autoAdjustXScaleDomain) {
+                return null;
             }
-            else if (property === "y" && this._autoAdjustYScaleDomain) {
-                return this._wtf("x");
+            if (property === "y" && !this._autoAdjustYScaleDomain) {
+                return null;
             }
-            return null;
-        };
-        XYPlot.prototype._wtf = function (property) {
-            var binding = this._propertyBindings.get(property);
-            if (binding != null) {
-                var accessor = binding.accessor;
-                var scale = binding.scale;
-                if (scale != null) {
-                    return function (value) {
-                        var range = scale.range();
-                        return Plottable.Utils.Math.inRange(scale.scale(value), range[0], range[1]);
-                    };
-                }
+            var binding = this._propertyBindings.get(property === "x" ? "y" : "x");
+            if (binding == null) {
+                return null;
             }
-            return null;
+            var scale = binding.scale;
+            if (scale == null) {
+                return null;
+            }
+            return function (value) {
+                var range = scale.range();
+                return Plottable.Utils.Math.inRange(scale.scale(value), range[0], range[1]);
+            };
         };
         XYPlot.prototype._makeFilterByProperty = function (property) {
             var binding = this._propertyBindings.get(property);

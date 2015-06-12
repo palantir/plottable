@@ -109,28 +109,26 @@ module Plottable {
     }
 
     protected _hackedFilterForProperty(property: string) {
-      if (property === "x" && this._autoAdjustXScaleDomain) {
-        return this._wtf("y");
-      } else if (property === "y" && this._autoAdjustYScaleDomain) {
-        return this._wtf("x");
+      if (property === "x" && !this._autoAdjustXScaleDomain) {
+        return null;
       }
-      return null;
-    }
 
-    private _wtf(property: string) {
-      var binding = this._propertyBindings.get(property);
-      if (binding != null) {
-        var accessor = binding.accessor;
-        var scale = binding.scale;
-        if (scale != null) {
-          return (value: string) => {
-            var range = scale.range();
-            return Utils.Math.inRange(scale.scale(value), range[0], range[1]);
-          };
-        }
+      if (property === "y" && !this._autoAdjustYScaleDomain) {
+        return null;
       }
-      return null;
 
+      var binding = this._propertyBindings.get(property === "x" ? "y" : "x");
+      if (binding == null) {
+        return null;
+      }
+      var scale = binding.scale;
+      if (scale == null) {
+        return null;
+      }
+      return (value: string) => {
+        var range = scale.range();
+        return Utils.Math.inRange(scale.scale(value), range[0], range[1]);
+      };
     }
 
     private _makeFilterByProperty(property: string) {
