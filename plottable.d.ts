@@ -2263,7 +2263,7 @@ declare module Plottable {
         }
     }
     class Plot extends Component {
-        protected static ANIMATION_MAX_DURATION: number;
+        protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;

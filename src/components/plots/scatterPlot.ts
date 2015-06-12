@@ -19,7 +19,7 @@ export module Plots {
       var animator = new Animators.Easing();
       animator.startDelay(5);
       animator.stepDuration(250);
-      animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
