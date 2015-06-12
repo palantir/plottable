@@ -672,10 +672,10 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface ScaleCallback<S extends Scale<any, any>> {
-        (scale: S): any;
-    }
     module Scales {
+        interface ScaleCallback<S extends Scale<any, any>> {
+            (scale: S): any;
+        }
         /**
          * A function that supplies domain values to be included into a Scale.
          *
@@ -716,17 +716,17 @@ declare module Plottable {
         /**
          * Adds a callback to be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        onUpdate(callback: Scales.ScaleCallback<Scale<D, R>>): Scale<D, R>;
         /**
          * Removes a callback that would be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: Scales.ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
          * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.

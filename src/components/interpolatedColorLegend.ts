@@ -16,7 +16,7 @@ export module Components {
     private _swatchBoundingBox: d3.Selection<void>;
     private _lowerLabel: d3.Selection<void>;
     private _upperLabel: d3.Selection<void>;
-    private _redrawCallback: ScaleCallback<Scales.InterpolatedColor>;
+    private _redrawCallback: Scales.ScaleCallback<Scales.InterpolatedColor>;
 
     /**
      * The css class applied to the legend labels.

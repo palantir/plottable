@@ -1407,7 +1407,7 @@ var Plottable;
         /**
          * Adds a callback to be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
         Scale.prototype.onUpdate = function (callback) {
@@ -1417,7 +1417,7 @@ var Plottable;
         /**
          * Removes a callback that would be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
         Scale.prototype.offUpdate = function (callback) {

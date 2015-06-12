@@ -8,7 +8,7 @@ export module Components {
     private _xLinesContainer: d3.Selection<void>;
     private _yLinesContainer: d3.Selection<void>;
 
-    private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
+    private _renderCallback: Scales.ScaleCallback<QuantitativeScale<any>>;
 
     /**
      * @constructor

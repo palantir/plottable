@@ -24,7 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
-    private _redrawCallback: ScaleCallback<Scales.Color>;
+    private _redrawCallback: Scales.ScaleCallback<Scales.Color>;
 
     /**
      * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
