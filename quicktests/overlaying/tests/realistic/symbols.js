@@ -44,7 +44,7 @@ function run(svg, data, Plottable){
   cs.domain(["x+y+", "x+y-", "x-y+", "x-y-"]);
   cs.range(["#00bb00", "#bbbbbb", "#bbbbbb", "#bb0000"]);
 
-  legend.symbolFactoryAccessor(function (d, i) {
+  legend.symbol(function (d, i) {
     if(d === "x+y+") { return triangleUpFactory; }
     if(d === "x+y-") { return crossFactory; }
     if(d === "x-y+") { return circleFactory; }
