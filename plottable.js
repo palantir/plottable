@@ -5094,7 +5094,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5113,12 +5113,12 @@ var Plottable;
                 });
                 return this;
             };
-            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
-                if (symbolFactoryAccessor == null) {
+            Legend.prototype.symbol = function (symbol) {
+                if (symbol == null) {
                     return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolFactoryAccessor = symbolFactoryAccessor;
+                    this._symbolFactoryAccessor = symbol;
                     this.render();
                     return this;
                 }
