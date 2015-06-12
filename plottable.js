@@ -227,6 +227,12 @@ var Plottable;
                 this._values = [];
                 this._updateSize();
             }
+            /**
+             * Adds a new value to the Set, unless the value already exists.
+             *
+             * @param {T} value Value to be added to the Set
+             * @return {Set} The Set object
+             */
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
@@ -234,6 +240,13 @@ var Plottable;
                 }
                 return this;
             };
+            /**
+             * Deletes a value from the Set.
+             *
+             * @param {T} value Value to be deleted from the set
+             * @return true if the value existed in the set
+             * @return false if the value did not exist in the set
+             */
             Set.prototype.delete = function (value) {
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
@@ -243,6 +256,9 @@ var Plottable;
                 }
                 return false;
             };
+            /**
+             * Tests whether or not the Set cotains a value
+             */
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };

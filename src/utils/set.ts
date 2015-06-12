@@ -19,6 +19,12 @@ module Plottable {
         this._updateSize();
       }
 
+    /**
+     * Adds a new value to the Set, unless the value already exists.
+     *
+     * @param {T} value Value to be added to the Set
+     * @return {Set} The Set object
+     */
       public add(value: T) {
         if (!this.has(value)) {
           this._values.push(value);
@@ -27,6 +33,13 @@ module Plottable {
         return this;
       }
 
+      /**
+       * Deletes a value from the Set.
+       *
+       * @param {T} value Value to be deleted from the set
+       * @return true if the value existed in the set
+       * @return false if the value did not exist in the set
+       */
       public delete(value: T) {
         var index = this._values.indexOf(value);
         if (index !== -1) {
@@ -37,6 +50,9 @@ module Plottable {
         return false;
       }
 
+      /**
+       * Tests whether or not the Set cotains a value
+       */
       public has(value: T) {
         return this._values.indexOf(value) !== -1;
       }

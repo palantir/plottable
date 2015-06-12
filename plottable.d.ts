@@ -123,8 +123,24 @@ declare module Plottable {
              */
             size: number;
             constructor();
+            /**
+             * Adds a new value to the Set, unless the value already exists.
+             *
+             * @param {T} value Value to be added to the Set
+             * @return {Set} The Set object
+             */
             add(value: T): Set<T>;
+            /**
+             * Deletes a value from the Set.
+             *
+             * @param {T} value Value to be deleted from the set
+             * @return true if the value existed in the set
+             * @return false if the value did not exist in the set
+             */
             delete(value: T): boolean;
+            /**
+             * Tests whether or not the Set cotains a value
+             */
             has(value: T): boolean;
             /**
              * The forEach method executes the provided callback once for each value which actually exists
