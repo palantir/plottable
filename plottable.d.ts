@@ -2263,7 +2263,7 @@ declare module Plottable {
         }
     }
     class Plot extends Component {
-        protected static ANIMATION_MAX_DURATION: number;
+        protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
@@ -3106,8 +3106,8 @@ declare module Plottable {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];
-        protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 

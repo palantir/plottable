@@ -31,12 +31,12 @@ module Plottable {
       }
     }
 
-    protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+    protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
       this._connect();
       callbackSet.add(callback);
     }
 
-    protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
+    protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function) {
       callbackSet.delete(callback);
       this._disconnect();
     }

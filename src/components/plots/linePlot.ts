@@ -13,9 +13,9 @@ export module Plots {
       super();
       this.addClass("line-plot");
       var animator = new Animators.Easing();
-      animator.stepDuration(Plot.ANIMATION_MAX_DURATION);
+      animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
       animator.easingMode("exp-in-out");
-      animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");

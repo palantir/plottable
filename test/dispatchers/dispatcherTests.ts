@@ -55,21 +55,21 @@ describe("Dispatchers", () => {
       assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
     });
 
-    it("setCallback()", () => {
+    it("_setCallback()", () => {
       var dispatcher = new Plottable.Dispatcher();
       var callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
       var callbackWasCalled = false;
       var callback = () => callbackWasCalled = true;
 
-      (<any> dispatcher).setCallback(callbackSet, callback);
+      (<any> dispatcher)._setCallback(callbackSet, callback);
       callbackSet.callCallbacks();
-      assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
+      assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
 
-      (<any> dispatcher).unsetCallback(callbackSet, callback);
+      (<any> dispatcher)._unsetCallback(callbackSet, callback);
       callbackWasCalled = false;
       callbackSet.callCallbacks();
-      assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
+      assert.isFalse(callbackWasCalled, "callback was removed by calling _unsetCallback()");
     });
   });
 });
