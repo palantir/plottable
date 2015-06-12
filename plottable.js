@@ -5932,6 +5932,8 @@ var Plottable;
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         function Plot() {
@@ -6906,11 +6908,9 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             function Scatter() {
                 _super.call(this);
@@ -7000,9 +7000,9 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function Bar(orientation) {
@@ -7469,9 +7469,9 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Line() {
                 _super.call(this);
@@ -7588,8 +7588,6 @@ var Plottable;
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Area() {
                 _super.call(this);
@@ -7758,8 +7756,6 @@ var Plottable;
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function ClusteredBar(orientation) {
@@ -7818,8 +7814,6 @@ var Plottable;
             __extends(StackedArea, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
                 var _this = this;

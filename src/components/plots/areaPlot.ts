@@ -11,8 +11,6 @@ export module Plots {
      * An Area Plot draws a filled region (area) between Y and Y0.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale
-     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();

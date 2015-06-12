@@ -2298,6 +2298,8 @@ declare module Plottable {
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         constructor();
@@ -2692,18 +2694,44 @@ declare module Plottable {
     module Plots {
         class Scatter<X, Y> extends XYPlot<X, Y> {
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             constructor();
             protected _createDrawer(dataset: Dataset): Drawers.Symbol;
+            /**
+             * Gets the AccessorScaleBinding for the size property of the plot.
+             * The size property corresponds to the area of the symbol.
+             */
             size<S>(): AccessorScaleBinding<S, number>;
+            /**
+             * Sets the size property to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} size
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+            /**
+             * Sets the size property to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {S|Accessor<S>} sectorValue
+             * @param {Scale<S, number>} scale
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for the symbol property of the plot.
+             * The symbol property corresponds to how the symbol will be drawn.
+             */
             symbol(): AccessorScaleBinding<any, any>;
+            /**
+             * Sets the symbol property to an Accessor<SymbolFactory>.
+             *
+             * @param {Accessor<SymbolFactory>} symbol
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
@@ -2720,9 +2748,9 @@ declare module Plottable {
             static ORIENTATION_HORIZONTAL: string;
             protected _isVertical: boolean;
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
@@ -2844,9 +2872,9 @@ declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _createDrawer(dataset: Dataset): Drawer;
@@ -2877,8 +2905,6 @@ declare module Plottable {
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _setup(): void;
@@ -2922,8 +2948,6 @@ declare module Plottable {
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
@@ -2941,8 +2965,6 @@ declare module Plottable {
         class StackedArea<X> extends Area<X> {
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _getAnimator(key: string): Animator;
