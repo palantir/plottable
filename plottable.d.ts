@@ -294,7 +294,7 @@ declare module Plottable {
             };
             type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
             /**
-             * Computes the stacking information (value and offset) for each data point in each Dataset.
+             * Computes the StackingResult (value and offset) for each data point in each Dataset.
              *
              * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
              * @param {Accessor<any>} keyAccessor Accessor for the key of the data

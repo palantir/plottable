@@ -14,17 +14,14 @@ module Plottable {
       var nativeMath: Math = (<any>window).Math;
 
       /**
-       * Computes the stacking information (value and offset) for each data point in each Dataset.
+       * Computes the StackingResult (value and offset) for each data point in each Dataset.
        *
        * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
        * @param {Accessor<any>} keyAccessor Accessor for the key of the data
        * @param {Accessor<number>} valueAccessor Accessor for the value of the data
        * @return {StackingResult} value and offset information for each datapoint in each Dataset
        */
-      export function stack(
-          datasets: Dataset[],
-          keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<number>): StackingResult {
+      export function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
         var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();

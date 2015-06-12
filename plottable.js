@@ -625,7 +625,7 @@ var Plottable;
         (function (Stacking) {
             var nativeMath = window.Math;
             /**
-             * Computes the stacking information (value and offset) for each data point in each Dataset.
+             * Computes the StackingResult (value and offset) for each data point in each Dataset.
              *
              * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
              * @param {Accessor<any>} keyAccessor Accessor for the key of the data
