@@ -7,6 +7,11 @@ export module Utils {
     private _svg: SVGElement;
     private _measureRect: SVGElement;
 
+    /**
+     * Returns the singleton (per document) ClientToSVGTranslator.
+     *
+     * It is recommended to use this method instead of the explicit constructor to ensure singularity.
+     */
     public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
       var svg = Utils.DOM.boundingSVG(elem);
 

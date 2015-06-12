@@ -378,6 +378,11 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
+            /**
+             * Returns the singleton (per document) ClientToSVGTranslator.
+             *
+             * It is recommended to use this method instead of the explicit constructor to ensure singularity.
+             */
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
             constructor(svg: SVGElement);
             /**

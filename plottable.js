@@ -870,6 +870,11 @@ var Plottable;
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
             }
+            /**
+             * Returns the singleton (per document) ClientToSVGTranslator.
+             *
+             * It is recommended to use this method instead of the explicit constructor to ensure singularity.
+             */
             ClientToSVGTranslator.getTranslator = function (elem) {
                 var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
