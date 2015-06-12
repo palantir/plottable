@@ -89,7 +89,7 @@ module Plottable {
       if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(dataset);
+      var drawer = this._createDrawer(dataset);
       this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
@@ -107,7 +107,7 @@ module Plottable {
       return drawer;
     }
 
-    protected _getDrawer(dataset: Dataset): Drawer {
+    protected _createDrawer(dataset: Dataset): Drawer {
       return new Drawer(dataset);
     }
 

@@ -2271,7 +2271,7 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
-        protected _getDrawer(dataset: Dataset): Drawer;
+        protected _createDrawer(dataset: Dataset): Drawer;
         protected _getAnimator(key: string): Animator;
         protected _onDatasetUpdate(): void;
         /**
@@ -2393,7 +2393,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
-            protected _getDrawer(dataset: Dataset): Drawers.Arc;
+            protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.
@@ -2567,7 +2567,7 @@ declare module Plottable {
              * @param {Scale.Scale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _generateAttrToProjector(): {
                 [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
@@ -2658,7 +2658,7 @@ declare module Plottable {
              * @param {Scale} yScale The y scale to use.
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Symbol;
+            protected _createDrawer(dataset: Dataset): Drawers.Symbol;
             size<S>(): AccessorScaleBinding<S, number>;
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
             size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
@@ -2697,7 +2697,7 @@ declare module Plottable {
              * @return "vertical" | "horizontal"
              */
             orientation(): string;
-            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
              * Gets the baseline value.
@@ -2808,7 +2808,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawer;
+            protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
@@ -2860,7 +2860,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
-            protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _createDrawer(dataset: Dataset): Drawers.Area;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;

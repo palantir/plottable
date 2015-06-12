@@ -56,7 +56,7 @@ export module Plots {
       this._updatePieAngles();
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Arc(dataset);
     }
 
