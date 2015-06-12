@@ -8551,36 +8551,6 @@ describe("Utils", function () {
             return dataArray.map(function (data) { return new Plottable.Dataset(data); });
         };
         var filter;
-        it("domainKeys() works as expected with strings as keys", function () {
-            var data1 = [
-                { key: "Fred", value: 1 },
-                { key: "Barney", value: 2 },
-                { key: "Wilma", value: 1 }
-            ];
-            var data2 = [
-                { key: "Fred", value: 0 },
-                { key: "Barney", value: 1 },
-                { key: "Betty", value: 1 }
-            ];
-            var datasets = createDatasets([data1, data2]);
-            var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
-            var expectedDomainKeys = ["Fred", "Barney", "Wilma", "Betty"];
-            assert.deepEqual(domainKeys, expectedDomainKeys, "the expected domain keys is a set reunion of the datasets keys");
-        });
-        it("domainKeys() works as expected with numbers as keys", function () {
-            var data1 = [
-                { key: 1, value: 1 },
-                { key: 3, value: 1 }
-            ];
-            var data2 = [
-                { key: 2, value: 0 },
-                { key: 4, value: 1 }
-            ];
-            var datasets = createDatasets([data1, data2]);
-            var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
-            var expectedDomainKeys = ["1", "3", "2", "4"];
-            assert.deepEqual(domainKeys.sort(), expectedDomainKeys.sort(), "the expected domain keys is a set reunion of the datasets keys");
-        });
         it("stack() works as expected with positive values", function () {
             var data1 = [{ key: "Fred", value: 1 }];
             var data2 = [{ key: "Fred", value: 1 }];

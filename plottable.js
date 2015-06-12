@@ -686,25 +686,6 @@ var Plottable;
             }
             Stacking.computeStackExtent = computeStackExtent;
             /**
-             * Given an array of Datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
-             * before being returned.
-             *
-             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
-             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
-             * @return {string[]} An array of stringified keys
-             */
-            function domainKeys(datasets, keyAccessor) {
-                var domainKeys = d3.set();
-                datasets.forEach(function (dataset) {
-                    dataset.data().forEach(function (datum, index) {
-                        domainKeys.add(keyAccessor(datum, index, dataset));
-                    });
-                });
-                return domainKeys.values();
-            }
-            Stacking.domainKeys = domainKeys;
-            /**
              * Normalizes a key used for stacking
              *
              * @param {any} key The key to be normalized
@@ -7861,10 +7842,28 @@ var Plottable;
                 var keySets = datasets.map(function (dataset) {
                     return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
                 });
-                var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
+                var domainKeys = StackedArea._domainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
+            };
+            /**
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
+             */
+            StackedArea._domainKeys = function (datasets, keyAccessor) {
+                var domainKeys = d3.set();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum, index) {
+                        domainKeys.add(keyAccessor(datum, index, dataset));
+                    });
+                });
+                return domainKeys.values();
             };
             StackedArea.prototype._propertyProjectors = function () {
                 var _this = this;
