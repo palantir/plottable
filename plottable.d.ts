@@ -287,26 +287,37 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        class Stacked {
+        module Stacking {
+            type StackedDatum = {
+                value: number;
+                offset: number;
+            };
+            type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
             /**
-             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-             * for drawing purposes.
+             * Computes the StackingResult (value and offset) for each data point in each Dataset.
              *
-             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
+             * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data
+             * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+             * @return {StackingResult} value and offset for each datapoint in each Dataset
              */
-            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, d3.Map<number>>;
+            function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
             /**
-             * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that stacked bits have to be added together when calculating the extent
+             * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @return {[number]} The extent that spans all the stacked data
+             * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
+             * @return {[number, number]} The total extent
              */
-            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, d3.Map<number>>, filter: Accessor<boolean>): number[];
+            function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
-             * Given an array of datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each dataset.
+             * Normalizes a key used for stacking
+             *
+             * @param {any} key The key to be normalized
+             * @return {string} The stringified key
              */
-            static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            function normalizeKey(key: any): string;
         }
     }
 }

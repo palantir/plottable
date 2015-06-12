@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
+    private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
 
     private _baseline: d3.Selection<void>;
@@ -19,7 +19,7 @@ export module Plots {
       super();
       this.addClass("stacked-area-plot");
       this.attr("fill-opacity", 1);
-      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
+      this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
     }
@@ -124,30 +124,52 @@ export module Plots {
       var filter = this._filterForProperty("y");
 
       this._checkSameDomain(datasets, keyAccessor);
-      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+      this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     }
 
     private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {
       var keySets = datasets.map((dataset) => {
         return d3.set(dataset.data().map((datum, i) => keyAccessor(datum, i, dataset).toString())).values();
       });
-      var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
+      var domainKeys = StackedArea._domainKeys(datasets, keyAccessor);
 
       if (keySets.some((keySet) => keySet.length !== domainKeys.length)) {
         Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
       }
     }
 
+    /**
+     * Given an array of Datasets and the accessor function for the key, computes the
+     * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+     * before being returned.
+     *
+     * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+     * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+     * @return {string[]} An array of stringified keys
+     */
+    private static _domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>) {
+      var domainKeys = d3.set();
+      datasets.forEach((dataset) => {
+        dataset.data().forEach((datum, index) => {
+          domainKeys.add(keyAccessor(datum, index, dataset));
+        });
+      });
+
+      return domainKeys.values();
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
-
+      var normalizedXAccessor = (datum: any, index: number, dataset: Dataset) => {
+        return Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
+      };
       var stackYProjector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
       var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)));
+        this.y().scale.scale(this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
 
       propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
       return propertyToProjectors;
@@ -157,7 +179,7 @@ export module Plots {
       var pixelPoint = super._pixelPoint(datum, index, dataset);
       var xValue = this.x().accessor(datum, index, dataset);
       var yValue = this.y().accessor(datum, index, dataset);
-      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue));
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
 
