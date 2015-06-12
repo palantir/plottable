@@ -301,7 +301,7 @@ declare module Plottable {
              * @param {Accessor<number>} valueAccessor Accessor for the value of the data
              * @return {StackingResult} value and offset information for each datapoint in each Dataset
              */
-            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
+            function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
             /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *

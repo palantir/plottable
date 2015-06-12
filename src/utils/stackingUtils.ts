@@ -21,7 +21,7 @@ module Plottable {
        * @param {Accessor<number>} valueAccessor Accessor for the value of the data
        * @return {StackingResult} value and offset information for each datapoint in each Dataset
        */
-      export function computeStackInformation(
+      export function stack(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
           valueAccessor: Accessor<number>): StackingResult {

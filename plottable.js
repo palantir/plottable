@@ -632,7 +632,7 @@ var Plottable;
              * @param {Accessor<number>} valueAccessor Accessor for the value of the data
              * @return {StackingResult} value and offset information for each datapoint in each Dataset
              */
-            function computeStackInformation(datasets, keyAccessor, valueAccessor) {
+            function stack(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
                 var negativeOffsets = d3.map();
                 var datasetToKeyToStackedDatum = new Utils.Map();
@@ -660,7 +660,7 @@ var Plottable;
                 });
                 return datasetToKeyToStackedDatum;
             }
-            Stacking.computeStackInformation = computeStackInformation;
+            Stacking.stack = stack;
             /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
@@ -7854,7 +7854,7 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackingResult = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
@@ -7996,7 +7996,7 @@ var Plottable;
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackingResult = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
                 this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
             };
             return StackedBar;

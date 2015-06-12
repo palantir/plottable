@@ -124,7 +124,7 @@ export module Plots {
       var filter = this._filterForProperty("y");
 
       this._checkSameDomain(datasets, keyAccessor);
-      this._stackingResult = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+      this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
       this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
     }
 
