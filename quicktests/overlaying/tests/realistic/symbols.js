@@ -44,12 +44,21 @@ function run(svg, data, Plottable){
   cs.domain(["x+y+", "x+y-", "x-y+", "x-y-"]);
   cs.range(["#00bb00", "#bbbbbb", "#bbbbbb", "#bb0000"]);
 
-  legend.symbol(function (d, i) {
-    if(d === "x+y+") { return triangleUpFactory; }
-    if(d === "x+y-") { return crossFactory; }
-    if(d === "x-y+") { return circleFactory; }
-    if(d === "x-y-") { return triangleDownFactory; }
-  });
+  if (typeof legend.symbol === "function") {
+    legend.symbol(function (d, i) {
+      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y-") { return crossFactory; }
+      if(d === "x-y+") { return circleFactory; }
+      if(d === "x-y-") { return triangleDownFactory; }
+    });
+  } else {
+    legend.symbolFactoryAccessor(function (d, i) {
+      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y-") { return crossFactory; }
+      if(d === "x-y+") { return circleFactory; }
+      if(d === "x-y-") { return triangleDownFactory; }
+    });
+  }
 
   var table = new Plottable.Components.Table([[null, title, null],
                                              [yAxis, plot, legend],

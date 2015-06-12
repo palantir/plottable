@@ -56,10 +56,17 @@ function run(svg, data, Plottable) {
   var squareFactory = Plottable.SymbolFactories.square();
   var circleFactory = Plottable.SymbolFactories.circle();
 
-  legend.symbol(function (d, i) {
-    if(i === 0) { return squareFactory; }
-    else { return circleFactory; }
-  });
+  if (typeof legend.symbol === "function") {
+    legend.symbol(function (d, i) {
+      if(i === 0) { return squareFactory; }
+      else { return circleFactory; }
+    });
+  } else {
+    legend.symbolFactoryAccessor(function (d, i) {
+      if(i === 0) { return squareFactory; }
+      else { return circleFactory; }
+    });
+  }
 
 
   var plots = new Plottable.Components.Group([bandPlot, avgPlot, tigerLine, tigerScatter]);
