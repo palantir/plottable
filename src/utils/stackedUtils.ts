@@ -19,35 +19,35 @@ module Plottable {
        * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
        */
       public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
-        var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
+        var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
 
-        var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+        var dataMapArray = Utils.Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Stacked._populateMap(domainKeys, (domainKey) => {
+          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
           });
         });
 
         var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return Stacked._populateMap(domainKeys, (domainKey) => {
+          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
           });
         });
 
-        var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
-        var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
+        var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
+        var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
 
-        var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack);
+        var stackOffsets = Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
 
         return stackOffsets;
       }
 
       /**
        * Calculates an extent across all datasets. The extent is a <number> interval that
-       * accounts for the fact that stacked bits have to be added together when calculating the extent
+       * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
        *
-       * @return {[number]} The extent that spans all the stacked data
+       * @return {[number]} The extent that spans all the Utils.stacked data
        */
       public static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean) {
         var extents: number[] = [];
@@ -105,7 +105,7 @@ module Plottable {
           domainKeys: string[]) {
 
         var dataMapArray = datasets.map(() => {
-          return Stacked._populateMap(domainKeys, (domainKey) => {
+          return Utils.Stacked._populateMap(domainKeys, (domainKey) => {
             return { key: domainKey, value: 0 };
           });
         });

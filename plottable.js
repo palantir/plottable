@@ -590,28 +590,28 @@ var Plottable;
              * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
             Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
-                var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
-                var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+                var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
+                var dataMapArray = Utils.Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
                 var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
+                    return Utils.Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
                     });
                 });
                 var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
+                    return Utils.Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
                     });
                 });
-                var posStack = Stacked._stack(positiveDataMapArray, domainKeys);
-                var negStack = Stacked._stack(negativeDataMapArray, domainKeys);
-                var stackOffsets = Stacked._generateStackOffsets(datasets, posStack, negStack);
+                var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
+                var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
+                var stackOffsets = Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
                 return stackOffsets;
             };
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that stacked bits have to be added together when calculating the extent
+             * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
              *
-             * @return {[number]} The extent that spans all the stacked data
+             * @return {[number]} The extent that spans all the Utils.stacked data
              */
             Stacked.computeStackExtent = function (stackOffsets, filter) {
                 var extents = [];
@@ -653,7 +653,7 @@ var Plottable;
             };
             Stacked._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
                 var dataMapArray = datasets.map(function () {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
+                    return Utils.Stacked._populateMap(domainKeys, function (domainKey) {
                         return { key: domainKey, value: 0 };
                     });
                 });

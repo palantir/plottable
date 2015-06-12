@@ -251,9 +251,9 @@ declare module Plottable {
             }>>;
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that stacked bits have to be added together when calculating the extent
+             * accounts for the fact that Utils.stacked bits have to be added together when calculating the extent
              *
-             * @return {[number]} The extent that spans all the stacked data
+             * @return {[number]} The extent that spans all the Utils.stacked data
              */
             static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean): number[];
             /**
