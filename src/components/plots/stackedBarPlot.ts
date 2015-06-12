@@ -18,7 +18,7 @@ export module Plots {
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
-      this.classed("stacked-bar-plot", true);
+      this.addClass("stacked-bar-plot");
       this._stackOffsets = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacked.StackedDatum>>();
       this._stackedExtent = [];
     }

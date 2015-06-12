@@ -16,7 +16,7 @@ export module Plots {
      */
     constructor() {
       super();
-      this.classed("area-plot", true);
+      this.addClass("area-plot");
       this.y0(0); // default
       this.attr("fill-opacity", 0.25);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -120,7 +120,7 @@ export module Plots {
       return lineAttrToProjector;
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Area(dataset);
     }
 

@@ -20,7 +20,7 @@ function generateBasicTable(nRows: number, nCols: number) {
 describe("Tables", () => {
   it("tables are classed properly", () => {
     var table = new Plottable.Components.Table();
-    assert.isTrue(table.classed("table"));
+    assert.isTrue(table.hasClass("table"));
   });
 
   it("padTableToSize works properly", () => {

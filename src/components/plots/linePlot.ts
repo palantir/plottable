@@ -11,7 +11,7 @@ export module Plots {
      */
     constructor() {
       super();
-      this.classed("line-plot", true);
+      this.addClass("line-plot");
       var animator = new Animators.Easing();
       animator.stepDuration(Plot.ANIMATION_MAX_DURATION);
       animator.easingMode("exp-in-out");
@@ -21,7 +21,7 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
     }
 
@@ -73,7 +73,7 @@ export module Plots {
       var minYDist = Infinity;
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
         var xDist = Math.abs(queryPoint.x - entity.position.x);
@@ -112,7 +112,7 @@ export module Plots {
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
   }

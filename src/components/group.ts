@@ -16,7 +16,7 @@ export module Components {
      */
     constructor(components: Component[] = []) {
       super();
-      this.classed("component-group", true);
+      this.addClass("component-group");
       components.forEach((c: Component) => this.append(c));
     }
 
@@ -47,7 +47,7 @@ export module Components {
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight

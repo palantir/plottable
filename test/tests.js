@@ -325,9 +325,7 @@ var MockAnimator = (function () {
 })();
 function createMockDrawer(dataset) {
     var drawer = new Plottable.Drawer(dataset);
-    drawer._drawStep = function (step) {
-        step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
-    };
+    drawer._svgElementName = "circle";
     return drawer;
 }
 describe("Drawers", function () {
@@ -394,7 +392,7 @@ describe("Drawers", function () {
         });
         it("selectionForIndex()", function () {
             var svg = TestMethods.generateSVG(300, 300);
-            var drawer = new Plottable.Drawer(null);
+            var drawer = createMockDrawer(null);
             drawer.renderArea(svg.append("g"));
             drawer.selector = function () { return "circle"; };
             var data = [{ one: 2, two: 1 }, { one: 33, two: 21 }, { one: 11, two: 10 }];
@@ -406,7 +404,7 @@ describe("Drawers", function () {
         });
         it("totalDrawTime()", function () {
             var svg = TestMethods.generateSVG(300, 300);
-            var drawer = new Plottable.Drawer(null);
+            var drawer = createMockDrawer(null);
             var dataObjects = 9;
             var stepDuration = 987;
             var stepDelay = 133;
@@ -438,7 +436,7 @@ describe("Drawers", function () {
             var yScale = new Plottable.Scales.Linear();
             var linePlot = new Plottable.Plots.Line();
             var drawer = new Plottable.Drawers.Line(dataset);
-            linePlot._getDrawer = function () { return drawer; };
+            linePlot._createDrawer = function () { return drawer; };
             linePlot.addDataset(dataset);
             linePlot.x(function (d) { return d.a; }, xScale);
             linePlot.y(function (d) { return d.b; }, yScale);
@@ -791,13 +789,13 @@ describe("TimeAxis", function () {
                     return d3.select(this).style("visibility") === "visible";
                 });
                 var numLabels = visibleTickLabels[0].length;
-                var box1;
-                var box2;
+                var clientRect1;
+                var clientRect2;
                 for (var i = 0; i < numLabels; i++) {
                     for (var j = i + 1; j < numLabels; j++) {
-                        box1 = visibleTickLabels[0][i].getBoundingClientRect();
-                        box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                        assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                        clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
+                        clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
+                        assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
                     }
                 }
             }
@@ -877,7 +875,7 @@ describe("TimeAxis", function () {
         })[0].map(function (label) { return label.getBoundingClientRect(); });
         labelRects.forEach(function (labelRect) {
             tickRects.forEach(function (tickRect) {
-                assert.isFalse(Plottable.Utils.DOM.boxesOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(labelRect, tickRect), "visible label does not overlap with a tick");
             });
         });
         svg.remove();
@@ -1130,13 +1128,13 @@ describe("NumericAxis", function () {
             return d3.select(this).style("visibility") === "visible";
         });
         var numLabels = visibleTickLabels[0].length;
-        var box1;
-        var box2;
+        var clientRect1;
+        var clientRect2;
         for (var i = 0; i < numLabels; i++) {
             for (var j = i + 1; j < numLabels; j++) {
-                box1 = visibleTickLabels[0][i].getBoundingClientRect();
-                box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
+                clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
             }
         }
         numericAxis.orientation("bottom");
@@ -1146,9 +1144,9 @@ describe("NumericAxis", function () {
         numLabels = visibleTickLabels[0].length;
         for (i = 0; i < numLabels; i++) {
             for (j = i + 1; j < numLabels; j++) {
-                box1 = visibleTickLabels[0][i].getBoundingClientRect();
-                box2 = visibleTickLabels[0][j].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.boxesOverlap(box1, box2), "tick labels don't overlap");
+                clientRect1 = visibleTickLabels[0][i].getBoundingClientRect();
+                clientRect2 = visibleTickLabels[0][j].getBoundingClientRect();
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(clientRect1, clientRect2), "tick labels don't overlap");
             }
         }
         svg.remove();
@@ -1331,10 +1329,10 @@ describe("NumericAxis", function () {
             return (visibility === "visible") || (visibility === "inherit");
         });
         tickLabels.each(function () {
-            var tickLabelBox = this.getBoundingClientRect();
+            var tickLabelRect = this.getBoundingClientRect();
             tickMarks.each(function () {
-                var tickMarkBox = this.getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
+                var tickMarkRect = this.getBoundingClientRect();
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tickMarks and tickLabels should not overlap when top/bottom/left/right position is used for the tickLabel");
             });
         });
         svg.remove();
@@ -1462,9 +1460,9 @@ describe("Category Axes", function () {
     it("axis labels respect tick labels", function () {
         function verifyTickLabelOverlaps(tickLabels, tickMarks) {
             for (var i = 0; i < tickLabels[0].length; i++) {
-                var tickLabelBox = tickLabels[0][i].getBoundingClientRect();
-                var tickMarkBox = tickMarks[0][i].getBoundingClientRect();
-                assert.isFalse(Plottable.Utils.DOM.boxesOverlap(tickLabelBox, tickMarkBox), "tick label and box do not overlap");
+                var tickLabelRect = tickLabels[0][i].getBoundingClientRect();
+                var tickMarkRect = tickMarks[0][i].getBoundingClientRect();
+                assert.isFalse(Plottable.Utils.DOM.clientRectsOverlap(tickLabelRect, tickMarkRect), "tick label and box do not overlap");
             }
         }
         var svg = TestMethods.generateSVG(400, 300);
@@ -2015,9 +2013,9 @@ describe("InterpolatedColorLegend", function () {
         var swatchContainerBCR = swatchContainer.node().getBoundingClientRect();
         var swatchBoundingBox = legendElement.select(".swatch-bounding-box");
         var boundingBoxBCR = swatchBoundingBox.node().getBoundingClientRect();
-        assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, boundingBoxBCR), "bounding box contains all swatches");
+        assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, boundingBoxBCR), "bounding box contains all swatches");
         var elementBCR = legendElement.node().getBoundingClientRect();
-        assert.isTrue(Plottable.Utils.DOM.boxIsInside(swatchContainerBCR, elementBCR), "swatches are drawn within the legend's element");
+        assert.isTrue(Plottable.Utils.DOM.clientRectInside(swatchContainerBCR, elementBCR), "swatches are drawn within the legend's element");
         var formattedDomainValues = scaleDomain.map(legend._formatter);
         var labels = legendElement.selectAll("text");
         var labelTexts = labels[0].map(function (textNode) { return textNode.textContent; });
@@ -2228,6 +2226,11 @@ var CountingPlot = (function (_super) {
         ++this.renders;
         return _super.prototype.render.call(this);
     };
+    CountingPlot.prototype._createDrawer = function (dataset) {
+        var drawer = new Plottable.Drawer(dataset);
+        drawer._svgElement = "g";
+        return drawer;
+    };
     return CountingPlot;
 })(Plottable.Plot);
 describe("Plots", function () {
@@ -2235,6 +2238,7 @@ describe("Plots", function () {
         it("Plots default correctly", function () {
             var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.renderTo(svg);
             TestMethods.verifyClipPath(r);
             svg.remove();
@@ -2242,6 +2246,7 @@ describe("Plots", function () {
         it("Base Plot functionality works", function () {
             var svg = TestMethods.generateSVG(400, 300);
             var r = new Plottable.Plot();
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.anchor(svg);
             r.computeLayout();
             var renderArea = r._content.select(".render-area");
@@ -2271,6 +2276,7 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([]);
             var dataset2 = new Plottable.Dataset([]);
             var plot = new Plottable.Plot();
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(dataset1);
             plot.addDataset(dataset2);
             assert.deepEqual(plot.datasets(), [dataset1, dataset2], "retrieved Datasets in order they were added");
@@ -2285,6 +2291,7 @@ describe("Plots", function () {
         it("Updates its projectors when the Dataset is changed", function () {
             var d1 = new Plottable.Dataset([{ x: 5, y: 6 }], { cssClass: "bar" });
             var r = new Plottable.Plot();
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             r.addDataset(d1);
             var xScaleCalls = 0;
             var yScaleCalls = 0;
@@ -2321,6 +2328,7 @@ describe("Plots", function () {
         });
         it("Plot.project works as intended", function () {
             var r = new Plottable.Plot();
+            r._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             var s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
             r.attr("attr", function (d) { return d.a; }, s);
             var attrToProjector = r._generateAttrToProjector();
@@ -2333,8 +2341,12 @@ describe("Plots", function () {
             var s = new Plottable.Scales.Linear().padProportion(0);
             var svg1 = TestMethods.generateSVG(100, 100);
             var svg2 = TestMethods.generateSVG(100, 100);
-            new Plottable.Plot().addDataset(ds1).attr("x", function (x) { return x; }, s).renderTo(svg1);
-            new Plottable.Plot().addDataset(ds2).attr("x", function (x) { return x; }, s).renderTo(svg2);
+            var plot1 = new Plottable.Plot();
+            plot1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot1.addDataset(ds1).attr("x", function (x) { return x; }, s).renderTo(svg1);
+            var plot2 = new Plottable.Plot();
+            plot2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot2.addDataset(ds2).attr("x", function (x) { return x; }, s).renderTo(svg2);
             assert.deepEqual(s.domain(), [0, 3], "Simple domain combining");
             ds1.data([]);
             assert.deepEqual(s.domain(), [1, 3], "Contracting domain due to projection becoming empty");
@@ -2348,11 +2360,13 @@ describe("Plots", function () {
             var dataset2 = new Plottable.Dataset([{ value: 1 }, { value: 2 }, { value: 3 }]);
             // Create mock drawers with functioning selector()
             var mockDrawer1 = new Plottable.Drawer(dataset1);
+            mockDrawer1._svgElementName = "circle";
             mockDrawer1.selector = function () { return "circle"; };
             var mockDrawer2 = new Plottable.Drawer(dataset2);
+            mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2397,11 +2411,13 @@ describe("Plots", function () {
             var data2PointConverter = function (datum, index) { return data2Points[index]; };
             // Create mock drawers with functioning selector()
             var mockDrawer1 = new Plottable.Drawer(dataset1);
+            mockDrawer1._svgElementName = "circle";
             mockDrawer1.selector = function () { return "circle"; };
             var mockDrawer2 = new Plottable.Drawer(dataset2);
+            mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2458,12 +2474,13 @@ describe("Plots", function () {
             var dataPointConverter = function (datum, index) { return dataPoints[index]; };
             // Create mock drawer with already drawn items
             var mockDrawer = new Plottable.Drawer(dataset);
+            mockDrawer._svgElementName = "circle";
             mockDrawer.selector = function () { return "circle"; };
             plot._pixelPoint = function (datum, index, dataset) {
                 return dataPointConverter(datum, index);
             };
-            // Mock _getDrawer to return the mock drawer
-            plot._getDrawer = function () { return mockDrawer; };
+            // Mock _createDrawer to return the mock drawer
+            plot._createDrawer = function () { return mockDrawer; };
             plot.addDataset(dataset);
             plot.renderTo(svg);
             // replace the renderArea with our own
@@ -2504,14 +2521,16 @@ describe("Plots", function () {
             var renderArea1 = svg.append("g");
             renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
             mockDrawer1.setup = function () { return mockDrawer1._renderArea = renderArea1; };
+            mockDrawer1._svgElementName = "circle";
             mockDrawer1.selector = function () { return "circle"; };
             var renderArea2 = svg.append("g");
             renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
             var mockDrawer2 = new Plottable.Drawer(dataset2);
             mockDrawer2.setup = function () { return mockDrawer2._renderArea = renderArea2; };
+            mockDrawer2._svgElementName = "circle";
             mockDrawer2.selector = function () { return "circle"; };
-            // Mock _getDrawer to return the mock drawers
-            plot._getDrawer = function (dataset) {
+            // Mock _createDrawer to return the mock drawers
+            plot._createDrawer = function (dataset) {
                 if (dataset === dataset1) {
                     return mockDrawer1;
                 }
@@ -2576,6 +2595,8 @@ describe("Plots", function () {
             var plot1 = new Plottable.Plot();
             var plot2 = new Plottable.Plot();
             var svg = TestMethods.generateSVG(400, 400);
+            plot1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+            plot2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot1.attr("null", id, scale1);
             plot2.attr("null", id, scale1);
             plot1.renderTo(svg);
@@ -2621,6 +2642,7 @@ describe("Plots", function () {
             var dataset1 = new Plottable.Dataset([{ key: "A" }]);
             var dataset2 = new Plottable.Dataset([{ key: "B" }]);
             var plot = new Plottable.Plot();
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(dataset2);
             plot.addDataset(dataset1);
             plot.attr("key", function (d) { return d.key; }, categoryScale);
@@ -2661,6 +2683,7 @@ describe("Plots", function () {
             xScale = new Plottable.Scales.Linear();
             yScale = new Plottable.Scales.Linear();
             plot = new Plottable.XYPlot();
+            plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
             plot.addDataset(simpleDataset);
             plot.x(xAccessor, xScale).y(yAccessor, yScale).renderTo(svg);
         });
@@ -3017,13 +3040,13 @@ describe("Plots", function () {
             renderArea = linePlot._renderArea;
         });
         it("draws a line correctly", function () {
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
             assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
             svg.remove();
         });
         it("attributes set appropriately from accessor", function () {
-            var areaPath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var areaPath = renderArea.select(".line");
             assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
             svg.remove();
         });
@@ -3031,7 +3054,7 @@ describe("Plots", function () {
             var newColorAccessor = function () { return "pink"; };
             linePlot.attr("stroke", newColorAccessor);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
             svg.remove();
         });
@@ -3042,7 +3065,7 @@ describe("Plots", function () {
             });
             simpleDataset.data(data);
             linePlot.attr("stroke", function (d) { return d.stroke; });
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
             data[0].stroke = "green";
             simpleDataset.data(data);
@@ -3058,7 +3081,7 @@ describe("Plots", function () {
                 { foo: 0.8, bar: 0.8 }
             ];
             simpleDataset.data(lineData);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
+            var linePath = renderArea.select(".line");
             var d_original = TestMethods.normalizePath(linePath.attr("d"));
             function assertCorrectPathSplitting(msgPrefix) {
                 var d = TestMethods.normalizePath(linePath.attr("d"));
@@ -3218,9 +3241,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             linePlot.attr("class", newClassProjector);
             linePlot.renderTo(svg);
-            var linePath = renderArea.select("." + Plottable.Drawers.Line.PATH_CLASS);
-            assert.isTrue(linePath.classed("pink"));
-            assert.isTrue(linePath.classed(Plottable.Drawers.Line.PATH_CLASS));
+            var linePath = renderArea.select(".line");
+            assert.isTrue(linePath.classed("pink"), "'pink' class is applied");
+            assert.isTrue(linePath.classed("line"), "'line' class is retained");
             svg.remove();
         });
     });
@@ -3391,9 +3414,9 @@ describe("Plots", function () {
             var newClassProjector = function () { return "pink"; };
             areaPlot.attr("class", newClassProjector);
             areaPlot.renderTo(svg);
-            var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
+            var areaPath = renderArea.select(".area");
             assert.isTrue(areaPath.classed("pink"));
-            assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
+            assert.isTrue(areaPath.classed("area"));
             svg.remove();
         });
     });
@@ -4536,8 +4559,6 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedBar();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
-            stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
             var data0 = [
@@ -4638,8 +4659,6 @@ describe("Plots", function () {
             stackedPlot = new Plottable.Plots.StackedArea();
             stackedPlot.x(function (d) { return d.x; }, xScale);
             stackedPlot.y(function (d) { return d.y; }, yScale);
-            stackedPlot._getDrawer = function (dataset) { return new Plottable.Drawer(dataset); };
-            stackedPlot._isVertical = true;
         });
         it("uses positive offset on stacking the 0 value", function () {
             var data0 = [
@@ -6147,8 +6166,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("detach()", function () {
-        var c1 = new Plottable.Component().classed("component-1", true);
-        var c2 = new Plottable.Component().classed("component-2", true);
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = TestMethods.generateSVG(200, 200);
         cg.renderTo(svg);
@@ -6174,8 +6193,8 @@ describe("ComponentGroups", function () {
         svg.remove();
     });
     it("destroy()s its Components when destroy()ed", function () {
-        var c1 = new Plottable.Component().classed("component-1", true);
-        var c2 = new Plottable.Component().classed("component-2", true);
+        var c1 = new Plottable.Component().addClass("component-1");
+        var c2 = new Plottable.Component().addClass("component-2");
         var cg = new Plottable.Components.Group([c1, c2]);
         var svg = TestMethods.generateSVG(200, 200);
         cg.renderTo(svg);
@@ -6489,23 +6508,23 @@ describe("Component behavior", function () {
         svg.remove();
     });
     it("css classing works as expected", function () {
-        assert.isFalse(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-KEEP", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        c.classed("CSS-PREANCHOR-REMOVE", true);
-        assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
-        c.classed("CSS-PREANCHOR-REMOVE", false);
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-KEEP");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        c.addClass("CSS-PREANCHOR-REMOVE");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        c.removeClass("CSS-PREANCHOR-REMOVE");
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
         c.anchor(svg);
-        assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-        assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", true);
-        assert.isTrue(c.classed("CSS-POSTANCHOR"));
-        c.classed("CSS-POSTANCHOR", false);
-        assert.isFalse(c.classed("CSS-POSTANCHOR"));
-        assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-        assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+        assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+        assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        c.addClass("CSS-POSTANCHOR");
+        assert.isTrue(c.hasClass("CSS-POSTANCHOR"));
+        c.removeClass("CSS-POSTANCHOR");
+        assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+        assert.isFalse(c.hasClass(undefined), "returns false when hasClass called w/ undefined");
+        assert.strictEqual(c.addClass(undefined), c, "returns this when hasClass called w/ undefined and true");
         svg.remove();
     });
     it("can't reuse component if it's been destroy()-ed", function () {
@@ -6748,7 +6767,7 @@ function generateBasicTable(nRows, nCols) {
 describe("Tables", function () {
     it("tables are classed properly", function () {
         var table = new Plottable.Components.Table();
-        assert.isTrue(table.classed("table"));
+        assert.isTrue(table.hasClass("table"));
     });
     it("padTableToSize works properly", function () {
         var t = new Plottable.Components.Table();
@@ -7606,7 +7625,9 @@ describe("Scales", function () {
             });
             it("scale autorange works as expected with single dataset", function () {
                 var svg = TestMethods.generateSVG(100, 100);
-                new Plottable.Plot().addDataset(dataset).attr("x", function (d) { return d.foo; }, scale).renderTo(svg);
+                var plot = new Plottable.Plot();
+                plot._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+                plot.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale).renderTo(svg);
                 assert.deepEqual(scale.domain(), [0, 5], "scale domain was autoranged properly");
                 data.push({ foo: 100, bar: 200 });
                 dataset.data(data);
@@ -7616,9 +7637,13 @@ describe("Scales", function () {
             it("scale reference counting works as expected", function () {
                 var svg1 = TestMethods.generateSVG(100, 100);
                 var svg2 = TestMethods.generateSVG(100, 100);
-                var renderer1 = new Plottable.Plot().addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
+                var renderer1 = new Plottable.Plot();
+                renderer1._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+                renderer1.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
                 renderer1.renderTo(svg1);
-                var renderer2 = new Plottable.Plot().addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
+                var renderer2 = new Plottable.Plot();
+                renderer2._createDrawer = function (dataset) { return createMockDrawer(dataset); };
+                renderer2.addDataset(dataset).attr("x", function (d) { return d.foo; }, scale);
                 renderer2.renderTo(svg2);
                 var otherScale = new Plottable.Scales.Linear();
                 renderer1.attr("x", function (d) { return d.foo; }, otherScale);

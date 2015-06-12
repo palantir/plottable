@@ -49,7 +49,7 @@ export module Components {
        * wouldn't be able to grab the edges or corners for resizing.
        */
       this._clipPathEnabled = true;
-      this.classed("drag-box-layer", true);
+      this.addClass("drag-box-layer");
 
       this._dragInteraction = new Interactions.Drag();
       this._setUpCallbacks();
@@ -263,8 +263,13 @@ export module Components {
 
     // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
     protected _setResizableClasses(canResize: boolean) {
-      this.classed("x-resizable", canResize);
-      this.classed("y-resizable", canResize);
+      if (canResize) {
+        this.addClass("x-resizable");
+        this.addClass("y-resizable");
+      } else {
+        this.removeClass("x-resizable");
+        this.removeClass("y-resizable");
+      }
     }
 
     /**

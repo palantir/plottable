@@ -11,7 +11,7 @@ describe("Drawers", () => {
       var linePlot = new Plottable.Plots.Line();
 
       var drawer = new Plottable.Drawers.Line(dataset);
-      (<any> linePlot)._getDrawer = () => drawer;
+      (<any> linePlot)._createDrawer = () => drawer;
 
       linePlot.addDataset(dataset);
       linePlot.x((d: any) => d.a, xScale);

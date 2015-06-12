@@ -174,7 +174,7 @@ export module Axes {
      */
     constructor(scale: Scales.Time, orientation: string) {
       super(scale, orientation);
-      this.classed("time-axis", true);
+      this.addClass("time-axis");
       this.tickLabelPadding(5);
       this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
     }
@@ -304,11 +304,11 @@ export module Axes {
       return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       // Makes sure that the size it requires is a multiple of tier sizes, such that
       // we have no leftover tiers
 
-      var size = super._getSize(availableWidth, availableHeight);
+      var size = super._sizeFromOffer(availableWidth, availableHeight);
       size.height = this._tierHeights.reduce((prevValue, currValue, index, arr) => {
         return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
       });
@@ -537,7 +537,7 @@ export module Axes {
         var tickLabel = d3.select(this);
         var leadingTickMark = visibleTickMarkRects[i];
         var trailingTickMark = visibleTickMarkRects[i + 1];
-        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect))
+        if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect))
             || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
           tickLabel.style("visibility", "hidden");
         } else {

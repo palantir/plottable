@@ -18,7 +18,7 @@ module Plottable {
      */
     constructor() {
       super();
-      this.classed("xy-plot", true);
+      this.addClass("xy-plot");
 
       this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
       this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
