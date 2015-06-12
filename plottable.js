@@ -624,28 +624,37 @@ var Plottable;
         var Stacked;
         (function (Stacked) {
             var nativeMath = window.Math;
-            /**
-             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-             * for drawing purposes.
-             *
-             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
-             */
             function computeStackOffsets(datasets, keyAccessor, valueAccessor) {
-                var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
-                var dataMapArray = _generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
-                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return _populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
+                var getKey = function (datum, index, dataset) {
+                    return String(keyAccessor(datum, index, dataset));
+                };
+                var positiveOffsets = d3.map();
+                var negativeOffsets = d3.map();
+                var datasetToKeyToStackedDatum = new Utils.Map();
+                datasets.forEach(function (dataset) {
+                    var keyToStackedDatum = new Utils.Map();
+                    dataset.data().forEach(function (datum, index) {
+                        var key = getKey(datum, index, dataset);
+                        var value = +valueAccessor(datum, index, dataset);
+                        var offset;
+                        var offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
+                        if (offsetMap.has(key)) {
+                            offset = offsetMap.get(key);
+                            offsetMap.set(key, offset + value);
+                        }
+                        else {
+                            offset = 0;
+                            offsetMap.set(key, value);
+                        }
+                        keyToStackedDatum.set(key, {
+                            key: key,
+                            value: value,
+                            offset: offset
+                        });
                     });
+                    datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
                 });
-                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return _populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
-                    });
-                });
-                var positiveDataStack = _stack(positiveDataMapArray, domainKeys);
-                var negativeDataStack = _stack(negativeDataMapArray, domainKeys);
-                return _combineDataStacks(datasets, positiveDataStack, negativeDataStack);
+                return datasetToKeyToStackedDatum;
             }
             Stacked.computeStackOffsets = computeStackOffsets;
             /**
@@ -683,73 +692,6 @@ var Plottable;
                 return domainKeys.values();
             }
             Stacked.domainKeys = domainKeys;
-            /**
-             * Feeds the data through d3's stack layout function which will calculate
-             * the stack offsets and use the the function declared in .out to set the offsets on the data.
-             */
-            function _stack(dataArray, domainKeys) {
-                var outFunction = function (d, y0, y) {
-                    d.offset = y0;
-                };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
-                return dataArray;
-            }
-            function _generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys) {
-                var dataMapArray = datasets.map(function () {
-                    return _populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: 0 };
-                    });
-                });
-                datasets.forEach(function (dataset, datasetIndex) {
-                    dataset.data().forEach(function (datum, index) {
-                        var key = String(keyAccessor(datum, index, dataset));
-                        var value = valueAccessor(datum, index, dataset);
-                        dataMapArray[datasetIndex].set(key, { key: key, value: value });
-                    });
-                });
-                return dataMapArray;
-            }
-            /**
-             * After the stack offsets have been determined on each separate dataset, the offsets need
-             * to be determined correctly on the overall datasets
-             */
-            function _combineDataStacks(datasets, positiveDataStack, negativeDataStack) {
-                var stackOffsets = new Utils.Map();
-                datasets.forEach(function (dataset, index) {
-                    var datasetOffsets = new Utils.Map();
-                    var positiveDataMap = positiveDataStack[index];
-                    var negativeDataMap = negativeDataStack[index];
-                    positiveDataMap.forEach(function (key, positiveStackedDatum) {
-                        var negativeStackedDatum = negativeDataMap.get(key);
-                        if (positiveStackedDatum.value !== 0) {
-                            datasetOffsets.set(key, positiveStackedDatum);
-                        }
-                        else if (negativeStackedDatum.value !== 0) {
-                            datasetOffsets.set(key, negativeStackedDatum);
-                        }
-                        else {
-                            positiveStackedDatum.value = 0;
-                            datasetOffsets.set(key, positiveStackedDatum);
-                        }
-                    });
-                    stackOffsets.set(dataset, datasetOffsets);
-                });
-                return stackOffsets;
-            }
-            /**
-             * Populates a map from an array of keys and a transformation function.
-             *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {d3.Map<T>} A map mapping keys to their transformed values.
-             */
-            function _populateMap(keys, transform) {
-                var map = d3.map();
-                keys.forEach(function (key, i) {
-                    map.set(key, transform(key, i));
-                });
-                return map;
-            }
         })(Stacked = Utils.Stacked || (Utils.Stacked = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));

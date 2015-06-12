@@ -293,12 +293,6 @@ declare module Plottable {
                 value: number;
                 offset?: number;
             };
-            /**
-             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-             * for drawing purposes.
-             *
-             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
-             */
             function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
                 key: any;
                 value: number;

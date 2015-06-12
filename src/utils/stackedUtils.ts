@@ -12,31 +12,38 @@ module Plottable {
 
       var nativeMath: Math = (<any>window).Math;
 
-      /**
-       * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-       * for drawing purposes.
-       *
-       * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
-       */
       export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
-        var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
-        var dataMapArray = _generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
+        var getKey = (datum: any, index: number, dataset: Dataset) => {
+          return String(keyAccessor(datum, index, dataset));
+        };
 
-        var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return _populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
+        var positiveOffsets = d3.map<number>();
+        var negativeOffsets = d3.map<number>();
+        var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
+
+        datasets.forEach((dataset) => {
+          var keyToStackedDatum = new Utils.Map<string, StackedDatum>();
+          dataset.data().forEach((datum, index) => {
+            var key = getKey(datum, index, dataset);
+            var value = +valueAccessor(datum, index, dataset);
+            var offset: number;
+            var offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
+            if (offsetMap.has(key)) {
+              offset = offsetMap.get(key);
+              offsetMap.set(key, offset + value);
+            } else {
+              offset = 0;
+              offsetMap.set(key, value);
+            }
+            keyToStackedDatum.set(key, {
+              key: key,
+              value: value,
+              offset: offset
+            });
           });
+          datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
         });
-
-        var negativeDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
-          return _populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
-          });
-        });
-
-        var positiveDataStack = _stack(positiveDataMapArray, domainKeys);
-        var negativeDataStack = _stack(negativeDataMapArray, domainKeys);
-        return _combineDataStacks(datasets, positiveDataStack, negativeDataStack);
+        return datasetToKeyToStackedDatum;
       }
 
       /**
@@ -76,94 +83,6 @@ module Plottable {
         });
 
         return domainKeys.values();
-      }
-
-      /**
-       * Feeds the data through d3's stack layout function which will calculate
-       * the stack offsets and use the the function declared in .out to set the offsets on the data.
-       */
-      function _stack(dataArray: d3.Map<StackedDatum>[], domainKeys: string[]) {
-        var outFunction = (d: StackedDatum, y0: number, y: number) => {
-          d.offset = y0;
-        };
-
-        d3.layout.stack<d3.Map<StackedDatum>, StackedDatum>()
-          .x((d) => d.key)
-          .y((d) => +d.value)
-          .values((d) => domainKeys.map((domainKey) => d.get(domainKey)))
-          .out(outFunction)(dataArray);
-
-        return dataArray;
-      }
-
-      function _generateDefaultMapArray(
-          datasets: Dataset[],
-          keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<number>,
-          domainKeys: string[]) {
-
-        var dataMapArray = datasets.map(() => {
-          return _populateMap(domainKeys, (domainKey) => {
-            return { key: domainKey, value: 0 };
-          });
-        });
-
-        datasets.forEach((dataset, datasetIndex) => {
-          dataset.data().forEach((datum, index) => {
-            var key = String(keyAccessor(datum, index, dataset));
-            var value = valueAccessor(datum, index, dataset);
-            dataMapArray[datasetIndex].set(key, { key: key, value: value });
-          });
-        });
-
-        return dataMapArray;
-      }
-
-      /**
-       * After the stack offsets have been determined on each separate dataset, the offsets need
-       * to be determined correctly on the overall datasets
-       */
-      function _combineDataStacks(
-          datasets: Dataset[],
-          positiveDataStack: d3.Map<StackedDatum>[],
-          negativeDataStack: d3.Map<StackedDatum>[]) {
-
-        var stackOffsets = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
-        datasets.forEach((dataset, index) => {
-          var datasetOffsets = new Utils.Map<string, StackedDatum>();
-          var positiveDataMap = positiveDataStack[index];
-          var negativeDataMap = negativeDataStack[index];
-
-          positiveDataMap.forEach((key: string, positiveStackedDatum: StackedDatum) => {
-            var negativeStackedDatum = negativeDataMap.get(key);
-
-            if (positiveStackedDatum.value !== 0) {
-              datasetOffsets.set(key, positiveStackedDatum);
-            } else if (negativeStackedDatum.value !== 0) {
-              datasetOffsets.set(key, negativeStackedDatum);
-            } else { // illegal value / undefined / null / etc
-              positiveStackedDatum.value = 0;
-              datasetOffsets.set(key, positiveStackedDatum);
-            }
-          });
-          stackOffsets.set(dataset, datasetOffsets);
-        });
-        return stackOffsets;
-      }
-
-      /**
-       * Populates a map from an array of keys and a transformation function.
-       *
-       * @param {string[]} keys The array of keys.
-       * @param {(string, number) => T} transform A transformation function to apply to the keys.
-       * @return {d3.Map<T>} A map mapping keys to their transformed values.
-       */
-      function _populateMap<T>(keys: string[], transform: (key: string, index: number) => T) {
-        var map = d3.map<T>();
-        keys.forEach((key: string, i: number) => {
-          map.set(key, transform(key, i));
-        });
-        return map;
       }
 
     }
