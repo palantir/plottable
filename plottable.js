@@ -313,7 +313,9 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            // Screen refresh rate which is assumed to be 60fps
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
             DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
             /**
              * Polyfill for `window.requestAnimationFrame`.
@@ -419,6 +421,9 @@ var Plottable;
             }
             DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
             function generateUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
             }
@@ -494,6 +499,10 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color, factor) {
                 var hsl = d3.hsl(color).brighter(factor);
                 return hsl.rgb().toString();

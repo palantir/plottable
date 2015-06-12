@@ -20,14 +20,16 @@ export module Utils {
       return bbox;
     }
 
-    // Screen refresh rate which is assumed to be 60fps
+    /**
+     * Screen refresh rate which is assumed to be 60fps
+     */
     export var SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
 
     /**
      * Polyfill for `window.requestAnimationFrame`.
      * If the function exists, then we use the function directly.
      * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
-     * 
+     *
      * @param {() => void} callback The callback to call in the next animation frame
      */
     export function requestAnimationFramePolyfill(callback: () => void) {
@@ -41,7 +43,7 @@ export module Utils {
     /**
      * Calculates the width of the element.
      * The width includes the padding and the border on the element's left and right sides.
-     * 
+     *
      * @param {Element} element The element to query
      * @returns {number} The width of the element.
      */
@@ -57,7 +59,7 @@ export module Utils {
     /**
      * Calculates the height of the element.
      * The height includes the padding the and the border on the element's top and bottom sides.
-     * 
+     *
      * @param {Element} element The element to query
      * @returns {number} The height of the element
      */
@@ -72,14 +74,14 @@ export module Utils {
 
     /**
      * Retrieves the number array representing the translation for the selection
-     * 
+     *
      * @param {d3.Selection<any>} selection The selection to query
      * @returns {[number, number]} The number array representing the translation
      */
     export function translate(selection: d3.Selection<any>): [number, number];
     /**
      * Translates the given selection by the input x / y pixel amounts.
-     * 
+     *
      * @param {d3.Selection<any>} selection The selection to translate
      * @param {number} x The amount to translate in the x direction
      * @param {number} y The amount to translate in the y direction
@@ -102,7 +104,7 @@ export module Utils {
 
     /**
      * Checks if the first ClientRect overlaps the second.
-     * 
+     *
      * @param {ClientRect} clientRectA The first ClientRect
      * @param {ClientRect} clientRectB The second ClientRect
      * @returns {boolean} If the ClientRects overlap each other.
@@ -117,7 +119,7 @@ export module Utils {
 
     /**
      * Returns true if and only if innerClientRect is inside outerClientRect.
-     * 
+     *
      * @param {ClientRect} innerClientRect The first ClientRect
      * @param {ClientRect} outerClientRect The second ClientRect
      * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
@@ -133,7 +135,7 @@ export module Utils {
 
     /**
      * Retrieves the bounding svg of the input element
-     * 
+     *
      * @param {SVGElement} element The element to query
      * @returns {SVGElement} The bounding svg
      */
@@ -149,6 +151,9 @@ export module Utils {
     }
 
     var _latestClipPathId = 0;
+    /**
+     * Generates a ClipPath ID that is unique for this instance of Plottable
+     */
     export function generateUniqueClipPathId() {
       return "plottableClipPath" + ++_latestClipPathId;
     }

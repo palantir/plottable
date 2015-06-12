@@ -18,6 +18,10 @@ export module Utils {
       return l1 > l2 ? l1 / l2 : l2 / l1;
     }
 
+    /**
+     * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+     * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+     */
     export function lightenColor(color: string, factor: number) {
       var hsl = <d3.Hsl> d3.hsl(color).brighter(factor);
       return hsl.rgb().toString();

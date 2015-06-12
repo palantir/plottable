@@ -163,6 +163,9 @@ declare module Plottable {
              * @returns {SVGRed} The bounding box.
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
             var SCREEN_REFRESH_RATE_MILLISECONDS: number;
             /**
              * Polyfill for `window.requestAnimationFrame`.
@@ -227,6 +230,9 @@ declare module Plottable {
              * @returns {SVGElement} The bounding svg
              */
             function boundingSVG(element: SVGElement): SVGElement;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
             function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
@@ -257,6 +263,10 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color: string, factor: number): string;
             function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
