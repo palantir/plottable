@@ -21,7 +21,7 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _getDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
     }
 
@@ -112,7 +112,7 @@ export module Plots {
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
   }

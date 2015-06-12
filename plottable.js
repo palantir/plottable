@@ -2570,12 +2570,20 @@ var Plottable;
             }
         };
         /**
-         * Enter new data to render area and creates binding
+         * Binds data to selection
          *
          * @param{any[]} data The data to be drawn
          */
-        Drawer.prototype._enterData = function (data) {
-            // no-op
+        Drawer.prototype._bindSelectionData = function (data) {
+            var dataElements = this._selection().data(data);
+            dataElements.enter().append(this._svgElementName);
+            dataElements.exit().remove();
+            this._applyDefaultAttributes(dataElements);
+        };
+        Drawer.prototype._applyDefaultAttributes = function (selection) {
+            if (this._className != null) {
+                selection.classed(this._className, true);
+            }
         };
         /**
          * Draws data using one step
@@ -2583,10 +2591,17 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            // no-op
-        };
-        Drawer.prototype._numberOfAnimationIterations = function (data) {
-            return data.length;
+            var selection = this._selection();
+            var colorAttributes = ["fill", "stroke"];
+            colorAttributes.forEach(function (colorAttribute) {
+                if (step.attrToAppliedProjector[colorAttribute] != null) {
+                    selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+                }
+            });
+            step.animator.animate(selection, step.attrToAppliedProjector);
+            if (this._className != null) {
+                this._selection().classed(this._className, true);
+            }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
@@ -2597,10 +2612,9 @@ var Plottable;
             return modifiedAttrToProjector;
         };
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-            var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return delay;
         };
@@ -2619,27 +2633,28 @@ var Plottable;
                     animator: dr.animator
                 };
             });
-            this._enterData(data);
-            var numberOfIterations = this._numberOfAnimationIterations(data);
+            this._bindSelectionData(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return this;
+        };
+        Drawer.prototype._selection = function () {
+            return this.renderArea().selectAll(this.selector());
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            throw new Error("The base Drawer class has no elements to select");
+            return this._svgElementName;
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            var allSelections = this.renderArea().selectAll(this.selector());
-            return d3.select(allSelections[0][index]);
+            return d3.select(this._selection()[0][index]);
         };
         return Drawer;
     })();
@@ -2659,35 +2674,18 @@ var Plottable;
     (function (Drawers) {
         var Line = (function (_super) {
             __extends(Line, _super);
-            function Line() {
-                _super.apply(this, arguments);
+            function Line(dataset) {
+                _super.call(this, dataset);
+                this._className = "line";
+                this._svgElementName = "path";
             }
-            Line.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                this._pathSelection.datum(data);
-            };
-            Line.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                _super.prototype.renderArea.call(this, area);
-                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
-                return this;
-            };
-            Line.prototype._numberOfAnimationIterations = function (data) {
-                return 1;
-            };
-            Line.prototype._drawStep = function (step) {
-                step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
-                this._pathSelection.classed(Line.PATH_CLASS, true);
-            };
-            Line.prototype.selector = function () {
-                return "." + Line.PATH_CLASS;
+            Line.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
-            Line.PATH_CLASS = "line";
             return Line;
         })(Plottable.Drawer);
         Drawers.Line = Line;
@@ -2707,76 +2705,21 @@ var Plottable;
     (function (Drawers) {
         var Area = (function (_super) {
             __extends(Area, _super);
-            function Area() {
-                _super.apply(this, arguments);
+            function Area(dataset) {
+                _super.call(this, dataset);
+                this._className = "area";
+                this._svgElementName = "path";
             }
-            Area.prototype._enterData = function (data) {
-                this._areaSelection.datum(data);
+            Area.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("stroke", "none");
             };
-            Area.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                Plottable.Drawer.prototype.renderArea.call(this, area);
-                this._areaSelection = area.append("path").style("stroke", "none");
-                return this;
+            Area.prototype.selectionForIndex = function (index) {
+                return this.renderArea().select(this.selector());
             };
-            Area.prototype._drawStep = function (step) {
-                step.animator.animate(this._areaSelection, step.attrToAppliedProjector);
-                this._areaSelection.classed(Area.PATH_CLASS, true);
-            };
-            Area.prototype.selector = function () {
-                return "path";
-            };
-            Area.PATH_CLASS = "area";
             return Area;
-        })(Drawers.Line);
-        Drawers.Area = Area;
-    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Drawers;
-    (function (Drawers) {
-        var Element = (function (_super) {
-            __extends(Element, _super);
-            function Element() {
-                _super.apply(this, arguments);
-            }
-            Element.prototype._getDrawSelection = function () {
-                return this.renderArea().selectAll(this._svgElement);
-            };
-            Element.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var drawSelection = this._getDrawSelection();
-                if (step.attrToAppliedProjector["fill"]) {
-                    drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, step.attrToAppliedProjector);
-            };
-            Element.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append(this._svgElement);
-                if (this._className != null) {
-                    dataElements.classed(this._className, true);
-                }
-                dataElements.exit().remove();
-            };
-            Element.prototype.selector = function () {
-                return this._svgElement;
-            };
-            return Element;
         })(Plottable.Drawer);
-        Drawers.Element = Element;
+        Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -2795,10 +2738,10 @@ var Plottable;
             __extends(Rectangle, _super);
             function Rectangle(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "rect";
+                this._svgElementName = "rect";
             }
             return Rectangle;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2819,10 +2762,10 @@ var Plottable;
             function Arc(dataset) {
                 _super.call(this, dataset);
                 this._className = "arc";
-                this._svgElement = "path";
+                this._svgElementName = "path";
             }
             return Arc;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2842,11 +2785,11 @@ var Plottable;
             __extends(Symbol, _super);
             function Symbol(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "path";
+                this._svgElementName = "path";
                 this._className = "symbol";
             }
             return Symbol;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -7605,7 +7548,7 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
                 return dataToDraw;
             };
             return Line;

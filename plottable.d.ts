@@ -1171,8 +1171,8 @@ declare module Plottable {
         };
     }
     class Drawer {
+        protected _svgElementName: string;
         protected _className: string;
-        protected _dataset: Dataset;
         /**
          * Constructs a Drawer
          *
@@ -1195,19 +1195,7 @@ declare module Plottable {
          * Removes the Drawer and its renderArea
          */
         remove(): void;
-        /**
-         * Enter new data to render area and creates binding
-         *
-         * @param{any[]} data The data to be drawn
-         */
-        protected _enterData(data: any[]): void;
-        /**
-         * Draws data using one step
-         *
-         * @param{AppliedDrawStep} step The step, how data should be drawn.
-         */
-        protected _drawStep(step: Drawers.AppliedDrawStep): void;
-        protected _numberOfAnimationIterations(data: any[]): number;
+        protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
@@ -1231,13 +1219,8 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Line extends Drawer {
-            static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
-            protected _numberOfAnimationIterations(data: any[]): number;
-            protected _drawStep(step: AppliedDrawStep): void;
-            selector(): string;
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }
@@ -1246,13 +1229,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Area extends Line {
-            static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
-            protected _drawStep(step: AppliedDrawStep): void;
-            selector(): string;
+        class Area extends Drawer {
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+            selectionForIndex(index: number): d3.Selection<void>;
         }
     }
 }
@@ -1260,19 +1240,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Element extends Drawer {
-            protected _svgElement: string;
-            protected _drawStep(step: AppliedDrawStep): void;
-            protected _enterData(data: any[]): void;
-            selector(): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Drawers {
-        class Rectangle extends Element {
+        class Rectangle extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -1281,7 +1249,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc extends Element {
+        class Arc extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -1290,7 +1258,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Symbol extends Element {
+        class Symbol extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -2840,7 +2808,7 @@ declare module Plottable {
              * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Line;
+            protected _getDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
