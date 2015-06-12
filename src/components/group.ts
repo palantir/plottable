@@ -9,7 +9,7 @@ export module Components {
      * Constructs a Group.
      *
      * A Group contains Components that will be rendered on top of each other.
-     * Components added later will be rendered on top of Components already in the Group.
+     * Components added later will be rendered above Components already in the Group.
      *
      * @constructor
      * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -71,7 +71,7 @@ export module Components {
 
     /**
      * Adds a Component to this Group.
-     * The added Component will be rendered on top of Components already in the Group.
+     * The added Component will be rendered above Components already in the Group.
      */
     public append(component: Component) {
       if (component != null && !this.has(component)) {
