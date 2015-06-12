@@ -2350,7 +2350,7 @@ declare module Plottable {
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
-        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
@@ -2644,7 +2644,7 @@ declare module Plottable {
             symbol(): AccessorScaleBinding<any, any>;
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2730,7 +2730,7 @@ declare module Plottable {
              * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             entityNearest(queryPoint: Point): PlotEntity;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             /**
              * Gets the Entities at a particular Point.
              *

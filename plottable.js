@@ -6295,7 +6295,7 @@ var Plottable;
             var closestDistanceSquared = Infinity;
             var closest;
             this.entities().forEach(function (entity) {
-                if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -6306,7 +6306,7 @@ var Plottable;
             });
             return closest;
         };
-        Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+        Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -6956,7 +6956,7 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -7146,7 +7146,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -7178,7 +7178,7 @@ var Plottable;
                 });
                 return closest;
             };
-            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
@@ -7532,7 +7532,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);

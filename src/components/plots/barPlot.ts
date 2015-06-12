@@ -228,7 +228,7 @@ export module Plots {
 
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
         var primaryDist = 0;
@@ -264,7 +264,7 @@ export module Plots {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
       var barBBox = Utils.DOM.elementBBox(selection);
