@@ -2968,9 +2968,9 @@ declare module Plottable {
     module Plots {
         class StackedArea<X> extends Area<X> {
             /**
+             * A StackedArea Plot draws Areas stacked on top of each other.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _getAnimator(key: string): Animator;

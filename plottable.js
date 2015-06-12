@@ -7815,9 +7815,9 @@ var Plottable;
         var StackedArea = (function (_super) {
             __extends(StackedArea, _super);
             /**
+             * A StackedArea Plot draws Areas stacked on top of each other.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
                 var _this = this;
