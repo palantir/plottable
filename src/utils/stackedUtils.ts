@@ -11,11 +11,11 @@ module Plottable {
 
       var nativeMath: Math = (<any>window).Math;
 
-      export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
-        var getKey = (datum: any, index: number, dataset: Dataset) => {
-          return String(keyAccessor(datum, index, dataset));
-        };
+      export function normalizeKey(key: any) {
+        return String(key);
+      }
 
+      export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
         var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
@@ -23,7 +23,7 @@ module Plottable {
         datasets.forEach((dataset) => {
           var keyToStackedDatum = new Utils.Map<string, StackedDatum>();
           dataset.data().forEach((datum, index) => {
-            var key = getKey(datum, index, dataset);
+            var key = normalizeKey(keyAccessor(datum, index, dataset));
             var value = +valueAccessor(datum, index, dataset);
             var offset: number;
             var offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
@@ -48,18 +48,13 @@ module Plottable {
           stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>,
           keyAccessor: Accessor<any>,
           filter: Accessor<boolean>) {
-
-        var getKey = (datum: any, index: number, dataset: Dataset) => {
-          return String(keyAccessor(datum, index, dataset));
-        };
-
         var extents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
           dataset.data().forEach((datum, index) => {
             if (filter != null && !filter(datum, index, dataset)) {
               return;
             }
-            var stackedDatum = stackedDatumMap.get(getKey(datum, index, dataset));
+            var stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
             extents.push(stackedDatum.value + stackedDatum.offset);
           })
         });
