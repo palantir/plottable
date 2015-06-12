@@ -450,6 +450,14 @@ var Plottable;
                 return hsl.rgb().toString();
             }
             Color.lightenColor = lightenColor;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester, className) {
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
