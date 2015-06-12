@@ -41,7 +41,18 @@ declare module Plottable {
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n: any): boolean;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) separeted by step
+             */
             function range(start: number, stop: number, step?: number): number[];
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
+             */
             function distanceSquared(p1: Point, p2: Point): number;
         }
     }
@@ -55,45 +66,10 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             set(key: K, value: V): Map<K, V>;
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             get(key: K): V;
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             has(key: K): boolean;
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             delete(key: K): boolean;
         }
     }
@@ -112,13 +88,6 @@ declare module Plottable {
             add(value: T): Set<T>;
             delete(value: T): boolean;
             has(value: T): boolean;
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
         }
     }
@@ -133,6 +102,9 @@ declare module Plottable {
              * @returns {SVGRed} The bounding box.
              */
             function elementBBox(element: d3.Selection<any>): SVGRect;
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
             var SCREEN_REFRESH_RATE_MILLISECONDS: number;
             /**
              * Polyfill for `window.requestAnimationFrame`.
@@ -197,6 +169,9 @@ declare module Plottable {
              * @returns {SVGElement} The bounding svg
              */
             function boundingSVG(element: SVGElement): SVGElement;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
             function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
@@ -227,7 +202,19 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color: string, factor: number): string;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
     }
@@ -338,6 +325,10 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
+            /**
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+             */
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
             constructor(svg: SVGElement);
             /**

@@ -83,6 +83,10 @@ var Plottable;
                 return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
             }
             Math.isValidNumber = isValidNumber;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) separeted by step
+             */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -96,6 +100,13 @@ var Plottable;
                 return range;
             }
             Math.range = range;
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
+             */
             function distanceSquared(p1, p2) {
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
@@ -117,13 +128,6 @@ var Plottable;
             function Map() {
                 this._keyValuePairs = [];
             }
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             Map.prototype.set = function (key, value) {
                 if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
@@ -137,12 +141,6 @@ var Plottable;
                 this._keyValuePairs.push({ key: key, value: value });
                 return this;
             };
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -151,15 +149,6 @@ var Plottable;
                 }
                 return undefined;
             };
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -168,25 +157,12 @@ var Plottable;
                 }
                 return false;
             };
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
             };
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -232,26 +208,22 @@ var Plottable;
                 }
                 return false;
             };
-            Set.prototype._updateSize = function () {
-                Object.defineProperty(this, "size", {
-                    value: this._values.length,
-                    configurable: true
-                });
-            };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
+                });
+            };
+            /**
+             * Updates the value of the read-only parameter size
+             */
+            Set.prototype._updateSize = function () {
+                Object.defineProperty(this, "size", {
+                    value: this._values.length,
+                    configurable: true
                 });
             };
             return Set;
@@ -283,7 +255,9 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            // Screen refresh rate which is assumed to be 60fps
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
             DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
             /**
              * Polyfill for `window.requestAnimationFrame`.
@@ -389,6 +363,9 @@ var Plottable;
             }
             DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
             function generateUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
             }
@@ -464,11 +441,23 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color, factor) {
                 var hsl = d3.hsl(color).brighter(factor);
                 return hsl.rgb().toString();
             }
             Color.lightenColor = lightenColor;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester, className) {
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
@@ -831,6 +820,10 @@ var Plottable;
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
             }
+            /**
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+             */
             ClientToSVGTranslator.getTranslator = function (elem) {
                 var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];

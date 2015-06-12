@@ -75,6 +75,10 @@ export module Utils {
       return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
     }
 
+    /**
+     * Generates an array of consecutive, strictly increasing numbers
+     * in the range [start, stop) separeted by step
+     */
     export function range(start: number, stop: number, step = 1): number[] {
       if (step === 0) {
         throw new Error("step cannot be 0");
@@ -89,6 +93,13 @@ export module Utils {
       return range;
     }
 
+    /**
+     * Returns the square of the distance between two points
+     *
+     * @param {Point} p1
+     * @param {Point} p2
+     * @return {number} dist(p1, p2)^2
+     */
     export function distanceSquared(p1: Point, p2: Point) {
       return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
     }
