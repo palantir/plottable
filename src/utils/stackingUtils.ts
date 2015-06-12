@@ -9,7 +9,7 @@ module Plottable {
         offset: number;
       };
 
-      export type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+      export type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
 
       var nativeMath: Math = (<any>window).Math;
 
@@ -19,12 +19,12 @@ module Plottable {
        * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
        * @param {Accessor<any>} keyAccessor Accessor for the key of the data
        * @param {Accessor<number>} valueAccessor Accessor for the value of the data
-       * @return {StackInformation} value and offset information for each datapoint in each Dataset
+       * @return {StackingResult} value and offset information for each datapoint in each Dataset
        */
       export function computeStackInformation(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
-          valueAccessor: Accessor<number>): StackInformation {
+          valueAccessor: Accessor<number>): StackingResult {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
         var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
@@ -56,12 +56,12 @@ module Plottable {
       /**
        * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
        *
-       * @param {StackInformation} stackInformation The value and offset information for each datapoint in each dataset
+       * @param {StackingResult} stackInformation The value and offset information for each datapoint in each dataset
        * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
        * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
        * @return {[number, number]} The total extent
        */
-      export function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
+      export function computeStackExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
         var extents: number[] = [];
         stackInformation.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
           dataset.data().forEach((datum, index) => {

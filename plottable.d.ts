@@ -292,25 +292,25 @@ declare module Plottable {
                 value: number;
                 offset: number;
             };
-            type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+            type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
             /**
              * Computes the stacking information (value and offset) for each data point in each Dataset.
              *
              * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
              * @param {Accessor<any>} keyAccessor Accessor for the key of the data
              * @param {Accessor<number>} valueAccessor Accessor for the value of the data
-             * @return {StackInformation} value and offset information for each datapoint in each Dataset
+             * @return {StackingResult} value and offset information for each datapoint in each Dataset
              */
-            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackInformation;
+            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
             /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @param {StackInformation} stackInformation The value and offset information for each datapoint in each dataset
+             * @param {StackingResult} stackInformation The value and offset information for each datapoint in each dataset
              * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
-            function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
+            function computeStackExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of Datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified

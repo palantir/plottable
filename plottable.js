@@ -630,7 +630,7 @@ var Plottable;
              * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
              * @param {Accessor<any>} keyAccessor Accessor for the key of the data
              * @param {Accessor<number>} valueAccessor Accessor for the value of the data
-             * @return {StackInformation} value and offset information for each datapoint in each Dataset
+             * @return {StackingResult} value and offset information for each datapoint in each Dataset
              */
             function computeStackInformation(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
@@ -664,7 +664,7 @@ var Plottable;
             /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @param {StackInformation} stackInformation The value and offset information for each datapoint in each dataset
+             * @param {StackingResult} stackInformation The value and offset information for each datapoint in each dataset
              * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
@@ -7769,7 +7769,7 @@ var Plottable;
                 this._baselineValue = 0;
                 this.addClass("stacked-area-plot");
                 this.attr("fill-opacity", 1);
-                this._stackInformation = new Plottable.Utils.Map();
+                this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
@@ -7854,8 +7854,8 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackInformation = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackInformation, keyAccessor, filter);
+                this._stackingResult = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
@@ -7874,8 +7874,8 @@ var Plottable;
                 var normalizedXAccessor = function (datum, index, dataset) {
                     return Plottable.Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
                 };
-                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
-                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
+                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
+                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
                 return propertyToProjectors;
             };
@@ -7883,7 +7883,7 @@ var Plottable;
                 var pixelPoint = _super.prototype._pixelPoint.call(this, datum, index, dataset);
                 var xValue = this.x().accessor(datum, index, dataset);
                 var yValue = this.y().accessor(datum, index, dataset);
-                var scaledYValue = this.y().scale.scale(+yValue + this._stackInformation.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
+                var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
             };
             return StackedArea;
@@ -7919,7 +7919,7 @@ var Plottable;
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, orientation);
                 this.addClass("stacked-bar-plot");
-                this._stackInformation = new Plottable.Utils.Map();
+                this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
             StackedBar.prototype.x = function (x, xScale) {
@@ -7959,8 +7959,8 @@ var Plottable;
                 var normalizedKeyAccessor = function (datum, index, dataset) {
                     return Plottable.Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
                 };
-                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackInformation.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
-                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackInformation.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
+                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
+                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
                 var heightF = function (d, i, dataset) {
                     return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
                 };
@@ -7996,8 +7996,8 @@ var Plottable;
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackInformation = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackInformation, keyAccessor, filter);
+                this._stackingResult = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
             };
             return StackedBar;
         })(Plots.Bar);

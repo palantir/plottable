@@ -424,8 +424,8 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var ds1FirstColumnOffset = (<any> plot)._stackInformation.get(ds1).get("A").offset;
-      var ds2FirstColumnOffset = (<any> plot)._stackInformation.get(ds2).get("A").offset;
+      var ds1FirstColumnOffset = (<any> plot)._stackingResult.get(ds1).get("A").offset;
+      var ds2FirstColumnOffset = (<any> plot)._stackingResult.get(ds2).get("A").offset;
 
       assert.strictEqual(typeof ds1FirstColumnOffset, "number", "ds0 offset should be a number");
       assert.strictEqual(typeof ds2FirstColumnOffset, "number", "ds1 offset should be a number");
@@ -468,9 +468,9 @@ describe("Plots", () => {
       plot.attr("fill", "fill");
       plot.x((d: any) => d.x, xScale).y((d: any) => d.y, yScale);
 
-      var offset0 = (<any> plot)._stackInformation.get(ds1).get("A").offset;
-      var offset2 = (<any> plot)._stackInformation.get(ds3).get("A").offset;
-      var offset4 = (<any> plot)._stackInformation.get(ds5).get("A").offset;
+      var offset0 = (<any> plot)._stackingResult.get(ds1).get("A").offset;
+      var offset2 = (<any> plot)._stackingResult.get(ds3).get("A").offset;
+      var offset4 = (<any> plot)._stackingResult.get(ds5).get("A").offset;
 
       assert.strictEqual(offset0, 0,
         "Plot columns should start from offset 0 (at the very bottom)");

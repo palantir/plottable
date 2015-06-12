@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackInformation: Utils.Stacking.StackInformation;
+    private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
 
     /**
@@ -19,7 +19,7 @@ export module Plots {
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
       this.addClass("stacked-bar-plot");
-      this._stackInformation = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
+      this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
     }
 
@@ -69,10 +69,10 @@ export module Plots {
         return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
       };
       var getStart = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(this._stackInformation.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
+        primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
       var getEnd = (d: any, i: number, dataset: Dataset) =>
         primaryScale.scale(+primaryAccessor(d, i, dataset) +
-          this._stackInformation.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
+          this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
 
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
@@ -117,8 +117,8 @@ export module Plots {
       var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._stackInformation = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackInformation, keyAccessor, filter);
+      this._stackingResult = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
     }
   }
 }
