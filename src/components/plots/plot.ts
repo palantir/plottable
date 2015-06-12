@@ -210,20 +210,32 @@ module Plottable {
     }
 
     /**
-     * Returns whether the plot will be animated.
+     * Enables animation on the plot.
+     * 
+     * @returns {Plot} The calling Plot.
      */
-    public animated(): boolean;
-    /**
-     * Enables or disables animation.
-     */
-    public animated(willAnimate: boolean): Plot;
-    public animated(willAnimate?: boolean): any {
-      if (willAnimate == null) {
-        return this._animate;
-      }
-
-      this._animate = willAnimate;
+    public enableAnimation() {
+      this._animate = true;
       return this;
+    }
+
+    /**
+     * Disables animation on the plot.
+     * 
+     * @returns {Plot} The calling Plot.
+     */
+    public disableAnimation() {
+      this._animate = false;
+      return this;
+    }
+
+    /**
+     * Gets if the plot will animate
+     * 
+     * @returns {boolean} If the plot will animate.
+     */
+    public willAnimate() {
+      return this._animate;
     }
 
     public detach() {
