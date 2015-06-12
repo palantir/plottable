@@ -9,29 +9,33 @@ export module Drawers {
    */
   export type DrawStep = {
     attrToProjector: AttributeToProjector;
-    animator: Animators.Plot;
+    animator: Animator;
   };
 
+  /**
+   * A DrawStep that carries an AttributeToAppliedProjector map.
+   */
   export type AppliedDrawStep = {
     attrToAppliedProjector: AttributeToAppliedProjector;
-    animator: Animators.Plot;
+    animator: Animator;
   };
 
 }
 
   export class Drawer {
     private _renderArea: d3.Selection<void>;
+    protected _svgElementName: string;
     protected _className: string;
-    protected _dataset: Dataset;
+    private _dataset: Dataset;
 
     /**
-     * Constructs a Drawer
+     * A Drawer draws svg elements based on the input Dataset.
      *
      * @constructor
      * @param {Dataset} dataset The dataset associated with this Drawer
      */
     constructor(dataset: Dataset) {
-        this._dataset = dataset;
+      this._dataset = dataset;
     }
 
     /**
@@ -63,12 +67,21 @@ export module Drawers {
     }
 
     /**
-     * Enter new data to render area and creates binding
+     * Binds data to selection
      *
      * @param{any[]} data The data to be drawn
      */
-    protected _enterData(data: any[]) {
-      // no-op
+    private _bindSelectionData(data: any[]) {
+      var dataElements = this._selection().data(data);
+      dataElements.enter().append(this._svgElementName);
+      dataElements.exit().remove();
+      this._applyDefaultAttributes(dataElements);
+    }
+
+    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+      if (this._className != null) {
+        selection.classed(this._className, true);
+      }
     }
 
     /**
@@ -76,12 +89,18 @@ export module Drawers {
      *
      * @param{AppliedDrawStep} step The step, how data should be drawn.
      */
-    protected _drawStep(step: Drawers.AppliedDrawStep) {
-      // no-op
-    }
-
-    protected _numberOfAnimationIterations(data: any[]): number {
-      return data.length;
+    private _drawStep(step: Drawers.AppliedDrawStep) {
+      var selection = this._selection();
+      var colorAttributes = ["fill", "stroke"];
+      colorAttributes.forEach((colorAttribute) => {
+        if (step.attrToAppliedProjector[colorAttribute] != null) {
+          selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+        }
+      });
+      step.animator.animate(selection, step.attrToAppliedProjector);
+      if (this._className != null) {
+        this._selection().classed(this._className, true);
+      }
     }
 
     private _appliedProjectors(attrToProjector: AttributeToProjector): AttributeToAppliedProjector {
@@ -94,11 +113,17 @@ export module Drawers {
       return modifiedAttrToProjector;
     }
 
+    /**
+     * Calculates the total time it takes to use the input drawSteps to draw the input data
+     * 
+     * @param {any[]} data The data that would have been drawn
+     * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+     * @returns {number} The total time it takes to draw
+     */
     public totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]) {
-      var numberOfIterations = this._numberOfAnimationIterations(data);
       var delay = 0;
       drawSteps.forEach((drawStep, i) => {
-        delay += drawStep.animator.totalTime(numberOfIterations);
+        delay += drawStep.animator.totalTime(data.length);
       });
 
       return delay;
@@ -119,31 +144,33 @@ export module Drawers {
         };
       });
 
-      this._enterData(data);
-      var numberOfIterations = this._numberOfAnimationIterations(data);
+      this._bindSelectionData(data);
 
       var delay = 0;
       appliedDrawSteps.forEach((drawStep, i) => {
         Utils.Window.setTimeout(() => this._drawStep(drawStep), delay);
-        delay += drawStep.animator.totalTime(numberOfIterations);
+        delay += drawStep.animator.totalTime(data.length);
       });
 
       return this;
+    }
+
+    private _selection() {
+      return this.renderArea().selectAll(this.selector());
     }
 
     /**
      * Returns the CSS selector for this Drawer's visual elements.
      */
     public selector(): string {
-      throw new Error("The base Drawer class has no elements to select");
+      return this._svgElementName;
     }
 
     /**
      * Returns the D3 selection corresponding to the datum with the specified index.
      */
     public selectionForIndex(index: number) {
-      var allSelections = this.renderArea().selectAll(this.selector());
-      return d3.select(allSelections[0][index]);
+      return d3.select(this._selection()[0][index]);
     }
 
   }

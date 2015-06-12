@@ -8,7 +8,7 @@
 /// <reference path="utils/colorUtils.ts" />
 /// <reference path="utils/arrayUtils.ts" />
 /// <reference path="utils/callbackSet.ts" />
-/// <reference path="utils/stackedUtils.ts" />
+/// <reference path="utils/stackingUtils.ts" />
 /// <reference path="utils/windowUtils.ts" />
 /// <reference path="utils/clientToSVGTranslator.ts" />
 
@@ -36,7 +36,6 @@
 /// <reference path="drawers/drawer.ts" />
 /// <reference path="drawers/lineDrawer.ts" />
 /// <reference path="drawers/areaDrawer.ts" />
-/// <reference path="drawers/elementDrawer.ts" />
 /// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
@@ -69,9 +68,9 @@
 /// <reference path="components/plots/stackedAreaPlot.ts" />
 /// <reference path="components/plots/stackedBarPlot.ts" />
 
-/// <reference path="core/animator.ts" />
+/// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
-/// <reference path="animators/baseAnimator.ts" />
+/// <reference path="animators/easingAnimator.ts" />
 
 /// <reference path="dispatchers/dispatcher.ts" />
 /// <reference path="dispatchers/mouseDispatcher.ts" />

@@ -31,7 +31,7 @@ export module Dispatchers {
     constructor() {
       super();
 
-      this._event2Callback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
+      this._eventToCallback["keydown"] = (e: KeyboardEvent) => this._processKeydown(e);
 
       this._keydownCallbacks = new Utils.CallbackSet<KeyCallback>();
       this._callbacks = [this._keydownCallbacks];
@@ -44,7 +44,7 @@ export module Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public onKeyDown(callback: KeyCallback): Key {
-      this.setCallback(this._keydownCallbacks, callback);
+      this._setCallback(this._keydownCallbacks, callback);
       return this;
     }
 
@@ -55,7 +55,7 @@ export module Dispatchers {
      * @return {Dispatchers.Key} The calling Key Dispatcher.
      */
     public offKeyDown(callback: KeyCallback): Key {
-      this.unsetCallback(this._keydownCallbacks, callback);
+      this._unsetCallback(this._keydownCallbacks, callback);
       return this;
     }
 

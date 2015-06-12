@@ -20,7 +20,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch}
      */
     public static getDispatcher(elem: SVGElement): Dispatchers.Touch {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var dispatcher: Touch = (<any> svg)[Touch._DISPATCHER_KEY];
       if (dispatcher == null) {
@@ -47,10 +47,10 @@ export module Dispatchers {
       this._cancelCallbacks = new Utils.CallbackSet<TouchCallback>();
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
-      this._event2Callback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
-      this._event2Callback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
-      this._event2Callback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
-      this._event2Callback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
+      this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
+      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
+      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
+      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
     }
 
     /**
@@ -60,7 +60,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchStart(callback: TouchCallback): Dispatchers.Touch {
-      this.setCallback(this._startCallbacks, callback);
+      this._setCallback(this._startCallbacks, callback);
       return this;
     }
 
@@ -71,7 +71,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchStart(callback: TouchCallback): Dispatchers.Touch {
-      this.unsetCallback(this._startCallbacks, callback);
+      this._unsetCallback(this._startCallbacks, callback);
       return this;
     }
 
@@ -82,7 +82,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchMove(callback: TouchCallback): Dispatchers.Touch {
-      this.setCallback(this._moveCallbacks, callback);
+      this._setCallback(this._moveCallbacks, callback);
       return this;
     }
 
@@ -93,7 +93,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchMove(callback: TouchCallback): Dispatchers.Touch {
-      this.unsetCallback(this._moveCallbacks, callback);
+      this._unsetCallback(this._moveCallbacks, callback);
       return this;
     }
 
@@ -104,7 +104,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchEnd(callback: TouchCallback): Dispatchers.Touch {
-      this.setCallback(this._endCallbacks, callback);
+      this._setCallback(this._endCallbacks, callback);
       return this;
     }
 
@@ -115,7 +115,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchEnd(callback: TouchCallback): Dispatchers.Touch {
-      this.unsetCallback(this._endCallbacks, callback);
+      this._unsetCallback(this._endCallbacks, callback);
       return this;
     }
 
@@ -126,7 +126,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public onTouchCancel(callback: TouchCallback): Dispatchers.Touch {
-      this.setCallback(this._cancelCallbacks, callback);
+      this._setCallback(this._cancelCallbacks, callback);
       return this;
     }
 
@@ -137,7 +137,7 @@ export module Dispatchers {
      * @return {Dispatchers.Touch} The calling Touch Dispatcher.
      */
     public offTouchCancel(callback: TouchCallback): Dispatchers.Touch {
-      this.unsetCallback(this._cancelCallbacks, callback);
+      this._unsetCallback(this._cancelCallbacks, callback);
       return this;
     }
 

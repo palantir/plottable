@@ -41,7 +41,18 @@ declare module Plottable {
              * Numbers represented as strings do not pass this function
              */
             function isValidNumber(n: any): boolean;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) separeted by step
+             */
             function range(start: number, stop: number, step?: number): number[];
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
+             */
             function distanceSquared(p1: Point, p2: Point): number;
         }
     }
@@ -55,45 +66,10 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             set(key: K, value: V): Map<K, V>;
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             get(key: K): V;
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             has(key: K): boolean;
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             delete(key: K): boolean;
         }
     }
@@ -112,13 +88,6 @@ declare module Plottable {
             add(value: T): Set<T>;
             delete(value: T): boolean;
             has(value: T): boolean;
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
         }
     }
@@ -132,19 +101,78 @@ declare module Plottable {
              * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element: d3.Selection<any>): SVGRect;
-            var POLYFILL_TIMEOUT_MSEC: number;
-            function requestAnimationFramePolyfill(fn: () => any): void;
-            function isSelectionRemovedFromSVG(selection: d3.Selection<any>): boolean;
-            function getElementWidth(elem: Element): number;
-            function getElementHeight(elem: Element): number;
-            function getSVGPixelWidth(svg: d3.Selection<void>): number;
-            function translate(s: d3.Selection<any>): d3.Transform;
-            function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
-            function boxesOverlap(boxA: ClientRect, boxB: ClientRect): boolean;
-            function boxIsInside(inner: ClientRect, outer: ClientRect): boolean;
-            function getBoundingSVG(elem: SVGElement): SVGElement;
-            function getUniqueClipPathId(): string;
+            function elementBBox(element: d3.Selection<any>): SVGRect;
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
+            var SCREEN_REFRESH_RATE_MILLISECONDS: number;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback: () => void): void;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
+            function elementWidth(element: Element): number;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
+            function elementHeight(element: Element): number;
+            /**
+             * Retrieves the number array representing the translation for the selection
+             *
+             * @param {d3.Selection<any>} selection The selection to query
+             * @returns {[number, number]} The number array representing the translation
+             */
+            function translate(selection: d3.Selection<any>): [number, number];
+            /**
+             * Translates the given selection by the input x / y pixel amounts.
+             *
+             * @param {d3.Selection<any>} selection The selection to translate
+             * @param {number} x The amount to translate in the x direction
+             * @param {number} y The amount to translate in the y direction
+             * @returns {d3.Selection<any>} The input selection
+             */
+            function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect): boolean;
+            /**
+             * Returns true if and only if innerClientRect is inside outerClientRect.
+             *
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+             */
+            function clientRectInside(innerClientRect: ClientRect, outerClientRect: ClientRect): boolean;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element: SVGElement): SVGElement;
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
+            function generateUniqueClipPathId(): string;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
@@ -174,7 +202,19 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color: string, factor: number): string;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
     }
@@ -234,26 +274,37 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        class Stacked {
+        module Stacking {
+            type StackedDatum = {
+                value: number;
+                offset: number;
+            };
+            type StackingResult = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
             /**
-             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-             * for drawing purposes.
+             * Computes the StackingResult (value and offset) for each data point in each Dataset.
              *
-             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
+             * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data
+             * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+             * @return {StackingResult} value and offset for each datapoint in each Dataset
              */
-            static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, d3.Map<number>>;
+            function stack(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackingResult;
             /**
-             * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that stacked bits have to be added together when calculating the extent
+             * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @return {[number]} The extent that spans all the stacked data
+             * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
+             * @return {[number, number]} The total extent
              */
-            static computeStackExtent(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>, stackOffsets: Utils.Map<Dataset, d3.Map<number>>, filter: Accessor<boolean>): number[];
+            function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
-             * Given an array of datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each dataset.
+             * Normalizes a key used for stacking
+             *
+             * @param {any} key The key to be normalized
+             * @return {string} The stringified key
              */
-            static domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            function normalizeKey(key: any): string;
         }
     }
 }
@@ -277,17 +328,6 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject<T>(oldObject: {
-                [key: string]: T;
-            }): {
-                [key: string]: T;
-            };
         }
     }
 }
@@ -296,6 +336,10 @@ declare module Plottable {
 declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
+            /**
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+             */
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
             constructor(svg: SVGElement);
             /**
@@ -435,8 +479,8 @@ declare module Plottable {
             var ANIMATION_FRAME: string;
             var TIMEOUT: string;
         }
-        var _renderPolicy: RenderPolicies.RenderPolicy;
-        function setRenderPolicy(policy: string): void;
+        function renderPolicy(): RenderPolicies.RenderPolicy;
+        function renderPolicy(renderPolicy: string): void;
         /**
          * Enqueues the Component for rendering.
          *
@@ -467,24 +511,41 @@ declare module Plottable {
         (datum: any, index: number, dataset: Dataset): T;
     }
     /**
-     * Retrieves scaled datum property.
+     * Retrieves a scaled datum property.
+     * Essentially passes the result of an Accessor through a Scale.
      */
     type Projector = (datum: any, index: number, dataset: Dataset) => any;
-    type AppliedProjector = (datum: any, index: number) => any;
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
      */
     type AttributeToProjector = {
-        [attrToSet: string]: Projector;
+        [attr: string]: Projector;
     };
+    /**
+     * A function that generates attribute values from the datum and index.
+     * Essentially a Projector with a particular Dataset rolled in.
+     */
+    type AppliedProjector = (datum: any, index: number) => any;
+    /**
+     * A mapping from attributes to the AppliedProjectors used to generate them.
+     */
     type AttributeToAppliedProjector = {
-        [attrToSet: string]: AppliedProjector;
+        [attr: string]: AppliedProjector;
     };
+    /**
+     * Space request used during layout negotiation.
+     *
+     * @member {number} minWidth The minimum acceptable width given the offered space.
+     * @member {number} minHeight the minimum acceptable height given the offered space.
+     */
     type SpaceRequest = {
         minWidth: number;
         minHeight: number;
     };
+    /**
+     * Min and max values for a particular property.
+     */
     type Range = {
         min: number;
         max: number;
@@ -590,11 +651,6 @@ declare module Plottable {
          * @returns {Formatter} A formatter for time/date values.
          */
         function time(specifier: string): Formatter;
-        /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
         /**
          * Creates a formatter for relative dates.
          *
@@ -732,14 +788,14 @@ declare module Plottable {
          * Adds an IncludedValuesProvider to the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         addIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
         /**
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
     }
@@ -1051,6 +1107,11 @@ declare module Plottable {
             invert(value: number): Date;
             defaultTicks(): Date[];
             protected _niceDomain(domain: Date[]): Date[];
+            /**
+             * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+             * If the provided TimeInterval is incorrect, the default is d3.time.year
+             */
+            static timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
         }
     }
 }
@@ -1065,32 +1126,16 @@ declare module Plottable {
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @constructor
-             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-             *   ("#FFFFFF") or keywords ("white").
              * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
-            constructor(colorRange?: string[], scaleType?: string);
+            constructor(scaleType?: string);
             extentOfValues(values: number[]): number[];
-            /**
-             * Gets the color range.
-             *
-             * @returns {string[]}
-             */
-            colorRange(): string[];
-            /**
-             * Sets the color range.
-             *
-             * @param {string[]} colorRange
-             * @returns {InterpolatedColor} The calling InterpolatedColor Scale.
-             */
-            colorRange(colorRange: string[]): InterpolatedColor;
             autoDomain(): InterpolatedColor;
             scale(value: number): string;
             protected _getDomain(): number[];
             protected _setBackingScaleDomain(values: number[]): void;
             protected _getRange(): string[];
-            protected _setRange(values: string[]): void;
+            protected _setRange(range: string[]): void;
         }
     }
 }
@@ -1137,18 +1182,21 @@ declare module Plottable {
          */
         type DrawStep = {
             attrToProjector: AttributeToProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
+        /**
+         * A DrawStep that carries an AttributeToAppliedProjector map.
+         */
         type AppliedDrawStep = {
             attrToAppliedProjector: AttributeToAppliedProjector;
-            animator: Animators.Plot;
+            animator: Animator;
         };
     }
     class Drawer {
+        protected _svgElementName: string;
         protected _className: string;
-        protected _dataset: Dataset;
         /**
-         * Constructs a Drawer
+         * A Drawer draws svg elements based on the input Dataset.
          *
          * @constructor
          * @param {Dataset} dataset The dataset associated with this Drawer
@@ -1169,19 +1217,14 @@ declare module Plottable {
          * Removes the Drawer and its renderArea
          */
         remove(): void;
+        protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         /**
-         * Enter new data to render area and creates binding
+         * Calculates the total time it takes to use the input drawSteps to draw the input data
          *
-         * @param{any[]} data The data to be drawn
+         * @param {any[]} data The data that would have been drawn
+         * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+         * @returns {number} The total time it takes to draw
          */
-        protected _enterData(data: any[]): void;
-        /**
-         * Draws data using one step
-         *
-         * @param{AppliedDrawStep} step The step, how data should be drawn.
-         */
-        protected _drawStep(step: Drawers.AppliedDrawStep): void;
-        protected _numberOfAnimationIterations(data: any[]): number;
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata
@@ -1205,13 +1248,8 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Line extends Drawer {
-            static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
-            protected _numberOfAnimationIterations(data: any[]): number;
-            protected _drawStep(step: AppliedDrawStep): void;
-            selector(): string;
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
             selectionForIndex(index: number): d3.Selection<void>;
         }
     }
@@ -1220,13 +1258,10 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Area extends Line {
-            static PATH_CLASS: string;
-            protected _enterData(data: any[]): void;
-            renderArea(): d3.Selection<void>;
-            renderArea(area: d3.Selection<void>): Drawer;
-            protected _drawStep(step: AppliedDrawStep): void;
-            selector(): string;
+        class Area extends Drawer {
+            constructor(dataset: Dataset);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+            selectionForIndex(index: number): d3.Selection<void>;
         }
     }
 }
@@ -1234,19 +1269,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Element extends Drawer {
-            protected _svgElement: string;
-            protected _drawStep(step: AppliedDrawStep): void;
-            protected _enterData(data: any[]): void;
-            selector(): string;
-        }
-    }
-}
-
-
-declare module Plottable {
-    module Drawers {
-        class Rectangle extends Element {
+        class Rectangle extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -1255,7 +1278,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Arc extends Element {
+        class Arc extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -1264,7 +1287,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Drawers {
-        class Symbol extends Element {
+        class Symbol extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -1287,6 +1310,7 @@ declare module Plottable {
         protected _clipPathEnabled: boolean;
         protected _isSetup: boolean;
         protected _isAnchored: boolean;
+        constructor();
         /**
          * Attaches the Component as a child of a given d3 Selection.
          *
@@ -1316,6 +1340,13 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes and sets the size, position, and alignment of the Component from the specified values.
@@ -1328,7 +1359,7 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Component;
-        protected _getSize(availableWidth: number, availableHeight: number): {
+        protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
             width: number;
             height: number;
         };
@@ -1338,6 +1369,9 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         render(): Component;
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         renderImmediately(): Component;
         /**
          * Causes the Component to re-layout and render.
@@ -1382,15 +1416,21 @@ declare module Plottable {
          *
          * @param {string} cssClass The CSS class to check for.
          */
-        classed(cssClass: string): boolean;
+        hasClass(cssClass: string): boolean;
         /**
-         * Adds/removes a given CSS class to/from the Component.
+         * Adds a given CSS class to the Component.
          *
-         * @param {string} cssClass The CSS class to add or remove.
-         * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+         * @param {string} cssClass The CSS class to add.
          * @returns {Component} The calling Component.
          */
-        classed(cssClass: string, addClass: boolean): Component;
+        addClass(cssClass: string): Component;
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        removeClass(cssClass: string): Component;
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
          * Returns false by default on the base Component class.
@@ -1424,7 +1464,16 @@ declare module Plottable {
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
+        /**
+         * Gets the parent ComponentContainer for this Component.
+         */
         parent(): ComponentContainer;
+        /**
+         * Sets the parent ComponentContainer for this Component.
+         * An error will be thrown if the parent does not contain this Component.
+         * Adding a Component to a ComponentContainer should be done
+         * using the appropriate method on the ComponentContainer.
+         */
         parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects all listeners.
@@ -1518,7 +1567,7 @@ declare module Plottable {
              * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
-             * Components added later will be rendered on top of Components already in the Group.
+             * Components added later will be rendered above Components already in the Group.
              *
              * @constructor
              * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -1531,7 +1580,7 @@ declare module Plottable {
             has(component: Component): boolean;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Group;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -1541,6 +1590,10 @@ declare module Plottable {
              * @return {Component[]} The Components in this Group.
              */
             components(): Component[];
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered above Components already in the Group.
+             */
             append(component: Component): Group;
             protected _remove(component: Component): boolean;
         }
@@ -1575,9 +1628,8 @@ declare module Plottable {
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        constructor(scale: Scale<D, number>, orientation: string, formatter?: (d: any) => string);
+        constructor(scale: Scale<D, number>, orientation: string);
         destroy(): void;
         protected _isHorizontal(): boolean;
         protected _computeWidth(): number;
@@ -1646,18 +1698,18 @@ declare module Plottable {
          */
         tickLabelPadding(padding: number): Axis<D>;
         /**
-         * Gets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Gets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          */
-        gutter(): number;
+        margin(): number;
         /**
-         * Sets the size of the gutter in pixels.
-         * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+         * Sets the margin in pixels.
+         * The margin is the amount of space between the tick labels and the outer edge of the Axis.
          *
          * @param {number} size
          * @returns {Axis} The calling Axis.
          */
-        gutter(size: number): Axis<D>;
+        margin(size: number): Axis<D>;
         /**
          * Gets the orientation of the Axis.
          */
@@ -1754,7 +1806,7 @@ declare module Plottable {
             orientation(): string;
             orientation(orientation: string): Time;
             protected _computeHeight(): number;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -1777,9 +1829,8 @@ declare module Plottable {
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            constructor(scale: QuantitativeScale<number>, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: QuantitativeScale<number>, orientation: string);
             protected _setup(): void;
             protected _computeWidth(): number;
             protected _computeHeight(): number;
@@ -1816,9 +1867,8 @@ declare module Plottable {
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
-            constructor(scale: Scales.Category, orientation: string, formatter?: (d: any) => string);
+            constructor(scale: Scales.Category, orientation: string);
             protected _setup(): void;
             protected _rescale(): Component;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
@@ -1946,10 +1996,10 @@ declare module Plottable {
             /**
              * Sets the maximum number of entries perrow.
              *
-             * @param {number} numEntries
+             * @param {number} maxEntriesPerRow
              * @returns {Legend} The calling Legend.
              */
-            maxEntriesPerRow(numEntries: number): Legend;
+            maxEntriesPerRow(maxEntriesPerRow: number): Legend;
             /**
              * Gets the current comparator for the Legend's entries.
              *
@@ -1989,20 +2039,18 @@ declare module Plottable {
             entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
-             * Gets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Gets the function determining the symbols of the Legend.
              *
              * @returns {(datum: any, index: number) => symbolFactory}
              */
-            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
+            symbol(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Sets the function determining the symbols of the Legend.
              *
-             * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
+             * @param {(datum: any, index: number) => SymbolFactory} symbol
              * @returns {Legend} The calling Legend
              */
-            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
@@ -2026,10 +2074,8 @@ declare module Plottable {
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
-            constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation?: string, formatter?: (d: any) => string);
+            constructor(interpolatedColorScale: Scales.InterpolatedColor);
             destroy(): void;
             /**
              * Gets the Formatter for the labels.
@@ -2206,7 +2252,7 @@ declare module Plottable {
             protected _box: d3.Selection<void>;
             constructor();
             protected _setup(): void;
-            protected _getSize(availableWidth: number, availableHeight: number): {
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
                 width: number;
                 height: number;
             };
@@ -2258,14 +2304,13 @@ declare module Plottable {
         }
     }
     class Plot extends Component {
-        protected static ANIMATION_MAX_DURATION: number;
-        protected _dataChanged: boolean;
+        protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
-        protected _animate: boolean;
-        protected _animateOnNextRender: boolean;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         constructor();
@@ -2280,8 +2325,8 @@ declare module Plottable {
          */
         addDataset(dataset: Dataset): Plot;
         protected _createNodesForDataset(dataset: Dataset): Drawer;
-        protected _getDrawer(dataset: Dataset): Drawer;
-        protected _getAnimator(key: string): Animators.Plot;
+        protected _createDrawer(dataset: Dataset): Drawer;
+        protected _getAnimator(key: string): Animator;
         protected _onDatasetUpdate(): void;
         /**
          * Gets the AccessorScaleBinding for a particular attribute.
@@ -2332,17 +2377,17 @@ declare module Plottable {
         /**
          * Get the Animator associated with the specified Animator key.
          *
-         * @return {Animators.Plot}
+         * @return {Animator}
          */
-        animator(animatorKey: string): Animators.Plot;
+        animator(animatorKey: string): Animator;
         /**
          * Set the Animator associated with the specified Animator key.
          *
          * @param {string} animatorKey
-         * @param {Animators.Plot} animator
+         * @param {Animator} animator
          * @returns {Plot} The calling Plot.
          */
-        animator(animatorKey: string, animator: Animators.Plot): Plot;
+        animator(animatorKey: string, animator: Animator): Plot;
         /**
          * Removes a Dataset from the Plot.
          *
@@ -2364,7 +2409,7 @@ declare module Plottable {
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+        selections(datasets?: Dataset[]): d3.Selection<any>;
         /**
          * Gets the Entities associated with the specified Datasets.
          *
@@ -2380,12 +2425,13 @@ declare module Plottable {
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
-        protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+        protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
         protected static _scaledAccessor<D, R>(binding: Plots.AccessorScaleBinding<D, R>): Accessor<any>;
         protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point;
+        protected _animateOnNextRender(): boolean;
     }
 }
 
@@ -2401,7 +2447,7 @@ declare module Plottable {
             addDataset(dataset: Dataset): Pie;
             removeDataset(dataset: Dataset): Pie;
             protected _onDatasetUpdate(): void;
-            protected _getDrawer(dataset: Dataset): Drawers.Arc;
+            protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];
             /**
              * Gets the AccessorScaleBinding for the sector value.
@@ -2531,20 +2577,20 @@ declare module Plottable {
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
         /**
-         * Gets the automatic domain adjustment setting for visible points.
+         * Gets the automatic domain adjustment mode for visible points.
          */
-        autorange(): string;
+        autorangeMode(): string;
         /**
-         * Sets the automatic domain adjustment for visible points to operate against the X Scale, Y Scale, or neither.
+         * Sets the automatic domain adjustment mode for visible points to operate against the X Scale, Y Scale, or neither.
          * If "x" or "y" is specified the adjustment is immediately performed.
          *
-         * @param {string} scaleName One of "x"/"y"/"none".
+         * @param {string} autorangeMode One of "x"/"y"/"none".
          *   "x" will adjust the x Scale in relation to changes in the y domain.
          *   "y" will adjust the y Scale in relation to changes in the x domain.
          *   "none" means neither Scale will change automatically.
          * @returns {XYPlot} The calling XYPlot.
          */
-        autorange(scaleName: string): XYPlot<X, Y>;
+        autorangeMode(autorangeMode: string): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts the domains of both X and Y scales to show all data.
@@ -2575,9 +2621,9 @@ declare module Plottable {
              * @param {Scale.Scale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             /**
@@ -2659,21 +2705,47 @@ declare module Plottable {
     module Plots {
         class Scatter<X, Y> extends XYPlot<X, Y> {
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Symbol;
+            protected _createDrawer(dataset: Dataset): Drawers.Symbol;
+            /**
+             * Gets the AccessorScaleBinding for the size property of the plot.
+             * The size property corresponds to the area of the symbol.
+             */
             size<S>(): AccessorScaleBinding<S, number>;
+            /**
+             * Sets the size property to a constant number or the result of an Accessor<number>.
+             *
+             * @param {number|Accessor<number>} size
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+            /**
+             * Sets the size property to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {S|Accessor<S>} sectorValue
+             * @param {Scale<S, number>} scale
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for the symbol property of the plot.
+             * The symbol property corresponds to how the symbol will be drawn.
+             */
             symbol(): AccessorScaleBinding<any, any>;
+            /**
+             * Sets the symbol property to an Accessor<SymbolFactory>.
+             *
+             * @param {Accessor<SymbolFactory>} symbol
+             * @returns {Plots.Scatter} The calling Scatter Plot.
+             */
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2687,9 +2759,9 @@ declare module Plottable {
             static ORIENTATION_HORIZONTAL: string;
             protected _isVertical: boolean;
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
@@ -2705,7 +2777,7 @@ declare module Plottable {
              * @return "vertical" | "horizontal"
              */
             orientation(): string;
-            protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
              * Gets the baseline value.
@@ -2738,14 +2810,14 @@ declare module Plottable {
             /**
              * Gets the Formatter for the labels.
              */
-            labelsFormatter(): Formatter;
+            labelFormatter(): Formatter;
             /**
              * Sets the Formatter for the labels.
              *
              * @param {Formatter} formatter
              * @returns {Bar} The calling Bar Plot.
              */
-            labelsFormatter(formatter: Formatter): Bar<X, Y>;
+            labelFormatter(formatter: Formatter): Bar<X, Y>;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _removeDatasetNodes(dataset: Dataset): void;
             /**
@@ -2759,7 +2831,7 @@ declare module Plottable {
              * @returns {PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
              */
             entityNearest(queryPoint: Point): PlotEntity;
-            protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
@@ -2785,7 +2857,7 @@ declare module Plottable {
             protected _additionalPaint(time: number): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
              * Computes the barPixelWidth of all the bars in the plot.
@@ -2811,16 +2883,16 @@ declare module Plottable {
     module Plots {
         class Line<X> extends XYPlot<X, number> {
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getDrawer(dataset: Dataset): Drawers.Line;
+            protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
              * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
@@ -2844,8 +2916,6 @@ declare module Plottable {
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
             protected _setup(): void;
@@ -2868,12 +2938,12 @@ declare module Plottable {
             addDataset(dataset: Dataset): Area<X>;
             protected _removeDatasetNodes(dataset: Dataset): void;
             protected _additionalPaint(): void;
-            protected _getDrawer(dataset: Dataset): Drawers.Area;
+            protected _createDrawer(dataset: Dataset): Drawers.Area;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _updateYScale(): void;
             protected _getResetYFunction(): Accessor<any>;
             protected _propertyProjectors(): AttributeToProjector;
-            getAllSelections(datasets?: Dataset[]): d3.Selection<any>;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _constructAreaProjector(xProjector: Projector, yProjector: Projector, y0Projector: Projector): (datum: any[], index: number, dataset: Dataset) => string;
         }
     }
@@ -2889,13 +2959,11 @@ declare module Plottable {
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             constructor(orientation?: string);
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
@@ -2908,11 +2976,9 @@ declare module Plottable {
         class StackedArea<X> extends Area<X> {
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             constructor();
-            protected _getAnimator(key: string): Animators.Plot;
+            protected _getAnimator(key: string): Animator;
             protected _setup(): void;
             x(): Plots.AccessorScaleBinding<X, number>;
             x(x: number | Accessor<number>): StackedArea<X>;
@@ -2953,7 +3019,7 @@ declare module Plottable {
             y(y: number | Accessor<number>): StackedBar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
@@ -2964,30 +3030,25 @@ declare module Plottable {
 
 
 declare module Plottable {
-    module Animators {
-        interface Plot {
-            /**
-             * Applies the supplied attributes to a d3.Selection with some animation.
-             *
-             * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
-             * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
-             *     AppliedProjectors that we will use to set attributes on the selection.
-             * @return {any} Animators should return the selection or
-             *     transition object so that plots may chain the transitions between
-             *     animators.
-             */
-            animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
-            /**
-             * Given the number of elements, return the total time the animation requires
-             *
-             * @param {number} numberofIterations The number of elements that will be drawn
-             * @returns {number}
-             */
-            totalTime(numberOfIterations: number): number;
-        }
-        type PlotAnimatorMap = {
-            [animatorKey: string]: Plot;
-        };
+    interface Animator {
+        /**
+         * Applies the supplied attributes to a d3.Selection with some animation.
+         *
+         * @param {d3.Selection} selection The update selection or transition selection that we wish to animate.
+         * @param {AttributeToAppliedProjector} attrToAppliedProjector The set of
+         *     AppliedProjectors that we will use to set attributes on the selection.
+         * @return {any} Animators should return the selection or
+         *     transition object so that plots may chain the transitions between
+         *     animators.
+         */
+        animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any> | d3.Transition<any>;
+        /**
+         * Given the number of elements, return the total time the animation requires
+         *
+         * @param {number} numberofIterations The number of elements that will be drawn
+         * @returns {number}
+         */
+        totalTime(numberOfIterations: number): number;
     }
 }
 
@@ -2998,7 +3059,7 @@ declare module Plottable {
          * An animator implementation with no animation. The attributes are
          * immediately set on the selection.
          */
-        class Null implements Animators.Plot {
+        class Null implements Animator {
             totalTime(selection: any): number;
             animate(selection: d3.Selection<any>, attrToAppliedProjector: AttributeToAppliedProjector): d3.Selection<any>;
         }
@@ -3009,41 +3070,9 @@ declare module Plottable {
 declare module Plottable {
     module Animators {
         /**
-         * The base animator implementation with easing, duration, and delay.
-         *
-         * The delay between animations can be configured with iterativeDelay().
-         * This will be affected if the maxTotalDuration() is used such that the entire animation
-         * fits within the timeframe
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then iterativeDelay
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(iterativeDelay(),
-         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+         * An Animator with easing and configurable durations and delays.
          */
-        class Base implements Animators.Plot {
-            /**
-             * The default starting delay of the animation in milliseconds
-             */
-            static DEFAULT_START_DELAY_MILLISECONDS: number;
-            /**
-             * The default duration of one animation step in milliseconds
-             */
-            static DEFAULT_STEP_DURATION_MILLISECONDS: number;
-            /**
-             * The default maximum start delay between each step of an animation
-             */
-            static DEFAULT_ITERATIVE_DELAY_MILLISECONDS: number;
-            /**
-             * The default maximum total animation duration
-             */
-            static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS: number;
-            /**
-             * The default easing of the animation
-             */
-            static DEFAULT_EASING: string;
+        class Easing implements Animator {
             /**
              * Constructs the default animator
              *
@@ -3062,9 +3091,9 @@ declare module Plottable {
              * Sets the start delay of the animation in milliseconds.
              *
              * @param {number} startDelay The start delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            startDelay(startDelay: number): Base;
+            startDelay(startDelay: number): Easing;
             /**
              * Gets the duration of one animation step in milliseconds.
              *
@@ -3075,24 +3104,28 @@ declare module Plottable {
              * Sets the duration of one animation step in milliseconds.
              *
              * @param {number} stepDuration The duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            stepDuration(stepDuration: number): Base;
+            stepDuration(stepDuration: number): Easing;
             /**
              * Gets the maximum start delay between animation steps in milliseconds.
              *
              * @returns {number} The current maximum iterative delay.
              */
-            iterativeDelay(): number;
+            stepDelay(): number;
             /**
              * Sets the maximum start delay between animation steps in milliseconds.
              *
-             * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @param {number} stepDelay The maximum iterative delay in milliseconds.
+             * @returns {Easing} The calling Easing Animator.
              */
-            iterativeDelay(iterativeDelay: number): Base;
+            stepDelay(stepDelay: number): Easing;
             /**
              * Gets the maximum total animation duration constraint in milliseconds.
+             *
+             * If the animation time would exceed the specified time, the duration of each step
+             * and the delay between each step will be reduced until the animation fits within
+             * the specified time.
              *
              * @returns {number} The current maximum total animation duration.
              */
@@ -3100,23 +3133,27 @@ declare module Plottable {
             /**
              * Sets the maximum total animation duration constraint in miliseconds.
              *
+             * If the animation time would exceed the specified time, the duration of each step
+             * and the delay between each step will be reduced until the animation fits within
+             * the specified time.
+             *
              * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-             * @returns {Base} The calling Base Animator.
+             * @returns {Easing} The calling Easing Animator.
              */
-            maxTotalDuration(maxTotalDuration: number): Base;
+            maxTotalDuration(maxTotalDuration: number): Easing;
             /**
-             * Gets the current easing of the animation.
+             * Gets the current easing mode of the animation.
              *
              * @returns {string} the current easing mode.
              */
-            easing(): string;
+            easingMode(): string;
             /**
              * Sets the easing mode of the animation.
              *
-             * @param {string} easing The desired easing mode.
-             * @returns {Base} The calling Base Animator.
+             * @param {string} easingMode The desired easing mode.
+             * @returns {Easing} The calling Easing Animator.
              */
-            easing(easing: string): Base;
+            easingMode(easingMode: string): Easing;
         }
     }
 }
@@ -3124,12 +3161,12 @@ declare module Plottable {
 
 declare module Plottable {
     class Dispatcher {
-        protected _event2Callback: {
+        protected _eventToCallback: {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];
-        protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 
@@ -3228,10 +3265,7 @@ declare module Plottable {
              *
              * @return {Point}
              */
-            lastMousePosition(): {
-                x: number;
-                y: number;
-            };
+            lastMousePosition(): Point;
         }
     }
 }
@@ -3457,7 +3491,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            onKey(keyCode: number, callback: KeyCallback): Key;
+            onKeyPress(keyCode: number, callback: KeyCallback): Key;
             /**
              * Removes a callback that would be called when the key with the given keyCode is
              * pressed and the user is moused over the Component.
@@ -3466,7 +3500,7 @@ declare module Plottable {
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            offKey(keyCode: number, callback: KeyCallback): Key;
+            offKeyPress(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }
@@ -3529,10 +3563,6 @@ declare module Plottable {
     module Interactions {
         class PanZoom extends Interaction {
             /**
-             * The number of pixels occupied in a line.
-             */
-            static PIXELS_PER_LINE: number;
-            /**
              * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
              * in response to the user panning or zooming.
              *
@@ -3564,7 +3594,7 @@ declare module Plottable {
              *
              * @return {boolean}
              */
-            constrainToComponent(): boolean;
+            constrainedToComponent(): boolean;
             /**
              * Sets whether the Drag Interaction constrains Points passed to its
              * callbacks to lie inside its Component.
@@ -3576,7 +3606,7 @@ declare module Plottable {
              * @param {boolean}
              * @return {Interactions.Drag} The calling Drag Interaction.
              */
-            constrainToComponent(constrain: boolean): Drag;
+            constrainedToComponent(constrainedToComponent: boolean): Drag;
             /**
              * Adds a callback to be called when dragging starts.
              *

@@ -4,47 +4,35 @@ module Plottable {
 export module Animators {
 
   /**
-   * The base animator implementation with easing, duration, and delay.
-   *
-   * The delay between animations can be configured with iterativeDelay().
-   * This will be affected if the maxTotalDuration() is used such that the entire animation
-   * fits within the timeframe
-   *
-   * The maximum total animation duration can be configured with maxTotalDuration.
-   * It is guaranteed the animation will not exceed this value,
-   * by first reducing stepDuration, then iterativeDelay
-   *
-   * The actual interval delay is calculated by following formula:
-   * min(iterativeDelay(),
-   *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+   * An Animator with easing and configurable durations and delays.
    */
-  export class Base implements Animators.Plot {
+  export class Easing implements Animator {
     /**
      * The default starting delay of the animation in milliseconds
      */
-    public static DEFAULT_START_DELAY_MILLISECONDS = 0;
+    private static _DEFAULT_START_DELAY_MILLISECONDS = 0;
     /**
      * The default duration of one animation step in milliseconds
      */
-    public static DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+    private static _DEFAULT_STEP_DURATION_MILLISECONDS = 300;
     /**
      * The default maximum start delay between each step of an animation
      */
-    public static DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+    private static _DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
     /**
      * The default maximum total animation duration
      */
-    public static DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+    private static _DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
     /**
      * The default easing of the animation
      */
-    public static DEFAULT_EASING = "exp-out";
+    private static _DEFAULT_EASING_MODE = "exp-out";
 
     private _startDelay: number;
     private _stepDuration: number;
-    private _iterativeDelay: number;
+    private _stepDelay: number;
     private _maxTotalDuration: number;
-    private _easing: string;
+    private _easingMode: string;
 
     /**
      * Constructs the default animator
@@ -52,11 +40,11 @@ export module Animators {
      * @constructor
      */
     constructor() {
-      this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
-      this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-      this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-      this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-      this._easing = Base.DEFAULT_EASING;
+      this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
+      this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
+      this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+      this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+      this._easingMode = Easing._DEFAULT_EASING_MODE;
     }
 
     public totalTime(numberOfSteps: number) {
@@ -69,7 +57,7 @@ export module Animators {
       var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
 
       return selection.transition()
-        .ease(this.easing())
+        .ease(this.easingMode())
         .duration(this.stepDuration())
         .delay((d: any, i: number) => this.startDelay() + adjustedIterativeDelay * i)
         .attr(attrToAppliedProjector);
@@ -85,9 +73,9 @@ export module Animators {
      * Sets the start delay of the animation in milliseconds.
      *
      * @param {number} startDelay The start delay in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public startDelay(startDelay: number): Base;
+    public startDelay(startDelay: number): Easing;
     public startDelay(startDelay?: number): any {
       if (startDelay == null) {
         return this._startDelay;
@@ -107,9 +95,9 @@ export module Animators {
      * Sets the duration of one animation step in milliseconds.
      *
      * @param {number} stepDuration The duration in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public stepDuration(stepDuration: number): Base;
+    public stepDuration(stepDuration: number): Easing;
     public stepDuration(stepDuration?: number): any {
       if (stepDuration == null) {
         return Math.min(this._stepDuration, this._maxTotalDuration);
@@ -124,19 +112,19 @@ export module Animators {
      *
      * @returns {number} The current maximum iterative delay.
      */
-    public iterativeDelay(): number;
+    public stepDelay(): number;
     /**
      * Sets the maximum start delay between animation steps in milliseconds.
      *
-     * @param {number} iterativeDelay The maximum iterative delay in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @param {number} stepDelay The maximum iterative delay in milliseconds.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public iterativeDelay(iterativeDelay: number): Base;
-    public iterativeDelay(iterativeDelay?: number): any {
-      if (iterativeDelay == null) {
-        return this._iterativeDelay;
+    public stepDelay(stepDelay: number): Easing;
+    public stepDelay(stepDelay?: number): any {
+      if (stepDelay == null) {
+        return this._stepDelay;
       } else {
-        this._iterativeDelay = iterativeDelay;
+        this._stepDelay = stepDelay;
         return this;
       }
     }
@@ -144,16 +132,24 @@ export module Animators {
     /**
      * Gets the maximum total animation duration constraint in milliseconds.
      *
+     * If the animation time would exceed the specified time, the duration of each step
+     * and the delay between each step will be reduced until the animation fits within
+     * the specified time.
+     * 
      * @returns {number} The current maximum total animation duration.
      */
     public maxTotalDuration(): number;
     /**
      * Sets the maximum total animation duration constraint in miliseconds.
+     * 
+     * If the animation time would exceed the specified time, the duration of each step
+     * and the delay between each step will be reduced until the animation fits within
+     * the specified time.
      *
      * @param {number} maxTotalDuration The maximum total animation duration in milliseconds.
-     * @returns {Base} The calling Base Animator.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public maxTotalDuration(maxTotalDuration: number): Base;
+    public maxTotalDuration(maxTotalDuration: number): Easing;
     public maxTotalDuration(maxTotalDuration?: number): any {
       if (maxTotalDuration == null) {
         return this._maxTotalDuration;
@@ -164,23 +160,23 @@ export module Animators {
     }
 
     /**
-     * Gets the current easing of the animation.
+     * Gets the current easing mode of the animation.
      *
      * @returns {string} the current easing mode.
      */
-    public easing(): string;
+    public easingMode(): string;
     /**
      * Sets the easing mode of the animation.
      *
-     * @param {string} easing The desired easing mode.
-     * @returns {Base} The calling Base Animator.
+     * @param {string} easingMode The desired easing mode.
+     * @returns {Easing} The calling Easing Animator.
      */
-    public easing(easing: string): Base;
-    public easing(easing?: string): any {
-      if (easing == null) {
-        return this._easing;
+    public easingMode(easingMode: string): Easing;
+    public easingMode(easingMode?: string): any {
+      if (easingMode == null) {
+        return this._easingMode;
       } else {
-        this._easing = easing;
+        this._easingMode = easingMode;
         return this;
       }
     }
@@ -192,7 +188,7 @@ export module Animators {
       var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
       stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
       var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
-      return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
+      return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
     }
   }
 }

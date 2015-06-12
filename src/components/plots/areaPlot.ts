@@ -11,12 +11,10 @@ export module Plots {
      * An Area Plot draws a filled region (area) between Y and Y0.
      *
      * @constructor
-     * @param {QuantitativeScale} xScale
-     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();
-      this.classed("area-plot", true);
+      this.addClass("area-plot");
       this.y0(0); // default
       this.attr("fill-opacity", 0.25);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -105,7 +103,7 @@ export module Plots {
 
     private _generateLineDrawSteps() {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var attrToProjector = this._generateLineAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
@@ -120,13 +118,13 @@ export module Plots {
       return lineAttrToProjector;
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Area(dataset);
     }
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()),
                                                             this._getResetYFunction(),
@@ -174,8 +172,8 @@ export module Plots {
       return propertyToProjectors;
     }
 
-    public getAllSelections(datasets = this.datasets()) {
-      var allSelections = super.getAllSelections(datasets)[0];
+    public selections(datasets = this.datasets()) {
+      var allSelections = super.selections(datasets)[0];
       var lineDrawers = datasets.map((dataset) => this._lineDrawers.get(dataset))
                                 .filter((drawer) => drawer != null);
       lineDrawers.forEach((ld, i) => allSelections.push(ld.selectionForIndex(i).node()));

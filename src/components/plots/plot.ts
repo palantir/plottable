@@ -21,9 +21,9 @@ module Plottable {
   }
 
   export class Plot extends Component {
-    protected static ANIMATION_MAX_DURATION = 600;
+    protected static _ANIMATION_MAX_DURATION = 600;
 
-    protected _dataChanged = false;
+    private _dataChanged = false;
     private _datasetToDrawer: Utils.Map<Dataset, Drawer>;
 
     protected _renderArea: d3.Selection<void>;
@@ -31,10 +31,9 @@ module Plottable {
     private _attrExtents: d3.Map<any[]>;
     private _includedValuesProvider: Scales.IncludedValuesProvider<any>;
 
-    protected _animate: boolean = false;
-    private _animators: {[animator: string]: Animators.Plot} = {};
+    private _animate = false;
+    private _animators: {[animator: string]: Animator} = {};
 
-    protected _animateOnNextRender = true;
     private _renderCallback: ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
@@ -42,12 +41,14 @@ module Plottable {
     protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
 
     /**
+     * A Plot draws some visualization of the inputted Datasets.
+     *
      * @constructor
      */
     constructor() {
       super();
       this._clipPathEnabled = true;
-      this.classed("plot", true);
+      this.addClass("plot");
       this._datasetToDrawer = new Utils.Map<Dataset, Drawer>();
       this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._attrExtents = d3.map<any[]>();
@@ -56,14 +57,13 @@ module Plottable {
       this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
       this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
       this._propertyExtents = d3.map<any[]>();
-      var mainAnimator = new Animators.Base().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      var mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, mainAnimator);
       this.animator(Plots.Animator.RESET, new Animators.Null());
     }
 
     public anchor(selection: d3.Selection<void>) {
       super.anchor(selection);
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this._updateExtents();
       return this;
@@ -91,7 +91,7 @@ module Plottable {
       if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(dataset);
+      var drawer = this._createDrawer(dataset);
       this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
@@ -109,12 +109,12 @@ module Plottable {
       return drawer;
     }
 
-    protected _getDrawer(dataset: Dataset): Drawer {
+    protected _createDrawer(dataset: Dataset): Drawer {
       return new Drawer(dataset);
     }
 
-    protected _getAnimator(key: string): Animators.Plot {
-      if (this._animate && this._animateOnNextRender) {
+    protected _getAnimator(key: string): Animator {
+      if (this._animateOnNextRender()) {
         return this._animators[key] || new Animators.Null();
       } else {
         return new Animators.Null();
@@ -123,7 +123,6 @@ module Plottable {
 
     protected _onDatasetUpdate() {
       this._updateExtents();
-      this._animateOnNextRender = true;
       this._dataChanged = true;
       this.render();
     }
@@ -208,7 +207,6 @@ module Plottable {
       if (this._isAnchored) {
         this._paint();
         this._dataChanged = false;
-        this._animateOnNextRender = false;
       }
       return this;
     }
@@ -340,18 +338,18 @@ module Plottable {
     /**
      * Get the Animator associated with the specified Animator key.
      *
-     * @return {Animators.Plot}
+     * @return {Animator}
      */
-    public animator(animatorKey: string): Animators.Plot;
+    public animator(animatorKey: string): Animator;
     /**
      * Set the Animator associated with the specified Animator key.
      *
      * @param {string} animatorKey
-     * @param {Animators.Plot} animator
+     * @param {Animator} animator
      * @returns {Plot} The calling Plot.
      */
-    public animator(animatorKey: string, animator: Animators.Plot): Plot;
-    public animator(animatorKey: string, animator?: Animators.Plot): any {
+    public animator(animatorKey: string, animator: Animator): Plot;
+    public animator(animatorKey: string, animator?: Animator): any {
       if (animator === undefined) {
         return this._animators[animatorKey];
       } else {
@@ -431,18 +429,18 @@ module Plottable {
      *   If not provided, Selections will be retrieved for all Datasets on the Plot.
      * @returns {d3.Selection}
      */
-    public getAllSelections(datasets = this.datasets()): d3.Selection<any> {
-      var allSelections: Element[] = [];
+    public selections(datasets = this.datasets()): d3.Selection<any> {
+      var selections: Element[] = [];
 
       datasets.forEach((dataset) => {
         var drawer = this._datasetToDrawer.get(dataset);
         if (drawer == null) { return; }
         drawer.renderArea().selectAll(drawer.selector()).each(function() {
-          allSelections.push(this);
+          selections.push(this);
         });
       });
 
-      return d3.selectAll(allSelections);
+      return d3.selectAll(selections);
     }
 
     /**
@@ -459,7 +457,7 @@ module Plottable {
         var validDatumIndex = 0;
         dataset.data().forEach((datum: any, datasetIndex: number) => {
           var position = this._pixelPoint(datum, datasetIndex, dataset);
-          if (position.x !== position.x || position.y !== position.y) {
+          if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
             return;
           }
           entities.push({
@@ -486,7 +484,7 @@ module Plottable {
       var closestDistanceSquared = Infinity;
       var closest: Plots.PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
@@ -500,7 +498,7 @@ module Plottable {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
@@ -527,6 +525,10 @@ module Plottable {
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
       return { x: 0, y: 0 };
+    }
+
+    protected _animateOnNextRender() {
+      return this._animate && this._dataChanged;
     }
   }
 }

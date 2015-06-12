@@ -32,10 +32,8 @@ export module Components {
      *
      * @constructor
      * @param {Scales.InterpolatedColor} interpolatedColorScale
-     * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
      */
-    constructor(interpolatedColorScale: Scales.InterpolatedColor, orientation = "horizontal", formatter = Formatters.general()) {
+    constructor(interpolatedColorScale: Scales.InterpolatedColor) {
       super();
       if (interpolatedColorScale == null ) {
         throw new Error("InterpolatedColorLegend requires a interpolatedColorScale");
@@ -43,10 +41,11 @@ export module Components {
       this._scale = interpolatedColorScale;
       this._redrawCallback = (scale) => this.redraw();
       this._scale.onUpdate(this._redrawCallback);
-      this._formatter = formatter;
-      this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
+      this._formatter = Formatters.general();
+      this._orientation = "horizontal";
 
-      this.classed("legend", true).classed("interpolated-color-legend", true);
+      this.addClass("legend");
+      this.addClass("interpolated-color-legend");
     }
 
     public destroy() {

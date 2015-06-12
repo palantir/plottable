@@ -5,23 +5,23 @@ export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
     /**
+     * A Line Plot draws line segments starting from the first data point to the next.
+     * 
      * @constructor
-     * @param {QuantitativeScale} xScale
-     * @param {QuantitativeScale} yScale
      */
     constructor() {
       super();
-      this.classed("line-plot", true);
-      var animator = new Animators.Base();
-      animator.stepDuration(Plot.ANIMATION_MAX_DURATION);
-      animator.easing("exp-in-out");
-      animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      this.addClass("line-plot");
+      var animator = new Animators.Easing();
+      animator.stepDuration(Plot._ANIMATION_MAX_DURATION);
+      animator.easingMode("exp-in-out");
+      animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
     }
 
@@ -39,7 +39,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var attrToProjector = this._generateAttrToProjector();
         attrToProjector["d"] = this._constructLineProjector(Plot._scaledAccessor(this.x()), this._getResetYFunction());
         drawSteps.push({attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
@@ -73,7 +73,7 @@ export module Plots {
       var minYDist = Infinity;
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
         var xDist = Math.abs(queryPoint.x - entity.position.x);
@@ -99,8 +99,8 @@ export module Plots {
       var definedProjector = (d: any, i: number, dataset: Dataset) => {
         var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
         var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
-        return positionX != null && positionX === positionX &&
-               positionY != null && positionY === positionY;
+        return positionX != null && !Utils.Math.isNaN(positionX) &&
+               positionY != null && !Utils.Math.isNaN(positionY);
       };
       return (datum: any, index: number, dataset: Dataset) => {
         return d3.svg.line()
@@ -112,7 +112,7 @@ export module Plots {
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]> ();
-      this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
+      this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
   }

@@ -7,8 +7,12 @@ export module Utils {
     private _svg: SVGElement;
     private _measureRect: SVGElement;
 
+    /**
+     * Returns the ClientToSVGTranslator for the <svg> containing elem.
+     * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+     */
     public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-      var svg = Utils.DOM.getBoundingSVG(elem);
+      var svg = Utils.DOM.boundingSVG(elem);
 
       var translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
       if (translator == null) {

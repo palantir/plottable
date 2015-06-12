@@ -21,10 +21,10 @@ export module Plots {
       super();
 
       this.animator("rectangles", new Animators.Null());
-      this.classed("rectangle-plot", true);
+      this.addClass("rectangle-plot");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Drawers.Rectangle(dataset);
     }
 

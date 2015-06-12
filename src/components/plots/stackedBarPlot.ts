@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedBar<X, Y> extends Bar<X, Y> {
-    private _stackOffsets: Utils.Map<Dataset, d3.Map<number>>;
+    private _stackingResult: Utils.Stacking.StackingResult;
     private _stackedExtent: number[];
 
     /**
@@ -18,8 +18,8 @@ export module Plots {
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super(orientation);
-      this.classed("stacked-bar-plot", true);
-      this._stackOffsets = new Utils.Map<Dataset, d3.Map<number>>();
+      this.addClass("stacked-bar-plot");
+      this._stackingResult = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacking.StackedDatum>>();
       this._stackedExtent = [];
     }
 
@@ -65,10 +65,14 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
+      var normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
+        return Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
+      };
       var getStart = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+        primaryScale.scale(this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
       var getEnd = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(+primaryAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)));
+        primaryScale.scale(+primaryAccessor(d, i, dataset) +
+          this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
 
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
@@ -113,8 +117,8 @@ export module Plots {
       var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+      this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+      this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     }
   }
 }

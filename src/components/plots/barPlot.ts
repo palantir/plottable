@@ -28,14 +28,14 @@ export module Plots {
     private _baselineValueProvider: () => (X|Y)[];
 
     /**
+     * A Bar Plot draws bars growing out from a baseline to some value
+     * 
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
       super();
-      this.classed("bar-plot", true);
+      this.addClass("bar-plot");
       if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
         throw new Error(orientation + " is not a valid orientation for Plots.Bar");
       }
@@ -92,7 +92,7 @@ export module Plots {
       return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Rectangle(dataset);
     }
 
@@ -167,15 +167,15 @@ export module Plots {
     /**
      * Gets the Formatter for the labels.
      */
-    public labelsFormatter(): Formatter;
+    public labelFormatter(): Formatter;
     /**
      * Sets the Formatter for the labels.
      *
      * @param {Formatter} formatter
      * @returns {Bar} The calling Bar Plot.
      */
-    public labelsFormatter(formatter: Formatter): Bar<X, Y>;
-    public labelsFormatter(formatter?: Formatter): any {
+    public labelFormatter(formatter: Formatter): Bar<X, Y>;
+    public labelFormatter(formatter?: Formatter): any {
       if (formatter == null) {
         return this._labelFormatter;
       } else {
@@ -228,14 +228,14 @@ export module Plots {
 
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
         var primaryDist = 0;
         var secondaryDist = 0;
         var plotPt = entity.position;
         // if we're inside a bar, distance in both directions should stay 0
-        var barBBox = Utils.DOM.getBBox(entity.selection);
+        var barBBox = Utils.DOM.elementBBox(entity.selection);
         if (!Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
           var plotPtPrimary = this._isVertical ? plotPt.x : plotPt.y;
           primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -264,10 +264,10 @@ export module Plots {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
-      var barBBox = Utils.DOM.getBBox(selection);
+      var barBBox = Utils.DOM.elementBBox(selection);
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
@@ -314,7 +314,7 @@ export module Plots {
     private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
       var intersected: PlotEntity[] = [];
       this.entities().forEach((entity) => {
-        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.getBBox(entity.selection))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
           intersected.push(entity);
         }
       });
@@ -423,7 +423,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var resetAttrToProjector = this._generateAttrToProjector();
         var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
         var scaledBaseline = primaryScale.scale(this.baselineValue());

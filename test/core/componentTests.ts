@@ -284,7 +284,7 @@ describe("Component behavior", () => {
     boxStrings.forEach((s) => {
       var box = boxContainer.select(s);
       assert.isNotNull(box.node(), s + " box was created and placed inside boxContainer");
-      var bb = Plottable.Utils.DOM.getBBox(box);
+      var bb = Plottable.Utils.DOM.elementBBox(box);
       assert.strictEqual(bb.width, SVG_WIDTH, s + " width as expected");
       assert.strictEqual(bb.height, SVG_HEIGHT, s + " height as expected");
     });
@@ -298,24 +298,24 @@ describe("Component behavior", () => {
   });
 
   it("css classing works as expected", () => {
-    assert.isFalse(c.classed("CSS-PREANCHOR-KEEP"));
-    c.classed("CSS-PREANCHOR-KEEP", true);
-    assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-    c.classed("CSS-PREANCHOR-REMOVE", true);
-    assert.isTrue(c.classed("CSS-PREANCHOR-REMOVE"));
-    c.classed("CSS-PREANCHOR-REMOVE", false);
-    assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
+    assert.isFalse(c.hasClass("CSS-PREANCHOR-KEEP"));
+    c.addClass("CSS-PREANCHOR-KEEP");
+    assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+    c.addClass("CSS-PREANCHOR-REMOVE");
+    assert.isTrue(c.hasClass("CSS-PREANCHOR-REMOVE"));
+    c.removeClass("CSS-PREANCHOR-REMOVE");
+    assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
 
     c.anchor(svg);
-    assert.isTrue(c.classed("CSS-PREANCHOR-KEEP"));
-    assert.isFalse(c.classed("CSS-PREANCHOR-REMOVE"));
-    assert.isFalse(c.classed("CSS-POSTANCHOR"));
-    c.classed("CSS-POSTANCHOR", true);
-    assert.isTrue(c.classed("CSS-POSTANCHOR"));
-    c.classed("CSS-POSTANCHOR", false);
-    assert.isFalse(c.classed("CSS-POSTANCHOR"));
-    assert.isFalse(c.classed(undefined), "returns false when classed called w/ undefined");
-    assert.strictEqual(c.classed(undefined, true), c, "returns this when classed called w/ undefined and true");
+    assert.isTrue(c.hasClass("CSS-PREANCHOR-KEEP"));
+    assert.isFalse(c.hasClass("CSS-PREANCHOR-REMOVE"));
+    assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+    c.addClass("CSS-POSTANCHOR");
+    assert.isTrue(c.hasClass("CSS-POSTANCHOR"));
+    c.removeClass("CSS-POSTANCHOR");
+    assert.isFalse(c.hasClass("CSS-POSTANCHOR"));
+    assert.isFalse(c.hasClass(undefined), "returns false when hasClass called w/ undefined");
+    assert.strictEqual(c.addClass(undefined), c, "returns this when hasClass called w/ undefined and true");
     svg.remove();
   });
 

@@ -16,10 +16,10 @@ export module Axes {
      * @constructor
      * @param {QuantitativeScale} scale
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
      */
-    constructor(scale: QuantitativeScale<number>, orientation: string, formatter = Formatters.general()) {
-      super(scale, orientation, formatter);
+    constructor(scale: QuantitativeScale<number>, orientation: string) {
+      super(scale, orientation);
+      this.formatter(Formatters.general());
     }
 
     protected _setup() {
@@ -77,7 +77,7 @@ export module Axes {
 
       if (!this._isHorizontal()) {
         var reComputedWidth = this._computeWidth();
-        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
           this.redraw();
           return;
         }
@@ -277,11 +277,11 @@ export module Axes {
         return;
       }
       var firstTickLabel = <Element> tickLabels[0][0];
-      if (!Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+      if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(firstTickLabel).style("visibility", "hidden");
       }
       var lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
-      if (!Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+      if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
         d3.select(lastTickLabel).style("visibility", "hidden");
       }
     }
@@ -294,7 +294,7 @@ export module Axes {
         return;
       }
       tickLabels.each(function(d: any, i: number) {
-        if (!Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+        if (!Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
           d3.select(this).style("visibility", "hidden");
         }
       });

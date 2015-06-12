@@ -27,7 +27,7 @@ function run(svg, data, Plottable) {
   var colorScale = new Plottable.Scales.Color();
   var legend = new Plottable.Components.Legend(colorScale).xAlignment("left");
   legend.maxEntriesPerRow(1);
-  var title = new Plottable.Components.Label("Sales by Region").classed("title-label", true);
+  var title = new Plottable.Components.TitleLabel("Sales by Region");
   var Alabel = new Plottable.Components.Label("Product A");
   var Blabel = new Plottable.Components.Label("Product B");
   var ABlabel = new Plottable.Components.Label("Combined");

@@ -17,7 +17,7 @@ export module Plots {
       super();
       this.innerRadius(0);
       this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
-      this.classed("pie-plot", true);
+      this.addClass("pie-plot");
       this.attr("fill", (d, i) => String(i), new Scales.Color());
     }
 
@@ -56,7 +56,7 @@ export module Plots {
       this._updatePieAngles();
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Arc(dataset);
     }
 

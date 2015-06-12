@@ -25,7 +25,7 @@ module Plottable {
     private _endTickLength = 5;
     private _tickLength = 5;
     private _tickLabelPadding = 10;
-    private _gutter = 15;
+    private _margin = 15;
     private _showEndTickLabels = false;
     private _rescaleCallback: ScaleCallback<Scale<D, number>>;
 
@@ -36,22 +36,21 @@ module Plottable {
      * @constructor
      * @param {Scale} scale
      * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-     * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
      */
-    constructor(scale: Scale<D, number>, orientation: string, formatter = Formatters.identity()) {
+    constructor(scale: Scale<D, number>, orientation: string) {
       super();
       if (scale == null || orientation == null) { throw new Error("Axis requires a scale and orientation"); }
       this._scale = scale;
       this.orientation(orientation);
       this._setDefaultAlignment();
-      this.classed("axis", true);
+      this.addClass("axis");
       if (this._isHorizontal()) {
-        this.classed("x-axis", true);
+        this.addClass("x-axis");
       } else {
-        this.classed("y-axis", true);
+        this.addClass("y-axis");
       }
 
-      this.formatter(formatter);
+      this.formatter(Formatters.identity());
 
       this._rescaleCallback = (scale) => this._rescale();
       this._scale.onUpdate(this._rescaleCallback);
@@ -86,12 +85,12 @@ module Plottable {
         if (this._computedHeight == null) {
           this._computeHeight();
         }
-        requestedHeight = this._computedHeight + this._gutter;
+        requestedHeight = this._computedHeight + this._margin;
       } else { // vertical
         if (this._computedWidth == null) {
           this._computeWidth();
         }
-        requestedWidth = this._computedWidth + this._gutter;
+        requestedWidth = this._computedWidth + this._margin;
       }
 
       return {
@@ -269,7 +268,7 @@ module Plottable {
      */
     public formatter(formatter: Formatter): Axis<D>;
     public formatter(formatter?: Formatter): any {
-      if (formatter === undefined) {
+      if (formatter == null) {
         return this._formatter;
       }
       this._formatter = formatter;
@@ -358,26 +357,26 @@ module Plottable {
     }
 
     /**
-     * Gets the size of the gutter in pixels.
-     * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+     * Gets the margin in pixels.
+     * The margin is the amount of space between the tick labels and the outer edge of the Axis.
      */
-    public gutter(): number;
+    public margin(): number;
     /**
-     * Sets the size of the gutter in pixels.
-     * The gutter is the extra space between the tick labels and the outer edge of the Axis.
+     * Sets the margin in pixels.
+     * The margin is the amount of space between the tick labels and the outer edge of the Axis.
      *
      * @param {number} size
      * @returns {Axis} The calling Axis.
      */
-    public gutter(size: number): Axis<D>;
-    public gutter(size?: number): any {
+    public margin(size: number): Axis<D>;
+    public margin(size?: number): any {
       if (size == null) {
-        return this._gutter;
+        return this._margin;
       } else {
         if (size < 0) {
-          throw new Error("gutter size must be positive");
+          throw new Error("margin size must be positive");
         }
-        this._gutter = size;
+        this._margin = size;
         this.redraw();
         return this;
       }

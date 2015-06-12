@@ -44,10 +44,14 @@ module Plottable {
     private _isTopLevelComponent = false;
     private _width: number; // Width and height of the Component. Used to size the hitbox, bounding box, etc
     private _height: number;
-    private _cssClasses: string[] = ["component"];
+    private _cssClasses = new Utils.Set<string>();
     private _destroyed = false;
     private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
     private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
+
+    public constructor() {
+      this._cssClasses.add("component");
+    }
 
     /**
      * Attaches the Component as a child of a given d3 Selection.
@@ -120,7 +124,7 @@ module Plottable {
       this._cssClasses.forEach((cssClass: string) => {
         this._element.classed(cssClass, true);
       });
-      this._cssClasses = null;
+      this._cssClasses = new Utils.Set<string>();
 
       this._backgroundContainer = this._element.append("g").classed("background-container", true);
       this._addBox("background-fill", this._backgroundContainer);
@@ -137,6 +141,13 @@ module Plottable {
       this._isSetup = true;
     }
 
+    /**
+     * Given available space in pixels, returns the minimum width and height this Component will need.
+     * 
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {SpaceRequest}
+     */
     public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {
         minWidth: 0,
@@ -173,13 +184,13 @@ module Plottable {
           }
 
           var elem: HTMLScriptElement = (<HTMLScriptElement> this._rootSVG.node());
-          availableWidth = Utils.DOM.getElementWidth(elem);
-          availableHeight = Utils.DOM.getElementHeight(elem);
+          availableWidth = Utils.DOM.elementWidth(elem);
+          availableHeight = Utils.DOM.elementHeight(elem);
         } else {
           throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
         }
       }
-      var size = this._getSize(availableWidth, availableHeight);
+      var size = this._sizeFromOffer(availableWidth, availableHeight);
       this._width = size.width;
       this._height = size.height;
       var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
@@ -193,7 +204,7 @@ module Plottable {
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
       return {
         width: this.fixedWidth() ? Math.min(availableWidth , requestedSpace.minWidth) : availableWidth,
@@ -219,6 +230,9 @@ module Plottable {
       }
     }
 
+    /**
+     * Renders the Component without waiting for the next frame.
+     */
     public renderImmediately() {
       return this;
     }
@@ -263,8 +277,8 @@ module Plottable {
         this.anchor(selection);
       }
       if (this._element == null) {
-        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+        throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " +
+          "or a d3.Selection, or a selector string");
       }
       this.computeLayout();
       this.render();
@@ -344,7 +358,7 @@ module Plottable {
       // They don't need the current URL in the clip path reference.
       var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
       prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-      var clipPathId = Utils.DOM.getUniqueClipPathId();
+      var clipPathId = Utils.DOM.generateUniqueClipPathId();
       this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
       var clipPathParent = this._boxContainer.append("clipPath")
                                              .attr("id", clipPathId);
@@ -356,40 +370,56 @@ module Plottable {
      *
      * @param {string} cssClass The CSS class to check for.
      */
-    public classed(cssClass: string): boolean;
+    public hasClass(cssClass: string) {
+      if (cssClass == null) {
+        return false;
+      }
+
+      if (this._element == null) {
+        return this._cssClasses.has(cssClass);
+      } else {
+        return this._element.classed(cssClass);
+      }
+    }
+
     /**
-     * Adds/removes a given CSS class to/from the Component.
+     * Adds a given CSS class to the Component.
      *
-     * @param {string} cssClass The CSS class to add or remove.
-     * @param {boolean} addClass If true, adds the provided CSS class; otherwise, removes it.
+     * @param {string} cssClass The CSS class to add.
      * @returns {Component} The calling Component.
      */
-    public classed(cssClass: string, addClass: boolean): Component;
-    public classed(cssClass: string, addClass?: boolean): any {
-      if (addClass == null) {
-        if (cssClass == null) {
-          return false;
-        } else if (this._element == null) {
-          return (this._cssClasses.indexOf(cssClass) !== -1);
-        } else {
-          return this._element.classed(cssClass);
-        }
-      } else {
-        if (cssClass == null) {
-          return this;
-        }
-        if (this._element == null) {
-          var classIndex = this._cssClasses.indexOf(cssClass);
-          if (addClass && classIndex === -1) {
-            this._cssClasses.push(cssClass);
-          } else if (!addClass && classIndex !== -1) {
-            this._cssClasses.splice(classIndex, 1);
-          }
-        } else {
-          this._element.classed(cssClass, addClass);
-        }
+    public addClass(cssClass: string) {
+      if (cssClass == null) {
         return this;
       }
+
+      if (this._element == null) {
+        this._cssClasses.add(cssClass);
+      } else {
+        this._element.classed(cssClass, true);
+      }
+
+      return this;
+    }
+
+    /**
+     * Removes a given CSS class from the Component.
+     *
+     * @param {string} cssClass The CSS class to remove.
+     * @returns {Component} The calling Component.
+     */
+    public removeClass(cssClass: string) {
+      if (cssClass == null) {
+        return this;
+      }
+
+      if (this._element == null) {
+        this._cssClasses.delete(cssClass);
+      } else {
+        this._element.classed(cssClass, false);
+      }
+
+      return this;
     }
 
     /**
@@ -450,7 +480,16 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Gets the parent ComponentContainer for this Component.
+     */
     public parent(): ComponentContainer;
+    /**
+     * Sets the parent ComponentContainer for this Component.
+     * An error will be thrown if the parent does not contain this Component.
+     * Adding a Component to a ComponentContainer should be done
+     * using the appropriate method on the ComponentContainer.
+     */
     public parent(parent: ComponentContainer): Component;
     public parent(parent?: ComponentContainer): any {
       if (parent === undefined) {

@@ -260,7 +260,7 @@ describe("Interactions", () => {
       c.renderTo(svg);
 
       var drag = new Plottable.Interactions.Drag();
-      assert.isTrue(drag.constrainToComponent(), "constrains by default");
+      assert.isTrue(drag.constrainedToComponent(), "constrains by default");
 
       var receivedStart: Plottable.Point;
       var receivedEnd: Plottable.Point;
@@ -306,7 +306,7 @@ describe("Interactions", () => {
       TestMethods.triggerFakeTouchEvent("touchend", target, [{x: outsidePointNeg.x, y: outsidePointNeg.y}]);
       assert.deepEqual(receivedEnd, constrainedNeg, "dragging outside the Component is constrained (negative) (touchend)");
 
-      drag.constrainToComponent(false);
+      drag.constrainedToComponent(false);
 
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);

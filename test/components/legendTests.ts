@@ -55,9 +55,9 @@ describe("Legend", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable.Utils.DOM.getBBox((<any> legend)._content);
+    var contentBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._content);
     var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable.Utils.DOM.getBBox((<any> legend)._element.select(".bounding-box"));
+    var bboxBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._element.select(".bounding-box"));
     var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
@@ -155,7 +155,7 @@ describe("Legend", () => {
     function verifySymbolHeight() {
       var text = (<any> legend)._content.select("text");
       var icon = (<any> legend)._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
-      var textHeight = Plottable.Utils.DOM.getBBox(text).height;
+      var textHeight = Plottable.Utils.DOM.elementBBox(text).height;
       var symbolHeight = icon.node().getBoundingClientRect().height;
       assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
       assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");

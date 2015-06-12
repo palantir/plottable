@@ -9,131 +9,152 @@ export module Utils {
      * @param {d3.Selection} element
      * @returns {SVGRed} The bounding box.
      */
-    export function getBBox(element: d3.Selection<any>): SVGRect {
+    export function elementBBox(element: d3.Selection<any>) {
       var bbox: SVGRect;
       // HACKHACK: Firefox won't correctly measure nodes with style "display: none" or their descendents (FF Bug 612118).
       try {
         bbox = (<any> element.node()).getBBox();
       } catch (err) {
-        bbox = {
-          x: 0, y: 0, width: 0, height: 0
-        };
+        bbox = { x: 0, y: 0, width: 0, height: 0 };
       }
       return bbox;
     }
 
-    export var POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
-    export function requestAnimationFramePolyfill(fn: () => any): void {
+    /**
+     * Screen refresh rate which is assumed to be 60fps
+     */
+    export var SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+
+    /**
+     * Polyfill for `window.requestAnimationFrame`.
+     * If the function exists, then we use the function directly.
+     * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+     *
+     * @param {() => void} callback The callback to call in the next animation frame
+     */
+    export function requestAnimationFramePolyfill(callback: () => void) {
       if (window.requestAnimationFrame != null) {
-        window.requestAnimationFrame(fn);
+        window.requestAnimationFrame(callback);
       } else {
-        setTimeout(fn, POLYFILL_TIMEOUT_MSEC);
+        setTimeout(callback, SCREEN_REFRESH_RATE_MILLISECONDS);
       }
     }
 
-    function getParsedStyleValue(style: CSSStyleDeclaration, prop: string): number {
-      var value: any = style.getPropertyValue(prop);
-      var parsedValue = parseFloat(value);
-      if (parsedValue !== parsedValue) {
-          return 0;
-      }
-      return parsedValue;
+    /**
+     * Calculates the width of the element.
+     * The width includes the padding and the border on the element's left and right sides.
+     *
+     * @param {Element} element The element to query
+     * @returns {number} The width of the element.
+     */
+    export function elementWidth(element: Element) {
+      var style = window.getComputedStyle(element);
+      return _parseStyleValue(style, "width")
+        + _parseStyleValue(style, "padding-left")
+        + _parseStyleValue(style, "padding-right")
+        + _parseStyleValue(style, "border-left-width")
+        + _parseStyleValue(style, "border-right-width");
     }
 
-    export function isSelectionRemovedFromSVG(selection: d3.Selection<any>) {
-      var n = (<Node> selection.node());
-      while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-        n = n.parentNode;
-      }
-      return (n == null);
+    /**
+     * Calculates the height of the element.
+     * The height includes the padding the and the border on the element's top and bottom sides.
+     *
+     * @param {Element} element The element to query
+     * @returns {number} The height of the element
+     */
+    export function elementHeight(element: Element) {
+      var style = window.getComputedStyle(element);
+      return _parseStyleValue(style, "height")
+        + _parseStyleValue(style, "padding-top")
+        + _parseStyleValue(style, "padding-bottom")
+        + _parseStyleValue(style, "border-top-width")
+        + _parseStyleValue(style, "border-bottom-width");
     }
 
-    export function getElementWidth(elem: Element): number {
-      var style: CSSStyleDeclaration = window.getComputedStyle(elem);
-      return getParsedStyleValue(style, "width")
-        + getParsedStyleValue(style, "padding-left")
-        + getParsedStyleValue(style, "padding-right")
-        + getParsedStyleValue(style, "border-left-width")
-        + getParsedStyleValue(style, "border-right-width");
-    }
+    /**
+     * Retrieves the number array representing the translation for the selection
+     *
+     * @param {d3.Selection<any>} selection The selection to query
+     * @returns {[number, number]} The number array representing the translation
+     */
+    export function translate(selection: d3.Selection<any>): [number, number];
+    /**
+     * Translates the given selection by the input x / y pixel amounts.
+     *
+     * @param {d3.Selection<any>} selection The selection to translate
+     * @param {number} x The amount to translate in the x direction
+     * @param {number} y The amount to translate in the y direction
+     * @returns {d3.Selection<any>} The input selection
+     */
+    export function translate(selection: d3.Selection<any>, x: number, y: number): d3.Selection<any>;
+    export function translate(selection: d3.Selection<any>, x?: number, y?: number): any {
+      var transformMatrix = d3.transform(selection.attr("transform"));
 
-    export function getElementHeight(elem: Element): number {
-      var style: CSSStyleDeclaration = window.getComputedStyle(elem);
-      return getParsedStyleValue(style, "height")
-        + getParsedStyleValue(style, "padding-top")
-        + getParsedStyleValue(style, "padding-bottom")
-        + getParsedStyleValue(style, "border-top-width")
-        + getParsedStyleValue(style, "border-bottom-width");
-    }
-
-    export function getSVGPixelWidth(svg: d3.Selection<void>) {
-      var width = (<Element> svg.node()).clientWidth;
-
-      if (width === 0) { // Firefox bug #874811
-        var widthAttr = svg.attr("width");
-
-        if (widthAttr.indexOf("%") !== -1) { // percentage
-          var ancestorNode = <Element> (<Element> svg.node()).parentNode;
-          while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-            ancestorNode = <Element> ancestorNode.parentNode;
-          }
-          if (ancestorNode == null) {
-            throw new Error("Could not compute width of element");
-          }
-          width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-        } else {
-          width = parseFloat(widthAttr);
-        }
-      }
-
-      return width;
-    }
-
-    export function translate(s: d3.Selection<any>): d3.Transform;
-    export function translate(s: d3.Selection<any>, x: number, y: number): d3.Selection<any>
-    export function translate(s: d3.Selection<any>, x?: number, y?: number): any {
-      var xform = d3.transform(s.attr("transform"));
       if (x == null) {
-        return xform.translate;
-      } else {
-        y = (y == null) ? 0 : y;
-        xform.translate[0] = x;
-        xform.translate[1] = y;
-        s.attr("transform", xform.toString());
-        return s;
+        return transformMatrix.translate;
       }
+
+      y = (y == null) ? 0 : y;
+      transformMatrix.translate[0] = x;
+      transformMatrix.translate[1] = y;
+      selection.attr("transform", transformMatrix.toString());
+      return selection;
     }
 
-    export function boxesOverlap(boxA: ClientRect, boxB: ClientRect) {
-      if (boxA.right < boxB.left) { return false; }
-      if (boxA.left > boxB.right) { return false; }
-      if (boxA.bottom < boxB.top) { return false; }
-      if (boxA.top > boxB.bottom) { return false; }
+    /**
+     * Checks if the first ClientRect overlaps the second.
+     *
+     * @param {ClientRect} clientRectA The first ClientRect
+     * @param {ClientRect} clientRectB The second ClientRect
+     * @returns {boolean} If the ClientRects overlap each other.
+     */
+    export function clientRectsOverlap(clientRectA: ClientRect, clientRectB: ClientRect) {
+      if (clientRectA.right < clientRectB.left) { return false; }
+      if (clientRectA.left > clientRectB.right) { return false; }
+      if (clientRectA.bottom < clientRectB.top) { return false; }
+      if (clientRectA.top > clientRectB.bottom) { return false; }
       return true;
     }
 
-    export function boxIsInside(inner: ClientRect, outer: ClientRect) {
+    /**
+     * Returns true if and only if innerClientRect is inside outerClientRect.
+     *
+     * @param {ClientRect} innerClientRect The first ClientRect
+     * @param {ClientRect} outerClientRect The second ClientRect
+     * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+     */
+    export function clientRectInside(innerClientRect: ClientRect, outerClientRect: ClientRect) {
       return (
-        nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) &&
-        nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) &&
-        nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) &&
-        nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom)
+        nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) &&
+        nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) &&
+        nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) &&
+        nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom)
       );
     }
 
-    export function getBoundingSVG(elem: SVGElement): SVGElement {
-      var ownerSVG = elem.ownerSVGElement;
+    /**
+     * Retrieves the bounding svg of the input element
+     *
+     * @param {SVGElement} element The element to query
+     * @returns {SVGElement} The bounding svg
+     */
+    export function boundingSVG(element: SVGElement): SVGElement {
+      var ownerSVG = element.ownerSVGElement;
       if (ownerSVG != null) {
         return ownerSVG;
       }
-      if (elem.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
-        return elem;
+      if (element.nodeName.toLowerCase() === "svg") { // elem itself is an SVG
+        return element;
       }
       return null; // not in the DOM
     }
 
     var _latestClipPathId = 0;
-    export function getUniqueClipPathId() {
+    /**
+     * Generates a ClipPath ID that is unique for this instance of Plottable
+     */
+    export function generateUniqueClipPathId() {
       return "plottableClipPath" + ++_latestClipPathId;
     }
 
@@ -149,17 +170,22 @@ export module Utils {
      * @returns {boolean} True if the supplied coordinates or Ranges intersect or are
      * contained by bbox, false otherwise.
      */
-    export function intersectsBBox(xValOrRange: number | Range, yValOrRange: number | Range,
-      bbox: SVGRect, tolerance = 0.5): boolean {
-      var xRange: Range = parseRange(xValOrRange);
-      var yRange: Range = parseRange(yValOrRange);
+    export function intersectsBBox(
+        xValOrRange: number | Range,
+        yValOrRange: number | Range,
+        bbox: SVGRect,
+        tolerance = 0.5) {
+      var xRange = _parseRange(xValOrRange);
+      var yRange = _parseRange(yValOrRange);
 
       // SVGRects are positioned with sub-pixel accuracy (the default unit
       // for the x, y, height & width attributes), but user selections (e.g. via
       // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
       // seems appropriate.
-      return bbox.x + bbox.width >= xRange.min - tolerance && bbox.x <= xRange.max + tolerance &&
-        bbox.y + bbox.height >= yRange.min - tolerance && bbox.y <= yRange.max + tolerance;
+      return bbox.x + bbox.width >= xRange.min - tolerance &&
+        bbox.x <= xRange.max + tolerance &&
+        bbox.y + bbox.height >= yRange.min - tolerance &&
+        bbox.y <= yRange.max + tolerance;
     }
 
     /**
@@ -169,14 +195,24 @@ export module Utils {
      *
      * @returns {Range} The generated Range
      */
-    function parseRange(input: any): Range {
+    function _parseRange(input: number | Range): Range {
       if (typeof (input) === "number") {
-        return { min: input, max: input };
-      } else if (input instanceof Object && "min" in input && "max" in input) {
-        return <Range> input;
-      } else {
-        throw new Error("input '" + input + "' can't be parsed as an Range");
+        var value = <number>input;
+        return { min: value, max: value };
       }
+
+      var range = <Range>input;
+      if (range instanceof Object && "min" in range && "max" in range) {
+        return range;
+      }
+
+      throw new Error("input '" + input + "' can't be parsed as an Range");
+    }
+
+    function _parseStyleValue(style: CSSStyleDeclaration, property: string): number {
+      var value = style.getPropertyValue(property);
+      var parsedValue = parseFloat(value);
+      return parsedValue || 0;
     }
   }
 }

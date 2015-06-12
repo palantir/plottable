@@ -44,12 +44,21 @@ function run(svg, data, Plottable){
   cs.domain(["x+y+", "x+y-", "x-y+", "x-y-"]);
   cs.range(["#00bb00", "#bbbbbb", "#bbbbbb", "#bb0000"]);
 
-  legend.symbolFactoryAccessor(function (d, i) {
-    if(d === "x+y+") { return triangleUpFactory; }
-    if(d === "x+y-") { return crossFactory; }
-    if(d === "x-y+") { return circleFactory; }
-    if(d === "x-y-") { return triangleDownFactory; }
-  });
+  if (typeof legend.symbol === "function") {
+    legend.symbol(function (d, i) {
+      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y-") { return crossFactory; }
+      if(d === "x-y+") { return circleFactory; }
+      if(d === "x-y-") { return triangleDownFactory; }
+    });
+  } else {
+    legend.symbolFactoryAccessor(function (d, i) {
+      if(d === "x+y+") { return triangleUpFactory; }
+      if(d === "x+y-") { return crossFactory; }
+      if(d === "x-y+") { return circleFactory; }
+      if(d === "x-y-") { return triangleDownFactory; }
+    });
+  }
 
   var table = new Plottable.Components.Table([[null, title, null],
                                              [yAxis, plot, legend],
@@ -90,17 +99,31 @@ function run(svg, data, Plottable){
   });
 
   var key = new Plottable.Interactions.Key();
-  key.onKey(78, function(keyData){
+  if (typeof key.onKeyPress === "function") {
+    key.onKeyPress(78, function(keyData){
       d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
       dataset.data(d);
-  });
+    });
 
-  key.onKey(68, function(keyData){
+    key.onKeyPress(68, function(keyData){
       if(d.length > 0){
         d.splice(d.length-1,1);
         dataset.data(d);
       }
-  });
+    });
+  } else {
+    key.onKey(78, function(keyData){
+      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(d);
+    });
+
+    key.onKey(68, function(keyData){
+      if(d.length > 0){
+        d.splice(d.length-1,1);
+        dataset.data(d);
+      }
+    });
+  }
 
   pointer.attachTo(plot);
   key.attachTo(plot);

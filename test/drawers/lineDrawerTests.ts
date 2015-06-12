@@ -11,14 +11,14 @@ describe("Drawers", () => {
       var linePlot = new Plottable.Plots.Line();
 
       var drawer = new Plottable.Drawers.Line(dataset);
-      (<any> linePlot)._getDrawer = () => drawer;
+      (<any> linePlot)._createDrawer = () => drawer;
 
       linePlot.addDataset(dataset);
       linePlot.x((d: any) => d.a, xScale);
       linePlot.y((d: any) => d.b, yScale);
       linePlot.renderTo(svg);
 
-      var lineSelection = linePlot.getAllSelections();
+      var lineSelection = linePlot.selections();
       data.forEach((datum: any, index: number) => {
         var selection = drawer.selectionForIndex(index);
         assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");

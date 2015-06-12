@@ -14,14 +14,14 @@ describe("BaseAxis", () => {
     assert.throws(() => baseAxis.tickLabelPadding(-1), "must be positive");
   });
 
-  it("gutter() rejects negative values", () => {
+  it("margin() rejects negative values", () => {
     var scale = new Plottable.Scales.Linear();
     var axis = new Plottable.Axis(scale, "right");
 
-    assert.throws(() => axis.gutter(-1), "must be positive");
+    assert.throws(() => axis.margin(-1), "must be positive");
   });
 
-  it("width() + gutter()", () => {
+  it("width() + margin()", () => {
     var SVG_WIDTH = 100;
     var SVG_HEIGHT = 500;
     var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -29,17 +29,17 @@ describe("BaseAxis", () => {
     var verticalAxis = new Plottable.Axis(scale, "right");
     verticalAxis.renderTo(svg);
 
-    var expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter(); // tick length and gutter by default
+    var expectedWidth = verticalAxis.tickLength() + verticalAxis.margin(); // tick length and margin by default
     assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
 
-    verticalAxis.gutter(20);
-    expectedWidth = verticalAxis.tickLength() + verticalAxis.gutter();
-    assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the gutter size updates the width");
+    verticalAxis.margin(20);
+    expectedWidth = verticalAxis.tickLength() + verticalAxis.margin();
+    assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the margin size updates the width");
 
     svg.remove();
   });
 
-  it("height() + gutter()", () => {
+  it("height() + margin()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -47,12 +47,12 @@ describe("BaseAxis", () => {
     var horizontalAxis = new Plottable.Axis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
-    var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter(); // tick length and gutter by default
+    var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin(); // tick length and margin by default
     assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
 
-    horizontalAxis.gutter(20);
-    expectedHeight = horizontalAxis.tickLength() + horizontalAxis.gutter();
-    assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the gutter size updates the height");
+    horizontalAxis.margin(20);
+    expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin();
+    assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the margin size updates the height");
 
     svg.remove();
   });
@@ -181,17 +181,17 @@ describe("BaseAxis", () => {
     baseAxis.showEndTickLabels(true);
     baseAxis.renderTo(svg);
 
-    var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.gutter();
+    var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.margin();
     assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
 
     baseAxis.tickLength(20);
-    assert.strictEqual(baseAxis.height(), 20 + baseAxis.gutter(), "height should increase to tick length");
+    assert.strictEqual(baseAxis.height(), 20 + baseAxis.margin(), "height should increase to tick length");
 
     baseAxis.endTickLength(30);
-    assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should increase to end tick length");
+    assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should increase to end tick length");
 
     baseAxis.tickLength(10);
-    assert.strictEqual(baseAxis.height(), 30 + baseAxis.gutter(), "height should not decrease");
+    assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should not decrease");
 
     svg.remove();
   });

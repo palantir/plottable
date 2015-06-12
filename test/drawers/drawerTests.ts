@@ -1,6 +1,6 @@
 ///<reference path="../testReference.ts" />
 
-class MockAnimator implements Plottable.Animators.Plot {
+class MockAnimator implements Plottable.Animator {
   private _time: number;
   private _callback: Function;
   constructor(time: number, callback?: Function) {
@@ -22,9 +22,7 @@ class MockAnimator implements Plottable.Animators.Plot {
 
 function createMockDrawer(dataset: Plottable.Dataset) {
   var drawer = new Plottable.Drawer(dataset);
-  (<any> drawer)._drawStep = (step: Plottable.Drawers.AppliedDrawStep) => {
-    step.animator.animate(drawer.renderArea(), step.attrToAppliedProjector);
-  };
+  (<any> drawer)._svgElementName = "circle";
   return drawer;
 }
 
@@ -94,7 +92,7 @@ describe("Drawers", () => {
 
     it("selectionForIndex()", () => {
       var svg = TestMethods.generateSVG(300, 300);
-      var drawer = new Plottable.Drawer(null);
+      var drawer = createMockDrawer(null);
       drawer.renderArea(svg.append("g"));
       drawer.selector = () => "circle";
       var data = [{one: 2, two: 1}, {one: 33, two: 21}, {one: 11, two: 10}];
@@ -107,7 +105,7 @@ describe("Drawers", () => {
 
     it("totalDrawTime()", () => {
       var svg = TestMethods.generateSVG(300, 300);
-      var drawer = new Plottable.Drawer(null);
+      var drawer = createMockDrawer(null);
 
       var dataObjects = 9;
       var stepDuration = 987;
@@ -120,10 +118,10 @@ describe("Drawers", () => {
 
       var attrToProjector: Plottable.AttributeToProjector = null;
 
-      var animator = new Plottable.Animators.Base();
+      var animator = new Plottable.Animators.Easing();
       animator.maxTotalDuration(Infinity);
       animator.stepDuration(stepDuration);
-      animator.iterativeDelay(stepDelay);
+      animator.stepDelay(stepDelay);
       animator.startDelay(startDelay);
 
       var mockDrawStep = [{attrToProjector: attrToProjector, animator: animator}];

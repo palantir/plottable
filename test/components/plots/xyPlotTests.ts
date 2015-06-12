@@ -21,26 +21,27 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
       plot = new Plottable.XYPlot<number, number>();
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)
           .renderTo(svg);
     });
 
-    it("autorange() getter", () => {
-      assert.strictEqual(plot.autorange(), "none");
-      assert.strictEqual(plot.autorange("x"), plot, "autorange() setter did not return the original object");
-      assert.strictEqual(plot.autorange(), "x");
-      plot.autorange("y");
-      assert.strictEqual(plot.autorange(), "y");
-      plot.autorange("none");
-      assert.strictEqual(plot.autorange(), "none");
+    it("autorangeMode() getter", () => {
+      assert.strictEqual(plot.autorangeMode(), "none");
+      assert.strictEqual(plot.autorangeMode("x"), plot, "autorangeMode() setter did not return the original object");
+      assert.strictEqual(plot.autorangeMode(), "x");
+      plot.autorangeMode("y");
+      assert.strictEqual(plot.autorangeMode(), "y");
+      plot.autorangeMode("none");
+      assert.strictEqual(plot.autorangeMode(), "none");
       svg.remove();
     });
 
-    it("autorange() invalid inputs", () => {
+    it("autorangeMode() invalid inputs", () => {
       assert.throws(() => {
-        plot.autorange("foobar");
+        plot.autorangeMode("foobar");
       });
       svg.remove();
     });
@@ -48,21 +49,21 @@ describe("Plots", () => {
     it("automatically adjusting Y domain over visible points", () => {
       xScale.domain([-3, 3]);
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.autorange("y");
+      plot.autorangeMode("y");
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-      plot.autorange("none");
+      plot.autorangeMode("none");
       svg.remove();
     });
 
     it("automatically adjusting Y domain when no points are visible", () => {
-      plot.autorange("y");
+      plot.autorangeMode("y");
       xScale.domain([-0.5, 0.5]);
       assert.deepEqual(yScale.domain(), [0, 1], "scale uses default domain");
       svg.remove();
     });
 
     it("automatically adjusting Y domain when X scale is replaced", () => {
-      plot.autorange("y");
+      plot.autorangeMode("y");
       var newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
       plot.x(xAccessor, newXScale);
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
@@ -74,21 +75,21 @@ describe("Plots", () => {
     it("automatically adjusting X domain over visible points", () => {
       yScale.domain([-3, 3]);
       assert.deepEqual(xScale.domain(), [-7, 7], "domain has not been adjusted to visible points");
-      plot.autorange("x");
+      plot.autorangeMode("x");
       assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points");
-      plot.autorange("none");
+      plot.autorangeMode("none");
       svg.remove();
     });
 
     it("automatically adjusting X domain when no points are visible", () => {
-      plot.autorange("x");
+      plot.autorangeMode("x");
       yScale.domain([-0.5, 0.5]);
       assert.deepEqual(xScale.domain(), [0, 1], "scale uses default domain");
       svg.remove();
     });
 
     it("automatically adjusting X domain when Y scale is replaced", () => {
-      plot.autorange("x");
+      plot.autorangeMode("x");
       var newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
       plot.y(yAccessor, newYScale);
       assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
@@ -98,7 +99,7 @@ describe("Plots", () => {
     });
 
     it("showAllData()", () => {
-      plot.autorange("y");
+      plot.autorangeMode("y");
       xScale.domain([-0.5, 0.5]);
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -107,9 +108,9 @@ describe("Plots", () => {
     });
 
     it("show all data without auto adjust domain", () => {
-      plot.autorange("y");
+      plot.autorangeMode("y");
       xScale.domain([-0.5, 0.5]);
-      plot.autorange("none");
+      plot.autorangeMode("none");
       plot.showAllData();
       assert.deepEqual(yScale.domain(), [-7, 7], "domain has been adjusted to show all data");
       assert.deepEqual(xScale.domain(), [-7, 7], "domain has been adjusted to show all data");
@@ -117,7 +118,7 @@ describe("Plots", () => {
     });
 
     it("listeners are deregistered after removal", () => {
-      plot.autorange("y");
+      plot.autorangeMode("y");
       plot.destroy();
 
       assert.strictEqual((<any> xScale)._callbacks.size, 0, "the plot is no longer attached to xScale");

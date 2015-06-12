@@ -7,19 +7,17 @@ export module Plots {
     private static _SYMBOL_KEY = "symbol";
 
     /**
-     * Constructs a ScatterPlot.
+     * A Scatter Plot draws a symbol at each data point.
      *
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
      */
     constructor() {
       super();
-      this.classed("scatter-plot", true);
-      var animator = new Animators.Base();
+      this.addClass("scatter-plot");
+      var animator = new Animators.Easing();
       animator.startDelay(5);
       animator.stepDuration(250);
-      animator.maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+      animator.maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("opacity", 0.6);
       this.attr("fill", new Scales.Color().range()[0]);
@@ -28,12 +26,30 @@ export module Plots {
       this.symbol(() => circleSymbolFactory);
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Symbol(dataset);
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the size property of the plot.
+     * The size property corresponds to the area of the symbol.
+     */
     public size<S>(): AccessorScaleBinding<S, number>;
+    /**
+     * Sets the size property to a constant number or the result of an Accessor<number>.
+     *
+     * @param {number|Accessor<number>} size
+     * @returns {Plots.Scatter} The calling Scatter Plot.
+     */
     public size(size: number | Accessor<number>): Plots.Scatter<X, Y>;
+    /**
+     * Sets the size property to a scaled constant value or scaled result of an Accessor.
+     * The provided Scale will account for the values when autoDomain()-ing.
+     *
+     * @param {S|Accessor<S>} sectorValue
+     * @param {Scale<S, number>} scale
+     * @returns {Plots.Scatter} The calling Scatter Plot.
+     */
     public size<S>(size: S | Accessor<S>, scale: Scale<S, number>): Plots.Scatter<X, Y>;
     public size<S>(size?: number | Accessor<number> | S | Accessor<S>, scale?: Scale<S, number>): any {
       if (size == null) {
@@ -44,7 +60,17 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for the symbol property of the plot.
+     * The symbol property corresponds to how the symbol will be drawn.
+     */
     public symbol(): AccessorScaleBinding<any, any>;
+    /**
+     * Sets the symbol property to an Accessor<SymbolFactory>.
+     *
+     * @param {Accessor<SymbolFactory>} symbol
+     * @returns {Plots.Scatter} The calling Scatter Plot.
+     */
     public symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
     public symbol(symbol?: Accessor<SymbolFactory>): any {
       if (symbol == null) {
@@ -57,7 +83,7 @@ export module Plots {
 
     protected _generateDrawSteps(): Drawers.DrawStep[] {
       var drawSteps: Drawers.DrawStep[] = [];
-      if (this._dataChanged && this._animate) {
+      if (this._animateOnNextRender()) {
         var resetAttrToProjector = this._generateAttrToProjector();
         resetAttrToProjector["d"] = () => "";
         drawSteps.push({attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET)});
@@ -67,12 +93,12 @@ export module Plots {
       return drawSteps;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
       var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = Utils.DOM.getBBox(selection);
+      var bbox = Utils.DOM.elementBBox(selection);
       var translatedBbox: SVGRect = {
         x: bbox.x + translation[0],
         y: bbox.y + translation[1],

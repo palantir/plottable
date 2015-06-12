@@ -34,27 +34,23 @@ module Plottable {
         return false;
       }
 
-      private _updateSize() {
-        Object.defineProperty(this, "size", {
-          value: this._values.length,
-          configurable: true
-        });
-      }
-
       public has(value: T) {
         return this._values.indexOf(value) !== -1;
       }
 
-      /**
-       * The forEach method executes the provided callback once for each value which actually exists
-       * in the Set object. It is not invoked for values which have been deleted.
-       *
-       * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-       * @param {any} thisArg The `this` context
-       */
       public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
         this._values.forEach((value: T) => {
           callback.call(thisArg, value, value, this);
+        });
+      }
+
+      /**
+       * Updates the value of the read-only parameter size
+       */
+      private _updateSize() {
+        Object.defineProperty(this, "size", {
+          value: this._values.length,
+          configurable: true
         });
       }
     }

@@ -13,7 +13,7 @@
 ///<reference path="drawers/drawerTests.ts" />
 ///<reference path="drawers/lineDrawerTests.ts" />
 
-///<reference path="animators/baseAnimatorTests.ts" />
+///<reference path="animators/easingAnimatorTests.ts" />
 
 ///<reference path="components/baseAxisTests.ts" />
 ///<reference path="components/timeAxisTests.ts" />
@@ -54,14 +54,13 @@
 
 ///<reference path="utils/domUtilsTests.ts" />
 ///<reference path="utils/colorUtilsTests.ts" />
-///<reference path="utils/windowUtilsTests.ts" />
 ///<reference path="utils/mapTests.ts" />
 ///<reference path="utils/setTests.ts" />
 ///<reference path="utils/clientToSVGTranslatorTests.ts" />
 ///<reference path="utils/mathUtilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
 ///<reference path="utils/arrayUtilsTests.ts" />
-///<reference path="utils/stackedUtilsTests.ts" />
+///<reference path="utils/stackingUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/keyInteractionTests.ts" />

@@ -35,7 +35,7 @@ module Plottable {
      * but useful for browsers that don't suppoort `requestAnimationFrame`.
      */
     export class Timeout implements RenderPolicy {
-      private _timeoutMsec: number = Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+      private _timeoutMsec: number = Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
 
       public render() {
         setTimeout(RenderController.flush, this._timeoutMsec);

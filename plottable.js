@@ -1,25 +1,23 @@
 /*!
-Plottable 1.0.0-rc6 (https://github.com/palantir/plottable)
+Plottable 1.0.0-rc7 (https://github.com/palantir/plottable)
 Copyright 2014 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
-(function (root, factory) {
-  if (typeof define === 'function' && define.amd) {
-    // AMD. Register as an anonymous module unless amdModuleId is set
-    define([], function () {
-      return (root['Plottable'] = factory());
-    });
-  } else if (typeof exports === 'object') {
-    // Node. Does not work with strict CommonJS, but
-    // only CommonJS-like environments that support module.exports,
-    // like Node.
-    module.exports = factory();
-  } else {
-    root['Plottable'] = factory();
-  }
-}(this, function () {
-
+(function(root, factory) {
+    if(typeof exports === 'object') {
+        module.exports = factory(require, exports, module);
+    }
+    else if(typeof define === 'function' && define.amd) {
+        define(['require', 'exports', 'module'], factory);
+    }
+    else {
+        var req = function(id) {return root[id];},
+            exp = root,
+            mod = {exports: exp};
+        root['Plottable'] = factory(req, exp, mod);
+    }
+}(this, function(require, exports, module) {
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
@@ -85,6 +83,10 @@ var Plottable;
                 return typeof n === "number" && !Plottable.Utils.Math.isNaN(n) && isFinite(n);
             }
             Math.isValidNumber = isValidNumber;
+            /**
+             * Generates an array of consecutive, strictly increasing numbers
+             * in the range [start, stop) separeted by step
+             */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
                 if (step === 0) {
@@ -98,6 +100,13 @@ var Plottable;
                 return range;
             }
             Math.range = range;
+            /**
+             * Returns the square of the distance between two points
+             *
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
+             */
             function distanceSquared(p1, p2) {
                 return nativeMath.pow(p2.y - p1.y, 2) + nativeMath.pow(p2.x - p1.x, 2);
             }
@@ -119,15 +128,8 @@ var Plottable;
             function Map() {
                 this._keyValuePairs = [];
             }
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             Map.prototype.set = function (key, value) {
-                if (key !== key) {
+                if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
@@ -139,12 +141,6 @@ var Plottable;
                 this._keyValuePairs.push({ key: key, value: value });
                 return this;
             };
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -153,15 +149,6 @@ var Plottable;
                 }
                 return undefined;
             };
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -170,25 +157,12 @@ var Plottable;
                 }
                 return false;
             };
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
             };
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -234,26 +208,22 @@ var Plottable;
                 }
                 return false;
             };
-            Set.prototype._updateSize = function () {
-                Object.defineProperty(this, "size", {
-                    value: this._values.length,
-                    configurable: true
-                });
-            };
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
+                });
+            };
+            /**
+             * Updates the value of the read-only parameter size
+             */
+            Set.prototype._updateSize = function () {
+                Object.defineProperty(this, "size", {
+                    value: this._values.length,
+                    configurable: true
                 });
             };
             return Set;
@@ -274,129 +244,132 @@ var Plottable;
              * @param {d3.Selection} element
              * @returns {SVGRed} The bounding box.
              */
-            function getBBox(element) {
+            function elementBBox(element) {
                 var bbox;
                 try {
                     bbox = element.node().getBBox();
                 }
                 catch (err) {
-                    bbox = {
-                        x: 0,
-                        y: 0,
-                        width: 0,
-                        height: 0
-                    };
+                    bbox = { x: 0, y: 0, width: 0, height: 0 };
                 }
                 return bbox;
             }
-            DOM.getBBox = getBBox;
-            DOM.POLYFILL_TIMEOUT_MSEC = 1000 / 60; // 60 fps
-            function requestAnimationFramePolyfill(fn) {
+            DOM.elementBBox = elementBBox;
+            /**
+             * Screen refresh rate which is assumed to be 60fps
+             */
+            DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback) {
                 if (window.requestAnimationFrame != null) {
-                    window.requestAnimationFrame(fn);
+                    window.requestAnimationFrame(callback);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MSEC);
+                    setTimeout(callback, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
-            function getParsedStyleValue(style, prop) {
-                var value = style.getPropertyValue(prop);
-                var parsedValue = parseFloat(value);
-                if (parsedValue !== parsedValue) {
-                    return 0;
-                }
-                return parsedValue;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
+            function elementWidth(element) {
+                var style = window.getComputedStyle(element);
+                return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
-            function isSelectionRemovedFromSVG(selection) {
-                var n = selection.node();
-                while (n !== null && n.nodeName.toLowerCase() !== "svg") {
-                    n = n.parentNode;
-                }
-                return (n == null);
+            DOM.elementWidth = elementWidth;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
+            function elementHeight(element) {
+                var style = window.getComputedStyle(element);
+                return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
             }
-            DOM.isSelectionRemovedFromSVG = isSelectionRemovedFromSVG;
-            function getElementWidth(elem) {
-                var style = window.getComputedStyle(elem);
-                return getParsedStyleValue(style, "width") + getParsedStyleValue(style, "padding-left") + getParsedStyleValue(style, "padding-right") + getParsedStyleValue(style, "border-left-width") + getParsedStyleValue(style, "border-right-width");
-            }
-            DOM.getElementWidth = getElementWidth;
-            function getElementHeight(elem) {
-                var style = window.getComputedStyle(elem);
-                return getParsedStyleValue(style, "height") + getParsedStyleValue(style, "padding-top") + getParsedStyleValue(style, "padding-bottom") + getParsedStyleValue(style, "border-top-width") + getParsedStyleValue(style, "border-bottom-width");
-            }
-            DOM.getElementHeight = getElementHeight;
-            function getSVGPixelWidth(svg) {
-                var width = svg.node().clientWidth;
-                if (width === 0) {
-                    var widthAttr = svg.attr("width");
-                    if (widthAttr.indexOf("%") !== -1) {
-                        var ancestorNode = svg.node().parentNode;
-                        while (ancestorNode != null && ancestorNode.clientWidth === 0) {
-                            ancestorNode = ancestorNode.parentNode;
-                        }
-                        if (ancestorNode == null) {
-                            throw new Error("Could not compute width of element");
-                        }
-                        width = ancestorNode.clientWidth * parseFloat(widthAttr) / 100;
-                    }
-                    else {
-                        width = parseFloat(widthAttr);
-                    }
-                }
-                return width;
-            }
-            DOM.getSVGPixelWidth = getSVGPixelWidth;
-            function translate(s, x, y) {
-                var xform = d3.transform(s.attr("transform"));
+            DOM.elementHeight = elementHeight;
+            function translate(selection, x, y) {
+                var transformMatrix = d3.transform(selection.attr("transform"));
                 if (x == null) {
-                    return xform.translate;
+                    return transformMatrix.translate;
                 }
-                else {
-                    y = (y == null) ? 0 : y;
-                    xform.translate[0] = x;
-                    xform.translate[1] = y;
-                    s.attr("transform", xform.toString());
-                    return s;
-                }
+                y = (y == null) ? 0 : y;
+                transformMatrix.translate[0] = x;
+                transformMatrix.translate[1] = y;
+                selection.attr("transform", transformMatrix.toString());
+                return selection;
             }
             DOM.translate = translate;
-            function boxesOverlap(boxA, boxB) {
-                if (boxA.right < boxB.left) {
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA, clientRectB) {
+                if (clientRectA.right < clientRectB.left) {
                     return false;
                 }
-                if (boxA.left > boxB.right) {
+                if (clientRectA.left > clientRectB.right) {
                     return false;
                 }
-                if (boxA.bottom < boxB.top) {
+                if (clientRectA.bottom < clientRectB.top) {
                     return false;
                 }
-                if (boxA.top > boxB.bottom) {
+                if (clientRectA.top > clientRectB.bottom) {
                     return false;
                 }
                 return true;
             }
-            DOM.boxesOverlap = boxesOverlap;
-            function boxIsInside(inner, outer) {
-                return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
+            DOM.clientRectsOverlap = clientRectsOverlap;
+            /**
+             * Returns true if and only if innerClientRect is inside outerClientRect.
+             *
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+             */
+            function clientRectInside(innerClientRect, outerClientRect) {
+                return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) && nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) && nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) && nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
             }
-            DOM.boxIsInside = boxIsInside;
-            function getBoundingSVG(elem) {
-                var ownerSVG = elem.ownerSVGElement;
+            DOM.clientRectInside = clientRectInside;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element) {
+                var ownerSVG = element.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
                 }
-                if (elem.nodeName.toLowerCase() === "svg") {
-                    return elem;
+                if (element.nodeName.toLowerCase() === "svg") {
+                    return element;
                 }
                 return null; // not in the DOM
             }
-            DOM.getBoundingSVG = getBoundingSVG;
+            DOM.boundingSVG = boundingSVG;
             var _latestClipPathId = 0;
-            function getUniqueClipPathId() {
+            /**
+             * Generates a ClipPath ID that is unique for this instance of Plottable
+             */
+            function generateUniqueClipPathId() {
                 return "plottableClipPath" + ++_latestClipPathId;
             }
-            DOM.getUniqueClipPathId = getUniqueClipPathId;
+            DOM.generateUniqueClipPathId = generateUniqueClipPathId;
             /**
              * Returns true if the supplied coordinates or Ranges intersect or are contained by bbox.
              *
@@ -411,8 +384,8 @@ var Plottable;
              */
             function intersectsBBox(xValOrRange, yValOrRange, bbox, tolerance) {
                 if (tolerance === void 0) { tolerance = 0.5; }
-                var xRange = parseRange(xValOrRange);
-                var yRange = parseRange(yValOrRange);
+                var xRange = _parseRange(xValOrRange);
+                var yRange = _parseRange(yValOrRange);
                 // SVGRects are positioned with sub-pixel accuracy (the default unit
                 // for the x, y, height & width attributes), but user selections (e.g. via
                 // mouse events) usually have pixel accuracy. A tolerance of half-a-pixel
@@ -427,16 +400,21 @@ var Plottable;
              *
              * @returns {Range} The generated Range
              */
-            function parseRange(input) {
+            function _parseRange(input) {
                 if (typeof (input) === "number") {
-                    return { min: input, max: input };
+                    var value = input;
+                    return { min: value, max: value };
                 }
-                else if (input instanceof Object && "min" in input && "max" in input) {
-                    return input;
+                var range = input;
+                if (range instanceof Object && "min" in range && "max" in range) {
+                    return range;
                 }
-                else {
-                    throw new Error("input '" + input + "' can't be parsed as an Range");
-                }
+                throw new Error("input '" + input + "' can't be parsed as an Range");
+            }
+            function _parseStyleValue(style, property) {
+                var value = style.getPropertyValue(property);
+                var parsedValue = parseFloat(value);
+                return parsedValue || 0;
             }
         })(DOM = Utils.DOM || (Utils.DOM = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
@@ -463,11 +441,23 @@ var Plottable;
                 return l1 > l2 ? l1 / l2 : l2 / l1;
             }
             Color.contrast = contrast;
+            /**
+             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
+             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
+             */
             function lightenColor(color, factor) {
                 var hsl = d3.hsl(color).brighter(factor);
                 return hsl.rgb().toString();
             }
             Color.lightenColor = lightenColor;
+            /**
+             * Gets the Hex Code of the color resulting by applying the className CSS class to the
+             * colorTester selection. Returns null if the tester is transparent.
+             *
+             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+             * @param {string} className The name of the class to be applied
+             * @return {string} The hex code of the computed color
+             */
             function colorTest(colorTester, className) {
                 colorTester.classed(className, true);
                 // Use regex to get the text inside the rgb parentheses
@@ -620,144 +610,81 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var nativeMath = window.Math;
-        var Stacked = (function () {
-            function Stacked() {
-            }
+        var Stacking;
+        (function (Stacking) {
+            var nativeMath = window.Math;
             /**
-             * Calculates the offset of each piece of data, in each dataset, relative to the baseline,
-             * for drawing purposes.
+             * Computes the StackingResult (value and offset) for each data point in each Dataset.
              *
-             * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
+             * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data
+             * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+             * @return {StackingResult} value and offset for each datapoint in each Dataset
              */
-            Stacked.computeStackOffsets = function (datasets, keyAccessor, valueAccessor) {
-                var domainKeys = Stacked.domainKeys(datasets, keyAccessor);
-                var dataMapArray = Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
-                var positiveDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: nativeMath.max(0, dataMap.get(domainKey).value) || 0 };
-                    });
-                });
-                var negativeDataMapArray = dataMapArray.map(function (dataMap) {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: nativeMath.min(dataMap.get(domainKey).value, 0) || 0 };
-                    });
-                });
-                var stackOffsets = Stacked._generateStackOffsets(datasets, Stacked._stack(positiveDataMapArray, domainKeys), Stacked._stack(negativeDataMapArray, domainKeys), keyAccessor, valueAccessor);
-                return stackOffsets;
-            };
-            /**
-             * Calculates an extent across all datasets. The extent is a <number> interval that
-             * accounts for the fact that stacked bits have to be added together when calculating the extent
-             *
-             * @return {[number]} The extent that spans all the stacked data
-             */
-            Stacked.computeStackExtent = function (datasets, keyAccessor, valueAccessor, stackOffsets, filter) {
-                var maxStackExtent = Utils.Math.max(datasets, function (dataset) {
-                    var data = dataset.data();
-                    if (filter != null) {
-                        data = data.filter(function (d, i) { return filter(d, i, dataset); });
-                    }
-                    return Utils.Math.max(data, function (datum, i) {
-                        return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
-                    }, 0);
-                }, 0);
-                var minStackExtent = Utils.Math.min(datasets, function (dataset) {
-                    var data = dataset.data();
-                    if (filter != null) {
-                        data = data.filter(function (d, i) { return filter(d, i, dataset); });
-                    }
-                    return Utils.Math.min(data, function (datum, i) {
-                        return +valueAccessor(datum, i, dataset) + stackOffsets.get(dataset).get(String(keyAccessor(datum, i, dataset)));
-                    }, 0);
-                }, 0);
-                return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
-            };
-            /**
-             * Given an array of datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each dataset.
-             */
-            Stacked.domainKeys = function (datasets, keyAccessor) {
-                var domainKeys = d3.set();
+            function stack(datasets, keyAccessor, valueAccessor) {
+                var positiveOffsets = d3.map();
+                var negativeOffsets = d3.map();
+                var datasetToKeyToStackedDatum = new Utils.Map();
                 datasets.forEach(function (dataset) {
+                    var keyToStackedDatum = new Utils.Map();
                     dataset.data().forEach(function (datum, index) {
-                        domainKeys.add(keyAccessor(datum, index, dataset));
-                    });
-                });
-                return domainKeys.values();
-            };
-            /**
-             * Feeds the data through d3's stack layout function which will calculate
-             * the stack offsets and use the the function declared in .out to set the offsets on the data.
-             */
-            Stacked._stack = function (dataArray, domainKeys) {
-                var outFunction = function (d, y0, y) {
-                    d.offset = y0;
-                };
-                d3.layout.stack().x(function (d) { return d.key; }).y(function (d) { return +d.value; }).values(function (d) { return domainKeys.map(function (domainKey) { return d.get(domainKey); }); }).out(outFunction)(dataArray);
-                return dataArray;
-            };
-            Stacked._generateDefaultMapArray = function (datasets, keyAccessor, valueAccessor, domainKeys) {
-                var dataMapArray = datasets.map(function () {
-                    return Stacked._populateMap(domainKeys, function (domainKey) {
-                        return { key: domainKey, value: 0 };
-                    });
-                });
-                datasets.forEach(function (dataset, datasetIndex) {
-                    dataset.data().forEach(function (datum, index) {
-                        var key = String(keyAccessor(datum, index, dataset));
-                        var value = valueAccessor(datum, index, dataset);
-                        dataMapArray[datasetIndex].set(key, { key: key, value: value });
-                    });
-                });
-                return dataMapArray;
-            };
-            /**
-             * After the stack offsets have been determined on each separate dataset, the offsets need
-             * to be determined correctly on the overall datasets
-             */
-            Stacked._generateStackOffsets = function (datasets, positiveDataMapArray, negativeDataMapArray, keyAccessor, valueAccessor) {
-                var stackOffsets = new Utils.Map();
-                datasets.forEach(function (dataset, index) {
-                    var datasetOffsets = d3.map();
-                    var positiveDataMap = positiveDataMapArray[index];
-                    var negativeDataMap = negativeDataMapArray[index];
-                    var isAllNegativeValues = dataset.data().every(function (datum, i) { return valueAccessor(datum, i, dataset) <= 0; });
-                    dataset.data().forEach(function (datum, datumIndex) {
-                        var key = String(keyAccessor(datum, datumIndex, dataset));
-                        var positiveOffset = positiveDataMap.get(key).offset;
-                        var negativeOffset = negativeDataMap.get(key).offset;
-                        var value = valueAccessor(datum, datumIndex, dataset);
+                        var key = normalizeKey(keyAccessor(datum, index, dataset));
+                        var value = +valueAccessor(datum, index, dataset);
                         var offset;
-                        if (!+value) {
-                            offset = isAllNegativeValues ? negativeOffset : positiveOffset;
+                        var offsetMap = (value >= 0) ? positiveOffsets : negativeOffsets;
+                        if (offsetMap.has(key)) {
+                            offset = offsetMap.get(key);
+                            offsetMap.set(key, offset + value);
                         }
                         else {
-                            offset = value > 0 ? positiveOffset : negativeOffset;
+                            offset = 0;
+                            offsetMap.set(key, value);
                         }
-                        datasetOffsets.set(key, offset);
+                        keyToStackedDatum.set(key, {
+                            value: value,
+                            offset: offset
+                        });
                     });
-                    stackOffsets.set(dataset, datasetOffsets);
+                    datasetToKeyToStackedDatum.set(dataset, keyToStackedDatum);
                 });
-                return stackOffsets;
-            };
+                return datasetToKeyToStackedDatum;
+            }
+            Stacking.stack = stack;
             /**
-             * Populates a map from an array of keys and a transformation function.
+             * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @param {string[]} keys The array of keys.
-             * @param {(string, number) => T} transform A transformation function to apply to the keys.
-             * @return {d3.Map<T>} A map mapping keys to their transformed values.
+             * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
+             * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
+             * @return {[number, number]} The total extent
              */
-            Stacked._populateMap = function (keys, transform) {
-                var map = d3.map();
-                keys.forEach(function (key, i) {
-                    map.set(key, transform(key, i));
+            function stackedExtent(stackingResult, keyAccessor, filter) {
+                var extents = [];
+                stackingResult.forEach(function (stackedDatumMap, dataset) {
+                    dataset.data().forEach(function (datum, index) {
+                        if (filter != null && !filter(datum, index, dataset)) {
+                            return;
+                        }
+                        var stackedDatum = stackedDatumMap.get(normalizeKey(keyAccessor(datum, index, dataset)));
+                        extents.push(stackedDatum.value + stackedDatum.offset);
+                    });
                 });
-                return map;
-            };
-            return Stacked;
-        })();
-        Utils.Stacked = Stacked;
+                var maxStackExtent = Utils.Math.max(extents, 0);
+                var minStackExtent = Utils.Math.min(extents, 0);
+                return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
+            }
+            Stacking.stackedExtent = stackedExtent;
+            /**
+             * Normalizes a key used for stacking
+             *
+             * @param {any} key The key to be normalized
+             * @return {string} The stringified key
+             */
+            function normalizeKey(key) {
+                return String(key);
+            }
+            Stacking.normalizeKey = normalizeKey;
+        })(Stacking = Utils.Stacking || (Utils.Stacking = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -811,18 +738,6 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
-            /**
-             * Creates shallow copy of the object.
-             * @param {{ [key: string]: any }} oldMap Map to copy
-             *
-             * @returns {[{ [key: string]: any }} coppied object.
-             */
-            function copyObject(oldObject) {
-                var newObject = {};
-                Object.keys(oldObject).forEach(function (key) { return newObject[key] = oldObject[key]; });
-                return newObject;
-            }
-            Window.copyObject = copyObject;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -842,8 +757,12 @@ var Plottable;
                 this._measureRect.setAttribute("height", "1");
                 this._svg.appendChild(this._measureRect);
             }
+            /**
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
+             */
             ClientToSVGTranslator.getTranslator = function (elem) {
-                var svg = Utils.DOM.getBoundingSVG(elem);
+                var svg = Utils.DOM.boundingSVG(elem);
                 var translator = svg[ClientToSVGTranslator._TRANSLATOR_KEY];
                 if (translator == null) {
                     translator = new ClientToSVGTranslator(svg);
@@ -905,7 +824,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.0.0-rc6";
+    Plottable.version = "1.0.0-rc7";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1010,7 +929,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MSEC;
+                this._timeoutMsec = Plottable.Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
@@ -1052,23 +971,26 @@ var Plottable;
             Policy.ANIMATION_FRAME = "animationframe";
             Policy.TIMEOUT = "timeout";
         })(Policy = RenderController.Policy || (RenderController.Policy = {}));
-        RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
-        function setRenderPolicy(policy) {
-            switch (policy.toLowerCase()) {
+        var _renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+        function renderPolicy(renderPolicy) {
+            if (renderPolicy == null) {
+                return _renderPolicy;
+            }
+            switch (renderPolicy.toLowerCase()) {
                 case Policy.IMMEDIATE:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.Immediate();
+                    _renderPolicy = new Plottable.RenderPolicies.Immediate();
                     break;
                 case Policy.ANIMATION_FRAME:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
+                    _renderPolicy = new Plottable.RenderPolicies.AnimationFrame();
                     break;
                 case Policy.TIMEOUT:
-                    RenderController._renderPolicy = new Plottable.RenderPolicies.Timeout();
+                    _renderPolicy = new Plottable.RenderPolicies.Timeout();
                     break;
                 default:
-                    Plottable.Utils.Window.warn("Unrecognized renderPolicy: " + policy);
+                    Plottable.Utils.Window.warn("Unrecognized renderPolicy: " + renderPolicy);
             }
         }
-        RenderController.setRenderPolicy = setRenderPolicy;
+        RenderController.renderPolicy = renderPolicy;
         /**
          * Enqueues the Component for rendering.
          *
@@ -1097,7 +1019,7 @@ var Plottable;
             // Only run or enqueue flush on first request.
             if (!_animationRequested) {
                 _animationRequested = true;
-                RenderController._renderPolicy.render();
+                _renderPolicy.render();
             }
         }
         /**
@@ -1325,31 +1247,6 @@ var Plottable;
         }
         Formatters.time = time;
         /**
-         * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
-         * If the provided TimeInterval is incorrect, the default is d3.time.year
-         */
-        function timeIntervalToD3Time(timeInterval) {
-            switch (timeInterval) {
-                case Plottable.TimeInterval.second:
-                    return d3.time.second;
-                case Plottable.TimeInterval.minute:
-                    return d3.time.minute;
-                case Plottable.TimeInterval.hour:
-                    return d3.time.hour;
-                case Plottable.TimeInterval.day:
-                    return d3.time.day;
-                case Plottable.TimeInterval.week:
-                    return d3.time.week;
-                case Plottable.TimeInterval.month:
-                    return d3.time.month;
-                case Plottable.TimeInterval.year:
-                    return d3.time.year;
-                default:
-                    throw Error("TimeInterval specified does not exist: " + timeInterval);
-            }
-        }
-        Formatters.timeIntervalToD3Time = timeIntervalToD3Time;
-        /**
          * Creates a formatter for relative dates.
          *
          * @param {number} baseValue The start date (as epoch time) used in computing relative dates (default 0)
@@ -1534,7 +1431,7 @@ var Plottable;
          * Adds an IncludedValuesProvider to the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.add(provider);
@@ -1545,7 +1442,7 @@ var Plottable;
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.delete(provider);
@@ -1737,7 +1634,7 @@ var Plottable;
             }
         };
         QuantitativeScale.prototype._setDomain = function (values) {
-            var isNaNOrInfinity = function (x) { return x !== x || x === Infinity || x === -Infinity; };
+            var isNaNOrInfinity = function (x) { return Plottable.Utils.Math.isNaN(x) || x === Infinity || x === -Infinity; };
             if (isNaNOrInfinity(values[0]) || isNaNOrInfinity(values[1])) {
                 Plottable.Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
                 return;
@@ -1831,7 +1728,7 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Linear.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Linear._DEFAULT_NUM_TICKS);
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
@@ -1946,7 +1843,7 @@ var Plottable;
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
-                    ticks = d3.scale.linear().domain([min, max]).ticks(ModifiedLog._DEFAULT_NUM_TICKS);
+                    ticks = d3.scale.linear().domain([min, max]).ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 }
                 return ticks;
             };
@@ -1993,7 +1890,7 @@ var Plottable;
                 var adjustedLower = this._adjustedLog(lower);
                 var adjustedUpper = this._adjustedLog(upper);
                 var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-                var ticks = Math.ceil(proportion * ModifiedLog._DEFAULT_NUM_TICKS);
+                var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
                 return ticks;
             };
             ModifiedLog.prototype._niceDomain = function (domain, count) {
@@ -2024,7 +1921,7 @@ var Plottable;
                 this._d3Scale.range(values);
             };
             ModifiedLog.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2291,7 +2188,7 @@ var Plottable;
             Time.prototype.tickInterval = function (interval, step) {
                 // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
                 var tempScale = d3.time.scale();
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(interval);
+                var d3Interval = Time.timeIntervalToD3Time(interval);
                 tempScale.domain(this.domain());
                 tempScale.range(this.range());
                 return tempScale.ticks(d3Interval, step);
@@ -2334,10 +2231,34 @@ var Plottable;
                 return this._d3Scale.invert(value);
             };
             Time.prototype.defaultTicks = function () {
-                return this._d3Scale.ticks(Plottable.QuantitativeScale._DEFAULT_NUM_TICKS);
+                return this._d3Scale.ticks(Scales.Time._DEFAULT_NUM_TICKS);
             };
             Time.prototype._niceDomain = function (domain) {
                 return this._d3Scale.copy().domain(domain).nice().domain();
+            };
+            /**
+             * Transforms the Plottable TimeInterval string into a d3 time interval equivalent.
+             * If the provided TimeInterval is incorrect, the default is d3.time.year
+             */
+            Time.timeIntervalToD3Time = function (timeInterval) {
+                switch (timeInterval) {
+                    case Plottable.TimeInterval.second:
+                        return d3.time.second;
+                    case Plottable.TimeInterval.minute:
+                        return d3.time.minute;
+                    case Plottable.TimeInterval.hour:
+                        return d3.time.hour;
+                    case Plottable.TimeInterval.day:
+                        return d3.time.day;
+                    case Plottable.TimeInterval.week:
+                        return d3.time.week;
+                    case Plottable.TimeInterval.month:
+                        return d3.time.month;
+                    case Plottable.TimeInterval.year:
+                        return d3.time.year;
+                    default:
+                        throw Error("TimeInterval specified does not exist: " + timeInterval);
+                }
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -2361,16 +2282,11 @@ var Plottable;
             /**
              * An InterpolatedColor Scale maps numbers to color hex values, expressed as strings.
              *
-             * @constructor
-             * @param {string[]} [colors=InterpolatedColor.REDS] an array of strings representing color hex values
-             *   ("#FFFFFF") or keywords ("white").
              * @param {string} [scaleType="linear"] One of "linear"/"log"/"sqrt"/"pow".
              */
-            function InterpolatedColor(colorRange, scaleType) {
-                if (colorRange === void 0) { colorRange = InterpolatedColor.REDS; }
+            function InterpolatedColor(scaleType) {
                 if (scaleType === void 0) { scaleType = "linear"; }
                 _super.call(this);
-                this._colorRange = colorRange;
                 switch (scaleType) {
                     case "linear":
                         this._colorScale = d3.scale.linear();
@@ -2388,7 +2304,7 @@ var Plottable;
                 if (this._colorScale == null) {
                     throw new Error("unknown QuantitativeScale scale type " + scaleType);
                 }
-                this._d3Scale = this._d3InterpolatedScale();
+                this.range(InterpolatedColor.REDS);
             }
             InterpolatedColor.prototype.extentOfValues = function (values) {
                 var extent = d3.extent(values);
@@ -2428,14 +2344,6 @@ var Plottable;
                     };
                 };
             };
-            InterpolatedColor.prototype.colorRange = function (colorRange) {
-                if (colorRange == null) {
-                    return this._colorRange;
-                }
-                this._colorRange = colorRange;
-                this._resetScale();
-                return this;
-            };
             InterpolatedColor.prototype._resetScale = function () {
                 this._d3Scale = this._d3InterpolatedScale();
                 this._autoDomainIfAutomaticMode();
@@ -2459,10 +2367,11 @@ var Plottable;
                 this._d3Scale.domain(values);
             };
             InterpolatedColor.prototype._getRange = function () {
-                return this.colorRange();
+                return this._colorRange;
             };
-            InterpolatedColor.prototype._setRange = function (values) {
-                this.colorRange(values);
+            InterpolatedColor.prototype._setRange = function (range) {
+                this._colorRange = range;
+                this._resetScale();
             };
             InterpolatedColor.REDS = [
                 "#FFFFFF",
@@ -2567,7 +2476,7 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
     var Drawer = (function () {
         /**
-         * Constructs a Drawer
+         * A Drawer draws svg elements based on the input Dataset.
          *
          * @constructor
          * @param {Dataset} dataset The dataset associated with this Drawer
@@ -2591,12 +2500,20 @@ var Plottable;
             }
         };
         /**
-         * Enter new data to render area and creates binding
+         * Binds data to selection
          *
          * @param{any[]} data The data to be drawn
          */
-        Drawer.prototype._enterData = function (data) {
-            // no-op
+        Drawer.prototype._bindSelectionData = function (data) {
+            var dataElements = this._selection().data(data);
+            dataElements.enter().append(this._svgElementName);
+            dataElements.exit().remove();
+            this._applyDefaultAttributes(dataElements);
+        };
+        Drawer.prototype._applyDefaultAttributes = function (selection) {
+            if (this._className != null) {
+                selection.classed(this._className, true);
+            }
         };
         /**
          * Draws data using one step
@@ -2604,10 +2521,17 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            // no-op
-        };
-        Drawer.prototype._numberOfAnimationIterations = function (data) {
-            return data.length;
+            var selection = this._selection();
+            var colorAttributes = ["fill", "stroke"];
+            colorAttributes.forEach(function (colorAttribute) {
+                if (step.attrToAppliedProjector[colorAttribute] != null) {
+                    selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+                }
+            });
+            step.animator.animate(selection, step.attrToAppliedProjector);
+            if (this._className != null) {
+                this._selection().classed(this._className, true);
+            }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
@@ -2617,11 +2541,17 @@ var Plottable;
             });
             return modifiedAttrToProjector;
         };
+        /**
+         * Calculates the total time it takes to use the input drawSteps to draw the input data
+         *
+         * @param {any[]} data The data that would have been drawn
+         * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+         * @returns {number} The total time it takes to draw
+         */
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-            var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return delay;
         };
@@ -2640,27 +2570,28 @@ var Plottable;
                     animator: dr.animator
                 };
             });
-            this._enterData(data);
-            var numberOfIterations = this._numberOfAnimationIterations(data);
+            this._bindSelectionData(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return this;
+        };
+        Drawer.prototype._selection = function () {
+            return this.renderArea().selectAll(this.selector());
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            throw new Error("The base Drawer class has no elements to select");
+            return this._svgElementName;
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            var allSelections = this.renderArea().selectAll(this.selector());
-            return d3.select(allSelections[0][index]);
+            return d3.select(this._selection()[0][index]);
         };
         return Drawer;
     })();
@@ -2680,36 +2611,18 @@ var Plottable;
     (function (Drawers) {
         var Line = (function (_super) {
             __extends(Line, _super);
-            function Line() {
-                _super.apply(this, arguments);
+            function Line(dataset) {
+                _super.call(this, dataset);
+                this._className = "line";
+                this._svgElementName = "path";
             }
-            Line.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                this._pathSelection.datum(data);
-            };
-            Line.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                _super.prototype.renderArea.call(this, area);
-                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
-                return this;
-            };
-            Line.prototype._numberOfAnimationIterations = function (data) {
-                return 1;
-            };
-            Line.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
-                step.animator.animate(this._pathSelection, attrToProjector);
-                this._pathSelection.classed(Line.PATH_CLASS, true);
-            };
-            Line.prototype.selector = function () {
-                return "." + Line.PATH_CLASS;
+            Line.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
-            Line.PATH_CLASS = "line";
             return Line;
         })(Plottable.Drawer);
         Drawers.Line = Line;
@@ -2729,77 +2642,21 @@ var Plottable;
     (function (Drawers) {
         var Area = (function (_super) {
             __extends(Area, _super);
-            function Area() {
-                _super.apply(this, arguments);
+            function Area(dataset) {
+                _super.call(this, dataset);
+                this._className = "area";
+                this._svgElementName = "path";
             }
-            Area.prototype._enterData = function (data) {
-                this._areaSelection.datum(data);
+            Area.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("stroke", "none");
             };
-            Area.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                Plottable.Drawer.prototype.renderArea.call(this, area);
-                this._areaSelection = area.append("path").style("stroke", "none");
-                return this;
+            Area.prototype.selectionForIndex = function (index) {
+                return this.renderArea().select(this.selector());
             };
-            Area.prototype._drawStep = function (step) {
-                var attrToProjector = Plottable.Utils.Window.copyObject(step.attrToAppliedProjector);
-                step.animator.animate(this._areaSelection, attrToProjector);
-                this._areaSelection.classed(Area.PATH_CLASS, true);
-            };
-            Area.prototype.selector = function () {
-                return "path";
-            };
-            Area.PATH_CLASS = "area";
             return Area;
-        })(Drawers.Line);
-        Drawers.Area = Area;
-    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Drawers;
-    (function (Drawers) {
-        var Element = (function (_super) {
-            __extends(Element, _super);
-            function Element() {
-                _super.apply(this, arguments);
-            }
-            Element.prototype._getDrawSelection = function () {
-                return this.renderArea().selectAll(this._svgElement);
-            };
-            Element.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var drawSelection = this._getDrawSelection();
-                if (step.attrToAppliedProjector["fill"]) {
-                    drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, step.attrToAppliedProjector);
-            };
-            Element.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append(this._svgElement);
-                if (this._className != null) {
-                    dataElements.classed(this._className, true);
-                }
-                dataElements.exit().remove();
-            };
-            Element.prototype.selector = function () {
-                return this._svgElement;
-            };
-            return Element;
         })(Plottable.Drawer);
-        Drawers.Element = Element;
+        Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -2818,10 +2675,10 @@ var Plottable;
             __extends(Rectangle, _super);
             function Rectangle(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "rect";
+                this._svgElementName = "rect";
             }
             return Rectangle;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2842,10 +2699,10 @@ var Plottable;
             function Arc(dataset) {
                 _super.call(this, dataset);
                 this._className = "arc";
-                this._svgElement = "path";
+                this._svgElementName = "path";
             }
             return Arc;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2865,11 +2722,11 @@ var Plottable;
             __extends(Symbol, _super);
             function Symbol(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "path";
+                this._svgElementName = "path";
                 this._className = "symbol";
             }
             return Symbol;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2901,10 +2758,11 @@ var Plottable;
             this._isAnchored = false;
             this._boxes = [];
             this._isTopLevelComponent = false;
-            this._cssClasses = ["component"];
+            this._cssClasses = new Plottable.Utils.Set();
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
+            this._cssClasses.add("component");
         }
         /**
          * Attaches the Component as a child of a given d3 Selection.
@@ -2974,7 +2832,7 @@ var Plottable;
             this._cssClasses.forEach(function (cssClass) {
                 _this._element.classed(cssClass, true);
             });
-            this._cssClasses = null;
+            this._cssClasses = new Plottable.Utils.Set();
             this._backgroundContainer = this._element.append("g").classed("background-container", true);
             this._addBox("background-fill", this._backgroundContainer);
             this._content = this._element.append("g").classed("content", true);
@@ -2987,6 +2845,13 @@ var Plottable;
             this._boundingBox = this._addBox("bounding-box");
             this._isSetup = true;
         };
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: 0,
@@ -3022,14 +2887,14 @@ var Plottable;
                         this._rootSVG.attr("height", "100%");
                     }
                     var elem = this._rootSVG.node();
-                    availableWidth = Plottable.Utils.DOM.getElementWidth(elem);
-                    availableHeight = Plottable.Utils.DOM.getElementHeight(elem);
+                    availableWidth = Plottable.Utils.DOM.elementWidth(elem);
+                    availableHeight = Plottable.Utils.DOM.elementHeight(elem);
                 }
                 else {
                     throw new Error("null arguments cannot be passed to computeLayout() on a non-root node");
                 }
             }
-            var size = this._getSize(availableWidth, availableHeight);
+            var size = this._sizeFromOffer(availableWidth, availableHeight);
             this._width = size.width;
             this._height = size.height;
             var xAlignProportion = Component._xAlignToProportion[this._xAlignment];
@@ -3042,7 +2907,7 @@ var Plottable;
             this._boxes.forEach(function (b) { return b.attr("width", _this.width()).attr("height", _this.height()); });
             return this;
         };
-        Component.prototype._getSize = function (availableWidth, availableHeight) {
+        Component.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
             var requestedSpace = this.requestedSpace(availableWidth, availableHeight);
             return {
                 width: this.fixedWidth() ? Math.min(availableWidth, requestedSpace.minWidth) : availableWidth,
@@ -3065,6 +2930,9 @@ var Plottable;
                 Plottable.RenderController.registerToComputeLayout(this);
             }
         };
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         Component.prototype.renderImmediately = function () {
             return this;
         };
@@ -3109,8 +2977,7 @@ var Plottable;
                 this.anchor(selection);
             }
             if (this._element == null) {
-                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, \
-          or a d3.Selection, or a selector string");
+                throw new Error("If a Component has never been rendered before, then renderTo must be given a node to render to, " + "or a d3.Selection, or a selector string");
             }
             this.computeLayout();
             this.render();
@@ -3163,41 +3030,62 @@ var Plottable;
             // They don't need the current URL in the clip path reference.
             var prefix = /MSIE [5-9]/.test(navigator.userAgent) ? "" : document.location.href;
             prefix = prefix.split("#")[0]; // To fix cases where an anchor tag was used
-            var clipPathId = Plottable.Utils.DOM.getUniqueClipPathId();
+            var clipPathId = Plottable.Utils.DOM.generateUniqueClipPathId();
             this._element.attr("clip-path", "url(\"" + prefix + "#" + clipPathId + "\")");
             var clipPathParent = this._boxContainer.append("clipPath").attr("id", clipPathId);
             this._addBox("clip-rect", clipPathParent);
         };
-        Component.prototype.classed = function (cssClass, addClass) {
-            if (addClass == null) {
-                if (cssClass == null) {
-                    return false;
-                }
-                else if (this._element == null) {
-                    return (this._cssClasses.indexOf(cssClass) !== -1);
-                }
-                else {
-                    return this._element.classed(cssClass);
-                }
+        /**
+         * Checks if the Component has a given CSS class.
+         *
+         * @param {string} cssClass The CSS class to check for.
+         */
+        Component.prototype.hasClass = function (cssClass) {
+            if (cssClass == null) {
+                return false;
+            }
+            if (this._element == null) {
+                return this._cssClasses.has(cssClass);
             }
             else {
-                if (cssClass == null) {
-                    return this;
-                }
-                if (this._element == null) {
-                    var classIndex = this._cssClasses.indexOf(cssClass);
-                    if (addClass && classIndex === -1) {
-                        this._cssClasses.push(cssClass);
-                    }
-                    else if (!addClass && classIndex !== -1) {
-                        this._cssClasses.splice(classIndex, 1);
-                    }
-                }
-                else {
-                    this._element.classed(cssClass, addClass);
-                }
+                return this._element.classed(cssClass);
+            }
+        };
+        /**
+         * Adds a given CSS class to the Component.
+         *
+         * @param {string} cssClass The CSS class to add.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.addClass = function (cssClass) {
+            if (cssClass == null) {
                 return this;
             }
+            if (this._element == null) {
+                this._cssClasses.add(cssClass);
+            }
+            else {
+                this._element.classed(cssClass, true);
+            }
+            return this;
+        };
+        /**
+         * Removes a given CSS class from the Component.
+         *
+         * @param {string} cssClass The CSS class to remove.
+         * @returns {Component} The calling Component.
+         */
+        Component.prototype.removeClass = function (cssClass) {
+            if (cssClass == null) {
+                return this;
+            }
+            if (this._element == null) {
+                this._cssClasses.delete(cssClass);
+            }
+            else {
+                this._element.classed(cssClass, false);
+            }
+            return this;
         };
         /**
          * Checks if the Component has a fixed width or if it grows to fill available space.
@@ -3450,7 +3338,7 @@ var Plottable;
              * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
-             * Components added later will be rendered on top of Components already in the Group.
+             * Components added later will be rendered above Components already in the Group.
              *
              * @constructor
              * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -3460,11 +3348,11 @@ var Plottable;
                 if (components === void 0) { components = []; }
                 _super.call(this);
                 this._components = [];
-                this.classed("component-group", true);
+                this.addClass("component-group");
                 components.forEach(function (c) { return _this.append(c); });
             }
             Group.prototype._forEach = function (callback) {
-                this._components.forEach(callback);
+                this.components().forEach(callback);
             };
             /**
              * Checks whether the specified Component is in the Group.
@@ -3487,7 +3375,7 @@ var Plottable;
                 });
                 return this;
             };
-            Group.prototype._getSize = function (availableWidth, availableHeight) {
+            Group.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 return {
                     width: availableWidth,
                     height: availableHeight
@@ -3505,6 +3393,10 @@ var Plottable;
             Group.prototype.components = function () {
                 return this._components.slice();
             };
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered above Components already in the Group.
+             */
             Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();
@@ -3546,16 +3438,14 @@ var Plottable;
          * @constructor
          * @param {Scale} scale
          * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-         * @param {Formatter} [formatter=Formatters.identity()] Tick values are passed through this Formatter before being displayed.
          */
-        function Axis(scale, orientation, formatter) {
+        function Axis(scale, orientation) {
             var _this = this;
-            if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
             _super.call(this);
             this._endTickLength = 5;
             this._tickLength = 5;
             this._tickLabelPadding = 10;
-            this._gutter = 15;
+            this._margin = 15;
             this._showEndTickLabels = false;
             if (scale == null || orientation == null) {
                 throw new Error("Axis requires a scale and orientation");
@@ -3563,14 +3453,14 @@ var Plottable;
             this._scale = scale;
             this.orientation(orientation);
             this._setDefaultAlignment();
-            this.classed("axis", true);
+            this.addClass("axis");
             if (this._isHorizontal()) {
-                this.classed("x-axis", true);
+                this.addClass("x-axis");
             }
             else {
-                this.classed("y-axis", true);
+                this.addClass("y-axis");
             }
-            this.formatter(formatter);
+            this.formatter(Plottable.Formatters.identity());
             this._rescaleCallback = function (scale) { return _this._rescale(); };
             this._scale.onUpdate(this._rescaleCallback);
         }
@@ -3598,13 +3488,13 @@ var Plottable;
                 if (this._computedHeight == null) {
                     this._computeHeight();
                 }
-                requestedHeight = this._computedHeight + this._gutter;
+                requestedHeight = this._computedHeight + this._margin;
             }
             else {
                 if (this._computedWidth == null) {
                     this._computeWidth();
                 }
-                requestedWidth = this._computedWidth + this._gutter;
+                requestedWidth = this._computedWidth + this._margin;
             }
             return {
                 minWidth: requestedWidth,
@@ -3741,7 +3631,7 @@ var Plottable;
             }
         };
         Axis.prototype.formatter = function (formatter) {
-            if (formatter === undefined) {
+            if (formatter == null) {
                 return this._formatter;
             }
             this._formatter = formatter;
@@ -3795,15 +3685,15 @@ var Plottable;
                 return this;
             }
         };
-        Axis.prototype.gutter = function (size) {
+        Axis.prototype.margin = function (size) {
             if (size == null) {
-                return this._gutter;
+                return this._margin;
             }
             else {
                 if (size < 0) {
-                    throw new Error("gutter size must be positive");
+                    throw new Error("margin size must be positive");
                 }
-                this._gutter = size;
+                this._margin = size;
                 this.redraw();
                 return this;
             }
@@ -3883,7 +3773,7 @@ var Plottable;
             function Time(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tierLabelPositions = [];
-                this.classed("time-axis", true);
+                this.addClass("time-axis");
                 this.tickLabelPadding(5);
                 this.axisConfigurations(Time._DEFAULT_TIME_AXIS_CONFIGURATIONS);
             }
@@ -3952,7 +3842,7 @@ var Plottable;
             };
             Time.prototype._getIntervalLength = function (config) {
                 var startDate = this._scale.domain()[0];
-                var d3Interval = Plottable.Formatters.timeIntervalToD3Time(config.interval);
+                var d3Interval = Plottable.Scales.Time.timeIntervalToD3Time(config.interval);
                 var endDate = d3Interval.offset(startDate, config.step);
                 if (endDate > this._scale.domain()[1]) {
                     // this offset is too large, so just return available width
@@ -3972,10 +3862,10 @@ var Plottable;
                 var worstWidth = this._maxWidthForInterval(config) + 2 * this.tickLabelPadding();
                 return Math.min(this._getIntervalLength(config), this.width()) >= worstWidth;
             };
-            Time.prototype._getSize = function (availableWidth, availableHeight) {
+            Time.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 // Makes sure that the size it requires is a multiple of tier sizes, such that
                 // we have no leftover tiers
-                var size = _super.prototype._getSize.call(this, availableWidth, availableHeight);
+                var size = _super.prototype._sizeFromOffer.call(this, availableWidth, availableHeight);
                 size.height = this._tierHeights.reduce(function (prevValue, currValue, index, arr) {
                     return (prevValue + currValue > size.height) ? prevValue : (prevValue + currValue);
                 });
@@ -4157,7 +4047,7 @@ var Plottable;
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -4307,12 +4197,11 @@ var Plottable;
              * @constructor
              * @param {QuantitativeScale} scale
              * @param {string} orientation One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] Tick values are passed through this Formatter before being displayed.
              */
-            function Numeric(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
-                _super.call(this, scale, orientation, formatter);
+            function Numeric(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
+                this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4363,7 +4252,7 @@ var Plottable;
                 }
                 if (!this._isHorizontal()) {
                     var reComputedWidth = this._computeWidth();
-                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.gutter())) {
+                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
                         this.redraw();
                         return;
                     }
@@ -4519,11 +4408,11 @@ var Plottable;
                     return;
                 }
                 var firstTickLabel = tickLabels[0][0];
-                if (!Plottable.Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!Plottable.Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4535,7 +4424,7 @@ var Plottable;
                     return;
                 }
                 tickLabels.each(function (d, i) {
-                    if (!Plottable.Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });
@@ -4615,13 +4504,11 @@ var Plottable;
              * @constructor
              * @param {Scales.Category} scale
              * @param {string} [orientation="bottom"] One of "top"/"bottom"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.identity()]
              */
-            function Category(scale, orientation, formatter) {
-                if (formatter === void 0) { formatter = Plottable.Formatters.identity(); }
-                _super.call(this, scale, orientation, formatter);
+            function Category(scale, orientation) {
+                _super.call(this, scale, orientation);
                 this._tickLabelAngle = 0;
-                this.classed("category-axis", true);
+                this.addClass("category-axis");
             }
             Category.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -4633,8 +4520,8 @@ var Plottable;
                 return this.redraw();
             };
             Category.prototype.requestedSpace = function (offeredWidth, offeredHeight) {
-                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter();
-                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.gutter() : 0;
+                var widthRequiredByTicks = this._isHorizontal() ? 0 : this._maxLabelTickLength() + this.tickLabelPadding() + this.margin();
+                var heightRequiredByTicks = this._isHorizontal() ? this._maxLabelTickLength() + this.tickLabelPadding() + this.margin() : 0;
                 if (this._scale.domain().length === 0) {
                     return {
                         minWidth: 0,
@@ -4812,7 +4699,7 @@ var Plottable;
                 if (displayText === void 0) { displayText = ""; }
                 if (angle === void 0) { angle = 0; }
                 _super.call(this);
-                this.classed("label", true);
+                this.addClass("label");
                 this.text(displayText);
                 this.angle(angle);
                 this.xAlignment("center").yAlignment("center");
@@ -4918,7 +4805,7 @@ var Plottable;
              */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
-                this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
+                this.addClass(TitleLabel.TITLE_LABEL_CLASS);
             }
             TitleLabel.TITLE_LABEL_CLASS = "title-label";
             return TitleLabel;
@@ -4933,7 +4820,7 @@ var Plottable;
              */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
-                this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
+                this.addClass(AxisLabel.AXIS_LABEL_CLASS);
             }
             AxisLabel.AXIS_LABEL_CLASS = "axis-label";
             return AxisLabel;
@@ -4965,7 +4852,7 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._padding = 5;
-                this.classed("legend", true);
+                this.addClass("legend");
                 this.maxEntriesPerRow(1);
                 if (colorScale == null) {
                     throw new Error("Legend requires a colorScale");
@@ -4986,12 +4873,12 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper).addTitleElement(true);
             };
-            Legend.prototype.maxEntriesPerRow = function (numEntries) {
-                if (numEntries == null) {
+            Legend.prototype.maxEntriesPerRow = function (maxEntriesPerRow) {
+                if (maxEntriesPerRow == null) {
                     return this._maxEntriesPerRow;
                 }
                 else {
-                    this._maxEntriesPerRow = numEntries;
+                    this._maxEntriesPerRow = maxEntriesPerRow;
                     this.redraw();
                     return this;
                 }
@@ -5143,7 +5030,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5162,12 +5049,12 @@ var Plottable;
                 });
                 return this;
             };
-            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
-                if (symbolFactoryAccessor == null) {
+            Legend.prototype.symbol = function (symbol) {
+                if (symbol == null) {
                     return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolFactoryAccessor = symbolFactoryAccessor;
+                    this._symbolFactoryAccessor = symbol;
                     this.render();
                     return this;
                 }
@@ -5218,13 +5105,9 @@ var Plottable;
              *
              * @constructor
              * @param {Scales.InterpolatedColor} interpolatedColorScale
-             * @param {string} [orientation="horizontal"] One of "horizontal"/"left"/"right".
-             * @param {Formatter} [formatter=Formatters.general()] The Formatter for the labels.
              */
-            function InterpolatedColorLegend(interpolatedColorScale, orientation, formatter) {
+            function InterpolatedColorLegend(interpolatedColorScale) {
                 var _this = this;
-                if (orientation === void 0) { orientation = "horizontal"; }
-                if (formatter === void 0) { formatter = Plottable.Formatters.general(); }
                 _super.call(this);
                 this._padding = 5;
                 this._numSwatches = 10;
@@ -5234,9 +5117,10 @@ var Plottable;
                 this._scale = interpolatedColorScale;
                 this._redrawCallback = function (scale) { return _this.redraw(); };
                 this._scale.onUpdate(this._redrawCallback);
-                this._formatter = formatter;
-                this._orientation = InterpolatedColorLegend._ensureOrientation(orientation);
-                this.classed("legend", true).classed("interpolated-color-legend", true);
+                this._formatter = Plottable.Formatters.general();
+                this._orientation = "horizontal";
+                this.addClass("legend");
+                this.addClass("interpolated-color-legend");
             }
             InterpolatedColorLegend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
@@ -5452,7 +5336,7 @@ var Plottable;
                     throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
                 }
                 _super.call(this);
-                this.classed("gridlines", true);
+                this.addClass("gridlines");
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._renderCallback = function (scale) { return _this.render(); };
@@ -5549,7 +5433,7 @@ var Plottable;
                 this._nRows = 0;
                 this._nCols = 0;
                 this._calculatedLayout = null;
-                this.classed("table", true);
+                this.addClass("table");
                 rows.forEach(function (row, rowIndex) {
                     row.forEach(function (component, colIndex) {
                         if (component != null) {
@@ -5891,14 +5775,14 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
-                this.classed("selection-box-layer", true);
+                this.addClass("selection-box-layer");
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
                 this._box = this.content().append("g").classed("selection-box", true).remove();
                 this._boxArea = this._box.append("rect").classed("selection-area", true);
             };
-            SelectionBoxLayer.prototype._getSize = function (availableWidth, availableHeight) {
+            SelectionBoxLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
                 return {
                     width: availableWidth,
                     height: availableHeight
@@ -5985,6 +5869,8 @@ var Plottable;
     var Plot = (function (_super) {
         __extends(Plot, _super);
         /**
+         * A Plot draws some visualization of the inputted Datasets.
+         *
          * @constructor
          */
         function Plot() {
@@ -5993,9 +5879,8 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._animators = {};
-            this._animateOnNextRender = true;
             this._clipPathEnabled = true;
-            this.classed("plot", true);
+            this.addClass("plot");
             this._datasetToDrawer = new Plottable.Utils.Map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
@@ -6004,13 +5889,12 @@ var Plottable;
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
-            var mainAnimator = new Plottable.Animators.Base().maxTotalDuration(Plot.ANIMATION_MAX_DURATION);
+            var mainAnimator = new Plottable.Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
             this.animator(Plots.Animator.MAIN, mainAnimator);
             this.animator(Plots.Animator.RESET, new Plottable.Animators.Null());
         }
         Plot.prototype.anchor = function (selection) {
             _super.prototype.anchor.call(this, selection);
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this._updateExtents();
             return this;
@@ -6038,7 +5922,7 @@ var Plottable;
                 this.removeDataset(dataset);
             }
             ;
-            var drawer = this._getDrawer(dataset);
+            var drawer = this._createDrawer(dataset);
             this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
                 this._createNodesForDataset(dataset);
@@ -6052,11 +5936,11 @@ var Plottable;
             drawer.renderArea(this._renderArea.append("g"));
             return drawer;
         };
-        Plot.prototype._getDrawer = function (dataset) {
+        Plot.prototype._createDrawer = function (dataset) {
             return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
-            if (this._animate && this._animateOnNextRender) {
+            if (this._animateOnNextRender()) {
                 return this._animators[key] || new Plottable.Animators.Null();
             }
             else {
@@ -6065,7 +5949,6 @@ var Plottable;
         };
         Plot.prototype._onDatasetUpdate = function () {
             this._updateExtents();
-            this._animateOnNextRender = true;
             this._dataChanged = true;
             this.render();
         };
@@ -6116,7 +5999,6 @@ var Plottable;
             if (this._isAnchored) {
                 this._paint();
                 this._dataChanged = false;
-                this._animateOnNextRender = false;
             }
             return this;
         };
@@ -6293,20 +6175,20 @@ var Plottable;
          *   If not provided, Selections will be retrieved for all Datasets on the Plot.
          * @returns {d3.Selection}
          */
-        Plot.prototype.getAllSelections = function (datasets) {
+        Plot.prototype.selections = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var allSelections = [];
+            var selections = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 if (drawer == null) {
                     return;
                 }
                 drawer.renderArea().selectAll(drawer.selector()).each(function () {
-                    allSelections.push(this);
+                    selections.push(this);
                 });
             });
-            return d3.selectAll(allSelections);
+            return d3.selectAll(selections);
         };
         /**
          * Gets the Entities associated with the specified Datasets.
@@ -6324,7 +6206,7 @@ var Plottable;
                 var validDatumIndex = 0;
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
-                    if (position.x !== position.x || position.y !== position.y) {
+                    if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
                     entities.push({
@@ -6351,7 +6233,7 @@ var Plottable;
             var closestDistanceSquared = Infinity;
             var closest;
             this.entities().forEach(function (entity) {
-                if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -6362,7 +6244,7 @@ var Plottable;
             });
             return closest;
         };
-        Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+        Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -6382,7 +6264,10 @@ var Plottable;
         Plot.prototype._pixelPoint = function (datum, index, dataset) {
             return { x: 0, y: 0 };
         };
-        Plot.ANIMATION_MAX_DURATION = 600;
+        Plot.prototype._animateOnNextRender = function () {
+            return this._animate && this._dataChanged;
+        };
+        Plot._ANIMATION_MAX_DURATION = 600;
         return Plot;
     })(Plottable.Component);
     Plottable.Plot = Plot;
@@ -6409,7 +6294,7 @@ var Plottable;
                 _super.call(this);
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
-                this.classed("pie-plot", true);
+                this.addClass("pie-plot");
                 this.attr("fill", function (d, i) { return String(i); }, new Plottable.Scales.Color());
             }
             Pie.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -6443,7 +6328,7 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
             };
-            Pie.prototype._getDrawer = function (dataset) {
+            Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
             };
             Pie.prototype.entities = function (datasets) {
@@ -6563,7 +6448,7 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            this.classed("xy-plot", true);
+            this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
         }
@@ -6638,8 +6523,8 @@ var Plottable;
             }
             return this;
         };
-        XYPlot.prototype.autorange = function (scaleName) {
-            if (scaleName == null) {
+        XYPlot.prototype.autorangeMode = function (autorangeMode) {
+            if (autorangeMode == null) {
                 if (this._autoAdjustXScaleDomain) {
                     return "x";
                 }
@@ -6648,7 +6533,7 @@ var Plottable;
                 }
                 return "none";
             }
-            switch (scaleName) {
+            switch (autorangeMode) {
                 case "x":
                     this._autoAdjustXScaleDomain = true;
                     this._autoAdjustYScaleDomain = false;
@@ -6664,7 +6549,7 @@ var Plottable;
                     this._autoAdjustYScaleDomain = false;
                     break;
                 default:
-                    throw new Error("Invalid scale name '" + scaleName + "', must be 'x', 'y' or 'none'");
+                    throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
             }
             return this;
         };
@@ -6785,9 +6670,9 @@ var Plottable;
             function Rectangle() {
                 _super.call(this);
                 this.animator("rectangles", new Plottable.Animators.Null());
-                this.classed("rectangle-plot", true);
+                this.addClass("rectangle-plot");
             }
-            Rectangle.prototype._getDrawer = function (dataset) {
+            Rectangle.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
@@ -6960,19 +6845,17 @@ var Plottable;
         var Scatter = (function (_super) {
             __extends(Scatter, _super);
             /**
-             * Constructs a ScatterPlot.
+             * A Scatter Plot draws a symbol at each data point.
              *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              */
             function Scatter() {
                 _super.call(this);
-                this.classed("scatter-plot", true);
-                var animator = new Plottable.Animators.Base();
+                this.addClass("scatter-plot");
+                var animator = new Plottable.Animators.Easing();
                 animator.startDelay(5);
                 animator.stepDuration(250);
-                animator.maxTotalDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
+                animator.maxTotalDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
                 this.animator(Plots.Animator.MAIN, animator);
                 this.attr("opacity", 0.6);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -6980,7 +6863,7 @@ var Plottable;
                 var circleSymbolFactory = Plottable.SymbolFactories.circle();
                 this.symbol(function () { return circleSymbolFactory; });
             }
-            Scatter.prototype._getDrawer = function (dataset) {
+            Scatter.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Symbol(dataset);
             };
             Scatter.prototype.size = function (size, scale) {
@@ -7001,7 +6884,7 @@ var Plottable;
             };
             Scatter.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     resetAttrToProjector["d"] = function () { return ""; };
                     drawSteps.push({ attrToProjector: resetAttrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7009,11 +6892,11 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = Plottable.Utils.DOM.getBBox(selection);
+                var bbox = Plottable.Utils.DOM.elementBBox(selection);
                 var translatedBbox = {
                     x: bbox.x + translation[0],
                     y: bbox.y + translation[1],
@@ -7054,9 +6937,9 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function Bar(orientation) {
@@ -7066,7 +6949,7 @@ var Plottable;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
-                this.classed("bar-plot", true);
+                this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
                 }
@@ -7111,7 +6994,7 @@ var Plottable;
             Bar.prototype.orientation = function () {
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
             };
-            Bar.prototype._getDrawer = function (dataset) {
+            Bar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Bar.prototype._setup = function () {
@@ -7150,7 +7033,7 @@ var Plottable;
                     return this;
                 }
             };
-            Bar.prototype.labelsFormatter = function (formatter) {
+            Bar.prototype.labelFormatter = function (formatter) {
                 if (formatter == null) {
                     return this._labelFormatter;
                 }
@@ -7199,14 +7082,14 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var primaryDist = 0;
                     var secondaryDist = 0;
                     var plotPt = entity.position;
                     // if we're inside a bar, distance in both directions should stay 0
-                    var barBBox = Plottable.Utils.DOM.getBBox(entity.selection);
+                    var barBBox = Plottable.Utils.DOM.elementBBox(entity.selection);
                     if (!Plottable.Utils.DOM.intersectsBBox(queryPoint.x, queryPoint.y, barBBox, tolerance)) {
                         var plotPtPrimary = _this._isVertical ? plotPt.x : plotPt.y;
                         primaryDist = Math.abs(queryPtPrimary - plotPtPrimary);
@@ -7231,10 +7114,10 @@ var Plottable;
                 });
                 return closest;
             };
-            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var barBBox = Plottable.Utils.DOM.getBBox(selection);
+                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
@@ -7263,7 +7146,7 @@ var Plottable;
             Bar.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
                 var intersected = [];
                 this.entities().forEach(function (entity) {
-                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.getBBox(entity.selection))) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.elementBBox(entity.selection))) {
                         intersected.push(entity);
                     }
                 });
@@ -7369,7 +7252,7 @@ var Plottable;
             };
             Bar.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var resetAttrToProjector = this._generateAttrToProjector();
                     var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                     var scaledBaseline = primaryScale.scale(this.baselineValue());
@@ -7523,22 +7406,22 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Line() {
                 _super.call(this);
-                this.classed("line-plot", true);
-                var animator = new Plottable.Animators.Base();
-                animator.stepDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
-                animator.easing("exp-in-out");
-                animator.maxTotalDuration(Plottable.Plot.ANIMATION_MAX_DURATION);
+                this.addClass("line-plot");
+                var animator = new Plottable.Animators.Easing();
+                animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
+                animator.easingMode("exp-in-out");
+                animator.maxTotalDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
                 this.animator(Plots.Animator.MAIN, animator);
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
-            Line.prototype._getDrawer = function (dataset) {
+            Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
             Line.prototype._getResetYFunction = function () {
@@ -7554,7 +7437,7 @@ var Plottable;
             };
             Line.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7585,7 +7468,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);
@@ -7608,7 +7491,7 @@ var Plottable;
                 var definedProjector = function (d, i, dataset) {
                     var positionX = Plottable.Plot._scaledAccessor(_this.x())(d, i, dataset);
                     var positionY = Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                    return positionX != null && positionX === positionX && positionY != null && positionY === positionY;
+                    return positionX != null && !Plottable.Utils.Math.isNaN(positionX) && positionY != null && !Plottable.Utils.Math.isNaN(positionY);
                 };
                 return function (datum, index, dataset) {
                     return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
@@ -7616,7 +7499,7 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
                 return dataToDraw;
             };
             return Line;
@@ -7642,12 +7525,10 @@ var Plottable;
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Area() {
                 _super.call(this);
-                this.classed("area-plot", true);
+                this.addClass("area-plot");
                 this.y0(0); // default
                 this.attr("fill-opacity", 0.25);
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
@@ -7713,7 +7594,7 @@ var Plottable;
             };
             Area.prototype._generateLineDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateLineAttrToProjector();
                     attrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction());
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7726,12 +7607,12 @@ var Plottable;
                 lineAttrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
                 return lineAttrToProjector;
             };
-            Area.prototype._getDrawer = function (dataset) {
+            Area.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Area(dataset);
             };
             Area.prototype._generateDrawSteps = function () {
                 var drawSteps = [];
-                if (this._dataChanged && this._animate) {
+                if (this._animateOnNextRender()) {
                     var attrToProjector = this._generateAttrToProjector();
                     attrToProjector["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), this._getResetYFunction(), Plottable.Plot._scaledAccessor(this.y0()));
                     drawSteps.push({ attrToProjector: attrToProjector, animator: this._getAnimator(Plots.Animator.RESET) });
@@ -7766,10 +7647,10 @@ var Plottable;
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()), Plottable.Plot._scaledAccessor(this.y0()));
                 return propertyToProjectors;
             };
-            Area.prototype.getAllSelections = function (datasets) {
+            Area.prototype.selections = function (datasets) {
                 var _this = this;
                 if (datasets === void 0) { datasets = this.datasets(); }
-                var allSelections = _super.prototype.getAllSelections.call(this, datasets)[0];
+                var allSelections = _super.prototype.selections.call(this, datasets)[0];
                 var lineDrawers = datasets.map(function (dataset) { return _this._lineDrawers.get(dataset); }).filter(function (drawer) { return drawer != null; });
                 lineDrawers.forEach(function (ld, i) { return allSelections.push(ld.selectionForIndex(i).node()); });
                 return d3.selectAll(allSelections);
@@ -7812,8 +7693,6 @@ var Plottable;
              *   On a horizontal ClusteredBar Plot, the bars with the same Y value are grouped.
              *
              * @constructor
-             * @param {Scale} xScale
-             * @param {Scale} yScale
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function ClusteredBar(orientation) {
@@ -7872,16 +7751,14 @@ var Plottable;
             __extends(StackedArea, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function StackedArea() {
                 var _this = this;
                 _super.call(this);
                 this._baselineValue = 0;
-                this.classed("stacked-area-plot", true);
+                this.addClass("stacked-area-plot");
                 this.attr("fill-opacity", 1);
-                this._stackOffsets = new Plottable.Utils.Map();
+                this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
                 this._baselineValueProvider = function () { return [_this._baselineValue]; };
             }
@@ -7966,25 +7843,46 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
                     return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
                 });
-                var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
+                var domainKeys = StackedArea._domainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
+            };
+            /**
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
+             */
+            StackedArea._domainKeys = function (datasets, keyAccessor) {
+                var domainKeys = d3.set();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum, index) {
+                        domainKeys.add(keyAccessor(datum, index, dataset));
+                    });
+                });
+                return domainKeys.values();
             };
             StackedArea.prototype._propertyProjectors = function () {
                 var _this = this;
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 var yAccessor = this.y().accessor;
                 var xAccessor = this.x().accessor;
-                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
-                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset))); };
+                var normalizedXAccessor = function (datum, index, dataset) {
+                    return Plottable.Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
+                };
+                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
+                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackingResult.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
                 return propertyToProjectors;
             };
@@ -7992,7 +7890,7 @@ var Plottable;
                 var pixelPoint = _super.prototype._pixelPoint.call(this, datum, index, dataset);
                 var xValue = this.x().accessor(datum, index, dataset);
                 var yValue = this.y().accessor(datum, index, dataset);
-                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue));
+                var scaledYValue = this.y().scale.scale(+yValue + this._stackingResult.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
             };
             return StackedArea;
@@ -8027,8 +7925,8 @@ var Plottable;
             function StackedBar(orientation) {
                 if (orientation === void 0) { orientation = Plots.Bar.ORIENTATION_VERTICAL; }
                 _super.call(this, orientation);
-                this.classed("stacked-bar-plot", true);
-                this._stackOffsets = new Plottable.Utils.Map();
+                this.addClass("stacked-bar-plot");
+                this._stackingResult = new Plottable.Utils.Map();
                 this._stackedExtent = [];
             }
             StackedBar.prototype.x = function (x, xScale) {
@@ -8065,8 +7963,11 @@ var Plottable;
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                 var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
                 var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset))); };
-                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset))); };
+                var normalizedKeyAccessor = function (datum, index, dataset) {
+                    return Plottable.Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
+                };
+                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
+                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackingResult.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
                 var heightF = function (d, i, dataset) {
                     return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
                 };
@@ -8102,8 +8003,8 @@ var Plottable;
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(datasets, keyAccessor, valueAccessor, this._stackOffsets, filter);
+                this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             return StackedBar;
         })(Plots.Bar);
@@ -8112,12 +8013,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var Plottable;
-(function (Plottable) {
-    var Animators;
-    (function (Animators) {
-    })(Animators = Plottable.Animators || (Plottable.Animators = {}));
-})(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
 var Plottable;
@@ -8149,44 +8044,32 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * The base animator implementation with easing, duration, and delay.
-         *
-         * The delay between animations can be configured with iterativeDelay().
-         * This will be affected if the maxTotalDuration() is used such that the entire animation
-         * fits within the timeframe
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then iterativeDelay
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(iterativeDelay(),
-         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+         * An Animator with easing and configurable durations and delays.
          */
-        var Base = (function () {
+        var Easing = (function () {
             /**
              * Constructs the default animator
              *
              * @constructor
              */
-            function Base() {
-                this._startDelay = Base.DEFAULT_START_DELAY_MILLISECONDS;
-                this._stepDuration = Base.DEFAULT_STEP_DURATION_MILLISECONDS;
-                this._iterativeDelay = Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
-                this._maxTotalDuration = Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
-                this._easing = Base.DEFAULT_EASING;
+            function Easing() {
+                this._startDelay = Easing._DEFAULT_START_DELAY_MILLISECONDS;
+                this._stepDuration = Easing._DEFAULT_STEP_DURATION_MILLISECONDS;
+                this._stepDelay = Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS;
+                this._maxTotalDuration = Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS;
+                this._easingMode = Easing._DEFAULT_EASING_MODE;
             }
-            Base.prototype.totalTime = function (numberOfSteps) {
+            Easing.prototype.totalTime = function (numberOfSteps) {
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
                 return this.startDelay() + adjustedIterativeDelay * (Math.max(numberOfSteps - 1, 0)) + this.stepDuration();
             };
-            Base.prototype.animate = function (selection, attrToAppliedProjector) {
+            Easing.prototype.animate = function (selection, attrToAppliedProjector) {
                 var _this = this;
                 var numberOfSteps = selection[0].length;
                 var adjustedIterativeDelay = this._getAdjustedIterativeDelay(numberOfSteps);
-                return selection.transition().ease(this.easing()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
+                return selection.transition().ease(this.easingMode()).duration(this.stepDuration()).delay(function (d, i) { return _this.startDelay() + adjustedIterativeDelay * i; }).attr(attrToAppliedProjector);
             };
-            Base.prototype.startDelay = function (startDelay) {
+            Easing.prototype.startDelay = function (startDelay) {
                 if (startDelay == null) {
                     return this._startDelay;
                 }
@@ -8195,7 +8078,7 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.stepDuration = function (stepDuration) {
+            Easing.prototype.stepDuration = function (stepDuration) {
                 if (stepDuration == null) {
                     return Math.min(this._stepDuration, this._maxTotalDuration);
                 }
@@ -8204,16 +8087,16 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.iterativeDelay = function (iterativeDelay) {
-                if (iterativeDelay == null) {
-                    return this._iterativeDelay;
+            Easing.prototype.stepDelay = function (stepDelay) {
+                if (stepDelay == null) {
+                    return this._stepDelay;
                 }
                 else {
-                    this._iterativeDelay = iterativeDelay;
+                    this._stepDelay = stepDelay;
                     return this;
                 }
             };
-            Base.prototype.maxTotalDuration = function (maxTotalDuration) {
+            Easing.prototype.maxTotalDuration = function (maxTotalDuration) {
                 if (maxTotalDuration == null) {
                     return this._maxTotalDuration;
                 }
@@ -8222,47 +8105,47 @@ var Plottable;
                     return this;
                 }
             };
-            Base.prototype.easing = function (easing) {
-                if (easing == null) {
-                    return this._easing;
+            Easing.prototype.easingMode = function (easingMode) {
+                if (easingMode == null) {
+                    return this._easingMode;
                 }
                 else {
-                    this._easing = easing;
+                    this._easingMode = easingMode;
                     return this;
                 }
             };
             /**
              * Adjust the iterative delay, such that it takes into account the maxTotalDuration constraint
              */
-            Base.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
+            Easing.prototype._getAdjustedIterativeDelay = function (numberOfSteps) {
                 var stepStartTimeInterval = this.maxTotalDuration() - this.stepDuration();
                 stepStartTimeInterval = Math.max(stepStartTimeInterval, 0);
                 var maxPossibleIterativeDelay = stepStartTimeInterval / Math.max(numberOfSteps - 1, 1);
-                return Math.min(this.iterativeDelay(), maxPossibleIterativeDelay);
+                return Math.min(this.stepDelay(), maxPossibleIterativeDelay);
             };
             /**
              * The default starting delay of the animation in milliseconds
              */
-            Base.DEFAULT_START_DELAY_MILLISECONDS = 0;
+            Easing._DEFAULT_START_DELAY_MILLISECONDS = 0;
             /**
              * The default duration of one animation step in milliseconds
              */
-            Base.DEFAULT_STEP_DURATION_MILLISECONDS = 300;
+            Easing._DEFAULT_STEP_DURATION_MILLISECONDS = 300;
             /**
              * The default maximum start delay between each step of an animation
              */
-            Base.DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
+            Easing._DEFAULT_ITERATIVE_DELAY_MILLISECONDS = 15;
             /**
              * The default maximum total animation duration
              */
-            Base.DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
+            Easing._DEFAULT_MAX_TOTAL_DURATION_MILLISECONDS = Infinity;
             /**
              * The default easing of the animation
              */
-            Base.DEFAULT_EASING = "exp-out";
-            return Base;
+            Easing._DEFAULT_EASING_MODE = "exp-out";
+            return Easing;
         })();
-        Animators.Base = Base;
+        Animators.Easing = Easing;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8271,7 +8154,7 @@ var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {
         function Dispatcher() {
-            this._event2Callback = {};
+            this._eventToCallback = {};
             this._callbacks = [];
             this._connected = false;
         }
@@ -8283,8 +8166,8 @@ var Plottable;
             if (this._connected) {
                 return;
             }
-            Object.keys(this._event2Callback).forEach(function (event) {
-                var callback = _this._event2Callback[event];
+            Object.keys(this._eventToCallback).forEach(function (event) {
+                var callback = _this._eventToCallback[event];
                 document.addEventListener(event, callback);
             });
             this._connected = true;
@@ -8292,18 +8175,18 @@ var Plottable;
         Dispatcher.prototype._disconnect = function () {
             var _this = this;
             if (this._connected && this._hasNoListeners()) {
-                Object.keys(this._event2Callback).forEach(function (event) {
-                    var callback = _this._event2Callback[event];
+                Object.keys(this._eventToCallback).forEach(function (event) {
+                    var callback = _this._eventToCallback[event];
                     document.removeEventListener(event, callback);
                 });
                 this._connected = false;
             }
         };
-        Dispatcher.prototype.setCallback = function (callbackSet, callback) {
+        Dispatcher.prototype._setCallback = function (callbackSet, callback) {
             this._connect();
             callbackSet.add(callback);
         };
-        Dispatcher.prototype.unsetCallback = function (callbackSet, callback) {
+        Dispatcher.prototype._unsetCallback = function (callbackSet, callback) {
             callbackSet.delete(callback);
             this._disconnect();
         };
@@ -8343,13 +8226,13 @@ var Plottable;
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
                 var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
-                this._event2Callback["mouseover"] = processMoveCallback;
-                this._event2Callback["mousemove"] = processMoveCallback;
-                this._event2Callback["mouseout"] = processMoveCallback;
-                this._event2Callback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
-                this._event2Callback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
-                this._event2Callback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
-                this._event2Callback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
+                this._eventToCallback["mouseover"] = processMoveCallback;
+                this._eventToCallback["mousemove"] = processMoveCallback;
+                this._eventToCallback["mouseout"] = processMoveCallback;
+                this._eventToCallback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
+                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._eventToCallback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
+                this._eventToCallback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
             /**
              * Get a Mouse Dispatcher for the <svg> containing elem.
@@ -8359,7 +8242,7 @@ var Plottable;
              * @return {Dispatchers.Mouse}
              */
             Mouse.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Mouse._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Mouse(svg);
@@ -8374,7 +8257,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.onMouseMove = function (callback) {
-                this.setCallback(this._moveCallbacks, callback);
+                this._setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
@@ -8384,7 +8267,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.offMouseMove = function (callback) {
-                this.unsetCallback(this._moveCallbacks, callback);
+                this._unsetCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
@@ -8394,7 +8277,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.onMouseDown = function (callback) {
-                this.setCallback(this._downCallbacks, callback);
+                this._setCallback(this._downCallbacks, callback);
                 return this;
             };
             /**
@@ -8404,7 +8287,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.offMouseDown = function (callback) {
-                this.unsetCallback(this._downCallbacks, callback);
+                this._unsetCallback(this._downCallbacks, callback);
                 return this;
             };
             /**
@@ -8414,7 +8297,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.onMouseUp = function (callback) {
-                this.setCallback(this._upCallbacks, callback);
+                this._setCallback(this._upCallbacks, callback);
                 return this;
             };
             /**
@@ -8424,7 +8307,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.offMouseUp = function (callback) {
-                this.unsetCallback(this._upCallbacks, callback);
+                this._unsetCallback(this._upCallbacks, callback);
                 return this;
             };
             /**
@@ -8434,7 +8317,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.onWheel = function (callback) {
-                this.setCallback(this._wheelCallbacks, callback);
+                this._setCallback(this._wheelCallbacks, callback);
                 return this;
             };
             /**
@@ -8444,7 +8327,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.offWheel = function (callback) {
-                this.unsetCallback(this._wheelCallbacks, callback);
+                this._unsetCallback(this._wheelCallbacks, callback);
                 return this;
             };
             /**
@@ -8454,7 +8337,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.onDblClick = function (callback) {
-                this.setCallback(this._dblClickCallbacks, callback);
+                this._setCallback(this._dblClickCallbacks, callback);
                 return this;
             };
             /**
@@ -8464,7 +8347,7 @@ var Plottable;
              * @return {Dispatchers.Mouse} The calling Mouse Dispatcher.
              */
             Mouse.prototype.offDblClick = function (callback) {
-                this.unsetCallback(this._dblClickCallbacks, callback);
+                this._unsetCallback(this._dblClickCallbacks, callback);
                 return this;
             };
             /**
@@ -8521,10 +8404,10 @@ var Plottable;
                 this._endCallbacks = new Plottable.Utils.CallbackSet();
                 this._cancelCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
-                this._event2Callback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
-                this._event2Callback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
-                this._event2Callback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
-                this._event2Callback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
+                this._eventToCallback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
+                this._eventToCallback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                this._eventToCallback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
+                this._eventToCallback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
             }
             /**
              * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -8534,7 +8417,7 @@ var Plottable;
              * @return {Dispatchers.Touch}
              */
             Touch.getDispatcher = function (elem) {
-                var svg = Plottable.Utils.DOM.getBoundingSVG(elem);
+                var svg = Plottable.Utils.DOM.boundingSVG(elem);
                 var dispatcher = svg[Touch._DISPATCHER_KEY];
                 if (dispatcher == null) {
                     dispatcher = new Touch(svg);
@@ -8549,7 +8432,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.onTouchStart = function (callback) {
-                this.setCallback(this._startCallbacks, callback);
+                this._setCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
@@ -8559,7 +8442,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.offTouchStart = function (callback) {
-                this.unsetCallback(this._startCallbacks, callback);
+                this._unsetCallback(this._startCallbacks, callback);
                 return this;
             };
             /**
@@ -8569,7 +8452,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.onTouchMove = function (callback) {
-                this.setCallback(this._moveCallbacks, callback);
+                this._setCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
@@ -8579,7 +8462,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.offTouchMove = function (callback) {
-                this.unsetCallback(this._moveCallbacks, callback);
+                this._unsetCallback(this._moveCallbacks, callback);
                 return this;
             };
             /**
@@ -8589,7 +8472,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.onTouchEnd = function (callback) {
-                this.setCallback(this._endCallbacks, callback);
+                this._setCallback(this._endCallbacks, callback);
                 return this;
             };
             /**
@@ -8599,7 +8482,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.offTouchEnd = function (callback) {
-                this.unsetCallback(this._endCallbacks, callback);
+                this._unsetCallback(this._endCallbacks, callback);
                 return this;
             };
             /**
@@ -8609,7 +8492,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.onTouchCancel = function (callback) {
-                this.setCallback(this._cancelCallbacks, callback);
+                this._setCallback(this._cancelCallbacks, callback);
                 return this;
             };
             /**
@@ -8619,7 +8502,7 @@ var Plottable;
              * @return {Dispatchers.Touch} The calling Touch Dispatcher.
              */
             Touch.prototype.offTouchCancel = function (callback) {
-                this.unsetCallback(this._cancelCallbacks, callback);
+                this._unsetCallback(this._cancelCallbacks, callback);
                 return this;
             };
             /**
@@ -8672,7 +8555,7 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.call(this);
-                this._event2Callback["keydown"] = function (e) { return _this._processKeydown(e); };
+                this._eventToCallback["keydown"] = function (e) { return _this._processKeydown(e); };
                 this._keydownCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._keydownCallbacks];
             }
@@ -8697,7 +8580,7 @@ var Plottable;
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             Key.prototype.onKeyDown = function (callback) {
-                this.setCallback(this._keydownCallbacks, callback);
+                this._setCallback(this._keydownCallbacks, callback);
                 return this;
             };
             /**
@@ -8707,7 +8590,7 @@ var Plottable;
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             Key.prototype.offKeyDown = function (callback) {
-                this.unsetCallback(this._keydownCallbacks, callback);
+                this._unsetCallback(this._keydownCallbacks, callback);
                 return this;
             };
             Key.prototype._processKeydown = function (event) {
@@ -9036,7 +8919,7 @@ var Plottable;
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            Key.prototype.onKey = function (keyCode, callback) {
+            Key.prototype.onKeyPress = function (keyCode, callback) {
                 if (!this._keyCodeCallbacks[keyCode]) {
                     this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
@@ -9051,7 +8934,7 @@ var Plottable;
              * @param {KeyCallback} callback
              * @returns {Interactions.Key} The calling Key Interaction.
              */
-            Key.prototype.offKey = function (keyCode, callback) {
+            Key.prototype.offKeyPress = function (keyCode, callback) {
                 this._keyCodeCallbacks[keyCode].delete(callback);
                 if (this._keyCodeCallbacks[keyCode].size === 0) {
                     delete this._keyCodeCallbacks[keyCode];
@@ -9306,7 +9189,7 @@ var Plottable;
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
                     e.preventDefault();
-                    var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom.PIXELS_PER_LINE : 1);
+                    var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
                         PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
@@ -9318,7 +9201,7 @@ var Plottable;
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
-                this._dragInteraction.constrainToComponent(false);
+                this._dragInteraction.constrainedToComponent(false);
                 var lastDragPoint;
                 this._dragInteraction.onDragStart(function () { return lastDragPoint = null; });
                 this._dragInteraction.onDrag(function (startPoint, endPoint) {
@@ -9339,7 +9222,7 @@ var Plottable;
             /**
              * The number of pixels occupied in a line.
              */
-            PanZoom.PIXELS_PER_LINE = 120;
+            PanZoom._PIXELS_PER_LINE = 120;
             return PanZoom;
         })(Plottable.Interaction);
         Interactions.PanZoom = PanZoom;
@@ -9363,7 +9246,7 @@ var Plottable;
                 var _this = this;
                 _super.apply(this, arguments);
                 this._dragging = false;
-                this._constrain = true;
+                this._constrainedToComponent = true;
                 this._dragStartCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragCallbacks = new Plottable.Utils.CallbackSet();
                 this._dragEndCallbacks = new Plottable.Utils.CallbackSet();
@@ -9398,7 +9281,7 @@ var Plottable;
             };
             Drag.prototype._translateAndConstrain = function (p) {
                 var translatedP = this._translateToComponentSpace(p);
-                if (!this._constrain) {
+                if (!this._constrainedToComponent) {
                     return translatedP;
                 }
                 return {
@@ -9432,11 +9315,11 @@ var Plottable;
                     this._dragEndCallbacks.callCallbacks(this._dragOrigin, this._translateAndConstrain(point));
                 }
             };
-            Drag.prototype.constrainToComponent = function (constrain) {
-                if (constrain == null) {
-                    return this._constrain;
+            Drag.prototype.constrainedToComponent = function (constrainedToComponent) {
+                if (constrainedToComponent == null) {
+                    return this._constrainedToComponent;
                 }
-                this._constrain = constrain;
+                this._constrainedToComponent = constrainedToComponent;
                 return this;
             };
             /**
@@ -9539,7 +9422,7 @@ var Plottable;
                  * wouldn't be able to grab the edges or corners for resizing.
                  */
                 this._clipPathEnabled = true;
-                this.classed("drag-box-layer", true);
+                this.addClass("drag-box-layer");
                 this._dragInteraction = new Plottable.Interactions.Drag();
                 this._setUpCallbacks();
                 this._dragInteraction.attachTo(this);
@@ -9718,8 +9601,14 @@ var Plottable;
             };
             // Sets resizable classes. Overridden by subclasses that only resize in one dimension.
             DragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("x-resizable", canResize);
-                this.classed("y-resizable", canResize);
+                if (canResize) {
+                    this.addClass("x-resizable");
+                    this.addClass("y-resizable");
+                }
+                else {
+                    this.removeClass("x-resizable");
+                    this.removeClass("y-resizable");
+                }
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -9814,7 +9703,7 @@ var Plottable;
              */
             function XDragBoxLayer() {
                 _super.call(this);
-                this.classed("x-drag-box-layer", true);
+                this.addClass("x-drag-box-layer");
                 this._hasCorners = false;
             }
             XDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -9829,7 +9718,12 @@ var Plottable;
                 });
             };
             XDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("x-resizable", canResize);
+                if (canResize) {
+                    this.addClass("x-resizable");
+                }
+                else {
+                    this.removeClass("x-resizable");
+                }
             };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
@@ -9858,7 +9752,7 @@ var Plottable;
              */
             function YDragBoxLayer() {
                 _super.call(this);
-                this.classed("y-drag-box-layer", true);
+                this.addClass("y-drag-box-layer");
                 this._hasCorners = false;
             }
             YDragBoxLayer.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -9873,7 +9767,12 @@ var Plottable;
                 });
             };
             YDragBoxLayer.prototype._setResizableClasses = function (canResize) {
-                this.classed("y-resizable", canResize);
+                if (canResize) {
+                    this.addClass("y-resizable");
+                }
+                else {
+                    this.removeClass("y-resizable");
+                }
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);
@@ -10857,5 +10756,4 @@ var SVGTypewriter;
 })(SVGTypewriter || (SVGTypewriter = {}));
 
 return Plottable;
-
 }));

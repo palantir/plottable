@@ -156,12 +156,12 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    describe("getAllSelections()", () => {
+    describe("selections()", () => {
 
       it("retrieves all selections with no args", () => {
         var newTwoPointData = [{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }];
         areaPlot.addDataset(new Plottable.Dataset(newTwoPointData));
-        var allAreas = areaPlot.getAllSelections();
+        var allAreas = areaPlot.selections();
         assert.strictEqual(allAreas.filter(".line").size(), 2, "2 lines retrieved");
         assert.strictEqual(allAreas.filter(".area").size(), 2, "2 areas retrieved");
 
@@ -171,7 +171,7 @@ describe("Plots", () => {
       it("retrieves correct selections", () => {
         var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
         areaPlot.addDataset(twoPointDataset);
-        var allAreas = areaPlot.getAllSelections([twoPointDataset]);
+        var allAreas = areaPlot.selections([twoPointDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
         assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
@@ -183,7 +183,7 @@ describe("Plots", () => {
         var twoPointDataset = new Plottable.Dataset([{ foo: 2, bar: 1 }, { foo: 3, bar: 2 }]);
         areaPlot.addDataset(twoPointDataset);
         var dummyDataset = new Plottable.Dataset([]);
-        var allAreas = areaPlot.getAllSelections([twoPointDataset, dummyDataset]);
+        var allAreas = areaPlot.selections([twoPointDataset, dummyDataset]);
         assert.strictEqual(allAreas.size(), 2, "areas/lines retrieved");
         var selectionData = allAreas.data();
         assert.include(selectionData, twoPointDataset.data(), "new dataset data in selection data");
@@ -196,9 +196,9 @@ describe("Plots", () => {
       var newClassProjector = () => "pink";
       areaPlot.attr("class", newClassProjector);
       areaPlot.renderTo(svg);
-      var areaPath = renderArea.select("." + Plottable.Drawers.Area.PATH_CLASS);
+      var areaPath = renderArea.select(".area");
       assert.isTrue(areaPath.classed("pink"));
-      assert.isTrue(areaPath.classed(Plottable.Drawers.Area.PATH_CLASS));
+      assert.isTrue(areaPath.classed("area"));
       svg.remove();
     });
   });
