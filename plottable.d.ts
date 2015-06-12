@@ -293,10 +293,7 @@ declare module Plottable {
                 offset: number;
             };
             type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
-            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
-                value: number;
-                offset: number;
-            }>>;
+            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackInformation;
             function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the

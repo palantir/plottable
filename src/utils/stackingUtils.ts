@@ -13,7 +13,10 @@ module Plottable {
 
       var nativeMath: Math = (<any>window).Math;
 
-      export function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
+      export function computeStackInformation(
+          datasets: Dataset[],
+          keyAccessor: Accessor<any>,
+          valueAccessor: Accessor<number>): StackInformation {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
         var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
