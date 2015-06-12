@@ -2,7 +2,7 @@
 
 module Plottable {
   export module Utils {
-    export module Stacked {
+    export module Stacking {
 
       export type StackedDatum = {
         value: number;

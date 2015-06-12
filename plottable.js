@@ -621,8 +621,8 @@ var Plottable;
 (function (Plottable) {
     var Utils;
     (function (Utils) {
-        var Stacked;
-        (function (Stacked) {
+        var Stacking;
+        (function (Stacking) {
             var nativeMath = window.Math;
             function computeStackOffsets(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
@@ -652,7 +652,7 @@ var Plottable;
                 });
                 return datasetToKeyToStackedDatum;
             }
-            Stacked.computeStackOffsets = computeStackOffsets;
+            Stacking.computeStackOffsets = computeStackOffsets;
             function computeStackExtent(stackOffsets, keyAccessor, filter) {
                 var extents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
@@ -668,7 +668,7 @@ var Plottable;
                 var minStackExtent = Utils.Math.min(extents, 0);
                 return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             }
-            Stacked.computeStackExtent = computeStackExtent;
+            Stacking.computeStackExtent = computeStackExtent;
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
@@ -682,12 +682,12 @@ var Plottable;
                 });
                 return domainKeys.values();
             }
-            Stacked.domainKeys = domainKeys;
+            Stacking.domainKeys = domainKeys;
             function normalizeKey(key) {
                 return String(key);
             }
-            Stacked.normalizeKey = normalizeKey;
-        })(Stacked = Utils.Stacked || (Utils.Stacked = {}));
+            Stacking.normalizeKey = normalizeKey;
+        })(Stacking = Utils.Stacking || (Utils.Stacking = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
@@ -7827,14 +7827,14 @@ var Plottable;
                 var valueAccessor = this.y().accessor;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
-                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
+                this._stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackOffsets, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
                     return d3.set(dataset.data().map(function (datum, i) { return keyAccessor(datum, i, dataset).toString(); })).values();
                 });
-                var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
+                var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
                 if (keySets.some(function (keySet) { return keySet.length !== domainKeys.length; })) {
                     Plottable.Utils.Window.warn("the domains across the datasets are not the same. Plot may produce unintended behavior.");
                 }
@@ -7845,7 +7845,7 @@ var Plottable;
                 var yAccessor = this.y().accessor;
                 var xAccessor = this.x().accessor;
                 var normalizedXAccessor = function (datum, index, dataset) {
-                    return Plottable.Utils.Stacked.normalizeKey(xAccessor(datum, index, dataset));
+                    return Plottable.Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
                 };
                 var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
                 var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset); };
@@ -7856,7 +7856,7 @@ var Plottable;
                 var pixelPoint = _super.prototype._pixelPoint.call(this, datum, index, dataset);
                 var xValue = this.x().accessor(datum, index, dataset);
                 var yValue = this.y().accessor(datum, index, dataset);
-                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(Plottable.Utils.Stacked.normalizeKey(xValue)).offset);
+                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(Plottable.Utils.Stacking.normalizeKey(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
             };
             return StackedArea;
@@ -7930,7 +7930,7 @@ var Plottable;
                 var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
                 var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
                 var normalizedKeyAccessor = function (datum, index, dataset) {
-                    return Plottable.Utils.Stacked.normalizeKey(keyAccessor(datum, index, dataset));
+                    return Plottable.Utils.Stacking.normalizeKey(keyAccessor(datum, index, dataset));
                 };
                 var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackOffsets.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
                 var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset); };
@@ -7969,8 +7969,8 @@ var Plottable;
                 var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
-                this._stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
+                this._stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackOffsets, keyAccessor, filter);
             };
             return StackedBar;
         })(Plots.Bar);

@@ -3,7 +3,7 @@
 var assert = chai.assert;
 
 describe("Utils", () => {
-  describe("StackedUtils", () => {
+  describe("StackingUtils", () => {
 
     var keyAccessor = (d: any) => d.key;
     var valueAccessor = (d: any) => d.value;
@@ -25,7 +25,7 @@ describe("Utils", () => {
       ];
 
       var datasets = createDatasets([data1, data2]);
-      var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
+      var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
       var expectedDomainKeys = ["Fred", "Barney", "Wilma", "Betty"];
 
       assert.deepEqual(domainKeys, expectedDomainKeys, "the expected domain keys is a set reunion of the datasets keys");
@@ -42,7 +42,7 @@ describe("Utils", () => {
       ];
 
       var datasets = createDatasets([data1, data2]);
-      var domainKeys = Plottable.Utils.Stacked.domainKeys(datasets, keyAccessor);
+      var domainKeys = Plottable.Utils.Stacking.domainKeys(datasets, keyAccessor);
       var expectedDomainKeys = ["1", "3", "2", "4"];
 
       assert.deepEqual(domainKeys.sort(), expectedDomainKeys.sort(), "the expected domain keys is a set reunion of the datasets keys");
@@ -56,7 +56,7 @@ describe("Utils", () => {
       var data5 = [{key: "Fred", value: 2}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
@@ -73,7 +73,7 @@ describe("Utils", () => {
       var data5 = [{key: "Fred", value: -2}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, -1, "Offset 2 = 0 - 1");
@@ -90,7 +90,7 @@ describe("Utils", () => {
       var data6 = [{key: "Fred", value: -1}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5, data6]);
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
@@ -107,10 +107,10 @@ describe("Utils", () => {
       var data4 = [{key: "Fred", value: 2}];
 
       var datasets = createDatasets([data1, data2, data3, data4]);
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
       var expectedStackExtents = [0, 303];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack up and the sum of their values is 303");
@@ -123,10 +123,10 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
       var expectedStackExtents = [-301, 0];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
@@ -141,10 +141,10 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
 
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
       var expectedStackExtents = [-10, 120];
 
       assert.deepEqual(stackExtents, expectedStackExtents, "all datasets stack down and the sum of their values is -301");
@@ -166,10 +166,10 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = null;
 
-      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
       var expectedStackExtents = [-50, 100];
 
       assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Barney has the smallest minimum stack (-50)");
@@ -192,10 +192,10 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
       filter = (datum: any) => datum.key === "Fred";
 
-      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
       var expectedStackExtents = [-5, 100];
 
       assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Fred has the smallest minimum stack");

@@ -287,7 +287,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Utils {
-        module Stacked {
+        module Stacking {
             type StackedDatum = {
                 value: number;
                 offset: number;
