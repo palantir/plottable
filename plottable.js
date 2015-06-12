@@ -604,8 +604,7 @@ var Plottable;
                 });
                 var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
                 var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
-                var stackOffsets = Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
-                return stackOffsets;
+                return Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
             };
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that

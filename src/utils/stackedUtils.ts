@@ -20,7 +20,6 @@ module Plottable {
        */
       public static computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var domainKeys = Utils.Stacked.domainKeys(datasets, keyAccessor);
-
         var dataMapArray = Utils.Stacked._generateDefaultMapArray(datasets, keyAccessor, valueAccessor, domainKeys);
 
         var positiveDataMapArray: d3.Map<StackedDatum>[] = dataMapArray.map((dataMap) => {
@@ -37,10 +36,7 @@ module Plottable {
 
         var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
         var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
-
-        var stackOffsets = Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
-
-        return stackOffsets;
+        return Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
       }
 
       /**
