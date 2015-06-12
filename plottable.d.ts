@@ -1418,7 +1418,9 @@ declare module Plottable {
         parent(): ComponentContainer;
         /**
          * Sets the parent ComponentContainer for this Component.
-         * The call will fail if the parent does not contain this Component.
+         * An error will be thrown if the parent does not contain this Component.
+         * Adding a Component to a ComponentContainer should be done
+         * using the appropriate method on the ComponentContainer.
          */
         parent(parent: ComponentContainer): Component;
         /**
