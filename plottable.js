@@ -6348,6 +6348,8 @@ var Plottable;
         var Pie = (function (_super) {
             __extends(Pie, _super);
             /**
+             * A Pie Plot draws a circle separated into sectors in accordance with the sector values in the data.
+             *
              * @constructor
              */
             function Pie() {

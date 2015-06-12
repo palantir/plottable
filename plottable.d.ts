@@ -2429,6 +2429,8 @@ declare module Plottable {
     module Plots {
         class Pie extends Plot {
             /**
+             * A Pie Plot draws a circle separated into sectors in accordance with the sector values in the data.
+             *
              * @constructor
              */
             constructor();
