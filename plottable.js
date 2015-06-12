@@ -7000,9 +7000,9 @@ var Plottable;
         var Bar = (function (_super) {
             __extends(Bar, _super);
             /**
+             * A Bar Plot draws bars growing out from a baseline to some value
+             *
              * @constructor
-             * @param {Scale} xScale The x scale to use.
-             * @param {Scale} yScale The y scale to use.
              * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
              */
             function Bar(orientation) {
@@ -7588,8 +7588,6 @@ var Plottable;
              * An Area Plot draws a filled region (area) between Y and Y0.
              *
              * @constructor
-             * @param {QuantitativeScale} xScale
-             * @param {QuantitativeScale} yScale
              */
             function Area() {
                 _super.call(this);

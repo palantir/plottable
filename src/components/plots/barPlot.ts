@@ -28,9 +28,9 @@ export module Plots {
     private _baselineValueProvider: () => (X|Y)[];
 
     /**
+     * A Bar Plot draws bars growing out from a baseline to some value
+     * 
      * @constructor
-     * @param {Scale} xScale The x scale to use.
-     * @param {Scale} yScale The y scale to use.
      * @param {string} [orientation="vertical"] One of "vertical"/"horizontal".
      */
     constructor(orientation = Bar.ORIENTATION_VERTICAL) {
