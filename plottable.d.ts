@@ -1194,7 +1194,7 @@ declare module Plottable {
         protected _svgElementName: string;
         protected _className: string;
         /**
-         * Constructs a Drawer
+         * A Drawer draws svg elements based on the input Dataset.
          *
          * @constructor
          * @param {Dataset} dataset The dataset associated with this Drawer
@@ -1216,6 +1216,13 @@ declare module Plottable {
          */
         remove(): void;
         protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
+        /**
+         * Calculates the total time it takes to use the input drawSteps to draw the input data
+         *
+         * @param {any[]} data The data that would have been drawn
+         * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+         * @returns {number} The total time it takes to draw
+         */
         totalDrawTime(data: any[], drawSteps: Drawers.DrawStep[]): number;
         /**
          * Draws the data into the renderArea using the spefic steps and metadata

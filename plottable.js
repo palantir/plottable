@@ -2546,7 +2546,7 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
     var Drawer = (function () {
         /**
-         * Constructs a Drawer
+         * A Drawer draws svg elements based on the input Dataset.
          *
          * @constructor
          * @param {Dataset} dataset The dataset associated with this Drawer
@@ -2611,6 +2611,13 @@ var Plottable;
             });
             return modifiedAttrToProjector;
         };
+        /**
+         * Calculates the total time it takes to use the input drawSteps to draw the input data
+         *
+         * @param {any[]} data The data that would have been drawn
+         * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
+         * @returns {number} The total time it takes to draw
+         */
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
