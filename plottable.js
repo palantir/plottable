@@ -616,7 +616,6 @@ var Plottable;
             Stacked.computeStackExtent = function (stackOffsets, filter) {
                 var extents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
-                    var stackingData = [];
                     stackedDatumMap.forEach(function (key, stackedDatum) {
                         if (filter != null && !filter(stackedDatum.key)) {
                             return;

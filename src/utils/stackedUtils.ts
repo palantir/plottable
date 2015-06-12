@@ -49,14 +49,9 @@ module Plottable {
        *
        * @return {[number]} The extent that spans all the stacked data
        */
-      public static computeStackExtent(
-          stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>,
-          filter: (value: number) => boolean) {
-
+      public static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: number) => boolean) {
         var extents: number[] = [];
         stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
-
-          var stackingData: number[] = [];
           stackedDatumMap.forEach((key: string, stackedDatum: StackedDatum) => {
             if (filter != null && !filter(stackedDatum.key)) {
               return;
