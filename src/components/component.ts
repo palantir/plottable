@@ -141,6 +141,13 @@ module Plottable {
       this._isSetup = true;
     }
 
+    /**
+     * Given available space in pixels, returns the minimum width and height this Component will need.
+     * 
+     * @param {number} availableWidth
+     * @param {number} availableHeight
+     * @returns {SpaceRequest}
+     */
     public requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest {
       return {
         minWidth: 0,
@@ -223,6 +230,9 @@ module Plottable {
       }
     }
 
+    /**
+     * Renders the Component without waiting for the next frame.
+     */
     public renderImmediately() {
       return this;
     }
@@ -470,7 +480,16 @@ module Plottable {
       return this;
     }
 
+    /**
+     * Gets the parent ComponentContainer for this Component.
+     */
     public parent(): ComponentContainer;
+    /**
+     * Sets the parent ComponentContainer for this Component.
+     * An error will be thrown if the parent does not contain this Component.
+     * Adding a Component to a ComponentContainer should be done
+     * using the appropriate method on the ComponentContainer.
+     */
     public parent(parent: ComponentContainer): Component;
     public parent(parent?: ComponentContainer): any {
       if (parent === undefined) {

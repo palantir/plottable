@@ -1308,6 +1308,13 @@ declare module Plottable {
          * Override in subclasses to provide additional functionality.
          */
         protected _setup(): void;
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         requestedSpace(availableWidth: number, availableHeight: number): SpaceRequest;
         /**
          * Computes and sets the size, position, and alignment of the Component from the specified values.
@@ -1330,6 +1337,9 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         render(): Component;
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         renderImmediately(): Component;
         /**
          * Causes the Component to re-layout and render.
@@ -1422,7 +1432,16 @@ declare module Plottable {
          * @return {Component} The calling Component.
          */
         offDetach(callback: ComponentCallback): Component;
+        /**
+         * Gets the parent ComponentContainer for this Component.
+         */
         parent(): ComponentContainer;
+        /**
+         * Sets the parent ComponentContainer for this Component.
+         * An error will be thrown if the parent does not contain this Component.
+         * Adding a Component to a ComponentContainer should be done
+         * using the appropriate method on the ComponentContainer.
+         */
         parent(parent: ComponentContainer): Component;
         /**
          * Removes a Component from the DOM and disconnects all listeners.
@@ -1516,7 +1535,7 @@ declare module Plottable {
              * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
-             * Components added later will be rendered on top of Components already in the Group.
+             * Components added later will be rendered above Components already in the Group.
              *
              * @constructor
              * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -1539,6 +1558,10 @@ declare module Plottable {
              * @return {Component[]} The Components in this Group.
              */
             components(): Component[];
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered above Components already in the Group.
+             */
             append(component: Component): Group;
             protected _remove(component: Component): boolean;
         }

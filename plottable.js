@@ -2923,6 +2923,13 @@ var Plottable;
             this._boundingBox = this._addBox("bounding-box");
             this._isSetup = true;
         };
+        /**
+         * Given available space in pixels, returns the minimum width and height this Component will need.
+         *
+         * @param {number} availableWidth
+         * @param {number} availableHeight
+         * @returns {SpaceRequest}
+         */
         Component.prototype.requestedSpace = function (availableWidth, availableHeight) {
             return {
                 minWidth: 0,
@@ -3001,6 +3008,9 @@ var Plottable;
                 Plottable.RenderController.registerToComputeLayout(this);
             }
         };
+        /**
+         * Renders the Component without waiting for the next frame.
+         */
         Component.prototype.renderImmediately = function () {
             return this;
         };
@@ -3406,7 +3416,7 @@ var Plottable;
              * Constructs a Group.
              *
              * A Group contains Components that will be rendered on top of each other.
-             * Components added later will be rendered on top of Components already in the Group.
+             * Components added later will be rendered above Components already in the Group.
              *
              * @constructor
              * @param {Component[]} [components=[]] Components to be added to the Group.
@@ -3461,6 +3471,10 @@ var Plottable;
             Group.prototype.components = function () {
                 return this._components.slice();
             };
+            /**
+             * Adds a Component to this Group.
+             * The added Component will be rendered above Components already in the Group.
+             */
             Group.prototype.append = function (component) {
                 if (component != null && !this.has(component)) {
                     component.detach();
