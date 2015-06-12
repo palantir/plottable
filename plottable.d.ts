@@ -43,7 +43,7 @@ declare module Plottable {
             function isValidNumber(n: any): boolean;
             /**
              * Generates an array of consecutive, strictly increasing numbers
-             * in the range [start, stop) step by step
+             * in the range [start, stop) separeted by step
              */
             function range(start: number, stop: number, step?: number): number[];
             /**
@@ -66,45 +66,10 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             set(key: K, value: V): Map<K, V>;
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             get(key: K): V;
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             has(key: K): boolean;
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any): void;
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             delete(key: K): boolean;
         }
     }
@@ -118,37 +83,11 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Set
          */
         class Set<T> {
-            /**
-             * The size of the set. The value is read-only.
-             */
             size: number;
             constructor();
-            /**
-             * Adds a new value to the Set, unless the value already exists.
-             *
-             * @param {T} value Value to be added to the Set
-             * @return {Set} The Set object
-             */
             add(value: T): Set<T>;
-            /**
-             * Deletes a value from the Set.
-             *
-             * @param {T} value Value to be deleted from the set
-             * @return {boolean} true if the value existed in the set
-             * @return {boolean} false if the value did not exist in the set
-             */
             delete(value: T): boolean;
-            /**
-             * Tests whether or not the Set cotains a value
-             */
             has(value: T): boolean;
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any): void;
         }
     }

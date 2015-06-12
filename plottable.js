@@ -85,7 +85,7 @@ var Plottable;
             Math.isValidNumber = isValidNumber;
             /**
              * Generates an array of consecutive, strictly increasing numbers
-             * in the range [start, stop) step by step
+             * in the range [start, stop) separeted by step
              */
             function range(start, stop, step) {
                 if (step === void 0) { step = 1; }
@@ -128,13 +128,6 @@ var Plottable;
             function Map() {
                 this._keyValuePairs = [];
             }
-            /**
-             * Set a new key/value pair in the Map.
-             *
-             * @param {K} key Key to set in the Map
-             * @param {V} value Value to set in the Map
-             * @return {Map} The Map object
-             */
             Map.prototype.set = function (key, value) {
                 if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
@@ -148,12 +141,6 @@ var Plottable;
                 this._keyValuePairs.push({ key: key, value: value });
                 return this;
             };
-            /**
-             * Get a value from the store, given a key.
-             *
-             * @param {K} key Key associated with value to retrieve
-             * @return {V} Value if found, undefined otherwise
-             */
             Map.prototype.get = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -162,15 +149,6 @@ var Plottable;
                 }
                 return undefined;
             };
-            /**
-             * Test whether store has a value associated with given key.
-             *
-             * Will return true if there is a key/value entry,
-             * even if the value is explicitly `undefined`.
-             *
-             * @param {K} key Key to test for presence of an entry
-             * @return {boolean} Whether there was a matching entry for that key
-             */
             Map.prototype.has = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -179,25 +157,12 @@ var Plottable;
                 }
                 return false;
             };
-            /**
-             * The forEach method executes the provided callback once for each key of the map which
-             * actually exist. It is not invoked for keys which have been deleted.
-             *
-             * @param {(value: V, key: K, map: Map<K, V>) => void} callbackFn The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
             };
-            /**
-             * Delete a key from the Map. Return whether the key was present.
-             *
-             * @param {K} The key to remove
-             * @return {boolean} Whether a matching entry was found and removed
-             */
             Map.prototype.delete = function (key) {
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -227,12 +192,6 @@ var Plottable;
                 this._values = [];
                 this._updateSize();
             }
-            /**
-             * Adds a new value to the Set, unless the value already exists.
-             *
-             * @param {T} value Value to be added to the Set
-             * @return {Set} The Set object
-             */
             Set.prototype.add = function (value) {
                 if (!this.has(value)) {
                     this._values.push(value);
@@ -240,13 +199,6 @@ var Plottable;
                 }
                 return this;
             };
-            /**
-             * Deletes a value from the Set.
-             *
-             * @param {T} value Value to be deleted from the set
-             * @return {boolean} true if the value existed in the set
-             * @return {boolean} false if the value did not exist in the set
-             */
             Set.prototype.delete = function (value) {
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
@@ -256,19 +208,9 @@ var Plottable;
                 }
                 return false;
             };
-            /**
-             * Tests whether or not the Set cotains a value
-             */
             Set.prototype.has = function (value) {
                 return this._values.indexOf(value) !== -1;
             };
-            /**
-             * The forEach method executes the provided callback once for each value which actually exists
-             * in the Set object. It is not invoked for values which have been deleted.
-             *
-             * @param {(value: T, value2: T, set: Set<T>) => void} callback The callback to be invoked
-             * @param {any} thisArg The `this` context
-             */
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
                 this._values.forEach(function (value) {

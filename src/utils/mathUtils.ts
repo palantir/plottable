@@ -77,7 +77,7 @@ export module Utils {
 
     /**
      * Generates an array of consecutive, strictly increasing numbers
-     * in the range [start, stop) step by step
+     * in the range [start, stop) separeted by step
      */
     export function range(start: number, stop: number, step = 1): number[] {
       if (step === 0) {
