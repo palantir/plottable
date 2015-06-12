@@ -9,9 +9,11 @@ module Plottable {
         offset: number;
       };
 
+      export type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+
       var nativeMath: Math = (<any>window).Math;
 
-      export function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
+      export function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>) {
         var positiveOffsets = d3.map<number>();
         var negativeOffsets = d3.map<number>();
         var datasetToKeyToStackedDatum = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
@@ -40,12 +42,9 @@ module Plottable {
         return datasetToKeyToStackedDatum;
       }
 
-      export function computeStackExtent(
-          stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>,
-          keyAccessor: Accessor<any>,
-          filter: Accessor<boolean>) {
+      export function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
         var extents: number[] = [];
-        stackOffsets.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
+        stackInformation.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
           dataset.data().forEach((datum, index) => {
             if (filter != null && !filter(datum, index, dataset)) {
               return;

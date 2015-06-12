@@ -117,7 +117,7 @@ export module Plots {
       var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
-      this._stackOffsets = Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      this._stackOffsets = Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackOffsets, keyAccessor, filter);
     }
   }

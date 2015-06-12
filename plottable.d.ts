@@ -292,11 +292,12 @@ declare module Plottable {
                 value: number;
                 offset: number;
             };
-            function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
+            type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+            function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
                 value: number;
                 offset: number;
             }>>;
-            function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
+            function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.

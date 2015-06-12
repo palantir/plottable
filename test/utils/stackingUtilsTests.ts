@@ -48,7 +48,7 @@ describe("Utils", () => {
       assert.deepEqual(domainKeys.sort(), expectedDomainKeys.sort(), "the expected domain keys is a set reunion of the datasets keys");
     });
 
-    it("computeStackOffsets() works as expected with positive values", () => {
+    it("computeStackInformation() works as expected with positive values", () => {
       var data1 = [{key: "Fred", value: 1}];
       var data2 = [{key: "Fred", value: 1}];
       var data3 = [{key: "Fred", value: 3}];
@@ -56,7 +56,7 @@ describe("Utils", () => {
       var data5 = [{key: "Fred", value: 2}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
@@ -65,7 +65,7 @@ describe("Utils", () => {
       assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred").offset, 5, "Offset 5 = 0 + 1 + 1 + 3 + 0");
     });
 
-    it("computeStackOffsets() works as expected with negative values", () => {
+    it("computeStackInformation() works as expected with negative values", () => {
       var data1 = [{key: "Fred", value: -1}];
       var data2 = [{key: "Fred", value: -1}];
       var data3 = [{key: "Fred", value: -3}];
@@ -73,7 +73,7 @@ describe("Utils", () => {
       var data5 = [{key: "Fred", value: -2}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, -1, "Offset 2 = 0 - 1");
@@ -81,7 +81,7 @@ describe("Utils", () => {
       assert.strictEqual(stackOffsets.get(datasets[4]).get("Fred").offset, -5, "Offset 5 = 0 - 1 - 1 - 3 - 0");
     });
 
-    it("computeStackOffsets() works as expected with positive and negative values", () => {
+    it("computeStackInformation() works as expected with positive and negative values", () => {
       var data1 = [{key: "Fred", value: 1}];
       var data2 = [{key: "Fred", value: 2}];
       var data3 = [{key: "Fred", value: -2}];
@@ -90,7 +90,7 @@ describe("Utils", () => {
       var data6 = [{key: "Fred", value: -1}];
 
       var datasets = createDatasets([data1, data2, data3, data4, data5, data6]);
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
 
       assert.strictEqual(stackOffsets.get(datasets[0]).get("Fred").offset, 0, "Offset 1 = 0");
       assert.strictEqual(stackOffsets.get(datasets[1]).get("Fred").offset, 1, "Offset 2 = 0 + 1");
@@ -107,7 +107,7 @@ describe("Utils", () => {
       var data4 = [{key: "Fred", value: 2}];
 
       var datasets = createDatasets([data1, data2, data3, data4]);
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       filter = null;
 
       var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
@@ -123,7 +123,7 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       filter = null;
 
       var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
@@ -141,7 +141,7 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3, data4, data5]);
 
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       filter = null;
 
       var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
@@ -166,7 +166,7 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       filter = null;
 
       var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
@@ -192,7 +192,7 @@ describe("Utils", () => {
 
       var datasets = createDatasets([data1, data2, data3]);
 
-      var stackOffsets = Plottable.Utils.Stacking.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      var stackOffsets = Plottable.Utils.Stacking.computeStackInformation(datasets, keyAccessor, valueAccessor);
       filter = (datum: any) => datum.key === "Fred";
 
       var stackExtents = Plottable.Utils.Stacking.computeStackExtent(stackOffsets, keyAccessor, filter);
