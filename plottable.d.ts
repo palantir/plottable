@@ -207,15 +207,6 @@ declare module Plottable {
              * Channel values are capped at the maximum value of 255, and the minimum value of 30.
              */
             function lightenColor(color: string, factor: number): string;
-            /**
-             * Gets the Hex Code of the color resulting by applying the className CSS class to the
-             * colorTester selection. Returns null if the tester is transparent.
-             *
-             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
-             * @param {string} className The name of the class to be applied
-             * @return {string} The hex code of the computed color
-             */
-            function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
     }
 }

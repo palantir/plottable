@@ -65,10 +65,10 @@ export module Scales {
       var plottableDefaultColors: string[] = [];
       var colorTester = d3.select("body").append("plottable-color-tester");
 
-      var defaultColorHex: string = Utils.Color.colorTest(colorTester, "");
+      var defaultColorHex: string = Color._colorTest(colorTester, "");
       var i = 0;
       var colorHex: string;
-      while ((colorHex = Utils.Color.colorTest(colorTester, "plottable-colors-" + i)) !== null &&
+      while ((colorHex = Color._colorTest(colorTester, "plottable-colors-" + i)) !== null &&
               i < this._MAXIMUM_COLORS_FROM_CSS) {
         if (colorHex === defaultColorHex && colorHex === plottableDefaultColors[plottableDefaultColors.length - 1]) {
           break;
@@ -79,6 +79,37 @@ export module Scales {
       colorTester.remove();
       return plottableDefaultColors;
     }
+
+    /**
+     * Gets the Hex Code of the color resulting by applying the className CSS class to the
+     * colorTester selection. Returns null if the tester is transparent.
+     *
+     * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
+     * @param {string} className The name of the class to be applied
+     * @return {string} The hex code of the computed color
+     */
+    private static _colorTest(colorTester: d3.Selection<void>, className: string) {
+      colorTester.classed(className, true);
+      // Use regex to get the text inside the rgb parentheses
+      var colorStyle = colorTester.style("background-color");
+      if (colorStyle === "transparent") {
+        return null;
+      }
+      var rgb = /\((.+)\)/.exec(colorStyle)[1]
+                          .split(",")
+                          .map((colorValue: string) => {
+                            var colorNumber = +colorValue;
+                            var hexValue = colorNumber.toString(16);
+                            return colorNumber < 16 ? "0" + hexValue : hexValue;
+                          });
+      if (rgb.length === 4 && rgb[3] === "00") {
+        return null;
+      }
+      var hexCode = "#" + rgb.join("");
+      colorTester.classed(className, false);
+      return hexCode;
+    }
+
 
     /**
      * Returns the color-string corresponding to a given string.
