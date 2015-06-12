@@ -175,5 +175,31 @@ describe("Utils", () => {
       assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Barney has the smallest minimum stack (-50)");
       assert.deepEqual(stackExtents[1], expectedStackExtents[1], "Fred has the largest maximum stack (100)");
     });
+
+    it("computeStackExtent() works with filter", () => {
+      var data1 = [
+        {key: "Fred", value: 100},
+        {key: "Barney", value: 15}
+      ];
+      var data2 = [
+        {key: "Fred", value: -5},
+        {key: "Barney", value: -50}
+      ];
+      var data3 = [
+        {key: "Fred", value: 0},
+        {key: "Barney", value: 0}
+      ];
+
+      var datasets = createDatasets([data1, data2, data3]);
+
+      var stackOffsets = Plottable.Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
+      filter = (datum: any) => datum.key === "Fred";
+
+      var stackExtents = Plottable.Utils.Stacked.computeStackExtent(stackOffsets, keyAccessor, filter);
+      var expectedStackExtents = [-5, 100];
+
+      assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Fred has the smallest minimum stack");
+      assert.deepEqual(stackExtents[1], expectedStackExtents[1], "Fred has the largest maximum stack");
+    });
   });
 });
