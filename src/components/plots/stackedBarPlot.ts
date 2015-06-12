@@ -65,11 +65,14 @@ export module Plots {
       var primaryScale: Scale<any, number> = this._isVertical ? this.y().scale : this.x().scale;
       var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
       var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
+      var normalizedKeyAccessor = (datum: any, index: number, dataset: Dataset) => {
+        return Utils.Stacked.normalizeKey(keyAccessor(datum, index, dataset));
+      };
       var getStart = (d: any, i: number, dataset: Dataset) =>
-        primaryScale.scale(this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset);
+        primaryScale.scale(this._stackOffsets.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
       var getEnd = (d: any, i: number, dataset: Dataset) =>
         primaryScale.scale(+primaryAccessor(d, i, dataset) +
-          this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset);
+          this._stackOffsets.get(dataset).get(normalizedKeyAccessor(d, i, dataset)).offset);
 
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
@@ -112,10 +115,10 @@ export module Plots {
       var datasets = this.datasets();
       var keyAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
       var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
-      var filter = this._valueFilterForProperty(this._isVertical ? "y" : "x");
+      var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
     }
   }
 }

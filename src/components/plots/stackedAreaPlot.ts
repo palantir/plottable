@@ -121,11 +121,11 @@ export module Plots {
       var datasets = this.datasets();
       var keyAccessor = this.x().accessor;
       var valueAccessor = this.y().accessor;
-      var filter = this._valueFilterForProperty("y");
+      var filter = this._filterForProperty("y");
 
       this._checkSameDomain(datasets, keyAccessor);
       this._stackOffsets = Utils.Stacked.computeStackOffsets(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacked.computeStackExtent(this._stackOffsets, filter);
+      this._stackedExtent = Utils.Stacked.computeStackExtent(this._stackOffsets, keyAccessor, filter);
     }
 
     private _checkSameDomain(datasets: Dataset[], keyAccessor: Accessor<any>) {
@@ -143,11 +143,13 @@ export module Plots {
       var propertyToProjectors = super._propertyProjectors();
       var yAccessor = this.y().accessor;
       var xAccessor = this.x().accessor;
-
+      var normalizedXAccessor = (datum: any, index: number, dataset: Dataset) => {
+        return Utils.Stacked.normalizeKey(xAccessor(datum, index, dataset));
+      };
       var stackYProjector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset);
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
       var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset);
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
 
       propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
       return propertyToProjectors;
@@ -157,7 +159,7 @@ export module Plots {
       var pixelPoint = super._pixelPoint(datum, index, dataset);
       var xValue = this.x().accessor(datum, index, dataset);
       var yValue = this.y().accessor(datum, index, dataset);
-      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(String(xValue)).offset);
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(Utils.Stacked.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
 
