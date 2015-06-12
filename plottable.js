@@ -615,7 +615,7 @@ var Plottable;
             function computeStackExtent(stackOffsets, filter) {
                 var extents = [];
                 stackOffsets.forEach(function (stackedDatumMap, dataset) {
-                    stackedDatumMap.forEach(function (key, stackedDatum) {
+                    stackedDatumMap.forEach(function (stackedDatum) {
                         if (filter != null && !filter(stackedDatum.key)) {
                             return;
                         }
@@ -674,7 +674,7 @@ var Plottable;
             function _combineDataStacks(datasets, positiveDataStack, negativeDataStack) {
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
-                    var datasetOffsets = d3.map();
+                    var datasetOffsets = new Utils.Map();
                     var positiveDataMap = positiveDataStack[index];
                     var negativeDataMap = negativeDataStack[index];
                     positiveDataMap.forEach(function (key, positiveStackedDatum) {
@@ -7920,8 +7920,8 @@ var Plottable;
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 var yAccessor = this.y().accessor;
                 var xAccessor = this.x().accessor;
-                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)).offset); };
-                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)).offset); };
+                var stackYProjector = function (d, i, dataset) { return _this.y().scale.scale(+yAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset); };
+                var stackY0Projector = function (d, i, dataset) { return _this.y().scale.scale(_this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset); };
                 propertyToProjectors["d"] = this._constructAreaProjector(Plottable.Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
                 return propertyToProjectors;
             };
@@ -7929,7 +7929,7 @@ var Plottable;
                 var pixelPoint = _super.prototype._pixelPoint.call(this, datum, index, dataset);
                 var xValue = this.x().accessor(datum, index, dataset);
                 var yValue = this.y().accessor(datum, index, dataset);
-                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue).offset);
+                var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(String(xValue)).offset);
                 return { x: pixelPoint.x, y: scaledYValue };
             };
             return StackedArea;
@@ -8002,8 +8002,8 @@ var Plottable;
                 var primaryScale = this._isVertical ? this.y().scale : this.x().scale;
                 var primaryAccessor = this._propertyBindings.get(valueAttr).accessor;
                 var keyAccessor = this._propertyBindings.get(keyAttr).accessor;
-                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)).offset); };
-                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(keyAccessor(d, i, dataset)).offset); };
+                var getStart = function (d, i, dataset) { return primaryScale.scale(_this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset); };
+                var getEnd = function (d, i, dataset) { return primaryScale.scale(+primaryAccessor(d, i, dataset) + _this._stackOffsets.get(dataset).get(String(keyAccessor(d, i, dataset))).offset); };
                 var heightF = function (d, i, dataset) {
                     return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
                 };

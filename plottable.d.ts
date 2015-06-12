@@ -244,7 +244,7 @@ declare module Plottable {
              *
              * @return {Utils.Map<Dataset, d3.Map<number>>} A map from each dataset to the offset of each datapoint
              */
-            function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, d3.Map<{
+            function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
                 key: any;
                 value: number;
                 offset?: number;
@@ -255,7 +255,7 @@ declare module Plottable {
              *
              * @return {[number]} The extent that spans all the Utils.stacked data
              */
-            function computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean): number[];
+            function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, filter: (value: string) => boolean): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.

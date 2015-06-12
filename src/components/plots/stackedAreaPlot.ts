@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class StackedArea<X> extends Area<X> {
-    private _stackOffsets: Utils.Map<Dataset, d3.Map<Utils.Stacked.StackedDatum>>;
+    private _stackOffsets: Utils.Map<Dataset, Utils.Map<string, Utils.Stacked.StackedDatum>>;
     private _stackedExtent: number[];
 
     private _baseline: d3.Selection<void>;
@@ -19,7 +19,7 @@ export module Plots {
       super();
       this.classed("stacked-area-plot", true);
       this.attr("fill-opacity", 1);
-      this._stackOffsets = new Utils.Map<Dataset, d3.Map<Utils.Stacked.StackedDatum>>();
+      this._stackOffsets = new Utils.Map<Dataset, Utils.Map<string, Utils.Stacked.StackedDatum>>();
       this._stackedExtent = [];
       this._baselineValueProvider = () => [this._baselineValue];
     }
@@ -145,9 +145,9 @@ export module Plots {
       var xAccessor = this.x().accessor;
 
       var stackYProjector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)).offset);
+        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset);
       var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(this._stackOffsets.get(dataset).get(xAccessor(d, i, dataset)).offset);
+        this.y().scale.scale(this._stackOffsets.get(dataset).get(String(xAccessor(d, i, dataset))).offset);
 
       propertyToProjectors["d"] = this._constructAreaProjector(Plot._scaledAccessor(this.x()), stackYProjector, stackY0Projector);
       return propertyToProjectors;
@@ -157,7 +157,7 @@ export module Plots {
       var pixelPoint = super._pixelPoint(datum, index, dataset);
       var xValue = this.x().accessor(datum, index, dataset);
       var yValue = this.y().accessor(datum, index, dataset);
-      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(xValue).offset);
+      var scaledYValue = this.y().scale.scale(+yValue + this._stackOffsets.get(dataset).get(String(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
 

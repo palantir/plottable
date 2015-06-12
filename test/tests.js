@@ -5215,9 +5215,9 @@ describe("Plots", function () {
             plot.addDataset(dataset2);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get(2).offset;
-            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get(2).offset;
-            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get(2).offset;
+            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get("2").offset;
+            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get("2").offset;
+            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get("2").offset;
             assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) sh1uld have no offset on middle point");
             assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");
@@ -5249,9 +5249,9 @@ describe("Plots", function () {
             plot.addDataset(dataset2);
             plot.attr("fill", "fill");
             plot.x(function (d) { return d.x; }, xScale).y(function (d) { return d.y; }, yScale);
-            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get(2).offset;
-            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get(2).offset;
-            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get(2).offset;
+            var ds0Point2Offset = plot._stackOffsets.get(dataset0).get("2").offset;
+            var ds1Point2Offset = plot._stackOffsets.get(dataset1).get("2").offset;
+            var ds2Point2Offset = plot._stackOffsets.get(dataset2).get("2").offset;
             assert.strictEqual(ds0Point2Offset, 0, "dataset0 (blue) should have no offset on middle point");
             assert.strictEqual(ds1Point2Offset, 2, "dataset1 (red) should have this offset and be on top of blue dataset");
             assert.strictEqual(ds2Point2Offset, 2, "dataset2 (green) should have this offset because the red dataset has no height in this point");

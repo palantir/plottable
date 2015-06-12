@@ -45,10 +45,10 @@ module Plottable {
        *
        * @return {[number]} The extent that spans all the Utils.stacked data
        */
-      export function computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean) {
+      export function computeStackExtent(stackOffsets: Utils.Map<Dataset, Utils.Map<string, StackedDatum>>, filter: (value: string) => boolean) {
         var extents: number[] = [];
-        stackOffsets.forEach((stackedDatumMap: d3.Map<StackedDatum>, dataset: Dataset) => {
-          stackedDatumMap.forEach((key: string, stackedDatum: StackedDatum) => {
+        stackOffsets.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
+          stackedDatumMap.forEach((stackedDatum: StackedDatum) => {
             if (filter != null && !filter(stackedDatum.key)) {
               return;
             }
@@ -126,9 +126,9 @@ module Plottable {
           positiveDataStack: d3.Map<StackedDatum>[],
           negativeDataStack: d3.Map<StackedDatum>[]) {
 
-        var stackOffsets = new Utils.Map<Dataset, d3.Map<StackedDatum>>();
+        var stackOffsets = new Utils.Map<Dataset, Utils.Map<string, StackedDatum>>();
         datasets.forEach((dataset, index) => {
-          var datasetOffsets = d3.map<StackedDatum>();
+          var datasetOffsets = new Utils.Map<string, StackedDatum>();
           var positiveDataMap = positiveDataStack[index];
           var negativeDataMap = negativeDataStack[index];
 
