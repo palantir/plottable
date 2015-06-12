@@ -293,13 +293,22 @@ declare module Plottable {
                 offset: number;
             };
             type StackInformation = Utils.Map<Dataset, Utils.Map<string, StackedDatum>>;
+            /**
+             * Computes the stacking information (value and offset) for each data point in each dataset
+             */
             function computeStackInformation(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): StackInformation;
+            /**
+             * Computes the total extent over all data points in all datasets, taking stacking into consideration
+             */
             function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
              */
             function domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            /**
+             * Normalizes a key to be used when for stacking
+             */
             function normalizeKey(key: any): string;
         }
     }

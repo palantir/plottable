@@ -147,7 +147,8 @@ export module Plots {
         return Utils.Stacking.normalizeKey(xAccessor(datum, index, dataset));
       };
       var stackYProjector = (d: any, i: number, dataset: Dataset) =>
-        this.y().scale.scale(+yAccessor(d, i, dataset) + this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
+        this.y().scale.scale(+yAccessor(d, i, dataset) +
+          this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
       var stackY0Projector = (d: any, i: number, dataset: Dataset) =>
         this.y().scale.scale(this._stackInformation.get(dataset).get(normalizedXAccessor(d, i, dataset)).offset);
 
@@ -159,7 +160,8 @@ export module Plots {
       var pixelPoint = super._pixelPoint(datum, index, dataset);
       var xValue = this.x().accessor(datum, index, dataset);
       var yValue = this.y().accessor(datum, index, dataset);
-      var scaledYValue = this.y().scale.scale(+yValue + this._stackInformation.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
+      var scaledYValue = this.y().scale.scale(+yValue +
+        this._stackInformation.get(dataset).get(Utils.Stacking.normalizeKey(xValue)).offset);
       return { x: pixelPoint.x, y: scaledYValue };
     }
 

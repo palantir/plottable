@@ -13,6 +13,9 @@ module Plottable {
 
       var nativeMath: Math = (<any>window).Math;
 
+      /**
+       * Computes the stacking information (value and offset) for each data point in each dataset
+       */
       export function computeStackInformation(
           datasets: Dataset[],
           keyAccessor: Accessor<any>,
@@ -45,6 +48,9 @@ module Plottable {
         return datasetToKeyToStackedDatum;
       }
 
+      /**
+       * Computes the total extent over all data points in all datasets, taking stacking into consideration
+       */
       export function computeStackExtent(stackInformation: StackInformation, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
         var extents: number[] = [];
         stackInformation.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
@@ -77,6 +83,9 @@ module Plottable {
         return domainKeys.values();
       }
 
+      /**
+       * Normalizes a key to be used when for stacking
+       */
       export function normalizeKey(key: any) {
         return String(key);
       }

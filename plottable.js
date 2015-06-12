@@ -624,6 +624,9 @@ var Plottable;
         var Stacking;
         (function (Stacking) {
             var nativeMath = window.Math;
+            /**
+             * Computes the stacking information (value and offset) for each data point in each dataset
+             */
             function computeStackInformation(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
                 var negativeOffsets = d3.map();
@@ -653,6 +656,9 @@ var Plottable;
                 return datasetToKeyToStackedDatum;
             }
             Stacking.computeStackInformation = computeStackInformation;
+            /**
+             * Computes the total extent over all data points in all datasets, taking stacking into consideration
+             */
             function computeStackExtent(stackInformation, keyAccessor, filter) {
                 var extents = [];
                 stackInformation.forEach(function (stackedDatumMap, dataset) {
@@ -683,6 +689,9 @@ var Plottable;
                 return domainKeys.values();
             }
             Stacking.domainKeys = domainKeys;
+            /**
+             * Normalizes a key to be used when for stacking
+             */
             function normalizeKey(key) {
                 return String(key);
             }
