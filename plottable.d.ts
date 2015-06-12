@@ -454,24 +454,41 @@ declare module Plottable {
         (datum: any, index: number, dataset: Dataset): T;
     }
     /**
-     * Retrieves scaled datum property.
+     * Retrieves a scaled datum property.
+     * Essentially passes the result of an Accessor through a Scale.
      */
     type Projector = (datum: any, index: number, dataset: Dataset) => any;
-    type AppliedProjector = (datum: any, index: number) => any;
     /**
      * A mapping from attributes ("x", "fill", etc.) to the functions that get
      * that information out of the data.
      */
     type AttributeToProjector = {
-        [attrToSet: string]: Projector;
+        [attr: string]: Projector;
     };
+    /**
+     * A function that generates attribute values from the datum and index.
+     * Essentially a Projector with a particular Dataset rolled in.
+     */
+    type AppliedProjector = (datum: any, index: number) => any;
+    /**
+     * A mapping from attributes to the AppliedProjectors used to generate them.
+     */
     type AttributeToAppliedProjector = {
-        [attrToSet: string]: AppliedProjector;
+        [attr: string]: AppliedProjector;
     };
+    /**
+     * Space request used during layout negotiation.
+     *
+     * @member {number} minWidth The minimum acceptable width given the offered space.
+     * @member {number} minHeight the minimum acceptable height given the offered space.
+     */
     type SpaceRequest = {
         minWidth: number;
         minHeight: number;
     };
+    /**
+     * Min and max values for a particular property.
+     */
     type Range = {
         min: number;
         max: number;
@@ -2548,7 +2565,7 @@ declare module Plottable {
             constructor();
             protected _getDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
             /**
@@ -2756,7 +2773,7 @@ declare module Plottable {
             protected _additionalPaint(time: number): void;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
              * Computes the barPixelWidth of all the bars in the plot.
@@ -2791,7 +2808,7 @@ declare module Plottable {
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             /**
              * Returns the PlotEntity nearest to the query point by X then by Y, or undefined if no PlotEntity can be found.
@@ -2866,7 +2883,7 @@ declare module Plottable {
              */
             constructor(orientation?: string);
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
@@ -2924,7 +2941,7 @@ declare module Plottable {
             y(y: number | Accessor<number>): StackedBar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): StackedBar<X, Y>;
             protected _generateAttrToProjector(): {
-                [attrToSet: string]: (datum: any, index: number, dataset: Dataset) => any;
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
