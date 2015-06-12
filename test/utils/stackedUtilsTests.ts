@@ -10,7 +10,7 @@ describe("Utils", () => {
     var createDatasets = (dataArray: any[]) => {
       return dataArray.map((data: any[]) => new Plottable.Dataset(data));
     };
-    var filter: (value: number) => boolean;
+    var filter: (value: string) => boolean;
 
     it("domainKeys() works as expected with strings as keys", () => {
       var data1 = [

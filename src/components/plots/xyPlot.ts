@@ -123,7 +123,7 @@ module Plottable {
         var accessor = binding.accessor;
         var scale = binding.scale;
         if (scale != null) {
-          return (value: number) => {
+          return (value: string) => {
             var range = scale.range();
             return Utils.Math.inRange(scale.scale(value), range[0], range[1]);
           };

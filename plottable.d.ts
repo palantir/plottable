@@ -255,7 +255,7 @@ declare module Plottable {
              *
              * @return {[number]} The extent that spans all the stacked data
              */
-            static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: number) => boolean): number[];
+            static computeStackExtent(stackOffsets: Utils.Map<Dataset, d3.Map<StackedDatum>>, filter: (value: string) => boolean): number[];
             /**
              * Given an array of datasets and the accessor function for the key, computes the
              * set reunion (no duplicates) of the domain of each dataset.
@@ -2500,7 +2500,7 @@ declare module Plottable {
          */
         y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): XYPlot<X, Y>;
         protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
-        protected _hackedFilterForProperty(property: string): (value: number) => boolean;
+        protected _hackedFilterForProperty(property: string): (value: string) => boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         destroy(): XYPlot<X, Y>;
