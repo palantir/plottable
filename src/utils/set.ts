@@ -37,8 +37,8 @@ module Plottable {
        * Deletes a value from the Set.
        *
        * @param {T} value Value to be deleted from the set
-       * @return true if the value existed in the set
-       * @return false if the value did not exist in the set
+       * @return {boolean} true if the value existed in the set
+       * @return {boolean} false if the value did not exist in the set
        */
       public delete(value: T) {
         var index = this._values.indexOf(value);

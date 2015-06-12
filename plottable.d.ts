@@ -43,15 +43,15 @@ declare module Plottable {
             function isValidNumber(n: any): boolean;
             /**
              * Generates an array of consecutive, strictly increasing numbers
-             * in the range [start, stop) at a step distance of each other
+             * in the range [start, stop) step by step
              */
             function range(start: number, stop: number, step?: number): number[];
             /**
              * Returns the square of the distance between two points
              *
-             * @param p1
-             * @param p2
-             * @return dist(p1, p2)^2
+             * @param {Point} p1
+             * @param {Point} p2
+             * @return {number} dist(p1, p2)^2
              */
             function distanceSquared(p1: Point, p2: Point): number;
         }
@@ -134,8 +134,8 @@ declare module Plottable {
              * Deletes a value from the Set.
              *
              * @param {T} value Value to be deleted from the set
-             * @return true if the value existed in the set
-             * @return false if the value did not exist in the set
+             * @return {boolean} true if the value existed in the set
+             * @return {boolean} false if the value did not exist in the set
              */
             delete(value: T): boolean;
             /**
@@ -379,9 +379,8 @@ declare module Plottable {
     module Utils {
         class ClientToSVGTranslator {
             /**
-             * Returns the singleton (per document) ClientToSVGTranslator.
-             *
-             * It is recommended to use this method instead of the explicit constructor to ensure singularity.
+             * Returns the ClientToSVGTranslator for the <svg> containing elem.
+             * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
              */
             static getTranslator(elem: SVGElement): ClientToSVGTranslator;
             constructor(svg: SVGElement);
