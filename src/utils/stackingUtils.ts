@@ -53,14 +53,14 @@ module Plottable {
       /**
        * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
        *
-       * @param {StackingResult} stackInformation The value and offset information for each datapoint in each dataset
-       * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
+       * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
+       * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
        * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
        * @return {[number, number]} The total extent
        */
-      export function stackedExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
+      export function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
         var extents: number[] = [];
-        stackInformation.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
+        stackingResult.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
           dataset.data().forEach((datum, index) => {
             if (filter != null && !filter(datum, index, dataset)) {
               return;

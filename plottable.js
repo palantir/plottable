@@ -664,14 +664,14 @@ var Plottable;
             /**
              * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
              *
-             * @param {StackingResult} stackInformation The value and offset information for each datapoint in each dataset
-             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
+             * @param {StackingResult} stackingResult The value and offset information for each datapoint in each dataset
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackingResult
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
-            function stackedExtent(stackInformation, keyAccessor, filter) {
+            function stackedExtent(stackingResult, keyAccessor, filter) {
                 var extents = [];
-                stackInformation.forEach(function (stackedDatumMap, dataset) {
+                stackingResult.forEach(function (stackedDatumMap, dataset) {
                     dataset.data().forEach(function (datum, index) {
                         if (filter != null && !filter(datum, index, dataset)) {
                             return;
