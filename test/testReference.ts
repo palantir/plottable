@@ -60,7 +60,7 @@
 ///<reference path="utils/mathUtilsTests.ts" />
 ///<reference path="utils/callbackSetTests.ts" />
 ///<reference path="utils/arrayUtilsTests.ts" />
-///<reference path="utils/stackedUtilsTests.ts" />
+///<reference path="utils/stackingUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/keyInteractionTests.ts" />
