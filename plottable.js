@@ -604,7 +604,7 @@ var Plottable;
                 });
                 var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
                 var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
-                return Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
+                return Utils.Stacked._combineDataStacks(datasets, positiveDataStack, negativeDataStack);
             };
             /**
              * Calculates an extent across all datasets. The extent is a <number> interval that
@@ -669,7 +669,7 @@ var Plottable;
              * After the stack offsets have been determined on each separate dataset, the offsets need
              * to be determined correctly on the overall datasets
              */
-            Stacked._generateStackOffsets = function (datasets, positiveDataStack, negativeDataStack) {
+            Stacked._combineDataStacks = function (datasets, positiveDataStack, negativeDataStack) {
                 var stackOffsets = new Utils.Map();
                 datasets.forEach(function (dataset, index) {
                     var datasetOffsets = d3.map();

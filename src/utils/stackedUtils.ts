@@ -36,7 +36,7 @@ module Plottable {
 
         var positiveDataStack = Utils.Stacked._stack(positiveDataMapArray, domainKeys);
         var negativeDataStack = Utils.Stacked._stack(negativeDataMapArray, domainKeys);
-        return Utils.Stacked._generateStackOffsets(datasets, positiveDataStack, negativeDataStack);
+        return Utils.Stacked._combineDataStacks(datasets, positiveDataStack, negativeDataStack);
       }
 
       /**
@@ -121,7 +121,7 @@ module Plottable {
        * After the stack offsets have been determined on each separate dataset, the offsets need
        * to be determined correctly on the overall datasets
        */
-      private static _generateStackOffsets(
+      private static _combineDataStacks(
           datasets: Dataset[],
           positiveDataStack: d3.Map<StackedDatum>[],
           negativeDataStack: d3.Map<StackedDatum>[]) {
