@@ -27,7 +27,7 @@ module Plottable {
     private _tickLabelPadding = 10;
     private _margin = 15;
     private _showEndTickLabels = false;
-    private _rescaleCallback: ScaleCallback<Scale<D, number>>;
+    private _rescaleCallback: Scales.ScaleCallback<Scale<D, number>>;
 
     /**
      * Constructs an Axis.

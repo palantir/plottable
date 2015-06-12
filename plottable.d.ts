@@ -202,20 +202,6 @@ declare module Plottable {
              * see http://www.w3.org/TR/2008/REC-WCAG20-20081211/#contrast-ratiodef
              */
             function contrast(a: string, b: string): number;
-            /**
-             * Returns a brighter copy of this color. Each channel is multiplied by 0.7 ^ -factor.
-             * Channel values are capped at the maximum value of 255, and the minimum value of 30.
-             */
-            function lightenColor(color: string, factor: number): string;
-            /**
-             * Gets the Hex Code of the color resulting by applying the className CSS class to the
-             * colorTester selection. Returns null if the tester is transparent.
-             *
-             * @param {d3.Selection<void>} colorTester The d3 selection to apply the CSS class to
-             * @param {string} className The name of the class to be applied
-             * @return {string} The hex code of the computed color
-             */
-            function colorTest(colorTester: d3.Selection<void>, className: string): string;
         }
     }
 }
@@ -672,10 +658,10 @@ declare module Plottable {
 
 
 declare module Plottable {
-    interface ScaleCallback<S extends Scale<any, any>> {
-        (scale: S): any;
-    }
     module Scales {
+        interface ScaleCallback<S extends Scale<any, any>> {
+            (scale: S): any;
+        }
         /**
          * A function that supplies domain values to be included into a Scale.
          *
@@ -716,17 +702,17 @@ declare module Plottable {
         /**
          * Adds a callback to be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        onUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        onUpdate(callback: Scales.ScaleCallback<Scale<D, R>>): Scale<D, R>;
         /**
          * Removes a callback that would be called when the Scale updates.
          *
-         * @param {ScaleCallback} callback.
+         * @param {Scales.ScaleCallback} callback.
          * @returns {Scale} The calling Scale.
          */
-        offUpdate(callback: ScaleCallback<Scale<D, R>>): Scale<D, R>;
+        offUpdate(callback: Scales.ScaleCallback<Scale<D, R>>): Scale<D, R>;
         protected _dispatchUpdate(): void;
         /**
          * Sets the Scale's domain so that it spans the Extents of all its ExtentsProviders.

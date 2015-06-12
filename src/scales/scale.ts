@@ -1,11 +1,11 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export interface ScaleCallback<S extends Scale<any, any>> {
-    (scale: S): any;
-  }
-
   export module Scales {
+
+    export interface ScaleCallback<S extends Scale<any, any>> {
+      (scale: S): any;
+    }
 
     /**
      * A function that supplies domain values to be included into a Scale.
@@ -31,7 +31,7 @@ module Plottable {
   }
 
   export class Scale<D, R> {
-    private _callbacks: Utils.CallbackSet<ScaleCallback<Scale<D, R>>>;
+    private _callbacks: Utils.CallbackSet<Scales.ScaleCallback<Scale<D, R>>>;
     private _autoDomainAutomatically = true;
     private _domainModificationInProgress = false;
     private _includedValuesProviders: Utils.Set<Scales.IncludedValuesProvider<D>>;
@@ -42,7 +42,7 @@ module Plottable {
      * @constructor
      */
     constructor() {
-      this._callbacks = new Utils.CallbackSet<ScaleCallback<Scale<D, R>>>();
+      this._callbacks = new Utils.CallbackSet<Scales.ScaleCallback<Scale<D, R>>>();
       this._includedValuesProviders = new Utils.Set<Scales.IncludedValuesProvider<D>>();
     }
 
@@ -72,10 +72,10 @@ module Plottable {
     /**
      * Adds a callback to be called when the Scale updates.
      *
-     * @param {ScaleCallback} callback.
+     * @param {Scales.ScaleCallback} callback.
      * @returns {Scale} The calling Scale.
      */
-    public onUpdate(callback: ScaleCallback<Scale<D, R>>) {
+    public onUpdate(callback: Scales.ScaleCallback<Scale<D, R>>) {
       this._callbacks.add(callback);
       return this;
     }
@@ -83,10 +83,10 @@ module Plottable {
     /**
      * Removes a callback that would be called when the Scale updates.
      *
-     * @param {ScaleCallback} callback.
+     * @param {Scales.ScaleCallback} callback.
      * @returns {Scale} The calling Scale.
      */
-    public offUpdate(callback: ScaleCallback<Scale<D, R>>) {
+    public offUpdate(callback: Scales.ScaleCallback<Scale<D, R>>) {
       this._callbacks.delete(callback);
       return this;
     }

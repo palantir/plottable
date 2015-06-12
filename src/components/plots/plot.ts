@@ -34,7 +34,7 @@ module Plottable {
     private _animate = false;
     private _animators: {[animator: string]: Animator} = {};
 
-    private _renderCallback: ScaleCallback<Scale<any, any>>;
+    private _renderCallback: Scales.ScaleCallback<Scale<any, any>>;
     private _onDatasetUpdateCallback: DatasetCallback;
 
     protected _propertyExtents: d3.Map<any[]>;

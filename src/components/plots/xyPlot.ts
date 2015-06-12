@@ -6,8 +6,8 @@ module Plottable {
     protected static _Y_KEY = "y";
     private _autoAdjustXScaleDomain = false;
     private _autoAdjustYScaleDomain = false;
-    private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
-    private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
+    private _adjustYDomainOnChangeFromXCallback: Scales.ScaleCallback<Scale<any, any>>;
+    private _adjustXDomainOnChangeFromYCallback: Scales.ScaleCallback<Scale<any, any>>;
 
     /**
      * An XYPlot is a Plot that displays data along two primary directions, X and Y.
