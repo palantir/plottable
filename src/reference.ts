@@ -44,10 +44,10 @@
 /// <reference path="components/componentContainer.ts" />
 /// <reference path="components/group.ts" />
 
-/// <reference path="components/axes/axis.ts" />
-/// <reference path="components/axes/timeAxis.ts" />
-/// <reference path="components/axes/numericAxis.ts" />
-/// <reference path="components/axes/categoryAxis.ts" />
+/// <reference path="axes/axis.ts" />
+/// <reference path="axes/timeAxis.ts" />
+/// <reference path="axes/numericAxis.ts" />
+/// <reference path="axes/categoryAxis.ts" />
 
 /// <reference path="components/label.ts" />
 /// <reference path="components/legend.ts" />
@@ -56,17 +56,17 @@
 /// <reference path="components/table.ts" />
 /// <reference path="components/selectionBoxLayer.ts" />
 
-/// <reference path="components/plots/plot.ts" />
-/// <reference path="components/plots/piePlot.ts" />
-/// <reference path="components/plots/xyPlot.ts" />
-/// <reference path="components/plots/rectanglePlot.ts" />
-/// <reference path="components/plots/scatterPlot.ts" />
-/// <reference path="components/plots/barPlot.ts" />
-/// <reference path="components/plots/linePlot.ts" />
-/// <reference path="components/plots/areaPlot.ts" />
-/// <reference path="components/plots/clusteredBarPlot.ts" />
-/// <reference path="components/plots/stackedAreaPlot.ts" />
-/// <reference path="components/plots/stackedBarPlot.ts" />
+/// <reference path="plots/plot.ts" />
+/// <reference path="plots/piePlot.ts" />
+/// <reference path="plots/xyPlot.ts" />
+/// <reference path="plots/rectanglePlot.ts" />
+/// <reference path="plots/scatterPlot.ts" />
+/// <reference path="plots/barPlot.ts" />
+/// <reference path="plots/linePlot.ts" />
+/// <reference path="plots/areaPlot.ts" />
+/// <reference path="plots/clusteredBarPlot.ts" />
+/// <reference path="plots/stackedAreaPlot.ts" />
+/// <reference path="plots/stackedBarPlot.ts" />
 
 /// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
