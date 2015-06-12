@@ -9752,18 +9752,18 @@ describe("Dispatchers", function () {
             TestMethods.triggerFakeUIEvent("click", d3document);
             assert.isFalse(callbackWasCalled, "disconnected when dispatcher had no listeners");
         });
-        it("setCallback()", function () {
+        it("_setCallback()", function () {
             var dispatcher = new Plottable.Dispatcher();
             var callbackSet = new Plottable.Utils.CallbackSet();
             var callbackWasCalled = false;
             var callback = function () { return callbackWasCalled = true; };
-            dispatcher.setCallback(callbackSet, callback);
+            dispatcher._setCallback(callbackSet, callback);
             callbackSet.callCallbacks();
-            assert.isTrue(callbackWasCalled, "callback was called after setting with setCallback()");
-            dispatcher.unsetCallback(callbackSet, callback);
+            assert.isTrue(callbackWasCalled, "callback was called after setting with _setCallback()");
+            dispatcher._unsetCallback(callbackSet, callback);
             callbackWasCalled = false;
             callbackSet.callCallbacks();
-            assert.isFalse(callbackWasCalled, "callback was removed by calling setCallback() with null");
+            assert.isFalse(callbackWasCalled, "callback was removed by calling _unsetCallback()");
         });
     });
 });
