@@ -6049,12 +6049,31 @@ var Plottable;
             }
             return this;
         };
-        Plot.prototype.animated = function (willAnimate) {
-            if (willAnimate == null) {
-                return this._animate;
-            }
-            this._animate = willAnimate;
+        /**
+         * Enables animation on the plot.
+         *
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.enableAnimation = function () {
+            this._animate = true;
             return this;
+        };
+        /**
+         * Disables animation on the plot.
+         *
+         * @returns {Plot} The calling Plot.
+         */
+        Plot.prototype.disableAnimation = function () {
+            this._animate = false;
+            return this;
+        };
+        /**
+         * Gets if the plot will animate
+         *
+         * @returns {boolean} If the plot will animate.
+         */
+        Plot.prototype.willAnimate = function () {
+            return this._animate;
         };
         Plot.prototype.detach = function () {
             _super.prototype.detach.call(this);

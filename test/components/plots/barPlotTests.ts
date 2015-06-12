@@ -55,7 +55,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<string, number>();
         barPlot.addDataset(dataset);
-        barPlot.animated(false);
+        barPlot.disableAnimation();
         barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
@@ -282,7 +282,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<number, number>();
         barPlot.addDataset(dataset);
-        barPlot.animated(false);
+        barPlot.disableAnimation();
         barPlot.baselineValue(0);
         yScale.domain([-2, 2]);
         barPlot.x((d) => d.x, xScale);
@@ -440,7 +440,7 @@ describe("Plots", () => {
         dataset = new Plottable.Dataset(data);
         barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
         barPlot.addDataset(dataset);
-        barPlot.animated(false);
+        barPlot.disableAnimation();
         barPlot.baselineValue(0);
         barPlot.x((d) => d.x, xScale);
         barPlot.y((d) => d.y, yScale);

@@ -2623,7 +2623,7 @@ describe("Plots", function () {
             var x = new Plottable.Scales.Linear();
             var y = new Plottable.Scales.Linear();
             var plot = new Plottable.Plots.Bar();
-            plot.addDataset(new Plottable.Dataset([])).animated(true);
+            plot.addDataset(new Plottable.Dataset([])).enableAnimation();
             var recordedTime = -1;
             var additionalPaint = function (x) {
                 recordedTime = Math.max(x, recordedTime);
@@ -2653,11 +2653,11 @@ describe("Plots", function () {
         });
         it("animated() getter", function () {
             var plot = new Plottable.Plot();
-            assert.strictEqual(plot.animated(), false, "by default the plot is not animated");
-            assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
-            assert.strictEqual(plot.animated(), true, "animated toggled on");
-            plot.animated(false);
-            assert.strictEqual(plot.animated(), false, "animated toggled off");
+            assert.strictEqual(plot.willAnimate(), false, "by default the plot is not animated");
+            assert.strictEqual(plot.enableAnimation(), plot, "toggling animation returns the plot");
+            assert.strictEqual(plot.willAnimate(), true, "animated toggled on");
+            plot.disableAnimation();
+            assert.strictEqual(plot.willAnimate(), false, "animated toggled off");
         });
     });
 });
@@ -3470,7 +3470,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
-                barPlot.animated(false);
+                barPlot.disableAnimation();
                 barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
@@ -3662,7 +3662,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar();
                 barPlot.addDataset(dataset);
-                barPlot.animated(false);
+                barPlot.disableAnimation();
                 barPlot.baselineValue(0);
                 yScale.domain([-2, 2]);
                 barPlot.x(function (d) { return d.x; }, xScale);
@@ -3795,7 +3795,7 @@ describe("Plots", function () {
                 dataset = new Plottable.Dataset(data);
                 barPlot = new Plottable.Plots.Bar(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
                 barPlot.addDataset(dataset);
-                barPlot.animated(false);
+                barPlot.disableAnimation();
                 barPlot.baselineValue(0);
                 barPlot.x(function (d) { return d.x; }, xScale);
                 barPlot.y(function (d) { return d.y; }, yScale);
