@@ -58,7 +58,7 @@ module Plottable {
        * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
        * @return {[number, number]} The total extent
        */
-      export function computeStackExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
+      export function stackedExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>) {
         var extents: number[] = [];
         stackInformation.forEach((stackedDatumMap: Utils.Map<string, StackedDatum>, dataset: Dataset) => {
           dataset.data().forEach((datum, index) => {

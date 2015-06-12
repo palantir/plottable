@@ -669,7 +669,7 @@ var Plottable;
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
-            function computeStackExtent(stackInformation, keyAccessor, filter) {
+            function stackedExtent(stackInformation, keyAccessor, filter) {
                 var extents = [];
                 stackInformation.forEach(function (stackedDatumMap, dataset) {
                     dataset.data().forEach(function (datum, index) {
@@ -684,7 +684,7 @@ var Plottable;
                 var minStackExtent = Utils.Math.min(extents, 0);
                 return [nativeMath.min(minStackExtent, 0), nativeMath.max(0, maxStackExtent)];
             }
-            Stacking.computeStackExtent = computeStackExtent;
+            Stacking.stackedExtent = stackedExtent;
             /**
              * Normalizes a key used for stacking
              *
@@ -7836,7 +7836,7 @@ var Plottable;
                 var filter = this._filterForProperty("y");
                 this._checkSameDomain(datasets, keyAccessor);
                 this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
+                this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             StackedArea.prototype._checkSameDomain = function (datasets, keyAccessor) {
                 var keySets = datasets.map(function (dataset) {
@@ -7996,7 +7996,7 @@ var Plottable;
                 var valueAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
                 var filter = this._filterForProperty(this._isVertical ? "y" : "x");
                 this._stackingResult = Plottable.Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
-                this._stackedExtent = Plottable.Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
+                this._stackedExtent = Plottable.Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
             };
             return StackedBar;
         })(Plots.Bar);

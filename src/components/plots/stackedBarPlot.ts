@@ -118,7 +118,7 @@ export module Plots {
       var filter = this._filterForProperty(this._isVertical ? "y" : "x");
 
       this._stackingResult = Utils.Stacking.stack(datasets, keyAccessor, valueAccessor);
-      this._stackedExtent = Utils.Stacking.computeStackExtent(this._stackingResult, keyAccessor, filter);
+      this._stackedExtent = Utils.Stacking.stackedExtent(this._stackingResult, keyAccessor, filter);
     }
   }
 }

@@ -310,7 +310,7 @@ declare module Plottable {
              * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
              * @return {[number, number]} The total extent
              */
-            function computeStackExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
+            function stackedExtent(stackInformation: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
              * Normalizes a key used for stacking
              *
