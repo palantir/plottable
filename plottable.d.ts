@@ -289,12 +289,10 @@ declare module Plottable {
     module Utils {
         module Stacked {
             type StackedDatum = {
-                key: any;
                 value: number;
                 offset?: number;
             };
             function computeStackOffsets(datasets: Dataset[], keyAccessor: Accessor<any>, valueAccessor: Accessor<number>): Map<Dataset, Map<string, {
-                key: any;
                 value: number;
                 offset?: number;
             }>>;

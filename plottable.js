@@ -647,7 +647,6 @@ var Plottable;
                             offsetMap.set(key, value);
                         }
                         keyToStackedDatum.set(key, {
-                            key: key,
                             value: value,
                             offset: offset
                         });

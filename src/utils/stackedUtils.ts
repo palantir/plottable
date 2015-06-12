@@ -5,7 +5,6 @@ module Plottable {
     export module Stacked {
 
       export type StackedDatum = {
-        key: any;
         value: number;
         offset?: number;
       };
@@ -36,7 +35,6 @@ module Plottable {
               offsetMap.set(key, value);
             }
             keyToStackedDatum.set(key, {
-              key: key,
               value: value,
               offset: offset
             });
