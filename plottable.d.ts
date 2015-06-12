@@ -3106,8 +3106,8 @@ declare module Plottable {
             [eventName: string]: (e: Event) => any;
         };
         protected _callbacks: Utils.CallbackSet<Function>[];
-        protected setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
-        protected unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _setCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
+        protected _unsetCallback(callbackSet: Utils.CallbackSet<Function>, callback: Function): void;
     }
 }
 
