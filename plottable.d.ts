@@ -1964,20 +1964,18 @@ declare module Plottable {
             entitiesAt(p: Point): Entity<Legend>[];
             renderImmediately(): Legend;
             /**
-             * Gets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Gets the function determining the symbols of the Legend.
              *
              * @returns {(datum: any, index: number) => symbolFactory}
              */
-            symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
+            symbol(): (datum: any, index: number) => SymbolFactory;
             /**
-             * Sets the SymbolFactory accessor of the Legend.
-             * The accessor determines the symbol for each entry.
+             * Sets the function determining the symbols of the Legend.
              *
-             * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
+             * @param {(datum: any, index: number) => SymbolFactory} symbol
              * @returns {Legend} The calling Legend
              */
-            symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
+            symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
