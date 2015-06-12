@@ -687,7 +687,8 @@ var Plottable;
             Stacking.computeStackExtent = computeStackExtent;
             /**
              * Given an array of Datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each Dataset.
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
              *
              * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
              * @param {Accessor<any>} keyAccessor The accessor for the key of the data
@@ -704,7 +705,7 @@ var Plottable;
             }
             Stacking.domainKeys = domainKeys;
             /**
-             * Normalizes a key to be used when for stacking
+             * Normalizes a key used for stacking
              *
              * @param {any} key The key to be normalized
              * @return {string} The stringified key
