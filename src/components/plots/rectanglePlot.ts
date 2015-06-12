@@ -24,7 +24,7 @@ export module Plots {
       this.addClass("rectangle-plot");
     }
 
-    protected _getDrawer(dataset: Dataset) {
+    protected _createDrawer(dataset: Dataset) {
       return new Drawers.Rectangle(dataset);
     }
 

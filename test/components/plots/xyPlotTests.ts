@@ -21,6 +21,7 @@ describe("Plots", () => {
       xScale = new Plottable.Scales.Linear();
       yScale = new Plottable.Scales.Linear();
       plot = new Plottable.XYPlot<number, number>();
+      (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)

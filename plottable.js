@@ -283,21 +283,43 @@ var Plottable;
                 return bbox;
             }
             DOM.elementBBox = elementBBox;
-            DOM.POLYFILL_TIMEOUT_MILLISECONDS = 1000 / 60; // 60 fps
-            function requestAnimationFramePolyfill(fn) {
+            // Screen refresh rate which is assumed to be 60fps
+            DOM.SCREEN_REFRESH_RATE_MILLISECONDS = 1000 / 60;
+            /**
+             * Polyfill for `window.requestAnimationFrame`.
+             * If the function exists, then we use the function directly.
+             * Otherwise, we set a timeout on `SCREEN_REFRESH_RATE_MILLISECONDS` and then perform the function.
+             *
+             * @param {() => void} callback The callback to call in the next animation frame
+             */
+            function requestAnimationFramePolyfill(callback) {
                 if (window.requestAnimationFrame != null) {
-                    window.requestAnimationFrame(fn);
+                    window.requestAnimationFrame(callback);
                 }
                 else {
-                    setTimeout(fn, DOM.POLYFILL_TIMEOUT_MILLISECONDS);
+                    setTimeout(callback, DOM.SCREEN_REFRESH_RATE_MILLISECONDS);
                 }
             }
             DOM.requestAnimationFramePolyfill = requestAnimationFramePolyfill;
+            /**
+             * Calculates the width of the element.
+             * The width includes the padding and the border on the element's left and right sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The width of the element.
+             */
             function elementWidth(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "width") + _parseStyleValue(style, "padding-left") + _parseStyleValue(style, "padding-right") + _parseStyleValue(style, "border-left-width") + _parseStyleValue(style, "border-right-width");
             }
             DOM.elementWidth = elementWidth;
+            /**
+             * Calculates the height of the element.
+             * The height includes the padding the and the border on the element's top and bottom sides.
+             *
+             * @param {Element} element The element to query
+             * @returns {number} The height of the element
+             */
             function elementHeight(element) {
                 var style = window.getComputedStyle(element);
                 return _parseStyleValue(style, "height") + _parseStyleValue(style, "padding-top") + _parseStyleValue(style, "padding-bottom") + _parseStyleValue(style, "border-top-width") + _parseStyleValue(style, "border-bottom-width");
@@ -315,33 +337,53 @@ var Plottable;
                 return selection;
             }
             DOM.translate = translate;
-            function boxesOverlap(boxA, boxB) {
-                if (boxA.right < boxB.left) {
+            /**
+             * Checks if the first ClientRect overlaps the second.
+             *
+             * @param {ClientRect} clientRectA The first ClientRect
+             * @param {ClientRect} clientRectB The second ClientRect
+             * @returns {boolean} If the ClientRects overlap each other.
+             */
+            function clientRectsOverlap(clientRectA, clientRectB) {
+                if (clientRectA.right < clientRectB.left) {
                     return false;
                 }
-                if (boxA.left > boxB.right) {
+                if (clientRectA.left > clientRectB.right) {
                     return false;
                 }
-                if (boxA.bottom < boxB.top) {
+                if (clientRectA.bottom < clientRectB.top) {
                     return false;
                 }
-                if (boxA.top > boxB.bottom) {
+                if (clientRectA.top > clientRectB.bottom) {
                     return false;
                 }
                 return true;
             }
-            DOM.boxesOverlap = boxesOverlap;
-            function boxIsInside(inner, outer) {
-                return (nativeMath.floor(outer.left) <= nativeMath.ceil(inner.left) && nativeMath.floor(outer.top) <= nativeMath.ceil(inner.top) && nativeMath.floor(inner.right) <= nativeMath.ceil(outer.right) && nativeMath.floor(inner.bottom) <= nativeMath.ceil(outer.bottom));
+            DOM.clientRectsOverlap = clientRectsOverlap;
+            /**
+             * Returns true if and only if innerClientRect is inside outerClientRect.
+             *
+             * @param {ClientRect} innerClientRect The first ClientRect
+             * @param {ClientRect} outerClientRect The second ClientRect
+             * @returns {boolean} If and only if the innerClientRect is inside outerClientRect.
+             */
+            function clientRectInside(innerClientRect, outerClientRect) {
+                return (nativeMath.floor(outerClientRect.left) <= nativeMath.ceil(innerClientRect.left) && nativeMath.floor(outerClientRect.top) <= nativeMath.ceil(innerClientRect.top) && nativeMath.floor(innerClientRect.right) <= nativeMath.ceil(outerClientRect.right) && nativeMath.floor(innerClientRect.bottom) <= nativeMath.ceil(outerClientRect.bottom));
             }
-            DOM.boxIsInside = boxIsInside;
-            function boundingSVG(elem) {
-                var ownerSVG = elem.ownerSVGElement;
+            DOM.clientRectInside = clientRectInside;
+            /**
+             * Retrieves the bounding svg of the input element
+             *
+             * @param {SVGElement} element The element to query
+             * @returns {SVGElement} The bounding svg
+             */
+            function boundingSVG(element) {
+                var ownerSVG = element.ownerSVGElement;
                 if (ownerSVG != null) {
                     return ownerSVG;
                 }
-                if (elem.nodeName.toLowerCase() === "svg") {
-                    return elem;
+                if (element.nodeName.toLowerCase() === "svg") {
+                    return element;
                 }
                 return null; // not in the DOM
             }
@@ -957,7 +999,7 @@ var Plottable;
          */
         var Timeout = (function () {
             function Timeout() {
-                this._timeoutMsec = Plottable.Utils.DOM.POLYFILL_TIMEOUT_MILLISECONDS;
+                this._timeoutMsec = Plottable.Utils.DOM.SCREEN_REFRESH_RATE_MILLISECONDS;
             }
             Timeout.prototype.render = function () {
                 setTimeout(Plottable.RenderController.flush, this._timeoutMsec);
@@ -2528,12 +2570,20 @@ var Plottable;
             }
         };
         /**
-         * Enter new data to render area and creates binding
+         * Binds data to selection
          *
          * @param{any[]} data The data to be drawn
          */
-        Drawer.prototype._enterData = function (data) {
-            // no-op
+        Drawer.prototype._bindSelectionData = function (data) {
+            var dataElements = this._selection().data(data);
+            dataElements.enter().append(this._svgElementName);
+            dataElements.exit().remove();
+            this._applyDefaultAttributes(dataElements);
+        };
+        Drawer.prototype._applyDefaultAttributes = function (selection) {
+            if (this._className != null) {
+                selection.classed(this._className, true);
+            }
         };
         /**
          * Draws data using one step
@@ -2541,10 +2591,17 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            // no-op
-        };
-        Drawer.prototype._numberOfAnimationIterations = function (data) {
-            return data.length;
+            var selection = this._selection();
+            var colorAttributes = ["fill", "stroke"];
+            colorAttributes.forEach(function (colorAttribute) {
+                if (step.attrToAppliedProjector[colorAttribute] != null) {
+                    selection.attr(colorAttribute, step.attrToAppliedProjector[colorAttribute]);
+                }
+            });
+            step.animator.animate(selection, step.attrToAppliedProjector);
+            if (this._className != null) {
+                this._selection().classed(this._className, true);
+            }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
             var _this = this;
@@ -2555,10 +2612,9 @@ var Plottable;
             return modifiedAttrToProjector;
         };
         Drawer.prototype.totalDrawTime = function (data, drawSteps) {
-            var numberOfIterations = this._numberOfAnimationIterations(data);
             var delay = 0;
             drawSteps.forEach(function (drawStep, i) {
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return delay;
         };
@@ -2577,27 +2633,28 @@ var Plottable;
                     animator: dr.animator
                 };
             });
-            this._enterData(data);
-            var numberOfIterations = this._numberOfAnimationIterations(data);
+            this._bindSelectionData(data);
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
-                delay += drawStep.animator.totalTime(numberOfIterations);
+                delay += drawStep.animator.totalTime(data.length);
             });
             return this;
+        };
+        Drawer.prototype._selection = function () {
+            return this.renderArea().selectAll(this.selector());
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
         Drawer.prototype.selector = function () {
-            throw new Error("The base Drawer class has no elements to select");
+            return this._svgElementName;
         };
         /**
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            var allSelections = this.renderArea().selectAll(this.selector());
-            return d3.select(allSelections[0][index]);
+            return d3.select(this._selection()[0][index]);
         };
         return Drawer;
     })();
@@ -2617,35 +2674,18 @@ var Plottable;
     (function (Drawers) {
         var Line = (function (_super) {
             __extends(Line, _super);
-            function Line() {
-                _super.apply(this, arguments);
+            function Line(dataset) {
+                _super.call(this, dataset);
+                this._className = "line";
+                this._svgElementName = "path";
             }
-            Line.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                this._pathSelection.datum(data);
-            };
-            Line.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                _super.prototype.renderArea.call(this, area);
-                this._pathSelection = area.append("path").classed(Line.PATH_CLASS, true).style("fill", "none");
-                return this;
-            };
-            Line.prototype._numberOfAnimationIterations = function (data) {
-                return 1;
-            };
-            Line.prototype._drawStep = function (step) {
-                step.animator.animate(this._pathSelection, step.attrToAppliedProjector);
-                this._pathSelection.classed(Line.PATH_CLASS, true);
-            };
-            Line.prototype.selector = function () {
-                return "." + Line.PATH_CLASS;
+            Line.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
                 return this.renderArea().select(this.selector());
             };
-            Line.PATH_CLASS = "line";
             return Line;
         })(Plottable.Drawer);
         Drawers.Line = Line;
@@ -2665,76 +2705,21 @@ var Plottable;
     (function (Drawers) {
         var Area = (function (_super) {
             __extends(Area, _super);
-            function Area() {
-                _super.apply(this, arguments);
+            function Area(dataset) {
+                _super.call(this, dataset);
+                this._className = "area";
+                this._svgElementName = "path";
             }
-            Area.prototype._enterData = function (data) {
-                this._areaSelection.datum(data);
+            Area.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("stroke", "none");
             };
-            Area.prototype.renderArea = function (area) {
-                if (area == null) {
-                    return _super.prototype.renderArea.call(this);
-                }
-                Plottable.Drawer.prototype.renderArea.call(this, area);
-                this._areaSelection = area.append("path").style("stroke", "none");
-                return this;
+            Area.prototype.selectionForIndex = function (index) {
+                return this.renderArea().select(this.selector());
             };
-            Area.prototype._drawStep = function (step) {
-                step.animator.animate(this._areaSelection, step.attrToAppliedProjector);
-                this._areaSelection.classed(Area.PATH_CLASS, true);
-            };
-            Area.prototype.selector = function () {
-                return "path";
-            };
-            Area.PATH_CLASS = "area";
             return Area;
-        })(Drawers.Line);
-        Drawers.Area = Area;
-    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
-})(Plottable || (Plottable = {}));
-
-///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
-    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
-    function __() { this.constructor = d; }
-    __.prototype = b.prototype;
-    d.prototype = new __();
-};
-var Plottable;
-(function (Plottable) {
-    var Drawers;
-    (function (Drawers) {
-        var Element = (function (_super) {
-            __extends(Element, _super);
-            function Element() {
-                _super.apply(this, arguments);
-            }
-            Element.prototype._getDrawSelection = function () {
-                return this.renderArea().selectAll(this._svgElement);
-            };
-            Element.prototype._drawStep = function (step) {
-                _super.prototype._drawStep.call(this, step);
-                var drawSelection = this._getDrawSelection();
-                if (step.attrToAppliedProjector["fill"]) {
-                    drawSelection.attr("fill", step.attrToAppliedProjector["fill"]); // so colors don't animate
-                }
-                step.animator.animate(drawSelection, step.attrToAppliedProjector);
-            };
-            Element.prototype._enterData = function (data) {
-                _super.prototype._enterData.call(this, data);
-                var dataElements = this._getDrawSelection().data(data);
-                dataElements.enter().append(this._svgElement);
-                if (this._className != null) {
-                    dataElements.classed(this._className, true);
-                }
-                dataElements.exit().remove();
-            };
-            Element.prototype.selector = function () {
-                return this._svgElement;
-            };
-            return Element;
         })(Plottable.Drawer);
-        Drawers.Element = Element;
+        Drawers.Area = Area;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -2753,10 +2738,10 @@ var Plottable;
             __extends(Rectangle, _super);
             function Rectangle(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "rect";
+                this._svgElementName = "rect";
             }
             return Rectangle;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Rectangle = Rectangle;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2777,10 +2762,10 @@ var Plottable;
             function Arc(dataset) {
                 _super.call(this, dataset);
                 this._className = "arc";
-                this._svgElement = "path";
+                this._svgElementName = "path";
             }
             return Arc;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Arc = Arc;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -2800,11 +2785,11 @@ var Plottable;
             __extends(Symbol, _super);
             function Symbol(dataset) {
                 _super.call(this, dataset);
-                this._svgElement = "path";
+                this._svgElementName = "path";
                 this._className = "symbol";
             }
             return Symbol;
-        })(Drawers.Element);
+        })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
@@ -4125,7 +4110,7 @@ var Plottable;
                     var tickLabel = d3.select(this);
                     var leadingTickMark = visibleTickMarkRects[i];
                     var trailingTickMark = visibleTickMarkRects[i + 1];
-                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.boxesOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
+                    if (!isInsideBBox(clientRect) || (lastLabelClientRect != null && Plottable.Utils.DOM.clientRectsOverlap(clientRect, lastLabelClientRect)) || (leadingTickMark.right > clientRect.left || trailingTickMark.left < clientRect.right)) {
                         tickLabel.style("visibility", "hidden");
                     }
                     else {
@@ -4486,11 +4471,11 @@ var Plottable;
                     return;
                 }
                 var firstTickLabel = tickLabels[0][0];
-                if (!Plottable.Utils.DOM.boxIsInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(firstTickLabel).style("visibility", "hidden");
                 }
                 var lastTickLabel = tickLabels[0][tickLabels[0].length - 1];
-                if (!Plottable.Utils.DOM.boxIsInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
+                if (!Plottable.Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
                     d3.select(lastTickLabel).style("visibility", "hidden");
                 }
             };
@@ -4502,7 +4487,7 @@ var Plottable;
                     return;
                 }
                 tickLabels.each(function (d, i) {
-                    if (!Plottable.Utils.DOM.boxIsInside(this.getBoundingClientRect(), boundingBox)) {
+                    if (!Plottable.Utils.DOM.clientRectInside(this.getBoundingClientRect(), boundingBox)) {
                         d3.select(this).style("visibility", "hidden");
                     }
                 });
@@ -5108,7 +5093,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
@@ -5127,12 +5112,12 @@ var Plottable;
                 });
                 return this;
             };
-            Legend.prototype.symbolFactoryAccessor = function (symbolFactoryAccessor) {
-                if (symbolFactoryAccessor == null) {
+            Legend.prototype.symbol = function (symbol) {
+                if (symbol == null) {
                     return this._symbolFactoryAccessor;
                 }
                 else {
-                    this._symbolFactoryAccessor = symbolFactoryAccessor;
+                    this._symbolFactoryAccessor = symbol;
                     this.render();
                     return this;
                 }
@@ -5998,7 +5983,7 @@ var Plottable;
                 this.removeDataset(dataset);
             }
             ;
-            var drawer = this._getDrawer(dataset);
+            var drawer = this._createDrawer(dataset);
             this._datasetToDrawer.set(dataset, drawer);
             if (this._isSetup) {
                 this._createNodesForDataset(dataset);
@@ -6012,7 +5997,7 @@ var Plottable;
             drawer.renderArea(this._renderArea.append("g"));
             return drawer;
         };
-        Plot.prototype._getDrawer = function (dataset) {
+        Plot.prototype._createDrawer = function (dataset) {
             return new Plottable.Drawer(dataset);
         };
         Plot.prototype._getAnimator = function (key) {
@@ -6309,7 +6294,7 @@ var Plottable;
             var closestDistanceSquared = Infinity;
             var closest;
             this.entities().forEach(function (entity) {
-                if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -6320,7 +6305,7 @@ var Plottable;
             });
             return closest;
         };
-        Plot.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+        Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -6404,7 +6389,7 @@ var Plottable;
                 _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
             };
-            Pie.prototype._getDrawer = function (dataset) {
+            Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
             };
             Pie.prototype.entities = function (datasets) {
@@ -6748,7 +6733,7 @@ var Plottable;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
-            Rectangle.prototype._getDrawer = function (dataset) {
+            Rectangle.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Rectangle.prototype._generateAttrToProjector = function () {
@@ -6941,7 +6926,7 @@ var Plottable;
                 var circleSymbolFactory = Plottable.SymbolFactories.circle();
                 this.symbol(function () { return circleSymbolFactory; });
             }
-            Scatter.prototype._getDrawer = function (dataset) {
+            Scatter.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Symbol(dataset);
             };
             Scatter.prototype.size = function (size, scale) {
@@ -6970,7 +6955,7 @@ var Plottable;
                 drawSteps.push({ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) });
                 return drawSteps;
             };
-            Scatter.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -7072,7 +7057,7 @@ var Plottable;
             Bar.prototype.orientation = function () {
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
             };
-            Bar.prototype._getDrawer = function (dataset) {
+            Bar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
             Bar.prototype._setup = function () {
@@ -7160,7 +7145,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -7192,7 +7177,7 @@ var Plottable;
                 });
                 return closest;
             };
-            Bar.prototype._isVisibleOnPlot = function (datum, pixelPoint, selection) {
+            Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
@@ -7499,7 +7484,7 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
-            Line.prototype._getDrawer = function (dataset) {
+            Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
             Line.prototype._getResetYFunction = function () {
@@ -7546,7 +7531,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);
@@ -7577,7 +7562,7 @@ var Plottable;
             };
             Line.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();
-                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, dataset.data()); });
+                this.datasets().forEach(function (dataset) { return dataToDraw.set(dataset, [dataset.data()]); });
                 return dataToDraw;
             };
             return Line;
@@ -7687,7 +7672,7 @@ var Plottable;
                 lineAttrToProjector["d"] = this._constructLineProjector(Plottable.Plot._scaledAccessor(this.x()), Plottable.Plot._scaledAccessor(this.y()));
                 return lineAttrToProjector;
             };
-            Area.prototype._getDrawer = function (dataset) {
+            Area.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Area(dataset);
             };
             Area.prototype._generateDrawSteps = function () {

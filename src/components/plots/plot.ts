@@ -89,7 +89,7 @@ module Plottable {
       if (this.datasets().indexOf(dataset) > -1) {
         this.removeDataset(dataset);
       };
-      var drawer = this._getDrawer(dataset);
+      var drawer = this._createDrawer(dataset);
       this._datasetToDrawer.set(dataset, drawer);
 
       if (this._isSetup) {
@@ -107,7 +107,7 @@ module Plottable {
       return drawer;
     }
 
-    protected _getDrawer(dataset: Dataset): Drawer {
+    protected _createDrawer(dataset: Dataset): Drawer {
       return new Drawer(dataset);
     }
 
@@ -482,7 +482,7 @@ module Plottable {
       var closestDistanceSquared = Infinity;
       var closest: Plots.PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._isVisibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
           return;
         }
 
@@ -496,7 +496,7 @@ module Plottable {
       return closest;
     }
 
-    protected _isVisibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
         pixelPoint.x > this.width() || pixelPoint.y > this.height());
     }
