@@ -625,7 +625,12 @@ var Plottable;
         (function (Stacking) {
             var nativeMath = window.Math;
             /**
-             * Computes the stacking information (value and offset) for each data point in each dataset
+             * Computes the stacking information (value and offset) for each data point in each Dataset.
+             *
+             * @param {Dataset[]} datasets The Datasets to be stacked on top of each other in the order of stacking
+             * @param {Accessor<any>} keyAccessor Accessor for the key of the data
+             * @param {Accessor<number>} valueAccessor Accessor for the value of the data
+             * @return {StackInformation} value and offset information for each datapoint in each Dataset
              */
             function computeStackInformation(datasets, keyAccessor, valueAccessor) {
                 var positiveOffsets = d3.map();
@@ -657,7 +662,12 @@ var Plottable;
             }
             Stacking.computeStackInformation = computeStackInformation;
             /**
-             * Computes the total extent over all data points in all datasets, taking stacking into consideration
+             * Computes the total extent over all data points in all Datasets, taking stacking into consideration.
+             *
+             * @param {StackInformation} stackInformation The value and offset information for each datapoint in each dataset
+             * @oaram {Accessor<any>} keyAccessor Accessor for the key of the data existent in the stackInformation
+             * @param {Accessor<boolean>} filter A filter for data to be considered when computing the total extent
+             * @return {[number, number]} The total extent
              */
             function computeStackExtent(stackInformation, keyAccessor, filter) {
                 var extents = [];
@@ -676,8 +686,12 @@ var Plottable;
             }
             Stacking.computeStackExtent = computeStackExtent;
             /**
-             * Given an array of datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each dataset.
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
              */
             function domainKeys(datasets, keyAccessor) {
                 var domainKeys = d3.set();
@@ -691,6 +705,9 @@ var Plottable;
             Stacking.domainKeys = domainKeys;
             /**
              * Normalizes a key to be used when for stacking
+             *
+             * @param {any} key The key to be normalized
+             * @return {string} The stringified key
              */
             function normalizeKey(key) {
                 return String(key);
