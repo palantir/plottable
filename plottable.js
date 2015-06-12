@@ -7469,6 +7469,8 @@ var Plottable;
         var Line = (function (_super) {
             __extends(Line, _super);
             /**
+             * A Line Plot draws line segments starting from the first data point to the next.
+             *
              * @constructor
              */
             function Line() {
