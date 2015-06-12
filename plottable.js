@@ -1459,7 +1459,7 @@ var Plottable;
          * Adds an IncludedValuesProvider to the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.addIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.add(provider);
@@ -1470,7 +1470,7 @@ var Plottable;
          * Removes the IncludedValuesProvider from the Scale.
          *
          * @param {Scales.IncludedValuesProvider} provider
-         * @returns {Sclae} The calling Scale.
+         * @returns {Scale} The calling Scale.
          */
         Scale.prototype.removeIncludedValuesProvider = function (provider) {
             this._includedValuesProviders.delete(provider);
@@ -8090,19 +8090,7 @@ var Plottable;
     var Animators;
     (function (Animators) {
         /**
-         * The base animator implementation with easing, duration, and delay.
-         *
-         * The delay between animations can be configured with stepDelay().
-         * This will be affected if the maxTotalDuration() is used such that the entire animation
-         * fits within the timeframe
-         *
-         * The maximum total animation duration can be configured with maxTotalDuration.
-         * It is guaranteed the animation will not exceed this value,
-         * by first reducing stepDuration, then stepDelay
-         *
-         * The actual interval delay is calculated by following formula:
-         * min(stepDelay(),
-         *   max(maxTotalDuration() - stepDuration(), 0) / (<number of iterations> - 1)
+         * An Animator with easing and configurable durations and delays.
          */
         var Easing = (function () {
             /**
