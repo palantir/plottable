@@ -1,26 +1,26 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Drawers {
-  /**
-   * A step for the drawer to draw.
-   *
-   * Specifies how AttributeToProjector needs to be animated.
-   */
-  export type DrawStep = {
-    attrToProjector: AttributeToProjector;
-    animator: Animator;
-  };
+  export module Drawers {
+    /**
+     * A step for the drawer to draw.
+     *
+     * Specifies how AttributeToProjector needs to be animated.
+     */
+    export type DrawStep = {
+      attrToProjector: AttributeToProjector;
+      animator: Animator;
+    };
 
-  /**
-   * A DrawStep that carries an AttributeToAppliedProjector map.
-   */
-  export type AppliedDrawStep = {
-    attrToAppliedProjector: AttributeToAppliedProjector;
-    animator: Animator;
-  };
+    /**
+     * A DrawStep that carries an AttributeToAppliedProjector map.
+     */
+    export type AppliedDrawStep = {
+      attrToAppliedProjector: AttributeToAppliedProjector;
+      animator: Animator;
+    };
 
-}
+  }
 
   export class Drawer {
     private _renderArea: d3.Selection<void>;
@@ -115,7 +115,7 @@ export module Drawers {
 
     /**
      * Calculates the total time it takes to use the input drawSteps to draw the input data
-     * 
+     *
      * @param {any[]} data The data that would have been drawn
      * @param {Drawers.DrawStep[]} drawSteps The DrawSteps to use
      * @returns {number} The total time it takes to draw
