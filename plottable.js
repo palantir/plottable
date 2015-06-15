@@ -217,30 +217,30 @@ var Plottable;
                 else {
                     this._values = [];
                 }
-                this._updateSize();
+                this.size = 0;
             }
             Set.prototype.add = function (value) {
                 if (this._es6Set != null) {
                     this._es6Set.add(value);
+                    this.size = this._es6Set.size;
+                    return this;
                 }
-                else {
-                    if (!this.has(value)) {
-                        this._values.push(value);
-                    }
+                if (!this.has(value)) {
+                    this._values.push(value);
+                    this.size = this._values.length;
                 }
-                this._updateSize();
                 return this;
             };
             Set.prototype.delete = function (value) {
                 if (this._es6Set != null) {
                     var deleted = this._es6Set.delete(value);
-                    this._updateSize();
+                    this.size = this._es6Set.size;
                     return deleted;
                 }
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
-                    this._updateSize();
+                    this.size = this._values.length;
                     return true;
                 }
                 return false;
@@ -260,21 +260,6 @@ var Plottable;
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
                 });
-            };
-            /**
-             * Updates the value of the read-only parameter size
-             */
-            Set.prototype._updateSize = function () {
-                if (this._es6Set != null) {
-                    this.size = this._es6Set.size;
-                }
-                else {
-                    this.size = this._values.length;
-                }
-                // Object.defineProperty(this, "size", {
-                //   value: newSize,
-                //   configurable: true
-                // });
             };
             return Set;
         })();
