@@ -1,5 +1,5 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-  export var version = "@VERSION";
+export var version = "@VERSION";
 }
