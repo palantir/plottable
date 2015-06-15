@@ -43,12 +43,6 @@ function run(svg, data, Plottable) {
         if (zone > 40) { zone_offset = 2; }
         if (zone > 60) { zone_offset = 3; }
 
-        console.log("d");
-        console.log(d.A);
-        console.log(d.G);
-        console.log(zone);
-        console.log(zone_offset);
-
         return colorRange[slope_offset * 4 + zone_offset];
       });
 

@@ -47,7 +47,11 @@ function makeData() {
   ];
 
 
-  return [dataAustralia, dataIndia, dataRoK];
+  return {
+    australia: dataAustralia,
+    india: dataIndia,
+    korea: dataRoK
+  };
 }
 
 function run(svg, data, Plottable) {
@@ -65,9 +69,9 @@ function run(svg, data, Plottable) {
     .maxEntriesPerRow(3)
     .xAlignment("left");
 
-  var AusDataset = new Plottable.Dataset(data[0]);
-  var IndDataset = new Plottable.Dataset(data[1]);
-  var RoKDataset = new Plottable.Dataset(data[2]);
+  var AusDataset = new Plottable.Dataset(data.australia);
+  var IndDataset = new Plottable.Dataset(data.india);
+  var RoKDataset = new Plottable.Dataset(data.korea);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 1]);
   var xScale_reverse = new Plottable.Scales.Linear().domain([1, 0]);
