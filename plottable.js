@@ -5332,17 +5332,11 @@ var Plottable;
             __extends(Gridlines, _super);
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {Scale<any, number>} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {Scale<any, number>} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                // if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-                //   throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-                // }
-                // if (yScale != null && !(QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-                //   throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-                // }
                 _super.call(this);
                 this.addClass("gridlines");
                 this._xScale = xScale;

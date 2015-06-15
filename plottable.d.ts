@@ -2120,10 +2120,10 @@ declare module Plottable {
         class Gridlines extends Component {
             /**
              * @constructor
-             * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
-             * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
+             * @param {Scale<any, number>} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
+             * @param {Scale<any, number>} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
-            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>);
+            constructor(xScale: Scale<any, number>, yScale: Scale<any, number>);
             destroy(): Gridlines;
             protected _setup(): void;
             renderImmediately(): Gridlines;
