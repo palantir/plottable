@@ -135,8 +135,7 @@ export module Interactions {
     }
 
     private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
-      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      scale.domain(scale.range().map(magnifyTransform));
+      scale.domainZoomFactor(magnifyAmount, centerValue);
     }
 
     private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {

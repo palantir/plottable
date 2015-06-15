@@ -1475,6 +1475,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
+            this._domainZoomFactor = 1.0;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1674,8 +1675,15 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype.domainZoomFactor = function (domainZoomFactor) {
-            // TODO: Must implement
+        QuantitativeScale.prototype.domainZoomFactor = function (domainZoomFactor, centerValue) {
+            var _this = this;
+            if (domainZoomFactor == null) {
+                return this._domainZoomFactor;
+            }
+            this._domainZoomFactor = domainZoomFactor;
+            var magnifyTransform = function (rangeValue) { return _this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor); };
+            this.domain(this.range().map(magnifyTransform));
+            return this;
         };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
@@ -9181,8 +9189,7 @@ var Plottable;
                 });
             };
             PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                scale.domain(scale.range().map(magnifyTransform));
+                scale.domainZoomFactor(magnifyAmount, centerValue);
             };
             PanZoom._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };

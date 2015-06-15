@@ -920,7 +920,7 @@ declare module Plottable {
          * The zoom factor dictates how wide the ends of the domain should be
          * relative to the original domain (having a zoom factor of 1).
          */
-        domainZoomFactor(domainZoomFactor: number): QuantitativeScale<D>;
+        domainZoomFactor(domainZoomFactor: number, centerValue: number): QuantitativeScale<D>;
     }
 }
 
