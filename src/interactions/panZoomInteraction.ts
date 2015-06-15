@@ -151,10 +151,17 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
-          PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
+          var centerX = (this._xScale.range()[0] + this._xScale.range()[1]) / 2;
+          var invertedPX = this._xScale.invert(translatedP.x);
+          PanZoom._magnifyScale(this._xScale, zoomAmount, centerX);
+          PanZoom._translateScale(this._xScale, -translatedP.x + this._xScale.scale(invertedPX));
         }
         if (this._yScale != null) {
           PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
+          var centerY = (this._yScale.range()[0] + this._yScale.range()[1]) / 2;
+          var invertedPY = this._yScale.invert(translatedP.y);
+          PanZoom._magnifyScale(this._yScale, zoomAmount, centerY);
+          PanZoom._translateScale(this._yScale, -translatedP.y + this._yScale.scale(invertedPY));
         }
       }
     }
