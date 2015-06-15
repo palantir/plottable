@@ -159,6 +159,7 @@ export module Scales {
     protected _setRange(values: number[]) {
       this._d3Scale.range(values);
     }
+
   }
 }
 }

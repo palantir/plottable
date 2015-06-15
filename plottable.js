@@ -1449,6 +1449,14 @@ var Plottable;
             this._autoDomainIfAutomaticMode();
             return this;
         };
+        /**
+         * Gets an array of tick values spanning the domain.
+         *
+         * @returns {D[]}
+         */
+        Scale.prototype.ticks = function () {
+            return this.domain();
+        };
         return Scale;
     })();
     Plottable.Scale = Scale;
@@ -5329,12 +5337,12 @@ var Plottable;
              */
             function Gridlines(xScale, yScale) {
                 var _this = this;
-                if (xScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(xScale))) {
-                    throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
-                }
-                if (yScale != null && !(Plottable.QuantitativeScale.prototype.isPrototypeOf(yScale))) {
-                    throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
-                }
+                // if (xScale != null && !(QuantitativeScale.prototype.isPrototypeOf(xScale))) {
+                //   throw new Error("xScale needs to inherit from Scale.QuantitativeScale");
+                // }
+                // if (yScale != null && !(QuantitativeScale.prototype.isPrototypeOf(yScale))) {
+                //   throw new Error("yScale needs to inherit from Scale.QuantitativeScale");
+                // }
                 _super.call(this);
                 this.addClass("gridlines");
                 this._xScale = xScale;

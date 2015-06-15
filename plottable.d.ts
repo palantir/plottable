@@ -798,6 +798,12 @@ declare module Plottable {
          * @returns {Scale} The calling Scale.
          */
         removeIncludedValuesProvider(provider: Scales.IncludedValuesProvider<D>): Scale<D, R>;
+        /**
+         * Gets an array of tick values spanning the domain.
+         *
+         * @returns {D[]}
+         */
+        ticks(): D[];
     }
 }
 
@@ -2117,7 +2123,7 @@ declare module Plottable {
              * @param {QuantitativeScale} xScale The scale to base the x gridlines on. Pass null if no gridlines are desired.
              * @param {QuantitativeScale} yScale The scale to base the y gridlines on. Pass null if no gridlines are desired.
              */
-            constructor(xScale: QuantitativeScale<any>, yScale: QuantitativeScale<any>);
+            constructor(xScale: Scale<any, any>, yScale: Scale<any, any>);
             destroy(): Gridlines;
             protected _setup(): void;
             renderImmediately(): Gridlines;

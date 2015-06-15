@@ -215,5 +215,15 @@ module Plottable {
       this._autoDomainIfAutomaticMode();
       return this;
     }
+
+   /**
+    * Gets an array of tick values spanning the domain.
+    *
+    * @returns {D[]}
+    */
+    public ticks(): D[] {
+      return this.domain();
+    }
+
   }
 }
