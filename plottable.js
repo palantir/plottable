@@ -211,17 +211,32 @@ var Plottable;
          */
         var Set = (function () {
             function Set() {
-                this._values = [];
+                if (typeof window.Set === "function") {
+                    this._es6Set = new window.Set();
+                }
+                else {
+                    this._values = [];
+                }
                 this._updateSize();
             }
             Set.prototype.add = function (value) {
-                if (!this.has(value)) {
-                    this._values.push(value);
-                    this._updateSize();
+                if (this._es6Set != null) {
+                    this._es6Set.add(value);
                 }
+                else {
+                    if (!this.has(value)) {
+                        this._values.push(value);
+                    }
+                }
+                this._updateSize();
                 return this;
             };
             Set.prototype.delete = function (value) {
+                if (this._es6Set != null) {
+                    var deleted = this._es6Set.delete(value);
+                    this._updateSize();
+                    return deleted;
+                }
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
@@ -231,10 +246,17 @@ var Plottable;
                 return false;
             };
             Set.prototype.has = function (value) {
+                if (this._es6Set != null) {
+                    return this._es6Set.has(value);
+                }
                 return this._values.indexOf(value) !== -1;
             };
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
+                if (this._es6Set != null) {
+                    this._es6Set.forEach(callback, thisArg);
+                    return;
+                }
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
                 });
@@ -243,8 +265,15 @@ var Plottable;
              * Updates the value of the read-only parameter size
              */
             Set.prototype._updateSize = function () {
+                var newSize = 0;
+                if (this._es6Set != null) {
+                    newSize = this._es6Set.size;
+                }
+                else {
+                    newSize = this._values.length;
+                }
                 Object.defineProperty(this, "size", {
-                    value: this._values.length,
+                    value: newSize,
                     configurable: true
                 });
             };
