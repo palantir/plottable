@@ -6,7 +6,7 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-  d3.csv("../overlaying/tests/baseball.csv").get(function(error, rows) {
+  d3.csv("/quicktests/overlaying/data/baseball.csv").get(function(error, rows) {
   var data = rows;
   var dataset = new Plottable.Dataset(data);
 
