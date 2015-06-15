@@ -46,7 +46,7 @@ export module Components {
      */
     constructor(rows: Component[][] = []) {
       super();
-      this.classed("table", true);
+      this.addClass("table");
       rows.forEach((row, rowIndex) => {
         row.forEach((component, colIndex) => {
           if (component != null) {

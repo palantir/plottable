@@ -1,13 +1,13 @@
 function makeData() {
-  "use strict";  
+  "use strict";
 
 }
 
 function run(svg, data, Plottable) {
   "use strict";
 
-  d3.csv("../overlaying/tests/hockey.csv").get(function(error, rows) {
-  var data = rows; 
+  d3.csv("/quicktests/overlaying/data/hockey.csv").get(function(error, rows) {
+  var data = rows;
   var ds = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 80]);
@@ -65,11 +65,11 @@ function run(svg, data, Plottable) {
   var linePlot60 = new Plottable.Plots.Line(xScale, yScale);
   linePlot60.addDataset(new Plottable.Dataset([{x: 60, y: 0}, {x: 0, y: 60}]));
   styleLinePlot(linePlot60);
- 
+
   var linePlotLow = new Plottable.Plots.Line(xScale, yScale);
   linePlotLow.addDataset(new Plottable.Dataset([{x: 0, y: 0}, {x: 80, y: 33.14}]));
   styleLinePlot(linePlotLow);
-                     
+
   var linePlotMed = new Plottable.Plots.Line(xScale, yScale);
   linePlotMed.addDataset(new Plottable.Dataset([{x: 0, y: 0}, {x: 80, y: 80}]));
   styleLinePlot(linePlotMed);
@@ -80,13 +80,13 @@ function run(svg, data, Plottable) {
 
 
   var mergedPlots = new Plottable.Components.Group([linePlot20, linePlot40,
-                                                    linePlot60, linePlotMed, 
+                                                    linePlot60, linePlotMed,
                                                     linePlotLow, linePlotHigh,
                                                     plot]);
 
   var table = new Plottable.Components.Table([[yLabel, yAxis, mergedPlots],
                                              [null, null, xAxis],
                                              [null, null, xLabel]]);
-  table.renderTo(svg); 
+  table.renderTo(svg);
   });
 }

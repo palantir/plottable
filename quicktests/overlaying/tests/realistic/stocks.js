@@ -12,13 +12,13 @@ function run(svg, data, Plottable) {
   }
 
   // load GOOG
-  d3.csv("/quicktests/data/GOOG_20140401_20140901.csv")
+  d3.csv("/quicktests/overlaying/data/GOOG_20140401_20140901.csv")
     .get(function(error, rows) {
       var goog = rows.reverse();
       goog.forEach(processDatum);
 
       // load AAPL
-      d3.csv("/quicktests/data/AAPL_20140401_20140901.csv")
+      d3.csv("/quicktests/overlaying/data/AAPL_20140401_20140901.csv")
         .get(function(error, rows) {
           var aapl = rows.reverse();
           aapl.forEach(processDatum);
@@ -74,7 +74,7 @@ function run(svg, data, Plottable) {
           if (typeof line_aapl.autorange === "function") {
             line_aapl.autorange("y");
           } else {
-            line_aapl.automaticallyAdjustYScaleOverVisiblePoints(true);
+            line_aapl.autorangeMode("y");
           }
           var line_goog = new Plottable.Plots.Line().animated(true)
                                   .addDataset(googSource)
@@ -84,7 +84,7 @@ function run(svg, data, Plottable) {
           if (typeof line_aapl.autorange === "function") {
             line_goog.autorange("y");
           } else {
-            line_goog.automaticallyAdjustYScaleOverVisiblePoints(true);
+            line_goog.autorangeMode("y");
           }
 
           // should be one line plot, pending #917
@@ -123,12 +123,10 @@ function run(svg, data, Plottable) {
           if (typeof keyInteraction.onKeyPress === "function") {
             keyInteraction.onKeyPress(65, function() {
                                        xScale.autoDomain();
-                                       pzi.resetZoom();
                                      });
           } else {
             keyInteraction.onKey(65, function() {
                                        xScale.autoDomain();
-                                       pzi.resetZoom();
                                      });
           }
           keyInteraction.attachTo(plotArea);

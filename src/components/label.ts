@@ -20,7 +20,7 @@ export module Components {
      */
     constructor(displayText = "", angle = 0) {
       super();
-      this.classed("label", true);
+      this.addClass("label");
       this.text(displayText);
       this.angle(angle);
       this.xAlignment("center").yAlignment("center");
@@ -162,7 +162,7 @@ export module Components {
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);
-      this.classed(TitleLabel.TITLE_LABEL_CLASS, true);
+      this.addClass(TitleLabel.TITLE_LABEL_CLASS);
     }
   }
 
@@ -175,7 +175,7 @@ export module Components {
      */
     constructor(text?: string, angle?: number) {
       super(text, angle);
-      this.classed(AxisLabel.AXIS_LABEL_CLASS, true);
+      this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }
   }
 }

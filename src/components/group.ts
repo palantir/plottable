@@ -9,19 +9,19 @@ export module Components {
      * Constructs a Group.
      *
      * A Group contains Components that will be rendered on top of each other.
-     * Components added later will be rendered on top of Components already in the Group.
+     * Components added later will be rendered above Components already in the Group.
      *
      * @constructor
      * @param {Component[]} [components=[]] Components to be added to the Group.
      */
     constructor(components: Component[] = []) {
       super();
-      this.classed("component-group", true);
+      this.addClass("component-group");
       components.forEach((c: Component) => this.append(c));
     }
 
     protected _forEach(callback: (component: Component) => any) {
-      this._components.forEach(callback);
+      this.components().forEach(callback);
     }
 
     /**
@@ -47,7 +47,7 @@ export module Components {
       return this;
     }
 
-    protected _getSize(availableWidth: number, availableHeight: number) {
+    protected _sizeFromOffer(availableWidth: number, availableHeight: number) {
       return {
         width: availableWidth,
         height: availableHeight
@@ -69,6 +69,10 @@ export module Components {
       return this._components.slice();
     }
 
+    /**
+     * Adds a Component to this Group.
+     * The added Component will be rendered above Components already in the Group.
+     */
     public append(component: Component) {
       if (component != null && !this.has(component)) {
         component.detach();

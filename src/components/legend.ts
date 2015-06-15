@@ -34,7 +34,7 @@ export module Components {
      */
     constructor(colorScale: Scales.Color) {
       super();
-      this.classed("legend", true);
+      this.addClass("legend");
       this.maxEntriesPerRow(1);
 
       if (colorScale == null ) {
@@ -206,9 +206,9 @@ export module Components {
     }
 
     /**
-     * Gets the Entities (representing Legend entries) at a particular point. 
+     * Gets the Entities (representing Legend entries) at a particular point.
      * Returns an empty array if no Entities are present at that location.
-     * 
+     *
      * @param {Point} p
      * @returns {Entity<Legend>[]}
      */
@@ -277,7 +277,7 @@ export module Components {
         });
       });
 
-      entries.select("path").attr("d", (d: any, i: number) => this.symbolFactoryAccessor()(d, i)(layout.textHeight * 0.6))
+      entries.select("path").attr("d", (d: any, i: number) => this.symbol()(d, i)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._colorScale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
@@ -304,25 +304,23 @@ export module Components {
     }
 
     /**
-     * Gets the SymbolFactory accessor of the Legend.
-     * The accessor determines the symbol for each entry.
+     * Gets the function determining the symbols of the Legend.
      *
      * @returns {(datum: any, index: number) => symbolFactory}
      */
-    public symbolFactoryAccessor(): (datum: any, index: number) => SymbolFactory;
+    public symbol(): (datum: any, index: number) => SymbolFactory;
     /**
-     * Sets the SymbolFactory accessor of the Legend.
-     * The accessor determines the symbol for each entry.
+     * Sets the function determining the symbols of the Legend.
      *
-     * @param {(datum: any, index: number) => symbolFactory} symbolFactoryAccessor
+     * @param {(datum: any, index: number) => SymbolFactory} symbol
      * @returns {Legend} The calling Legend
      */
-    public symbolFactoryAccessor(symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory): Legend;
-    public symbolFactoryAccessor(symbolFactoryAccessor?: (datum: any, index: number) => SymbolFactory): any {
-      if (symbolFactoryAccessor == null) {
+    public symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+    public symbol(symbol?: (datum: any, index: number) => SymbolFactory): any {
+      if (symbol == null) {
         return this._symbolFactoryAccessor;
       } else {
-        this._symbolFactoryAccessor = symbolFactoryAccessor;
+        this._symbolFactoryAccessor = symbol;
         this.render();
         return this;
       }
