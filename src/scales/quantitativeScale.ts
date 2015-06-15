@@ -307,9 +307,12 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (domainZoomFactor == null) {
       return this._domainZoomFactor;
     }
+    var oldDomainZoomFactor = this._domainZoomFactor;
+    var magnifyTransform = (rangeValue: number) => {
+      var centerValue = (this.range()[0] + this.range()[1]) / 2;
+      return this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor / oldDomainZoomFactor);
+    };
     this._domainZoomFactor = domainZoomFactor;
-    var centerValue = (this.range()[0] + this.range()[1]) / 2;
-    var magnifyTransform = (rangeValue: number) => this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor);
     this.domain(this.range().map(magnifyTransform));
     return this;
   }

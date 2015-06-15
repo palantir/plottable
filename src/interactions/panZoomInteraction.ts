@@ -94,12 +94,12 @@ export module Interactions {
 
       if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
         var invertedPX = this._xScale.invert(oldCenterPoint.x);
-        PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance);
+        this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
         PanZoom._translateScale(this._xScale, this._xScale.scale(invertedPX) - newCenterPoint.x);
       }
       if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
         var invertedPY = this._yScale.invert(oldCenterPoint.y);
-        PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance);
+        this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
         PanZoom._translateScale(this._yScale, this._yScale.scale(invertedPY) - newCenterPoint.y);
       }
     }
@@ -136,10 +136,6 @@ export module Interactions {
       });
     }
 
-    private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number) {
-      scale.domainZoomFactor(magnifyAmount);
-    }
-
     private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
@@ -154,12 +150,12 @@ export module Interactions {
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
           var invertedPX = this._xScale.invert(translatedP.x);
-          PanZoom._magnifyScale(this._xScale, zoomAmount);
+          this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * zoomAmount);
           PanZoom._translateScale(this._xScale, -translatedP.x + this._xScale.scale(invertedPX));
         }
         if (this._yScale != null) {
           var invertedPY = this._yScale.invert(translatedP.y);
-          PanZoom._magnifyScale(this._yScale, zoomAmount);
+          this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * zoomAmount);
           PanZoom._translateScale(this._yScale, -translatedP.y + this._yScale.scale(invertedPY));
         }
       }
