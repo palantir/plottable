@@ -73,16 +73,15 @@ export module Utils {
      * Updates the value of the read-only parameter size
      */
     private _updateSize() {
-      var newSize = 0;
       if (this._es6Set != null) {
-        newSize = this._es6Set.size;
+        this.size = this._es6Set.size;
       } else {
-        newSize = this._values.length;
+        this.size = this._values.length;
       }
-      Object.defineProperty(this, "size", {
-        value: newSize,
-        configurable: true
-      });
+      // Object.defineProperty(this, "size", {
+      //   value: newSize,
+      //   configurable: true
+      // });
     }
   }
 }
