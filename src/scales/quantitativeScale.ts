@@ -287,5 +287,23 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return this;
     }
   }
+
+  /**
+   * Gets the zoom factor for the domain of the scale.
+   * 
+   * The zoom factor dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom factor of 1).
+   */
+  public domainZoomFactor(): number;
+  /**
+   * Sets the zoom factor for the domain of the scale and affects the domain accordingly.
+   * 
+   * The zoom factor dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom factor of 1).
+   */
+  public domainZoomFactor(domainZoomFactor: number): QuantitativeScale<D>;
+  public domainZoomFactor(domainZoomFactor?: number): any {
+    // TODO: Must implement
+  }
 }
 }

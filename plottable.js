@@ -1674,6 +1674,9 @@ var Plottable;
                 return this;
             }
         };
+        QuantitativeScale.prototype.domainZoomFactor = function (domainZoomFactor) {
+            // TODO: Must implement
+        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);

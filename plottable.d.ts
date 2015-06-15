@@ -907,6 +907,20 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
+        /**
+         * Gets the zoom factor for the domain of the scale.
+         *
+         * The zoom factor dictates how wide the ends of the domain should be
+         * relative to the original domain (having a zoom factor of 1).
+         */
+        domainZoomFactor(): number;
+        /**
+         * Sets the zoom factor for the domain of the scale and affects the domain accordingly.
+         *
+         * The zoom factor dictates how wide the ends of the domain should be
+         * relative to the original domain (having a zoom factor of 1).
+         */
+        domainZoomFactor(domainZoomFactor: number): QuantitativeScale<D>;
     }
 }
 
