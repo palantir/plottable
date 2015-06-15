@@ -302,12 +302,13 @@ export class QuantitativeScale<D> extends Scale<D, number> {
    * The zoom factor dictates how wide the ends of the domain should be
    * relative to the original domain (having a zoom factor of 1).
    */
-  public domainZoomFactor(domainZoomFactor: number, centerValue: number): QuantitativeScale<D>;
-  public domainZoomFactor(domainZoomFactor?: number, centerValue?: number): any {
+  public domainZoomFactor(domainZoomFactor: number): QuantitativeScale<D>;
+  public domainZoomFactor(domainZoomFactor?: number): any {
     if (domainZoomFactor == null) {
       return this._domainZoomFactor;
     }
     this._domainZoomFactor = domainZoomFactor;
+    var centerValue = (this.range()[0] + this.range()[1]) / 2;
     var magnifyTransform = (rangeValue: number) => this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor);
     this.domain(this.range().map(magnifyTransform));
     return this;
