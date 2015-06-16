@@ -3845,6 +3845,29 @@ describe("Plots", function () {
                 assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
                 svg.remove();
             });
+            it("entityAt with defaults", function () {
+                var click1 = { x: 300, y: 200 };
+                var entity1 = piePlot.entityAt(click1);
+                assert.strictEqual(entity1.datum.value, 5);
+                var click2 = { x: 200, y: 300 };
+                var entity2 = piePlot.entityAt(click2);
+                assert.strictEqual(entity2.datum.value, 15);
+                var click3 = { x: 0, y: 0 };
+                var entity3 = piePlot.entityAt(click3);
+                assert.isNull(entity3);
+                svg.remove();
+            });
+            it("entityAt with radius modifications", function () {
+                piePlot.innerRadius(100).render();
+                var click1 = { x: 250, y: 250 };
+                var entity1 = piePlot.entityAt(click1);
+                assert.isNull(entity1);
+                piePlot.outerRadius(150).render();
+                var click2 = { x: 300, y: 100 };
+                var entity2 = piePlot.entityAt(click2);
+                assert.isNull(entity2);
+                svg.remove();
+            });
         });
         describe("Fill", function () {
             it("sectors are filled in according to defaults", function () {

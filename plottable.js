@@ -6366,6 +6366,37 @@ var Plottable;
                 this.render();
                 return this;
             };
+            /**
+             * Returns the PlotEntity at the query point.
+             *
+             * @param {Point} queryPoint
+             * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found.
+             */
+            Pie.prototype.entityAt = function (queryPoint) {
+                var bbox = d3.select(this._boundingBox[0][0]);
+                var center = { x: +bbox.attr("width") / 2, y: +bbox.attr("height") / 2 };
+                var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
+                var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
+                var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
+                if (adjustedQueryPoint.x < 0) {
+                    angle = Math.PI * 2 - angle;
+                }
+                for (var i = 0; i < this.entities().length; i++) {
+                    var entity = this.entities()[i];
+                    var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (this.innerRadius().scale) {
+                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (this.outerRadius().scale) {
+                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                    }
+                    if (this._startAngles[i] <= angle && this._endAngles[i] > angle && innerRadius < radius && outerRadius > radius) {
+                        return this.entities()[i];
+                    }
+                }
+                return null;
+            };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
