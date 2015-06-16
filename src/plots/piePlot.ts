@@ -163,10 +163,8 @@ export module Plots {
      * @param {Point} queryPoint
      * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found. 
      */
-    public entityAt(queryPoint: Point): PlotEntity {
-      var bbox = d3.select(this._boundingBox[0][0]);
-      var center = { x: +bbox.attr("width") / 2, y: +bbox.attr("height") / 2 };
-
+    public entitiesAt(queryPoint: Point): PlotEntity[] {
+      var center = { x: this.width() / 2, y: this.height() / 2 };
       var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
       var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
       var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
@@ -186,11 +184,11 @@ export module Plots {
         }
         if (this._startAngles[i] <= angle && this._endAngles[i] > angle &&
             innerRadius < radius && outerRadius > radius) {
-          return this.entities()[i];
+          return [this.entities()[i]];
         }
       }
 
-      return null;
+      return [];
     }
 
     protected _propertyProjectors(): AttributeToProjector {

@@ -2515,7 +2515,7 @@ declare module Plottable {
              * @param {Point} queryPoint
              * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found.
              */
-            entityAt(queryPoint: Point): PlotEntity;
+            entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {

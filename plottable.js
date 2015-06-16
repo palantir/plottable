@@ -6372,9 +6372,8 @@ var Plottable;
              * @param {Point} queryPoint
              * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found.
              */
-            Pie.prototype.entityAt = function (queryPoint) {
-                var bbox = d3.select(this._boundingBox[0][0]);
-                var center = { x: +bbox.attr("width") / 2, y: +bbox.attr("height") / 2 };
+            Pie.prototype.entitiesAt = function (queryPoint) {
+                var center = { x: this.width() / 2, y: this.height() / 2 };
                 var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
                 var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
                 var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
@@ -6392,10 +6391,10 @@ var Plottable;
                         outerRadius = this.outerRadius().scale.scale(outerRadius);
                     }
                     if (this._startAngles[i] <= angle && this._endAngles[i] > angle && innerRadius < radius && outerRadius > radius) {
-                        return this.entities()[i];
+                        return [this.entities()[i]];
                     }
                 }
-                return null;
+                return [];
             };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
