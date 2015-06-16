@@ -8,8 +8,8 @@ export module Interactions {
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScales: Utils.Set<QuantitativeScale<any>>;
-    private _yScales: Utils.Set<QuantitativeScale<any>>;
+    private _xScales: QuantitativeScale<any>[];
+    private _yScales: QuantitativeScale<any>[];
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -32,14 +32,8 @@ export module Interactions {
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
-      this._xScales = new Utils.Set<QuantitativeScale<any>>();
-      if (xScale != null) {
-        this._xScales.add(xScale);
-      }
-      this._yScales = new Utils.Set<QuantitativeScale<any>>();
-      if (yScale != null) {
-        this._yScales.add(yScale);
-      }
+      this._xScales = xScale == null ? [] : [xScale];
+      this._yScales = yScale == null ? [] : [yScale];
 
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
