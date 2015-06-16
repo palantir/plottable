@@ -35,9 +35,9 @@ export module Utils {
       return this;
     }
 
-    public delete(value: T): boolean {
+    public delete(value: T) {
       if (this._es6Set != null) {
-        var deleted = this._es6Set.delete(value);
+        var deleted = <boolean>this._es6Set.delete(value);
         this.size = this._es6Set.size;
         return deleted;
       }
@@ -51,9 +51,9 @@ export module Utils {
       return false;
     }
 
-    public has(value: T): boolean {
+    public has(value: T) {
       if (this._es6Set != null) {
-        return this._es6Set.has(value);
+        return <boolean>this._es6Set.has(value);
       }
 
       return this._values.indexOf(value) !== -1;

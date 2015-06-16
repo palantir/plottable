@@ -38,9 +38,9 @@ export module Utils {
       return this;
     }
 
-    public get(key: K): V {
+    public get(key: K) {
       if (this._es6Map != null) {
-        return this._es6Map.get(key);
+        return <V>this._es6Map.get(key);
       }
 
       for (var i = 0; i < this._keyValuePairs.length; i++) {
@@ -51,9 +51,9 @@ export module Utils {
       return undefined;
     }
 
-    public has(key: K): boolean {
+    public has(key: K) {
       if (this._es6Map != null) {
-        return this._es6Map.has(key);
+        return <boolean>this._es6Map.has(key);
       }
 
       for (var i = 0; i < this._keyValuePairs.length; i++) {
@@ -75,9 +75,9 @@ export module Utils {
       });
     }
 
-    public delete(key: K): boolean {
+    public delete(key: K) {
       if (this._es6Map != null) {
-        return this._es6Map.delete(key);
+        return <boolean>this._es6Map.delete(key);
       }
 
       for (var i = 0; i < this._keyValuePairs.length; i++) {
