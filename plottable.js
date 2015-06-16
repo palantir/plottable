@@ -9238,15 +9238,33 @@ var Plottable;
                 return this;
             };
             PanZoom.prototype.addXScale = function (xScale) {
+                if (this.xScales().indexOf(xScale) === -1) {
+                    return this;
+                }
+                this._xScales.push(xScale);
                 return this;
             };
-            PanZoom.prototype.removeXScale = function (yScale) {
+            PanZoom.prototype.removeXScale = function (xScale) {
+                var xScaleIndex = this.xScales().indexOf(xScale);
+                if (xScaleIndex === -1) {
+                    return this;
+                }
+                this._xScales.splice(xScaleIndex, 1);
                 return this;
             };
-            PanZoom.prototype.addYScale = function (xScale) {
+            PanZoom.prototype.addYScale = function (yScale) {
+                if (this.yScales().indexOf(yScale) === -1) {
+                    return this;
+                }
+                this._yScales.push(yScale);
                 return this;
             };
             PanZoom.prototype.removeYScale = function (yScale) {
+                var yScaleIndex = this.yScales().indexOf(yScale);
+                if (yScaleIndex === -1) {
+                    return this;
+                }
+                this._yScales.splice(yScaleIndex, 1);
                 return this;
             };
             /**

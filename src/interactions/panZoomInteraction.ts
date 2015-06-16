@@ -206,18 +206,36 @@ export module Interactions {
     }
 
     public addXScale(xScale: QuantitativeScale<any>) {
+      if (this.xScales().indexOf(xScale) === -1) {
+        return this;
+      }
+      this._xScales.push(xScale);
       return this;
     }
 
-    public removeXScale(yScale: QuantitativeScale<any>) {
+    public removeXScale(xScale: QuantitativeScale<any>) {
+      var xScaleIndex = this.xScales().indexOf(xScale);
+      if (xScaleIndex === -1) {
+        return this;
+      }
+      this._xScales.splice(xScaleIndex, 1);
       return this;
     }
 
-    public addYScale(xScale: QuantitativeScale<any>) {
+    public addYScale(yScale: QuantitativeScale<any>) {
+      if (this.yScales().indexOf(yScale) === -1) {
+        return this;
+      }
+      this._yScales.push(yScale);
       return this;
     }
 
     public removeYScale(yScale: QuantitativeScale<any>) {
+      var yScaleIndex = this.yScales().indexOf(yScale);
+      if (yScaleIndex === -1) {
+        return this;
+      }
+      this._yScales.splice(yScaleIndex, 1);
       return this;
     }
   }
