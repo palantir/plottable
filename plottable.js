@@ -1475,6 +1475,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
+            this._zoomLevel = 1.0;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1604,6 +1605,7 @@ var Plottable;
             if (values != null) {
                 this._domainMin = values[0];
                 this._domainMax = values[1];
+                this._zoomLevel = 1.0;
             }
             return _super.prototype.domain.call(this, values);
         };
@@ -1673,6 +1675,20 @@ var Plottable;
                 this._tickGenerator = generator;
                 return this;
             }
+        };
+        QuantitativeScale.prototype.zoomLevel = function (zoomLevel) {
+            var _this = this;
+            if (zoomLevel == null) {
+                return this._zoomLevel;
+            }
+            var oldZoomLevel = this._zoomLevel;
+            var magnifyTransform = function (rangeValue) {
+                var centerValue = (_this.range()[0] + _this.range()[1]) / 2;
+                return _this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
+            };
+            this._zoomLevel = zoomLevel;
+            this._setDomain(this.range().map(magnifyTransform));
+            return this;
         };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
@@ -9143,12 +9159,14 @@ var Plottable;
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                    var invertedPX = this._xScale.invert(oldCenterPoint.x);
+                    this._xScale.zoomLevel(this._xScale.zoomLevel() * oldCornerDistance / newCornerDistance);
+                    PanZoom._translateScale(this._xScale, this._xScale.scale(invertedPX) - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                    var invertedPY = this._yScale.invert(oldCenterPoint.y);
+                    this._yScale.zoomLevel(this._yScale.zoomLevel() * oldCornerDistance / newCornerDistance);
+                    PanZoom._translateScale(this._yScale, this._yScale.scale(invertedPY) - newCenterPoint.y);
                 }
             };
             PanZoom.prototype._centerPoint = function () {
@@ -9177,10 +9195,6 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                scale.domain(scale.range().map(magnifyTransform));
-            };
             PanZoom._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
                 scale.domain(scale.range().map(translateTransform));
@@ -9192,10 +9206,14 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
+                        var invertedPX = this._xScale.invert(translatedP.x);
+                        this._xScale.zoomLevel(this._xScale.zoomLevel() * zoomAmount);
+                        PanZoom._translateScale(this._xScale, -translatedP.x + this._xScale.scale(invertedPX));
                     }
                     if (this._yScale != null) {
-                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
+                        var invertedPY = this._yScale.invert(translatedP.y);
+                        this._yScale.zoomLevel(this._yScale.zoomLevel() * zoomAmount);
+                        PanZoom._translateScale(this._yScale, -translatedP.y + this._yScale.scale(invertedPY));
                     }
                 }
             };

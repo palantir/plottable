@@ -8,6 +8,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
+  private _zoomLevel = 1.0;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -175,6 +176,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (values != null) {
       this._domainMin = values[0];
       this._domainMax = values[1];
+      this._zoomLevel = 1.0;
     }
     return super.domain(values);
   }
@@ -286,6 +288,34 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       this._tickGenerator = generator;
       return this;
     }
+  }
+
+  /**
+   * Gets the zoom level for the scale.
+   * 
+   * The zoom level dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom level of 1).
+   */
+  public zoomLevel(): number;
+  /**
+   * Sets the zoom level for the scale and affects the domain accordingly.
+   * 
+   * The zoom level dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom level of 1).
+   */
+  public zoomLevel(zoomLevel: number): QuantitativeScale<D>;
+  public zoomLevel(zoomLevel?: number): any {
+    if (zoomLevel == null) {
+      return this._zoomLevel;
+    }
+    var oldZoomLevel = this._zoomLevel;
+    var magnifyTransform = (rangeValue: number) => {
+      var centerValue = (this.range()[0] + this.range()[1]) / 2;
+      return this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
+    };
+    this._zoomLevel = zoomLevel;
+    this._setDomain(this.range().map(magnifyTransform));
+    return this;
   }
 }
 }
