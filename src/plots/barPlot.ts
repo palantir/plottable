@@ -504,7 +504,7 @@ export module Plots {
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
-    protected _updateBarPixelWidth(): number {
+    protected _getBarPixelWidth(): number {
 
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
@@ -542,7 +542,11 @@ export module Plots {
 
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
-      this._barPixelWidth = barPixelWidth;
+      return barPixelWidth;
+    }
+
+    private _updateBarPixelWidth() {
+      this._barPixelWidth = this._getBarPixelWidth();
     }
 
     public entities(datasets = this.datasets()): PlotEntity[] {
