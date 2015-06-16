@@ -7052,6 +7052,11 @@ var Plottable;
             Bar.prototype.orientation = function () {
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
             };
+            Bar.prototype.render = function () {
+                _super.prototype.render.call(this);
+                this._getBarPixelWidth();
+                return this;
+            };
             Bar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
             };
@@ -7380,8 +7385,6 @@ var Plottable;
                 }
                 else {
                     var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
-                    // var tmp: string[] = Plottable.Utils.Stacking.domainKeys(this.datasets(), barAccessor);
-                    // return 14;
                     var numberBarAccessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); }).filter(function (d) { return d != null; }).map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });

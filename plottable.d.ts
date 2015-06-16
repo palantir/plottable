@@ -2788,6 +2788,7 @@ declare module Plottable {
              * @return "vertical" | "horizontal"
              */
             orientation(): string;
+            render(): Bar<X, Y>;
             protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
