@@ -9219,6 +9219,24 @@ var Plottable;
                     lastDragPoint = endPoint;
                 });
             };
+            PanZoom.prototype.xScales = function (xScales) {
+                // TODO: Implement this.
+            };
+            PanZoom.prototype.yScales = function (xScales) {
+                // TODO: Implement this.
+            };
+            PanZoom.prototype.addXScale = function (xScale) {
+                return this;
+            };
+            PanZoom.prototype.removeXScale = function (yScale) {
+                return this;
+            };
+            PanZoom.prototype.addYScale = function (xScale) {
+                return this;
+            };
+            PanZoom.prototype.removeYScale = function (yScale) {
+                return this;
+            };
             /**
              * The number of pixels occupied in a line.
              */

@@ -181,6 +181,33 @@ export module Interactions {
       });
     }
 
+    public xScales(): QuantitativeScale<any>[];
+    public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public xScales(xScales?: QuantitativeScale<any>[]): any {
+      // TODO: Implement this.
+    }
+
+    public yScales(): QuantitativeScale<any>[];
+    public yScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public yScales(xScales?: QuantitativeScale<any>[]): any {
+      // TODO: Implement this.
+    }
+
+    public addXScale(xScale: QuantitativeScale<any>) {
+      return this;
+    }
+
+    public removeXScale(yScale: QuantitativeScale<any>) {
+      return this;
+    }
+
+    public addYScale(xScale: QuantitativeScale<any>) {
+      return this;
+    }
+
+    public removeYScale(yScale: QuantitativeScale<any>) {
+      return this;
+    }
   }
 }
 }

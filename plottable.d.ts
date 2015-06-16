@@ -3573,6 +3573,14 @@ declare module Plottable {
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            xScales(): QuantitativeScale<any>[];
+            xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            yScales(): QuantitativeScale<any>[];
+            yScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            addXScale(xScale: QuantitativeScale<any>): PanZoom;
+            removeXScale(yScale: QuantitativeScale<any>): PanZoom;
+            addYScale(xScale: QuantitativeScale<any>): PanZoom;
+            removeYScale(yScale: QuantitativeScale<any>): PanZoom;
         }
     }
 }
