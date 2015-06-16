@@ -4609,14 +4609,14 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4657,14 +4657,14 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar width takes an appropriate value", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4676,20 +4676,20 @@ describe("Plots", function () {
             it("sensible bar width one datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]));
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
                 svg.remove();
             });
         });
@@ -4709,7 +4709,7 @@ describe("Plots", function () {
             it("bar width takes an appropriate value", function () {
                 var timeFormatter = d3.time.format("%m/%d/%y");
                 var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarWidth, 0.1, "width is difference between two dates");
                 svg.remove();
             });
         });
@@ -8240,7 +8240,12 @@ describe("Map", function () {
         map.forEach(function (value, key, mp) {
             assert.strictEqual(value, values[index], "Value " + index + " is the expected one");
             assert.strictEqual(key, keys[index], "Key " + index + " is the expected one");
-            assert.strictEqual(mp, map, "The correct map is passed as the third argument");
+            if (map._es6Map != null) {
+                assert.strictEqual(mp, map._es6Map, "The correct map is passed as the third argument (ES6)");
+            }
+            else {
+                assert.strictEqual(mp, map, "The correct map is passed as the third argument (non ES6)");
+            }
             index++;
         });
         assert.strictEqual(index, keys.length, "The expected number of iterations executed in the forEach");
@@ -8280,15 +8285,21 @@ describe("Utils", function () {
             var value1 = { value: "one" };
             set.add(value1);
             assert.strictEqual(set.size, 1, "set contains one value");
-            assert.strictEqual(set._values[0], value1, "the value was added to the set");
+            if (set._values != null) {
+                assert.strictEqual(set._values[0], value1, "the value was added to the set");
+            }
             set.add(value1);
             assert.strictEqual(set.size, 1, "same value is not added twice");
-            assert.strictEqual(set._values[0], value1, "list still contains the value");
+            if (set._values != null) {
+                assert.strictEqual(set._values[0], value1, "list still contains the value");
+            }
             var value2 = { value: "two" };
             set.add(value2);
             assert.strictEqual(set.size, 2, "set now contains two values");
-            assert.strictEqual(set._values[0], value1, "set contains value 1");
-            assert.strictEqual(set._values[1], value2, "set contains value 2");
+            if (set._values != null) {
+                assert.strictEqual(set._values[0], value1, "set contains value 1");
+                assert.strictEqual(set._values[1], value2, "set contains value 2");
+            }
         });
         it("delete()", function () {
             var set = new Plottable.Utils.Set();
@@ -8321,7 +8332,12 @@ describe("Utils", function () {
             set.forEach(function (value1, value2, passedSet) {
                 assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
-                assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
+                if (set._es6Set != null) {
+                    assert.strictEqual(passedSet, set._es6Set, "The correct Set is passed as the third argument (ES6)");
+                }
+                else {
+                    assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument (non ES6)");
+                }
                 index++;
             });
             assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");
