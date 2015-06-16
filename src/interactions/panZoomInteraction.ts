@@ -185,7 +185,15 @@ export module Interactions {
       });
     }
 
+    /**
+     * Gets the x scales for this PanZoom Interaction.
+     */
     public xScales(): QuantitativeScale<any>[];
+    /**
+     * Sets the x scales for this PanZoom Interaction.
+     * 
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public xScales(xScales?: QuantitativeScale<any>[]): any {
       if (xScales == null) {
@@ -195,7 +203,15 @@ export module Interactions {
       return this;
     }
 
+    /**
+     * Gets the y scales for this PanZoom Interaction.
+     */
     public yScales(): QuantitativeScale<any>[];
+    /**
+     * Sets the y scales for this PanZoom Interaction.
+     * 
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public yScales(yScales?: QuantitativeScale<any>[]): any {
       if (yScales == null) {
@@ -205,6 +221,12 @@ export module Interactions {
       return this;
     }
 
+    /**
+     * Adds an x scale to use for this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An x scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public addXScale(xScale: QuantitativeScale<any>) {
       if (this.xScales().indexOf(xScale) === -1) {
         return this;
@@ -213,6 +235,12 @@ export module Interactions {
       return this;
     }
 
+    /**
+     * Removes an x scale that would have been used for this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An x scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public removeXScale(xScale: QuantitativeScale<any>) {
       var xScaleIndex = this.xScales().indexOf(xScale);
       if (xScaleIndex === -1) {
@@ -222,6 +250,12 @@ export module Interactions {
       return this;
     }
 
+    /**
+     * Adds a y scale to use for this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An y scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public addYScale(yScale: QuantitativeScale<any>) {
       if (this.yScales().indexOf(yScale) === -1) {
         return this;
@@ -230,6 +264,12 @@ export module Interactions {
       return this;
     }
 
+    /**
+     * Removes a y scale that would have been used for this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An y scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
     public removeYScale(yScale: QuantitativeScale<any>) {
       var yScaleIndex = this.yScales().indexOf(yScale);
       if (yScaleIndex === -1) {

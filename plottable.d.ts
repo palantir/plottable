@@ -3573,13 +3573,53 @@ declare module Plottable {
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            /**
+             * Gets the x scales for this PanZoom Interaction.
+             */
             xScales(): QuantitativeScale<any>[];
+            /**
+             * Sets the x scales for this PanZoom Interaction.
+             *
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            /**
+             * Gets the y scales for this PanZoom Interaction.
+             */
             yScales(): QuantitativeScale<any>[];
+            /**
+             * Sets the y scales for this PanZoom Interaction.
+             *
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            /**
+             * Adds an x scale to use for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             addXScale(xScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Removes an x scale that would have been used for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             removeXScale(xScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Adds a y scale to use for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             addYScale(yScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Removes a y scale that would have been used for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             removeYScale(yScale: QuantitativeScale<any>): PanZoom;
         }
     }

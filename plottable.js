@@ -9237,6 +9237,12 @@ var Plottable;
                 this._yScales = yScales;
                 return this;
             };
+            /**
+             * Adds an x scale to use for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             PanZoom.prototype.addXScale = function (xScale) {
                 if (this.xScales().indexOf(xScale) === -1) {
                     return this;
@@ -9244,6 +9250,12 @@ var Plottable;
                 this._xScales.push(xScale);
                 return this;
             };
+            /**
+             * Removes an x scale that would have been used for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             PanZoom.prototype.removeXScale = function (xScale) {
                 var xScaleIndex = this.xScales().indexOf(xScale);
                 if (xScaleIndex === -1) {
@@ -9252,6 +9264,12 @@ var Plottable;
                 this._xScales.splice(xScaleIndex, 1);
                 return this;
             };
+            /**
+             * Adds a y scale to use for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             PanZoom.prototype.addYScale = function (yScale) {
                 if (this.yScales().indexOf(yScale) === -1) {
                     return this;
@@ -9259,6 +9277,12 @@ var Plottable;
                 this._yScales.push(yScale);
                 return this;
             };
+            /**
+             * Removes a y scale that would have been used for this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
             PanZoom.prototype.removeYScale = function (yScale) {
                 var yScaleIndex = this.yScales().indexOf(yScale);
                 if (yScaleIndex === -1) {
