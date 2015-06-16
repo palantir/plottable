@@ -176,6 +176,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (values != null) {
       this._domainMin = values[0];
       this._domainMax = values[1];
+      this._zoomLevel = 1.0;
     }
     return super.domain(values);
   }
@@ -313,7 +314,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
     };
     this._zoomLevel = zoomLevel;
-    this.domain(this.range().map(magnifyTransform));
+    this._setDomain(this.range().map(magnifyTransform));
     return this;
   }
 }

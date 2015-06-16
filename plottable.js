@@ -1605,6 +1605,7 @@ var Plottable;
             if (values != null) {
                 this._domainMin = values[0];
                 this._domainMax = values[1];
+                this._zoomLevel = 1.0;
             }
             return _super.prototype.domain.call(this, values);
         };
@@ -1686,7 +1687,7 @@ var Plottable;
                 return _this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
             };
             this._zoomLevel = zoomLevel;
-            this.domain(this.range().map(magnifyTransform));
+            this._setDomain(this.range().map(magnifyTransform));
             return this;
         };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
