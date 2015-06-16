@@ -67,7 +67,11 @@ describe("Utils", () => {
       set.forEach((value1: any, value2: any, passedSet: Plottable.Utils.Set<any>) => {
         assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
         assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
-        assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
+        if ((<any>set)._es6Set != null) {
+            assert.strictEqual(passedSet, (<any>set)._es6Set, "The correct Set is passed as the third argument (ES6)");
+          } else {
+            assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument (non ES6)");
+          }
         index++;
       });
       assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");

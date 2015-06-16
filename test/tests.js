@@ -8240,7 +8240,12 @@ describe("Map", function () {
         map.forEach(function (value, key, mp) {
             assert.strictEqual(value, values[index], "Value " + index + " is the expected one");
             assert.strictEqual(key, keys[index], "Key " + index + " is the expected one");
-            assert.strictEqual(mp, map, "The correct map is passed as the third argument");
+            if (map._es6Map != null) {
+                assert.strictEqual(mp, map._es6Map, "The correct map is passed as the third argument (ES6)");
+            }
+            else {
+                assert.strictEqual(mp, map, "The correct map is passed as the third argument (non ES6)");
+            }
             index++;
         });
         assert.strictEqual(index, keys.length, "The expected number of iterations executed in the forEach");
@@ -8327,7 +8332,12 @@ describe("Utils", function () {
             set.forEach(function (value1, value2, passedSet) {
                 assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
-                assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
+                if (set._es6Set != null) {
+                    assert.strictEqual(passedSet, set._es6Set, "The correct Set is passed as the third argument (ES6)");
+                }
+                else {
+                    assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument (non ES6)");
+                }
                 index++;
             });
             assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");
