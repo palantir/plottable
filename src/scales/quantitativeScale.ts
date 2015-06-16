@@ -8,7 +8,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
-  private _domainZoomFactor = 1.0;
+  private _zoomLevel = 1.0;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -290,29 +290,29 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   }
 
   /**
-   * Gets the zoom factor for the domain of the scale.
+   * Gets the zoom level for the scale.
    * 
-   * The zoom factor dictates how wide the ends of the domain should be
-   * relative to the original domain (having a zoom factor of 1).
+   * The zoom level dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom level of 1).
    */
-  public domainZoomFactor(): number;
+  public zoomLevel(): number;
   /**
-   * Sets the zoom factor for the domain of the scale and affects the domain accordingly.
+   * Sets the zoom level for the scale and affects the domain accordingly.
    * 
-   * The zoom factor dictates how wide the ends of the domain should be
-   * relative to the original domain (having a zoom factor of 1).
+   * The zoom level dictates how wide the ends of the domain should be
+   * relative to the original domain (having a zoom level of 1).
    */
-  public domainZoomFactor(domainZoomFactor: number): QuantitativeScale<D>;
-  public domainZoomFactor(domainZoomFactor?: number): any {
-    if (domainZoomFactor == null) {
-      return this._domainZoomFactor;
+  public zoomLevel(zoomLevel: number): QuantitativeScale<D>;
+  public zoomLevel(zoomLevel?: number): any {
+    if (zoomLevel == null) {
+      return this._zoomLevel;
     }
-    var oldDomainZoomFactor = this._domainZoomFactor;
+    var oldZoomLevel = this._zoomLevel;
     var magnifyTransform = (rangeValue: number) => {
       var centerValue = (this.range()[0] + this.range()[1]) / 2;
-      return this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor / oldDomainZoomFactor);
+      return this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
     };
-    this._domainZoomFactor = domainZoomFactor;
+    this._zoomLevel = zoomLevel;
     this.domain(this.range().map(magnifyTransform));
     return this;
   }

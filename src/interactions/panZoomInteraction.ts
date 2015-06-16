@@ -94,12 +94,12 @@ export module Interactions {
 
       if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
         var invertedPX = this._xScale.invert(oldCenterPoint.x);
-        this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
+        this._xScale.zoomLevel(this._xScale.zoomLevel() * oldCornerDistance / newCornerDistance);
         PanZoom._translateScale(this._xScale, this._xScale.scale(invertedPX) - newCenterPoint.x);
       }
       if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
         var invertedPY = this._yScale.invert(oldCenterPoint.y);
-        this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
+        this._yScale.zoomLevel(this._yScale.zoomLevel() * oldCornerDistance / newCornerDistance);
         PanZoom._translateScale(this._yScale, this._yScale.scale(invertedPY) - newCenterPoint.y);
       }
     }
@@ -150,12 +150,12 @@ export module Interactions {
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
           var invertedPX = this._xScale.invert(translatedP.x);
-          this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * zoomAmount);
+          this._xScale.zoomLevel(this._xScale.zoomLevel() * zoomAmount);
           PanZoom._translateScale(this._xScale, -translatedP.x + this._xScale.scale(invertedPX));
         }
         if (this._yScale != null) {
           var invertedPY = this._yScale.invert(translatedP.y);
-          this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * zoomAmount);
+          this._yScale.zoomLevel(this._yScale.zoomLevel() * zoomAmount);
           PanZoom._translateScale(this._yScale, -translatedP.y + this._yScale.scale(invertedPY));
         }
       }

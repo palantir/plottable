@@ -1475,7 +1475,7 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
-            this._domainZoomFactor = 1.0;
+            this._zoomLevel = 1.0;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1675,17 +1675,17 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype.domainZoomFactor = function (domainZoomFactor) {
+        QuantitativeScale.prototype.zoomLevel = function (zoomLevel) {
             var _this = this;
-            if (domainZoomFactor == null) {
-                return this._domainZoomFactor;
+            if (zoomLevel == null) {
+                return this._zoomLevel;
             }
-            var oldDomainZoomFactor = this._domainZoomFactor;
+            var oldZoomLevel = this._zoomLevel;
             var magnifyTransform = function (rangeValue) {
                 var centerValue = (_this.range()[0] + _this.range()[1]) / 2;
-                return _this.invert(centerValue - (centerValue - rangeValue) * domainZoomFactor / oldDomainZoomFactor);
+                return _this.invert(centerValue - (centerValue - rangeValue) * zoomLevel / oldZoomLevel);
             };
-            this._domainZoomFactor = domainZoomFactor;
+            this._zoomLevel = zoomLevel;
             this.domain(this.range().map(magnifyTransform));
             return this;
         };
@@ -9159,12 +9159,12 @@ var Plottable;
                 var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
                     var invertedPX = this._xScale.invert(oldCenterPoint.x);
-                    this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
+                    this._xScale.zoomLevel(this._xScale.zoomLevel() * oldCornerDistance / newCornerDistance);
                     PanZoom._translateScale(this._xScale, this._xScale.scale(invertedPX) - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
                     var invertedPY = this._yScale.invert(oldCenterPoint.y);
-                    this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * oldCornerDistance / newCornerDistance);
+                    this._yScale.zoomLevel(this._yScale.zoomLevel() * oldCornerDistance / newCornerDistance);
                     PanZoom._translateScale(this._yScale, this._yScale.scale(invertedPY) - newCenterPoint.y);
                 }
             };
@@ -9206,12 +9206,12 @@ var Plottable;
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
                         var invertedPX = this._xScale.invert(translatedP.x);
-                        this._xScale.domainZoomFactor(this._xScale.domainZoomFactor() * zoomAmount);
+                        this._xScale.zoomLevel(this._xScale.zoomLevel() * zoomAmount);
                         PanZoom._translateScale(this._xScale, -translatedP.x + this._xScale.scale(invertedPX));
                     }
                     if (this._yScale != null) {
                         var invertedPY = this._yScale.invert(translatedP.y);
-                        this._yScale.domainZoomFactor(this._yScale.domainZoomFactor() * zoomAmount);
+                        this._yScale.zoomLevel(this._yScale.zoomLevel() * zoomAmount);
                         PanZoom._translateScale(this._yScale, -translatedP.y + this._yScale.scale(invertedPY));
                     }
                 }
