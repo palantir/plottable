@@ -28,7 +28,7 @@ export module Plots {
     private _baselineValueProvider: () => (X|Y)[];
 
     private _barPixelWidth = 0;
-    private _getBarPixelWidthCallback: (() => void);
+    private _updateBarPixelWidthCallback: (() => void);
 
     /**
      * A Bar Plot draws bars growing out from a baseline to some value
@@ -48,7 +48,7 @@ export module Plots {
       this.attr("width", () => this._barPixelWidth);
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
       this._baselineValueProvider = () => [this.baselineValue()];
-      this._getBarPixelWidthCallback = () => this._getBarPixelWidth();
+      this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -63,7 +63,7 @@ export module Plots {
         super.x(<number | Accessor<number>>x);
       } else {
         super.x(< X | Accessor<X>>x, xScale);
-        xScale.onUpdate(this._getBarPixelWidthCallback);
+        xScale.onUpdate(this._updateBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -82,7 +82,7 @@ export module Plots {
         super.y(<number | Accessor<number>>y);
       } else {
         super.y(<Y | Accessor<Y>>y, yScale);
-        yScale.onUpdate(this._getBarPixelWidthCallback);
+        yScale.onUpdate(this._updateBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -100,7 +100,7 @@ export module Plots {
 
     public render() {
       super.render();
-      this._getBarPixelWidth();
+      this._updateBarPixelWidth();
       return this;
     }
 
@@ -154,16 +154,16 @@ export module Plots {
     }
 
     public addDataset(dataset: Dataset) {
-      dataset.onUpdate(this._getBarPixelWidthCallback);
+      dataset.onUpdate(this._updateBarPixelWidthCallback);
       super.addDataset(dataset);
-      this._getBarPixelWidth();
+      this._updateBarPixelWidth();
       return this;
     }
 
     public removeDataset(dataset: Dataset) {
-      dataset.offUpdate(this._getBarPixelWidthCallback);
+      dataset.offUpdate(this._updateBarPixelWidthCallback);
       super.removeDataset(dataset);
-      this._getBarPixelWidth();
+      this._updateBarPixelWidth();
       return this;
     }
 
@@ -504,7 +504,7 @@ export module Plots {
      *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
-    protected _getBarPixelWidth(): number {
+    protected _updateBarPixelWidth(): number {
 
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
@@ -543,8 +543,6 @@ export module Plots {
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
       this._barPixelWidth = barPixelWidth;
-
-      return barPixelWidth;
     }
 
     public entities(datasets = this.datasets()): PlotEntity[] {
@@ -583,7 +581,7 @@ export module Plots {
     }
 
   protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
-    scale.offUpdate(this._getBarPixelWidthCallback);
+    scale.offUpdate(this._updateBarPixelWidthCallback);
     super._uninstallScaleForKey(scale, key);
   }
 

@@ -6979,7 +6979,7 @@ var Plottable;
                 this.attr("width", function () { return _this._barPixelWidth; });
                 this._labelConfig = new Plottable.Utils.Map();
                 this._baselineValueProvider = function () { return [_this.baselineValue()]; };
-                this._getBarPixelWidthCallback = function () { return _this._getBarPixelWidth(); };
+                this._updateBarPixelWidthCallback = function () { return _this._updateBarPixelWidth(); };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -6990,7 +6990,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.x.call(this, x, xScale);
-                    xScale.onUpdate(this._getBarPixelWidthCallback);
+                    xScale.onUpdate(this._updateBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -7004,7 +7004,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.y.call(this, y, yScale);
-                    yScale.onUpdate(this._getBarPixelWidthCallback);
+                    yScale.onUpdate(this._updateBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -7019,7 +7019,7 @@ var Plottable;
             };
             Bar.prototype.render = function () {
                 _super.prototype.render.call(this);
-                this._getBarPixelWidth();
+                this._updateBarPixelWidth();
                 return this;
             };
             Bar.prototype._createDrawer = function (dataset) {
@@ -7052,15 +7052,15 @@ var Plottable;
                 return this;
             };
             Bar.prototype.addDataset = function (dataset) {
-                dataset.onUpdate(this._getBarPixelWidthCallback);
+                dataset.onUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.addDataset.call(this, dataset);
-                this._getBarPixelWidth();
+                this._updateBarPixelWidth();
                 return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
-                dataset.offUpdate(this._getBarPixelWidthCallback);
+                dataset.offUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype.removeDataset.call(this, dataset);
-                this._getBarPixelWidth();
+                this._updateBarPixelWidth();
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
@@ -7339,7 +7339,7 @@ var Plottable;
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
              */
-            Bar.prototype._getBarPixelWidth = function () {
+            Bar.prototype._updateBarPixelWidth = function () {
                 if (!this._projectorsReady()) {
                     return 0;
                 }
@@ -7372,7 +7372,6 @@ var Plottable;
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 this._barPixelWidth = barPixelWidth;
-                return barPixelWidth;
             };
             Bar.prototype.entities = function (datasets) {
                 var _this = this;
@@ -7411,7 +7410,7 @@ var Plottable;
                 return { x: x, y: y };
             };
             Bar.prototype._uninstallScaleForKey = function (scale, key) {
-                scale.offUpdate(this._getBarPixelWidthCallback);
+                scale.offUpdate(this._updateBarPixelWidthCallback);
                 _super.prototype._uninstallScaleForKey.call(this, scale, key);
             };
             Bar.prototype._getDataToDraw = function () {
