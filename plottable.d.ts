@@ -299,16 +299,6 @@ declare module Plottable {
              */
             function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
-             * Given an array of Datasets and the accessor function for the key, computes the
-             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
-             * before being returned.
-             *
-             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
-             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
-             * @return {string[]} An array of stringified keys
-             */
-            function domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
-            /**
              * Normalizes a key used for stacking
              *
              * @param {any} key The key to be normalized
