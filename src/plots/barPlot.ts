@@ -530,6 +530,16 @@ export module Plots {
           return Math.abs(pair[1] - pair[0]);
         }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
+        var minScaledDatum = Utils.Math.min(scaledData, 0);
+        if (minScaledDatum > 0) {
+          barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
+        }
+        var maxScaledDatum = Utils.Math.max(scaledData, 0);
+        if ( maxScaledDatum < barWidthDimension) {
+          var margin = barWidthDimension - maxScaledDatum;
+          barPixelWidth = Math.min(barPixelWidth, margin * 2);
+        }
+
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
       this._barPixelWidth = barPixelWidth;
