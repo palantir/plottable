@@ -61,7 +61,8 @@ export module Utils {
 
     public forEach(callback: (value: T, value2: T, set: Set<T>) => void, thisArg?: any) {
       if (this._es6Set != null) {
-        this._es6Set.forEach(callback, thisArg);
+        var callbackWrapper = (value: T, value2: T) => callback.call(thisArg, value, value2, this);
+        this._es6Set.forEach(callbackWrapper, thisArg);
         return;
       }
 

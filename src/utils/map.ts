@@ -66,7 +66,8 @@ export module Utils {
 
     public forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
       if (this._es6Map != null) {
-        this._es6Map.forEach(callbackFn, thisArg);
+        var callbackWrapper = (value: V, key: K) => callbackFn.call(thisArg, value, key, this);
+        this._es6Map.forEach(callbackWrapper, thisArg);
         return;
       }
 

@@ -175,7 +175,8 @@ var Plottable;
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
                 if (this._es6Map != null) {
-                    this._es6Map.forEach(callbackFn, thisArg);
+                    var callbackWrapper = function (value, key) { return callbackFn.call(thisArg, value, key, _this); };
+                    this._es6Map.forEach(callbackWrapper, thisArg);
                     return;
                 }
                 this._keyValuePairs.forEach(function (keyValuePair) {
@@ -254,7 +255,8 @@ var Plottable;
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
                 if (this._es6Set != null) {
-                    this._es6Set.forEach(callback, thisArg);
+                    var callbackWrapper = function (value, value2) { return callback.call(thisArg, value, value2, _this); };
+                    this._es6Set.forEach(callbackWrapper, thisArg);
                     return;
                 }
                 this._values.forEach(function (value) {
