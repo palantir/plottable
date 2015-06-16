@@ -10,23 +10,17 @@ describe("Utils", () => {
       var value1 = { value: "one" };
       set.add(value1);
       assert.strictEqual(set.size, 1, "set contains one value");
-      if ((<any>set)._values != null) {
-        assert.strictEqual((<any>set)._values[0], value1, "the value was added to the set");
-      }
+      assert.strictEqual((<any>set)._values[0], value1, "the value was added to the set");
 
       set.add(value1);
       assert.strictEqual(set.size, 1, "same value is not added twice");
-      if ((<any>set)._values != null) {
-        assert.strictEqual((<any>set)._values[0], value1, "list still contains the value");
-      }
+      assert.strictEqual((<any>set)._values[0], value1, "list still contains the value");
 
       var value2 = { value: "two" };
       set.add(value2);
       assert.strictEqual(set.size, 2, "set now contains two values");
-      if ((<any>set)._values != null) {
-        assert.strictEqual((<any>set)._values[0], value1, "set contains value 1");
-        assert.strictEqual((<any>set)._values[1], value2, "set contains value 2");
-      }
+      assert.strictEqual((<any>set)._values[0], value1, "set contains value 1");
+      assert.strictEqual((<any>set)._values[1], value2, "set contains value 2");
     });
 
     it("delete()", () => {
@@ -67,11 +61,7 @@ describe("Utils", () => {
       set.forEach((value1: any, value2: any, passedSet: Plottable.Utils.Set<any>) => {
         assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
         assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
-        if ((<any>set)._es6Set != null) {
-            assert.strictEqual(passedSet, (<any>set)._es6Set, "The correct Set is passed as the third argument (ES6)");
-          } else {
-            assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument (non ES6)");
-          }
+        assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
         index++;
       });
       assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");

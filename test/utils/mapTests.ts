@@ -44,11 +44,7 @@ describe("Map", () => {
     map.forEach((value: number, key: string, mp: Plottable.Utils.Map<string, number>) => {
       assert.strictEqual(value, values[index], "Value " + index + " is the expected one");
       assert.strictEqual(key, keys[index], "Key " + index + " is the expected one");
-      if ((<any>map)._es6Map != null) {
-        assert.strictEqual(mp, (<any>map)._es6Map, "The correct map is passed as the third argument (ES6)");
-      } else {
-        assert.strictEqual(mp, map, "The correct map is passed as the third argument (non ES6)");
-      }
+      assert.strictEqual(mp, map, "The correct map is passed as the third argument");
       index++;
     });
     assert.strictEqual(index, keys.length, "The expected number of iterations executed in the forEach");

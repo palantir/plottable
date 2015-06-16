@@ -8240,12 +8240,7 @@ describe("Map", function () {
         map.forEach(function (value, key, mp) {
             assert.strictEqual(value, values[index], "Value " + index + " is the expected one");
             assert.strictEqual(key, keys[index], "Key " + index + " is the expected one");
-            if (map._es6Map != null) {
-                assert.strictEqual(mp, map._es6Map, "The correct map is passed as the third argument (ES6)");
-            }
-            else {
-                assert.strictEqual(mp, map, "The correct map is passed as the third argument (non ES6)");
-            }
+            assert.strictEqual(mp, map, "The correct map is passed as the third argument");
             index++;
         });
         assert.strictEqual(index, keys.length, "The expected number of iterations executed in the forEach");
@@ -8285,21 +8280,15 @@ describe("Utils", function () {
             var value1 = { value: "one" };
             set.add(value1);
             assert.strictEqual(set.size, 1, "set contains one value");
-            if (set._values != null) {
-                assert.strictEqual(set._values[0], value1, "the value was added to the set");
-            }
+            assert.strictEqual(set._values[0], value1, "the value was added to the set");
             set.add(value1);
             assert.strictEqual(set.size, 1, "same value is not added twice");
-            if (set._values != null) {
-                assert.strictEqual(set._values[0], value1, "list still contains the value");
-            }
+            assert.strictEqual(set._values[0], value1, "list still contains the value");
             var value2 = { value: "two" };
             set.add(value2);
             assert.strictEqual(set.size, 2, "set now contains two values");
-            if (set._values != null) {
-                assert.strictEqual(set._values[0], value1, "set contains value 1");
-                assert.strictEqual(set._values[1], value2, "set contains value 2");
-            }
+            assert.strictEqual(set._values[0], value1, "set contains value 1");
+            assert.strictEqual(set._values[1], value2, "set contains value 2");
         });
         it("delete()", function () {
             var set = new Plottable.Utils.Set();
@@ -8332,12 +8321,7 @@ describe("Utils", function () {
             set.forEach(function (value1, value2, passedSet) {
                 assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
-                if (set._es6Set != null) {
-                    assert.strictEqual(passedSet, set._es6Set, "The correct Set is passed as the third argument (ES6)");
-                }
-                else {
-                    assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument (non ES6)");
-                }
+                assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
                 index++;
             });
             assert.strictEqual(index, values.length, "The expected number of iterations executed in the forEach");
