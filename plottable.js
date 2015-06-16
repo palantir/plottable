@@ -9244,7 +9244,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addXScale = function (xScale) {
-                if (this.xScales().indexOf(xScale) === -1) {
+                if (this.xScales().indexOf(xScale) != -1) {
                     return this;
                 }
                 this._xScales.push(xScale);
@@ -9271,7 +9271,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
-                if (this.yScales().indexOf(yScale) === -1) {
+                if (this.yScales().indexOf(yScale) != -1) {
                     return this;
                 }
                 this._yScales.push(yScale);

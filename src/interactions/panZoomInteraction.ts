@@ -228,7 +228,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addXScale(xScale: QuantitativeScale<any>) {
-      if (this.xScales().indexOf(xScale) === -1) {
+      if (this.xScales().indexOf(xScale) != -1) {
         return this;
       }
       this._xScales.push(xScale);
@@ -257,7 +257,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addYScale(yScale: QuantitativeScale<any>) {
-      if (this.yScales().indexOf(yScale) === -1) {
+      if (this.yScales().indexOf(yScale) != -1) {
         return this;
       }
       this._yScales.push(yScale);
