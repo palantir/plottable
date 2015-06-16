@@ -7048,13 +7048,15 @@ var Plottable;
             };
             Bar.prototype.addDataset = function (dataset) {
                 dataset.onUpdate(this._getBarPixelWidthCallback);
+                _super.prototype.addDataset.call(this, dataset);
                 this._getBarPixelWidth();
-                return _super.prototype.addDataset.call(this, dataset);
+                return this;
             };
             Bar.prototype.removeDataset = function (dataset) {
                 dataset.offUpdate(this._getBarPixelWidthCallback);
+                _super.prototype.removeDataset.call(this, dataset);
                 this._getBarPixelWidth();
-                return _super.prototype.removeDataset.call(this, dataset);
+                return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
                 if (enabled === undefined) {
@@ -7348,24 +7350,13 @@ var Plottable;
                     var numberBarAccessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); }).filter(function (d) { return d != null; }).map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });
-                    // console.log(tmp);
-                    // var numberBarAccessorData: number[] = tmp.map((v) => +v);
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
-                    var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+                    var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
+                    var barAccessorDataPairs = d3.pairs(scaledData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
                     barPixelWidth = Plottable.Utils.Math.min(barAccessorDataPairs, function (pair, i) {
-                        return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+                        return Math.abs(pair[1] - pair[0]);
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-                    var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
-                    var minScaledDatum = Plottable.Utils.Math.min(scaledData, 0);
-                    if (minScaledDatum > 0) {
-                        barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
-                    }
-                    var maxScaledDatum = Plottable.Utils.Math.max(scaledData, 0);
-                    if (maxScaledDatum < barWidthDimension) {
-                        var margin = barWidthDimension - maxScaledDatum;
-                        barPixelWidth = Math.min(barPixelWidth, margin * 2);
-                    }
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 this._barPixelWidth = barPixelWidth;
