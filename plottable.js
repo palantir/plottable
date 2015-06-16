@@ -9094,8 +9094,14 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-                this._xScales = xScale == null ? [] : [xScale];
-                this._yScales = yScale == null ? [] : [yScale];
+                this._xScales = new Plottable.Utils.Set();
+                if (xScale != null) {
+                    this._xScales.add(xScale);
+                }
+                this._yScales = new Plottable.Utils.Set();
+                if (yScale != null) {
+                    this._yScales.add(yScale);
+                }
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
