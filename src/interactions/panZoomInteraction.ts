@@ -8,8 +8,8 @@ export module Interactions {
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScale: QuantitativeScale<any>;
-    private _yScale: QuantitativeScale<any>;
+    private _xScales: QuantitativeScale<any>[];
+    private _yScales: QuantitativeScale<any>[];
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -32,8 +32,8 @@ export module Interactions {
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
-      this._xScale = xScale;
-      this._yScale = yScale;
+      this._xScales = xScale == null ? [] : [xScale];
+      this._yScales = yScale == null ? [] : [yScale];
 
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
@@ -92,13 +92,17 @@ export module Interactions {
       var newCenterPoint = this._centerPoint();
       var newCornerDistance = this._cornerDistance();
 
-      if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-        PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        this._xScales.forEach((xScale) => {
+          PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+          PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+        });
       }
-      if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-        PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        this._yScales.forEach((yScale) => {
+          PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+          PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+        });
       }
     }
 
@@ -151,12 +155,12 @@ export module Interactions {
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-        if (this._xScale != null) {
-          PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
-        }
-        if (this._yScale != null) {
-          PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
-        }
+        this._xScales.forEach((xScale) => {
+          PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+        });
+        this._yScales.forEach((yScale) => {
+          PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+        });
       }
     }
 
@@ -169,14 +173,14 @@ export module Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
-        if (this._xScale != null) {
+        this._xScales.forEach((xScale) => {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom._translateScale(this._xScale, -dragAmountX);
-        }
-        if (this._yScale != null) {
+          PanZoom._translateScale(xScale, -dragAmountX);
+        });
+        this._yScales.forEach((yScale) => {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom._translateScale(this._yScale, -dragAmountY);
-        }
+          PanZoom._translateScale(yScale, -dragAmountY);
+        });
         lastDragPoint = endPoint;
       });
     }

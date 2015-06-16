@@ -9094,8 +9094,8 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-                this._xScale = xScale;
-                this._yScale = yScale;
+                this._xScales = xScale == null ? [] : [xScale];
+                this._yScales = yScale == null ? [] : [yScale];
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
@@ -9142,13 +9142,17 @@ var Plottable;
                 });
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
-                if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this._xScales.forEach(function (xScale) {
+                        PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                        PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+                    });
                 }
-                if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this._yScales.forEach(function (yScale) {
+                        PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                        PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+                    });
                 }
             };
             PanZoom.prototype._centerPoint = function () {
@@ -9191,12 +9195,12 @@ var Plottable;
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-                    if (this._xScale != null) {
-                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
-                    }
-                    if (this._yScale != null) {
-                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
-                    }
+                    this._xScales.forEach(function (xScale) {
+                        PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+                    });
+                    this._yScales.forEach(function (yScale) {
+                        PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+                    });
                 }
             };
             PanZoom.prototype._setupDragInteraction = function () {
@@ -9208,14 +9212,14 @@ var Plottable;
                     if (_this._touchIds.size() >= 2) {
                         return;
                     }
-                    if (_this._xScale != null) {
+                    _this._xScales.forEach(function (xScale) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom._translateScale(_this._xScale, -dragAmountX);
-                    }
-                    if (_this._yScale != null) {
+                        PanZoom._translateScale(xScale, -dragAmountX);
+                    });
+                    _this._yScales.forEach(function (yScale) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom._translateScale(_this._yScale, -dragAmountY);
-                    }
+                        PanZoom._translateScale(yScale, -dragAmountY);
+                    });
                     lastDragPoint = endPoint;
                 });
             };
