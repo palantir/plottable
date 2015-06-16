@@ -2805,8 +2805,8 @@ declare module Plottable {
              * @returns {Bar} The calling Bar Plot.
              */
             baselineValue(value: X | Y): Bar<X, Y>;
-            addDataset(dataset: Dataset): Plot;
-            removeDataset(dataset: Dataset): Plot;
+            addDataset(dataset: Dataset): Bar<X, Y>;
+            removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *

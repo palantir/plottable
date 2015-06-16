@@ -149,14 +149,16 @@ export module Plots {
 
     public addDataset(dataset: Dataset) {
       dataset.onUpdate(this._getBarPixelWidthCallback);
+      super.addDataset(dataset);
       this._getBarPixelWidth();
-      return super.addDataset(dataset);
+      return this;
     }
 
     public removeDataset(dataset: Dataset) {
       dataset.offUpdate(this._getBarPixelWidthCallback);
+      super.removeDataset(dataset);
       this._getBarPixelWidth();
-      return super.removeDataset(dataset);
+      return this;
     }
 
     /**
@@ -516,33 +518,21 @@ export module Plots {
                                .map((d) => d.valueOf());
         }))).values().map((value) => +value);
 
-        // console.log(tmp);
-
-        // var numberBarAccessorData: number[] = tmp.map((v) => +v);
 
         numberBarAccessorData.sort((a, b) => a - b);
 
-        var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+        var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
+        var barAccessorDataPairs = d3.pairs(scaledData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
         barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
-          return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+          return Math.abs(pair[1] - pair[0]);
         }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-
-        var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
-        var minScaledDatum = Utils.Math.min(scaledData, 0);
-        if (minScaledDatum > 0) {
-          barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
-        }
-        var maxScaledDatum = Utils.Math.max(scaledData, 0);
-        if ( maxScaledDatum < barWidthDimension) {
-          var margin = barWidthDimension - maxScaledDatum;
-          barPixelWidth = Math.min(barPixelWidth, margin * 2);
-        }
 
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
       this._barPixelWidth = barPixelWidth;
+
       return barPixelWidth;
     }
 
