@@ -93,13 +93,13 @@ export module Interactions {
       var newCornerDistance = this._cornerDistance();
 
       if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this._xScales.forEach((xScale) => {
+        this.yScales().forEach((xScale) => {
           PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
           PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
         });
       }
       if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this._yScales.forEach((yScale) => {
+        this.yScales().forEach((yScale) => {
           PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
           PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
         });
@@ -155,10 +155,10 @@ export module Interactions {
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-        this._xScales.forEach((xScale) => {
+        this.xScales().forEach((xScale) => {
           PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
         });
-        this._yScales.forEach((yScale) => {
+        this.yScales().forEach((yScale) => {
           PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
       }
@@ -173,11 +173,11 @@ export module Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
-        this._xScales.forEach((xScale) => {
+        this.xScales().forEach((xScale) => {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
           PanZoom._translateScale(xScale, -dragAmountX);
         });
-        this._yScales.forEach((yScale) => {
+        this.yScales().forEach((yScale) => {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
           PanZoom._translateScale(yScale, -dragAmountY);
         });
@@ -188,13 +188,21 @@ export module Interactions {
     public xScales(): QuantitativeScale<any>[];
     public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public xScales(xScales?: QuantitativeScale<any>[]): any {
-      // TODO: Implement this.
+      if (xScales == null) {
+        return this._xScales;
+      }
+      this._xScales = xScales;
+      return this;
     }
 
     public yScales(): QuantitativeScale<any>[];
-    public yScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
-    public yScales(xScales?: QuantitativeScale<any>[]): any {
-      // TODO: Implement this.
+    public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public yScales(yScales?: QuantitativeScale<any>[]): any {
+      if (yScales == null) {
+        return this._yScales;
+      }
+      this._yScales = yScales;
+      return this;
     }
 
     public addXScale(xScale: QuantitativeScale<any>) {

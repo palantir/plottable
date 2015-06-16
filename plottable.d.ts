@@ -3576,7 +3576,7 @@ declare module Plottable {
             xScales(): QuantitativeScale<any>[];
             xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
             yScales(): QuantitativeScale<any>[];
-            yScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
             addXScale(xScale: QuantitativeScale<any>): PanZoom;
             removeXScale(yScale: QuantitativeScale<any>): PanZoom;
             addYScale(xScale: QuantitativeScale<any>): PanZoom;
