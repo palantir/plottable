@@ -12,6 +12,7 @@ describe("Interactions", () => {
 
     var xScale: Plottable.QuantitativeScale<number>;
     var yScale: Plottable.QuantitativeScale<number>;
+    var panZoomInteraction: Plottable.Interactions.PanZoom;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -23,7 +24,10 @@ describe("Interactions", () => {
       xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
       yScale = new Plottable.Scales.Linear();
       yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-      (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
+      panZoomInteraction = new Plottable.Interactions.PanZoom();
+      panZoomInteraction.addXScale(xScale);
+      panZoomInteraction.addYScale(yScale);
+      panZoomInteraction.attachTo(component);
 
       eventTarget = component.background();
     });
@@ -49,6 +53,20 @@ describe("Interactions", () => {
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
         assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
         assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+        svg.remove();
+      });
+
+      it("dragging a certain amount will translate multiple scales correctly (mouse)", () => {
+        var xScale2 = new Plottable.Scales.Linear();
+        xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+        panZoomInteraction.addXScale(xScale2);
+        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+        TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+        TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+        assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (mouse)");
         svg.remove();
       });
 
@@ -78,6 +96,20 @@ describe("Interactions", () => {
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
         assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
         assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
+        svg.remove();
+      });
+
+      it("dragging a certain amount will translate multiple scales correctly (touch)", () => {
+        var xScale2 = new Plottable.Scales.Linear();
+        xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+        panZoomInteraction.addXScale(xScale2);
+        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+        assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+        assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (touch)");
         svg.remove();
       });
 
