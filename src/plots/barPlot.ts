@@ -98,6 +98,12 @@ export module Plots {
       return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
     }
 
+    public render() {
+      super.render();
+      this._getBarPixelWidth();
+      return this;
+    }
+
     protected _createDrawer(dataset: Dataset) {
       return new Plottable.Drawers.Rectangle(dataset);
     }
@@ -508,16 +514,11 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
-        // var tmp: string[] = Plottable.Utils.Stacking.domainKeys(this.datasets(), barAccessor);
-        // return 14;
-
-
         var numberBarAccessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i, dataset))
                                .filter((d) => d != null)
                                .map((d) => d.valueOf());
         }))).values().map((value) => +value);
-
 
         numberBarAccessorData.sort((a, b) => a - b);
 
