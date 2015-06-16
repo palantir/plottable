@@ -289,5 +289,35 @@ describe("Scales", () => {
         svg.remove();
       });
     });
+
+    describe("zoomLevel()", () => {
+      var scale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        scale = new Plottable.Scales.Linear();
+        scale.domain([0, 100]);
+        scale.range([0, 200]);
+      });
+
+      it("default zoom level is 1.0", () => {
+        assert.strictEqual(scale.zoomLevel(), 1.0, "Default zoom level set to 1.0");
+      });
+
+      it("Setting the zoom level affects domain accordingly", () => {
+        scale.zoomLevel(0.5);
+        assert.strictEqual(scale.domain()[0], 25, "Domain left adjusted by zooming");
+        assert.strictEqual(scale.domain()[1], 75, "Domain right adjusted by zooming");
+      });
+
+      it("Setting the domain resets the zoom level back to 1", () => {
+        var zoomLevel = 0.5;
+        scale.zoomLevel(zoomLevel);
+        assert.strictEqual(scale.zoomLevel(), zoomLevel, "Zoom level set to set value");
+        var newDomain = [0, 200];
+        scale.domain(newDomain);
+        assert.strictEqual(scale.zoomLevel(), 1.0, "Zoom level reset back to 1.0");
+        assert.deepEqual(scale.domain(), newDomain, "Domain set to set value");
+      });
+    });
   });
 });
