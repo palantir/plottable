@@ -675,6 +675,25 @@ var Plottable;
             }
             Stacking.stackedExtent = stackedExtent;
             /**
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
+             */
+            function domainKeys(datasets, keyAccessor) {
+                var domainKeys = d3.set();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum, index) {
+                        domainKeys.add(keyAccessor(datum, index, dataset));
+                    });
+                });
+                return domainKeys.values();
+            }
+            Stacking.domainKeys = domainKeys;
+            /**
              * Normalizes a key used for stacking
              *
              * @param {any} key The key to be normalized
@@ -6949,6 +6968,7 @@ var Plottable;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
+                this._barPixelWidth = 0;
                 this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -6956,9 +6976,10 @@ var Plottable;
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("baseline", new Plottable.Animators.Null());
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
-                this.attr("width", function () { return _this._getBarPixelWidth(); });
+                this.attr("width", function () { return _this._barPixelWidth; });
                 this._labelConfig = new Plottable.Utils.Map();
                 this._baselineValueProvider = function () { return [_this.baselineValue()]; };
+                this._getBarPixelWidthCallback = function () { return _this._getBarPixelWidth(); };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -6969,6 +6990,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.x.call(this, x, xScale);
+                    xScale.onUpdate(this._getBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -6982,6 +7004,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.y.call(this, y, yScale);
+                    yScale.onUpdate(this._getBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -7022,6 +7045,16 @@ var Plottable;
                 this._updateValueScale();
                 this.render();
                 return this;
+            };
+            Bar.prototype.addDataset = function (dataset) {
+                dataset.onUpdate(this._getBarPixelWidthCallback);
+                this._getBarPixelWidth();
+                return _super.prototype.addDataset.call(this, dataset);
+            };
+            Bar.prototype.removeDataset = function (dataset) {
+                dataset.offUpdate(this._getBarPixelWidthCallback);
+                this._getBarPixelWidth();
+                return _super.prototype.removeDataset.call(this, dataset);
             };
             Bar.prototype.labelsEnabled = function (enabled) {
                 if (enabled === undefined) {
@@ -7310,9 +7343,13 @@ var Plottable;
                 }
                 else {
                     var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
+                    // var tmp: string[] = Plottable.Utils.Stacking.domainKeys(this.datasets(), barAccessor);
+                    // return 14;
                     var numberBarAccessorData = d3.set(Plottable.Utils.Array.flatten(this.datasets().map(function (dataset) {
                         return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); }).filter(function (d) { return d != null; }).map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });
+                    // console.log(tmp);
+                    // var numberBarAccessorData: number[] = tmp.map((v) => +v);
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
                     var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
@@ -7331,6 +7368,7 @@ var Plottable;
                     }
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
+                this._barPixelWidth = barPixelWidth;
                 return barPixelWidth;
             };
             Bar.prototype.entities = function (datasets) {
@@ -7368,6 +7406,10 @@ var Plottable;
                 var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
+            };
+            Bar.prototype._uninstallScaleForKey = function (scale, key) {
+                scale.offUpdate(this._getBarPixelWidthCallback);
+                _super.prototype._uninstallScaleForKey.call(this, scale, key);
             };
             Bar.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();

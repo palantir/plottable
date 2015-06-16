@@ -299,6 +299,16 @@ declare module Plottable {
              */
             function stackedExtent(stackingResult: StackingResult, keyAccessor: Accessor<any>, filter: Accessor<boolean>): number[];
             /**
+             * Given an array of Datasets and the accessor function for the key, computes the
+             * set reunion (no duplicates) of the domain of each Dataset. The keys are stringified
+             * before being returned.
+             *
+             * @param {Dataset[]} datasets The Datasets for which we extract the domain keys
+             * @param {Accessor<any>} keyAccessor The accessor for the key of the data
+             * @return {string[]} An array of stringified keys
+             */
+            function domainKeys(datasets: Dataset[], keyAccessor: Accessor<any>): string[];
+            /**
              * Normalizes a key used for stacking
              *
              * @param {any} key The key to be normalized
@@ -2794,6 +2804,8 @@ declare module Plottable {
              * @returns {Bar} The calling Bar Plot.
              */
             baselineValue(value: X | Y): Bar<X, Y>;
+            addDataset(dataset: Dataset): Plot;
+            removeDataset(dataset: Dataset): Plot;
             /**
              * Get whether bar labels are enabled.
              *
@@ -2873,6 +2885,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
