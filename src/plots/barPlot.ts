@@ -28,7 +28,7 @@ export module Plots {
     private _baselineValueProvider: () => (X|Y)[];
 
     private _barPixelWidth = 0;
-    private _updateBarPixelWidthCallback: (() => void);
+    private _updateBarPixelWidthCallback: () => void;
 
     /**
      * A Bar Plot draws bars growing out from a baseline to some value
@@ -505,7 +505,6 @@ export module Plots {
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
-
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
       var barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
@@ -522,7 +521,7 @@ export module Plots {
 
         numberBarAccessorData.sort((a, b) => a - b);
 
-        var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
+        var scaledData = numberBarAccessorData.map((datum) => barScale.scale(datum));
         var barAccessorDataPairs = d3.pairs(scaledData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
@@ -584,10 +583,10 @@ export module Plots {
       return { x: x, y: y };
     }
 
-  protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
-    scale.offUpdate(this._updateBarPixelWidthCallback);
-    super._uninstallScaleForKey(scale, key);
-  }
+    protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
+      scale.offUpdate(this._updateBarPixelWidthCallback);
+      super._uninstallScaleForKey(scale, key);
+    }
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]>();
