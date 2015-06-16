@@ -27,6 +27,9 @@ export module Plots {
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
     private _baselineValueProvider: () => (X|Y)[];
 
+    private _barPixelWidth = 0;
+    private _getBarPixelWidthCallback: (() => void);
+
     /**
      * A Bar Plot draws bars growing out from a baseline to some value
      *
@@ -42,9 +45,10 @@ export module Plots {
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("baseline", new Animators.Null());
       this.attr("fill", new Scales.Color().range()[0]);
-      this.attr("width", () => this._getBarPixelWidth());
+      this.attr("width", () => this._barPixelWidth);
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
       this._baselineValueProvider = () => [this.baselineValue()];
+      this._getBarPixelWidthCallback = () => this._getBarPixelWidth();
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -59,6 +63,7 @@ export module Plots {
         super.x(<number | Accessor<number>>x);
       } else {
         super.x(< X | Accessor<X>>x, xScale);
+        xScale.onUpdate(this._getBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -77,6 +82,7 @@ export module Plots {
         super.y(<number | Accessor<number>>y);
       } else {
         super.y(<Y | Accessor<Y>>y, yScale);
+        yScale.onUpdate(this._getBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -139,6 +145,18 @@ export module Plots {
       this._updateValueScale();
       this.render();
       return this;
+    }
+
+    public addDataset(dataset: Dataset) {
+      dataset.onUpdate(this._getBarPixelWidthCallback);
+      this._getBarPixelWidth();
+      return super.addDataset(dataset);
+    }
+
+    public removeDataset(dataset: Dataset) {
+      dataset.offUpdate(this._getBarPixelWidthCallback);
+      this._getBarPixelWidth();
+      return super.removeDataset(dataset);
     }
 
     /**
@@ -479,6 +497,7 @@ export module Plots {
      * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
      */
     protected _getBarPixelWidth(): number {
+
       if (!this._projectorsReady()) { return 0; }
       var barPixelWidth: number;
       var barScale: Scale<any, number> = this._isVertical ? this.x().scale : this.y().scale;
@@ -487,11 +506,19 @@ export module Plots {
       } else {
         var barAccessor = this._isVertical ? this.x().accessor : this.y().accessor;
 
+        // var tmp: string[] = Plottable.Utils.Stacking.domainKeys(this.datasets(), barAccessor);
+        // return 14;
+
+
         var numberBarAccessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => barAccessor(d, i, dataset))
                                .filter((d) => d != null)
                                .map((d) => d.valueOf());
         }))).values().map((value) => +value);
+
+        // console.log(tmp);
+
+        // var numberBarAccessorData: number[] = tmp.map((v) => +v);
 
         numberBarAccessorData.sort((a, b) => a - b);
 
@@ -515,6 +542,7 @@ export module Plots {
 
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
+      this._barPixelWidth = barPixelWidth;
       return barPixelWidth;
     }
 
@@ -552,6 +580,11 @@ export module Plots {
       var y = this._isVertical ? rectY : rectY + rectHeight / 2;
       return { x: x, y: y };
     }
+
+  protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
+    scale.offUpdate(this._getBarPixelWidthCallback);
+    super._uninstallScaleForKey(scale, key);
+  }
 
     protected _getDataToDraw() {
       var dataToDraw = new Utils.Map<Dataset, any[]>();
