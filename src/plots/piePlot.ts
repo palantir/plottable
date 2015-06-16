@@ -175,7 +175,7 @@ export module Plots {
       }
 
       for (var i = 0; i < this.entities().length; i++) {
-        var entity = this.entities()[i];       
+        var entity = this.entities()[i];
         var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
         if (this.innerRadius().scale) {
           innerRadius = this.innerRadius().scale.scale(innerRadius);
@@ -183,7 +183,7 @@ export module Plots {
         var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
         if (this.outerRadius().scale) {
           outerRadius = this.outerRadius().scale.scale(outerRadius);
-        }        
+        }
         if (this._startAngles[i] <= angle && this._endAngles[i] > angle &&
             innerRadius < radius && outerRadius > radius) {
           return this.entities()[i];
