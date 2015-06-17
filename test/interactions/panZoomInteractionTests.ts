@@ -197,5 +197,23 @@ describe("Interactions", () => {
       svg.remove();
     });
 
+    it("Setting the xScales in batch is the same as adding one at a time", () => {
+      var xScale2 = new Plottable.Scales.Linear();
+      panZoomInteraction.addXScale(xScale2);
+      var xScales = panZoomInteraction.xScales();
+      panZoomInteraction.xScales([xScale, xScale2]);
+      assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
+      svg.remove();
+    });
+
+    it("Setting the yScales in batch is the same as adding one at a time", () => {
+      var yScale2 = new Plottable.Scales.Linear();
+      panZoomInteraction.addYScale(yScale2);
+      var yScales = panZoomInteraction.yScales();
+      panZoomInteraction.yScales([yScale, yScale2]);
+      assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
+      svg.remove();
+    });
+
   });
 });

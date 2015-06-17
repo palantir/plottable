@@ -9773,6 +9773,22 @@ describe("Interactions", function () {
             assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale2 transforms to the correct domain via pinch");
             svg.remove();
         });
+        it("Setting the xScales in batch is the same as adding one at a time", function () {
+            var xScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addXScale(xScale2);
+            var xScales = panZoomInteraction.xScales();
+            panZoomInteraction.xScales([xScale, xScale2]);
+            assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
+            svg.remove();
+        });
+        it("Setting the yScales in batch is the same as adding one at a time", function () {
+            var yScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addYScale(yScale2);
+            var yScales = panZoomInteraction.yScales();
+            panZoomInteraction.yScales([yScale, yScale2]);
+            assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
+            svg.remove();
+        });
     });
 });
 
