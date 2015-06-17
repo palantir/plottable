@@ -7228,14 +7228,15 @@ var Plottable;
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
-                var improvedBBox = {
-                    x: 0,
-                    y: 0,
-                    height: 0,
-                    width: 0
+                var attrToProjector = this._generateAttrToProjector();
+                var width = attrToProjector["width"](datum, null, null);
+                var height = attrToProjector["height"](datum, null, null);
+                var barBBox = {
+                    x: pixelPoint.x - width / 2,
+                    y: pixelPoint.y,
+                    width: width,
+                    height: height
                 };
-                console.log(barBBox, improvedBBox);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
