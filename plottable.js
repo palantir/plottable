@@ -6210,6 +6210,9 @@ var Plottable;
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
+                    if (validDatumIndex >= selection.length) {
+                        validDatumIndex = selection.length - 1;
+                    }
                     entities.push({
                         datum: datum,
                         index: datasetIndex,
