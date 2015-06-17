@@ -222,7 +222,7 @@ export module Interactions {
     }
 
     /**
-     * Adds an x scale to use for this PanZoom Interaction
+     * Adds an x scale to this PanZoom Interaction
      * 
      * @param {QuantitativeScale<any>} An x scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
@@ -236,9 +236,9 @@ export module Interactions {
     }
 
     /**
-     * Removes an x scale that would have been used for this PanZoom Interaction
+     * Removes an x scale from this PanZoom Interaction
      * 
-     * @param {QuantitativeScale<any>} An x scale to add
+     * @param {QuantitativeScale<any>} An x scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public removeXScale(xScale: QuantitativeScale<any>) {
@@ -251,9 +251,9 @@ export module Interactions {
     }
 
     /**
-     * Adds a y scale to use for this PanZoom Interaction
+     * Adds a y scale to this PanZoom Interaction
      * 
-     * @param {QuantitativeScale<any>} An y scale to add
+     * @param {QuantitativeScale<any>} A y scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addYScale(yScale: QuantitativeScale<any>) {
@@ -265,9 +265,9 @@ export module Interactions {
     }
 
     /**
-     * Removes a y scale that would have been used for this PanZoom Interaction
+     * Removes a y scale from this PanZoom Interaction
      * 
-     * @param {QuantitativeScale<any>} An y scale to add
+     * @param {QuantitativeScale<any>} A y scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public removeYScale(yScale: QuantitativeScale<any>) {

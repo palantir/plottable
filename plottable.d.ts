@@ -3594,30 +3594,30 @@ declare module Plottable {
              */
             yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
             /**
-             * Adds an x scale to use for this PanZoom Interaction
+             * Adds an x scale to this PanZoom Interaction
              *
              * @param {QuantitativeScale<any>} An x scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             addXScale(xScale: QuantitativeScale<any>): PanZoom;
             /**
-             * Removes an x scale that would have been used for this PanZoom Interaction
+             * Removes an x scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An x scale to add
+             * @param {QuantitativeScale<any>} An x scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             removeXScale(xScale: QuantitativeScale<any>): PanZoom;
             /**
-             * Adds a y scale to use for this PanZoom Interaction
+             * Adds a y scale to this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An y scale to add
+             * @param {QuantitativeScale<any>} A y scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             addYScale(yScale: QuantitativeScale<any>): PanZoom;
             /**
-             * Removes a y scale that would have been used for this PanZoom Interaction
+             * Removes a y scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An y scale to add
+             * @param {QuantitativeScale<any>} A y scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             removeYScale(yScale: QuantitativeScale<any>): PanZoom;

@@ -9238,7 +9238,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Adds an x scale to use for this PanZoom Interaction
+             * Adds an x scale to this PanZoom Interaction
              *
              * @param {QuantitativeScale<any>} An x scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
@@ -9251,9 +9251,9 @@ var Plottable;
                 return this;
             };
             /**
-             * Removes an x scale that would have been used for this PanZoom Interaction
+             * Removes an x scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An x scale to add
+             * @param {QuantitativeScale<any>} An x scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeXScale = function (xScale) {
@@ -9265,9 +9265,9 @@ var Plottable;
                 return this;
             };
             /**
-             * Adds a y scale to use for this PanZoom Interaction
+             * Adds a y scale to this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An y scale to add
+             * @param {QuantitativeScale<any>} A y scale to add
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
@@ -9278,9 +9278,9 @@ var Plottable;
                 return this;
             };
             /**
-             * Removes a y scale that would have been used for this PanZoom Interaction
+             * Removes a y scale from this PanZoom Interaction
              *
-             * @param {QuantitativeScale<any>} An y scale to add
+             * @param {QuantitativeScale<any>} A y scale to remove
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeYScale = function (yScale) {
