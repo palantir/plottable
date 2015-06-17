@@ -293,17 +293,7 @@ export module Plots {
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
-
-      var attrToProjector = this._generateAttrToProjector();
-      var width = attrToProjector["width"](datum, null, null);
-      var height = attrToProjector["height"](datum, null, null);
-
-      var barBBox = {
-        x: pixelPoint.x - width / 2,
-        y: pixelPoint.y,
-        width: width,
-        height: height
-      }
+      var barBBox = Utils.DOM.elementBBox(selection);
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }

@@ -6986,12 +6986,13 @@ var Plottable;
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var diameter = this.size().accessor(datum, null, null);
+                var translation = d3.transform(selection.attr("transform")).translate;
+                var bbox = Plottable.Utils.DOM.elementBBox(selection);
                 var translatedBbox = {
-                    x: pixelPoint.x - diameter,
-                    y: pixelPoint.y - diameter,
-                    width: diameter,
-                    height: diameter
+                    x: bbox.x + translation[0],
+                    y: bbox.y + translation[1],
+                    width: bbox.width,
+                    height: bbox.height
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
@@ -7240,15 +7241,7 @@ var Plottable;
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var attrToProjector = this._generateAttrToProjector();
-                var width = attrToProjector["width"](datum, null, null);
-                var height = attrToProjector["height"](datum, null, null);
-                var barBBox = {
-                    x: pixelPoint.x - width / 2,
-                    y: pixelPoint.y,
-                    width: width,
-                    height: height
-                };
+                var barBBox = Plottable.Utils.DOM.elementBBox(selection);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             Bar.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
