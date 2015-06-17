@@ -9789,6 +9789,18 @@ describe("Interactions", function () {
             assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
             svg.remove();
         });
+        it("Adding an already existent xScale does nothing", function () {
+            var oldXScaleNumber = panZoomInteraction.xScales().length;
+            panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
+            assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
+            svg.remove();
+        });
+        it("Adding an already existent yScale does nothing", function () {
+            var oldYScaleNumber = panZoomInteraction.yScales().length;
+            panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
+            assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
+            svg.remove();
+        });
     });
 });
 

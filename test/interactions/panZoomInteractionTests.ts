@@ -215,5 +215,19 @@ describe("Interactions", () => {
       svg.remove();
     });
 
+    it("Adding an already existent xScale does nothing", () => {
+      var oldXScaleNumber = panZoomInteraction.xScales().length;
+      panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
+      assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
+      svg.remove();
+    });
+
+    it("Adding an already existent yScale does nothing", () => {
+      var oldYScaleNumber = panZoomInteraction.yScales().length;
+      panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
+      assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
+      svg.remove();
+    });
+
   });
 });
