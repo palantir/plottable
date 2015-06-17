@@ -776,19 +776,25 @@ var Plottable;
             }
             Window.setTimeout = setTimeout;
             /**
-             * To be used in the first line of a deprecated method
+             * Sends a warning to the console. The warning includes the version number of the deprecation,
+             * the name of the function which was deprecated and an optional message.
+             *
+             * Tu be used in the first line of a deprecated method.
              *
              * @param {string} version The version when the tagged method became obsolete
+             * @param {string?} message Optional message to be shown with the warning
              */
-            function deprecated(version) {
+            function deprecated(version, message) {
+                if (message === void 0) { message = ""; }
                 var callingMethod = "";
                 try {
-                    callingMethod = (new Error).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/at/); })[0];
+                    // Getting the name of the calling method through the stack trace.
+                    callingMethod = (new Error).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/at/); })[0]; // Dropping extra keywords in Chrome
                 }
                 catch (err) {
                     callingMethod = "called";
                 }
-                Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes.");
+                Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes. " + message);
             }
             Window.deprecated = deprecated;
         })(Window = Utils.Window || (Utils.Window = {}));
