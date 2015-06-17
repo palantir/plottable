@@ -8,8 +8,8 @@ export module Interactions {
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScales: QuantitativeScale<any>[];
-    private _yScales: QuantitativeScale<any>[];
+    private _xScales: Utils.Set<QuantitativeScale<any>>;
+    private _yScales: Utils.Set<QuantitativeScale<any>>;
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -32,8 +32,14 @@ export module Interactions {
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
-      this._xScales = xScale == null ? [] : [xScale];
-      this._yScales = yScale == null ? [] : [yScale];
+      this._xScales = new Utils.Set<QuantitativeScale<any>>();
+      if (xScale != null) {
+        this._xScales.add(xScale);
+      }
+      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      if (yScale != null) {
+        this._yScales.add(yScale);
+      }
 
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
@@ -197,9 +203,16 @@ export module Interactions {
     public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public xScales(xScales?: QuantitativeScale<any>[]): any {
       if (xScales == null) {
-        return this._xScales;
+        var scales: QuantitativeScale<any>[] = [];
+        this._xScales.forEach((xScale) => {
+          scales.push(xScale);
+        });
+        return scales;
       }
-      this._xScales = xScales;
+      this._xScales = new Utils.Set<QuantitativeScale<any>>();
+      xScales.forEach((xScale) => {
+        this.addXScale(xScale);
+      });
       return this;
     }
 
@@ -215,9 +228,16 @@ export module Interactions {
     public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
     public yScales(yScales?: QuantitativeScale<any>[]): any {
       if (yScales == null) {
-        return this._yScales;
+        var scales: QuantitativeScale<any>[] = [];
+        this._yScales.forEach((yScale) => {
+          scales.push(yScale);
+        });
+        return scales;
       }
-      this._yScales = yScales;
+      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      yScales.forEach((yScale) => {
+        this.addYScale(yScale);
+      });
       return this;
     }
 
@@ -228,10 +248,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addXScale(xScale: QuantitativeScale<any>) {
-      if (this.xScales().indexOf(xScale) !== -1) {
-        return this;
-      }
-      this._xScales.push(xScale);
+      this._xScales.add(xScale);
       return this;
     }
 
@@ -242,11 +259,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public removeXScale(xScale: QuantitativeScale<any>) {
-      var xScaleIndex = this.xScales().indexOf(xScale);
-      if (xScaleIndex === -1) {
-        return this;
-      }
-      this._xScales.splice(xScaleIndex, 1);
+      this._xScales.delete(xScale);
       return this;
     }
 
@@ -257,10 +270,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addYScale(yScale: QuantitativeScale<any>) {
-      if (this.yScales().indexOf(yScale) !== -1) {
-        return this;
-      }
-      this._yScales.push(yScale);
+      this._yScales.add(yScale);
       return this;
     }
 
@@ -271,11 +281,7 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public removeYScale(yScale: QuantitativeScale<any>) {
-      var yScaleIndex = this.yScales().indexOf(yScale);
-      if (yScaleIndex === -1) {
-        return this;
-      }
-      this._yScales.splice(yScaleIndex, 1);
+      this._yScales.delete(yScale);
       return this;
     }
   }

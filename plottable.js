@@ -9094,8 +9094,14 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-                this._xScales = xScale == null ? [] : [xScale];
-                this._yScales = yScale == null ? [] : [yScale];
+                this._xScales = new Plottable.Utils.Set();
+                if (xScale != null) {
+                    this._xScales.add(xScale);
+                }
+                this._yScales = new Plottable.Utils.Set();
+                if (yScale != null) {
+                    this._yScales.add(yScale);
+                }
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
@@ -9224,17 +9230,33 @@ var Plottable;
                 });
             };
             PanZoom.prototype.xScales = function (xScales) {
+                var _this = this;
                 if (xScales == null) {
-                    return this._xScales;
+                    var scales = [];
+                    this._xScales.forEach(function (xScale) {
+                        scales.push(xScale);
+                    });
+                    return scales;
                 }
-                this._xScales = xScales;
+                this._xScales = new Plottable.Utils.Set();
+                xScales.forEach(function (xScale) {
+                    _this.addXScale(xScale);
+                });
                 return this;
             };
             PanZoom.prototype.yScales = function (yScales) {
+                var _this = this;
                 if (yScales == null) {
-                    return this._yScales;
+                    var scales = [];
+                    this._yScales.forEach(function (yScale) {
+                        scales.push(yScale);
+                    });
+                    return scales;
                 }
-                this._yScales = yScales;
+                this._yScales = new Plottable.Utils.Set();
+                yScales.forEach(function (yScale) {
+                    _this.addYScale(yScale);
+                });
                 return this;
             };
             /**
@@ -9244,10 +9266,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addXScale = function (xScale) {
-                if (this.xScales().indexOf(xScale) !== -1) {
-                    return this;
-                }
-                this._xScales.push(xScale);
+                this._xScales.add(xScale);
                 return this;
             };
             /**
@@ -9257,11 +9276,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeXScale = function (xScale) {
-                var xScaleIndex = this.xScales().indexOf(xScale);
-                if (xScaleIndex === -1) {
-                    return this;
-                }
-                this._xScales.splice(xScaleIndex, 1);
+                this._xScales.delete(xScale);
                 return this;
             };
             /**
@@ -9271,10 +9286,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
-                if (this.yScales().indexOf(yScale) !== -1) {
-                    return this;
-                }
-                this._yScales.push(yScale);
+                this._yScales.add(yScale);
                 return this;
             };
             /**
@@ -9284,11 +9296,7 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.removeYScale = function (yScale) {
-                var yScaleIndex = this.yScales().indexOf(yScale);
-                if (yScaleIndex === -1) {
-                    return this;
-                }
-                this._yScales.splice(yScaleIndex, 1);
+                this._yScales.delete(yScale);
                 return this;
             };
             /**
