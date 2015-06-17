@@ -52,16 +52,17 @@ export module Utils {
 
       try {
         callingMethod = (<any> new Error).stack
-          .split('\n')
+          .split("\n")
           .filter((step: string) => step.match(/http/))[1]
           .trim()
           .split(/\s|@/)
           .filter((keyword: string) => !keyword.match(/at/))[0];
       } catch (err) {
+        callingMethod = "called";
       }
 
       Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
-        ". Please refer to the release notes.")
+        ". Please refer to the release notes.");
     }
 
   }

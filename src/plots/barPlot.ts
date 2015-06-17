@@ -312,7 +312,7 @@ export module Plots {
         y: pixelPoint.y,
         width: width,
         height: height
-      }
+      };
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
