@@ -126,11 +126,20 @@ var Plottable;
          */
         var Map = (function () {
             function Map() {
-                this._keyValuePairs = [];
+                if (typeof window.Map === "function") {
+                    this._es6Map = new window.Map();
+                }
+                else {
+                    this._keyValuePairs = [];
+                }
             }
             Map.prototype.set = function (key, value) {
                 if (Utils.Math.isNaN(key)) {
                     throw new Error("NaN may not be used as a key to the Map");
+                }
+                if (this._es6Map != null) {
+                    this._es6Map.set(key, value);
+                    return this;
                 }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
@@ -142,6 +151,9 @@ var Plottable;
                 return this;
             };
             Map.prototype.get = function (key) {
+                if (this._es6Map != null) {
+                    return this._es6Map.get(key);
+                }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
                         return this._keyValuePairs[i].value;
@@ -150,6 +162,9 @@ var Plottable;
                 return undefined;
             };
             Map.prototype.has = function (key) {
+                if (this._es6Map != null) {
+                    return this._es6Map.has(key);
+                }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
                         return true;
@@ -159,11 +174,19 @@ var Plottable;
             };
             Map.prototype.forEach = function (callbackFn, thisArg) {
                 var _this = this;
+                if (this._es6Map != null) {
+                    var callbackWrapper = function (value, key) { return callbackFn.call(thisArg, value, key, _this); };
+                    this._es6Map.forEach(callbackWrapper, thisArg);
+                    return;
+                }
                 this._keyValuePairs.forEach(function (keyValuePair) {
                     callbackFn.call(thisArg, keyValuePair.value, keyValuePair.key, _this);
                 });
             };
             Map.prototype.delete = function (key) {
+                if (this._es6Map != null) {
+                    return this._es6Map.delete(key);
+                }
                 for (var i = 0; i < this._keyValuePairs.length; i++) {
                     if (this._keyValuePairs[i].key === key) {
                         this._keyValuePairs.splice(i, 1);
@@ -189,41 +212,55 @@ var Plottable;
          */
         var Set = (function () {
             function Set() {
-                this._values = [];
-                this._updateSize();
+                if (typeof window.Set === "function") {
+                    this._es6Set = new window.Set();
+                }
+                else {
+                    this._values = [];
+                }
+                this.size = 0;
             }
             Set.prototype.add = function (value) {
+                if (this._es6Set != null) {
+                    this._es6Set.add(value);
+                    this.size = this._es6Set.size;
+                    return this;
+                }
                 if (!this.has(value)) {
                     this._values.push(value);
-                    this._updateSize();
+                    this.size = this._values.length;
                 }
                 return this;
             };
             Set.prototype.delete = function (value) {
+                if (this._es6Set != null) {
+                    var deleted = this._es6Set.delete(value);
+                    this.size = this._es6Set.size;
+                    return deleted;
+                }
                 var index = this._values.indexOf(value);
                 if (index !== -1) {
                     this._values.splice(index, 1);
-                    this._updateSize();
+                    this.size = this._values.length;
                     return true;
                 }
                 return false;
             };
             Set.prototype.has = function (value) {
+                if (this._es6Set != null) {
+                    return this._es6Set.has(value);
+                }
                 return this._values.indexOf(value) !== -1;
             };
             Set.prototype.forEach = function (callback, thisArg) {
                 var _this = this;
+                if (this._es6Set != null) {
+                    var callbackWrapper = function (value, value2) { return callback.call(thisArg, value, value2, _this); };
+                    this._es6Set.forEach(callbackWrapper, thisArg);
+                    return;
+                }
                 this._values.forEach(function (value) {
                     callback.call(thisArg, value, value, _this);
-                });
-            };
-            /**
-             * Updates the value of the read-only parameter size
-             */
-            Set.prototype._updateSize = function () {
-                Object.defineProperty(this, "size", {
-                    value: this._values.length,
-                    configurable: true
                 });
             };
             return Set;

@@ -8280,15 +8280,11 @@ describe("Utils", function () {
             var value1 = { value: "one" };
             set.add(value1);
             assert.strictEqual(set.size, 1, "set contains one value");
-            assert.strictEqual(set._values[0], value1, "the value was added to the set");
             set.add(value1);
             assert.strictEqual(set.size, 1, "same value is not added twice");
-            assert.strictEqual(set._values[0], value1, "list still contains the value");
             var value2 = { value: "two" };
             set.add(value2);
             assert.strictEqual(set.size, 2, "set now contains two values");
-            assert.strictEqual(set._values[0], value1, "set contains value 1");
-            assert.strictEqual(set._values[1], value2, "set contains value 2");
         });
         it("delete()", function () {
             var set = new Plottable.Utils.Set();

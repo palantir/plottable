@@ -66,6 +66,7 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
+            constructor();
             set(key: K, value: V): Map<K, V>;
             get(key: K): V;
             has(key: K): boolean;
