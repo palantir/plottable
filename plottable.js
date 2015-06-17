@@ -6211,21 +6211,17 @@ var Plottable;
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 var validDatumIndex = 0;
-                var selection = drawer.selection()[0];
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
-                    }
-                    if (validDatumIndex >= selection.length) {
-                        validDatumIndex = selection.length - 1;
                     }
                     entities.push({
                         datum: datum,
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: d3.select(selection[validDatumIndex]),
+                        selection: drawer.selectionForIndex(validDatumIndex),
                         component: _this
                     });
                     validDatumIndex++;
