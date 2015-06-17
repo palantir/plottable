@@ -277,10 +277,6 @@ export module Plots {
         });
       });
     }
-
-    private _center() {
-      return { x: this.width() / 2, y: this.height() / 2 };
-    }
   }
 }
 }

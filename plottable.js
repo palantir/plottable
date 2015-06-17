@@ -6467,9 +6467,6 @@ var Plottable;
                     });
                 });
             };
-            Pie.prototype._center = function () {
-                return { x: this.width() / 2, y: this.height() / 2 };
-            };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
             Pie._SECTOR_VALUE_KEY = "sector-value";
