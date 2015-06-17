@@ -9143,7 +9143,7 @@ var Plottable;
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
                 if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this.yScales().forEach(function (xScale) {
+                    this.xScales().forEach(function (xScale) {
                         PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
                         PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
                     });

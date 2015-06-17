@@ -9733,7 +9733,7 @@ describe("Interactions", function () {
             var deltaY = 500;
             TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
             assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
-            assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale2 zooms to the correct domain via scroll");
+            assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 2, SVG_WIDTH * 7 / 2], "xScale2 zooms to the correct domain via scroll");
             svg.remove();
         });
         it("pinching a certain amount will magnify the scale correctly", function () {
@@ -9770,7 +9770,7 @@ describe("Interactions", function () {
             TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
             TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
             assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
-            assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale2 transforms to the correct domain via pinch");
+            assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 4, SVG_WIDTH * 5 / 4], "xScale2 transforms to the correct domain via pinch");
             svg.remove();
         });
         it("Setting the xScales in batch is the same as adding one at a time", function () {

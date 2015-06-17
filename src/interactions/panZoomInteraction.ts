@@ -93,7 +93,7 @@ export module Interactions {
       var newCornerDistance = this._cornerDistance();
 
       if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this.yScales().forEach((xScale) => {
+        this.xScales().forEach((xScale) => {
           PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
           PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
         });
