@@ -63,6 +63,11 @@ svg.plottable {
   font-size: 14px;
 }
 
+.plottable .label-area text {
+  font-family: "Helvetica Neue", sans-serif;
+  fill: #32313F;
+}
+
 .plottable .light-label text {
   fill: white;
 }

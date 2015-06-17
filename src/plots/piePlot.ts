@@ -9,6 +9,7 @@ export module Plots {
     private static _SECTOR_VALUE_KEY = "sector-value";
     private _startAngles: number[];
     private _endAngles: number[];
+    private _labelsEnabled = false;
 
     /**
      * @constructor
@@ -157,6 +158,29 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Get whether slice labels are enabled.
+     *
+     * @returns {boolean} Whether slices should display labels or not.
+     */
+    public labelsEnabled(): boolean;
+    /**
+     * Sets whether labels are enabled.
+     *
+     * @param {boolean} labelsEnabled
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public labelsEnabled(enabled: boolean): Pie;
+    public labelsEnabled(enabled?: boolean): any {
+      if (enabled === undefined) {
+        return this._labelsEnabled;
+      } else {
+        this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector = super._propertyProjectors();
       var innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
@@ -208,6 +232,55 @@ export module Plots {
       var endAngle = pie[index].endAngle;
       var avgAngle = (startAngle + endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+    }
+
+    protected _additionalPaint(time: number) {
+      if (this._labelsEnabled) {
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
+      }
+    }
+
+    private _drawLabels() {
+      var attrToProjector = this._generateAttrToProjector();
+      var labelArea = this._renderArea.append("g").classed("label-area", true);
+      var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+      var writer = new SVGTypewriter.Writers.Writer(measurer);
+      this.entities().forEach((entity) => {
+        var value = "" + this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
+        var measurement = measurer.measure(value);
+
+        var center = this._center();
+        var theta = (this._endAngles[entity.index] + this._startAngles[entity.index]) / 2;
+        var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
+        if (this.outerRadius().scale) {
+          outerRadius = this.outerRadius().scale.scale(outerRadius);
+        }
+        var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
+        if (this.innerRadius().scale) {
+          innerRadius = this.innerRadius().scale.scale(innerRadius);
+        }
+        var labelRadius = (outerRadius + innerRadius) / 2;
+
+        var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+        var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+
+        var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
+        var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+        var className = dark ? "dark-label" : "light-label";
+        g.classed(className, true);
+
+        writer.write(value, measurement.width, measurement.height, {
+          selection: g,
+          xAlign: "center",
+          yAlign: "center",
+          textRotation: 0
+        });
+      });
+    }
+
+    private _center() {
+      return { x: this.width() / 2, y: this.height() / 2 };
     }
   }
 }

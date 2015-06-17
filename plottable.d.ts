@@ -2509,12 +2509,26 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            /**
+             * Get whether slice labels are enabled.
+             *
+             * @returns {boolean} Whether slices should display labels or not.
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelsEnabled(enabled: boolean): Pie;
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
             };
+            protected _additionalPaint(time: number): void;
         }
     }
 }

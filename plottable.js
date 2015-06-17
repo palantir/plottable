@@ -6292,6 +6292,7 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.addClass("pie-plot");
@@ -6366,6 +6367,16 @@ var Plottable;
                 this.render();
                 return this;
             };
+            Pie.prototype.labelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
@@ -6415,6 +6426,50 @@ var Plottable;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Pie.prototype._additionalPaint = function (time) {
+                var _this = this;
+                if (this._labelsEnabled) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Pie.prototype._drawLabels = function () {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                this.entities().forEach(function (entity) {
+                    var value = "" + _this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
+                    var measurement = measurer.measure(value);
+                    var center = _this._center();
+                    var theta = (_this._endAngles[entity.index] + _this._startAngles[entity.index]) / 2;
+                    var outerRadius = _this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (_this.outerRadius().scale) {
+                        outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = _this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (_this.innerRadius().scale) {
+                        innerRadius = _this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var labelRadius = (outerRadius + innerRadius) / 2;
+                    var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                    var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var className = dark ? "dark-label" : "light-label";
+                    g.classed(className, true);
+                    writer.write(value, measurement.width, measurement.height, {
+                        selection: g,
+                        xAlign: "center",
+                        yAlign: "center",
+                        textRotation: 0
+                    });
+                });
+            };
+            Pie.prototype._center = function () {
+                return { x: this.width() / 2, y: this.height() / 2 };
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
