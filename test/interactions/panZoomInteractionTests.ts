@@ -133,6 +133,27 @@ describe("Interactions", () => {
       svg.remove();
     });
 
+    it("mousewheeling a certain amount will magnify multiple scales correctly", () => {
+      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+      // https://github.com/ariya/phantomjs/issues/11289
+      if ( window.PHANTOMJS ) {
+        svg.remove();
+        return;
+      }
+      var xScale2 = new Plottable.Scales.Linear();
+      xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+      panZoomInteraction.addXScale(xScale2);
+
+      var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      var deltaY = 500;
+
+      TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+
+      assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+      assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale2 zooms to the correct domain via scroll");
+      svg.remove();
+    });
+
     it("pinching a certain amount will magnify the scale correctly", () => {
       // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
       // https://github.com/ariya/phantomjs/issues/11289
@@ -150,6 +171,29 @@ describe("Interactions", () => {
       TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
       assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
       assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
+      svg.remove();
+    });
+
+    it("pinching a certain amount will magnify multiple scales correctly", () => {
+      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+      // https://github.com/ariya/phantomjs/issues/11289
+      if ( window.PHANTOMJS ) {
+        svg.remove();
+        return;
+      }
+
+      var xScale2 = new Plottable.Scales.Linear();
+      xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+      panZoomInteraction.addXScale(xScale2);
+      var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+
+      var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+      TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+      TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+      assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+      assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale2 transforms to the correct domain via pinch");
       svg.remove();
     });
 
