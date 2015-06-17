@@ -7141,6 +7141,13 @@ var Plottable;
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
+                var improvedBBox = {
+                    x: 0,
+                    y: 0,
+                    height: 0,
+                    width: 0
+                };
+                console.log(barBBox, improvedBBox);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
