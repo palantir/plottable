@@ -775,8 +775,18 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
+            /**
+             * To be used in the first line of a deprecated method
+             *
+             * @param {string} version The version when the tagged method became obsolete
+             */
             function deprecated(version) {
-                var callingMethod = Error().stack.split('\n')[3].trim().split(' ')[1];
+                var callingMethod = "";
+                try {
+                    callingMethod = (new Error).stack.split('\n').filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/at/); })[0];
+                }
+                catch (err) {
+                }
                 Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes.");
             }
             Window.deprecated = deprecated;

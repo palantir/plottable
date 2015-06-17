@@ -329,6 +329,11 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * To be used in the first line of a deprecated method
+             *
+             * @param {string} version The version when the tagged method became obsolete
+             */
             function deprecated(version: string): void;
         }
     }

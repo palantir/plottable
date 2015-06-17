@@ -41,8 +41,25 @@ export module Utils {
       }
     }
 
+    /**
+     * To be used in the first line of a deprecated method
+     *
+     * @param {string} version The version when the tagged method became obsolete
+     */
     export function deprecated(version: string) {
-      var callingMethod = (<any>Error()).stack.split('\n')[3].trim().split(' ')[1];
+
+      var callingMethod = "";
+
+      try {
+        callingMethod = (<any> new Error).stack
+          .split('\n')
+          .filter((step: string) => step.match(/http/))[1]
+          .trim()
+          .split(/\s|@/)
+          .filter((keyword: string) => !keyword.match(/at/))[0];
+      } catch (err) {
+      }
+
       Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
         ". Please refer to the release notes.")
     }
