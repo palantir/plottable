@@ -786,7 +786,7 @@ var Plottable;
                     callingMethod = (new Error).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/at/); })[0];
                 }
                 catch (err) {
-                    callingMethod = "";
+                    callingMethod = "called";
                 }
                 Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes.");
             }
