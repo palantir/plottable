@@ -2482,6 +2482,7 @@ var Plottable;
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         function Drawer(dataset) {
+            this._cachedSelectionValid = false;
             this._dataset = dataset;
         }
         Drawer.prototype.renderArea = function (area) {
@@ -2489,6 +2490,7 @@ var Plottable;
                 return this._renderArea;
             }
             this._renderArea = area;
+            this._cachedSelectionValid = false;
             return this;
         };
         /**
@@ -2571,6 +2573,7 @@ var Plottable;
                 };
             });
             this._bindSelectionData(data);
+            this._cachedSelectionValid = false;
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
@@ -2579,7 +2582,11 @@ var Plottable;
             return this;
         };
         Drawer.prototype.selection = function () {
-            return this.renderArea().selectAll(this.selector());
+            if (!this._cachedSelectionValid) {
+                this._cachedSelection = this.renderArea().selectAll(this.selector());
+                this._cachedSelectionValid = true;
+            }
+            return this._cachedSelection;
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.

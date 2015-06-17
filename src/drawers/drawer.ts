@@ -28,6 +28,9 @@ export class Drawer {
   protected _className: string;
   private _dataset: Dataset;
 
+  private _cachedSelectionValid = false;
+  private _cachedSelection: d3.Selection<any>;
+
   /**
    * A Drawer draws svg elements based on the input Dataset.
    *
@@ -54,6 +57,7 @@ export class Drawer {
       return this._renderArea;
     }
     this._renderArea = area;
+    this._cachedSelectionValid = false;
     return this;
   }
 
@@ -145,6 +149,7 @@ export class Drawer {
     });
 
     this._bindSelectionData(data);
+    this._cachedSelectionValid = false;
 
     var delay = 0;
     appliedDrawSteps.forEach((drawStep, i) => {
@@ -156,7 +161,11 @@ export class Drawer {
   }
 
   public selection() {
-    return this.renderArea().selectAll(this.selector());
+    if (!this._cachedSelectionValid) {
+      this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionValid = true;
+    }
+    return this._cachedSelection;
   }
 
   /**
