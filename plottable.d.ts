@@ -2428,6 +2428,7 @@ declare module Plottable {
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
         protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+        protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
@@ -2755,6 +2756,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2844,6 +2846,7 @@ declare module Plottable {
              */
             entityNearest(queryPoint: Point): PlotEntity;
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             /**
              * Gets the Entities at a particular Point.
              *

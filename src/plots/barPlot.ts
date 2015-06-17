@@ -308,6 +308,24 @@ export module Plots {
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 
+    protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+
+      var attrToProjector = this._generateAttrToProjector();
+      var width = attrToProjector["width"](datum, index, dataset);
+      var height = attrToProjector["height"](datum, index, dataset);
+
+      var barBBox = {
+        x: pixelPoint.x - width / 2,
+        y: pixelPoint.y,
+        width: width,
+        height: height
+      }
+
+      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
+    }
+
     /**
      * Gets the Entities at a particular Point.
      *

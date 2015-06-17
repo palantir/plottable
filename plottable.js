@@ -6287,13 +6287,11 @@ var Plottable;
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
             var closestDistanceSquared = Infinity;
-            // var closest: LightweightPlotEntity;
             var closest;
-            // var entities = this._lightweightEntities();
-            var entities = this.entities();
+            var entities = this._lightweightEntities();
             entities.forEach(function (entity) {
-                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-                    // if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
+                console.log(entity);
+                if (!_this._visibleOnPlot(entity.datum, entity.position, null)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -6302,10 +6300,13 @@ var Plottable;
                     closest = entity;
                 }
             });
-            // closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
+            closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
             return closest;
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+            return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
+        };
+        Plot.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -6995,6 +6996,18 @@ var Plottable;
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
+            Scatter.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var diameter = this.size().accessor(datum, index, dataset);
+                var translatedBbox = {
+                    x: pixelPoint.x - diameter,
+                    y: pixelPoint.y - diameter,
+                    width: diameter,
+                    height: diameter
+                };
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
+            };
             Scatter.prototype._propertyProjectors = function () {
                 var propertyToProjectors = _super.prototype._propertyProjectors.call(this);
                 var xProjector = Plottable.Plot._scaledAccessor(this.x());
@@ -7231,6 +7244,20 @@ var Plottable;
                 var attrToProjector = this._generateAttrToProjector();
                 var width = attrToProjector["width"](datum, null, null);
                 var height = attrToProjector["height"](datum, null, null);
+                var barBBox = {
+                    x: pixelPoint.x - width / 2,
+                    y: pixelPoint.y,
+                    width: width,
+                    height: height
+                };
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
+            };
+            Bar.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var attrToProjector = this._generateAttrToProjector();
+                var width = attrToProjector["width"](datum, index, dataset);
+                var height = attrToProjector["height"](datum, index, dataset);
                 var barBBox = {
                     x: pixelPoint.x - width / 2,
                     y: pixelPoint.y,

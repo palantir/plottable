@@ -503,13 +503,11 @@ export class Plot extends Component {
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
-    // var closest: LightweightPlotEntity;
-    var closest: Plots.PlotEntity;
-    // var entities = this._lightweightEntities();
-    var entities = this.entities();
+    var closest: LightweightPlotEntity;
+    var entities = this._lightweightEntities();
     entities.forEach((entity) => {
-      if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-      // if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
+      console.log(entity);
+      if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
         return;
       }
 
@@ -520,12 +518,17 @@ export class Plot extends Component {
       }
     });
 
-    // closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
+    closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
 
     return closest;
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+      pixelPoint.x > this.width() || pixelPoint.y > this.height());
+  }
+
+  protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

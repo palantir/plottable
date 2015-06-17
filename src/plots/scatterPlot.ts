@@ -108,6 +108,21 @@ export module Plots {
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
+    protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+
+      var diameter = this.size().accessor(datum, index, dataset);
+      var translatedBbox: SVGRect = {
+        x: pixelPoint.x - diameter,
+        y: pixelPoint.y - diameter,
+        width: diameter,
+        height: diameter
+      };
+
+      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       var propertyToProjectors = super._propertyProjectors();
 
