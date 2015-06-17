@@ -7016,6 +7016,7 @@ var Plottable;
                 this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
+                this._barPixelWidth = 0;
                 this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -7023,9 +7024,10 @@ var Plottable;
                 this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
                 this.animator("baseline", new Plottable.Animators.Null());
                 this.attr("fill", new Plottable.Scales.Color().range()[0]);
-                this.attr("width", function () { return _this._getBarPixelWidth(); });
+                this.attr("width", function () { return _this._barPixelWidth; });
                 this._labelConfig = new Plottable.Utils.Map();
                 this._baselineValueProvider = function () { return [_this.baselineValue()]; };
+                this._updateBarPixelWidthCallback = function () { return _this._updateBarPixelWidth(); };
             }
             Bar.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -7036,6 +7038,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.x.call(this, x, xScale);
+                    xScale.onUpdate(this._updateBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -7049,6 +7052,7 @@ var Plottable;
                 }
                 else {
                     _super.prototype.y.call(this, y, yScale);
+                    yScale.onUpdate(this._updateBarPixelWidthCallback);
                 }
                 this._updateValueScale();
                 return this;
@@ -7060,6 +7064,11 @@ var Plottable;
              */
             Bar.prototype.orientation = function () {
                 return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+            };
+            Bar.prototype.render = function () {
+                _super.prototype.render.call(this);
+                this._updateBarPixelWidth();
+                return this;
             };
             Bar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Rectangle(dataset);
@@ -7088,6 +7097,18 @@ var Plottable;
                 this._baselineValue = value;
                 this._updateValueScale();
                 this.render();
+                return this;
+            };
+            Bar.prototype.addDataset = function (dataset) {
+                dataset.onUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype.addDataset.call(this, dataset);
+                this._updateBarPixelWidth();
+                return this;
+            };
+            Bar.prototype.removeDataset = function (dataset) {
+                dataset.offUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype.removeDataset.call(this, dataset);
+                this._updateBarPixelWidth();
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
@@ -7381,12 +7402,12 @@ var Plottable;
                         return dataset.data().map(function (d, i) { return barAccessor(d, i, dataset); }).filter(function (d) { return d != null; }).map(function (d) { return d.valueOf(); });
                     }))).values().map(function (value) { return +value; });
                     numberBarAccessorData.sort(function (a, b) { return a - b; });
-                    var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+                    var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
+                    var barAccessorDataPairs = d3.pairs(scaledData);
                     var barWidthDimension = this._isVertical ? this.width() : this.height();
                     barPixelWidth = Plottable.Utils.Math.min(barAccessorDataPairs, function (pair, i) {
-                        return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+                        return Math.abs(pair[1] - pair[0]);
                     }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
-                    var scaledData = numberBarAccessorData.map(function (datum) { return barScale.scale(datum); });
                     var minScaledDatum = Plottable.Utils.Math.min(scaledData, 0);
                     if (minScaledDatum > 0) {
                         barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
@@ -7399,6 +7420,9 @@ var Plottable;
                     barPixelWidth *= Bar._BAR_WIDTH_RATIO;
                 }
                 return barPixelWidth;
+            };
+            Bar.prototype._updateBarPixelWidth = function () {
+                this._barPixelWidth = this._getBarPixelWidth();
             };
             Bar.prototype.entities = function (datasets) {
                 var _this = this;
@@ -7435,6 +7459,10 @@ var Plottable;
                 var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
                 var y = this._isVertical ? rectY : rectY + rectHeight / 2;
                 return { x: x, y: y };
+            };
+            Bar.prototype._uninstallScaleForKey = function (scale, key) {
+                scale.offUpdate(this._updateBarPixelWidthCallback);
+                _super.prototype._uninstallScaleForKey.call(this, scale, key);
             };
             Bar.prototype._getDataToDraw = function () {
                 var dataToDraw = new Plottable.Utils.Map();

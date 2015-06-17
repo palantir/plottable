@@ -4635,14 +4635,14 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4683,14 +4683,14 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar width takes an appropriate value", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4702,20 +4702,20 @@ describe("Plots", function () {
             it("sensible bar width one datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]));
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
                 svg.remove();
             });
         });
@@ -4735,7 +4735,7 @@ describe("Plots", function () {
             it("bar width takes an appropriate value", function () {
                 var timeFormatter = d3.time.format("%m/%d/%y");
                 var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarWidth, 0.1, "width is difference between two dates");
                 svg.remove();
             });
         });
