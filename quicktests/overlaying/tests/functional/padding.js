@@ -51,8 +51,6 @@ function run(svg, data, Plottable) {
     xScale.removePaddingExceptionsProvider(negVal);
   }  
 
-
-
   var addBig  = new Plottable.Components.Label("include big number", 0);
   var removeBig  = new Plottable.Components.Label("remove big number", 0);
   var addNeg  = new Plottable.Components.Label("include neg number", 0);
@@ -76,15 +74,12 @@ function run(svg, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-
   new Plottable.Interactions.Click().onClick(addBigVal).attachTo(addBig);
   new Plottable.Interactions.Click().onClick(removeBigVal).attachTo(removeBig);
   new Plottable.Interactions.Click().onClick(addNegVal).attachTo(addNeg);
   new Plottable.Interactions.Click().onClick(removeNegVal).attachTo(removeNeg);
   new Plottable.Interactions.Click().onClick(padExceptionBig).attachTo(addPadExceptionBig);
-   new Plottable.Interactions.Click().onClick(padExceptionNeg).attachTo(addPadExceptionNeg);
+  new Plottable.Interactions.Click().onClick(padExceptionNeg).attachTo(addPadExceptionNeg);
   new Plottable.Interactions.Click().onClick(removePadExpBig).attachTo(removePadExceptionBig);
   new Plottable.Interactions.Click().onClick(removePadExpNeg).attachTo(removePadExceptionNeg);
-
-
 }

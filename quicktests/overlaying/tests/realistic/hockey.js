@@ -1,6 +1,5 @@
 function makeData() {
   "use strict";
-
 }
 
 function run(svg, data, Plottable) {
@@ -77,7 +76,6 @@ function run(svg, data, Plottable) {
   var linePlotHigh = new Plottable.Plots.Line(xScale, yScale);
   linePlotHigh.addDataset(new Plottable.Dataset([{x: 0, y: 0}, {x: 33.14, y: 80}]));
   styleLinePlot(linePlotHigh);
-
 
   var mergedPlots = new Plottable.Components.Group([linePlot20, linePlot40,
                                                     linePlot60, linePlotMed,

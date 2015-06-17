@@ -1,5 +1,3 @@
-
-
 function makeData() {
   "use strict";
   var d = [{
@@ -89,7 +87,6 @@ function run(svg, data, Plottable){
   var legend1 = new Plottable.Components.Legend(csType1).xAlignment("left");
   var legend2 = new Plottable.Components.Legend(csType2).xAlignment("left");
   var legend3 = new Plottable.Components.Legend(csType3).xAlignment("left");
- 
 
   var innerPie = new Plottable.Plots.Pie();
   innerPie.addDataset(dataset);

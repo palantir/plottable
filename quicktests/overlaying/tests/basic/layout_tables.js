@@ -34,7 +34,6 @@ function run(svg, data, Plottable) {
                                       .attr( "fill", d3.functor("red"));
     renderAreaD3.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
 
-
     //test merge:
     //empty component + empty component
 
@@ -42,7 +41,6 @@ function run(svg, data, Plottable) {
 
     //empty component + XYRenderer
     var basicTable1 = new Plottable.Components.Table().add(renderAreaD0, 0, 1);
-
 
     //XYRenderer + empty component
     var basicTable2 = new Plottable.Components.Table().add(yAxis2, 0, 0)
@@ -65,6 +63,4 @@ function run(svg, data, Plottable) {
                                           .add(line1, 1, 1)
                                           .add(line2, 2, 1);
     bigtable.renderTo(svg);
-
-
 }

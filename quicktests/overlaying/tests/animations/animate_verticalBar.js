@@ -9,7 +9,6 @@ function run(svg, data, Plottable) {
 
   var doAnimate = true;
 
-
   var xScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
