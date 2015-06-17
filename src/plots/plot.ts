@@ -503,12 +503,15 @@ export class Plot extends Component {
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
-    var closest: LightweightPlotEntity;
-    var entities = this._lightweightEntities();
+    // var closest: LightweightPlotEntity;
+    var closest: Plots.PlotEntity;
+    // var entities = this._lightweightEntities();
+    var entities = this.entities();
     entities.forEach((entity) => {
-      // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-      //   return;
-      // }
+      if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+      // if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
+        return;
+      }
 
       var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
@@ -517,7 +520,7 @@ export class Plot extends Component {
       }
     });
 
-    closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
+    // closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
 
     return closest;
   }

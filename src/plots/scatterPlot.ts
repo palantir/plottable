@@ -97,13 +97,12 @@ export module Plots {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
-      var translation = d3.transform(selection.attr("transform")).translate;
-      var bbox = Utils.DOM.elementBBox(selection);
+      var diameter = this.size().accessor(datum, null, null);
       var translatedBbox: SVGRect = {
-        x: bbox.x + translation[0],
-        y: bbox.y + translation[1],
-        width: bbox.width,
-        height: bbox.height
+        x: pixelPoint.x - diameter,
+        y: pixelPoint.y - diameter,
+        width: diameter,
+        height: diameter
       };
 
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);

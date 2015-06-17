@@ -6248,20 +6248,24 @@ var Plottable;
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint) {
+            var _this = this;
             var closestDistanceSquared = Infinity;
+            // var closest: LightweightPlotEntity;
             var closest;
-            var entities = this._lightweightEntities();
+            // var entities = this._lightweightEntities();
+            var entities = this.entities();
             entities.forEach(function (entity) {
-                // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-                //   return;
-                // }
+                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    // if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
+                    return;
+                }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
                 if (distanceSquared < closestDistanceSquared) {
                     closestDistanceSquared = distanceSquared;
                     closest = entity;
                 }
             });
-            closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
+            // closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
             return closest;
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
@@ -6915,13 +6919,12 @@ var Plottable;
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var translation = d3.transform(selection.attr("transform")).translate;
-                var bbox = Plottable.Utils.DOM.elementBBox(selection);
+                var diameter = this.size().accessor(datum, null, null);
                 var translatedBbox = {
-                    x: bbox.x + translation[0],
-                    y: bbox.y + translation[1],
-                    width: bbox.width,
-                    height: bbox.height
+                    x: pixelPoint.x - diameter,
+                    y: pixelPoint.y - diameter,
+                    width: diameter,
+                    height: diameter
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
