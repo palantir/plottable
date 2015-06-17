@@ -6205,6 +6205,16 @@ var Plottable;
          * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
+            if (datasets === void 0) { datasets = this.datasets(); }
+            var entities = this._lightweightEntities(datasets);
+            entities.forEach(function (entity) {
+                entity.selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+                delete (entity.drawer);
+                delete (entity.validDatumIndex);
+            });
+            return entities;
+        };
+        Plot.prototype._lightweightEntities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
             var entities = [];
@@ -6221,7 +6231,8 @@ var Plottable;
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: drawer.selectionForIndex(validDatumIndex),
+                        drawer: drawer,
+                        validDatumIndex: validDatumIndex,
                         component: _this
                     });
                     validDatumIndex++;
@@ -6236,20 +6247,20 @@ var Plottable;
          * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
          */
         Plot.prototype.entityNearest = function (queryPoint) {
-            var _this = this;
             var closestDistanceSquared = Infinity;
             var closest;
-            var entities = this.entities();
+            var entities = this._lightweightEntities(this.datasets());
             entities.forEach(function (entity) {
-                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-                    return;
-                }
+                // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                //   return;
+                // }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
                 if (distanceSquared < closestDistanceSquared) {
                     closestDistanceSquared = distanceSquared;
                     closest = entity;
                 }
             });
+            closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
             return closest;
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {

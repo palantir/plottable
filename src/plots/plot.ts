@@ -451,6 +451,19 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
+
+    var entities = this._lightweightEntities(datasets);
+
+    entities.forEach((entity) => {
+      entity.selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
+      delete(entity.drawer);
+      delete(entity.validDatumIndex);
+    });
+
+    return entities;
+  }
+
+  private _lightweightEntities(datasets = this.datasets()) {
     var entities: Plots.PlotEntity[] = [];
     datasets.forEach((dataset) => {
       var drawer = this._datasetToDrawer.get(dataset);
@@ -466,7 +479,8 @@ export class Plot extends Component {
           index: datasetIndex,
           dataset: dataset,
           position: position,
-          selection: drawer.selectionForIndex(validDatumIndex),
+          drawer: drawer,
+          validDatumIndex: validDatumIndex,
           component: this
         });
         validDatumIndex++;
@@ -484,11 +498,11 @@ export class Plot extends Component {
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
     var closest: Plots.PlotEntity;
-    var entities = this.entities();
+    var entities = this._lightweightEntities();
     entities.forEach((entity) => {
-      if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
-        return;
-      }
+      // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+      //   return;
+      // }
 
       var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
@@ -496,6 +510,8 @@ export class Plot extends Component {
         closest = entity;
       }
     });
+
+    closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
 
     return closest;
   }
