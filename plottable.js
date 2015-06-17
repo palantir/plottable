@@ -6442,7 +6442,6 @@ var Plottable;
                 this.entities().forEach(function (entity) {
                     var value = "" + _this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
                     var measurement = measurer.measure(value);
-                    var center = _this._center();
                     var theta = (_this._endAngles[entity.index] + _this._startAngles[entity.index]) / 2;
                     var outerRadius = _this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
                     if (_this.outerRadius().scale) {

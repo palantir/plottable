@@ -249,7 +249,6 @@ export module Plots {
         var value = "" + this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
         var measurement = measurer.measure(value);
 
-        var center = this._center();
         var theta = (this._endAngles[entity.index] + this._startAngles[entity.index]) / 2;
         var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
         if (this.outerRadius().scale) {
