@@ -20,6 +20,11 @@ export module Plots {
   }
 }
 
+interface LightweightPlotEntity extends Plots.PlotEntity {
+  drawer: Plottable.Drawer;
+  validDatumIndex: number;
+}
+
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
@@ -464,7 +469,7 @@ export class Plot extends Component {
   }
 
   private _lightweightEntities(datasets = this.datasets()) {
-    var entities: Plots.PlotEntity[] = [];
+    var entities: LightweightPlotEntity[] = [];
     datasets.forEach((dataset) => {
       var drawer = this._datasetToDrawer.get(dataset);
       var validDatumIndex = 0;
@@ -481,6 +486,7 @@ export class Plot extends Component {
           position: position,
           drawer: drawer,
           validDatumIndex: validDatumIndex,
+          selection: null,
           component: this
         });
         validDatumIndex++;
@@ -497,7 +503,7 @@ export class Plot extends Component {
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
-    var closest: Plots.PlotEntity;
+    var closest: LightweightPlotEntity;
     var entities = this._lightweightEntities();
     entities.forEach((entity) => {
       // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {

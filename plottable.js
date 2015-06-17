@@ -6233,6 +6233,7 @@ var Plottable;
                         position: position,
                         drawer: drawer,
                         validDatumIndex: validDatumIndex,
+                        selection: null,
                         component: _this
                     });
                     validDatumIndex++;
@@ -6249,7 +6250,7 @@ var Plottable;
         Plot.prototype.entityNearest = function (queryPoint) {
             var closestDistanceSquared = Infinity;
             var closest;
-            var entities = this._lightweightEntities(this.datasets());
+            var entities = this._lightweightEntities();
             entities.forEach(function (entity) {
                 // if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                 //   return;
