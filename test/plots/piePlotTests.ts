@@ -165,6 +165,34 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("retrieves entities under a point with entitiesAt()", () => {
+        var click1 = { x: 300, y: 200 };
+        var entity1 = piePlot.entitiesAt(click1);
+        TestMethods.assertPlotEntitiesEqual(entity1[0], piePlot.entities()[0], "entities are equal");
+        var click2 = { x: 200, y: 300 };
+        var entity2 = piePlot.entitiesAt(click2);
+        TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
+        var click3 = { x: 0, y: 0 };
+        var entity3 = piePlot.entitiesAt(click3);
+        assert.strictEqual(entity3.length, 0, "no entities returned");
+        svg.remove();
+      });
+
+      it("points within innerRadius() and outside of outerRadius() don't return entities", () => {
+        piePlot.innerRadius(100).render();
+        var click1 = { x: 200, y: 201 };
+        var entity1 = piePlot.entitiesAt(click1);
+        assert.strictEqual(entity1.length, 0, "no entities returned");
+        piePlot.outerRadius(150).render();
+        var click2 = { x: 200, y: 350 };
+        var entity2 = piePlot.entitiesAt(click2);
+        TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
+        var click3 = { x: 200, y: 399 };
+        var entity3 = piePlot.entitiesAt(click3);
+        assert.strictEqual(entity3.length, 0, "no entities returned");
+        svg.remove();
+      });
+
     });
 
     describe("Fill", () => {

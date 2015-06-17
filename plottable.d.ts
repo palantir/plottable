@@ -2510,6 +2510,13 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @param {PlotEntity[]}
+             */
+            entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {

@@ -6403,6 +6403,36 @@ var Plottable;
                 this.render();
                 return this;
             };
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @param {PlotEntity[]}
+             */
+            Pie.prototype.entitiesAt = function (queryPoint) {
+                var center = { x: this.width() / 2, y: this.height() / 2 };
+                var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
+                var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
+                var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
+                if (adjustedQueryPoint.x < 0) {
+                    angle = Math.PI * 2 - angle;
+                }
+                for (var i = 0; i < this.entities().length; i++) {
+                    var entity = this.entities()[i];
+                    var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (this.innerRadius().scale) {
+                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
+                    if (this.outerRadius().scale) {
+                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                    }
+                    if (this._startAngles[i] <= angle && this._endAngles[i] > angle && innerRadius < radius && outerRadius > radius) {
+                        return [this.entities()[i]];
+                    }
+                }
+                return [];
+            };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
