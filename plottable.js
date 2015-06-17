@@ -6367,10 +6367,10 @@ var Plottable;
                 return this;
             };
             /**
-             * Returns the PlotEntity at the query point.
+             * Gets the Entities at a particular Point.
              *
-             * @param {Point} queryPoint
-             * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found.
+             * @param {Point} p
+             * @param {PlotEntity[]}
              */
             Pie.prototype.entitiesAt = function (queryPoint) {
                 var center = { x: this.width() / 2, y: this.height() / 2 };

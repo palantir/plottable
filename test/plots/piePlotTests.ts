@@ -165,7 +165,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("entityAt with defaults", () => {
+      it("retrieves entities under a point with entitiesAt()", () => {
         var click1 = { x: 300, y: 200 };
         var entity1 = piePlot.entitiesAt(click1);
         TestMethods.assertPlotEntitiesEqual(entity1[0], piePlot.entities()[0], "entities are equal");
@@ -178,7 +178,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("entityAt with radius modifications", () => {
+      it("points within innerRadius() and outside of outerRadius() don't return entities", () => {
         piePlot.innerRadius(100).render();
         var click1 = { x: 250, y: 250 };
         var entity1 = piePlot.entitiesAt(click1);

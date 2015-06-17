@@ -3845,7 +3845,7 @@ describe("Plots", function () {
                 assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
                 svg.remove();
             });
-            it("entityAt with defaults", function () {
+            it("retrieves entities under a point with entitiesAt()", function () {
                 var click1 = { x: 300, y: 200 };
                 var entity1 = piePlot.entitiesAt(click1);
                 TestMethods.assertPlotEntitiesEqual(entity1[0], piePlot.entities()[0], "entities are equal");
@@ -3857,7 +3857,7 @@ describe("Plots", function () {
                 assert.strictEqual(entity3.length, 0, "no entities returned");
                 svg.remove();
             });
-            it("entityAt with radius modifications", function () {
+            it("points within innerRadius() and outside of outerRadius() don't return entities", function () {
                 piePlot.innerRadius(100).render();
                 var click1 = { x: 250, y: 250 };
                 var entity1 = piePlot.entitiesAt(click1);

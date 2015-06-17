@@ -2510,10 +2510,10 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             /**
-             * Returns the PlotEntity at the query point.
+             * Gets the Entities at a particular Point.
              *
-             * @param {Point} queryPoint
-             * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found.
+             * @param {Point} p
+             * @param {PlotEntity[]}
              */
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;

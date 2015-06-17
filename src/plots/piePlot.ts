@@ -158,12 +158,12 @@ export module Plots {
     }
 
     /**
-     * Returns the PlotEntity at the query point.
+     * Gets the Entities at a particular Point.
      * 
-     * @param {Point} queryPoint
-     * @param {PlotEntity} The PlotEntity at the point, or null if no PlotEntity can be found. 
+     * @param {Point} p
+     * @param {PlotEntity[]} 
      */
-    public entitiesAt(queryPoint: Point): PlotEntity[] {
+    public entitiesAt(queryPoint: Point) {
       var center = { x: this.width() / 2, y: this.height() / 2 };
       var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
       var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
