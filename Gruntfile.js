@@ -205,6 +205,12 @@ module.exports = function(grunt) {
         jshintrc: '.jshintrc'
       }
     },
+    jscs: {
+      files: ['Gruntfile.js', 'quicktests/**/*.js'],
+      options: {
+        config: '.jscsrc'
+      }
+    },
     parallelize: {
       tslint: {
         all: 4
@@ -301,7 +307,6 @@ module.exports = function(grunt) {
       }
     }
   };
-
 
   // project configuration
   grunt.initConfig(configJSON);
