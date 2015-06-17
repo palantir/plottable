@@ -66,6 +66,7 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
+            constructor();
             set(key: K, value: V): Map<K, V>;
             get(key: K): V;
             has(key: K): boolean;
@@ -2510,6 +2511,13 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            /**
+             * Gets the Entities at a particular Point.
+             *
+             * @param {Point} p
+             * @param {PlotEntity[]}
+             */
+            entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
@@ -2778,6 +2786,7 @@ declare module Plottable {
              * @return "vertical" | "horizontal"
              */
             orientation(): string;
+            render(): Bar<X, Y>;
             protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
@@ -2795,6 +2804,8 @@ declare module Plottable {
              * @returns {Bar} The calling Bar Plot.
              */
             baselineValue(value: X | Y): Bar<X, Y>;
+            addDataset(dataset: Dataset): Bar<X, Y>;
+            removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
@@ -2874,6 +2885,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }

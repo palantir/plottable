@@ -33,7 +33,6 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-
   var colorProjector = function(d, i, dataset) {
     return dataset.metadata().name;
   };
@@ -129,13 +128,10 @@ function run(svg, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-
   new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
   new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);
   new Plottable.Interactions.Click().onClick(longTitle).attachTo(longTitleLabel);
   new Plottable.Interactions.Click().onClick(noPlots).attachTo(noPlotsLabel);
   new Plottable.Interactions.Click().onClick(twoPlots).attachTo(shortLegendLabel);
   new Plottable.Interactions.Click().onClick(sixPlots).attachTo(tallLegendLabel);
-
-
 }

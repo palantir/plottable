@@ -11,12 +11,10 @@ function run(svg, data, Plottable) {
          d.x = d.x*100000000;
     };
 
-
   var big_numbers = [];
   deep_copy(data[0], big_numbers);
   big_numbers.forEach(large_x);
   var dataseries1 = new Plottable.Dataset(big_numbers);
-
 
   //Axis
   var xScale = new Plottable.Scales.Linear();
@@ -42,7 +40,6 @@ function run(svg, data, Plottable) {
   formatChoices.xAlignment("center");
 
   bigTable.renderTo(svg);
-
 
   function identity_frmt() {
     xAxis.formatter(Plottable.Formatters.identity());

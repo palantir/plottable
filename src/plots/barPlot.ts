@@ -27,6 +27,9 @@ export module Plots {
     private _labelConfig: Utils.Map<Dataset, LabelConfig>;
     private _baselineValueProvider: () => (X|Y)[];
 
+    private _barPixelWidth = 0;
+    private _updateBarPixelWidthCallback: () => void;
+
     /**
      * A Bar Plot draws bars growing out from a baseline to some value
      *
@@ -42,9 +45,10 @@ export module Plots {
       this._isVertical = orientation === Bar.ORIENTATION_VERTICAL;
       this.animator("baseline", new Animators.Null());
       this.attr("fill", new Scales.Color().range()[0]);
-      this.attr("width", () => this._getBarPixelWidth());
+      this.attr("width", () => this._barPixelWidth);
       this._labelConfig = new Utils.Map<Dataset, LabelConfig>();
       this._baselineValueProvider = () => [this.baselineValue()];
+      this._updateBarPixelWidthCallback = () => this._updateBarPixelWidth();
     }
 
     public x(): Plots.AccessorScaleBinding<X, number>;
@@ -59,6 +63,7 @@ export module Plots {
         super.x(<number | Accessor<number>>x);
       } else {
         super.x(< X | Accessor<X>>x, xScale);
+        xScale.onUpdate(this._updateBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -77,6 +82,7 @@ export module Plots {
         super.y(<number | Accessor<number>>y);
       } else {
         super.y(<Y | Accessor<Y>>y, yScale);
+        yScale.onUpdate(this._updateBarPixelWidthCallback);
       }
 
       this._updateValueScale();
@@ -90,6 +96,12 @@ export module Plots {
      */
     public orientation() {
       return this._isVertical ? Bar.ORIENTATION_VERTICAL : Bar.ORIENTATION_HORIZONTAL;
+    }
+
+    public render() {
+      super.render();
+      this._updateBarPixelWidth();
+      return this;
     }
 
     protected _createDrawer(dataset: Dataset) {
@@ -138,6 +150,20 @@ export module Plots {
       this._baselineValue = value;
       this._updateValueScale();
       this.render();
+      return this;
+    }
+
+    public addDataset(dataset: Dataset) {
+      dataset.onUpdate(this._updateBarPixelWidthCallback);
+      super.addDataset(dataset);
+      this._updateBarPixelWidth();
+      return this;
+    }
+
+    public removeDataset(dataset: Dataset) {
+      dataset.offUpdate(this._updateBarPixelWidthCallback);
+      super.removeDataset(dataset);
+      this._updateBarPixelWidth();
       return this;
     }
 
@@ -505,14 +531,14 @@ export module Plots {
 
         numberBarAccessorData.sort((a, b) => a - b);
 
-        var barAccessorDataPairs = d3.pairs(numberBarAccessorData);
+        var scaledData = numberBarAccessorData.map((datum) => barScale.scale(datum));
+        var barAccessorDataPairs = d3.pairs(scaledData);
         var barWidthDimension = this._isVertical ? this.width() : this.height();
 
         barPixelWidth = Utils.Math.min(barAccessorDataPairs, (pair: any[], i: number) => {
-          return Math.abs(barScale.scale(pair[1]) - barScale.scale(pair[0]));
+          return Math.abs(pair[1] - pair[0]);
         }, barWidthDimension * Bar._SINGLE_BAR_DIMENSION_RATIO);
 
-        var scaledData = numberBarAccessorData.map((datum: number) => barScale.scale(datum));
         var minScaledDatum = Utils.Math.min(scaledData, 0);
         if (minScaledDatum > 0) {
           barPixelWidth = Math.min(barPixelWidth, minScaledDatum * 2);
@@ -526,6 +552,10 @@ export module Plots {
         barPixelWidth *= Bar._BAR_WIDTH_RATIO;
       }
       return barPixelWidth;
+    }
+
+    private _updateBarPixelWidth() {
+      this._barPixelWidth = this._getBarPixelWidth();
     }
 
     public entities(datasets = this.datasets()): PlotEntity[] {
@@ -561,6 +591,11 @@ export module Plots {
       var x = this._isVertical ? rectX + rectWidth / 2 : rectX + rectWidth;
       var y = this._isVertical ? rectY : rectY + rectHeight / 2;
       return { x: x, y: y };
+    }
+
+    protected _uninstallScaleForKey(scale: Scale<any, number>, key: string) {
+      scale.offUpdate(this._updateBarPixelWidthCallback);
+      super._uninstallScaleForKey(scale, key);
     }
 
     protected _getDataToDraw() {

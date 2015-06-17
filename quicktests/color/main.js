@@ -132,7 +132,6 @@ function generatePlots(plots, dataType){
       .project("y", "y", yScale)
       .animate(true);
 
-
     if (singlePlots.indexOf(PlotType) > -1) { //if single dataset plot
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);

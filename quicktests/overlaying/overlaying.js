@@ -74,9 +74,7 @@ var svgWidth;
 var svgHeight;
 var sidebarPopulated = false;
 
-
 //METHODS
-
 
 function togglePlotDisplay(className, checkboxState){
   var classSelector = "." + className;
@@ -292,7 +290,6 @@ function filterQuickTests(category, branchList){
     }
   });
 }
-
 
 //retrieve different plottable objects then push to array
 function loadPlottableBranches(category, branchList){
