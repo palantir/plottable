@@ -523,6 +523,7 @@ export class Plot extends Component {
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    Utils.Window.deprecated("v1.1.0");
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

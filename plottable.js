@@ -775,6 +775,10 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
+            function deprecated(version) {
+                Utils.Window.warn("Method has been deprecated in version " + version + ". Please refer to the release notes.");
+            }
+            Window.deprecated = deprecated;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -6303,6 +6307,7 @@ var Plottable;
             return closest;
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+            Plottable.Utils.Window.deprecated("v1.1.0");
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
@@ -6984,6 +6989,7 @@ var Plottable;
                 return drawSteps;
             };
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+                Plottable.Utils.Window.deprecated("v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -7239,6 +7245,7 @@ var Plottable;
                 return closest;
             };
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+                Plottable.Utils.Window.deprecated("v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);

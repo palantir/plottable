@@ -291,6 +291,7 @@ export module Plots {
     }
 
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+      Utils.Window.deprecated("v1.1.0");
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
       var barBBox = Utils.DOM.elementBBox(selection);

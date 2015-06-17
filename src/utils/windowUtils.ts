@@ -41,6 +41,10 @@ export module Utils {
       }
     }
 
+    export function deprecated(version: string) {
+      Utils.Window.warn("Method has been deprecated in version " + version + ". Please refer to the release notes.")
+    }
+
   }
 }
 }
