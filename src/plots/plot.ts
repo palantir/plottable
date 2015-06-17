@@ -455,6 +455,9 @@ export class Plot extends Component {
     datasets.forEach((dataset) => {
       var drawer = this._datasetToDrawer.get(dataset);
       var validDatumIndex = 0;
+
+      var selection = drawer.selection()[0];
+
       dataset.data().forEach((datum: any, datasetIndex: number) => {
         var position = this._pixelPoint(datum, datasetIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
@@ -465,7 +468,7 @@ export class Plot extends Component {
           index: datasetIndex,
           dataset: dataset,
           position: position,
-          selection: drawer.selectionForIndex(validDatumIndex),
+          selection: d3.select(selection[validDatumIndex]),
           component: this
         });
         validDatumIndex++;
@@ -483,7 +486,8 @@ export class Plot extends Component {
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
     var closest: Plots.PlotEntity;
-    this.entities().forEach((entity) => {
+    var entities = this.entities();
+    entities.forEach((entity) => {
       if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
         return;
       }

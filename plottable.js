@@ -2505,7 +2505,7 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._bindSelectionData = function (data) {
-            var dataElements = this._selection().data(data);
+            var dataElements = this.selection().data(data);
             dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
             this._applyDefaultAttributes(dataElements);
@@ -2521,7 +2521,7 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            var selection = this._selection();
+            var selection = this.selection();
             var colorAttributes = ["fill", "stroke"];
             colorAttributes.forEach(function (colorAttribute) {
                 if (step.attrToAppliedProjector[colorAttribute] != null) {
@@ -2530,7 +2530,7 @@ var Plottable;
             });
             step.animator.animate(selection, step.attrToAppliedProjector);
             if (this._className != null) {
-                this._selection().classed(this._className, true);
+                this.selection().classed(this._className, true);
             }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
@@ -2578,7 +2578,7 @@ var Plottable;
             });
             return this;
         };
-        Drawer.prototype._selection = function () {
+        Drawer.prototype.selection = function () {
             return this.renderArea().selectAll(this.selector());
         };
         /**
@@ -2591,7 +2591,7 @@ var Plottable;
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            return d3.select(this._selection()[0][index]);
+            return d3.select(this.selection()[0][index]);
         };
         return Drawer;
     })();
@@ -6204,6 +6204,7 @@ var Plottable;
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 var validDatumIndex = 0;
+                var selection = drawer.selection()[0];
                 dataset.data().forEach(function (datum, datasetIndex) {
                     var position = _this._pixelPoint(datum, datasetIndex, dataset);
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
@@ -6214,7 +6215,7 @@ var Plottable;
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: drawer.selectionForIndex(validDatumIndex),
+                        selection: d3.select(selection[validDatumIndex]),
                         component: _this
                     });
                     validDatumIndex++;
@@ -6232,7 +6233,8 @@ var Plottable;
             var _this = this;
             var closestDistanceSquared = Infinity;
             var closest;
-            this.entities().forEach(function (entity) {
+            var entities = this.entities();
+            entities.forEach(function (entity) {
                 if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
                     return;
                 }

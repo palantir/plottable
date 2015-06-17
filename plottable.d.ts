@@ -1233,6 +1233,7 @@ declare module Plottable {
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
         draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
+        selection(): d3.Selection<any>;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
