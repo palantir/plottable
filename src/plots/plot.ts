@@ -506,8 +506,7 @@ export class Plot extends Component {
     var closest: LightweightPlotEntity;
     var entities = this._lightweightEntities();
     entities.forEach((entity) => {
-      console.log(entity);
-      if (!this._visibleOnPlot(entity.datum, entity.position, null)) {
+      if (!this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
         return;
       }
 

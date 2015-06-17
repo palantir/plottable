@@ -254,7 +254,7 @@ export module Plots {
 
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
         var primaryDist = 0;

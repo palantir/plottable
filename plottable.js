@@ -6290,8 +6290,7 @@ var Plottable;
             var closest;
             var entities = this._lightweightEntities();
             entities.forEach(function (entity) {
-                console.log(entity);
-                if (!_this._visibleOnPlot(entity.datum, entity.position, null)) {
+                if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -7206,7 +7205,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -7621,7 +7620,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);
