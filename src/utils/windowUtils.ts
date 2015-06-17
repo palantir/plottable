@@ -42,7 +42,9 @@ export module Utils {
     }
 
     export function deprecated(version: string) {
-      Utils.Window.warn("Method has been deprecated in version " + version + ". Please refer to the release notes.")
+      var callingMethod = (<any>Error()).stack.split('\n')[3].trim().split(' ')[1];
+      Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
+        ". Please refer to the release notes.")
     }
 
   }

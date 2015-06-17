@@ -776,7 +776,8 @@ var Plottable;
             }
             Window.setTimeout = setTimeout;
             function deprecated(version) {
-                Utils.Window.warn("Method has been deprecated in version " + version + ". Please refer to the release notes.");
+                var callingMethod = Error().stack.split('\n')[3].trim().split(' ')[1];
+                Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes.");
             }
             Window.deprecated = deprecated;
         })(Window = Utils.Window || (Utils.Window = {}));
