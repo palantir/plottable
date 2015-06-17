@@ -16,7 +16,7 @@ export module Drawers {
     }
 
     public selectionForIndex(index: number) {
-      return this.renderArea().select(this.selector());
+      return d3.select(this.selection()[0][0]);
     }
   }
 }

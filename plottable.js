@@ -2628,7 +2628,7 @@ var Plottable;
                 selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
-                return this.renderArea().select(this.selector());
+                return d3.select(this.selection()[0][0]);
             };
             return Line;
         })(Plottable.Drawer);
@@ -2659,7 +2659,7 @@ var Plottable;
                 selection.style("stroke", "none");
             };
             Area.prototype.selectionForIndex = function (index) {
-                return this.renderArea().select(this.selector());
+                return d3.select(this.selection()[0][0]);
             };
             return Area;
         })(Plottable.Drawer);
