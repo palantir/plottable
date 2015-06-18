@@ -8732,7 +8732,9 @@ describe("Utils.Window", function () {
         var oldWarn = Plottable.Utils.Window.warn;
         Plottable.Utils.Window.warn = function (msg) {
             warningTriggered = true;
-            assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
+            if (!TestMethods.isIE()) {
+                assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
+            }
         };
         var reallyOutdatedCallerMethod = function () { return Plottable.Utils.Window.deprecated("v0.1.2"); };
         reallyOutdatedCallerMethod();
