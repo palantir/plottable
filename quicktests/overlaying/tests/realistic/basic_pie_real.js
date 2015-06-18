@@ -70,6 +70,5 @@ function run(svg, data, Plottable) {
       [allPlots]
   ]);
 
-
   chart.renderTo(svg);
 }

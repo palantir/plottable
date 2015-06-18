@@ -32,7 +32,6 @@ function run(svg, data, Plottable) {
 
   yScale.innerPadding(2).outerPadding(0.5);
 
-
   var dots = new Plottable.Plots.Scatter()
     .addDataset(ds1)
     .addDataset(ds2)

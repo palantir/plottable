@@ -3845,6 +3845,32 @@ describe("Plots", function () {
                 assert.strictEqual(allSectors.size(), 0, "no sectors retrieved");
                 svg.remove();
             });
+            it("retrieves entities under a point with entitiesAt()", function () {
+                var click1 = { x: 300, y: 200 };
+                var entity1 = piePlot.entitiesAt(click1);
+                TestMethods.assertPlotEntitiesEqual(entity1[0], piePlot.entities()[0], "entities are equal");
+                var click2 = { x: 200, y: 300 };
+                var entity2 = piePlot.entitiesAt(click2);
+                TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
+                var click3 = { x: 0, y: 0 };
+                var entity3 = piePlot.entitiesAt(click3);
+                assert.strictEqual(entity3.length, 0, "no entities returned");
+                svg.remove();
+            });
+            it("points within innerRadius() and outside of outerRadius() don't return entities", function () {
+                piePlot.innerRadius(100).render();
+                var click1 = { x: 200, y: 201 };
+                var entity1 = piePlot.entitiesAt(click1);
+                assert.strictEqual(entity1.length, 0, "no entities returned");
+                piePlot.outerRadius(150).render();
+                var click2 = { x: 200, y: 350 };
+                var entity2 = piePlot.entitiesAt(click2);
+                TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
+                var click3 = { x: 200, y: 399 };
+                var entity3 = piePlot.entitiesAt(click3);
+                assert.strictEqual(entity3.length, 0, "no entities returned");
+                svg.remove();
+            });
         });
         describe("Fill", function () {
             it("sectors are filled in according to defaults", function () {
@@ -4609,14 +4635,14 @@ describe("Plots", function () {
                 barPlot.renderTo(svg);
             });
             it("barPixelWidth calculated appropriately", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), xScale.scale(2) * 2 * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, xScale.scale(2) * 2 * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4657,14 +4683,14 @@ describe("Plots", function () {
                 svg.remove();
             });
             it("bar width takes an appropriate value", function () {
-                assert.strictEqual(barPlot._getBarPixelWidth(), (xScale.scale(10) - xScale.scale(2)) * 0.95);
+                assert.strictEqual(barPlot._barPixelWidth, (xScale.scale(10) - xScale.scale(2)) * 0.95);
                 svg.remove();
             });
             it("bar widths are equal to barPixelWidth", function () {
                 var renderArea = barPlot._renderArea;
                 var bars = renderArea.selectAll("rect");
                 assert.lengthOf(bars[0], 3, "One bar was created per data point");
-                var barPixelWidth = barPlot._getBarPixelWidth();
+                var barPixelWidth = barPlot._barPixelWidth;
                 var bar0 = d3.select(bars[0][0]);
                 var bar1 = d3.select(bars[0][1]);
                 var bar2 = d3.select(bars[0][2]);
@@ -4676,20 +4702,20 @@ describe("Plots", function () {
             it("sensible bar width one datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "sensible bar width for only one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "sensible bar width for only one datum");
                 svg.remove();
             });
             it("sensible bar width same datum", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 10, y: 2 }, { x: 10, y: 2 }]));
-                assert.closeTo(barPlot._getBarPixelWidth(), 228, 0.1, "uses the width sensible for one datum");
+                assert.closeTo(barPlot._barPixelWidth, 228, 0.1, "uses the width sensible for one datum");
                 svg.remove();
             });
             it("sensible bar width unsorted data", function () {
                 barPlot.removeDataset(dataset);
                 barPlot.addDataset(new Plottable.Dataset([{ x: 2, y: 2 }, { x: 20, y: 2 }, { x: 5, y: 2 }]));
                 var expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
                 svg.remove();
             });
         });
@@ -4709,7 +4735,7 @@ describe("Plots", function () {
             it("bar width takes an appropriate value", function () {
                 var timeFormatter = d3.time.format("%m/%d/%y");
                 var expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
-                assert.closeTo(barPlot._getBarPixelWidth(), expectedBarWidth, 0.1, "width is difference between two dates");
+                assert.closeTo(barPlot._barPixelWidth, expectedBarWidth, 0.1, "width is difference between two dates");
                 svg.remove();
             });
         });
@@ -8280,15 +8306,11 @@ describe("Utils", function () {
             var value1 = { value: "one" };
             set.add(value1);
             assert.strictEqual(set.size, 1, "set contains one value");
-            assert.strictEqual(set._values[0], value1, "the value was added to the set");
             set.add(value1);
             assert.strictEqual(set.size, 1, "same value is not added twice");
-            assert.strictEqual(set._values[0], value1, "list still contains the value");
             var value2 = { value: "two" };
             set.add(value2);
             assert.strictEqual(set.size, 2, "set now contains two values");
-            assert.strictEqual(set._values[0], value1, "set contains value 1");
-            assert.strictEqual(set._values[1], value2, "set contains value 2");
         });
         it("delete()", function () {
             var set = new Plottable.Utils.Set();

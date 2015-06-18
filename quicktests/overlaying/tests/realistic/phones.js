@@ -46,7 +46,6 @@ function makeData() {
     {phoneType: "smart",    demographic: "Ages 45-64",  value: 0.49}
   ];
 
-
   return {
     australia: dataAustralia,
     india: dataIndia,

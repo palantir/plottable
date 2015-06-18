@@ -14,7 +14,6 @@ function run(svg, data, Plottable) {
     var yScale = new Plottable.Scales.Linear();
     var colorScale = new Plottable.Scales.Color();
 
-
     var xAxis = new Plottable.Axes.Category(xScale, "bottom");
     var yAxis = new Plottable.Axes.Numeric(yScale, "left");
     var animator;
@@ -44,12 +43,10 @@ function run(svg, data, Plottable) {
      vbar.labelFormatter(function(text){return text + "!";});
    }
 
-
     var chart = new Plottable.Components.Table([
                     [yAxis, vbar],
                     [null,  xAxis]
                   ]);
-
 
     var cb = function(){
       vbar.datasets()[0].data(data);
