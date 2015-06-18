@@ -1717,12 +1717,18 @@ var Plottable;
             if (minDomainExtent == null) {
                 return this._minDomainExtent;
             }
+            if (minDomainExtent > this.maxDomainExtent()) {
+                Plottable.Utils.Window.warn("The min domain extent is set higher than the min domain extent.  Results may be unexpected.");
+            }
             this._minDomainExtent = minDomainExtent;
             return this;
         };
         QuantitativeScale.prototype.maxDomainExtent = function (maxDomainExtent) {
             if (maxDomainExtent == null) {
                 return this._maxDomainExtent;
+            }
+            if (maxDomainExtent < this.minDomainExtent()) {
+                Plottable.Utils.Window.warn("The max domain extent is set lower than the min domain extent.  Results may be unexpected.");
             }
             this._maxDomainExtent = maxDomainExtent;
             return this;

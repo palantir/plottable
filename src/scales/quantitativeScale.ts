@@ -296,6 +296,9 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     if (minDomainExtent == null) {
       return this._minDomainExtent;
     }
+    if (minDomainExtent > this.maxDomainExtent()) {
+      Utils.Window.warn("The min domain extent is set higher than the min domain extent.  Results may be unexpected.");
+    }
     this._minDomainExtent = minDomainExtent;
     return this;
   }
@@ -305,6 +308,9 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   public maxDomainExtent(maxDomainExtent?: number): any {
     if (maxDomainExtent == null) {
       return this._maxDomainExtent;
+    }
+    if (maxDomainExtent < this.minDomainExtent()) {
+      Utils.Window.warn("The max domain extent is set lower than the min domain extent.  Results may be unexpected.");
     }
     this._maxDomainExtent = maxDomainExtent;
     return this;
