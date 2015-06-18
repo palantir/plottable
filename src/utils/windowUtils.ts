@@ -51,7 +51,6 @@ export module Utils {
      * @param {string?} message Optional message to be shown with the warning
      */
     export function deprecated(version: string, message = "") {
-
       var callingMethod = "";
 
       try {
@@ -61,7 +60,7 @@ export module Utils {
           .filter((step: string) => step.match(/http/))[1] // Just method names
           .trim()
           .split(/\s|@/) // Accounthing for both Chrome and Firefox
-          .filter((keyword: string) => !keyword.match(/at/))[0]; // Dropping extra keywords in Chrome
+          .filter((keyword: string) => !keyword.match(/^at$/))[0]; // Dropping extra keywords in Chrome
       } catch (err) { // IE9 does not give a stack trace
         callingMethod = "called";
       }
