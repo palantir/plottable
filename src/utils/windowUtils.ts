@@ -42,10 +42,10 @@ export module Utils {
     }
 
     /**
-     * Sends a warning to the console. The warning includes the version number of the deprecation,
+     * Sends a deprecation warning to the console. The warning includes the version number of the deprecation,
      * the name of the function which was deprecated and an optional message.
      *
-     * Tu be used in the first line of a deprecated method.
+     * To be used in the first line of a deprecated method.
      *
      * @param {string} version The version when the tagged method became obsolete
      * @param {string?} message Optional message to be shown with the warning
@@ -59,7 +59,7 @@ export module Utils {
           .split("\n")
           .filter((step: string) => step.match(/http/))[1] // Just method names
           .trim()
-          .split(/\s|@/) // Accounthing for both Chrome and Firefox
+          .split(/\s|@/) // Accounting for both Chrome and Firefox
           .filter((keyword: string) => !keyword.match(/^at$/))[0]; // Dropping extra keywords in Chrome
       } catch (err) { // IE9 does not give a stack trace
         callingMethod = "called";

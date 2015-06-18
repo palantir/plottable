@@ -776,10 +776,10 @@ var Plottable;
             }
             Window.setTimeout = setTimeout;
             /**
-             * Sends a warning to the console. The warning includes the version number of the deprecation,
+             * Sends a deprecation warning to the console. The warning includes the version number of the deprecation,
              * the name of the function which was deprecated and an optional message.
              *
-             * Tu be used in the first line of a deprecated method.
+             * To be used in the first line of a deprecated method.
              *
              * @param {string} version The version when the tagged method became obsolete
              * @param {string?} message Optional message to be shown with the warning
