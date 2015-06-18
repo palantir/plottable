@@ -8,6 +8,8 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
+  private _minDomainExtent = 0;
+  private _maxDomainExtent = Infinity;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -291,13 +293,21 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   public minDomainExtent(): number;
   public minDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
   public minDomainExtent(minDomainExtent?: number): any {
-    // TODO
+    if (minDomainExtent == null) {
+      return this._minDomainExtent;
+    }
+    this._minDomainExtent = minDomainExtent;
+    return this;
   }
 
   public maxDomainExtent(): number;
-  public maxDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
-  public maxDomainExtent(minDomainExtent?: number): any {
-    // TODO
+  public maxDomainExtent(maxDomainExtent: number): QuantitativeScale<D>;
+  public maxDomainExtent(maxDomainExtent?: number): any {
+    if (maxDomainExtent == null) {
+      return this._maxDomainExtent;
+    }
+    this._maxDomainExtent = maxDomainExtent;
+    return this;
   }
 }
 }

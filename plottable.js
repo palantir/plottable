@@ -1512,6 +1512,8 @@ var Plottable;
             _super.call(this);
             this._tickGenerator = function (scale) { return scale.defaultTicks(); };
             this._padProportion = 0.05;
+            this._minDomainExtent = 0;
+            this._maxDomainExtent = Infinity;
             this._paddingExceptionsProviders = new Plottable.Utils.Set();
         }
         QuantitativeScale.prototype.autoDomain = function () {
@@ -1712,10 +1714,18 @@ var Plottable;
             }
         };
         QuantitativeScale.prototype.minDomainExtent = function (minDomainExtent) {
-            // TODO
+            if (minDomainExtent == null) {
+                return this._minDomainExtent;
+            }
+            this._minDomainExtent = minDomainExtent;
+            return this;
         };
-        QuantitativeScale.prototype.maxDomainExtent = function (minDomainExtent) {
-            // TODO
+        QuantitativeScale.prototype.maxDomainExtent = function (maxDomainExtent) {
+            if (maxDomainExtent == null) {
+                return this._maxDomainExtent;
+            }
+            this._maxDomainExtent = maxDomainExtent;
+            return this;
         };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;

@@ -911,7 +911,7 @@ declare module Plottable {
         minDomainExtent(): number;
         minDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
         maxDomainExtent(): number;
-        maxDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
+        maxDomainExtent(maxDomainExtent: number): QuantitativeScale<D>;
     }
 }
 
