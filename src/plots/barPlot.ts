@@ -254,7 +254,7 @@ export module Plots {
 
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+        if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
         var primaryDist = 0;
@@ -299,7 +299,7 @@ export module Plots {
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }
 
-    protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 

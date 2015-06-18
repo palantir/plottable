@@ -6312,7 +6312,7 @@ var Plottable;
             var closestPointEntity;
             var entities = this._lightweightEntities();
             entities.forEach(function (entity) {
-                if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
@@ -6330,7 +6330,7 @@ var Plottable;
             Plottable.Utils.Window.deprecated("v1.1.0");
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
-        Plot.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+        Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -7022,7 +7022,7 @@ var Plottable;
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
-            Scatter.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+            Scatter.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var diameter = Plottable.Plot._scaledAccessor(this.size())(datum, index, dataset);
@@ -7232,7 +7232,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -7271,7 +7271,7 @@ var Plottable;
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
-            Bar.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+            Bar.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var attrToProjector = this._generateAttrToProjector();
@@ -7640,7 +7640,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);

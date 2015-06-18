@@ -505,7 +505,7 @@ export class Plot extends Component {
     var closestPointEntity: LightweightPlotEntity;
     var entities = this._lightweightEntities();
     entities.forEach((entity) => {
-      if (!this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
+      if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
         return;
       }
 
@@ -529,7 +529,7 @@ export class Plot extends Component {
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }
 
-  protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+  protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

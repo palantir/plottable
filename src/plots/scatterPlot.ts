@@ -110,7 +110,7 @@ export module Plots {
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
     }
 
-    protected _datumVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
