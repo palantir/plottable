@@ -5783,8 +5783,8 @@ var Plottable;
             };
             Table._fixedSpace = function (componentGroup, fixityAccessor) {
                 var all = function (bools) { return bools.reduce(function (a, b) { return a && b; }, true); };
-                var group_isFixed = function (components) { return all(components.map(fixityAccessor)); };
-                return all(componentGroup.map(group_isFixed));
+                var groupIsFixed = function (components) { return all(components.map(fixityAccessor)); };
+                return all(componentGroup.map(groupIsFixed));
             };
             return Table;
         })(Plottable.ComponentContainer);
