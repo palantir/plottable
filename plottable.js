@@ -1711,6 +1711,12 @@ var Plottable;
                 return this;
             }
         };
+        QuantitativeScale.prototype.minDomainExtent = function (minDomainExtent) {
+            // TODO
+        };
+        QuantitativeScale.prototype.maxDomainExtent = function (minDomainExtent) {
+            // TODO
+        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);

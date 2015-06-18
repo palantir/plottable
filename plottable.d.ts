@@ -908,6 +908,10 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
+        minDomainExtent(): number;
+        minDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
+        maxDomainExtent(): number;
+        maxDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
     }
 }
 

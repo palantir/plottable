@@ -287,5 +287,17 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return this;
     }
   }
+
+  public minDomainExtent(): number;
+  public minDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
+  public minDomainExtent(minDomainExtent?: number): any {
+    // TODO
+  }
+
+  public maxDomainExtent(): number;
+  public maxDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
+  public maxDomainExtent(minDomainExtent?: number): any {
+    // TODO
+  }
 }
 }
