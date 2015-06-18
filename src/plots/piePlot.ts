@@ -279,16 +279,19 @@ export module Plots {
       var labelArea = this._renderArea.append("g").classed("label-area", true);
       var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
-      this.entities().forEach((entity) => {
-        var value = "" + this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
+      var dataset = this.datasets()[0];
+
+      for (var i = 0; i < dataset.data().length; i++) {
+        var datum = dataset.data()[i];
+        var value = "" + this.sectorValue().accessor(datum, i, dataset);
         var measurement = measurer.measure(value);
 
-        var theta = (this._endAngles[entity.index] + this._startAngles[entity.index]) / 2;
-        var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
+        var theta = (this._endAngles[i] + this._startAngles[i]) / 2;
+        var outerRadius = this.outerRadius().accessor(datum, i, dataset);
         if (this.outerRadius().scale) {
           outerRadius = this.outerRadius().scale.scale(outerRadius);
         }
-        var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
+        var innerRadius = this.innerRadius().accessor(datum, i, dataset);
         if (this.innerRadius().scale) {
           innerRadius = this.innerRadius().scale.scale(innerRadius);
         }
@@ -313,13 +316,13 @@ export module Plots {
           if (entities.length < 1) {
             showLabel = false;
           } else {
-            if (entities[0].index != entity.index) {
+            if (entities[0].index !== i) {
               showLabel = false;
-            }            
+            }
           }
-        });        
+        });
 
-        var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
+        var color = attrToProjector["fill"](datum, i, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
         var className = dark ? "dark-label" : "light-label";
@@ -332,7 +335,7 @@ export module Plots {
           yAlign: "center",
           textRotation: 0
         });
-      });
+      }
     }
   }
 }

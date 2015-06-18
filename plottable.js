@@ -6506,24 +6506,26 @@ var Plottable;
                 var labelArea = this._renderArea.append("g").classed("label-area", true);
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
-                this.entities().forEach(function (entity) {
-                    var value = "" + _this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
+                var dataset = this.datasets()[0];
+                for (var i = 0; i < dataset.data().length; i++) {
+                    var datum = dataset.data()[i];
+                    var value = "" + this.sectorValue().accessor(datum, i, dataset);
                     var measurement = measurer.measure(value);
-                    var theta = (_this._endAngles[entity.index] + _this._startAngles[entity.index]) / 2;
-                    var outerRadius = _this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (_this.outerRadius().scale) {
-                        outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                    var theta = (this._endAngles[i] + this._startAngles[i]) / 2;
+                    var outerRadius = this.outerRadius().accessor(datum, i, dataset);
+                    if (this.outerRadius().scale) {
+                        outerRadius = this.outerRadius().scale.scale(outerRadius);
                     }
-                    var innerRadius = _this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (_this.innerRadius().scale) {
-                        innerRadius = _this.innerRadius().scale.scale(innerRadius);
+                    var innerRadius = this.innerRadius().accessor(datum, i, dataset);
+                    if (this.innerRadius().scale) {
+                        innerRadius = this.innerRadius().scale.scale(innerRadius);
                     }
                     var labelRadius = (outerRadius + innerRadius) / 2;
                     var x = Math.sin(theta) * labelRadius - measurement.width / 2;
                     var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
                     // Hide the label if it is outside of the slice area
-                    var svgX = x + _this.width() / 2;
-                    var svgY = y + _this.height() / 2;
+                    var svgX = x + this.width() / 2;
+                    var svgY = y + this.height() / 2;
                     var corners = [
                         { x: svgX, y: svgY },
                         { x: svgX + measurement.width, y: svgY },
@@ -6537,12 +6539,12 @@ var Plottable;
                             showLabel = false;
                         }
                         else {
-                            if (entities[0].index != entity.index) {
+                            if (entities[0].index !== i) {
                                 showLabel = false;
                             }
                         }
                     });
-                    var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
+                    var color = attrToProjector["fill"](datum, i, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                     var className = dark ? "dark-label" : "light-label";
@@ -6554,7 +6556,7 @@ var Plottable;
                         yAlign: "center",
                         textRotation: 0
                     });
-                });
+                }
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
