@@ -4047,14 +4047,14 @@ describe("Plots", function () {
             ];
             simpleDataset.data(lineData);
             var linePath = renderArea.select(".line");
-            var d_original = TestMethods.normalizePath(linePath.attr("d"));
+            var dOriginal = TestMethods.normalizePath(linePath.attr("d"));
             function assertCorrectPathSplitting(msgPrefix) {
                 var d = TestMethods.normalizePath(linePath.attr("d"));
                 var pathSegements = d.split("M").filter(function (segment) { return segment !== ""; });
                 assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-                var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+                var firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
                 assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-                var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+                var secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
                 assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
             }
             var dataWithNaN = lineData.slice();
@@ -5823,7 +5823,7 @@ describe("Plots", function () {
                 { key: "a", value: 3 },
                 { key: "b", value: -4 }
             ];
-            var data2_b = [
+            var data2B = [
                 { key: "a", value: 1 },
                 { key: "b", value: -2 }
             ];
@@ -5833,7 +5833,7 @@ describe("Plots", function () {
             stackedBarPlot.addDataset(dataset2);
             assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
             assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
-            dataset2.data(data2_b);
+            dataset2.data(data2B);
             assert.closeTo(yScale.domain()[0], -4, 1, "min stacked extent decreases in magnitude");
             assert.closeTo(yScale.domain()[1], 2, 1, "max stacked extent decreases in magnitude");
         });
