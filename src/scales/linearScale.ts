@@ -55,6 +55,13 @@ export module Scales {
     protected _niceDomain(domain: number[], count?: number): number[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
+
+    protected _computeDomainWithExtent(domain: number[], extent: number) {
+      var domainCenter = (domain[1] + domain[0]) / 2;
+      var domainMin = domainCenter - extent / 2;
+      var domainMax = domainCenter + extent / 2;
+      return domain[1] > domain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
+    }
   }
 }
 }

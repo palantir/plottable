@@ -8,6 +8,8 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
+  private _minDomainExtent = 0;
+  private _maxDomainExtent = Infinity;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -237,7 +239,24 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
       return;
     }
+    values = this._computeClampedDomain(values);
     super._setDomain(values);
+  }
+
+  private _computeClampedDomain(values: D[]) {
+    // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
+    var extent = Math.abs(<any> values[1].valueOf() - <any> values[0].valueOf());
+    if (extent < this.minDomainExtent()) {
+      return this._computeDomainWithExtent(values, this.minDomainExtent());
+    }
+    if (extent > this.maxDomainExtent()) {
+      return this._computeDomainWithExtent(values, this.maxDomainExtent());
+    }
+    return values;
+  }
+
+  protected _computeDomainWithExtent(domain: D[], extent: number) {
+    return domain;
   }
 
   /**
@@ -286,6 +305,32 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       this._tickGenerator = generator;
       return this;
     }
+  }
+
+  public minDomainExtent(): number;
+  public minDomainExtent(minDomainExtent: number): QuantitativeScale<D>;
+  public minDomainExtent(minDomainExtent?: number): any {
+    if (minDomainExtent == null) {
+      return this._minDomainExtent;
+    }
+    if (minDomainExtent > this.maxDomainExtent()) {
+      Utils.Window.warn("The min domain extent is set higher than the min domain extent.  Results may be unexpected.");
+    }
+    this._minDomainExtent = minDomainExtent;
+    return this;
+  }
+
+  public maxDomainExtent(): number;
+  public maxDomainExtent(maxDomainExtent: number): QuantitativeScale<D>;
+  public maxDomainExtent(maxDomainExtent?: number): any {
+    if (maxDomainExtent == null) {
+      return this._maxDomainExtent;
+    }
+    if (maxDomainExtent < this.minDomainExtent()) {
+      Utils.Window.warn("The max domain extent is set lower than the min domain extent.  Results may be unexpected.");
+    }
+    this._maxDomainExtent = maxDomainExtent;
+    return this;
   }
 }
 }
