@@ -159,7 +159,6 @@ export module Plots {
     }
 
     /**
-<<<<<<< HEAD
      * Get whether slice labels are enabled.
      *
      * @returns {boolean} Whether slices should display labels or not.
@@ -278,7 +277,7 @@ export module Plots {
     private _drawLabels() {
       var attrToProjector = this._generateAttrToProjector();
       var labelArea = this._renderArea.append("g").classed("label-area", true);
-      var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+      var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       this.entities().forEach((entity) => {
         var value = "" + this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
@@ -298,11 +297,34 @@ export module Plots {
         var x = Math.sin(theta) * labelRadius - measurement.width / 2;
         var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
+        // Hide the label if it is outside of the slice area
+        var svgX = x + this.width() / 2;
+        var svgY = y + this.height() / 2;
+        var corners = [
+          { x: svgX, y: svgY },
+          { x: svgX + measurement.width, y: svgY },
+          { x: svgX + measurement.width, y: svgY + measurement.height },
+          { x: svgX, y: svgY + measurement.height}
+        ];
+
+        var showLabel = true;
+        corners.forEach((corner) => {
+          var entities = this.entitiesAt(corner);
+          if (entities.length < 1) {
+            showLabel = false;
+          } else {
+            if (entities[0].index != entity.index) {
+              showLabel = false;
+            }            
+          }
+        });        
+
         var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
         var className = dark ? "dark-label" : "light-label";
         g.classed(className, true);
+        g.style("display", showLabel ? "block" : "none");
 
         writer.write(value, measurement.width, measurement.height, {
           selection: g,

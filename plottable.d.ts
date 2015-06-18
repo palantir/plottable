@@ -2511,7 +2511,6 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             /**
-        <<<<<<< HEAD
              * Get whether slice labels are enabled.
              *
              * @returns {boolean} Whether slices should display labels or not.

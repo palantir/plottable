@@ -6504,7 +6504,7 @@ var Plottable;
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
                 var labelArea = this._renderArea.append("g").classed("label-area", true);
-                var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 this.entities().forEach(function (entity) {
                     var value = "" + _this.sectorValue().accessor(entity.datum, entity.index, entity.dataset);
@@ -6521,11 +6521,33 @@ var Plottable;
                     var labelRadius = (outerRadius + innerRadius) / 2;
                     var x = Math.sin(theta) * labelRadius - measurement.width / 2;
                     var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    // Hide the label if it is outside of the slice area
+                    var svgX = x + _this.width() / 2;
+                    var svgY = y + _this.height() / 2;
+                    var corners = [
+                        { x: svgX, y: svgY },
+                        { x: svgX + measurement.width, y: svgY },
+                        { x: svgX + measurement.width, y: svgY + measurement.height },
+                        { x: svgX, y: svgY + measurement.height }
+                    ];
+                    var showLabel = true;
+                    corners.forEach(function (corner) {
+                        var entities = _this.entitiesAt(corner);
+                        if (entities.length < 1) {
+                            showLabel = false;
+                        }
+                        else {
+                            if (entities[0].index != entity.index) {
+                                showLabel = false;
+                            }
+                        }
+                    });
                     var color = attrToProjector["fill"](entity.datum, entity.index, entity.dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                     var className = dark ? "dark-label" : "light-label";
                     g.classed(className, true);
+                    g.style("display", showLabel ? "block" : "none");
                     writer.write(value, measurement.width, measurement.height, {
                         selection: g,
                         xAlign: "center",
