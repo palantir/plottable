@@ -239,7 +239,24 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       Utils.Window.warn("Warning: QuantitativeScales cannot take NaN or Infinity as a domain value. Ignoring.");
       return;
     }
+    values = this._computeClampedDomain(values);
     super._setDomain(values);
+  }
+
+  private _computeClampedDomain(values: D[]) {
+    // HACKHACK: TS1.4 doesn't consider numbers to be Number-like (valueOf() returning number), so D can't be typed correctly
+    var extent = Math.abs(<any> values[1].valueOf() - <any> values[0].valueOf());
+    if (extent < this.minDomainExtent()) {
+      return this._computeDomainWithExtent(values, this.minDomainExtent());
+    }
+    if (extent > this.maxDomainExtent()) {
+      return this._computeDomainWithExtent(values, this.maxDomainExtent());
+    }
+    return values;
+  }
+
+  protected _computeDomainWithExtent(domain: D[], extent: number) {
+    return domain;
   }
 
   /**

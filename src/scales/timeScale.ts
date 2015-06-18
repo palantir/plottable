@@ -109,6 +109,13 @@ export module Scales {
       }
     }
 
+    protected _computeDomainWithExtent(domain: Date[], extent: number) {
+      var domainCenter = (domain[1].valueOf() + domain[0].valueOf()) / 2;
+      var dateMin = new Date(domainCenter - extent / 2);
+      var dateMax = new Date(domainCenter + extent / 2);
+      return domain[1] > domain[0] ? [dateMin, dateMax] : [dateMax, dateMin];
+    }
+
   }
 }
 }
