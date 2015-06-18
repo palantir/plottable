@@ -274,7 +274,7 @@ export module Plots {
       }
     }
 
-    private _getSliceIndexForPoint(p: Point) {
+    private _sliceIndexForPoint(p: Point) {
       var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
       var pointAngle = Math.acos(-p.y / (1 + pointRadius));
       if (p.x < 0) {
@@ -325,7 +325,6 @@ export module Plots {
         var x = Math.sin(theta) * labelRadius - measurement.width / 2;
         var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
-        // Hide the label if it is outside of the slice area
         var corners = [
           { x: x, y: y },
           { x: x, y: y + measurement.height},
@@ -333,11 +332,10 @@ export module Plots {
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        // We use the first entity as a point of comparison
         var showLabel = true;
-        var index = this._getSliceIndexForPoint(corners[0]);
+        var index = this._sliceIndexForPoint(corners[0]);
         for (var j = 1; j < corners.length; j++) {
-          var sliceIndex = this._getSliceIndexForPoint(corners[j]);
+          var sliceIndex = this._sliceIndexForPoint(corners[j]);
           if (sliceIndex == null || sliceIndex !== index || sliceIndex !== i) {
             showLabel = false;
           }
