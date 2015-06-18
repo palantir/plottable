@@ -3908,6 +3908,30 @@ describe("Plots", function () {
             Plottable.Utils.Window.warn = oldWarn;
             svg.remove();
         });
+        describe("Labels", function () {
+            it("labels are shown and hidden appropriately", function () {
+                piePlot.removeDataset(simpleDataset);
+                var data = [
+                    { key: "A", value: 1 },
+                    { key: "B", value: 50 },
+                    { key: "C", value: 1 },
+                    { key: "D", value: 50 },
+                    { key: "E", value: 1 },
+                    { key: "F", value: 50 }
+                ];
+                var dataset = new Plottable.Dataset(data);
+                piePlot.addDataset(dataset).labelsEnabled(true);
+                $(".label-area").children("g").each(function (i) {
+                    if (i % 2 === 0) {
+                        assert.strictEqual($(this).css("display"), "none", "label hidden when slice is too small");
+                    }
+                    else {
+                        assert.strictEqual($(this).css("display"), "block", "label shown when slice is appropriately sized");
+                    }
+                });
+                svg.remove();
+            });
+        });
     });
     describe("fail safe tests", function () {
         it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", function () {

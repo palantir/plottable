@@ -6500,8 +6500,31 @@ var Plottable;
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
+            Pie.prototype._getSliceIndexForPoint = function (p) {
+                var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+                var pointAngle = Math.acos(-p.y / (1 + pointRadius));
+                if (p.x < 0) {
+                    pointAngle = Math.PI * 2 - pointAngle;
+                }
+                var index;
+                for (var i = 0; i < this._startAngles.length; i++) {
+                    if (this._startAngles[i] < pointAngle && this._endAngles[i] > pointAngle) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index !== undefined) {
+                    var dataset = this.datasets()[0];
+                    var datum = dataset.data()[i];
+                    var innerRadius = this.innerRadius().accessor(datum, index, dataset);
+                    var outerRadius = this.outerRadius().accessor(datum, index, dataset);
+                    if (pointRadius > innerRadius && pointRadius < outerRadius) {
+                        return index;
+                    }
+                }
+                return null;
+            };
             Pie.prototype._drawLabels = function () {
-                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
                 var labelArea = this._renderArea.append("g").classed("label-area", true);
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
@@ -6524,26 +6547,21 @@ var Plottable;
                     var x = Math.sin(theta) * labelRadius - measurement.width / 2;
                     var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
                     // Hide the label if it is outside of the slice area
-                    var svgX = x + this.width() / 2;
-                    var svgY = y + this.height() / 2;
                     var corners = [
-                        { x: svgX, y: svgY },
-                        { x: svgX + measurement.width, y: svgY },
-                        { x: svgX + measurement.width, y: svgY + measurement.height },
-                        { x: svgX, y: svgY + measurement.height }
+                        { x: x, y: y },
+                        { x: x, y: y + measurement.height },
+                        { x: x + measurement.width, y: y },
+                        { x: x + measurement.width, y: y + measurement.height }
                     ];
+                    // We use the first entity as a point of comparison
                     var showLabel = true;
-                    corners.forEach(function (corner) {
-                        var entities = _this.entitiesAt(corner);
-                        if (entities.length < 1) {
+                    var index = this._getSliceIndexForPoint(corners[0]);
+                    for (var j = 1; j < corners.length; j++) {
+                        var sliceIndex = this._getSliceIndexForPoint(corners[j]);
+                        if (sliceIndex == null || sliceIndex !== index || sliceIndex !== i) {
                             showLabel = false;
                         }
-                        else {
-                            if (entities[0].index !== i) {
-                                showLabel = false;
-                            }
-                        }
-                    });
+                    }
                     var color = attrToProjector["fill"](datum, i, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
