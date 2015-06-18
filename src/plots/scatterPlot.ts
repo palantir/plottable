@@ -114,8 +114,8 @@ export module Plots {
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
-      var diameter = this.size().accessor(datum, index, dataset);
-      var translatedBbox: SVGRect = {
+      var diameter = Plot._scaledAccessor(this.size())(datum, index, dataset);
+      var translatedBbox = {
         x: pixelPoint.x - diameter,
         y: pixelPoint.y - diameter,
         width: diameter,

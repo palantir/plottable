@@ -6276,7 +6276,7 @@ var Plottable;
         Plot.prototype._lightweightEntities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var entities = [];
+            var lightweightEntities = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 var validDatumIndex = 0;
@@ -6285,7 +6285,7 @@ var Plottable;
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
-                    entities.push({
+                    lightweightEntities.push({
                         datum: datum,
                         index: datasetIndex,
                         dataset: dataset,
@@ -6298,7 +6298,7 @@ var Plottable;
                     validDatumIndex++;
                 });
             });
-            return entities;
+            return lightweightEntities;
         };
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
@@ -6309,7 +6309,7 @@ var Plottable;
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
             var closestDistanceSquared = Infinity;
-            var closest;
+            var closestPointEntity;
             var entities = this._lightweightEntities();
             entities.forEach(function (entity) {
                 if (!_this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
@@ -6318,11 +6318,13 @@ var Plottable;
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
                 if (distanceSquared < closestDistanceSquared) {
                     closestDistanceSquared = distanceSquared;
-                    closest = entity;
+                    closestPointEntity = entity;
                 }
             });
-            closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
-            return closest;
+            closestPointEntity.selection = closestPointEntity.drawer.selectionForIndex(closestPointEntity.validDatumIndex);
+            delete (closestPointEntity.drawer);
+            delete (closestPointEntity.validDatumIndex);
+            return closestPointEntity;
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             Plottable.Utils.Window.deprecated("v1.1.0");
@@ -7023,7 +7025,7 @@ var Plottable;
             Scatter.prototype._datumVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
-                var diameter = this.size().accessor(datum, index, dataset);
+                var diameter = Plottable.Plot._scaledAccessor(this.size())(datum, index, dataset);
                 var translatedBbox = {
                     x: pixelPoint.x - diameter,
                     y: pixelPoint.y - diameter,

@@ -456,7 +456,6 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-
     var entities = this._lightweightEntities(datasets);
 
     entities.forEach((entity) => {
@@ -469,7 +468,7 @@ export class Plot extends Component {
   }
 
   private _lightweightEntities(datasets = this.datasets()) {
-    var entities: LightweightPlotEntity[] = [];
+    var lightweightEntities: LightweightPlotEntity[] = [];
     datasets.forEach((dataset) => {
       var drawer = this._datasetToDrawer.get(dataset);
       var validDatumIndex = 0;
@@ -479,7 +478,7 @@ export class Plot extends Component {
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
         }
-        entities.push({
+        lightweightEntities.push({
           datum: datum,
           index: datasetIndex,
           dataset: dataset,
@@ -492,7 +491,7 @@ export class Plot extends Component {
         validDatumIndex++;
       });
     });
-    return entities;
+    return lightweightEntities;
   }
 
   /**
@@ -503,7 +502,7 @@ export class Plot extends Component {
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
-    var closest: LightweightPlotEntity;
+    var closestPointEntity: LightweightPlotEntity;
     var entities = this._lightweightEntities();
     entities.forEach((entity) => {
       if (!this._datumVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
@@ -513,13 +512,15 @@ export class Plot extends Component {
       var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
-        closest = entity;
+        closestPointEntity = entity;
       }
     });
 
-    closest.selection = closest.drawer.selectionForIndex(closest.validDatumIndex);
+    closestPointEntity.selection = closestPointEntity.drawer.selectionForIndex(closestPointEntity.validDatumIndex);
+    delete(closestPointEntity.drawer);
+    delete(closestPointEntity.validDatumIndex);
 
-    return closest;
+    return closestPointEntity;
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
