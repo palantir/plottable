@@ -8732,7 +8732,7 @@ describe("Utils.Window", function () {
         var oldWarn = Plottable.Utils.Window.warn;
         Plottable.Utils.Window.warn = function (msg) {
             warningTriggered = true;
-            if (!TestMethods.isIE()) {
+            if (!TestMethods.isIE() && !window.PHANTOMJS) {
                 assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
             }
         };

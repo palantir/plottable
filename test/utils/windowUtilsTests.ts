@@ -19,7 +19,7 @@ describe("Utils.Window", () => {
 
   it("deprecated() version and message", () => {
     var version = "v0.77.2";
-    var message = "hadoop is doopey"
+    var message = "hadoop is doopey";
 
     var warningTriggered = false;
     var oldWarn = Plottable.Utils.Window.warn;
@@ -44,7 +44,7 @@ describe("Utils.Window", () => {
     var oldWarn = Plottable.Utils.Window.warn;
     Plottable.Utils.Window.warn = (msg: string) => {
       warningTriggered = true;
-      if (!TestMethods.isIE()) {
+      if (!TestMethods.isIE() && !window.PHANTOMJS) {
         assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
       }
     };
