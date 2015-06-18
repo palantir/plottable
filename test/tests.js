@@ -8716,8 +8716,9 @@ describe("Utils.Window", function () {
         var warningTriggered = false;
         var oldWarn = Plottable.Utils.Window.warn;
         Plottable.Utils.Window.warn = function (msg) {
+            assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
             assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
-            assert.strictEqual(msg.match(message)[0], message, "The message has been correctly passed in " + msg);
+            assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
             var regEx = new RegExp(message + "$");
             assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
             warningTriggered = true;
@@ -8731,9 +8732,10 @@ describe("Utils.Window", function () {
         var oldWarn = Plottable.Utils.Window.warn;
         Plottable.Utils.Window.warn = function (msg) {
             warningTriggered = true;
+            assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
         };
-        Plottable.Utils.Window.deprecated("v0.77.2");
-        assert.isTrue(warningTriggered, "warning has been issued about differing domains");
+        var reallyOutdatedCallerMethod = function () { return Plottable.Utils.Window.deprecated("v0.1.2"); };
+        reallyOutdatedCallerMethod();
         Plottable.Utils.Window.warn = oldWarn;
     });
 });
