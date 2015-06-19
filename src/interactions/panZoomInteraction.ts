@@ -141,12 +141,14 @@ export module Interactions {
 
     private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      scale.domain(scale.range().map(magnifyTransform));
+      var magnifiedDomain = scale.range().map(magnifyTransform);
+      scale.domain(magnifiedDomain);
     }
 
     private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      scale.domain(scale.range().map(translateTransform));
+      var translatedDomain = scale.range().map(translateTransform);
+      scale.domain(translatedDomain);
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {

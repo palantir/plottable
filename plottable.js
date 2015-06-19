@@ -9278,11 +9278,13 @@ var Plottable;
             };
             PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                scale.domain(scale.range().map(magnifyTransform));
+                var magnifiedDomain = scale.range().map(magnifyTransform);
+                scale.domain(magnifiedDomain);
             };
             PanZoom._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
-                scale.domain(scale.range().map(translateTransform));
+                var translatedDomain = scale.range().map(translateTransform);
+                scale.domain(translatedDomain);
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
