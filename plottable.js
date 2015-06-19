@@ -9189,6 +9189,10 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+                this._minXExtent = 0;
+                this._maxXExtent = Infinity;
+                this._minYExtent = 0;
+                this._maxYExtent = Infinity;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._dragInteraction = new Interactions.Drag();
@@ -9315,16 +9319,32 @@ var Plottable;
                 });
             };
             PanZoom.prototype.minXExtent = function (minXExtent) {
-                // TODO
+                if (minXExtent == null) {
+                    return this._minXExtent;
+                }
+                this._minXExtent = minXExtent;
+                return this;
             };
-            PanZoom.prototype.maxXExtent = function (minXExtent) {
-                // TODO
+            PanZoom.prototype.maxXExtent = function (maxXExtent) {
+                if (maxXExtent == null) {
+                    return this._maxXExtent;
+                }
+                this._maxXExtent = maxXExtent;
+                return this;
             };
-            PanZoom.prototype.minYExtent = function (minXExtent) {
-                // TODO
+            PanZoom.prototype.minYExtent = function (minYExtent) {
+                if (minYExtent == null) {
+                    return this._minYExtent;
+                }
+                this._minYExtent = minYExtent;
+                return this;
             };
-            PanZoom.prototype.maxYExtent = function (minXExtent) {
-                // TODO
+            PanZoom.prototype.maxYExtent = function (maxYExtent) {
+                if (maxYExtent == null) {
+                    return this._maxYExtent;
+                }
+                this._maxXExtent = maxYExtent;
+                return this;
             };
             /**
              * The number of pixels occupied in a line.

@@ -22,6 +22,11 @@ export module Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
+    private _minXExtent = 0;
+    private _maxXExtent = Infinity;
+    private _minYExtent = 0;
+    private _maxYExtent = Infinity;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -184,25 +189,41 @@ export module Interactions {
     public minXExtent(): number;
     public minXExtent(minXExtent: number): Interactions.PanZoom;
     public minXExtent(minXExtent?: number): any {
-      // TODO
+      if (minXExtent == null) {
+        return this._minXExtent;
+      }
+      this._minXExtent = minXExtent;
+      return this;
     }
 
     public maxXExtent(): number;
     public maxXExtent(maxXExtent: number): Interactions.PanZoom;
-    public maxXExtent(minXExtent?: number): any {
-      // TODO
+    public maxXExtent(maxXExtent?: number): any {
+      if (maxXExtent == null) {
+        return this._maxXExtent;
+      }
+      this._maxXExtent = maxXExtent;
+      return this;
     }
 
     public minYExtent(): number;
-    public minYExtent(maxXExtent: number): Interactions.PanZoom;
-    public minYExtent(minXExtent?: number): any {
-      // TODO
+    public minYExtent(minYExtent: number): Interactions.PanZoom;
+    public minYExtent(minYExtent?: number): any {
+      if (minYExtent == null) {
+        return this._minYExtent;
+      }
+      this._minYExtent = minYExtent;
+      return this;
     }
 
     public maxYExtent(): number;
-    public maxYExtent(maxXExtent: number): Interactions.PanZoom;
-    public maxYExtent(minXExtent?: number): any {
-      // TODO
+    public maxYExtent(maxYExtent: number): Interactions.PanZoom;
+    public maxYExtent(maxYExtent?: number): any {
+      if (maxYExtent == null) {
+        return this._maxYExtent;
+      }
+      this._maxXExtent = maxYExtent;
+      return this;
     }
 
   }

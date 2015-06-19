@@ -3590,9 +3590,9 @@ declare module Plottable {
             maxXExtent(): number;
             maxXExtent(maxXExtent: number): Interactions.PanZoom;
             minYExtent(): number;
-            minYExtent(maxXExtent: number): Interactions.PanZoom;
+            minYExtent(minYExtent: number): Interactions.PanZoom;
             maxYExtent(): number;
-            maxYExtent(maxXExtent: number): Interactions.PanZoom;
+            maxYExtent(maxYExtent: number): Interactions.PanZoom;
         }
     }
 }
