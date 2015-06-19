@@ -1,6 +1,6 @@
 /*!
 Plottable 1.0.0 (https://github.com/palantir/plottable)
-Copyright 2014 Palantir Technologies
+Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
 
