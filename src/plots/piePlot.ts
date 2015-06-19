@@ -331,7 +331,7 @@ export module Plots {
           { x: x + measurement.width, y: y },
           { x: x + measurement.width, y: y + measurement.height }
         ];
-        
+
         var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
         var showLabel = sliceIndices.every((index) => (index != null && index === sliceIndices[0]));
 
