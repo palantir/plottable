@@ -1250,7 +1250,7 @@ declare module Plottable {
         class Line extends Drawer {
             constructor(dataset: Dataset);
             protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
-            selectionForIndex(index: number): d3.Selection<void>;
+            selectionForIndex(index: number): d3.Selection<any>;
         }
     }
 }
@@ -1261,7 +1261,7 @@ declare module Plottable {
         class Area extends Drawer {
             constructor(dataset: Dataset);
             protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
-            selectionForIndex(index: number): d3.Selection<void>;
+            selectionForIndex(index: number): d3.Selection<any>;
         }
     }
 }

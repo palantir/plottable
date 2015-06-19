@@ -15,7 +15,7 @@ export module Drawers {
       selection.style("fill", "none");
     }
 
-    public selectionForIndex(index: number) {
+    public selectionForIndex(index: number): d3.Selection<any> {
       return this.renderArea().select(this.selector());
     }
   }
