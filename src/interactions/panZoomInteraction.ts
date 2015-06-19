@@ -195,8 +195,16 @@ export module Interactions {
       return domain;
     }
 
-    private static _constrainToExtent<D>(scale: QuantitativeScale<D>, extent: number) {
-      return scale.domain();
+    private static _constrainToExtent<D>(scale: QuantitativeScale<D>, extent: number): D[] {
+      var scaleDomain = scale.domain();
+      var domainCenter = (<any> scaleDomain[1].valueOf() + <any> scaleDomain[0].valueOf()) / 2;
+      var domainMin = domainCenter - extent / 2;
+      var domainMax = domainCenter + extent / 2;
+      var isAscending = scaleDomain[1] > scaleDomain[0];
+      if (scale instanceof Scales.Time) {
+        return <any[]> (isAscending ? [new Date(domainMin), new Date(domainMax)] : [new Date(domainMax), new Date(domainMin)]);
+      }
+      return <any[]> (isAscending ? [domainMin, domainMax] : [domainMax, domainMin]);
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {

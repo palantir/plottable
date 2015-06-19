@@ -9325,7 +9325,15 @@ var Plottable;
                 return domain;
             };
             PanZoom._constrainToExtent = function (scale, extent) {
-                return scale.domain();
+                var scaleDomain = scale.domain();
+                var domainCenter = (scaleDomain[1].valueOf() + scaleDomain[0].valueOf()) / 2;
+                var domainMin = domainCenter - extent / 2;
+                var domainMax = domainCenter + extent / 2;
+                var isAscending = scaleDomain[1] > scaleDomain[0];
+                if (scale instanceof Plottable.Scales.Time) {
+                    return (isAscending ? [new Date(domainMin), new Date(domainMax)] : [new Date(domainMax), new Date(domainMin)]);
+                }
+                return (isAscending ? [domainMin, domainMax] : [domainMax, domainMin]);
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
