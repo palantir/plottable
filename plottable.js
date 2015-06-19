@@ -6515,7 +6515,7 @@ var Plottable;
                 }
                 if (index !== undefined) {
                     var dataset = this.datasets()[0];
-                    var datum = dataset.data()[i];
+                    var datum = dataset.data()[index];
                     var innerRadius = this.innerRadius().accessor(datum, index, dataset);
                     var outerRadius = this.outerRadius().accessor(datum, index, dataset);
                     if (pointRadius > innerRadius && pointRadius < outerRadius) {
@@ -6525,6 +6525,7 @@ var Plottable;
                 return null;
             };
             Pie.prototype._drawLabels = function () {
+                var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
                 var labelArea = this._renderArea.append("g").classed("label-area", true);
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
@@ -6552,14 +6553,8 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var showLabel = true;
-                    var index = this._sliceIndexForPoint(corners[0]);
-                    for (var j = 1; j < corners.length; j++) {
-                        var sliceIndex = this._sliceIndexForPoint(corners[j]);
-                        if (sliceIndex == null || sliceIndex !== index || sliceIndex !== i) {
-                            showLabel = false;
-                        }
-                    }
+                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                    var showLabel = sliceIndices.every(function (index) { return (index != null && index === sliceIndices[0]); });
                     var color = attrToProjector["fill"](datum, i, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");

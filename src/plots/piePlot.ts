@@ -289,7 +289,7 @@ export module Plots {
       }
       if (index !== undefined) {
         var dataset = this.datasets()[0];
-        var datum = dataset.data()[i];
+        var datum = dataset.data()[index];
         var innerRadius = this.innerRadius().accessor(datum, index, dataset);
         var outerRadius = this.outerRadius().accessor(datum, index, dataset);
         if (pointRadius > innerRadius && pointRadius < outerRadius) {
@@ -331,15 +331,9 @@ export module Plots {
           { x: x + measurement.width, y: y },
           { x: x + measurement.width, y: y + measurement.height }
         ];
-
-        var showLabel = true;
-        var index = this._sliceIndexForPoint(corners[0]);
-        for (var j = 1; j < corners.length; j++) {
-          var sliceIndex = this._sliceIndexForPoint(corners[j]);
-          if (sliceIndex == null || sliceIndex !== index || sliceIndex !== i) {
-            showLabel = false;
-          }
-        }
+        
+        var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+        var showLabel = sliceIndices.every((index) => (index != null && index === sliceIndices[0]));
 
         var color = attrToProjector["fill"](datum, i, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
