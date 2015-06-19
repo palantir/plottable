@@ -181,6 +181,30 @@ export module Interactions {
       });
     }
 
+    public minXExtent(): number;
+    public minXExtent(minXExtent: number): Interactions.PanZoom;
+    public minXExtent(minXExtent?: number): any {
+      // TODO
+    }
+
+    public maxXExtent(): number;
+    public maxXExtent(maxXExtent: number): Interactions.PanZoom;
+    public maxXExtent(minXExtent?: number): any {
+      // TODO
+    }
+
+    public minYExtent(): number;
+    public minYExtent(maxXExtent: number): Interactions.PanZoom;
+    public minYExtent(minXExtent?: number): any {
+      // TODO
+    }
+
+    public maxYExtent(): number;
+    public maxYExtent(maxXExtent: number): Interactions.PanZoom;
+    public maxYExtent(minXExtent?: number): any {
+      // TODO
+    }
+
   }
 }
 }

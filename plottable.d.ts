@@ -3585,6 +3585,14 @@ declare module Plottable {
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            minXExtent(): number;
+            minXExtent(minXExtent: number): Interactions.PanZoom;
+            maxXExtent(): number;
+            maxXExtent(maxXExtent: number): Interactions.PanZoom;
+            minYExtent(): number;
+            minYExtent(maxXExtent: number): Interactions.PanZoom;
+            maxYExtent(): number;
+            maxYExtent(maxXExtent: number): Interactions.PanZoom;
         }
     }
 }

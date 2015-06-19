@@ -9314,6 +9314,18 @@ var Plottable;
                     lastDragPoint = endPoint;
                 });
             };
+            PanZoom.prototype.minXExtent = function (minXExtent) {
+                // TODO
+            };
+            PanZoom.prototype.maxXExtent = function (minXExtent) {
+                // TODO
+            };
+            PanZoom.prototype.minYExtent = function (minXExtent) {
+                // TODO
+            };
+            PanZoom.prototype.maxYExtent = function (minXExtent) {
+                // TODO
+            };
             /**
              * The number of pixels occupied in a line.
              */
