@@ -20,7 +20,12 @@ export module Plots {
   }
 }
 
-interface LightweightPlotEntity extends Plots.PlotEntity {
+interface LightweightPlotEntity {
+  datum: any;
+  position: Point;
+  dataset: Dataset;
+  index: number;
+  component: Plot;
   drawer: Plottable.Drawer;
   validDatumIndex: number;
 }
@@ -456,15 +461,7 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    var entities = this._lightweightEntities(datasets);
-
-    entities.forEach((entity) => {
-      entity.selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
-      delete(entity.drawer);
-      delete(entity.validDatumIndex);
-    });
-
-    return entities;
+    return this._lightweightEntities(datasets).map((entity) => this._lightweightEntityToPlotEntity(entity));
   }
 
   private _lightweightEntities(datasets = this.datasets()) {
@@ -483,15 +480,26 @@ export class Plot extends Component {
           index: datasetIndex,
           dataset: dataset,
           position: position,
+          component: this,
           drawer: drawer,
-          validDatumIndex: validDatumIndex,
-          selection: null,
-          component: this
+          validDatumIndex: validDatumIndex
         });
         validDatumIndex++;
       });
     });
     return lightweightEntities;
+  }
+
+  private _lightweightEntityToPlotEntity(entity: LightweightPlotEntity) {
+    var plotEntity: Plots.PlotEntity = {
+      datum: entity.datum,
+      position: entity.position,
+      dataset: entity.dataset,
+      index: entity.index,
+      component: entity.component,
+      selection: entity.drawer.selectionForIndex(entity.validDatumIndex)
+    };
+    return plotEntity;
   }
 
   /**
@@ -516,11 +524,7 @@ export class Plot extends Component {
       }
     });
 
-    closestPointEntity.selection = closestPointEntity.drawer.selectionForIndex(closestPointEntity.validDatumIndex);
-    delete(closestPointEntity.drawer);
-    delete(closestPointEntity.validDatumIndex);
-
-    return closestPointEntity;
+    return this._lightweightEntityToPlotEntity(closestPointEntity);
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {

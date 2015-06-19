@@ -6264,14 +6264,9 @@ var Plottable;
          * @return {Plots.PlotEntity[]}
          */
         Plot.prototype.entities = function (datasets) {
+            var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var entities = this._lightweightEntities(datasets);
-            entities.forEach(function (entity) {
-                entity.selection = entity.drawer.selectionForIndex(entity.validDatumIndex);
-                delete (entity.drawer);
-                delete (entity.validDatumIndex);
-            });
-            return entities;
+            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightEntityToPlotEntity(entity); });
         };
         Plot.prototype._lightweightEntities = function (datasets) {
             var _this = this;
@@ -6290,15 +6285,25 @@ var Plottable;
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
+                        component: _this,
                         drawer: drawer,
-                        validDatumIndex: validDatumIndex,
-                        selection: null,
-                        component: _this
+                        validDatumIndex: validDatumIndex
                     });
                     validDatumIndex++;
                 });
             });
             return lightweightEntities;
+        };
+        Plot.prototype._lightweightEntityToPlotEntity = function (entity) {
+            var plotEntity = {
+                datum: entity.datum,
+                position: entity.position,
+                dataset: entity.dataset,
+                index: entity.index,
+                component: entity.component,
+                selection: entity.drawer.selectionForIndex(entity.validDatumIndex)
+            };
+            return plotEntity;
         };
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
@@ -6321,10 +6326,7 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
-            closestPointEntity.selection = closestPointEntity.drawer.selectionForIndex(closestPointEntity.validDatumIndex);
-            delete (closestPointEntity.drawer);
-            delete (closestPointEntity.validDatumIndex);
-            return closestPointEntity;
+            return this._lightweightEntityToPlotEntity(closestPointEntity);
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             Plottable.Utils.Window.deprecated("v1.1.0");
