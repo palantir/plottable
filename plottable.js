@@ -9246,8 +9246,8 @@ var Plottable;
                     this._translateXScale(oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this._magnifyYScale(oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    this._translateYScale(oldCenterPoint.x - newCenterPoint.x);
+                    this._magnifyYScale(oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                    this._translateYScale(oldCenterPoint.y - newCenterPoint.y);
                 }
             };
             PanZoom.prototype._centerPoint = function () {
