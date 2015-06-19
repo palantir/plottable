@@ -9278,20 +9278,12 @@ var Plottable;
             };
             PanZoom.prototype._magnifyXScale = function (magnifyAmount, centerValue) {
                 var magnifyTransform = PanZoom._magnifyScaleTransform(this._xScale, magnifyAmount, centerValue);
-                var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
-                if (extent < this.minXExtent()) {
-                }
-                if (extent > this.maxXExtent()) {
-                }
+                magnifyTransform = this._constrainToXExtent(magnifyTransform);
                 this._xScale.domain(magnifyTransform);
             };
             PanZoom.prototype._magnifyYScale = function (magnifyAmount, centerValue) {
                 var magnifyTransform = PanZoom._magnifyScaleTransform(this._yScale, magnifyAmount, centerValue);
-                var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
-                if (extent < this.minYExtent()) {
-                }
-                if (extent > this.maxYExtent()) {
-                }
+                magnifyTransform = this._constrainToYExtent(magnifyTransform);
                 this._yScale.domain(magnifyTransform);
             };
             PanZoom._magnifyScaleTransform = function (scale, magnifyAmount, centerValue) {
@@ -9300,25 +9292,40 @@ var Plottable;
             };
             PanZoom.prototype._translateXScale = function (translateAmount) {
                 var translateTransform = PanZoom._translateScaleTransform(this._xScale, translateAmount);
-                var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
-                if (extent < this.minXExtent()) {
-                }
-                if (extent > this.maxXExtent()) {
-                }
+                translateTransform = this._constrainToXExtent(translateTransform);
                 this._xScale.domain(translateTransform);
             };
             PanZoom.prototype._translateYScale = function (translateAmount) {
                 var translateTransform = PanZoom._translateScaleTransform(this._yScale, translateAmount);
-                var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
-                if (extent < this.minYExtent()) {
-                }
-                if (extent > this.maxYExtent()) {
-                }
+                translateTransform = this._constrainToYExtent(translateTransform);
                 this._yScale.domain(translateTransform);
             };
             PanZoom._translateScaleTransform = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
                 return scale.range().map(translateTransform);
+            };
+            PanZoom.prototype._constrainToXExtent = function (domain) {
+                var extent = Math.abs(domain[1].valueOf() - domain[0].valueOf());
+                if (extent < this.minXExtent()) {
+                    return PanZoom._constrainToExtent(this._xScale, this.minXExtent());
+                }
+                if (extent > this.maxXExtent()) {
+                    return PanZoom._constrainToExtent(this._xScale, this.maxXExtent());
+                }
+                return domain;
+            };
+            PanZoom.prototype._constrainToYExtent = function (domain) {
+                var extent = Math.abs(domain[1].valueOf() - domain[0].valueOf());
+                if (extent < this.minYExtent()) {
+                    return PanZoom._constrainToExtent(this._yScale, this.minYExtent());
+                }
+                if (extent > this.maxYExtent()) {
+                    return PanZoom._constrainToExtent(this._yScale, this.maxYExtent());
+                }
+                return domain;
+            };
+            PanZoom._constrainToExtent = function (scale, extent) {
+                return scale.domain();
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);

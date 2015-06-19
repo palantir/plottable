@@ -141,25 +141,13 @@ export module Interactions {
 
     private _magnifyXScale(magnifyAmount: number, centerValue: number) {
       var magnifyTransform = PanZoom._magnifyScaleTransform(this._xScale, magnifyAmount, centerValue);
-      var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
-      if (extent < this.minXExtent()) {
-        // DO MATH
-      }
-      if (extent > this.maxXExtent()) {
-        // DO MATH
-      }
+      magnifyTransform = this._constrainToXExtent(magnifyTransform);
       this._xScale.domain(magnifyTransform);
     }
 
     private _magnifyYScale(magnifyAmount: number, centerValue: number) {
       var magnifyTransform = PanZoom._magnifyScaleTransform(this._yScale, magnifyAmount, centerValue);
-      var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
-      if (extent < this.minYExtent()) {
-        // DO MATH
-      }
-      if (extent > this.maxYExtent()) {
-        // DO MATH
-      }
+      magnifyTransform = this._constrainToYExtent(magnifyTransform);
       this._yScale.domain(magnifyTransform);
     }
 
@@ -170,31 +158,45 @@ export module Interactions {
 
     private _translateXScale(translateAmount: number) {
       var translateTransform = PanZoom._translateScaleTransform(this._xScale, translateAmount);
-      var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
-      if (extent < this.minXExtent()) {
-        // DO MATH
-      }
-      if (extent > this.maxXExtent()) {
-        // DO MATH
-      }
+      translateTransform = this._constrainToXExtent(translateTransform);
       this._xScale.domain(translateTransform);
     }
 
     private _translateYScale(translateAmount: number) {
       var translateTransform = PanZoom._translateScaleTransform(this._yScale, translateAmount);
-      var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
-      if (extent < this.minYExtent()) {
-        // DO MATH
-      }
-      if (extent > this.maxYExtent()) {
-        // DO MATH
-      }
+      translateTransform = this._constrainToYExtent(translateTransform);
       this._yScale.domain(translateTransform);
     }
 
-    private static _translateScaleTransform<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+    private static _translateScaleTransform<D>(scale: QuantitativeScale<D>, translateAmount: number): D[] {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       return scale.range().map(translateTransform);
+    }
+
+    private _constrainToXExtent<D>(domain: D[]) {
+      var extent = Math.abs(<any> domain[1].valueOf() - <any> domain[0].valueOf());
+      if (extent < this.minXExtent()) {
+        return PanZoom._constrainToExtent(this._xScale, this.minXExtent());
+      }
+      if (extent > this.maxXExtent()) {
+        return PanZoom._constrainToExtent(this._xScale, this.maxXExtent());
+      }
+      return domain;
+    }
+
+    private _constrainToYExtent<D>(domain: D[]) {
+      var extent = Math.abs(<any> domain[1].valueOf() - <any> domain[0].valueOf());
+      if (extent < this.minYExtent()) {
+        return PanZoom._constrainToExtent(this._yScale, this.minYExtent());
+      }
+      if (extent > this.maxYExtent()) {
+        return PanZoom._constrainToExtent(this._yScale, this.maxYExtent());
+      }
+      return domain;
+    }
+
+    private static _constrainToExtent<D>(scale: QuantitativeScale<D>, extent: number) {
+      return scale.domain();
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
