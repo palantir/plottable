@@ -9242,12 +9242,12 @@ var Plottable;
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                    this._magnifyXScale(oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    this._translateXScale(oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                    this._magnifyYScale(oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    this._translateYScale(oldCenterPoint.x - newCenterPoint.x);
                 }
             };
             PanZoom.prototype._centerPoint = function () {
@@ -9276,15 +9276,49 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                var magnifiedDomain = scale.range().map(magnifyTransform);
-                scale.domain(magnifiedDomain);
+            PanZoom.prototype._magnifyXScale = function (magnifyAmount, centerValue) {
+                var magnifyTransform = PanZoom._magnifyScaleTransform(this._xScale, magnifyAmount, centerValue);
+                var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
+                if (extent < this.minXExtent()) {
+                }
+                if (extent > this.maxXExtent()) {
+                }
+                this._xScale.domain(magnifyTransform);
             };
-            PanZoom._translateScale = function (scale, translateAmount) {
+            PanZoom.prototype._magnifyYScale = function (magnifyAmount, centerValue) {
+                var magnifyTransform = PanZoom._magnifyScaleTransform(this._yScale, magnifyAmount, centerValue);
+                var extent = Math.abs(magnifyTransform[1].valueOf() - magnifyTransform[0].valueOf());
+                if (extent < this.minYExtent()) {
+                }
+                if (extent > this.maxYExtent()) {
+                }
+                this._yScale.domain(magnifyTransform);
+            };
+            PanZoom._magnifyScaleTransform = function (scale, magnifyAmount, centerValue) {
+                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+                return scale.range().map(magnifyTransform);
+            };
+            PanZoom.prototype._translateXScale = function (translateAmount) {
+                var translateTransform = PanZoom._translateScaleTransform(this._xScale, translateAmount);
+                var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
+                if (extent < this.minXExtent()) {
+                }
+                if (extent > this.maxXExtent()) {
+                }
+                this._xScale.domain(translateTransform);
+            };
+            PanZoom.prototype._translateYScale = function (translateAmount) {
+                var translateTransform = PanZoom._translateScaleTransform(this._yScale, translateAmount);
+                var extent = Math.abs(translateTransform[1].valueOf() - translateTransform[0].valueOf());
+                if (extent < this.minYExtent()) {
+                }
+                if (extent > this.maxYExtent()) {
+                }
+                this._yScale.domain(translateTransform);
+            };
+            PanZoom._translateScaleTransform = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
-                var translatedDomain = scale.range().map(translateTransform);
-                scale.domain(translatedDomain);
+                return scale.range().map(translateTransform);
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9293,10 +9327,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
+                        this._magnifyXScale(zoomAmount, translatedP.x);
                     }
                     if (this._yScale != null) {
-                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
+                        this._magnifyYScale(zoomAmount, translatedP.y);
                     }
                 }
             };
@@ -9311,11 +9345,11 @@ var Plottable;
                     }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom._translateScale(_this._xScale, -dragAmountX);
+                        _this._translateXScale(-dragAmountX);
                     }
                     if (_this._yScale != null) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom._translateScale(_this._yScale, -dragAmountY);
+                        _this._translateYScale(-dragAmountY);
                     }
                     lastDragPoint = endPoint;
                 });
