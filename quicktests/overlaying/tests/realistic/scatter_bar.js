@@ -52,8 +52,8 @@ function run(svg, data, Plottable) {
         return "#660066";
       }      
     })
-    .attr("opacity", function(){return 1;})
-    .size(function(){ return yScale.rangeBand();});
+    .attr("opacity", function(){return 1; })
+    .size(function(){ return yScale.rangeBand(); });
 
   var grid = new Plottable.Components.Gridlines(xScale, null);
 
