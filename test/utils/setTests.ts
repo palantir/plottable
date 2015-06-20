@@ -55,7 +55,10 @@ describe("Utils", () => {
       set.add(values[1]);
       var index = 0;
       set.forEach((value1: any, value2: any, passedSet: Plottable.Utils.Set<any>) => {
-        assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+        // HACKHACK: Safari does not pass a duplicate value as the second argument, as the spec suggests.
+        if (value2 !== undefined) {
+          assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+        }
         assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
         assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
         index++;
