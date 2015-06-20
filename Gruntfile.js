@@ -149,7 +149,7 @@ module.exports = function(grunt) {
     bump: bumpJSON,
     umd: {
       all: {
-        src: "plottable.js", 
+        src: "plottable.js",
         template: "unit",
         objectToExport: "Plottable",
       }
@@ -341,7 +341,7 @@ module.exports = function(grunt) {
       "concat:definitions",
       "sed:definitions",
       "sed:private_definitions",
-      "umd:all", 
+      "umd:all",
       "concat:header",
       "sed:version_number",
       "definitions_prod",
