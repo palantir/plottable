@@ -323,7 +323,7 @@ function loadPlottableBranches(category, branchList){
       });
     }
     else if(textStatus === "error"){
-      console.log("could not retrieve Plottable branch, check if branch name " + branch + " is correct!");
+      console.log("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
   });
 }

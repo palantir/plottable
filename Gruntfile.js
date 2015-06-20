@@ -1,9 +1,6 @@
 module.exports = function(grunt) {
   "use strict";
 
-  var path = require("path");
-  var cwd = process.cwd();
-
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],

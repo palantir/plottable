@@ -1,8 +1,18 @@
 {
+  "env": {
+    "browser": true,
+    "jquery": true,
+    "node": true
+  },
+  "globals": {
+    "d3": true,
+    "Plottable": true,
+    "makeRandomData": true,
+    "deep_copy": true
+  },
   "rules": {
     "no-eval": 0,
     "no-return-assign": 0,
-    "no-undef": 0,
     "no-shadow": 0,
     "no-trailing-spaces": 0,
     "quotes": 0,
