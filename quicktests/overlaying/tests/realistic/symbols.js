@@ -8,9 +8,9 @@ function makeData() {
 function run(svg, data, Plottable){
   "use strict";
 
-  var d = [];
-  deep_copy(data[0], d);
-  var dataset = new Plottable.Dataset(d);
+  var plotData = [];
+  deep_copy(data[0], plotData);
+  var dataset = new Plottable.Dataset(plotData);
 
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
