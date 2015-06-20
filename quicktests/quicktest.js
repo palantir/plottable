@@ -147,7 +147,7 @@ function setup() {
     }
     //load github branch dropdown
     var branchOptions = {};
-    $.get("https://api.github.com/repos/palantir/plottable/branches" + auth, function(data,status){
+    $.get("https://api.github.com/repos/palantir/plottable/branches" + auth, function(){
       for(var i = 0; i < data.length; i++){
         branchOptions["val" + i] = data[i].name;
       }
