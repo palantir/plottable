@@ -30,7 +30,7 @@ function run(svg, data, Plottable) {
                                                  [null,  xAxis]]);
   lineChart.renderTo(svg);
 
-  var cb = function(x, y){
+  var cb = function(){
     var d = dataset.data();
     dataset.data(d);
   };

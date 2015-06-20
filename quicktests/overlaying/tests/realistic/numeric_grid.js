@@ -19,8 +19,6 @@ function run(svg, data, Plottable) {
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
 
-  var xAxis = new Plottable.Axes.Category(xScale, "top");
-  var yAxis = new Plottable.Axes.Category(yScale, "left");
   var plot = new Plottable.Plots.Rectangle();
   plot.addDataset(new Plottable.Dataset(data));
   plot.x(function(d){ return d.x; }, xScale)

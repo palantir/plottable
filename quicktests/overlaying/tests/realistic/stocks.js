@@ -45,7 +45,6 @@ function run(svg, data, Plottable) {
           }
 
           var extentFcnA = function() { return [new Date("2014-08-22"), new Date("2014-08-25")]; };
-          var extentFcnB = function() { return [new Date("2013-08-22"), new Date("2015-08-25")]; };
 
           var xScale = new Plottable.Scales.Time();
           xScale.addIncludedValuesProvider(extentFcnA);
@@ -95,7 +94,6 @@ function run(svg, data, Plottable) {
           var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
 
           var yScale_diff = new Plottable.Scales.Linear();
-          var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
           var bar_diff = new Plottable.Plots.Bar("vertical").animated(true)

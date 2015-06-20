@@ -8,7 +8,7 @@
     "quotes": 0,
     "consistent-return": 0,
     "no-console": 0,
-    "no-unused-vars": 0,
+    "no-unused-vars": [2, {"vars": "local"}],
     "no-multi-spaces": 0,
     "camelcase": 0,
     "comma-spacing": 0,

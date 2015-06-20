@@ -29,7 +29,7 @@ function run(svg, data, Plottable) {
 
   var center = new Plottable.Components.Group([stackedAreaPlot, new Plottable.Components.Legend(colorScale)]);
 
-  var horizChart = new Plottable.Components.Table([
+  new Plottable.Components.Table([
     [yAxis, center], [null, xAxis]
     ]).renderTo(svg);
 }

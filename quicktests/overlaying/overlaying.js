@@ -72,7 +72,6 @@ var firstBranch;
 var secondBranch;
 var svgWidth;
 var svgHeight;
-var sidebarPopulated = false;
 
 //METHODS
 
@@ -148,8 +147,6 @@ function populateTotalSidebarList(paths){
 
   setupCheckboxBinding();
   $(":checkbox").attr("checked" , true);
-  sidebarPopulated = true;
-
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -172,7 +169,6 @@ function populateSidebarList(paths, testsInCategory, category){
   $(":checkbox").attr("checked", false);
   setupCheckboxBinding();
   setCategoryCheckbox(category, true);
-  sidebarPopulated = true;
 }
 
 //initializing methods
@@ -193,7 +189,7 @@ function setupBindings(){
   }, function() {
       // Hover out code
       $("#test-category-descriptions").css("display", "none");
-  }).mousemove(function(e) {
+  }).mousemove(function() {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
       $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
@@ -218,7 +214,6 @@ function runQuickTest(result, svg, data, branch){
 }
 
 function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
-  var div = d3.select("#results");
   quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g , '');
     d3.text("http://localhost:9999/" + path, function(error, text) {
@@ -246,7 +241,6 @@ function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
 //load each quicktest locally, eval it, then run quicktest
 function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
 
-  var div = d3.select("#results");
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
@@ -314,7 +308,7 @@ function loadPlottableBranches(category, branchList){
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1], function(data, testStatus){ //load second
+      $.getScript(listOfUrl[1], function(){ //load second
         if(textStatus === "success"){
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
@@ -339,7 +333,6 @@ function clearTests(){
   plottableBranches = [];
   resetDisplayProperties();
   d3.selectAll(".quicktest, .sidebar-quicktest-category ").remove();
-  sidebarPopulated = false;
 }
 
 function initialize(){

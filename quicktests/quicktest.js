@@ -1,9 +1,8 @@
 (function iife(){
 "use strict";
-var quicktests = {};
 
 function loadScript(url) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve) {
     var element = document.createElement("script");
     element.type = "text/javascript";
     element.src = url;
@@ -14,7 +13,7 @@ function loadScript(url) {
 
 var Plottables = {};
 function loadPlottable(branchName) {
-  return new Promise(function (fulfill, reject) {
+  return new Promise(function (fulfill) {
     if (Plottables[branchName] != null) {
       fulfill();
     }
@@ -53,7 +52,7 @@ function loadTheQuicktests(quicktestsJSONArray) {
   window.quicktests = [];
   var numToLoad = quicktestsJSONArray.length;
   var numLoaded = 0;
-  return new Promise(function (f, r) {
+  return new Promise(function (f) {
     quicktestsJSONArray.forEach(function(q) {
       var name = q.name;
       d3.text("/quicktests/js/" + name + ".js", function(error, text) {
@@ -82,7 +81,7 @@ function loadTheQuicktests(quicktestsJSONArray) {
 }
 
 function loadListOfQuicktests() {
-  return new Promise(function (f, r) {
+  return new Promise(function (f) {
     d3.json("/quicktests/list_of_quicktests.json", function (error, json) {
       if (json !== undefined) {
         f(json);
@@ -95,7 +94,7 @@ function loadListOfQuicktests() {
 }
 
 function initializeByLoadingAllQuicktests() {
-  return new Promise(function(f, r) {
+  return new Promise(function(f) {
     if (window.list_of_quicktests == null) {
       loadListOfQuicktests()
         .then(loadTheQuicktests)
@@ -147,7 +146,7 @@ function setup() {
     }
     //load github branch dropdown
     var branchOptions = {};
-    $.get("https://api.github.com/repos/palantir/plottable/branches" + auth, function(data,status){
+    $.get("https://api.github.com/repos/palantir/plottable/branches" + auth, function(data){
       for(var i = 0; i < data.length; i++){
         branchOptions["val" + i] = data[i].name;
       }
