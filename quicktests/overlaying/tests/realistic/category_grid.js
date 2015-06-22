@@ -47,7 +47,7 @@ function makeData() {
           {hospital: "no", hour: "2 AM", percent: 5.0},
           {hospital: "no", hour: "3 AM", percent: 5.2},
           {hospital: "no", hour: "4 AM", percent: 5.2},
-          {hospital: "no", hour: "5 AM", percent: 4.9},
+          {hospital: "no", hour: "5 AM", percent: 4.9}
          ];
 }
 

@@ -58,7 +58,7 @@ function run(svg, data, Plottable) {
 
   var productPlots = new Plottable.Components.Table([
       [AGroup],
-      [BGroup],
+      [BGroup]
   ]);
 
   var allPlots = new Plottable.Components.Table([

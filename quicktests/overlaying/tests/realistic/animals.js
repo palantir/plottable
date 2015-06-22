@@ -59,7 +59,7 @@ function makeData() {
 	type1: "invertebrate",
 	type2: "insect",
 	type3: "pterygota"
-  },
+  }
   ];
 
   return [d];

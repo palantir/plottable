@@ -6,7 +6,7 @@ function makeData() {
           {company: "Google", overall: 0.30, leadership: 0.21},
           {company: "Intel", overall: 0.24, leadership: 0.16},
           {company: "Microsoft", overall: 0.29, leadership: 0.17},
-          {company: "Twitter", overall: 0.30, leadership: 0.21}, ];
+          {company: "Twitter", overall: 0.30, leadership: 0.21}];
 }
 
 function run(svg, data, Plottable) {

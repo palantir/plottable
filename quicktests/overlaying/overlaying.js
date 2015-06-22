@@ -17,13 +17,13 @@ function toggleSidebar(){
       left: '0%'
     });
     content.animate({
-      left: '20%',
+      left: '20%'
     });
     controls.animate({
-      width: '80%',
+      width: '80%'
     });
     sizeControls.animate({
-      width: '80%',
+      width: '80%'
     });
   }
   else{
@@ -36,10 +36,10 @@ function toggleSidebar(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%',
+      width: '100%'
     });
     sizeControls.animate({
-      width: '100%',
+      width: '100%'
     });
   }
 }
