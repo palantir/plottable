@@ -67,7 +67,7 @@ function showSizeControls(){
 
 "use strict";
 
-var plottableBranches=[];
+var plottableBranches = [];
 var firstBranch;
 var secondBranch;
 var svgWidth;
@@ -117,7 +117,7 @@ function populateTotalSidebarList(paths){
   testsPaths.forEach(function(test){
     var slashPos = test.indexOf("/");
     var categoryString = test.substr(0, slashPos);
-    var quicktestString = test.substr(slashPos+1, test.length-1);
+    var quicktestString = test.substr(slashPos + 1, test.length - 1);
     var quicktestArray = [quicktestString];
     if (!hash[categoryString]){
       hash[categoryString] = quicktestArray;
