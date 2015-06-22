@@ -47,7 +47,7 @@ function run(svg, data, Plottable) {
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#000000")
               .animated(true);
-    plot_array.push(lineRenderer); 
+    plot_array.push(lineRenderer);
   };
 
   var year_average = function(y){
@@ -65,12 +65,12 @@ function run(svg, data, Plottable) {
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#FF0000")
               .animated(true);
-    plot_array.push(lineRenderer);     
+    plot_array.push(lineRenderer);
   };
 
   for (var year = 0; year < data.length; year++){
-    add_year(year); 
-    year_average(year);          
+    add_year(year);
+    year_average(year);
   }
 
   var group = new Plottable.Components.Group(plot_array);
