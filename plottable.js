@@ -2769,6 +2769,32 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            function ErrorBar(dataset) {
+                _super.call(this, dataset);
+                this._ERROR_BAR_CLASS = "error-bar";
+                this._ERROR_BAR_WIDTH = 10;
+                this._className = this._ERROR_BAR_CLASS;
+                this._svgElementName = "line";
+            }
+            return ErrorBar;
+        })(Plottable.Drawer);
+        Drawers.ErrorBar = ErrorBar;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -8104,6 +8130,84 @@ var Plottable;
             return StackedBar;
         })(Plots.Bar);
         Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            function ErrorBar() {
+                _super.call(this);
+                this.addClass("error-bar-plot");
+            }
+            ErrorBar.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                }
+                return this;
+            };
+            ErrorBar.prototype.x2 = function (x2, xScale) {
+                if (x2 == null) {
+                    return this._propertyBindings.get("x2");
+                }
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty("x2", x2, xScale);
+                this.render();
+                return this;
+            };
+            ErrorBar.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                }
+                return this;
+            };
+            ErrorBar.prototype.y2 = function (y2, xScale) {
+                if (y2 == null) {
+                    return this._propertyBindings.get("y2");
+                }
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty("y2", y2, yScale);
+                this.render();
+                return this;
+            };
+            ErrorBar.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.ErrorBar(dataset);
+            };
+            ErrorBar.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
+                attrToProjector["x2"] = this.x2() != null ? Plottable.Plot._scaledAccessor(this.x2()) : Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["y2"] = this.y2() != null ? Plottable.Plot._scaledAccessor(this.y2()) : Plottable.Plot._scaledAccessor(this.y());
+                return attrToProjector;
+            };
+            return ErrorBar;
+        })(Plottable.XYPlot);
+        Plots.ErrorBar = ErrorBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 

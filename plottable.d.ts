@@ -1296,6 +1296,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Drawers {
+        class ErrorBar extends Drawer {
+            constructor(dataset: Dataset);
+        }
+    }
+}
+
+
+declare module Plottable {
     type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
@@ -3036,6 +3045,38 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class ErrorBar<X, Y> extends XYPlot<X, Y> {
+            constructor();
+            /**
+             * Gets the AccessorScaleBinding for X.
+             */
+            x(): Plots.AccessorScaleBinding<X, number>;
+            x(x: number | Accessor<number>): ErrorBar<X, Y>;
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2.
+             */
+            x2(): Plots.AccessorScaleBinding<X, number>;
+            x2(x2: number | Accessor<number>): ErrorBar<X, Y>;
+            x2(x2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y.
+             */
+            y(): Plots.AccessorScaleBinding<Y, number>;
+            y(y: number | Accessor<number>): ErrorBar<X, Y>;
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): ErrorBar<X, Y>;
+            y2(): Plots.AccessorScaleBinding<X, number>;
+            y2(y2: number | Accessor<number>): ErrorBar<X, Y>;
+            y2(y2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            protected _createDrawer(dataset: Dataset): Drawer;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
