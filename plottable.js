@@ -9200,6 +9200,8 @@ var Plottable;
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
+                this._minDomainExtents = new Plottable.Utils.Map();
+                this._maxDomainExtents = new Plottable.Utils.Map();
             }
             PanZoom.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -9362,6 +9364,7 @@ var Plottable;
              */
             PanZoom.prototype.addXScale = function (xScale) {
                 this._xScales.add(xScale);
+                this._ensureDefaultDomainExtents(xScale);
                 return this;
             };
             /**
@@ -9382,7 +9385,18 @@ var Plottable;
              */
             PanZoom.prototype.addYScale = function (yScale) {
                 this._yScales.add(yScale);
+                this._ensureDefaultDomainExtents(yScale);
                 return this;
+            };
+            PanZoom.prototype._ensureDefaultDomainExtents = function (scale) {
+                if (this._minDomainExtents.get(scale) == null) {
+                    this._minDomainExtents.set(scale, 0);
+                }
+                if (this._maxDomainExtents.get(scale) == null) {
+                    var maxDateValue = 8640000000000000;
+                    var defaultMaxDomainExtent = scale instanceof Plottable.Scales.Time ? maxDateValue : Infinity;
+                    this._maxDomainExtents.set(scale, defaultMaxDomainExtent);
+                }
             };
             /**
              * Removes a y scale from this PanZoom Interaction

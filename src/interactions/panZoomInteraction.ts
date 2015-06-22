@@ -22,6 +22,9 @@ export module Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
+    private _minDomainExtents: Utils.Map<QuantitativeScale<any>, number>;
+    private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, number>;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -44,6 +47,8 @@ export module Interactions {
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map<Point>();
+      this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
     }
 
     protected _anchor(component: Component) {
@@ -249,6 +254,7 @@ export module Interactions {
      */
     public addXScale(xScale: QuantitativeScale<any>) {
       this._xScales.add(xScale);
+      this._ensureDefaultDomainExtents(xScale);
       return this;
     }
 
@@ -271,7 +277,19 @@ export module Interactions {
      */
     public addYScale(yScale: QuantitativeScale<any>) {
       this._yScales.add(yScale);
+      this._ensureDefaultDomainExtents(yScale);
       return this;
+    }
+
+    private _ensureDefaultDomainExtents(scale: QuantitativeScale<any>) {
+      if (this._minDomainExtents.get(scale) == null) {
+        this._minDomainExtents.set(scale, 0);
+      }
+      if (this._maxDomainExtents.get(scale) == null) {
+        var maxDateValue = 8640000000000000;
+        var defaultMaxDomainExtent = scale instanceof Scales.Time ? maxDateValue : Infinity;
+        this._maxDomainExtents.set(scale, defaultMaxDomainExtent);
+      }
     }
 
     /**
