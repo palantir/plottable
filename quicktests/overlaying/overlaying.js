@@ -110,7 +110,7 @@ function setupCheckboxBinding(){
 
 function populateTotalSidebarList(paths){
   //IF CATEGORY IS ALL ******
-  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, '');});
+  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, ''); });
 
   //ex. animations/animate_area
   var hash = {};
@@ -182,7 +182,7 @@ function setupBindings(){
   window.onkeyup = function(e){
     var key = e.keyCode || e.which;
     var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
-    if(inputActive){return;}
+    if(inputActive){return; }
 
     var visibleQuickTests = $(".quicktest").filter(":visible").toArray();
     processKeyEvent(key, visibleQuickTests);
@@ -213,7 +213,7 @@ function runQuickTest(result, svg, data, branch){
     result.run(svg, data, plottableBranches[branch]);
     setTestBoxDimensions();
   } catch (err) {
-    setTimeout(function() {throw err;}, 0);
+    setTimeout(function() {throw err; }, 0);
   }
 }
 
@@ -277,10 +277,10 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
 function filterQuickTests(category, branchList){
   //filter list of quicktests to list of quicktest names to pass to doSomething
   d3.json("list_of_quicktests.json", function (data){
-    var paths = data.map(function(quickTestObj) {return quickTestObj.path;});
+    var paths = data.map(function(quickTestObj) {return quickTestObj.path; });
     if (category !== "all"){
-      var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1;});
-      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, '');});
+      var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });
+      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ''); });
       loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
       populateSidebarList(paths, testsInCategory, category);
     }
@@ -323,7 +323,7 @@ function loadPlottableBranches(category, branchList){
       });
     }
     else if(textStatus === "error"){
-      console.log("could not retrieve Plottable branch, check if branch name " + branch + " is correct!");
+      console.log("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
   });
 }
