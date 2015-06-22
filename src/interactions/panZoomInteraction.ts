@@ -22,6 +22,11 @@ export module Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
+    private _minXExtent = 0;
+    private _maxXExtent = Infinity;
+    private _minYExtent = 0;
+    private _maxYExtent = Infinity;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -93,12 +98,12 @@ export module Interactions {
       var newCornerDistance = this._cornerDistance();
 
       if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-        PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+        this._magnifyXScale(oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+        this._translateXScale(oldCenterPoint.x - newCenterPoint.x);
       }
       if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-        PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+        this._magnifyYScale(oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+        this._translateYScale(oldCenterPoint.y - newCenterPoint.y);
       }
     }
 
@@ -134,14 +139,72 @@ export module Interactions {
       });
     }
 
-    private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
-      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      scale.domain(scale.range().map(magnifyTransform));
+    private _magnifyXScale(magnifyAmount: number, centerValue: number) {
+      var magnifyTransform = PanZoom._magnifyScaleTransform(this._xScale, magnifyAmount, centerValue);
+      magnifyTransform = this._constrainToXExtent(magnifyTransform);
+      this._xScale.domain(magnifyTransform);
     }
 
-    private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+    private _magnifyYScale(magnifyAmount: number, centerValue: number) {
+      var magnifyTransform = PanZoom._magnifyScaleTransform(this._yScale, magnifyAmount, centerValue);
+      magnifyTransform = this._constrainToYExtent(magnifyTransform);
+      this._yScale.domain(magnifyTransform);
+    }
+
+    private static _magnifyScaleTransform<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
+      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
+      return scale.range().map(magnifyTransform);
+    }
+
+    private _translateXScale(translateAmount: number) {
+      var translateTransform = PanZoom._translateScaleTransform(this._xScale, translateAmount);
+      translateTransform = this._constrainToXExtent(translateTransform);
+      this._xScale.domain(translateTransform);
+    }
+
+    private _translateYScale(translateAmount: number) {
+      var translateTransform = PanZoom._translateScaleTransform(this._yScale, translateAmount);
+      translateTransform = this._constrainToYExtent(translateTransform);
+      this._yScale.domain(translateTransform);
+    }
+
+    private static _translateScaleTransform<D>(scale: QuantitativeScale<D>, translateAmount: number): D[] {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      scale.domain(scale.range().map(translateTransform));
+      return scale.range().map(translateTransform);
+    }
+
+    private _constrainToXExtent<D>(domain: D[]) {
+      var extent = Math.abs(<any> domain[1].valueOf() - <any> domain[0].valueOf());
+      if (extent < this.minXExtent()) {
+        return PanZoom._constrainToExtent(this._xScale, this.minXExtent());
+      }
+      if (extent > this.maxXExtent()) {
+        return PanZoom._constrainToExtent(this._xScale, this.maxXExtent());
+      }
+      return domain;
+    }
+
+    private _constrainToYExtent<D>(domain: D[]) {
+      var extent = Math.abs(<any> domain[1].valueOf() - <any> domain[0].valueOf());
+      if (extent < this.minYExtent()) {
+        return PanZoom._constrainToExtent(this._yScale, this.minYExtent());
+      }
+      if (extent > this.maxYExtent()) {
+        return PanZoom._constrainToExtent(this._yScale, this.maxYExtent());
+      }
+      return domain;
+    }
+
+    private static _constrainToExtent<D>(scale: QuantitativeScale<D>, extent: number): D[] {
+      var scaleDomain = scale.domain();
+      var domainCenter = (<any> scaleDomain[1].valueOf() + <any> scaleDomain[0].valueOf()) / 2;
+      var domainMin = domainCenter - extent / 2;
+      var domainMax = domainCenter + extent / 2;
+      var isAscending = scaleDomain[1] > scaleDomain[0];
+      if (scale instanceof Scales.Time) {
+        return <any[]> (isAscending ? [new Date(domainMin), new Date(domainMax)] : [new Date(domainMax), new Date(domainMin)]);
+      }
+      return <any[]> (isAscending ? [domainMin, domainMax] : [domainMax, domainMin]);
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
@@ -152,10 +215,10 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         if (this._xScale != null) {
-          PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
+          this._magnifyXScale(zoomAmount, translatedP.x);
         }
         if (this._yScale != null) {
-          PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
+          this._magnifyYScale(zoomAmount, translatedP.y);
         }
       }
     }
@@ -171,14 +234,54 @@ export module Interactions {
         }
         if (this._xScale != null) {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom._translateScale(this._xScale, -dragAmountX);
+          this._translateXScale(-dragAmountX);
         }
         if (this._yScale != null) {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom._translateScale(this._yScale, -dragAmountY);
+          this._translateYScale(-dragAmountY);
         }
         lastDragPoint = endPoint;
       });
+    }
+
+    public minXExtent(): number;
+    public minXExtent(minXExtent: number): Interactions.PanZoom;
+    public minXExtent(minXExtent?: number): any {
+      if (minXExtent == null) {
+        return this._minXExtent;
+      }
+      this._minXExtent = minXExtent;
+      return this;
+    }
+
+    public maxXExtent(): number;
+    public maxXExtent(maxXExtent: number): Interactions.PanZoom;
+    public maxXExtent(maxXExtent?: number): any {
+      if (maxXExtent == null) {
+        return this._maxXExtent;
+      }
+      this._maxXExtent = maxXExtent;
+      return this;
+    }
+
+    public minYExtent(): number;
+    public minYExtent(minYExtent: number): Interactions.PanZoom;
+    public minYExtent(minYExtent?: number): any {
+      if (minYExtent == null) {
+        return this._minYExtent;
+      }
+      this._minYExtent = minYExtent;
+      return this;
+    }
+
+    public maxYExtent(): number;
+    public maxYExtent(maxYExtent: number): Interactions.PanZoom;
+    public maxYExtent(maxYExtent?: number): any {
+      if (maxYExtent == null) {
+        return this._maxYExtent;
+      }
+      this._maxXExtent = maxYExtent;
+      return this;
     }
 
   }

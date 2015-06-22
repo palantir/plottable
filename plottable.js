@@ -9189,6 +9189,10 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
+                this._minXExtent = 0;
+                this._maxXExtent = Infinity;
+                this._minYExtent = 0;
+                this._maxYExtent = Infinity;
                 this._xScale = xScale;
                 this._yScale = yScale;
                 this._dragInteraction = new Interactions.Drag();
@@ -9238,12 +9242,12 @@ var Plottable;
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
                 if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                    this._magnifyXScale(oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                    this._translateXScale(oldCenterPoint.x - newCenterPoint.x);
                 }
                 if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                    this._magnifyYScale(oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                    this._translateYScale(oldCenterPoint.y - newCenterPoint.y);
                 }
             };
             PanZoom.prototype._centerPoint = function () {
@@ -9272,13 +9276,64 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
-                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
-                scale.domain(scale.range().map(magnifyTransform));
+            PanZoom.prototype._magnifyXScale = function (magnifyAmount, centerValue) {
+                var magnifyTransform = PanZoom._magnifyScaleTransform(this._xScale, magnifyAmount, centerValue);
+                magnifyTransform = this._constrainToXExtent(magnifyTransform);
+                this._xScale.domain(magnifyTransform);
             };
-            PanZoom._translateScale = function (scale, translateAmount) {
+            PanZoom.prototype._magnifyYScale = function (magnifyAmount, centerValue) {
+                var magnifyTransform = PanZoom._magnifyScaleTransform(this._yScale, magnifyAmount, centerValue);
+                magnifyTransform = this._constrainToYExtent(magnifyTransform);
+                this._yScale.domain(magnifyTransform);
+            };
+            PanZoom._magnifyScaleTransform = function (scale, magnifyAmount, centerValue) {
+                var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
+                return scale.range().map(magnifyTransform);
+            };
+            PanZoom.prototype._translateXScale = function (translateAmount) {
+                var translateTransform = PanZoom._translateScaleTransform(this._xScale, translateAmount);
+                translateTransform = this._constrainToXExtent(translateTransform);
+                this._xScale.domain(translateTransform);
+            };
+            PanZoom.prototype._translateYScale = function (translateAmount) {
+                var translateTransform = PanZoom._translateScaleTransform(this._yScale, translateAmount);
+                translateTransform = this._constrainToYExtent(translateTransform);
+                this._yScale.domain(translateTransform);
+            };
+            PanZoom._translateScaleTransform = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
-                scale.domain(scale.range().map(translateTransform));
+                return scale.range().map(translateTransform);
+            };
+            PanZoom.prototype._constrainToXExtent = function (domain) {
+                var extent = Math.abs(domain[1].valueOf() - domain[0].valueOf());
+                if (extent < this.minXExtent()) {
+                    return PanZoom._constrainToExtent(this._xScale, this.minXExtent());
+                }
+                if (extent > this.maxXExtent()) {
+                    return PanZoom._constrainToExtent(this._xScale, this.maxXExtent());
+                }
+                return domain;
+            };
+            PanZoom.prototype._constrainToYExtent = function (domain) {
+                var extent = Math.abs(domain[1].valueOf() - domain[0].valueOf());
+                if (extent < this.minYExtent()) {
+                    return PanZoom._constrainToExtent(this._yScale, this.minYExtent());
+                }
+                if (extent > this.maxYExtent()) {
+                    return PanZoom._constrainToExtent(this._yScale, this.maxYExtent());
+                }
+                return domain;
+            };
+            PanZoom._constrainToExtent = function (scale, extent) {
+                var scaleDomain = scale.domain();
+                var domainCenter = (scaleDomain[1].valueOf() + scaleDomain[0].valueOf()) / 2;
+                var domainMin = domainCenter - extent / 2;
+                var domainMax = domainCenter + extent / 2;
+                var isAscending = scaleDomain[1] > scaleDomain[0];
+                if (scale instanceof Plottable.Scales.Time) {
+                    return (isAscending ? [new Date(domainMin), new Date(domainMax)] : [new Date(domainMax), new Date(domainMin)]);
+                }
+                return (isAscending ? [domainMin, domainMax] : [domainMax, domainMin]);
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var translatedP = this._translateToComponentSpace(p);
@@ -9287,10 +9342,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     if (this._xScale != null) {
-                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
+                        this._magnifyXScale(zoomAmount, translatedP.x);
                     }
                     if (this._yScale != null) {
-                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
+                        this._magnifyYScale(zoomAmount, translatedP.y);
                     }
                 }
             };
@@ -9305,14 +9360,42 @@ var Plottable;
                     }
                     if (_this._xScale != null) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom._translateScale(_this._xScale, -dragAmountX);
+                        _this._translateXScale(-dragAmountX);
                     }
                     if (_this._yScale != null) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom._translateScale(_this._yScale, -dragAmountY);
+                        _this._translateYScale(-dragAmountY);
                     }
                     lastDragPoint = endPoint;
                 });
+            };
+            PanZoom.prototype.minXExtent = function (minXExtent) {
+                if (minXExtent == null) {
+                    return this._minXExtent;
+                }
+                this._minXExtent = minXExtent;
+                return this;
+            };
+            PanZoom.prototype.maxXExtent = function (maxXExtent) {
+                if (maxXExtent == null) {
+                    return this._maxXExtent;
+                }
+                this._maxXExtent = maxXExtent;
+                return this;
+            };
+            PanZoom.prototype.minYExtent = function (minYExtent) {
+                if (minYExtent == null) {
+                    return this._minYExtent;
+                }
+                this._minYExtent = minYExtent;
+                return this;
+            };
+            PanZoom.prototype.maxYExtent = function (maxYExtent) {
+                if (maxYExtent == null) {
+                    return this._maxYExtent;
+                }
+                this._maxXExtent = maxYExtent;
+                return this;
             };
             /**
              * The number of pixels occupied in a line.
