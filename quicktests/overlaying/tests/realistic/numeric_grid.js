@@ -28,8 +28,8 @@ function run(svg, data, Plottable) {
       .x2(function(d){ return d.x2; }, xScale)
       .y2(function(d) { return d.y2; }, yScale)
   	  .attr("fill", function(d) { return d.fill; })
-  	  .attr("stroke", function(){ return "#000000";})
-  	  .attr("stroke-width", function(){ return 4;});
+  	  .attr("stroke", function(){ return "#000000"; })
+  	  .attr("stroke-width", function(){ return 4; });
 
   plot.renderTo(svg);
 }
