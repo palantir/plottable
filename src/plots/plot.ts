@@ -40,6 +40,8 @@ export class Plot extends Component {
   protected _propertyExtents: d3.Map<any[]>;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
 
+  private _to = 0;
+
   /**
    * A Plot draws some visualization of the inputted Datasets.
    *
@@ -53,7 +55,16 @@ export class Plot extends Component {
     this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
-    this._renderCallback = (scale) => this.render();
+    var _timeout = 0;
+    this._renderCallback = (scale) => {
+      this._renderArea && this._renderArea.attr('transform', 'translate(100, 100)');
+      clearTimeout(this._to);
+      this._to = setTimeout(() => {
+        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0)');
+        this.render();
+      }, 500);
+      // console.log(_timeout);
+    }
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();

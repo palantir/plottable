@@ -5916,13 +5916,23 @@ var Plottable;
             this._dataChanged = false;
             this._animate = false;
             this._animators = {};
+            this._to = 0;
             this._clipPathEnabled = true;
             this.addClass("plot");
             this._datasetToDrawer = new Plottable.Utils.Map();
             this._attrBindings = d3.map();
             this._attrExtents = d3.map();
             this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
-            this._renderCallback = function (scale) { return _this.render(); };
+            var _timeout = 0;
+            this._renderCallback = function (scale) {
+                _this._renderArea && _this._renderArea.attr('transform', 'translate(100, 100)');
+                clearTimeout(_this._to);
+                _this._to = setTimeout(function () {
+                    _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0)');
+                    _this.render();
+                }, 500);
+                // console.log(_timeout);
+            };
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();
             this._propertyExtents = d3.map();
