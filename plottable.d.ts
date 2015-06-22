@@ -3633,6 +3633,10 @@ declare module Plottable {
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             removeYScale(yScale: QuantitativeScale<any>): PanZoom;
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
         }
     }
 }

@@ -9394,6 +9394,12 @@ var Plottable;
                 this._yScales.delete(yScale);
                 return this;
             };
+            PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
+                // TODO: Implement
+            };
+            PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
+                // TODO: Implement
+            };
             /**
              * The number of pixels occupied in a line.
              */

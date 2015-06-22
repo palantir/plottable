@@ -284,6 +284,18 @@ export module Interactions {
       this._yScales.delete(yScale);
       return this;
     }
+
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
+      // TODO: Implement
+    }
+
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
+      // TODO: Implement
+    }
   }
 }
 }
