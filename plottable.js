@@ -6560,7 +6560,7 @@ var Plottable;
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                     var className = dark ? "dark-label" : "light-label";
                     g.classed(className, true);
-                    g.style("display", showLabel ? "block" : "none");
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
                     writer.write(value, measurement.width, measurement.height, {
                         selection: g,
                         xAlign: "center",

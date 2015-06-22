@@ -257,9 +257,9 @@ describe("Plots", () => {
         piePlot.addDataset(dataset).labelsEnabled(true);
         $(".label-area").children("g").each(function(i) {
           if (i % 2 === 0) {
-            assert.strictEqual($(this).css("display"), "none", "label hidden when slice is too small");
+            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
           } else {
-            assert.strictEqual($(this).css("display"), "block", "label shown when slice is appropriately sized");
+            assert.strictEqual($(this).css("visibility"), "visible", "label shown when slice is appropriately sized");
           }
         });
         svg.remove();
