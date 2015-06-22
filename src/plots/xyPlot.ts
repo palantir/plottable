@@ -9,6 +9,22 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
+  private _to1 = 0;
+  private _to2 = 0;
+
+  private _temp = {
+    x0: 0,
+    x1: 1,
+    y0: 0,
+    y1: 1
+  };
+
+  private old_dx = 0;
+  private old_dy = 0;
+
+  private old_sx = 1;
+  private old_sy = 1;
+
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
    *
@@ -20,8 +36,59 @@ export class XYPlot<X, Y> extends Plot {
     super();
     this.addClass("xy-plot");
 
-    this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
-    this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
+    this._adjustYDomainOnChangeFromXCallback = (scale) => {
+      this._adjustYDomainOnChangeFromX();
+
+      var domain = scale.domain();
+      var scaleX = (this._temp.x1 - this._temp.x0) / (domain[1] - domain[0]);
+      this.old_sx = scaleX;
+
+      var deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
+      this.old_dx = deltaX;
+
+      this._renderArea && this._renderArea.attr('transform',
+        'translate(' + deltaX + ', ' + this.old_dy + ')' +
+        'scale(' + scaleX +', ' + this.old_sy + ')');
+      clearTimeout(this._to1);
+      this._to1 = setTimeout(() => {
+        this._temp.x0 = domain[0];
+        this._temp.x1 = domain[1];
+        this.old_dx = 0;
+        this.old_dy = 0;
+        this.render();
+        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+      }, 500);
+    }
+
+    this._adjustXDomainOnChangeFromYCallback = (scale) => {
+      this._adjustXDomainOnChangeFromY();
+
+      var domain = scale.domain();
+
+      var scaleY = (this._temp.y1 - this._temp.y0) / (domain[1] - domain[0]);
+      this.old_sy = scaleY;
+
+      var deltaY = - scale.scale(domain[0]) + scale.scale(this._temp.y0);
+      this.old_dy;
+
+      this._renderArea && this._renderArea.attr('transform',
+        'translate(' + this.old_dx + ', ' + deltaY + ')' +
+        'scale(' + this.old_sx + ', ' + scaleY + ')');
+      clearTimeout(this._to2);
+      this._to2 = setTimeout(() => {
+        this._temp.y0 = domain[0];
+        this._temp.y1 = domain[1];
+        this.old_dx = 0;
+        this.old_dy = 0;
+        this.render();
+        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+      }, 500);
+    }
+
+    this._renderCallback = (scale) => {
+    }
+
+
   }
 
   /**
