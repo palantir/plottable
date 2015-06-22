@@ -55,7 +55,7 @@ var plotheight;
 //functions
 
 function togglePlotDisplay(className){
-  var classSelector = "."+className;
+  var classSelector = "." + className;
   var displayStatus = $(classSelector).css("display") === "none" ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
@@ -212,7 +212,7 @@ function makeRandomData(numPoints, series, scaleFactor) {
 }
 
 function prepareSingleData(data){
-  data[0].map(function(element){element.type = ""+ element.x; });
+  data[0].map(function(element){ element.type = "" + element.x; });
   return data;
 }
 

@@ -22,7 +22,6 @@
     "camelcase": 0,
     "comma-spacing": 0,
     "key-spacing": 0,
-    "space-infix-ops": 0,
     "no-use-before-define": 0,
     "strict": 0,
     "no-underscore-dangle": 0,

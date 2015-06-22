@@ -36,7 +36,7 @@ function run(svg, data, Plottable){
   .y(function(d) { return d.y; }, yScale)
   .size(symbolSize)
   .symbol(fourSymbolAccessor)
-  .attr("fill", function(datum){return datum.y>0?(datum.x>0?"#00bb00":"#bbbbbb"):(datum.x>0?"#bbbbbb":"#bb0000"); });
+  .attr("fill", function(datum) { return datum.y > 0 ? (datum.x > 0 ? "#00bb00" : "#bbbbbb") : (datum.x > 0 ? "#bbbbbb" : "#bb0000"); });
 
   var title = new Plottable.Components.Label("n = new point, d = delete point");
   var cs = new Plottable.Scales.Color();
@@ -107,7 +107,7 @@ function run(svg, data, Plottable){
 
     key.onKeyPress(68, function(keyData){
       if(d.length > 0){
-        d.splice(d.length-1,1);
+        d.splice(d.length - 1,1);
         dataset.data(d);
       }
     });
@@ -119,7 +119,7 @@ function run(svg, data, Plottable){
 
     key.onKey(68, function(keyData){
       if(d.length > 0){
-        d.splice(d.length-1,1);
+        d.splice(d.length - 1,1);
         dataset.data(d);
       }
     });

@@ -35,11 +35,11 @@ function run(svg, data, Plottable) {
               "total value": getValue(0)
             }
           ];
-          for (var i=1; i<aapl.length; i++) {
+          for (var i = 1; i < aapl.length; i++) {
             var totalVal = getValue(i);
             diffData.push({
               "Date": aapl[i].Date,
-              "net change": totalVal - diffData[i-1]["total value"],
+              "net change": totalVal - diffData[i - 1]["total value"],
               "total value": totalVal
             });
           }
