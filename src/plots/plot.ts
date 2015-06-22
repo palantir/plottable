@@ -20,6 +20,10 @@ export module Plots {
   }
 }
 
+/**
+ * Lightweight version of Plots.PlotEntity. The field selection is missing, but can be deduced
+ * using the drawer and the validDatumIndex.
+ */
 interface LightweightPlotEntity {
   datum: any;
   position: Point;
