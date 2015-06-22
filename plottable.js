@@ -9409,10 +9409,20 @@ var Plottable;
                 return this;
             };
             PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
-                // TODO: Implement
+                if (minDomainExtent == null) {
+                    var minDomainExtentValue = this._minDomainExtents.get(quantitativeScale);
+                    return quantitativeScale instanceof Plottable.Scales.Time ? new Date(minDomainExtentValue) : minDomainExtentValue;
+                }
+                this._minDomainExtents.set(quantitativeScale, minDomainExtent.valueOf());
+                return this;
             };
             PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
-                // TODO: Implement
+                if (maxDomainExtent == null) {
+                    var maxDomainExtentValue = this._maxDomainExtents.get(quantitativeScale);
+                    return quantitativeScale instanceof Plottable.Scales.Time ? new Date(maxDomainExtentValue) : maxDomainExtentValue;
+                }
+                this._maxDomainExtents.set(quantitativeScale, maxDomainExtent.valueOf());
+                return this;
             };
             /**
              * The number of pixels occupied in a line.

@@ -306,13 +306,23 @@ export module Interactions {
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
-      // TODO: Implement
+      if (minDomainExtent == null) {
+        var minDomainExtentValue = this._minDomainExtents.get(quantitativeScale);
+        return quantitativeScale instanceof Scales.Time ? new Date(minDomainExtentValue) : minDomainExtentValue;
+      }
+      this._minDomainExtents.set(quantitativeScale, <any> minDomainExtent.valueOf());
+      return this;
     }
 
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
-      // TODO: Implement
+      if (maxDomainExtent == null) {
+        var maxDomainExtentValue = this._maxDomainExtents.get(quantitativeScale);
+        return quantitativeScale instanceof Scales.Time ? new Date(maxDomainExtentValue) : maxDomainExtentValue;
+      }
+      this._maxDomainExtents.set(quantitativeScale, <any> maxDomainExtent.valueOf());
+      return this;
     }
   }
 }
