@@ -14,7 +14,6 @@
     "key-spacing": 0,
     "space-infix-ops": 0,
     "no-mixed-spaces-and-tabs": 0,
-    "semi-spacing": 0,
     "comma-dangle": 0,
     "no-use-before-define": 0,
     "strict": 0,

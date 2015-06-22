@@ -38,9 +38,9 @@ function run(svg, data, Plottable) {
       .animator(Plottable.Plots.Animator.MAIN, animator)
       .animated(true);
    if (typeof vbar.labelsFormatter === "function") {
-     vbar.labelsFormatter(function(text){return text + "!";});
+     vbar.labelsFormatter(function(text){return text + "!"; });
    } else {
-     vbar.labelFormatter(function(text){return text + "!";});
+     vbar.labelFormatter(function(text){return text + "!"; });
    }
 
     var chart = new Plottable.Components.Table([

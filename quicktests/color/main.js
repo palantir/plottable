@@ -212,7 +212,7 @@ function makeRandomData(numPoints, series, scaleFactor) {
 }
 
 function prepareSingleData(data){
-  data[0].map(function(element){element.type = ""+ element.x;});
+  data[0].map(function(element){element.type = ""+ element.x; });
   return data;
 }
 
