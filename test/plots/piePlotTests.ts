@@ -259,7 +259,7 @@ describe("Plots", () => {
           if (i % 2 === 0) {
             assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
           } else {
-            assert.strictEqual($(this).css("visibility"), "visible", "label shown when slice is appropriately sized");
+            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
           }
         });
         svg.remove();
