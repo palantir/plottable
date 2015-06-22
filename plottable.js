@@ -789,7 +789,7 @@ var Plottable;
                 var callingMethod = "";
                 try {
                     // Getting the name of the calling method through the stack trace.
-                    callingMethod = (new Error).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/^at$/); })[0]; // Dropping extra keywords in Chrome
+                    callingMethod = (new Error()).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/^at$/); })[0]; // Dropping extra keywords in Chrome
                 }
                 catch (err) {
                     callingMethod = "called";

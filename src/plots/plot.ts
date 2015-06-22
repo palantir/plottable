@@ -21,8 +21,9 @@ export module Plots {
 }
 
 /**
- * Lightweight version of Plots.PlotEntity. The field selection is missing, but can be deduced
- * using the drawer and the validDatumIndex.
+ * Computing the selection of an entity is an expensive operation. This object aims to
+ * reproduce the bahavior of the Plots.PlotEntity, excluding the selection, but including
+ * drawer and validDatumIndex, which can be used to compute the selection.
  */
 interface LightweightPlotEntity {
   datum: any;

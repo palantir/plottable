@@ -55,7 +55,7 @@ export module Utils {
 
       try {
         // Getting the name of the calling method through the stack trace.
-        callingMethod = (<any> new Error).stack
+        callingMethod = (<any> new Error()).stack
           .split("\n")
           .filter((step: string) => step.match(/http/))[1] // Just method names
           .trim()
