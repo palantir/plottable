@@ -34,13 +34,20 @@ export class Plot extends Component {
   private _animate = false;
   private _animators: {[animator: string]: Animator} = {};
 
-  private _renderCallback: ScaleCallback<Scale<any, any>>;
+  protected _renderCallback: ScaleCallback<Scale<any, any>>;
   private _onDatasetUpdateCallback: DatasetCallback;
 
   protected _propertyExtents: d3.Map<any[]>;
   protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
 
   private _to = 0;
+
+  private _temp = {
+    x0: 0,
+    x1: 0,
+    y0: 0,
+    y1: 0
+  };
 
   /**
    * A Plot draws some visualization of the inputted Datasets.
@@ -57,13 +64,27 @@ export class Plot extends Component {
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
     var _timeout = 0;
     this._renderCallback = (scale) => {
-      this._renderArea && this._renderArea.attr('transform', 'translate(100, 100)');
+      var domain = scale.domain();
+      var range = scale.range();
+
+      console.log(this._temp.x0);
+
+      var deltaX = - scale.scale(domain[0]) + scale.scale(this._temp.x0);
+      var deltaY = - scale.scale(range[0]) + scale.scale(this._temp.y0);
+
+      // deltaX = scale.scale(deltaX);
+      // deltaY = scale.scale(deltaY);
+
+      this._renderArea && this._renderArea.attr('transform', 'translate(' + deltaY + ', ' + deltaX + ')');
       clearTimeout(this._to);
       this._to = setTimeout(() => {
         this._renderArea && this._renderArea.attr('transform', 'translate(0, 0)');
+        this._temp.x0 = domain[0];
+        this._temp.x1 = domain[1];
+        this._temp.y0 = range[0];
+        this._temp.y1 = range[1];
         this.render();
       }, 500);
-      // console.log(_timeout);
     }
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();

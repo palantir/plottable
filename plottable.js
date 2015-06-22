@@ -5917,6 +5917,12 @@ var Plottable;
             this._animate = false;
             this._animators = {};
             this._to = 0;
+            this._temp = {
+                x0: 0,
+                x1: 0,
+                y0: 0,
+                y1: 0
+            };
             this._clipPathEnabled = true;
             this.addClass("plot");
             this._datasetToDrawer = new Plottable.Utils.Map();
@@ -5925,13 +5931,23 @@ var Plottable;
             this._includedValuesProvider = function (scale) { return _this._includedValuesForScale(scale); };
             var _timeout = 0;
             this._renderCallback = function (scale) {
-                _this._renderArea && _this._renderArea.attr('transform', 'translate(100, 100)');
+                var domain = scale.domain();
+                var range = scale.range();
+                console.log(_this._temp.x0);
+                var deltaX = -scale.scale(domain[0]) + scale.scale(_this._temp.x0);
+                var deltaY = -scale.scale(range[0]) + scale.scale(_this._temp.y0);
+                // deltaX = scale.scale(deltaX);
+                // deltaY = scale.scale(deltaY);
+                _this._renderArea && _this._renderArea.attr('transform', 'translate(' + deltaY + ', ' + deltaX + ')');
                 clearTimeout(_this._to);
                 _this._to = setTimeout(function () {
                     _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0)');
+                    _this._temp.x0 = domain[0];
+                    _this._temp.x1 = domain[1];
+                    _this._temp.y0 = range[0];
+                    _this._temp.y1 = range[1];
                     _this.render();
                 }, 500);
-                // console.log(_timeout);
             };
             this._onDatasetUpdateCallback = function () { return _this._onDatasetUpdate(); };
             this._propertyBindings = d3.map();

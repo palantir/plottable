@@ -2307,6 +2307,7 @@ declare module Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
