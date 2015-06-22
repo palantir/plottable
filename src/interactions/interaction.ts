@@ -7,6 +7,7 @@ export class Interaction {
   private _anchorCallback = (component: Component) => this._anchor(component);
 
   private _isAnchored: boolean;
+  private _enabled = true;
 
   protected _anchor(component: Component) {
     this._isAnchored = true;
@@ -24,14 +25,19 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public attachTo(component: Component) {
-    if (this._componentAttachedTo) {
-      this.detachFrom(this._componentAttachedTo);
-    }
-
+    this._detach();
     this._componentAttachedTo = component;
-    component.onAnchor(this._anchorCallback);
-
+    this._attach();
     return this;
+  }
+
+  /**
+   * Attaches to existing _componentAttachedTo if enabled.
+   */
+  private _attach() {
+    if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
+      this._componentAttachedTo.onAnchor(this._anchorCallback);
+    }
   }
 
   /**
@@ -42,12 +48,42 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public detachFrom(component: Component) {
+    this._detach();
+    this._componentAttachedTo = null;
+    return this;
+  }
+
+  /**
+   * Detaches from existing _componentAttachedTo (if it exists)
+   * without overwriting _componentAttachedTo.
+   */
+  private _detach() {
     if (this._isAnchored) {
       this._unanchor();
     }
-    this._componentAttachedTo = null;
-    component.offAnchor(this._anchorCallback);
+    if (this._componentAttachedTo != null) {
+      this._componentAttachedTo.offAnchor(this._anchorCallback);
+    }
+  }
 
+  /**
+   * Gets whether this Interaction is enabled.
+   */
+  public enabled(): boolean;
+  /**
+   * Enables or disables this Interaction.
+   */
+  public enabled(enabled: boolean): Interaction;
+  public enabled(enabled?: boolean): any {
+    if (enabled == null) {
+      return this._enabled;
+    }
+    this._enabled = enabled;
+    if (this._enabled) {
+      this._attach();
+    } else {
+      this._detach();
+    }
     return this;
   }
 

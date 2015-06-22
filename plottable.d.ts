@@ -3423,6 +3423,14 @@ declare module Plottable {
          */
         detachFrom(component: Component): Interaction;
         /**
+         * Gets whether this Interaction is enabled.
+         */
+        enabled(): boolean;
+        /**
+         * Enables or disables this Interaction.
+         */
+        enabled(enabled: boolean): Interaction;
+        /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
          * @param {Point} p A Point in <svg>-space coordinates.
