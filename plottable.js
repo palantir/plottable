@@ -9189,8 +9189,14 @@ var Plottable;
                 this._touchMoveCallback = function (ids, idToPoint, e) { return _this._handlePinch(ids, idToPoint, e); };
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
-                this._xScale = xScale;
-                this._yScale = yScale;
+                this._xScales = new Plottable.Utils.Set();
+                if (xScale != null) {
+                    this._xScales.add(xScale);
+                }
+                this._yScales = new Plottable.Utils.Set();
+                if (yScale != null) {
+                    this._yScales.add(yScale);
+                }
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
@@ -9237,13 +9243,17 @@ var Plottable;
                 });
                 var newCenterPoint = this._centerPoint();
                 var newCornerDistance = this._cornerDistance();
-                if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                    PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this.xScales().forEach(function (xScale) {
+                        PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+                        PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+                    });
                 }
-                if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                    PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    this.yScales().forEach(function (yScale) {
+                        PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+                        PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+                    });
                 }
             };
             PanZoom.prototype._centerPoint = function () {
@@ -9286,12 +9296,12 @@ var Plottable;
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-                    if (this._xScale != null) {
-                        PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
-                    }
-                    if (this._yScale != null) {
-                        PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
-                    }
+                    this.xScales().forEach(function (xScale) {
+                        PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+                    });
+                    this.yScales().forEach(function (yScale) {
+                        PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+                    });
                 }
             };
             PanZoom.prototype._setupDragInteraction = function () {
@@ -9303,16 +9313,86 @@ var Plottable;
                     if (_this._touchIds.size() >= 2) {
                         return;
                     }
-                    if (_this._xScale != null) {
+                    _this.xScales().forEach(function (xScale) {
                         var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom._translateScale(_this._xScale, -dragAmountX);
-                    }
-                    if (_this._yScale != null) {
+                        PanZoom._translateScale(xScale, -dragAmountX);
+                    });
+                    _this.yScales().forEach(function (yScale) {
                         var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom._translateScale(_this._yScale, -dragAmountY);
-                    }
+                        PanZoom._translateScale(yScale, -dragAmountY);
+                    });
                     lastDragPoint = endPoint;
                 });
+            };
+            PanZoom.prototype.xScales = function (xScales) {
+                var _this = this;
+                if (xScales == null) {
+                    var scales = [];
+                    this._xScales.forEach(function (xScale) {
+                        scales.push(xScale);
+                    });
+                    return scales;
+                }
+                this._xScales = new Plottable.Utils.Set();
+                xScales.forEach(function (xScale) {
+                    _this.addXScale(xScale);
+                });
+                return this;
+            };
+            PanZoom.prototype.yScales = function (yScales) {
+                var _this = this;
+                if (yScales == null) {
+                    var scales = [];
+                    this._yScales.forEach(function (yScale) {
+                        scales.push(yScale);
+                    });
+                    return scales;
+                }
+                this._yScales = new Plottable.Utils.Set();
+                yScales.forEach(function (yScale) {
+                    _this.addYScale(yScale);
+                });
+                return this;
+            };
+            /**
+             * Adds an x scale to this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            PanZoom.prototype.addXScale = function (xScale) {
+                this._xScales.add(xScale);
+                return this;
+            };
+            /**
+             * Removes an x scale from this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to remove
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            PanZoom.prototype.removeXScale = function (xScale) {
+                this._xScales.delete(xScale);
+                return this;
+            };
+            /**
+             * Adds a y scale to this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} A y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            PanZoom.prototype.addYScale = function (yScale) {
+                this._yScales.add(yScale);
+                return this;
+            };
+            /**
+             * Removes a y scale from this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} A y scale to remove
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            PanZoom.prototype.removeYScale = function (yScale) {
+                this._yScales.delete(yScale);
+                return this;
             };
             /**
              * The number of pixels occupied in a line.
