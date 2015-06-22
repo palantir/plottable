@@ -369,7 +369,7 @@ describe("Plots", () => {
         { key: "a", value: 3 },
         { key: "b", value: -4 }
       ];
-      var data2_b = [
+      var data2B = [
         { key: "a", value: 1 },
         { key: "b", value: -2 }
       ];
@@ -382,7 +382,7 @@ describe("Plots", () => {
       assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
       assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
 
-      dataset2.data(data2_b);
+      dataset2.data(data2B);
 
       assert.closeTo(yScale.domain()[0], -4, 1, "min stacked extent decreases in magnitude");
       assert.closeTo(yScale.domain()[1], 2, 1, "max stacked extent decreases in magnitude");

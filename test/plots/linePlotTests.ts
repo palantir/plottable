@@ -131,15 +131,15 @@ describe("Plots", () => {
       ];
       simpleDataset.data(lineData);
       var linePath = renderArea.select(".line");
-      var d_original = TestMethods.normalizePath(linePath.attr("d"));
+      var dOriginal = TestMethods.normalizePath(linePath.attr("d"));
 
       function assertCorrectPathSplitting(msgPrefix: string) {
         var d = TestMethods.normalizePath(linePath.attr("d"));
         var pathSegements = d.split("M").filter((segment) => segment !== "");
         assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-        var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+        var firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
         assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-        var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+        var secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
         assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
       }
 

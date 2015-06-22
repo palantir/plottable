@@ -1,0 +1,30 @@
+{
+  "env": {
+    "browser": true,
+    "jquery": true,
+    "node": true
+  },
+  "globals": {
+    "d3": true,
+    "Plottable": true,
+    "makeRandomData": true,
+    "deep_copy": true
+  },
+  "rules": {
+    "no-eval": 0,
+    "no-return-assign": 0,
+    "no-shadow": 0,
+    "quotes": 0,
+    "consistent-return": 0,
+    "no-console": 0,
+    "no-unused-vars": 0,
+    "no-multi-spaces": 0,
+    "camelcase": 0,
+    "comma-spacing": 0,
+    "key-spacing": 0,
+    "no-use-before-define": 0,
+    "strict": 0,
+    "no-underscore-dangle": 0,
+    "no-labels": 0
+  }
+}

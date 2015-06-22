@@ -1,9 +1,6 @@
 module.exports = function(grunt) {
   "use strict";
 
-  var path = require("path");
-  var cwd = process.cwd();
-
   var tsJSON = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
@@ -72,27 +69,27 @@ module.exports = function(grunt) {
     private_definitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
-      path: "build/plottable.d.ts",
+      path: "build/plottable.d.ts"
     },
     plottable_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
-      path: "plottable_multifile.js",
+      path: "plottable_multifile.js"
     },
     definitions: {
       pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
-      path: "build/plottable.d.ts",
+      path: "build/plottable.d.ts"
     },
     tests_multifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/test/$1.js");',
-      path: "test/tests_multifile.js",
+      path: "test/tests_multifile.js"
     },
     sublime: {
       pattern: "(.*\\.ts)",
       replacement: '/// <reference path="../$1" />',
-      path: "build/sublime.d.ts",
+      path: "build/sublime.d.ts"
     },
     version_number: {
       pattern: "@VERSION",
@@ -149,46 +146,46 @@ module.exports = function(grunt) {
     bump: bumpJSON,
     umd: {
       all: {
-        src: "plottable.js", 
+        src: "plottable.js",
         template: "unit",
-        objectToExport: "Plottable",
+        objectToExport: "Plottable"
       }
     },
     concat: {
       header: {
         src: ["license_header.txt", "plottable.js"],
-        dest: "plottable.js",
+        dest: "plottable.js"
       },
       plottable_multifile: {
         src: ["synchronousRequire.js", "src/reference.ts"],
-        dest: "plottable_multifile.js",
+        dest: "plottable_multifile.js"
       },
       tests_multifile: {
         src: ["synchronousRequire.js", "test/testReference.ts"],
-        dest: "test/tests_multifile.js",
+        dest: "test/tests_multifile.js"
       },
       plottable: {
         src: tsFiles.map(function(s) {
               return "build/src/" + s.replace(".ts", ".js");
           }),
-        dest: "plottable.js",
+        dest: "plottable.js"
       },
       tests: {
         src: testTsFiles.map(function(s) {
               return "build/test/" + s.replace(".ts", ".js");
           }),
-        dest: "test/tests.js",
+        dest: "test/tests.js"
       },
       definitions: {
         src: tsFiles.map(function(s) {
               return "build/src/" + s.replace(".ts", ".d.ts");
           }),
-        dest: "build/plottable.d.ts",
+        dest: "build/plottable.d.ts"
       },
       svgtypewriter: {
         src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
-        dest: "plottable.js",
-      },
+        dest: "plottable.js"
+      }
     },
     ts: tsJSON,
     tslint: {
@@ -209,6 +206,12 @@ module.exports = function(grunt) {
       files: ['Gruntfile.js', 'quicktests/**/*.js'],
       options: {
         config: '.jscsrc'
+      }
+    },
+    eslint: {
+      target: ['Gruntfile.js', 'quicktests/**/*.js'],
+      options: {
+        configFile: '.eslintrc'
       }
     },
     parallelize: {
@@ -292,8 +295,8 @@ module.exports = function(grunt) {
     },
     shell: {
       sublime: {
-        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts",
-      },
+        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
+      }
     },
     'saucelabs-mocha': {
       all: {
@@ -323,7 +326,7 @@ module.exports = function(grunt) {
                                   "ts:test",
                                   "concat:tests_multifile",
                                   "sed:tests_multifile",
-                                  "concat:tests",
+                                  "concat:tests"
                                   ]);
   grunt.registerTask("default", "launch");
   var compile_task = [
@@ -335,7 +338,7 @@ module.exports = function(grunt) {
       "concat:definitions",
       "sed:definitions",
       "sed:private_definitions",
-      "umd:all", 
+      "umd:all",
       "concat:header",
       "sed:version_number",
       "definitions_prod",
@@ -365,7 +368,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts", "jscs"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts", "jscs", "eslint"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {
@@ -376,7 +379,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("sublime", [
                                   "shell:sublime",
-                                  "sed:sublime",
+                                  "sed:sublime"
                                   ]);
 
   var updateQuickTestsJSON = function() {

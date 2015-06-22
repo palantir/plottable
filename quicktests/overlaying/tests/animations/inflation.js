@@ -43,11 +43,11 @@ function run(svg, data, Plottable) {
     var dataset = new Plottable.Dataset(data[y]);
     var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
-              .x(function(d, i) { return d.x + y*12; }, xScale)
+              .x(function(d, i) { return d.x + y * 12; }, xScale)
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#000000")
               .animated(true);
-    plot_array.push(lineRenderer); 
+    plot_array.push(lineRenderer);
   };
 
   var year_average = function(y){
@@ -56,7 +56,7 @@ function run(svg, data, Plottable) {
     for (var month = 0; month < 12; month++){
       total += d[month].y;
     }
-    var average = total/12;
+    var average = total / 12;
     var avg_data = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
     var avg_ds = new Plottable.Dataset(avg_data);
     var lineRenderer = new Plottable.Plots.Line()
@@ -65,12 +65,12 @@ function run(svg, data, Plottable) {
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#FF0000")
               .animated(true);
-    plot_array.push(lineRenderer);     
+    plot_array.push(lineRenderer);
   };
 
   for (var year = 0; year < data.length; year++){
-    add_year(year); 
-    year_average(year);          
+    add_year(year);
+    year_average(year);
   }
 
   var group = new Plottable.Components.Group(plot_array);

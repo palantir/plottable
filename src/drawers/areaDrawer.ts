@@ -15,7 +15,7 @@ export module Drawers {
       selection.style("stroke", "none");
     }
 
-    public selectionForIndex(index: number) {
+    public selectionForIndex(index: number): d3.Selection<any> {
       return d3.select(this.selection()[0][0]);
     }
   }

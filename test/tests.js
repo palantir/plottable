@@ -4047,14 +4047,14 @@ describe("Plots", function () {
             ];
             simpleDataset.data(lineData);
             var linePath = renderArea.select(".line");
-            var d_original = TestMethods.normalizePath(linePath.attr("d"));
+            var dOriginal = TestMethods.normalizePath(linePath.attr("d"));
             function assertCorrectPathSplitting(msgPrefix) {
                 var d = TestMethods.normalizePath(linePath.attr("d"));
                 var pathSegements = d.split("M").filter(function (segment) { return segment !== ""; });
                 assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-                var firstSegmentContained = d_original.indexOf(pathSegements[0]) >= 0;
+                var firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
                 assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-                var secondSegmentContained = d_original.indexOf(pathSegements[1]) >= 0;
+                var secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
                 assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
             }
             var dataWithNaN = lineData.slice();
@@ -5823,7 +5823,7 @@ describe("Plots", function () {
                 { key: "a", value: 3 },
                 { key: "b", value: -4 }
             ];
-            var data2_b = [
+            var data2B = [
                 { key: "a", value: 1 },
                 { key: "b", value: -2 }
             ];
@@ -5833,7 +5833,7 @@ describe("Plots", function () {
             stackedBarPlot.addDataset(dataset2);
             assert.closeTo(yScale.domain()[0], -6, 1, "min stacked extent is as normal");
             assert.closeTo(yScale.domain()[1], 4, 1, "max stacked extent is as normal");
-            dataset2.data(data2_b);
+            dataset2.data(data2B);
             assert.closeTo(yScale.domain()[0], -4, 1, "min stacked extent decreases in magnitude");
             assert.closeTo(yScale.domain()[1], 2, 1, "max stacked extent decreases in magnitude");
         });
@@ -8341,7 +8341,10 @@ describe("Utils", function () {
             set.add(values[1]);
             var index = 0;
             set.forEach(function (value1, value2, passedSet) {
-                assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                // HACKHACK: Safari bug #21489317: Safari passes undefined instead of a duplicate value for value2.
+                if (value2 !== undefined) {
+                    assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                }
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
                 assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
                 index++;
@@ -9683,6 +9686,7 @@ describe("Interactions", function () {
         var eventTarget;
         var xScale;
         var yScale;
+        var panZoomInteraction;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var component = new Plottable.Component();
@@ -9691,7 +9695,10 @@ describe("Interactions", function () {
             xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
             yScale = new Plottable.Scales.Linear();
             yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-            (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
+            panZoomInteraction = new Plottable.Interactions.PanZoom();
+            panZoomInteraction.addXScale(xScale);
+            panZoomInteraction.addYScale(yScale);
+            panZoomInteraction.attachTo(component);
             eventTarget = component.background();
         });
         describe("Panning", function () {
@@ -9713,6 +9720,19 @@ describe("Interactions", function () {
                 TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
                 assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
                 assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging a certain amount will translate multiple scales correctly (mouse)", function () {
+                var xScale2 = new Plottable.Scales.Linear();
+                xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+                panZoomInteraction.addXScale(xScale2);
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (mouse)");
                 svg.remove();
             });
             it("dragging a certain amount will translate the scale correctly (touch)", function () {
@@ -9741,6 +9761,19 @@ describe("Interactions", function () {
                 assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
                 svg.remove();
             });
+            it("dragging a certain amount will translate multiple scales correctly (touch)", function () {
+                var xScale2 = new Plottable.Scales.Linear();
+                xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+                panZoomInteraction.addXScale(xScale2);
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
         });
         it("mousewheeling a certain amount will magnify the scale correctly", function () {
             // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
@@ -9754,6 +9787,23 @@ describe("Interactions", function () {
             TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
             assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
             assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("mousewheeling a certain amount will magnify multiple scales correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var xScale2 = new Plottable.Scales.Linear();
+            xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+            panZoomInteraction.addXScale(xScale2);
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 2, SVG_WIDTH * 7 / 2], "xScale2 zooms to the correct domain via scroll");
             svg.remove();
         });
         it("pinching a certain amount will magnify the scale correctly", function () {
@@ -9771,6 +9821,54 @@ describe("Interactions", function () {
             TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
             assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
             assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify multiple scales correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var xScale2 = new Plottable.Scales.Linear();
+            xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+            panZoomInteraction.addXScale(xScale2);
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 4, SVG_WIDTH * 5 / 4], "xScale2 transforms to the correct domain via pinch");
+            svg.remove();
+        });
+        it("Setting the xScales in batch is the same as adding one at a time", function () {
+            var xScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addXScale(xScale2);
+            var xScales = panZoomInteraction.xScales();
+            panZoomInteraction.xScales([xScale, xScale2]);
+            assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
+            svg.remove();
+        });
+        it("Setting the yScales in batch is the same as adding one at a time", function () {
+            var yScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addYScale(yScale2);
+            var yScales = panZoomInteraction.yScales();
+            panZoomInteraction.yScales([yScale, yScale2]);
+            assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
+            svg.remove();
+        });
+        it("Adding an already existent xScale does nothing", function () {
+            var oldXScaleNumber = panZoomInteraction.xScales().length;
+            panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
+            assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
+            svg.remove();
+        });
+        it("Adding an already existent yScale does nothing", function () {
+            var oldYScaleNumber = panZoomInteraction.yScales().length;
+            panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
+            assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
             svg.remove();
         });
     });

@@ -178,7 +178,7 @@ export class Drawer {
   /**
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
-  public selectionForIndex(index: number) {
+  public selectionForIndex(index: number): d3.Selection<any> {
     return d3.select(this.selection()[0][index]);
   }
 

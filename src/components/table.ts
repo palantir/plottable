@@ -471,8 +471,8 @@ export module Components {
 
     private static _fixedSpace(componentGroup: Component[][], fixityAccessor: (c: Component) => boolean) {
       var all = (bools: boolean[]) => bools.reduce((a, b) => a && b, true);
-      var group_isFixed = (components: Component[]) => all(components.map(fixityAccessor));
-      return all(componentGroup.map(group_isFixed));
+      var groupIsFixed = (components: Component[]) => all(components.map(fixityAccessor));
+      return all(componentGroup.map(groupIsFixed));
     }
   }
 }
