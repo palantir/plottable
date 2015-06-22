@@ -6531,10 +6531,11 @@ var Plottable;
             this.old_sx = 1;
             this.old_sy = 1;
             this.addClass("xy-plot");
+            // X
             this._adjustYDomainOnChangeFromXCallback = function (scale) {
                 _this._adjustYDomainOnChangeFromX();
                 var domain = scale.domain();
-                var scaleX = (_this._temp.x1 - _this._temp.x0) / (domain[1] - domain[0]);
+                var scaleX = (scale.scale(_this._temp.x1) - scale.scale(_this._temp.x0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
                 _this.old_sx = scaleX;
                 var deltaX = scale.scale(_this._temp.x0) - scale.scale(domain[0]);
                 _this.old_dx = deltaX;
@@ -6549,13 +6550,15 @@ var Plottable;
                     _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
                 }, 500);
             };
+            // Y
             this._adjustXDomainOnChangeFromYCallback = function (scale) {
                 _this._adjustXDomainOnChangeFromY();
                 var domain = scale.domain();
-                var deltaY = -scale.scale(domain[0]) + scale.scale(_this._temp.y0);
-                _this.old_dy;
-                var scaleY = (_this._temp.y1 - _this._temp.y0) / (domain[1] - domain[0]);
+                var scaleY = (scale.scale(_this._temp.y1) - scale.scale(_this._temp.y0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
                 _this.old_sy = scaleY;
+                var deltaY = -scale.scale(domain[0]) * scaleY + scale.scale(_this._temp.y0);
+                _this.old_dy = deltaY;
+                console.log(scale.scale(_this._temp.y0), scale.scale(domain[0]), domain[0], scaleY);
                 _this._renderArea && _this._renderArea.attr('transform', 'translate(' + _this.old_dx + ', ' + deltaY + ')' + 'scale(' + _this.old_sx + ', ' + scaleY + ')');
                 clearTimeout(_this._to2);
                 _this._to2 = setTimeout(function () {

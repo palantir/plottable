@@ -36,11 +36,13 @@ export class XYPlot<X, Y> extends Plot {
     super();
     this.addClass("xy-plot");
 
+    // X
     this._adjustYDomainOnChangeFromXCallback = (scale) => {
       this._adjustYDomainOnChangeFromX();
 
       var domain = scale.domain();
-      var scaleX = (this._temp.x1 - this._temp.x0) / (domain[1] - domain[0]);
+      var scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
+                   (scale.scale(domain[1]) - scale.scale(domain[0]));
       this.old_sx = scaleX;
 
       var deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
@@ -60,16 +62,20 @@ export class XYPlot<X, Y> extends Plot {
       }, 500);
     }
 
+    // Y
     this._adjustXDomainOnChangeFromYCallback = (scale) => {
       this._adjustXDomainOnChangeFromY();
 
       var domain = scale.domain();
 
-      var scaleY = (this._temp.y1 - this._temp.y0) / (domain[1] - domain[0]);
+      var scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) /
+                   (scale.scale(domain[1]) - scale.scale(domain[0]));
       this.old_sy = scaleY;
 
-      var deltaY = - scale.scale(domain[0]) + scale.scale(this._temp.y0);
-      this.old_dy;
+      var deltaY = - scale.scale(domain[0]) * scaleY + scale.scale(this._temp.y0);
+      this.old_dy = deltaY;
+
+      console.log(scale.scale(this._temp.y0), scale.scale(domain[0]), domain[0], scaleY)
 
       this._renderArea && this._renderArea.attr('transform',
         'translate(' + this.old_dx + ', ' + deltaY + ')' +
