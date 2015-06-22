@@ -79,9 +79,9 @@ function run(svg, data, Plottable){
   csType2.range(["#ff4c4c", "#cc3c3c", "#008000", "#4CA64C"]);
 
   var csType3 = new Plottable.Scales.Color();
-  csType3.domain(["odd-toed hoofed", "insectivore", "marsupial", 
+  csType3.domain(["odd-toed hoofed", "insectivore", "marsupial",
                   "squamata", "chelonia", "malacostraca", "pterygota"]);
-  csType3.range(["#d8b2d8", "#bf7fbf", "#b266b2", "#800080", 
+  csType3.range(["#d8b2d8", "#bf7fbf", "#b266b2", "#800080",
                  "#4c004c", "#ffb6c1", "#cc919a"]);
 
   var legend1 = new Plottable.Components.Legend(csType1).xAlignment("left");
@@ -100,19 +100,19 @@ function run(svg, data, Plottable){
   midPie.sectorValue(function(){ return 0.1; })
         .innerRadius(50)
         .outerRadius(75)
-        .attr("fill", function(d){ return d.type2; }, csType2);  		
+        .attr("fill", function(d){ return d.type2; }, csType2);
 
   var outerPie = new Plottable.Plots.Pie();
   outerPie.addDataset(dataset);
   outerPie.sectorValue(function(){ return 0.1; })
-        .innerRadius(75)
-        .outerRadius(100)
-        .attr("fill", function(d){ return d.type3; }, csType3);  		    
+          .innerRadius(75)
+          .outerRadius(100)
+          .attr("fill", function(d){ return d.type3; }, csType3);
 
   var pies = new Plottable.Components.Group([innerPie, midPie, outerPie]);
   var legendTable = new Plottable.Components.Table([[legend1],
                                                     [legend2],
                                                     [legend3]]);
   var table = new Plottable.Components.Table([[pies, legendTable]]);
-  table.renderTo(svg);  
+  table.renderTo(svg);
 }
