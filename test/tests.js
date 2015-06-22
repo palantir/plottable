@@ -8341,7 +8341,10 @@ describe("Utils", function () {
             set.add(values[1]);
             var index = 0;
             set.forEach(function (value1, value2, passedSet) {
-                assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                // HACKHACK: Safari bug #21489317: Safari passes undefined instead of a duplicate value for value2.
+                if (value2 !== undefined) {
+                    assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                }
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
                 assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
                 index++;
