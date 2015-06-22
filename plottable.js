@@ -6556,9 +6556,8 @@ var Plottable;
                 var domain = scale.domain();
                 var scaleY = (scale.scale(_this._temp.y1) - scale.scale(_this._temp.y0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
                 _this.old_sy = scaleY;
-                var deltaY = -scale.scale(domain[0]) * scaleY + scale.scale(_this._temp.y0);
+                var deltaY = scale.scale(_this._temp.y0) - scale.scale(domain[0]) * scaleY;
                 _this.old_dy = deltaY;
-                console.log(scale.scale(_this._temp.y0), scale.scale(domain[0]), domain[0], scaleY);
                 _this._renderArea && _this._renderArea.attr('transform', 'translate(' + _this.old_dx + ', ' + deltaY + ')' + 'scale(' + _this.old_sx + ', ' + scaleY + ')');
                 clearTimeout(_this._to2);
                 _this._to2 = setTimeout(function () {

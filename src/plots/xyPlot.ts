@@ -72,10 +72,8 @@ export class XYPlot<X, Y> extends Plot {
                    (scale.scale(domain[1]) - scale.scale(domain[0]));
       this.old_sy = scaleY;
 
-      var deltaY = - scale.scale(domain[0]) * scaleY + scale.scale(this._temp.y0);
+      var deltaY = scale.scale(this._temp.y0) - scale.scale(domain[0]) * scaleY;
       this.old_dy = deltaY;
-
-      console.log(scale.scale(this._temp.y0), scale.scale(domain[0]), domain[0], scaleY)
 
       this._renderArea && this._renderArea.attr('transform',
         'translate(' + this.old_dx + ', ' + deltaY + ')' +
