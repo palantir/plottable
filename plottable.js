@@ -6329,6 +6329,7 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.addClass("pie-plot");
@@ -6403,7 +6404,17 @@ var Plottable;
                 this.render();
                 return this;
             };
-            /**
+            Pie.prototype.labelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            /*
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
@@ -6482,6 +6493,81 @@ var Plottable;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Pie.prototype._additionalPaint = function (time) {
+                var _this = this;
+                if (this._labelsEnabled) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Pie.prototype._sliceIndexForPoint = function (p) {
+                var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+                var pointAngle = Math.acos(-p.y / (1 + pointRadius));
+                if (p.x < 0) {
+                    pointAngle = Math.PI * 2 - pointAngle;
+                }
+                var index;
+                for (var i = 0; i < this._startAngles.length; i++) {
+                    if (this._startAngles[i] < pointAngle && this._endAngles[i] > pointAngle) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index !== undefined) {
+                    var dataset = this.datasets()[0];
+                    var datum = dataset.data()[index];
+                    var innerRadius = this.innerRadius().accessor(datum, index, dataset);
+                    var outerRadius = this.outerRadius().accessor(datum, index, dataset);
+                    if (pointRadius > innerRadius && pointRadius < outerRadius) {
+                        return index;
+                    }
+                }
+                return null;
+            };
+            Pie.prototype._drawLabels = function () {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                var dataset = this.datasets()[0];
+                for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
+                    var datum = dataset.data()[datumIndex];
+                    var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
+                    var measurement = measurer.measure(value);
+                    var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+                    var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
+                    if (this.outerRadius().scale) {
+                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
+                    if (this.innerRadius().scale) {
+                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var labelRadius = (outerRadius + innerRadius) / 2;
+                    var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                    var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    var corners = [
+                        { x: x, y: y },
+                        { x: x, y: y + measurement.height },
+                        { x: x + measurement.width, y: y },
+                        { x: x + measurement.width, y: y + measurement.height }
+                    ];
+                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var color = attrToProjector["fill"](datum, datumIndex, dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var className = dark ? "dark-label" : "light-label";
+                    g.classed(className, true);
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
+                    writer.write(value, measurement.width, measurement.height, {
+                        selection: g,
+                        xAlign: "center",
+                        yAlign: "center",
+                        textRotation: 0
+                    });
+                }
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";

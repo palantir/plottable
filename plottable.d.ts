@@ -2511,11 +2511,18 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             /**
-             * Gets the Entities at a particular Point.
+             * Get whether slice labels are enabled.
              *
-             * @param {Point} p
-             * @param {PlotEntity[]}
+             * @returns {boolean} Whether slices should display labels or not.
              */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelsEnabled(enabled: boolean): Pie;
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
@@ -2523,6 +2530,7 @@ declare module Plottable {
                 x: number;
                 y: number;
             };
+            protected _additionalPaint(time: number): void;
         }
     }
 }
