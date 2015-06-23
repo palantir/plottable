@@ -330,15 +330,16 @@ declare module Plottable {
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
             /**
-             * Sends a deprecation warning to the console. The warning includes the version number of the deprecation,
-             * the name of the function which was deprecated and an optional message.
+             * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+             * version number of the deprecation, and an optional message.
              *
              * To be used in the first line of a deprecated method.
              *
+             * @param {string} callingMethod The name of the method being deprecated
              * @param {string} version The version when the tagged method became obsolete
              * @param {string?} message Optional message to be shown with the warning
              */
-            function deprecated(version: string, message?: string): void;
+            function deprecated(callingMethod: string, version: string, message?: string): void;
         }
     }
 }

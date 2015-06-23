@@ -776,24 +776,17 @@ var Plottable;
             }
             Window.setTimeout = setTimeout;
             /**
-             * Sends a deprecation warning to the console. The warning includes the version number of the deprecation,
-             * the name of the function which was deprecated and an optional message.
+             * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+             * version number of the deprecation, and an optional message.
              *
              * To be used in the first line of a deprecated method.
              *
+             * @param {string} callingMethod The name of the method being deprecated
              * @param {string} version The version when the tagged method became obsolete
              * @param {string?} message Optional message to be shown with the warning
              */
-            function deprecated(version, message) {
+            function deprecated(callingMethod, version, message) {
                 if (message === void 0) { message = ""; }
-                var callingMethod = "";
-                try {
-                    // Getting the name of the calling method through the stack trace.
-                    callingMethod = (new Error()).stack.split("\n").filter(function (step) { return step.match(/http/); })[1].trim().split(/\s|@/).filter(function (keyword) { return !keyword.match(/^at$/); })[0]; // Dropping extra keywords in Chrome
-                }
-                catch (err) {
-                    callingMethod = "called";
-                }
                 Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes. " + message);
             }
             Window.deprecated = deprecated;
@@ -6329,7 +6322,7 @@ var Plottable;
             return this._lightweightEntityToPlotEntity(closestPointEntity);
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-            Plottable.Utils.Window.deprecated("v1.1.0");
+            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
@@ -7011,7 +7004,7 @@ var Plottable;
                 return drawSteps;
             };
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("v1.1.0");
+                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -7267,7 +7260,7 @@ var Plottable;
                 return closest;
             };
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
-                Plottable.Utils.Window.deprecated("v1.1.0");
+                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);

@@ -8716,7 +8716,7 @@ describe("Utils.Window", function () {
             Plottable.Utils.Window.warn = function (msg) {
                 warningTriggered = true;
             };
-            Plottable.Utils.Window.deprecated("v0.77.2");
+            Plottable.Utils.Window.deprecated("deprecatedMethod", "v0.77.2");
             assert.isTrue(warningTriggered, "the warning has been triggered");
         });
         it("deprecated() version and message", function () {
@@ -8731,18 +8731,19 @@ describe("Utils.Window", function () {
                 assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
                 warningTriggered = true;
             };
-            Plottable.Utils.Window.deprecated(version, message);
+            Plottable.Utils.Window.deprecated("deprecatedMethod", version, message);
             assert.isTrue(warningTriggered, "the warning has been triggered");
         });
         it("deprecated() calling method", function () {
+            var methodName = "reallyOutdatedCallerMethod";
             var warningTriggered = false;
             Plottable.Utils.Window.warn = function (msg) {
                 warningTriggered = true;
                 if (!TestMethods.isIE() && !window.PHANTOMJS) {
-                    assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
+                    assert.isNotNull(msg.match(new RegExp(methodName)), "The method name exists in the message " + msg);
                 }
             };
-            var reallyOutdatedCallerMethod = function () { return Plottable.Utils.Window.deprecated("v0.1.2"); };
+            var reallyOutdatedCallerMethod = function () { return Plottable.Utils.Window.deprecated(methodName, "v0.1.2"); };
             reallyOutdatedCallerMethod();
         });
     });

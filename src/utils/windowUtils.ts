@@ -42,29 +42,16 @@ export module Utils {
     }
 
     /**
-     * Sends a deprecation warning to the console. The warning includes the version number of the deprecation,
-     * the name of the function which was deprecated and an optional message.
+     * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+     * version number of the deprecation, and an optional message.
      *
      * To be used in the first line of a deprecated method.
      *
+     * @param {string} callingMethod The name of the method being deprecated
      * @param {string} version The version when the tagged method became obsolete
      * @param {string?} message Optional message to be shown with the warning
      */
-    export function deprecated(version: string, message = "") {
-      var callingMethod = "";
-
-      try {
-        // Getting the name of the calling method through the stack trace.
-        callingMethod = (<any> new Error()).stack
-          .split("\n")
-          .filter((step: string) => step.match(/http/))[1] // Just method names
-          .trim()
-          .split(/\s|@/) // Accounting for both Chrome and Firefox
-          .filter((keyword: string) => !keyword.match(/^at$/))[0]; // Dropping extra keywords in Chrome
-      } catch (err) { // IE9 does not give a stack trace
-        callingMethod = "called";
-      }
-
+    export function deprecated(callingMethod: string, version: string, message = "") {
       Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
         ". Please refer to the release notes. " + message);
     }

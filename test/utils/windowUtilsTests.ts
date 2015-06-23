@@ -21,8 +21,7 @@ describe("Utils.Window", () => {
         warningTriggered = true;
       };
 
-      Plottable.Utils.Window.deprecated("v0.77.2");
-
+      Plottable.Utils.Window.deprecated("deprecatedMethod", "v0.77.2");
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
 
@@ -40,21 +39,22 @@ describe("Utils.Window", () => {
         warningTriggered = true;
       };
 
-      Plottable.Utils.Window.deprecated(version, message);
+      Plottable.Utils.Window.deprecated("deprecatedMethod", version, message);
 
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
 
     it("deprecated() calling method", () => {
+      var methodName = "reallyOutdatedCallerMethod";
       var warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         warningTriggered = true;
         if (!TestMethods.isIE() && !window.PHANTOMJS) {
-          assert.isNotNull(msg.match(/reallyOutdatedCallerMethod/), "The method name exists in the message " + msg);
+          assert.isNotNull(msg.match(new RegExp(methodName)), "The method name exists in the message " + msg);
         }
       };
 
-      var reallyOutdatedCallerMethod = () => Plottable.Utils.Window.deprecated("v0.1.2");
+      var reallyOutdatedCallerMethod = () => Plottable.Utils.Window.deprecated(methodName, "v0.1.2");
       reallyOutdatedCallerMethod();
     });
 
