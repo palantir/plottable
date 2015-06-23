@@ -8721,15 +8721,12 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.attachTo = function (component) {
-            this._detach();
+            this._disconnect();
             this._componentAttachedTo = component;
-            this._attach();
+            this._connect();
             return this;
         };
-        /**
-         * Attaches to existing _componentAttachedTo if enabled.
-         */
-        Interaction.prototype._attach = function () {
+        Interaction.prototype._connect = function () {
             if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
                 this._componentAttachedTo.onAnchor(this._anchorCallback);
             }
@@ -8742,15 +8739,11 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.detachFrom = function (component) {
-            this._detach();
+            this._disconnect();
             this._componentAttachedTo = null;
             return this;
         };
-        /**
-         * Detaches from existing _componentAttachedTo (if it exists)
-         * without overwriting _componentAttachedTo.
-         */
-        Interaction.prototype._detach = function () {
+        Interaction.prototype._disconnect = function () {
             if (this._isAnchored) {
                 this._unanchor();
             }
@@ -8764,10 +8757,10 @@ var Plottable;
             }
             this._enabled = enabled;
             if (this._enabled) {
-                this._attach();
+                this._connect();
             }
             else {
-                this._detach();
+                this._disconnect();
             }
             return this;
         };

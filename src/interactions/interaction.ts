@@ -25,16 +25,13 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public attachTo(component: Component) {
-    this._detach();
+    this._disconnect();
     this._componentAttachedTo = component;
-    this._attach();
+    this._connect();
     return this;
   }
 
-  /**
-   * Attaches to existing _componentAttachedTo if enabled.
-   */
-  private _attach() {
+  private _connect() {
     if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
       this._componentAttachedTo.onAnchor(this._anchorCallback);
     }
@@ -48,16 +45,12 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public detachFrom(component: Component) {
-    this._detach();
+    this._disconnect();
     this._componentAttachedTo = null;
     return this;
   }
 
-  /**
-   * Detaches from existing _componentAttachedTo (if it exists)
-   * without overwriting _componentAttachedTo.
-   */
-  private _detach() {
+  private _disconnect() {
     if (this._isAnchored) {
       this._unanchor();
     }
@@ -80,9 +73,9 @@ export class Interaction {
     }
     this._enabled = enabled;
     if (this._enabled) {
-      this._attach();
+      this._connect();
     } else {
-      this._detach();
+      this._disconnect();
     }
     return this;
   }
