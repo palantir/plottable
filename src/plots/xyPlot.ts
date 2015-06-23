@@ -16,10 +16,10 @@ export class XYPlot<X, Y> extends Plot {
   private _to2 = -1;
 
   private _temp = {
-    x0: 0,
-    x1: 1,
-    y0: 0,
-    y1: 1
+    x0: null,
+    x1: null,
+    y0: null,
+    y1: null
   };
 
   private deltaX = 0;
@@ -57,6 +57,12 @@ export class XYPlot<X, Y> extends Plot {
       return;
     }
 
+    if (this._temp.x0 == null) {
+      this._temp.x0 = domain[0];
+      this._temp.x1 = domain[1];
+      return;
+    }
+
     this.scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
                   (scale.scale(domain[1]) - scale.scale(domain[0]));
     this.deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
@@ -86,6 +92,13 @@ export class XYPlot<X, Y> extends Plot {
       this._temp.y1 = domain[1];
       return;
     }
+
+    if (this._temp.y0 == null) {
+      this._temp.y0 = domain[0];
+      this._temp.y1 = domain[1];
+      return;
+    }
+
 
     this.scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) /
                   (scale.scale(domain[1]) - scale.scale(domain[0]));

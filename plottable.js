@@ -6521,10 +6521,10 @@ var Plottable;
             this._to1 = -1;
             this._to2 = -1;
             this._temp = {
-                x0: 0,
-                x1: 1,
-                y0: 0,
-                y1: 1
+                x0: null,
+                x1: null,
+                y0: null,
+                y1: null
             };
             this.deltaX = 0;
             this.deltaY = 0;
@@ -6541,6 +6541,11 @@ var Plottable;
             var _this = this;
             var domain = scale.domain();
             if (!this._isAnchored) {
+                this._temp.x0 = domain[0];
+                this._temp.x1 = domain[1];
+                return;
+            }
+            if (this._temp.x0 == null) {
                 this._temp.x0 = domain[0];
                 this._temp.x1 = domain[1];
                 return;
@@ -6564,6 +6569,11 @@ var Plottable;
             var _this = this;
             var domain = scale.domain();
             if (!this._isAnchored) {
+                this._temp.y0 = domain[0];
+                this._temp.y1 = domain[1];
+                return;
+            }
+            if (this._temp.y0 == null) {
                 this._temp.y0 = domain[0];
                 this._temp.y1 = domain[1];
                 return;
