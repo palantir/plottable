@@ -46,8 +46,6 @@ export class XYPlot<X, Y> extends Plot {
 
     this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
     this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
-
-    this._renderCallback = () => {};
   }
 
   private _fastPanZoomOnX(scale: Scale<any, any>) {
@@ -75,13 +73,12 @@ export class XYPlot<X, Y> extends Plot {
         this.deltaY = 0;
         this.render();
         this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-      }, 0);
+      }, 500);
     }
 
   }
 
   private _fastPanZoomOnY(scale: Scale<any, any>) {
-
     var domain = scale.domain();
 
     if (!this._isAnchored) {
@@ -107,7 +104,7 @@ export class XYPlot<X, Y> extends Plot {
         this.deltaY = 0;
         this.render();
         this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-      }, 0);
+      }, 500);
     }
   }
 
@@ -121,14 +118,14 @@ export class XYPlot<X, Y> extends Plot {
     if (performanceEnabled) {
       console.log(1);
 
-      // if (this.x() && this.x().scale) {
-      //   this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
-      //   this.x().scale.offUpdate(this._renderCallback);
-      // }
-      // if (this.y() && this.y().scale) {
-      //   this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
-      //   this.y().scale.offUpdate(this._renderCallback);
-      // }
+      if (this.x() && this.x().scale) {
+        this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
+        this.x().scale.offUpdate(this._renderCallback);
+      }
+      if (this.y() && this.y().scale) {
+        this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
+        this.y().scale.offUpdate(this._renderCallback);
+      }
     } else {
 
     }
@@ -245,14 +242,12 @@ export class XYPlot<X, Y> extends Plot {
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
 
-    console.log(2);
-    // if (this._performanceEnabled) {
+    if (this._performanceEnabled) {
       var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
                                                       : this._fastPanZoomOnYCallback;
       scale.onUpdate(fastPanZoomCallback);
-      // scale.offUpdate(this._renderCallback);
-
-    // }
+      scale.offUpdate(this._renderCallback);
+    }
   }
 
   public destroy() {

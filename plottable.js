@@ -6536,8 +6536,6 @@ var Plottable;
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
             this._fastPanZoomOnXCallback = function (scale) { return _this._fastPanZoomOnX(scale); };
             this._fastPanZoomOnYCallback = function (scale) { return _this._fastPanZoomOnY(scale); };
-            this._renderCallback = function () {
-            };
         }
         XYPlot.prototype._fastPanZoomOnX = function (scale) {
             var _this = this;
@@ -6559,7 +6557,7 @@ var Plottable;
                     _this.deltaY = 0;
                     _this.render();
                     _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-                }, 0);
+                }, 500);
             }
         };
         XYPlot.prototype._fastPanZoomOnY = function (scale) {
@@ -6582,7 +6580,7 @@ var Plottable;
                     _this.deltaY = 0;
                     _this.render();
                     _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-                }, 0);
+                }, 500);
             }
         };
         XYPlot.prototype.performanceEnabled = function (performanceEnabled) {
@@ -6591,6 +6589,14 @@ var Plottable;
             }
             if (performanceEnabled) {
                 console.log(1);
+                if (this.x() && this.x().scale) {
+                    this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
+                    this.x().scale.offUpdate(this._renderCallback);
+                }
+                if (this.y() && this.y().scale) {
+                    this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
+                    this.y().scale.offUpdate(this._renderCallback);
+                }
             }
             else {
             }
@@ -6653,12 +6659,11 @@ var Plottable;
             _super.prototype._installScaleForKey.call(this, scale, key);
             var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
             scale.onUpdate(adjustCallback);
-            console.log(2);
-            // if (this._performanceEnabled) {
-            var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback : this._fastPanZoomOnYCallback;
-            scale.onUpdate(fastPanZoomCallback);
-            // scale.offUpdate(this._renderCallback);
-            // }
+            if (this._performanceEnabled) {
+                var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback : this._fastPanZoomOnYCallback;
+                scale.onUpdate(fastPanZoomCallback);
+                scale.offUpdate(this._renderCallback);
+            }
         };
         XYPlot.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
