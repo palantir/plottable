@@ -59,6 +59,10 @@ export module Scales {
     public valueToDomainType(value: number) {
       return value;
     }
+
+    public domainTypeMaximum() {
+      return Infinity;
+    }
   }
 }
 }

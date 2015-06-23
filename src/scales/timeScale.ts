@@ -113,6 +113,11 @@ export module Scales {
       return new Date(value);
     }
 
+    public domainTypeMaximum() {
+      var maxDateValue = 8640000000000000;
+      return new Date(maxDateValue);
+    }
+
   }
 }
 }

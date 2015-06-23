@@ -338,9 +338,7 @@ export module Interactions {
         this._minDomainExtents.set(scale, 0);
       }
       if (this._maxDomainExtents.get(scale) == null) {
-        var maxDateValue = 8640000000000000;
-        var defaultMaxDomainExtent = scale instanceof Scales.Time ? maxDateValue : Infinity;
-        this._maxDomainExtents.set(scale, defaultMaxDomainExtent);
+        this._maxDomainExtents.set(scale, scale.domainTypeMaximum().valueOf());
       }
     }
 

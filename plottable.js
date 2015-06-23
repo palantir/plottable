@@ -1714,6 +1714,9 @@ var Plottable;
         QuantitativeScale.prototype.valueToDomainType = function (value) {
             throw new Error("Subclasses should override valueToDomainType");
         };
+        QuantitativeScale.prototype.domainTypeMaximum = function () {
+            throw new Error("Subclasses should override domainTypeMaximum");
+        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);
@@ -1775,6 +1778,9 @@ var Plottable;
             };
             Linear.prototype.valueToDomainType = function (value) {
                 return value;
+            };
+            Linear.prototype.domainTypeMaximum = function () {
+                return Infinity;
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1968,6 +1974,9 @@ var Plottable;
             };
             ModifiedLog.prototype.valueToDomainType = function (value) {
                 return value;
+            };
+            ModifiedLog.prototype.domainTypeMaximum = function () {
+                return Infinity;
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2308,6 +2317,10 @@ var Plottable;
             };
             Time.prototype.valueToDomainType = function (value) {
                 return new Date(value);
+            };
+            Time.prototype.domainTypeMaximum = function () {
+                var maxDateValue = 8640000000000000;
+                return new Date(maxDateValue);
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -9452,9 +9465,7 @@ var Plottable;
                     this._minDomainExtents.set(scale, 0);
                 }
                 if (this._maxDomainExtents.get(scale) == null) {
-                    var maxDateValue = 8640000000000000;
-                    var defaultMaxDomainExtent = scale instanceof Plottable.Scales.Time ? maxDateValue : Infinity;
-                    this._maxDomainExtents.set(scale, defaultMaxDomainExtent);
+                    this._maxDomainExtents.set(scale, scale.domainTypeMaximum().valueOf());
                 }
             };
             /**

@@ -909,6 +909,7 @@ declare module Plottable {
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
         valueToDomainType(value: number): D;
+        domainTypeMaximum(): D;
     }
 }
 
@@ -931,6 +932,7 @@ declare module Plottable {
             defaultTicks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
             valueToDomainType(value: number): number;
+            domainTypeMaximum(): number;
         }
     }
 }
@@ -971,6 +973,7 @@ declare module Plottable {
             protected _setRange(values: number[]): void;
             defaultTicks(): number[];
             valueToDomainType(value: number): number;
+            domainTypeMaximum(): number;
         }
     }
 }
@@ -1117,6 +1120,7 @@ declare module Plottable {
              */
             static timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
             valueToDomainType(value: number): Date;
+            domainTypeMaximum(): Date;
         }
     }
 }
