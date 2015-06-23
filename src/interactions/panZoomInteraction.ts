@@ -198,7 +198,7 @@ export module Interactions {
         constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
       }
 
-      var constrainedDomain = constrainedDomainValues.map((value) => scale instanceof Scales.Time ? new Date(value) : value);
+      var constrainedDomain = constrainedDomainValues.map((value) => scale.valueToDomainType(value));
 
       return domainValues[1] > domainValues[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
     }

@@ -199,6 +199,10 @@ export module Scales {
     public defaultTicks(): number[] {
       return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
+
+    public valueToDomainType(value: number) {
+      return value;
+    }
   }
 }
 }

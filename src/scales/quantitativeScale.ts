@@ -287,5 +287,9 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return this;
     }
   }
+
+  public valueToDomainType(value: number): D {
+    throw new Error("Subclasses should override valueToDomainType");
+  }
 }
 }

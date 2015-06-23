@@ -109,6 +109,10 @@ export module Scales {
       }
     }
 
+    public valueToDomainType(value: number) {
+      return new Date(value);
+    }
+
   }
 }
 }

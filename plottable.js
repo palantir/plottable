@@ -1711,6 +1711,9 @@ var Plottable;
                 return this;
             }
         };
+        QuantitativeScale.prototype.valueToDomainType = function (value) {
+            throw new Error("Subclasses should override valueToDomainType");
+        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);
@@ -1769,6 +1772,9 @@ var Plottable;
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
+            };
+            Linear.prototype.valueToDomainType = function (value) {
+                return value;
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1959,6 +1965,9 @@ var Plottable;
             };
             ModifiedLog.prototype.defaultTicks = function () {
                 return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
+            };
+            ModifiedLog.prototype.valueToDomainType = function (value) {
+                return value;
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2296,6 +2305,9 @@ var Plottable;
                     default:
                         throw Error("TimeInterval specified does not exist: " + timeInterval);
                 }
+            };
+            Time.prototype.valueToDomainType = function (value) {
+                return new Date(value);
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -9329,7 +9341,7 @@ var Plottable;
                     constrainedDomainValues[0] = domainCenter - maxDomainExtent / 2;
                     constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
                 }
-                var constrainedDomain = constrainedDomainValues.map(function (value) { return scale instanceof Plottable.Scales.Time ? new Date(value) : value; });
+                var constrainedDomain = constrainedDomainValues.map(function (value) { return scale.valueToDomainType(value); });
                 return domainValues[1] > domainValues[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {

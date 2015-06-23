@@ -55,6 +55,10 @@ export module Scales {
     protected _niceDomain(domain: number[], count?: number): number[] {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
+
+    public valueToDomainType(value: number) {
+      return value;
+    }
   }
 }
 }
