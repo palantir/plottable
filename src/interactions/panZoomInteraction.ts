@@ -116,6 +116,24 @@ export module Interactions {
       }
     }
 
+    private _scalesAtMaxExtent() {
+      var scaleAtMaxExtent = (scale: QuantitativeScale<any>) => {
+        var scaleDomain = scale.domain();
+        var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+        return scaleExtent >= this._maxDomainExtents.get(scale);
+      };
+      return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
+    }
+
+    private _scalesAtMinExtent() {
+      var scaleAtMinExtent = (scale: QuantitativeScale<any>) => {
+        var scaleDomain = scale.domain();
+        var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+        return scaleExtent <= this._minDomainExtents.get(scale);
+      };
+      return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
+    }
+
     private _centerPoint() {
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
@@ -192,6 +210,14 @@ export module Interactions {
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
+
+        if (zoomAmount < 1 && this._scalesAtMinExtent()) {
+          return;
+        }
+
+        if (zoomAmount > 1 && this._scalesAtMaxExtent()) {
+          return;
+        }
         this.xScales().forEach((xScale) => {
           this._magnifyScale(xScale, zoomAmount, translatedP.x);
         });

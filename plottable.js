@@ -9190,6 +9190,7 @@ var Plottable;
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._xScales = new Plottable.Utils.Set();
+                this._yScales = new Plottable.Utils.Set();
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
@@ -9198,7 +9199,6 @@ var Plottable;
                 if (xScale != null) {
                     this.addXScale(xScale);
                 }
-                this._yScales = new Plottable.Utils.Set();
                 if (yScale != null) {
                     this.addYScale(yScale);
                 }
@@ -9257,6 +9257,24 @@ var Plottable;
                         _this._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
                     });
                 }
+            };
+            PanZoom.prototype._scalesAtMaxExtent = function () {
+                var _this = this;
+                var scaleAtMaxExtent = function (scale) {
+                    var scaleDomain = scale.domain();
+                    var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+                    return scaleExtent >= _this._maxDomainExtents.get(scale);
+                };
+                return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
+            };
+            PanZoom.prototype._scalesAtMinExtent = function () {
+                var _this = this;
+                var scaleAtMinExtent = function (scale) {
+                    var scaleDomain = scale.domain();
+                    var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+                    return scaleExtent <= _this._minDomainExtents.get(scale);
+                };
+                return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
             };
             PanZoom.prototype._centerPoint = function () {
                 var points = this._touchIds.values();
@@ -9321,6 +9339,12 @@ var Plottable;
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
+                    if (zoomAmount < 1 && this._scalesAtMinExtent()) {
+                        return;
+                    }
+                    if (zoomAmount > 1 && this._scalesAtMaxExtent()) {
+                        return;
+                    }
                     this.xScales().forEach(function (xScale) {
                         _this._magnifyScale(xScale, zoomAmount, translatedP.x);
                     });
