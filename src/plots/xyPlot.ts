@@ -63,7 +63,6 @@ export class XYPlot<X, Y> extends Plot {
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
       }, 500);
     }
-
   }
 
   private _fastPanZoomOnY(scale: Scale<Y, number>) {
@@ -73,8 +72,7 @@ export class XYPlot<X, Y> extends Plot {
 
     var domain = scale.domain();
     this._fastPanZoomScaleY = (scale.scale(this._fastPanZoomKnownDomainY[1]) - scale.scale(this._fastPanZoomKnownDomainY[0])) /
-                  (scale.scale(domain[1]) - scale.scale(domain[0]));
-
+                              (scale.scale(domain[1]) - scale.scale(domain[0]));
     this._fastPanZoomDeltaY = scale.scale(this._fastPanZoomKnownDomainY[0]) - scale.scale(domain[0]) * this._fastPanZoomScaleY;
 
     if (!this._renderArea != null) {
@@ -119,7 +117,6 @@ export class XYPlot<X, Y> extends Plot {
         this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
         this.y().scale.onUpdate(this._renderCallback);
       }
-
     }
 
     this._performanceEnabled = performanceEnabled;
