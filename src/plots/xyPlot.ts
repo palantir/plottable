@@ -116,8 +116,6 @@ export class XYPlot<X, Y> extends Plot {
     }
 
     if (performanceEnabled) {
-      console.log(1);
-
       if (this.x() && this.x().scale) {
         this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
         this.x().scale.offUpdate(this._renderCallback);
@@ -127,6 +125,14 @@ export class XYPlot<X, Y> extends Plot {
         this.y().scale.offUpdate(this._renderCallback);
       }
     } else {
+      if (this.x() && this.x().scale) {
+        this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
+        this.x().scale.onUpdate(this._renderCallback);
+      }
+      if (this.y() && this.y().scale) {
+        this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
+        this.y().scale.onUpdate(this._renderCallback);
+      }
 
     }
 
