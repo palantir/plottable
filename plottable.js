@@ -775,6 +775,21 @@ var Plottable;
                 }
             }
             Window.setTimeout = setTimeout;
+            /**
+             * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+             * version number of the deprecation, and an optional message.
+             *
+             * To be used in the first line of a deprecated method.
+             *
+             * @param {string} callingMethod The name of the method being deprecated
+             * @param {string} version The version when the tagged method became obsolete
+             * @param {string?} message Optional message to be shown with the warning
+             */
+            function deprecated(callingMethod, version, message) {
+                if (message === void 0) { message = ""; }
+                Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version + ". Please refer to the release notes. " + message);
+            }
+            Window.deprecated = deprecated;
         })(Window = Utils.Window || (Utils.Window = {}));
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
@@ -2544,6 +2559,7 @@ var Plottable;
          * @param {Dataset} dataset The dataset associated with this Drawer
          */
         function Drawer(dataset) {
+            this._cachedSelectionValid = false;
             this._dataset = dataset;
         }
         Drawer.prototype.renderArea = function (area) {
@@ -2551,6 +2567,7 @@ var Plottable;
                 return this._renderArea;
             }
             this._renderArea = area;
+            this._cachedSelectionValid = false;
             return this;
         };
         /**
@@ -2567,7 +2584,7 @@ var Plottable;
          * @param{any[]} data The data to be drawn
          */
         Drawer.prototype._bindSelectionData = function (data) {
-            var dataElements = this._selection().data(data);
+            var dataElements = this.selection().data(data);
             dataElements.enter().append(this._svgElementName);
             dataElements.exit().remove();
             this._applyDefaultAttributes(dataElements);
@@ -2583,7 +2600,7 @@ var Plottable;
          * @param{AppliedDrawStep} step The step, how data should be drawn.
          */
         Drawer.prototype._drawStep = function (step) {
-            var selection = this._selection();
+            var selection = this.selection();
             var colorAttributes = ["fill", "stroke"];
             colorAttributes.forEach(function (colorAttribute) {
                 if (step.attrToAppliedProjector[colorAttribute] != null) {
@@ -2592,7 +2609,7 @@ var Plottable;
             });
             step.animator.animate(selection, step.attrToAppliedProjector);
             if (this._className != null) {
-                this._selection().classed(this._className, true);
+                this.selection().classed(this._className, true);
             }
         };
         Drawer.prototype._appliedProjectors = function (attrToProjector) {
@@ -2633,6 +2650,7 @@ var Plottable;
                 };
             });
             this._bindSelectionData(data);
+            this._cachedSelectionValid = false;
             var delay = 0;
             appliedDrawSteps.forEach(function (drawStep, i) {
                 Plottable.Utils.Window.setTimeout(function () { return _this._drawStep(drawStep); }, delay);
@@ -2640,8 +2658,12 @@ var Plottable;
             });
             return this;
         };
-        Drawer.prototype._selection = function () {
-            return this.renderArea().selectAll(this.selector());
+        Drawer.prototype.selection = function () {
+            if (!this._cachedSelectionValid) {
+                this._cachedSelection = this.renderArea().selectAll(this.selector());
+                this._cachedSelectionValid = true;
+            }
+            return this._cachedSelection;
         };
         /**
          * Returns the CSS selector for this Drawer's visual elements.
@@ -2653,7 +2675,7 @@ var Plottable;
          * Returns the D3 selection corresponding to the datum with the specified index.
          */
         Drawer.prototype.selectionForIndex = function (index) {
-            return d3.select(this._selection()[0][index]);
+            return d3.select(this.selection()[0][index]);
         };
         return Drawer;
     })();
@@ -2683,7 +2705,7 @@ var Plottable;
                 selection.style("fill", "none");
             };
             Line.prototype.selectionForIndex = function (index) {
-                return this.renderArea().select(this.selector());
+                return d3.select(this.selection()[0][0]);
             };
             return Line;
         })(Plottable.Drawer);
@@ -2714,7 +2736,7 @@ var Plottable;
                 selection.style("stroke", "none");
             };
             Area.prototype.selectionForIndex = function (index) {
-                return this.renderArea().select(this.selector());
+                return d3.select(this.selection()[0][0]);
             };
             return Area;
         })(Plottable.Drawer);
@@ -6262,7 +6284,12 @@ var Plottable;
         Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            var entities = [];
+            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
+        };
+        Plot.prototype._lightweightEntities = function (datasets) {
+            var _this = this;
+            if (datasets === void 0) { datasets = this.datasets(); }
+            var lightweightEntities = [];
             datasets.forEach(function (dataset) {
                 var drawer = _this._datasetToDrawer.get(dataset);
                 var validDatumIndex = 0;
@@ -6271,18 +6298,30 @@ var Plottable;
                     if (Plottable.Utils.Math.isNaN(position.x) || Plottable.Utils.Math.isNaN(position.y)) {
                         return;
                     }
-                    entities.push({
+                    lightweightEntities.push({
                         datum: datum,
                         index: datasetIndex,
                         dataset: dataset,
                         position: position,
-                        selection: drawer.selectionForIndex(validDatumIndex),
-                        component: _this
+                        component: _this,
+                        drawer: drawer,
+                        validDatumIndex: validDatumIndex
                     });
                     validDatumIndex++;
                 });
             });
-            return entities;
+            return lightweightEntities;
+        };
+        Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
+            var plotEntity = {
+                datum: entity.datum,
+                position: entity.position,
+                dataset: entity.dataset,
+                index: entity.index,
+                component: entity.component,
+                selection: entity.drawer.selectionForIndex(entity.validDatumIndex)
+            };
+            return plotEntity;
         };
         /**
          * Returns the PlotEntity nearest to the query point by the Euclidian norm, or undefined if no PlotEntity can be found.
@@ -6293,20 +6332,25 @@ var Plottable;
         Plot.prototype.entityNearest = function (queryPoint) {
             var _this = this;
             var closestDistanceSquared = Infinity;
-            var closest;
-            this.entities().forEach(function (entity) {
-                if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+            var closestPointEntity;
+            var entities = this._lightweightEntities();
+            entities.forEach(function (entity) {
+                if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                     return;
                 }
                 var distanceSquared = Plottable.Utils.Math.distanceSquared(entity.position, queryPoint);
                 if (distanceSquared < closestDistanceSquared) {
                     closestDistanceSquared = distanceSquared;
-                    closest = entity;
+                    closestPointEntity = entity;
                 }
             });
-            return closest;
+            return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+            Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+            return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
+        };
+        Plot.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
             return !(pixelPoint.x < 0 || pixelPoint.y < 0 || pixelPoint.x > this.width() || pixelPoint.y > this.height());
         };
         Plot.prototype._uninstallScaleForKey = function (scale, key) {
@@ -6354,6 +6398,7 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
                 this.addClass("pie-plot");
@@ -6428,7 +6473,17 @@ var Plottable;
                 this.render();
                 return this;
             };
-            /**
+            Pie.prototype.labelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            /*
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
@@ -6507,6 +6562,81 @@ var Plottable;
                 var endAngle = pie[index].endAngle;
                 var avgAngle = (startAngle + endAngle) / 2;
                 return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
+            };
+            Pie.prototype._additionalPaint = function (time) {
+                var _this = this;
+                if (this._labelsEnabled) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Pie.prototype._sliceIndexForPoint = function (p) {
+                var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+                var pointAngle = Math.acos(-p.y / (1 + pointRadius));
+                if (p.x < 0) {
+                    pointAngle = Math.PI * 2 - pointAngle;
+                }
+                var index;
+                for (var i = 0; i < this._startAngles.length; i++) {
+                    if (this._startAngles[i] < pointAngle && this._endAngles[i] > pointAngle) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index !== undefined) {
+                    var dataset = this.datasets()[0];
+                    var datum = dataset.data()[index];
+                    var innerRadius = this.innerRadius().accessor(datum, index, dataset);
+                    var outerRadius = this.outerRadius().accessor(datum, index, dataset);
+                    if (pointRadius > innerRadius && pointRadius < outerRadius) {
+                        return index;
+                    }
+                }
+                return null;
+            };
+            Pie.prototype._drawLabels = function () {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                var dataset = this.datasets()[0];
+                for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
+                    var datum = dataset.data()[datumIndex];
+                    var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
+                    var measurement = measurer.measure(value);
+                    var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+                    var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
+                    if (this.outerRadius().scale) {
+                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
+                    if (this.innerRadius().scale) {
+                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    }
+                    var labelRadius = (outerRadius + innerRadius) / 2;
+                    var x = Math.sin(theta) * labelRadius - measurement.width / 2;
+                    var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+                    var corners = [
+                        { x: x, y: y },
+                        { x: x, y: y + measurement.height },
+                        { x: x + measurement.width, y: y },
+                        { x: x + measurement.width, y: y + measurement.height }
+                    ];
+                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var color = attrToProjector["fill"](datum, datumIndex, dataset);
+                    var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                    var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                    var className = dark ? "dark-label" : "light-label";
+                    g.classed(className, true);
+                    g.style("visibility", showLabel ? "inherit" : "hidden");
+                    writer.write(value, measurement.width, measurement.height, {
+                        selection: g,
+                        xAlign: "center",
+                        yAlign: "center",
+                        textRotation: 0
+                    });
+                }
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
@@ -6985,6 +7115,7 @@ var Plottable;
                 return drawSteps;
             };
             Scatter.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+                Plottable.Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var translation = d3.transform(selection.attr("transform")).translate;
@@ -6994,6 +7125,18 @@ var Plottable;
                     y: bbox.y + translation[1],
                     width: bbox.width,
                     height: bbox.height
+                };
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
+            };
+            Scatter.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var diameter = Plottable.Plot._scaledAccessor(this.size())(datum, index, dataset);
+                var translatedBbox = {
+                    x: pixelPoint.x - diameter,
+                    y: pixelPoint.y - diameter,
+                    width: diameter,
+                    height: diameter
                 };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
             };
@@ -7195,7 +7338,7 @@ var Plottable;
                 var tolerance = 0.5;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var primaryDist = 0;
@@ -7228,9 +7371,24 @@ var Plottable;
                 return closest;
             };
             Bar.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
+                Plottable.Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
                 var xRange = { min: 0, max: this.width() };
                 var yRange = { min: 0, max: this.height() };
                 var barBBox = Plottable.Utils.DOM.elementBBox(selection);
+                return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
+            };
+            Bar.prototype._entityVisibleOnPlot = function (pixelPoint, datum, index, dataset) {
+                var xRange = { min: 0, max: this.width() };
+                var yRange = { min: 0, max: this.height() };
+                var attrToProjector = this._generateAttrToProjector();
+                var width = attrToProjector["width"](datum, index, dataset);
+                var height = attrToProjector["height"](datum, index, dataset);
+                var barBBox = {
+                    x: pixelPoint.x - width / 2,
+                    y: pixelPoint.y,
+                    width: width,
+                    height: height
+                };
                 return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
             };
             /**
@@ -7588,7 +7746,7 @@ var Plottable;
                 var minYDist = Infinity;
                 var closest;
                 this.entities().forEach(function (entity) {
-                    if (!_this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+                    if (!_this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
                         return;
                     }
                     var xDist = Math.abs(queryPoint.x - entity.position.x);

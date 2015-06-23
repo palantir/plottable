@@ -329,6 +329,17 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+             * version number of the deprecation, and an optional message.
+             *
+             * To be used in the first line of a deprecated method.
+             *
+             * @param {string} callingMethod The name of the method being deprecated
+             * @param {string} version The version when the tagged method became obsolete
+             * @param {string?} message Optional message to be shown with the warning
+             */
+            function deprecated(callingMethod: string, version: string, message?: string): void;
         }
     }
 }
@@ -1242,6 +1253,7 @@ declare module Plottable {
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
         draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
+        selection(): d3.Selection<any>;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
@@ -2435,6 +2447,7 @@ declare module Plottable {
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
         protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+        protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
@@ -2519,11 +2532,18 @@ declare module Plottable {
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
             /**
-             * Gets the Entities at a particular Point.
+             * Get whether slice labels are enabled.
              *
-             * @param {Point} p
-             * @param {PlotEntity[]}
+             * @returns {boolean} Whether slices should display labels or not.
              */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelsEnabled(enabled: boolean): Pie;
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
@@ -2531,6 +2551,7 @@ declare module Plottable {
                 x: number;
                 y: number;
             };
+            protected _additionalPaint(time: number): void;
         }
     }
 }
@@ -2762,6 +2783,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2851,6 +2873,7 @@ declare module Plottable {
              */
             entityNearest(queryPoint: Point): PlotEntity;
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
