@@ -6520,12 +6520,6 @@ var Plottable;
             this._autoAdjustYScaleDomain = false;
             this._to1 = -1;
             this._to2 = -1;
-            this._temp = {
-                x0: 0,
-                x1: 1,
-                y0: 0,
-                y1: 1
-            };
             this.deltaX = 0;
             this.deltaY = 0;
             this.scaleX = 1;
@@ -6536,6 +6530,12 @@ var Plottable;
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
             this._fastPanZoomOnXCallback = function (scale) { return _this._fastPanZoomOnX(scale); };
             this._fastPanZoomOnYCallback = function (scale) { return _this._fastPanZoomOnY(scale); };
+            this._temp = {
+                x0: null,
+                x1: null,
+                y0: null,
+                y1: null,
+            };
         }
         XYPlot.prototype._fastPanZoomOnX = function (scale) {
             var _this = this;

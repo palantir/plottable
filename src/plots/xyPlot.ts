@@ -15,12 +15,7 @@ export class XYPlot<X, Y> extends Plot {
   private _to1 = -1;
   private _to2 = -1;
 
-  private _temp = {
-    x0: 0,
-    x1: 1,
-    y0: 0,
-    y1: 1
-  };
+  private _temp: {x0: X; x1: X; y0: Y; y1: Y; };
 
   private deltaX = 0;
   private deltaY = 0;
@@ -46,6 +41,13 @@ export class XYPlot<X, Y> extends Plot {
 
     this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
     this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
+
+    this._temp = {
+      x0: null,
+      x1: null,
+      y0: null,
+      y1: null,
+    }
   }
 
   private _fastPanZoomOnX(scale: Scale<any, any>) {
