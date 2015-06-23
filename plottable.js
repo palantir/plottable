@@ -6554,7 +6554,7 @@ var Plottable;
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
                     var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return (index != null && index === sliceIndices[0]); });
+                    var showLabel = sliceIndices.every(function (index) { return (index != null && index === i); });
                     var color = attrToProjector["fill"](datum, i, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");

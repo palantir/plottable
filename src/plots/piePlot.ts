@@ -333,7 +333,7 @@ export module Plots {
         ];
 
         var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-        var showLabel = sliceIndices.every((index) => (index != null && index === sliceIndices[0]));
+        var showLabel = sliceIndices.every((index) => (index != null && index === i));
 
         var color = attrToProjector["fill"](datum, i, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
