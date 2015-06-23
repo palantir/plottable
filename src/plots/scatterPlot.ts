@@ -94,6 +94,7 @@ export module Plots {
     }
 
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+      Utils.Window.deprecated("Scatter._visibleOnPlot()", "v1.1.0");
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
 
@@ -104,6 +105,21 @@ export module Plots {
         y: bbox.y + translation[1],
         width: bbox.width,
         height: bbox.height
+      };
+
+      return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);
+    }
+
+    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+
+      var diameter = Plot._scaledAccessor(this.size())(datum, index, dataset);
+      var translatedBbox = {
+        x: pixelPoint.x - diameter,
+        y: pixelPoint.y - diameter,
+        width: diameter,
+        height: diameter
       };
 
       return Utils.DOM.intersectsBBox(xRange, yRange, translatedBbox);

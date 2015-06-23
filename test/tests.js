@@ -8726,6 +8726,45 @@ describe("Utils", function () {
 
 ///<reference path="../testReference.ts" />
 var assert = chai.assert;
+describe("Utils.Window", function () {
+    describe("deprecated()", function () {
+        var oldWarn;
+        before(function () {
+            oldWarn = Plottable.Utils.Window.warn;
+        });
+        after(function () {
+            Plottable.Utils.Window.warn = oldWarn;
+        });
+        it("deprecated() issues a warning", function () {
+            var warningTriggered = false;
+            Plottable.Utils.Window.warn = function (msg) {
+                warningTriggered = true;
+            };
+            Plottable.Utils.Window.deprecated("deprecatedMethod", "v0.77.2");
+            assert.isTrue(warningTriggered, "the warning has been triggered");
+        });
+        it("deprecated() calling method name, version and message are correct", function () {
+            var callingMethod = "reallyOutdatedCallerMethod";
+            var version = "v0.77.2";
+            var message = "hadoop is doopey";
+            var warningTriggered = false;
+            Plottable.Utils.Window.warn = function (msg) {
+                assert.isNotNull(msg.match(new RegExp(callingMethod)), "The method name exists in the message " + msg);
+                assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
+                assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
+                assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
+                var regEx = new RegExp(message + "$");
+                assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
+                warningTriggered = true;
+            };
+            Plottable.Utils.Window.deprecated(callingMethod, version, message);
+            assert.isTrue(warningTriggered, "the warning has been triggered");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
 describe("Interactions", function () {
     describe("Interaction", function () {
         var SVG_WIDTH = 400;

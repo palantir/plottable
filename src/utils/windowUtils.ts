@@ -41,6 +41,21 @@ export module Utils {
       }
     }
 
+    /**
+     * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+     * version number of the deprecation, and an optional message.
+     *
+     * To be used in the first line of a deprecated method.
+     *
+     * @param {string} callingMethod The name of the method being deprecated
+     * @param {string} version The version when the tagged method became obsolete
+     * @param {string?} message Optional message to be shown with the warning
+     */
+    export function deprecated(callingMethod: string, version: string, message = "") {
+      Utils.Window.warn("Method " + callingMethod + " has been deprecated in version " + version +
+        ". Please refer to the release notes. " + message);
+    }
+
   }
 }
 }
