@@ -6526,10 +6526,11 @@ var Plottable;
                 y0: 0,
                 y1: 1
             };
-            this.old_dx = 0;
-            this.old_dy = 0;
-            this.old_sx = 1;
-            this.old_sy = 1;
+            this.deltaX = 0;
+            this.deltaY = 0;
+            this.scaleX = 1;
+            this.scaleY = 1;
+            this._performanceEnabled = false;
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
@@ -6542,38 +6543,49 @@ var Plottable;
         XYPlot.prototype._fastPanZoomOnX = function (scale) {
             var _this = this;
             var domain = scale.domain();
-            var scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-            this.old_sx = scaleX;
-            var deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
-            this.old_dx = deltaX;
-            this._renderArea && this._renderArea.attr('transform', 'translate(' + deltaX + ', ' + this.old_dy + ')' + 'scale(' + scaleX + ', ' + this.old_sy + ')');
-            clearTimeout(this._to1);
-            this._to1 = setTimeout(function () {
-                _this._temp.x0 = domain[0];
-                _this._temp.x1 = domain[1];
-                _this.old_dx = 0;
-                _this.old_dy = 0;
-                _this.render();
-                _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-            }, 500);
+            if (!this._isAnchored) {
+                this._temp.x0 = domain[0];
+                this._temp.x1 = domain[1];
+                return;
+            }
+            this.scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
+            this.deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
+            console.log(this.deltaX);
+            if (this._renderArea != null) {
+                this._renderArea.attr('transform', 'translate(' + this.deltaX + ', ' + this.deltaY + ')' + 'scale(' + this.scaleX + ', ' + this.scaleY + ')');
+                clearTimeout(this._to1);
+                this._to1 = setTimeout(function () {
+                    _this._temp.x0 = domain[0];
+                    _this._temp.x1 = domain[1];
+                    _this.deltaX = 0;
+                    _this.deltaY = 0;
+                    _this.render();
+                    _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+                }, 0);
+            }
         };
         XYPlot.prototype._fastPanZoomOnY = function (scale) {
             var _this = this;
             var domain = scale.domain();
-            var scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-            this.old_sy = scaleY;
-            var deltaY = scale.scale(this._temp.y0) - scale.scale(domain[0]) * scaleY;
-            this.old_dy = deltaY;
-            this._renderArea && this._renderArea.attr('transform', 'translate(' + this.old_dx + ', ' + deltaY + ')' + 'scale(' + this.old_sx + ', ' + scaleY + ')');
-            clearTimeout(this._to2);
-            this._to2 = setTimeout(function () {
-                _this._temp.y0 = domain[0];
-                _this._temp.y1 = domain[1];
-                _this.old_dx = 0;
-                _this.old_dy = 0;
-                _this.render();
-                _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-            }, 500);
+            if (!this._isAnchored) {
+                this._temp.y0 = domain[0];
+                this._temp.y1 = domain[1];
+                return;
+            }
+            this.scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
+            this.deltaY = scale.scale(this._temp.y0) - scale.scale(domain[0]) * this.scaleY;
+            if (!this._renderArea != null) {
+                this._renderArea.attr('transform', 'translate(' + this.deltaX + ', ' + this.deltaY + ')' + 'scale(' + this.scaleX + ', ' + this.scaleY + ')');
+                clearTimeout(this._to2);
+                this._to2 = setTimeout(function () {
+                    _this._temp.y0 = domain[0];
+                    _this._temp.y1 = domain[1];
+                    _this.deltaX = 0;
+                    _this.deltaY = 0;
+                    _this.render();
+                    _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+                }, 0);
+            }
         };
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
