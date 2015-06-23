@@ -170,14 +170,14 @@ export module Interactions {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       var transformedDomain = scale.range().map(magnifyTransform);
       var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
-      scale.domain(<any[]> constrainedDomain);
+      scale.domain(constrainedDomain);
     }
 
     private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       var transformedDomain = scale.range().map(translateTransform);
       var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
-      scale.domain(<any[]> constrainedDomain);
+      scale.domain(constrainedDomain);
     }
 
     private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
