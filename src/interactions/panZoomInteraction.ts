@@ -36,19 +36,18 @@ export module Interactions {
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
       this._xScales = new Utils.Set<QuantitativeScale<any>>();
-      if (xScale != null) {
-        this._xScales.add(xScale);
-      }
       this._yScales = new Utils.Set<QuantitativeScale<any>>();
-      if (yScale != null) {
-        this._yScales.add(yScale);
-      }
-
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map<Point>();
       this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
       this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      if (xScale != null) {
+        this.addXScale(xScale);
+      }
+      if (yScale != null) {
+        this.addYScale(yScale);
+      }
     }
 
     protected _anchor(component: Component) {
@@ -105,14 +104,14 @@ export module Interactions {
 
       if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
         this.xScales().forEach((xScale) => {
-          PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-          PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+          this._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+          this._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
         });
       }
       if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
         this.yScales().forEach((yScale) => {
-          PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-          PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+          this._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+          this._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
         });
       }
     }
@@ -149,14 +148,41 @@ export module Interactions {
       });
     }
 
-    private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
+    private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      scale.domain(scale.range().map(magnifyTransform));
+      var transformedDomain = scale.range().map(magnifyTransform);
+      var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
+      scale.domain(<any[]> constrainedDomain);
     }
 
-    private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+    private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      scale.domain(scale.range().map(translateTransform));
+      var transformedDomain = scale.range().map(translateTransform);
+      var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
+      scale.domain(<any[]> constrainedDomain);
+    }
+
+    private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
+      var domainValues = <number[]> domainToConstrain.map((d) => d.valueOf());
+      var domainExtent = Math.abs(domainValues[1] - domainValues[0]);
+      var domainCenter = (domainValues[1] + domainValues[0]) / 2;
+
+      var constrainedDomainValues = [Math.min(domainValues[0], domainValues[1]), Math.max(domainValues[0], domainValues[1])];
+      var minDomainExtent = this._minDomainExtents.get(scale);
+      if (domainExtent < minDomainExtent) {
+        constrainedDomainValues[0] = domainCenter - minDomainExtent / 2;
+        constrainedDomainValues[1] = domainCenter + minDomainExtent / 2;
+      }
+
+      var maxDomainExtent = this._maxDomainExtents.get(scale);
+      if (domainExtent > maxDomainExtent) {
+        constrainedDomainValues[0] = domainCenter - maxDomainExtent / 2;
+        constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
+      }
+
+      var constrainedDomain = constrainedDomainValues.map((value) => scale instanceof Scales.Time ? new Date(value) : value);
+
+      return domainValues[1] > domainValues[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
@@ -167,10 +193,10 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
         this.xScales().forEach((xScale) => {
-          PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+          this._magnifyScale(xScale, zoomAmount, translatedP.x);
         });
         this.yScales().forEach((yScale) => {
-          PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+          this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
       }
     }
@@ -186,11 +212,11 @@ export module Interactions {
         }
         this.xScales().forEach((xScale) => {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom._translateScale(xScale, -dragAmountX);
+          this._translateScale(xScale, -dragAmountX);
         });
         this.yScales().forEach((yScale) => {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom._translateScale(yScale, -dragAmountY);
+          this._translateScale(yScale, -dragAmountY);
         });
         lastDragPoint = endPoint;
       });
