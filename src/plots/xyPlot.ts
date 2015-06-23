@@ -44,60 +44,55 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    this._fastPanZoomOnXCallback = (scale) => {
+    this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
+    this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
+    this._renderCallback = (scale) => {}
+  }
 
-      var domain = scale.domain();
-      var scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
-                   (scale.scale(domain[1]) - scale.scale(domain[0]));
-      this.old_sx = scaleX;
+  private _fastPanZoomOnX(scale: Scale<any, any>) {
+    var domain = scale.domain();
+    var scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
+                 (scale.scale(domain[1]) - scale.scale(domain[0]));
+    this.old_sx = scaleX;
 
-      var deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
-      this.old_dx = deltaX;
+    var deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
+    this.old_dx = deltaX;
 
-      this._renderArea && this._renderArea.attr('transform',
-        'translate(' + deltaX + ', ' + this.old_dy + ')' +
-        'scale(' + scaleX +', ' + this.old_sy + ')');
-      clearTimeout(this._to1);
-      this._to1 = setTimeout(() => {
-        this._temp.x0 = domain[0];
-        this._temp.x1 = domain[1];
-        this.old_dx = 0;
-        this.old_dy = 0;
-        this.render();
-        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-      }, 500);
-    }
+    this._renderArea && this._renderArea.attr('transform',
+      'translate(' + deltaX + ', ' + this.old_dy + ')' +
+      'scale(' + scaleX +', ' + this.old_sy + ')');
+    clearTimeout(this._to1);
+    this._to1 = setTimeout(() => {
+      this._temp.x0 = domain[0];
+      this._temp.x1 = domain[1];
+      this.old_dx = 0;
+      this.old_dy = 0;
+      this.render();
+      this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+    }, 500);
+  }
 
+  private _fastPanZoomOnY(scale: Scale<any, any>) {
+    var domain = scale.domain();
+    var scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) /
+                 (scale.scale(domain[1]) - scale.scale(domain[0]));
+    this.old_sy = scaleY;
 
-    this._fastPanZoomOnYCallback = (scale) => {
+    var deltaY = scale.scale(this._temp.y0) - scale.scale(domain[0]) * scaleY;
+    this.old_dy = deltaY;
 
-      var domain = scale.domain();
-
-      var scaleY = (scale.scale(this._temp.y1) - scale.scale(this._temp.y0)) /
-                   (scale.scale(domain[1]) - scale.scale(domain[0]));
-      this.old_sy = scaleY;
-
-      var deltaY = scale.scale(this._temp.y0) - scale.scale(domain[0]) * scaleY;
-      this.old_dy = deltaY;
-
-      this._renderArea && this._renderArea.attr('transform',
-        'translate(' + this.old_dx + ', ' + deltaY + ')' +
-        'scale(' + this.old_sx + ', ' + scaleY + ')');
-      clearTimeout(this._to2);
-      this._to2 = setTimeout(() => {
-        this._temp.y0 = domain[0];
-        this._temp.y1 = domain[1];
-        this.old_dx = 0;
-        this.old_dy = 0;
-        this.render();
-        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
-      }, 500);
-    }
-
-    this._renderCallback = (scale) => {
-    }
-
-
+    this._renderArea && this._renderArea.attr('transform',
+      'translate(' + this.old_dx + ', ' + deltaY + ')' +
+      'scale(' + this.old_sx + ', ' + scaleY + ')');
+    clearTimeout(this._to2);
+    this._to2 = setTimeout(() => {
+      this._temp.y0 = domain[0];
+      this._temp.y1 = domain[1];
+      this.old_dx = 0;
+      this.old_dy = 0;
+      this.render();
+      this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+    }, 500);
   }
 
   /**
