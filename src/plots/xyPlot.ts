@@ -12,8 +12,8 @@ export class XYPlot<X, Y> extends Plot {
   private _fastPanZoomOnXCallback: ScaleCallback<Scale<any, any>>;
   private _fastPanZoomOnYCallback: ScaleCallback<Scale<any, any>>;
 
-  private _to1 = 0;
-  private _to2 = 0;
+  private _to1 = -1;
+  private _to2 = -1;
 
   private _temp = {
     x0: 0,
@@ -44,9 +44,9 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
-    this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
-    this._renderCallback = (scale) => {}
+    this._fastPanZoomOnXCallback = (scale) => {}//this._fastPanZoomOnX(scale);
+    this._fastPanZoomOnYCallback = (scale) => {}//this._fastPanZoomOnY(scale);
+    // this._renderCallback = (scale) => {}
   }
 
   private _fastPanZoomOnX(scale: Scale<any, any>) {
@@ -124,11 +124,6 @@ export class XYPlot<X, Y> extends Plot {
       this._updateYExtentsAndAutodomain();
     }
 
-    // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
-    if (xScale != null) {
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-    }
-
     this.render();
     return this;
   }
@@ -161,11 +156,6 @@ export class XYPlot<X, Y> extends Plot {
     this._bindProperty(XYPlot._Y_KEY, y, yScale);
     if (this._autoAdjustXScaleDomain) {
       this._updateXExtentsAndAutodomain();
-    }
-
-    // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
-    if (yScale != null) {
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
     this.render();

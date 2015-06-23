@@ -6518,8 +6518,8 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            this._to1 = 0;
-            this._to2 = 0;
+            this._to1 = -1;
+            this._to2 = -1;
             this._temp = {
                 x0: 0,
                 x1: 1,
@@ -6533,10 +6533,11 @@ var Plottable;
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            this._fastPanZoomOnXCallback = function (scale) { return _this._fastPanZoomOnX(scale); };
-            this._fastPanZoomOnYCallback = function (scale) { return _this._fastPanZoomOnY(scale); };
-            this._renderCallback = function (scale) {
-            };
+            this._fastPanZoomOnXCallback = function (scale) {
+            }; //this._fastPanZoomOnX(scale);
+            this._fastPanZoomOnYCallback = function (scale) {
+            }; //this._fastPanZoomOnY(scale);
+            // this._renderCallback = (scale) => {}
         }
         XYPlot.prototype._fastPanZoomOnX = function (scale) {
             var _this = this;
@@ -6582,10 +6583,6 @@ var Plottable;
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
-            // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
-            if (xScale != null) {
-                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
-            }
             this.render();
             return this;
         };
@@ -6596,10 +6593,6 @@ var Plottable;
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
-            }
-            // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
-            if (yScale != null) {
-                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
             return this;
