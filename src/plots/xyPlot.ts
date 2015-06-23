@@ -44,9 +44,10 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    this._fastPanZoomOnXCallback = (scale) => {}//this._fastPanZoomOnX(scale);
-    this._fastPanZoomOnYCallback = (scale) => {}//this._fastPanZoomOnY(scale);
-    // this._renderCallback = (scale) => {}
+    this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
+    this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
+
+    this._renderCallback = () => {};
   }
 
   private _fastPanZoomOnX(scale: Scale<any, any>) {
@@ -61,8 +62,6 @@ export class XYPlot<X, Y> extends Plot {
     this.scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
                   (scale.scale(domain[1]) - scale.scale(domain[0]));
     this.deltaX = scale.scale(this._temp.x0) - scale.scale(domain[0]);
-
-    console.log(this.deltaX);
 
     if (this._renderArea != null) {
       this._renderArea.attr('transform',
@@ -82,6 +81,7 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _fastPanZoomOnY(scale: Scale<any, any>) {
+
     var domain = scale.domain();
 
     if (!this._isAnchored) {
@@ -111,20 +111,31 @@ export class XYPlot<X, Y> extends Plot {
     }
   }
 
-  // public performanceEnabled(performanceEnabled: boolean) {
-  //   if (performanceEnabled == null) {
-  //     return this._performanceEnabled;
-  //   }
+  public performanceEnabled(): boolean;
+  public performanceEnabled(performanceEnabled: boolean): XYPlot<X, Y>;
+  public performanceEnabled(performanceEnabled?: boolean): any {
+    if (performanceEnabled == null) {
+      return this._performanceEnabled;
+    }
 
-  //   if (perfromanceEnabled) {
-  //     // this._renderCallback = (scale) => {}
-  //   } else {
+    if (performanceEnabled) {
+      console.log(1);
 
-  //   }
+      // if (this.x() && this.x().scale) {
+      //   this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
+      //   this.x().scale.offUpdate(this._renderCallback);
+      // }
+      // if (this.y() && this.y().scale) {
+      //   this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
+      //   this.y().scale.offUpdate(this._renderCallback);
+      // }
+    } else {
 
-  //   this._performanceEnabled = performanceEnabled;
-  //   return this;
-  // }
+    }
+
+    this._performanceEnabled = performanceEnabled;
+    return this;
+  }
 
   /**
    * Gets the AccessorScaleBinding for X.
@@ -234,9 +245,14 @@ export class XYPlot<X, Y> extends Plot {
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
 
-    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
-                                                    : this._fastPanZoomOnYCallback;
-    scale.onUpdate(fastPanZoomCallback);
+    console.log(2);
+    // if (this._performanceEnabled) {
+      var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
+                                                      : this._fastPanZoomOnYCallback;
+      scale.onUpdate(fastPanZoomCallback);
+      // scale.offUpdate(this._renderCallback);
+
+    // }
   }
 
   public destroy() {
