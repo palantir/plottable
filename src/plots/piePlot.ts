@@ -306,17 +306,17 @@ export module Plots {
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       var dataset = this.datasets()[0];
 
-      for (var i = 0; i < dataset.data().length; i++) {
-        var datum = dataset.data()[i];
-        var value = "" + this.sectorValue().accessor(datum, i, dataset);
+      for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
+        var datum = dataset.data()[datumIndex];
+        var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
         var measurement = measurer.measure(value);
 
-        var theta = (this._endAngles[i] + this._startAngles[i]) / 2;
-        var outerRadius = this.outerRadius().accessor(datum, i, dataset);
+        var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+        var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
         if (this.outerRadius().scale) {
           outerRadius = this.outerRadius().scale.scale(outerRadius);
         }
-        var innerRadius = this.innerRadius().accessor(datum, i, dataset);
+        var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
         if (this.innerRadius().scale) {
           innerRadius = this.innerRadius().scale.scale(innerRadius);
         }
@@ -333,9 +333,9 @@ export module Plots {
         ];
 
         var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-        var showLabel = sliceIndices.every((index) => (index != null && index === i));
+        var showLabel = sliceIndices.every((index) => index === datumIndex);
 
-        var color = attrToProjector["fill"](datum, i, dataset);
+        var color = attrToProjector["fill"](datum, datumIndex, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
         var className = dark ? "dark-label" : "light-label";

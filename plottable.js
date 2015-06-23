@@ -6531,16 +6531,16 @@ var Plottable;
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 var dataset = this.datasets()[0];
-                for (var i = 0; i < dataset.data().length; i++) {
-                    var datum = dataset.data()[i];
-                    var value = "" + this.sectorValue().accessor(datum, i, dataset);
+                for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
+                    var datum = dataset.data()[datumIndex];
+                    var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
                     var measurement = measurer.measure(value);
-                    var theta = (this._endAngles[i] + this._startAngles[i]) / 2;
-                    var outerRadius = this.outerRadius().accessor(datum, i, dataset);
+                    var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+                    var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
                     if (this.outerRadius().scale) {
                         outerRadius = this.outerRadius().scale.scale(outerRadius);
                     }
-                    var innerRadius = this.innerRadius().accessor(datum, i, dataset);
+                    var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
                     if (this.innerRadius().scale) {
                         innerRadius = this.innerRadius().scale.scale(innerRadius);
                     }
@@ -6554,8 +6554,8 @@ var Plottable;
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
                     var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return (index != null && index === i); });
-                    var color = attrToProjector["fill"](datum, i, dataset);
+                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var color = attrToProjector["fill"](datum, datumIndex, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                     var className = dark ? "dark-label" : "light-label";
