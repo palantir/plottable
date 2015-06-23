@@ -22,7 +22,6 @@ export class XYPlot<X, Y> extends Plot {
   private _fastPanZoomKnownDomainX: X[] = [null, null];
   private _fastPanZoomKnownDomainY: Y[] = [null, null];
 
-
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
    *
@@ -42,55 +41,53 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _fastPanZoomOnX(scale: Scale<X, number>) {
-    var domain = scale.domain();
-
     if (!this._isAnchored) {
       return;
     }
 
+    var domain = scale.domain();
     this._fastPanZoomScaleX = (scale.scale(this._fastPanZoomKnownDomainX[1]) - scale.scale(this._fastPanZoomKnownDomainX[0])) /
                               (scale.scale(domain[1]) - scale.scale(domain[0]));
     this._fastPanZoomDeltaX = scale.scale(this._fastPanZoomKnownDomainX[0]) - scale.scale(domain[0]);
 
     if (this._renderArea != null) {
-      this._renderArea.attr('transform',
-        'translate(' + this._fastPanZoomDeltaX + ', ' + this._fastPanZoomDeltaY + ')' +
-        'scale(' + this._fastPanZoomScaleX +', ' + this._fastPanZoomScaleY + ')');
+      this._renderArea.attr("transform",
+        "translate(" + this._fastPanZoomDeltaX + ", " + this._fastPanZoomDeltaY + ")" +
+        "scale(" + this._fastPanZoomScaleX + ", " + this._fastPanZoomScaleY + ")");
       clearTimeout(this._fastPanZoomTimeoutReferenceX);
       this._fastPanZoomTimeoutReferenceX = setTimeout(() => {
         this._fastPanZoomKnownDomainX = domain;
         this._fastPanZoomDeltaX = 0;
         this._fastPanZoomDeltaY = 0;
         this.render();
-        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+        this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
       }, 500);
     }
 
   }
 
   private _fastPanZoomOnY(scale: Scale<Y, number>) {
-    var domain = scale.domain();
-
     if (!this._isAnchored) {
       return;
     }
 
+    var domain = scale.domain();
     this._fastPanZoomScaleY = (scale.scale(this._fastPanZoomKnownDomainY[1]) - scale.scale(this._fastPanZoomKnownDomainY[0])) /
                   (scale.scale(domain[1]) - scale.scale(domain[0]));
 
     this._fastPanZoomDeltaY = scale.scale(this._fastPanZoomKnownDomainY[0]) - scale.scale(domain[0]) * this._fastPanZoomScaleY;
 
     if (!this._renderArea != null) {
-      this._renderArea.attr('transform',
-        'translate(' + this._fastPanZoomDeltaX + ', ' + this._fastPanZoomDeltaY + ')' +
-        'scale(' + this._fastPanZoomScaleX + ', ' + this._fastPanZoomScaleY + ')');
+      this._renderArea.attr("transform",
+        "translate(" + this._fastPanZoomDeltaX + ", " + this._fastPanZoomDeltaY + ")" +
+        "scale(" + this._fastPanZoomScaleX + ", " + this._fastPanZoomScaleY + ")");
       clearTimeout(this._fastPanZoomTimeoutReferenceY);
       this._fastPanZoomTimeoutReferenceY = setTimeout(() => {
         this._fastPanZoomKnownDomainY = domain;
         this._fastPanZoomDeltaX = 0;
         this._fastPanZoomDeltaY = 0;
         this.render();
-        this._renderArea && this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
+        this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
       }, 500);
     }
   }

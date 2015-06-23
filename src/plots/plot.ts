@@ -53,10 +53,7 @@ export class Plot extends Component {
     this._attrBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._attrExtents = d3.map<any[]>();
     this._includedValuesProvider = (scale: Scale<any, any>) => this._includedValuesForScale(scale);
-    var _timeout = 0;
-    this._renderCallback = (scale) => {
-      this.render();
-    }
+    this._renderCallback = (scale) => this.render();
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();
