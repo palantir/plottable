@@ -15,7 +15,7 @@ describe("Utils.Window", () => {
       Plottable.Utils.Window.warn = oldWarn;
     });
 
-    it("deprecated()", () => {
+    it("deprecated() issues a warning", () => {
       var warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         warningTriggered = true;
@@ -25,14 +25,14 @@ describe("Utils.Window", () => {
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
 
-    it("deprecated() version and message", () => {
-      var methodName = "reallyOutdatedCallerMethod";
+    it("deprecated() calling method name, version and message are correct", () => {
+      var callingMethod = "reallyOutdatedCallerMethod";
       var version = "v0.77.2";
       var message = "hadoop is doopey";
 
       var warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
-        assert.isNotNull(msg.match(new RegExp(methodName)), "The method name exists in the message " + msg);
+        assert.isNotNull(msg.match(new RegExp(callingMethod)), "The method name exists in the message " + msg);
         assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
         assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
         assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
@@ -41,7 +41,7 @@ describe("Utils.Window", () => {
         warningTriggered = true;
       };
 
-      Plottable.Utils.Window.deprecated(methodName, version, message);
+      Plottable.Utils.Window.deprecated(callingMethod, version, message);
 
       assert.isTrue(warningTriggered, "the warning has been triggered");
     });
