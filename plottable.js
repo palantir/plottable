@@ -2784,7 +2784,6 @@ var Plottable;
             function ErrorBar(dataset) {
                 _super.call(this, dataset);
                 this._ERROR_BAR_CLASS = "error-bar";
-                this._ERROR_BAR_WIDTH = 10;
                 this._className = this._ERROR_BAR_CLASS;
                 this._svgElementName = "line";
             }
@@ -8162,7 +8161,7 @@ var Plottable;
                 }
                 return this;
             };
-            ErrorBar.prototype.x2 = function (x2, xScale) {
+            ErrorBar.prototype.x2 = function (x2) {
                 if (x2 == null) {
                     return this._propertyBindings.get("x2");
                 }
@@ -8184,7 +8183,7 @@ var Plottable;
                 }
                 return this;
             };
-            ErrorBar.prototype.y2 = function (y2, xScale) {
+            ErrorBar.prototype.y2 = function (y2) {
                 if (y2 == null) {
                     return this._propertyBindings.get("y2");
                 }

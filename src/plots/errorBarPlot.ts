@@ -32,16 +32,24 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for X2.
      */
-    public x2(): Plots.AccessorScaleBinding<X, number>;
-    public x2(x2: number | Accessor<number>): ErrorBar<X, Y>;
-    public x2(x2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
-    public x2(x2?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    public x2(): AccessorScaleBinding<X, number>;
+    /**
+     * Sets X2 to a constant number or the result of an Accessor.
+     * If a Scale has been set for X, it will also be used to scale X2.
+     *
+     * @param {number|Accessor<number>|X|Accessor<X>} x2
+     * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+     */
+    public x2(x2: number | Accessor<number> | X | Accessor<X>): ErrorBar<X, Y>;
+    public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
       if (x2 == null) {
         return this._propertyBindings.get("x2");
       }
+
       var xBinding = this.x();
       var xScale = xBinding && xBinding.scale;
       this._bindProperty("x2", x2, xScale);
+
       this.render();
       return this;
     }
@@ -65,10 +73,19 @@ export module Plots {
       return this;
     }
 
-    public y2(): Plots.AccessorScaleBinding<X, number>;
-    public y2(y2: number | Accessor<number>): ErrorBar<X, Y>;
-    public y2(y2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
-    public y2(y2?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
+    /**
+     * Gets the AccessorScaleBinding for Y2.
+     */
+    public y2(): AccessorScaleBinding<Y, number>;
+    /**
+     * Sets Y2 to a constant number or the result of an Accessor.
+     * If a Scale has been set for Y, it will also be used to scale Y2.
+     *
+     * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+     * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+     */
+    public y2(y2: number | Accessor<number> | Y | Accessor<Y>): ErrorBar<X, Y>;
+    public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {
       if (y2 == null) {
         return this._propertyBindings.get("y2");
       }

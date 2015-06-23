@@ -3063,18 +3063,33 @@ declare module Plottable {
             /**
              * Gets the AccessorScaleBinding for X2.
              */
-            x2(): Plots.AccessorScaleBinding<X, number>;
-            x2(x2: number | Accessor<number>): ErrorBar<X, Y>;
-            x2(x2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|X|Accessor<X>} x2
+             * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+             */
+            x2(x2: number | Accessor<number> | X | Accessor<X>): ErrorBar<X, Y>;
             /**
              * Gets the AccessorScaleBinding for Y.
              */
             y(): Plots.AccessorScaleBinding<Y, number>;
             y(y: number | Accessor<number>): ErrorBar<X, Y>;
             y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): ErrorBar<X, Y>;
-            y2(): Plots.AccessorScaleBinding<X, number>;
-            y2(y2: number | Accessor<number>): ErrorBar<X, Y>;
-            y2(y2: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
+            y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+             */
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): ErrorBar<X, Y>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _propertyProjectors(): AttributeToProjector;
         }
