@@ -9,22 +9,18 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
-
   private _performanceEnabled = false;
   private _fastPanZoomOnXCallback: ScaleCallback<Scale<any, any>>;
   private _fastPanZoomOnYCallback: ScaleCallback<Scale<any, any>>;
 
-  private _fastPanZoomTimeoutX = 0;
-  private _fastPanZoomTimeoutY = 0;
+  private _fastPanZoomTimeoutReferenceX = 0;
+  private _fastPanZoomTimeoutReferenceY = 0;
   private _fastPanZoomDeltaX = 0;
   private _fastPanZoomDeltaY = 0;
   private _fastPanZoomScaleX = 1;
   private _fastPanZoomScaleY = 1;
-
-  private _fastPanZoomKnownDomainX: [X] = [null, null];
-  private _fastPanZoomKnownDomainY: [Y] = [null, null];
-
-  private _fastPanZoomKnownDomain: {x0: X; x1: X; y0: Y; y1: Y; };
+  private _fastPanZoomKnownDomainX: X[] = [null, null];
+  private _fastPanZoomKnownDomainY: Y[] = [null, null];
 
 
   /**
@@ -43,21 +39,12 @@ export class XYPlot<X, Y> extends Plot {
 
     this._fastPanZoomOnXCallback = (scale) => this._fastPanZoomOnX(scale);
     this._fastPanZoomOnYCallback = (scale) => this._fastPanZoomOnY(scale);
-
-    this._fastPanZoomKnownDomain = {
-      x0: null,
-      x1: null,
-      y0: null,
-      y1: null,
-    }
   }
 
-  private _fastPanZoomOnX(scale: Scale<any, any>) {
+  private _fastPanZoomOnX(scale: Scale<X, number>) {
     var domain = scale.domain();
 
     if (!this._isAnchored) {
-      this._fastPanZoomKnownDomainX[0] = domain[0];
-      this._fastPanZoomKnownDomainX[1] = domain[1];
       return;
     }
 
@@ -69,10 +56,9 @@ export class XYPlot<X, Y> extends Plot {
       this._renderArea.attr('transform',
         'translate(' + this._fastPanZoomDeltaX + ', ' + this._fastPanZoomDeltaY + ')' +
         'scale(' + this._fastPanZoomScaleX +', ' + this._fastPanZoomScaleY + ')');
-      clearTimeout(this._fastPanZoomTimeoutX);
-      this._fastPanZoomTimeoutX = setTimeout(() => {
-        this._fastPanZoomKnownDomainX[0] = domain[0];
-        this._fastPanZoomKnownDomainX[1] = domain[1];
+      clearTimeout(this._fastPanZoomTimeoutReferenceX);
+      this._fastPanZoomTimeoutReferenceX = setTimeout(() => {
+        this._fastPanZoomKnownDomainX = domain;
         this._fastPanZoomDeltaX = 0;
         this._fastPanZoomDeltaY = 0;
         this.render();
@@ -82,12 +68,10 @@ export class XYPlot<X, Y> extends Plot {
 
   }
 
-  private _fastPanZoomOnY(scale: Scale<any, any>) {
+  private _fastPanZoomOnY(scale: Scale<Y, number>) {
     var domain = scale.domain();
 
     if (!this._isAnchored) {
-      this._fastPanZoomKnownDomainY[0] = domain[0];
-      this._fastPanZoomKnownDomainY[1] = domain[1];
       return;
     }
 
@@ -100,10 +84,9 @@ export class XYPlot<X, Y> extends Plot {
       this._renderArea.attr('transform',
         'translate(' + this._fastPanZoomDeltaX + ', ' + this._fastPanZoomDeltaY + ')' +
         'scale(' + this._fastPanZoomScaleX + ', ' + this._fastPanZoomScaleY + ')');
-      clearTimeout(this._fastPanZoomTimeoutY);
-      this._fastPanZoomTimeoutY = setTimeout(() => {
-        this._fastPanZoomKnownDomainY[0] = domain[0];
-        this._fastPanZoomKnownDomainY[1] = domain[1];
+      clearTimeout(this._fastPanZoomTimeoutReferenceY);
+      this._fastPanZoomTimeoutReferenceY = setTimeout(() => {
+        this._fastPanZoomKnownDomainY = domain;
         this._fastPanZoomDeltaX = 0;
         this._fastPanZoomDeltaY = 0;
         this.render();
@@ -121,16 +104,14 @@ export class XYPlot<X, Y> extends Plot {
 
     if (performanceEnabled) {
       if (this.x() && this.x().scale) {
+        this._fastPanZoomKnownDomainX = this.x().scale.domain();
         this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
         this.x().scale.offUpdate(this._renderCallback);
-        this._fastPanZoomKnownDomainX[0] = this.x().scale.domain()[0];
-        this._fastPanZoomKnownDomainX[1] = this.x().scale.domain()[1];
       }
       if (this.y() && this.y().scale) {
+        this._fastPanZoomKnownDomainY = this.y().scale.domain();
         this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
         this.y().scale.offUpdate(this._renderCallback);
-        this._fastPanZoomKnownDomainY[0] = this.y().scale.domain()[0];
-        this._fastPanZoomKnownDomainY[1] = this.y().scale.domain()[1];
       }
     } else {
       if (this.x() && this.x().scale) {
