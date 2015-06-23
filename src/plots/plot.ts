@@ -22,7 +22,7 @@ export module Plots {
 
 /**
  * Computing the selection of an entity is an expensive operation. This object aims to
- * reproduce the bahavior of the Plots.PlotEntity, excluding the selection, but including
+ * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
  * drawer and validDatumIndex, which can be used to compute the selection.
  */
 interface LightweightPlotEntity {
@@ -466,7 +466,7 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    return this._lightweightEntities(datasets).map((entity) => this._lightweightEntityToPlotEntity(entity));
+    return this._lightweightEntities(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
   }
 
   private _lightweightEntities(datasets = this.datasets()) {
@@ -495,7 +495,7 @@ export class Plot extends Component {
     return lightweightEntities;
   }
 
-  private _lightweightEntityToPlotEntity(entity: LightweightPlotEntity) {
+  private _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
     var plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
       position: entity.position,
@@ -529,7 +529,7 @@ export class Plot extends Component {
       }
     });
 
-    return this._lightweightEntityToPlotEntity(closestPointEntity);
+    return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {

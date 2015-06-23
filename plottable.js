@@ -6259,7 +6259,7 @@ var Plottable;
         Plot.prototype.entities = function (datasets) {
             var _this = this;
             if (datasets === void 0) { datasets = this.datasets(); }
-            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightEntityToPlotEntity(entity); });
+            return this._lightweightEntities(datasets).map(function (entity) { return _this._lightweightPlotEntityToPlotEntity(entity); });
         };
         Plot.prototype._lightweightEntities = function (datasets) {
             var _this = this;
@@ -6287,7 +6287,7 @@ var Plottable;
             });
             return lightweightEntities;
         };
-        Plot.prototype._lightweightEntityToPlotEntity = function (entity) {
+        Plot.prototype._lightweightPlotEntityToPlotEntity = function (entity) {
             var plotEntity = {
                 datum: entity.datum,
                 position: entity.position,
@@ -6319,7 +6319,7 @@ var Plottable;
                     closestPointEntity = entity;
                 }
             });
-            return this._lightweightEntityToPlotEntity(closestPointEntity);
+            return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
         };
         Plot.prototype._visibleOnPlot = function (datum, pixelPoint, selection) {
             Plottable.Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
