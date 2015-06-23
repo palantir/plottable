@@ -3428,6 +3428,9 @@ declare module Plottable {
         enabled(): boolean;
         /**
          * Enables or disables this Interaction.
+         *
+         * @param {boolean} enabled Whether the Interaction should be enabled.
+         * @return {Interaction} The calling Interaction.
          */
         enabled(enabled: boolean): Interaction;
         /**

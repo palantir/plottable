@@ -65,6 +65,9 @@ export class Interaction {
   public enabled(): boolean;
   /**
    * Enables or disables this Interaction.
+   *
+   * @param {boolean} enabled Whether the Interaction should be enabled.
+   * @return {Interaction} The calling Interaction.
    */
   public enabled(enabled: boolean): Interaction;
   public enabled(enabled?: boolean): any {
