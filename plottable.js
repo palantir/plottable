@@ -9287,7 +9287,7 @@ var Plottable;
                 var _this = this;
                 var scaleAtMaxExtent = function (scale) {
                     var scaleDomain = scale.domain();
-                    var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+                    var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                     return scaleExtent >= _this._maxDomainExtents.get(scale);
                 };
                 return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
@@ -9296,7 +9296,7 @@ var Plottable;
                 var _this = this;
                 var scaleAtMinExtent = function (scale) {
                     var scaleDomain = scale.domain();
-                    var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+                    var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                     return scaleExtent <= _this._minDomainExtents.get(scale);
                 };
                 return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
@@ -9340,10 +9340,11 @@ var Plottable;
                 scale.domain(constrainedDomain);
             };
             PanZoom.prototype._constrainedDomain = function (scale, domainToConstrain) {
-                var domainValues = domainToConstrain.map(function (d) { return d.valueOf(); });
-                var domainExtent = Math.abs(domainValues[1] - domainValues[0]);
-                var domainCenter = (domainValues[1] + domainValues[0]) / 2;
-                var constrainedDomainValues = [Math.min(domainValues[0], domainValues[1]), Math.max(domainValues[0], domainValues[1])];
+                var domainToConstrainMin = Math.min(domainToConstrain[0], domainToConstrain[1]);
+                var domainToConstrainMax = Math.max(domainToConstrain[0], domainToConstrain[1]);
+                var domainExtent = domainToConstrainMax - domainToConstrainMin;
+                var domainCenter = (domainToConstrainMin + domainToConstrainMax) / 2;
+                var constrainedDomainValues = [domainToConstrainMin, domainToConstrainMax];
                 var minDomainExtent = this._minDomainExtents.get(scale);
                 if (domainExtent < minDomainExtent) {
                     constrainedDomainValues[0] = domainCenter - minDomainExtent / 2;
@@ -9355,7 +9356,7 @@ var Plottable;
                     constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
                 }
                 var constrainedDomain = constrainedDomainValues.map(function (value) { return scale.valueToDomainType(value); });
-                return domainValues[1] > domainValues[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
+                return domainToConstrain[1] > domainToConstrain[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var _this = this;
@@ -9465,7 +9466,7 @@ var Plottable;
                     this._minDomainExtents.set(scale, 0);
                 }
                 if (this._maxDomainExtents.get(scale) == null) {
-                    this._maxDomainExtents.set(scale, scale.domainTypeMaximum().valueOf());
+                    this._maxDomainExtents.set(scale, scale.domainTypeMaximum());
                 }
             };
             /**
@@ -9480,18 +9481,16 @@ var Plottable;
             };
             PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
                 if (minDomainExtent == null) {
-                    var minDomainExtentValue = this._minDomainExtents.get(quantitativeScale);
-                    return quantitativeScale instanceof Plottable.Scales.Time ? new Date(minDomainExtentValue) : minDomainExtentValue;
+                    return this._minDomainExtents.get(quantitativeScale);
                 }
-                this._minDomainExtents.set(quantitativeScale, minDomainExtent.valueOf());
+                this._minDomainExtents.set(quantitativeScale, minDomainExtent);
                 return this;
             };
             PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
                 if (maxDomainExtent == null) {
-                    var maxDomainExtentValue = this._maxDomainExtents.get(quantitativeScale);
-                    return quantitativeScale instanceof Plottable.Scales.Time ? new Date(maxDomainExtentValue) : maxDomainExtentValue;
+                    return this._maxDomainExtents.get(quantitativeScale);
                 }
-                this._maxDomainExtents.set(quantitativeScale, maxDomainExtent.valueOf());
+                this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;
             };
             /**

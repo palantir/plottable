@@ -22,8 +22,8 @@ export module Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
-    private _minDomainExtents: Utils.Map<QuantitativeScale<any>, number>;
-    private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, number>;
+    private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
+    private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
 
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
@@ -119,7 +119,7 @@ export module Interactions {
     private _scalesAtMaxExtent() {
       var scaleAtMaxExtent = (scale: QuantitativeScale<any>) => {
         var scaleDomain = scale.domain();
-        var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+        var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
         return scaleExtent >= this._maxDomainExtents.get(scale);
       };
       return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
@@ -128,7 +128,7 @@ export module Interactions {
     private _scalesAtMinExtent() {
       var scaleAtMinExtent = (scale: QuantitativeScale<any>) => {
         var scaleDomain = scale.domain();
-        var scaleExtent = Math.abs(scaleDomain[1].valueOf() - scaleDomain[0].valueOf());
+        var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
         return scaleExtent <= this._minDomainExtents.get(scale);
       };
       return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
@@ -181,11 +181,12 @@ export module Interactions {
     }
 
     private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
-      var domainValues = <number[]> domainToConstrain.map((d) => d.valueOf());
-      var domainExtent = Math.abs(domainValues[1] - domainValues[0]);
-      var domainCenter = (domainValues[1] + domainValues[0]) / 2;
+      var domainToConstrainMin = Math.min(<any> domainToConstrain[0], <any> domainToConstrain[1]);
+      var domainToConstrainMax = Math.max(<any> domainToConstrain[0], <any> domainToConstrain[1]);
+      var domainExtent = domainToConstrainMax - domainToConstrainMin;
+      var domainCenter = (domainToConstrainMin + domainToConstrainMax) / 2;
 
-      var constrainedDomainValues = [Math.min(domainValues[0], domainValues[1]), Math.max(domainValues[0], domainValues[1])];
+      var constrainedDomainValues = [domainToConstrainMin, domainToConstrainMax];
       var minDomainExtent = this._minDomainExtents.get(scale);
       if (domainExtent < minDomainExtent) {
         constrainedDomainValues[0] = domainCenter - minDomainExtent / 2;
@@ -200,7 +201,7 @@ export module Interactions {
 
       var constrainedDomain = constrainedDomainValues.map((value) => scale.valueToDomainType(value));
 
-      return domainValues[1] > domainValues[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
+      return domainToConstrain[1] > domainToConstrain[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
@@ -338,7 +339,7 @@ export module Interactions {
         this._minDomainExtents.set(scale, 0);
       }
       if (this._maxDomainExtents.get(scale) == null) {
-        this._maxDomainExtents.set(scale, scale.domainTypeMaximum().valueOf());
+        this._maxDomainExtents.set(scale, scale.domainTypeMaximum());
       }
     }
 
@@ -357,10 +358,9 @@ export module Interactions {
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
     public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
       if (minDomainExtent == null) {
-        var minDomainExtentValue = this._minDomainExtents.get(quantitativeScale);
-        return quantitativeScale instanceof Scales.Time ? new Date(minDomainExtentValue) : minDomainExtentValue;
+        return this._minDomainExtents.get(quantitativeScale);
       }
-      this._minDomainExtents.set(quantitativeScale, <any> minDomainExtent.valueOf());
+      this._minDomainExtents.set(quantitativeScale, minDomainExtent);
       return this;
     }
 
@@ -368,10 +368,9 @@ export module Interactions {
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
       if (maxDomainExtent == null) {
-        var maxDomainExtentValue = this._maxDomainExtents.get(quantitativeScale);
-        return quantitativeScale instanceof Scales.Time ? new Date(maxDomainExtentValue) : maxDomainExtentValue;
+        return this._maxDomainExtents.get(quantitativeScale);
       }
-      this._maxDomainExtents.set(quantitativeScale, <any> maxDomainExtent.valueOf());
+      this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
       return this;
     }
   }
