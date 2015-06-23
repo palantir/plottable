@@ -6531,9 +6531,9 @@ var Plottable;
             this.old_sx = 1;
             this.old_sy = 1;
             this.addClass("xy-plot");
-            // X
-            this._adjustYDomainOnChangeFromXCallback = function (scale) {
-                _this._adjustYDomainOnChangeFromX();
+            this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
+            this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+            this._fastPanZoomOnXCallback = function (scale) {
                 var domain = scale.domain();
                 var scaleX = (scale.scale(_this._temp.x1) - scale.scale(_this._temp.x0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
                 _this.old_sx = scaleX;
@@ -6550,9 +6550,7 @@ var Plottable;
                     _this._renderArea && _this._renderArea.attr('transform', 'translate(0, 0) scale(1, 1)');
                 }, 500);
             };
-            // Y
-            this._adjustXDomainOnChangeFromYCallback = function (scale) {
-                _this._adjustXDomainOnChangeFromY();
+            this._fastPanZoomOnYCallback = function (scale) {
                 var domain = scale.domain();
                 var scaleY = (scale.scale(_this._temp.y1) - scale.scale(_this._temp.y0)) / (scale.scale(domain[1]) - scale.scale(domain[0]));
                 _this.old_sy = scaleY;
@@ -6580,6 +6578,7 @@ var Plottable;
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
             }
+            // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
             if (xScale != null) {
                 xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
@@ -6594,6 +6593,7 @@ var Plottable;
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
             }
+            // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
             if (yScale != null) {
                 yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
@@ -6627,19 +6627,25 @@ var Plottable;
             _super.prototype._uninstallScaleForKey.call(this, scale, key);
             var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
             scale.offUpdate(adjustCallback);
+            var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback : this._fastPanZoomOnYCallback;
+            scale.offUpdate(fastPanZoomCallback);
         };
         XYPlot.prototype._installScaleForKey = function (scale, key) {
             _super.prototype._installScaleForKey.call(this, scale, key);
             var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
             scale.onUpdate(adjustCallback);
+            var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback : this._fastPanZoomOnYCallback;
+            scale.onUpdate(fastPanZoomCallback);
         };
         XYPlot.prototype.destroy = function () {
             _super.prototype.destroy.call(this);
             if (this.x().scale) {
                 this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+                this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
             }
             if (this.y().scale) {
                 this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+                this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
             }
             return this;
         };

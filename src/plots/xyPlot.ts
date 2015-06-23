@@ -9,6 +9,9 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
+  private _fastPanZoomOnXCallback: ScaleCallback<Scale<any, any>>;
+  private _fastPanZoomOnYCallback: ScaleCallback<Scale<any, any>>;
+
   private _to1 = 0;
   private _to2 = 0;
 
@@ -25,6 +28,8 @@ export class XYPlot<X, Y> extends Plot {
   private old_sx = 1;
   private old_sy = 1;
 
+
+
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
    *
@@ -36,9 +41,10 @@ export class XYPlot<X, Y> extends Plot {
     super();
     this.addClass("xy-plot");
 
-    // X
-    this._adjustYDomainOnChangeFromXCallback = (scale) => {
-      this._adjustYDomainOnChangeFromX();
+    this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
+    this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
+
+    this._fastPanZoomOnXCallback = (scale) => {
 
       var domain = scale.domain();
       var scaleX = (scale.scale(this._temp.x1) - scale.scale(this._temp.x0)) /
@@ -62,9 +68,8 @@ export class XYPlot<X, Y> extends Plot {
       }, 500);
     }
 
-    // Y
-    this._adjustXDomainOnChangeFromYCallback = (scale) => {
-      this._adjustXDomainOnChangeFromY();
+
+    this._fastPanZoomOnYCallback = (scale) => {
 
       var domain = scale.domain();
 
@@ -124,6 +129,7 @@ export class XYPlot<X, Y> extends Plot {
       this._updateYExtentsAndAutodomain();
     }
 
+    // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
     if (xScale != null) {
       xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
     }
@@ -162,6 +168,7 @@ export class XYPlot<X, Y> extends Plot {
       this._updateXExtentsAndAutodomain();
     }
 
+    // TODO This is extra (_bindProperty -> _bind -> _installScale -> onUpdate with thi smethod)
     if (yScale != null) {
       yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
@@ -199,6 +206,10 @@ export class XYPlot<X, Y> extends Plot {
     var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
+
+    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
+                                                    : this._fastPanZoomOnYCallback;
+    scale.offUpdate(fastPanZoomCallback);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
@@ -206,15 +217,21 @@ export class XYPlot<X, Y> extends Plot {
     var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
+
+    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
+                                                    : this._fastPanZoomOnYCallback;
+    scale.onUpdate(fastPanZoomCallback);
   }
 
   public destroy() {
     super.destroy();
     if (this.x().scale) {
       this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
+      this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
     }
     if (this.y().scale) {
       this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
+      this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
     }
     return this;
   }
