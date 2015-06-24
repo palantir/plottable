@@ -288,10 +288,6 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     }
   }
 
-  public valueToDomainType(value: number): D {
-    throw new Error("Subclasses should override valueToDomainType");
-  }
-
   public domainTypeMaximum(): D {
     throw new Error("Subclasses should override domainTypeMaximum");
   }

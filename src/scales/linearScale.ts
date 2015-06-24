@@ -56,10 +56,6 @@ export module Scales {
       return this._d3Scale.copy().domain(domain).nice(count).domain();
     }
 
-    public valueToDomainType(value: number) {
-      return value;
-    }
-
     public domainTypeMaximum() {
       return Infinity;
     }

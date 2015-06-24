@@ -1726,9 +1726,6 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype.valueToDomainType = function (value) {
-            throw new Error("Subclasses should override valueToDomainType");
-        };
         QuantitativeScale.prototype.domainTypeMaximum = function () {
             throw new Error("Subclasses should override domainTypeMaximum");
         };
@@ -1793,9 +1790,6 @@ var Plottable;
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
-            };
-            Linear.prototype.valueToDomainType = function (value) {
-                return value;
             };
             Linear.prototype.domainTypeMaximum = function () {
                 return Infinity;
@@ -1995,9 +1989,6 @@ var Plottable;
             };
             ModifiedLog.prototype.defaultTicks = function () {
                 return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
-            };
-            ModifiedLog.prototype.valueToDomainType = function (value) {
-                return value;
             };
             ModifiedLog.prototype.domainTypeMaximum = function () {
                 return Infinity;
@@ -2344,9 +2335,6 @@ var Plottable;
                     default:
                         throw Error("TimeInterval specified does not exist: " + timeInterval);
                 }
-            };
-            Time.prototype.valueToDomainType = function (value) {
-                return new Date(value);
             };
             Time.prototype.domainTypeMaximum = function () {
                 var maxDateValue = 8640000000000000;

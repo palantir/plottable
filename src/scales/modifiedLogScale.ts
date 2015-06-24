@@ -200,10 +200,6 @@ export module Scales {
       return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
 
-    public valueToDomainType(value: number) {
-      return value;
-    }
-
     public domainTypeMaximum() {
       return Infinity;
     }

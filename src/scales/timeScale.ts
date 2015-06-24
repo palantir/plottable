@@ -109,10 +109,6 @@ export module Scales {
       }
     }
 
-    public valueToDomainType(value: number) {
-      return new Date(value);
-    }
-
     public domainTypeMaximum() {
       var maxDateValue = 8640000000000000;
       return new Date(maxDateValue);
