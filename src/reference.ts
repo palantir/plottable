@@ -39,6 +39,7 @@
 /// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
+/// <reference path="drawers/errorBarDrawer.ts" />
 
 /// <reference path="components/component.ts" />
 /// <reference path="components/componentContainer.ts" />
@@ -67,6 +68,7 @@
 /// <reference path="plots/clusteredBarPlot.ts" />
 /// <reference path="plots/stackedAreaPlot.ts" />
 /// <reference path="plots/stackedBarPlot.ts" />
+/// <reference path="plots/errorBarPlot.ts" />
 
 /// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />

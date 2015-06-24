@@ -1308,6 +1308,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Drawers {
+        class ErrorBar extends Drawer {
+            constructor(dataset: Dataset);
+        }
+    }
+}
+
+
+declare module Plottable {
     type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
@@ -3059,6 +3068,47 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class ErrorBar<X, Y> extends XYPlot<X, Y> {
+            constructor();
+            /**
+             * Sets the tick length
+             */
+            tickLength(): number;
+            tickLength(tickLength: number): ErrorBar<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2.
+             */
+            x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|X|Accessor<X>} x2
+             * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+             */
+            x2(x2: number | Accessor<number> | X | Accessor<X>): ErrorBar<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
+            y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.ErrorBar} The calling Error Bar Plot.
+             */
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): ErrorBar<X, Y>;
+            protected _additionalPaint(time: number): void;
+            protected _createDrawer(dataset: Dataset): Drawer;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

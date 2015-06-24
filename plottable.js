@@ -2791,6 +2791,31 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            function ErrorBar(dataset) {
+                _super.call(this, dataset);
+                this._ERROR_BAR_CLASS = "error-bar";
+                this._className = this._ERROR_BAR_CLASS;
+                this._svgElementName = "line";
+            }
+            return ErrorBar;
+        })(Plottable.Drawer);
+        Drawers.ErrorBar = ErrorBar;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -8262,6 +8287,93 @@ var Plottable;
             return StackedBar;
         })(Plots.Bar);
         Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var ErrorBar = (function (_super) {
+            __extends(ErrorBar, _super);
+            function ErrorBar() {
+                _super.call(this);
+                this._tickLength = 10;
+                this._LOWER_BARS_CLASS = "error-lower-bars";
+                this._UPPER_BARS_CLASS = "error-upper-bars";
+                this.addClass("error-bar-plot");
+            }
+            ErrorBar.prototype.tickLength = function (tickLength) {
+                if (tickLength == null) {
+                    return this._tickLength;
+                }
+                this._tickLength = tickLength;
+                return this;
+            };
+            ErrorBar.prototype.x2 = function (x2) {
+                if (x2 == null) {
+                    return this._propertyBindings.get("x2");
+                }
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty("x2", x2, xScale);
+                this.render();
+                return this;
+            };
+            ErrorBar.prototype.y2 = function (y2) {
+                if (y2 == null) {
+                    return this._propertyBindings.get("y2");
+                }
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty("y2", y2, yScale);
+                this.render();
+                return this;
+            };
+            ErrorBar.prototype._additionalPaint = function (time) {
+                var _this = this;
+                _super.prototype._additionalPaint.call(this, time);
+                if (this._tickLength != null) {
+                    var lowerBars = this._renderArea.append("g").classed(this._LOWER_BARS_CLASS, true);
+                    var upperBars = this._renderArea.append("g").classed(this._UPPER_BARS_CLASS, true);
+                    this._renderArea.selectAll("line.error-bar")[0].forEach(function (elem) {
+                        var selection = d3.select(elem);
+                        var x1 = selection.attr("x1");
+                        var x2 = selection.attr("x2");
+                        var y1 = selection.attr("y1");
+                        var y2 = selection.attr("y2");
+                        if (x1 === x2) {
+                            lowerBars.append("line").attr("x1", +x1 - _this._tickLength / 2).attr("x2", +x1 + _this._tickLength / 2).attr("y1", +y1).attr("y2", +y1);
+                            upperBars.append("line").attr("x1", +x1 - _this._tickLength / 2).attr("x2", +x1 + _this._tickLength / 2).attr("y1", +y2).attr("y2", +y2);
+                        }
+                        else {
+                            lowerBars.append("line").attr("x1", +x1).attr("x2", +x1).attr("y1", +y1 - _this._tickLength / 2).attr("y2", +y1 + _this._tickLength / 2);
+                            upperBars.append("line").attr("x1", +x2).attr("x2", +x2).attr("y1", +y1 - _this._tickLength / 2).attr("y2", +y1 + _this._tickLength / 2);
+                        }
+                    });
+                }
+            };
+            ErrorBar.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.ErrorBar(dataset);
+            };
+            ErrorBar.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
+                attrToProjector["x2"] = this.x2() != null ? Plottable.Plot._scaledAccessor(this.x2()) : Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["y2"] = this.y2() != null ? Plottable.Plot._scaledAccessor(this.y2()) : Plottable.Plot._scaledAccessor(this.y());
+                return attrToProjector;
+            };
+            return ErrorBar;
+        })(Plottable.XYPlot);
+        Plots.ErrorBar = ErrorBar;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 

@@ -158,3 +158,8 @@ svg.plottable {
   stroke: #CCC;
   stroke-width: 1px;
 }
+
+.plottable .error-bar-plot line {
+  stroke: #333;
+  stroke-width: 2px;
+}
