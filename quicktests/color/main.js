@@ -118,7 +118,7 @@ function addAllDatasets(plot, arr, numOfDatasets){
   return plot;
 }
 
-function generatePlots(plots, dataType){
+function generatePlots(dataType){
   var plottablePlots = [];
   plots.forEach(function(PlotType){
     var xScale = new Plottable.Scale.Category();
@@ -251,7 +251,7 @@ function initialize(){
 
   d3.selectAll("svg").remove();
   var dataArray = prepareData(seriesNumber);
-  generatePlots(plots, dataArray);
+  generatePlots(dataArray);
 }
 
 //setup page

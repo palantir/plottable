@@ -138,9 +138,9 @@ function populateTotalSidebarList(paths){
 
     object.value.forEach(function(quicktest){
       var singleQuicktestName = quicktest;
-      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-      var endOlString = "</li>";
-      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endLiString = "</li>";
+      var quicktestStringHTML = startLiString + singleQuicktestName + endLiString;
       $("#" + categoryName).append(quicktestStringHTML);
     });
   });
@@ -161,9 +161,9 @@ function populateSidebarList(paths, testsInCategory, category){
 
     allQuickTests.forEach(function(quicktest){
       var singleQuicktestName = quicktest.value;
-      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-      var endOlString = "</li>";
-      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endLiString = "</li>";
+      var quicktestStringHTML = startLiString + singleQuicktestName + endLiString;
       $("#" + categoryName).append(quicktestStringHTML);
     });
   $(":checkbox").attr("checked", false);
@@ -213,7 +213,7 @@ function runQuickTest(result, svg, data, branch){
   }
 }
 
-function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
+function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g , '');
     d3.text("http://localhost:9999/" + path, function(error, text) {
@@ -233,14 +233,13 @@ function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstBranch);
-      runQuickTest(result, secondsvg, data, secondBranch);
+      runQuickTest(result, firstsvg, data, firstQTBranch);
+      runQuickTest(result, secondsvg, data, secondQTBranch);
     });
   });
 }
 //load each quicktest locally, eval it, then run quicktest
-function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
-
+function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secondQTBranch){
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
@@ -261,8 +260,8 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstBranch);
-      runQuickTest(result, secondsvg, data, secondBranch);
+      runQuickTest(result, firstsvg, data, firstQTBranch);
+      runQuickTest(result, secondsvg, data, secondQTBranch);
     });
   });
 }
@@ -308,8 +307,8 @@ function loadPlottableBranches(category, branchList){
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1], function(){ //load second
-        if(textStatus === "success"){
+      $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
+        if(innerTestStatus === "success"){
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);

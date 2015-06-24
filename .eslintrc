@@ -11,7 +11,6 @@
   },
   "rules": {
     "no-eval": 0,
-    "no-shadow": 0,
     "quotes": 0,
     "no-console": 0,
     "no-unused-vars": [2, {"vars": "local"}],

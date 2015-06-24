@@ -60,8 +60,8 @@ function run(svg, data, Plottable) {
     var avg_ds = new Plottable.Dataset(avg_data);
     var lineRenderer = new Plottable.Plots.Line()
               .addDataset(avg_ds)
-              .x(function(d) { return d.x; }, xScale)
-              .y(function(d) { return d.y; }, yScale)
+              .x(function(datum) { return datum.x; }, xScale)
+              .y(function(datum) { return datum.y; }, yScale)
               .attr("stroke", "#FF0000")
               .animated(true);
     plot_array.push(lineRenderer);

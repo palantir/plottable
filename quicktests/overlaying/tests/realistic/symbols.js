@@ -8,9 +8,9 @@ function makeData() {
 function run(svg, data, Plottable){
   "use strict";
 
-  var d = [];
-  deep_copy(data[0], d);
-  var dataset = new Plottable.Dataset(d);
+  var plotData = [];
+  deep_copy(data[0], plotData);
+  var dataset = new Plottable.Dataset(plotData);
 
   var xScale = new Plottable.Scales.Linear();
   var yScale = new Plottable.Scales.Linear();
@@ -101,26 +101,26 @@ function run(svg, data, Plottable){
   var key = new Plottable.Interactions.Key();
   if (typeof key.onKeyPress === "function") {
     key.onKeyPress(78, function(){
-      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(d);
+      plotData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(plotData);
     });
 
     key.onKeyPress(68, function(){
-      if(d.length > 0){
-        d.splice(d.length - 1,1);
-        dataset.data(d);
+      if(plotData.length > 0){
+        plotData.splice(plotData.length - 1,1);
+        dataset.data(plotData);
       }
     });
   } else {
     key.onKey(78, function(){
-      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(d);
+      plotData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(plotData);
     });
 
     key.onKey(68, function(){
-      if(d.length > 0){
-        d.splice(d.length - 1,1);
-        dataset.data(d);
+      if(plotData.length > 0){
+        plotData.splice(plotData.length - 1,1);
+        dataset.data(plotData);
       }
     });
   }

@@ -8863,7 +8863,6 @@ var Plottable;
         function Interaction() {
             var _this = this;
             this._anchorCallback = function (component) { return _this._anchor(component); };
-            this._enabled = true;
         }
         Interaction.prototype._anchor = function (component) {
             this._isAnchored = true;
@@ -8879,15 +8878,12 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.attachTo = function (component) {
-            this._disconnect();
-            this._componentAttachedTo = component;
-            this._connect();
-            return this;
-        };
-        Interaction.prototype._connect = function () {
-            if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
-                this._componentAttachedTo.onAnchor(this._anchorCallback);
+            if (this._componentAttachedTo) {
+                this.detachFrom(this._componentAttachedTo);
             }
+            this._componentAttachedTo = component;
+            component.onAnchor(this._anchorCallback);
+            return this;
         };
         /**
          * Detaches this Interaction from the Component.
@@ -8897,29 +8893,11 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.detachFrom = function (component) {
-            this._disconnect();
-            this._componentAttachedTo = null;
-            return this;
-        };
-        Interaction.prototype._disconnect = function () {
             if (this._isAnchored) {
                 this._unanchor();
             }
-            if (this._componentAttachedTo != null) {
-                this._componentAttachedTo.offAnchor(this._anchorCallback);
-            }
-        };
-        Interaction.prototype.enabled = function (enabled) {
-            if (enabled == null) {
-                return this._enabled;
-            }
-            this._enabled = enabled;
-            if (this._enabled) {
-                this._connect();
-            }
-            else {
-                this._disconnect();
-            }
+            this._componentAttachedTo = null;
+            component.offAnchor(this._anchorCallback);
             return this;
         };
         /**

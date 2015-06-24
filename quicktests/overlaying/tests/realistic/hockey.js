@@ -6,7 +6,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("/quicktests/overlaying/data/hockey.csv").get(function(error, rows) {
-  var data = rows;
+  data = rows;
   var ds = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 80]);
@@ -48,8 +48,8 @@ function run(svg, data, Plottable) {
   var x = function(d){ return d.x; };
   var y = function(d){ return d.y; };
 
-  var styleLinePlot = function(plot){
-    plot.x(x, xScale).y(y, yScale)
+  var styleLinePlot = function(linePlot){
+    linePlot.x(x, xScale).y(y, yScale)
     .attr("stroke", "#dddddd").attr("stroke-dasharray", 4);
   };
 
