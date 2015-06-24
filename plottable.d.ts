@@ -2533,7 +2533,6 @@ declare module Plottable {
     class XYPlot<X, Y> extends Plot {
         protected static _X_KEY: string;
         protected static _Y_KEY: string;
-        tempScrollTimeout: number;
         /**
          * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
