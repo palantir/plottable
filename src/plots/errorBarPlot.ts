@@ -5,6 +5,8 @@ export module Plots {
   export class ErrorBar<X, Y> extends XYPlot<X, Y> {
 
     private _tickLength = 10;
+    private _LOWER_BARS_CLASS = "error-lower-bars";
+    private _UPPER_BARS_CLASS = "error-upper-bars";
 
     constructor() {
       super();
@@ -21,6 +23,7 @@ export module Plots {
         return this._tickLength;
       }
       this._tickLength = tickLength;
+      return this;
     }
 
     /**
@@ -71,10 +74,9 @@ export module Plots {
 
     protected _additionalPaint(time: number) {
       super._additionalPaint(time);
-      console.log(this._tickLength);
       if (this._tickLength != null) {
-        var lowerBars = this._renderArea.append("g").classed("error-lower-bars", true);
-        var upperBars = this._renderArea.append("g").classed("error-upper-bars", true);
+        var lowerBars = this._renderArea.append("g").classed(this._LOWER_BARS_CLASS, true);
+        var upperBars = this._renderArea.append("g").classed(this._UPPER_BARS_CLASS, true);
         this._renderArea.selectAll("line.error-bar")[0].forEach((elem) => {
           var selection = d3.select(elem);
 
@@ -82,7 +84,7 @@ export module Plots {
           var x2 = selection.attr("x2");
           var y1 = selection.attr("y1");
           var y2 = selection.attr("y2");
-          
+
           if (x1 === x2) {
             lowerBars.append("line").attr("x1", +x1 - this._tickLength / 2).attr("x2", +x1 + this._tickLength / 2)
                                     .attr("y1", +y1).attr("y2", +y1);

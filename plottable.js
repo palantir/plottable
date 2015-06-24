@@ -8148,6 +8148,8 @@ var Plottable;
             function ErrorBar() {
                 _super.call(this);
                 this._tickLength = 10;
+                this._LOWER_BARS_CLASS = "error-lower-bars";
+                this._UPPER_BARS_CLASS = "error-upper-bars";
                 this.addClass("error-bar-plot");
             }
             ErrorBar.prototype.tickLength = function (tickLength) {
@@ -8155,6 +8157,7 @@ var Plottable;
                     return this._tickLength;
                 }
                 this._tickLength = tickLength;
+                return this;
             };
             ErrorBar.prototype.x2 = function (x2) {
                 if (x2 == null) {
@@ -8179,10 +8182,9 @@ var Plottable;
             ErrorBar.prototype._additionalPaint = function (time) {
                 var _this = this;
                 _super.prototype._additionalPaint.call(this, time);
-                console.log(this._tickLength);
                 if (this._tickLength != null) {
-                    var lowerBars = this._renderArea.append("g").classed("error-lower-bars", true);
-                    var upperBars = this._renderArea.append("g").classed("error-upper-bars", true);
+                    var lowerBars = this._renderArea.append("g").classed(this._LOWER_BARS_CLASS, true);
+                    var upperBars = this._renderArea.append("g").classed(this._UPPER_BARS_CLASS, true);
                     this._renderArea.selectAll("line.error-bar")[0].forEach(function (elem) {
                         var selection = d3.select(elem);
                         var x1 = selection.attr("x1");
