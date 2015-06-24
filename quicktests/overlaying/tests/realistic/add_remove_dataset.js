@@ -6,7 +6,7 @@ function makeData() {
     for (var i = 0; i < n; i++) {
       toReturn[i] = {
         x: startValue + i,
-        y: i > 0 ? toReturn[i-1].y + Math.random()*2-1 : Math.random() * 5
+        y: i > 0 ? toReturn[i - 1].y + Math.random() * 2 - 1 : Math.random() * 5
       };
     }
     return toReturn;

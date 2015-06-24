@@ -62,6 +62,7 @@
 ///<reference path="utils/callbackSetTests.ts" />
 ///<reference path="utils/arrayUtilsTests.ts" />
 ///<reference path="utils/stackingUtilsTests.ts" />
+///<reference path="utils/windowUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/keyInteractionTests.ts" />

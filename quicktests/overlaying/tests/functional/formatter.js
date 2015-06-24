@@ -8,7 +8,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
     var large_x = function(d){
-         d.x = d.x*100000000;
+         d.x = d.x * 100000000;
     };
 
   var big_numbers = [];

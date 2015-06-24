@@ -84,7 +84,7 @@ function run(svg, data, Plottable) {
     .endTickLength(0);
   var RoKLabels = new Plottable.Axes.Category(yScale, "left")
     .tickLength(0)
-    .endTickLength(0);    
+    .endTickLength(0);
   var featureLabel = new Plottable.Components.Label("Feature Phones", 0);
   var smartLabel = new Plottable.Components.Label("Smart Phones", 0);
 
@@ -107,7 +107,7 @@ function run(svg, data, Plottable) {
     if(d.phoneType === "smart"){
       return d.demographic;
     }
-  };  
+  };
   var AusFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(AusDataset)
       .x(filterFeatureX, xScale_reverse)
@@ -124,26 +124,26 @@ function run(svg, data, Plottable) {
       .addDataset(IndDataset)
       .x(filterFeatureX, xScale_reverse)
       .y(filterFeatureY, yScale)
-      .attr("fill", IndColor);   
+      .attr("fill", IndColor);
 
   var IndSmartPlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(IndDataset)
       .x(filterSmartX, xScale)
       .y(filterSmartY, yScale)
-      .attr("fill", IndColor); 
+      .attr("fill", IndColor);
 
   var RoKFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(RoKDataset)
       .x(filterFeatureX, xScale_reverse)
       .y(filterFeatureY, yScale)
-      .attr("fill", RoKColor);   
+      .attr("fill", RoKColor);
 
   var RoKSmartPlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(RoKDataset)
       .x(filterSmartX, xScale)
       .y(filterSmartY, yScale)
-      .attr("fill", RoKColor);                
-  
+      .attr("fill", RoKColor);
+
   var table = new Plottable.Components.Table([[legend,          null,       null],
                                               [featureLabel,    null,       smartLabel],
                                               [AusFeaturePlot,  AusLabels,  AusSmartPlot],

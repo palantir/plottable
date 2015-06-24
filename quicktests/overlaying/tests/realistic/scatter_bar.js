@@ -1,12 +1,12 @@
 function makeData() {
   "use strict";
   return [{company: "Amazon", overall: 0.37, leadership: 0.25},
-          {company: "Apple", overall: 0.30, leadership: 0.28}, 
-          {company: "Facebook", overall: 0.31, leadership: 0.23}, 
-          {company: "Google", overall: 0.30, leadership: 0.21}, 
-          {company: "Intel", overall: 0.24, leadership: 0.16}, 
+          {company: "Apple", overall: 0.30, leadership: 0.28},
+          {company: "Facebook", overall: 0.31, leadership: 0.23},
+          {company: "Google", overall: 0.30, leadership: 0.21},
+          {company: "Intel", overall: 0.24, leadership: 0.16},
           {company: "Microsoft", overall: 0.29, leadership: 0.17},
-          {company: "Twitter", overall: 0.30, leadership: 0.21}, ];
+          {company: "Twitter", overall: 0.30, leadership: 0.21}];
 }
 
 function run(svg, data, Plottable) {
@@ -50,10 +50,10 @@ function run(svg, data, Plottable) {
       }
       else{
         return "#660066";
-      }      
+      }
     })
-    .attr("opacity", function(){return 1;})
-    .size(function(){ return yScale.rangeBand();});
+    .attr("opacity", function(){return 1; })
+    .size(function(){ return yScale.rangeBand(); });
 
   var grid = new Plottable.Components.Gridlines(xScale, null);
 

@@ -8,8 +8,8 @@ export module Interactions {
      */
     private static _PIXELS_PER_LINE = 120;
 
-    private _xScale: QuantitativeScale<any>;
-    private _yScale: QuantitativeScale<any>;
+    private _xScales: Utils.Set<QuantitativeScale<any>>;
+    private _yScales: Utils.Set<QuantitativeScale<any>>;
     private _dragInteraction: Interactions.Drag;
     private _mouseDispatcher: Dispatchers.Mouse;
     private _touchDispatcher: Dispatchers.Touch;
@@ -32,8 +32,14 @@ export module Interactions {
      */
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
-      this._xScale = xScale;
-      this._yScale = yScale;
+      this._xScales = new Utils.Set<QuantitativeScale<any>>();
+      if (xScale != null) {
+        this._xScales.add(xScale);
+      }
+      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      if (yScale != null) {
+        this._yScales.add(yScale);
+      }
 
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
@@ -92,13 +98,17 @@ export module Interactions {
       var newCenterPoint = this._centerPoint();
       var newCornerDistance = this._cornerDistance();
 
-      if (this._xScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-        PanZoom._translateScale(this._xScale, oldCenterPoint.x - newCenterPoint.x);
+      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        this.xScales().forEach((xScale) => {
+          PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
+          PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+        });
       }
-      if (this._yScale != null && newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        PanZoom._magnifyScale(this._yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-        PanZoom._translateScale(this._yScale, oldCenterPoint.y - newCenterPoint.y);
+      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+        this.yScales().forEach((yScale) => {
+          PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
+          PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+        });
       }
     }
 
@@ -151,12 +161,12 @@ export module Interactions {
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
-        if (this._xScale != null) {
-          PanZoom._magnifyScale(this._xScale, zoomAmount, translatedP.x);
-        }
-        if (this._yScale != null) {
-          PanZoom._magnifyScale(this._yScale, zoomAmount, translatedP.y);
-        }
+        this.xScales().forEach((xScale) => {
+          PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+        });
+        this.yScales().forEach((yScale) => {
+          PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+        });
       }
     }
 
@@ -169,18 +179,111 @@ export module Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
-        if (this._xScale != null) {
+        this.xScales().forEach((xScale) => {
           var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom._translateScale(this._xScale, -dragAmountX);
-        }
-        if (this._yScale != null) {
+          PanZoom._translateScale(xScale, -dragAmountX);
+        });
+        this.yScales().forEach((yScale) => {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom._translateScale(this._yScale, -dragAmountY);
-        }
+          PanZoom._translateScale(yScale, -dragAmountY);
+        });
         lastDragPoint = endPoint;
       });
     }
 
+    /**
+     * Gets the x scales for this PanZoom Interaction.
+     */
+    public xScales(): QuantitativeScale<any>[];
+    /**
+     * Sets the x scales for this PanZoom Interaction.
+     * 
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public xScales(xScales?: QuantitativeScale<any>[]): any {
+      if (xScales == null) {
+        var scales: QuantitativeScale<any>[] = [];
+        this._xScales.forEach((xScale) => {
+          scales.push(xScale);
+        });
+        return scales;
+      }
+      this._xScales = new Utils.Set<QuantitativeScale<any>>();
+      xScales.forEach((xScale) => {
+        this.addXScale(xScale);
+      });
+      return this;
+    }
+
+    /**
+     * Gets the y scales for this PanZoom Interaction.
+     */
+    public yScales(): QuantitativeScale<any>[];
+    /**
+     * Sets the y scales for this PanZoom Interaction.
+     * 
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+    public yScales(yScales?: QuantitativeScale<any>[]): any {
+      if (yScales == null) {
+        var scales: QuantitativeScale<any>[] = [];
+        this._yScales.forEach((yScale) => {
+          scales.push(yScale);
+        });
+        return scales;
+      }
+      this._yScales = new Utils.Set<QuantitativeScale<any>>();
+      yScales.forEach((yScale) => {
+        this.addYScale(yScale);
+      });
+      return this;
+    }
+
+    /**
+     * Adds an x scale to this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An x scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public addXScale(xScale: QuantitativeScale<any>) {
+      this._xScales.add(xScale);
+      return this;
+    }
+
+    /**
+     * Removes an x scale from this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} An x scale to remove
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public removeXScale(xScale: QuantitativeScale<any>) {
+      this._xScales.delete(xScale);
+      return this;
+    }
+
+    /**
+     * Adds a y scale to this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} A y scale to add
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public addYScale(yScale: QuantitativeScale<any>) {
+      this._yScales.add(yScale);
+      return this;
+    }
+
+    /**
+     * Removes a y scale from this PanZoom Interaction
+     * 
+     * @param {QuantitativeScale<any>} A y scale to remove
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public removeYScale(yScale: QuantitativeScale<any>) {
+      this._yScales.delete(yScale);
+      return this;
+    }
   }
 }
 }
