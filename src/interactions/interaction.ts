@@ -7,6 +7,7 @@ export class Interaction {
   private _anchorCallback = (component: Component) => this._anchor(component);
 
   private _isAnchored: boolean;
+  private _enabled = true;
 
   protected _anchor(component: Component) {
     this._isAnchored = true;
@@ -24,14 +25,16 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public attachTo(component: Component) {
-    if (this._componentAttachedTo) {
-      this.detachFrom(this._componentAttachedTo);
-    }
-
+    this._disconnect();
     this._componentAttachedTo = component;
-    component.onAnchor(this._anchorCallback);
-
+    this._connect();
     return this;
+  }
+
+  private _connect() {
+    if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
+      this._componentAttachedTo.onAnchor(this._anchorCallback);
+    }
   }
 
   /**
@@ -42,12 +45,41 @@ export class Interaction {
    * @returns {Interaction} The calling Interaction.
    */
   public detachFrom(component: Component) {
+    this._disconnect();
+    this._componentAttachedTo = null;
+    return this;
+  }
+
+  private _disconnect() {
     if (this._isAnchored) {
       this._unanchor();
     }
-    this._componentAttachedTo = null;
-    component.offAnchor(this._anchorCallback);
+    if (this._componentAttachedTo != null) {
+      this._componentAttachedTo.offAnchor(this._anchorCallback);
+    }
+  }
 
+  /**
+   * Gets whether this Interaction is enabled.
+   */
+  public enabled(): boolean;
+  /**
+   * Enables or disables this Interaction.
+   *
+   * @param {boolean} enabled Whether the Interaction should be enabled.
+   * @return {Interaction} The calling Interaction.
+   */
+  public enabled(enabled: boolean): Interaction;
+  public enabled(enabled?: boolean): any {
+    if (enabled == null) {
+      return this._enabled;
+    }
+    this._enabled = enabled;
+    if (this._enabled) {
+      this._connect();
+    } else {
+      this._disconnect();
+    }
     return this;
   }
 
