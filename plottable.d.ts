@@ -3055,11 +3055,10 @@ declare module Plottable {
         class ErrorBar<X, Y> extends XYPlot<X, Y> {
             constructor();
             /**
-             * Gets the AccessorScaleBinding for X.
+             * Sets the tick length
              */
-            x(): Plots.AccessorScaleBinding<X, number>;
-            x(x: number | Accessor<number>): ErrorBar<X, Y>;
-            x(x: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
+            tickLength(): number;
+            tickLength(tickLength: number): ErrorBar<X, Y>;
             /**
              * Gets the AccessorScaleBinding for X2.
              */
@@ -3073,12 +3072,6 @@ declare module Plottable {
              */
             x2(x2: number | Accessor<number> | X | Accessor<X>): ErrorBar<X, Y>;
             /**
-             * Gets the AccessorScaleBinding for Y.
-             */
-            y(): Plots.AccessorScaleBinding<Y, number>;
-            y(y: number | Accessor<number>): ErrorBar<X, Y>;
-            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): ErrorBar<X, Y>;
-            /**
              * Gets the AccessorScaleBinding for Y2.
              */
             y2(): AccessorScaleBinding<Y, number>;
@@ -3090,6 +3083,7 @@ declare module Plottable {
              * @returns {Plots.ErrorBar} The calling Error Bar Plot.
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): ErrorBar<X, Y>;
+            protected _additionalPaint(time: number): void;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _propertyProjectors(): AttributeToProjector;
         }

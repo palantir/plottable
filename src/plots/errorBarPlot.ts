@@ -4,29 +4,23 @@ module Plottable {
 export module Plots {
   export class ErrorBar<X, Y> extends XYPlot<X, Y> {
 
+    private _tickLength = 10;
+
     constructor() {
       super();
       this.addClass("error-bar-plot");
     }
 
     /**
-     * Gets the AccessorScaleBinding for X.
+     * Sets the tick length
      */
-    public x(): Plots.AccessorScaleBinding<X, number>;
-    public x(x: number | Accessor<number>): ErrorBar<X, Y>;
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): ErrorBar<X, Y>;
-    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      if (x == null) {
-        return super.x();
+    public tickLength(): number;
+    public tickLength(tickLength: number): ErrorBar<X, Y>;
+    public tickLength(tickLength?: number): any {
+      if (tickLength == null) {
+        return this._tickLength;
       }
-
-      if (xScale == null) {
-        super.x(<number | Accessor<number>>x);
-      } else {
-        super.x(< X | Accessor<X>>x, xScale);
-      }
-
-      return this;
+      this._tickLength = tickLength;
     }
 
     /**
@@ -45,31 +39,10 @@ export module Plots {
       if (x2 == null) {
         return this._propertyBindings.get("x2");
       }
-
       var xBinding = this.x();
       var xScale = xBinding && xBinding.scale;
       this._bindProperty("x2", x2, xScale);
-
       this.render();
-      return this;
-    }
-
-    /**
-     * Gets the AccessorScaleBinding for Y.
-     */
-    public y(): Plots.AccessorScaleBinding<Y, number>;
-    public y(y: number | Accessor<number>): ErrorBar<X, Y>;
-    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): ErrorBar<X, Y>;
-    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-      if (y == null) {
-        return super.y();
-      }
-
-      if (yScale == null) {
-        super.y(<number | Accessor<number>>y);
-      } else {
-        super.y(<Y | Accessor<Y>>y, yScale);
-      }
       return this;
     }
 
@@ -89,13 +62,40 @@ export module Plots {
       if (y2 == null) {
         return this._propertyBindings.get("y2");
       }
-
       var yBinding = this.y();
       var yScale = yBinding && yBinding.scale;
       this._bindProperty("y2", y2, yScale);
-
       this.render();
       return this;
+    }
+
+    protected _additionalPaint(time: number) {
+      super._additionalPaint(time);
+      console.log(this._tickLength);
+      if (this._tickLength != null) {
+        var lowerBars = this._renderArea.append("g").classed("error-lower-bars", true);
+        var upperBars = this._renderArea.append("g").classed("error-upper-bars", true);
+        this._renderArea.selectAll("line.error-bar")[0].forEach((elem) => {
+          var selection = d3.select(elem);
+
+          var x1 = selection.attr("x1");
+          var x2 = selection.attr("x2");
+          var y1 = selection.attr("y1");
+          var y2 = selection.attr("y2");
+          
+          if (x1 === x2) {
+            lowerBars.append("line").attr("x1", +x1 - this._tickLength / 2).attr("x2", +x1 + this._tickLength / 2)
+                                    .attr("y1", +y1).attr("y2", +y1);
+            upperBars.append("line").attr("x1", +x1 - this._tickLength / 2).attr("x2", +x1 + this._tickLength / 2)
+                                    .attr("y1", +y2).attr("y2", +y2);
+          } else {
+            lowerBars.append("line").attr("x1", +x1).attr("x2", +x1)
+                                    .attr("y1", +y1 - this._tickLength / 2).attr("y2", +y1 + this._tickLength / 2);
+            upperBars.append("line").attr("x1", +x2).attr("x2", +x2)
+                                    .attr("y1", +y1 - this._tickLength / 2).attr("y2", +y1 + this._tickLength / 2);
+          }
+        });
+      }
     }
 
     protected _createDrawer(dataset: Dataset): Drawer {

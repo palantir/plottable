@@ -8147,19 +8147,14 @@ var Plottable;
             __extends(ErrorBar, _super);
             function ErrorBar() {
                 _super.call(this);
+                this._tickLength = 10;
                 this.addClass("error-bar-plot");
             }
-            ErrorBar.prototype.x = function (x, xScale) {
-                if (x == null) {
-                    return _super.prototype.x.call(this);
+            ErrorBar.prototype.tickLength = function (tickLength) {
+                if (tickLength == null) {
+                    return this._tickLength;
                 }
-                if (xScale == null) {
-                    _super.prototype.x.call(this, x);
-                }
-                else {
-                    _super.prototype.x.call(this, x, xScale);
-                }
-                return this;
+                this._tickLength = tickLength;
             };
             ErrorBar.prototype.x2 = function (x2) {
                 if (x2 == null) {
@@ -8171,18 +8166,6 @@ var Plottable;
                 this.render();
                 return this;
             };
-            ErrorBar.prototype.y = function (y, yScale) {
-                if (y == null) {
-                    return _super.prototype.y.call(this);
-                }
-                if (yScale == null) {
-                    _super.prototype.y.call(this, y);
-                }
-                else {
-                    _super.prototype.y.call(this, y, yScale);
-                }
-                return this;
-            };
             ErrorBar.prototype.y2 = function (y2) {
                 if (y2 == null) {
                     return this._propertyBindings.get("y2");
@@ -8192,6 +8175,30 @@ var Plottable;
                 this._bindProperty("y2", y2, yScale);
                 this.render();
                 return this;
+            };
+            ErrorBar.prototype._additionalPaint = function (time) {
+                var _this = this;
+                _super.prototype._additionalPaint.call(this, time);
+                console.log(this._tickLength);
+                if (this._tickLength != null) {
+                    var lowerBars = this._renderArea.append("g").classed("error-lower-bars", true);
+                    var upperBars = this._renderArea.append("g").classed("error-upper-bars", true);
+                    this._renderArea.selectAll("line.error-bar")[0].forEach(function (elem) {
+                        var selection = d3.select(elem);
+                        var x1 = selection.attr("x1");
+                        var x2 = selection.attr("x2");
+                        var y1 = selection.attr("y1");
+                        var y2 = selection.attr("y2");
+                        if (x1 === x2) {
+                            lowerBars.append("line").attr("x1", +x1 - _this._tickLength / 2).attr("x2", +x1 + _this._tickLength / 2).attr("y1", +y1).attr("y2", +y1);
+                            upperBars.append("line").attr("x1", +x1 - _this._tickLength / 2).attr("x2", +x1 + _this._tickLength / 2).attr("y1", +y2).attr("y2", +y2);
+                        }
+                        else {
+                            lowerBars.append("line").attr("x1", +x1).attr("x2", +x1).attr("y1", +y1 - _this._tickLength / 2).attr("y2", +y1 + _this._tickLength / 2);
+                            upperBars.append("line").attr("x1", +x2).attr("x2", +x2).attr("y1", +y1 - _this._tickLength / 2).attr("y2", +y1 + _this._tickLength / 2);
+                        }
+                    });
+                }
             };
             ErrorBar.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.ErrorBar(dataset);
