@@ -2003,9 +2003,9 @@ var Plottable;
                 return Infinity;
             };
             ModifiedLog.prototype.constrainedDomain = function (domainToConstrain, extent) {
-                var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
-                var domainMin = new Date(domainCenter - extent.valueOf() / 2);
-                var domainMax = new Date(domainCenter + extent.valueOf() / 2);
+                var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
+                var domainMin = domainCenter - extent / 2;
+                var domainMax = domainCenter + extent / 2;
                 return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return ModifiedLog;

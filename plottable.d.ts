@@ -987,6 +987,7 @@ declare module Plottable {
             defaultTicks(): number[];
             valueToDomainType(value: number): number;
             domainTypeMaximum(): number;
+            constrainedDomain(domainToConstrain: number[], extent: number): number[];
         }
     }
 }
