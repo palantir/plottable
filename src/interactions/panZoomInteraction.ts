@@ -121,7 +121,7 @@ export module Interactions {
         var scaleDomain = scale.domain();
         var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
         var maxDomainExtent = this._maxDomainExtents.get(scale);
-        return maxDomainExtent == null || scaleExtent >= maxDomainExtent;
+        return maxDomainExtent != null && scaleExtent >= maxDomainExtent;
       };
       return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
     }
@@ -131,7 +131,7 @@ export module Interactions {
         var scaleDomain = scale.domain();
         var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
         var minDomainExtent = this._minDomainExtents.get(scale);
-        return minDomainExtent == null || scaleExtent <= minDomainExtent;
+        return minDomainExtent != null && scaleExtent <= minDomainExtent;
       };
       return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
     }

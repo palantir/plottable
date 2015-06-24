@@ -1726,9 +1726,6 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype.domainTypeMaximum = function () {
-            throw new Error("Subclasses should override domainTypeMaximum");
-        };
         QuantitativeScale.prototype.constrainedDomain = function (domainToConstrain, extent) {
             throw new Error("Subclasses should override constrainedDomain");
         };
@@ -1790,9 +1787,6 @@ var Plottable;
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
-            };
-            Linear.prototype.domainTypeMaximum = function () {
-                return Infinity;
             };
             Linear.prototype.constrainedDomain = function (domainToConstrain, extent) {
                 var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
@@ -1989,9 +1983,6 @@ var Plottable;
             };
             ModifiedLog.prototype.defaultTicks = function () {
                 return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
-            };
-            ModifiedLog.prototype.domainTypeMaximum = function () {
-                return Infinity;
             };
             ModifiedLog.prototype.constrainedDomain = function (domainToConstrain, extent) {
                 var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
@@ -2335,10 +2326,6 @@ var Plottable;
                     default:
                         throw Error("TimeInterval specified does not exist: " + timeInterval);
                 }
-            };
-            Time.prototype.domainTypeMaximum = function () {
-                var maxDateValue = 8640000000000000;
-                return new Date(maxDateValue);
             };
             Time.prototype.constrainedDomain = function (domainToConstrain, extent) {
                 var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
@@ -9456,7 +9443,7 @@ var Plottable;
                     var scaleDomain = scale.domain();
                     var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                     var maxDomainExtent = _this._maxDomainExtents.get(scale);
-                    return maxDomainExtent == null || scaleExtent >= maxDomainExtent;
+                    return maxDomainExtent != null && scaleExtent >= maxDomainExtent;
                 };
                 return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
             };
@@ -9466,7 +9453,7 @@ var Plottable;
                     var scaleDomain = scale.domain();
                     var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                     var minDomainExtent = _this._minDomainExtents.get(scale);
-                    return minDomainExtent == null || scaleExtent <= minDomainExtent;
+                    return minDomainExtent != null && scaleExtent <= minDomainExtent;
                 };
                 return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
             };

@@ -200,10 +200,6 @@ export module Scales {
       return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
 
-    public domainTypeMaximum() {
-      return Infinity;
-    }
-
     public constrainedDomain(domainToConstrain: number[], extent: number) {
       var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
       var domainMin = domainCenter - extent / 2;

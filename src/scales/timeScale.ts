@@ -109,11 +109,6 @@ export module Scales {
       }
     }
 
-    public domainTypeMaximum() {
-      var maxDateValue = 8640000000000000;
-      return new Date(maxDateValue);
-    }
-
     public constrainedDomain(domainToConstrain: Date[], extent: Date) {
       var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
       var domainMin = new Date(domainCenter - extent.valueOf() / 2);
