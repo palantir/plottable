@@ -1732,6 +1732,9 @@ var Plottable;
         QuantitativeScale.prototype.domainTypeMaximum = function () {
             throw new Error("Subclasses should override domainTypeMaximum");
         };
+        QuantitativeScale.prototype.constrainedDomain = function (domainToConstrain, extent) {
+            throw new Error("Subclasses should override constrainedDomain");
+        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);
@@ -1796,6 +1799,12 @@ var Plottable;
             };
             Linear.prototype.domainTypeMaximum = function () {
                 return Infinity;
+            };
+            Linear.prototype.constrainedDomain = function (domainToConstrain, extent) {
+                var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
+                var domainMin = domainCenter - extent / 2;
+                var domainMax = domainCenter + extent / 2;
+                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1992,6 +2001,12 @@ var Plottable;
             };
             ModifiedLog.prototype.domainTypeMaximum = function () {
                 return Infinity;
+            };
+            ModifiedLog.prototype.constrainedDomain = function (domainToConstrain, extent) {
+                var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
+                var domainMin = new Date(domainCenter - extent.valueOf() / 2);
+                var domainMax = new Date(domainCenter + extent.valueOf() / 2);
+                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2336,6 +2351,12 @@ var Plottable;
             Time.prototype.domainTypeMaximum = function () {
                 var maxDateValue = 8640000000000000;
                 return new Date(maxDateValue);
+            };
+            Time.prototype.constrainedDomain = function (domainToConstrain, extent) {
+                var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
+                var domainMin = new Date(domainCenter - extent.valueOf() / 2);
+                var domainMax = new Date(domainCenter + extent.valueOf() / 2);
+                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -9498,23 +9519,16 @@ var Plottable;
                 scale.domain(constrainedDomain);
             };
             PanZoom.prototype._constrainedDomain = function (scale, domainToConstrain) {
-                var domainToConstrainMin = Math.min(domainToConstrain[0], domainToConstrain[1]);
-                var domainToConstrainMax = Math.max(domainToConstrain[0], domainToConstrain[1]);
-                var domainExtent = domainToConstrainMax - domainToConstrainMin;
-                var domainCenter = (domainToConstrainMin + domainToConstrainMax) / 2;
-                var constrainedDomainValues = [domainToConstrainMin, domainToConstrainMax];
+                var domainExtent = Math.abs(domainToConstrain[1] - domainToConstrain[0]);
                 var minDomainExtent = this._minDomainExtents.get(scale);
                 if (domainExtent < minDomainExtent) {
-                    constrainedDomainValues[0] = domainCenter - minDomainExtent / 2;
-                    constrainedDomainValues[1] = domainCenter + minDomainExtent / 2;
+                    return scale.constrainedDomain(domainToConstrain, minDomainExtent);
                 }
                 var maxDomainExtent = this._maxDomainExtents.get(scale);
                 if (domainExtent > maxDomainExtent) {
-                    constrainedDomainValues[0] = domainCenter - maxDomainExtent / 2;
-                    constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
+                    return scale.constrainedDomain(domainToConstrain, maxDomainExtent);
                 }
-                var constrainedDomain = constrainedDomainValues.map(function (value) { return scale.valueToDomainType(value); });
-                return domainToConstrain[1] > domainToConstrain[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
+                return domainToConstrain;
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
                 var _this = this;

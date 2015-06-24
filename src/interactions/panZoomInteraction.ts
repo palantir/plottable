@@ -181,27 +181,19 @@ export module Interactions {
     }
 
     private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
-      var domainToConstrainMin = Math.min(<any> domainToConstrain[0], <any> domainToConstrain[1]);
-      var domainToConstrainMax = Math.max(<any> domainToConstrain[0], <any> domainToConstrain[1]);
-      var domainExtent = domainToConstrainMax - domainToConstrainMin;
-      var domainCenter = (domainToConstrainMin + domainToConstrainMax) / 2;
+      var domainExtent = Math.abs(<any> domainToConstrain[1] - <any> domainToConstrain[0]);
 
-      var constrainedDomainValues = [domainToConstrainMin, domainToConstrainMax];
       var minDomainExtent = this._minDomainExtents.get(scale);
       if (domainExtent < minDomainExtent) {
-        constrainedDomainValues[0] = domainCenter - minDomainExtent / 2;
-        constrainedDomainValues[1] = domainCenter + minDomainExtent / 2;
+        return scale.constrainedDomain(domainToConstrain, minDomainExtent);
       }
 
       var maxDomainExtent = this._maxDomainExtents.get(scale);
       if (domainExtent > maxDomainExtent) {
-        constrainedDomainValues[0] = domainCenter - maxDomainExtent / 2;
-        constrainedDomainValues[1] = domainCenter + maxDomainExtent / 2;
+        return scale.constrainedDomain(domainToConstrain, maxDomainExtent);
       }
 
-      var constrainedDomain = constrainedDomainValues.map((value) => scale.valueToDomainType(value));
-
-      return domainToConstrain[1] > domainToConstrain[0] ? constrainedDomain : [constrainedDomain[1], constrainedDomain[0]];
+      return domainToConstrain;
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {

@@ -921,6 +921,7 @@ declare module Plottable {
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
         valueToDomainType(value: number): D;
         domainTypeMaximum(): D;
+        constrainedDomain(domainToConstrain: D[], extent: D): D[];
     }
 }
 
@@ -944,6 +945,7 @@ declare module Plottable {
             protected _niceDomain(domain: number[], count?: number): number[];
             valueToDomainType(value: number): number;
             domainTypeMaximum(): number;
+            constrainedDomain(domainToConstrain: number[], extent: number): number[];
         }
     }
 }
@@ -1132,6 +1134,7 @@ declare module Plottable {
             static timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
             valueToDomainType(value: number): Date;
             domainTypeMaximum(): Date;
+            constrainedDomain(domainToConstrain: Date[], extent: Date): Date[];
         }
     }
 }
