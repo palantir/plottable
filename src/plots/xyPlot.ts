@@ -10,8 +10,8 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
   private _performanceEnabled = false;
-  private _fastPanZoomOnXCallback: ScaleCallback<Scale<any, any>>;
-  private _fastPanZoomOnYCallback: ScaleCallback<Scale<any, any>>;
+  private _fastPanZoomOnXCallback: ScaleCallback<Scale<X, any>>;
+  private _fastPanZoomOnYCallback: ScaleCallback<Scale<Y, any>>;
 
   private _fastPanZoomTimeoutReferenceX = 0;
   private _fastPanZoomTimeoutReferenceY = 0;
