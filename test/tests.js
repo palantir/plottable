@@ -8875,6 +8875,59 @@ describe("Interactions", function () {
             svg1.remove();
             svg2.remove();
         });
+        describe("enabled()", function () {
+            it("setting and querying status", function () {
+                var interaction = new Plottable.Interaction();
+                assert.isTrue(interaction.enabled(), "defaults to enabled");
+                interaction.enabled(false);
+                assert.isFalse(interaction.enabled(), "enabled status set to false");
+                interaction.enabled(true);
+                assert.isTrue(interaction.enabled(), "enabled status set to true");
+            });
+            it("no longer responds when disabled", function () {
+                var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var component = new Plottable.Component();
+                component.renderTo(svg);
+                var clickInteraction = new Plottable.Interactions.Click();
+                var callbackCalled = false;
+                var callback = function () { return callbackCalled = true; };
+                clickInteraction.onClick(callback);
+                clickInteraction.attachTo(component);
+                clickInteraction.enabled(false);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                assert.isFalse(callbackCalled, "callback is not called when Interaction is disabled");
+                clickInteraction.enabled(true);
+                TestMethods.triggerFakeMouseEvent("mousedown", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                TestMethods.triggerFakeMouseEvent("mouseup", component.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                assert.isTrue(callbackCalled, "callback is called when Interaction is re-enabled");
+                svg.remove();
+            });
+            it("can be attached to new Component while disabled", function () {
+                var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+                var component1 = new Plottable.Component();
+                var component2 = new Plottable.Component();
+                component1.renderTo(svg1);
+                component2.renderTo(svg2);
+                var clickInteraction = new Plottable.Interactions.Click();
+                var callbackCalled = false;
+                var callback = function () { return callbackCalled = true; };
+                clickInteraction.onClick(callback);
+                clickInteraction.attachTo(component1);
+                clickInteraction.enabled(false);
+                clickInteraction.attachTo(component2);
+                TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                assert.isFalse(callbackCalled, "stays disabled even if attachTo() is called again");
+                clickInteraction.enabled(true);
+                TestMethods.triggerFakeMouseEvent("mousedown", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                TestMethods.triggerFakeMouseEvent("mouseup", component2.content(), SVG_WIDTH / 2, SVG_HEIGHT / 2);
+                assert.isTrue(callbackCalled, "re-enabled");
+                svg1.remove();
+                svg2.remove();
+            });
+        });
     });
 });
 
