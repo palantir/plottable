@@ -19,8 +19,8 @@ function run(svg, data, Plottable) {
 
       // load AAPL
       d3.csv("/quicktests/overlaying/data/AAPL_20140401_20140901.csv")
-        .get(function(error, rows) {
-          var aapl = rows.reverse();
+        .get(function(aaplError, aaplRows) {
+          var aapl = aaplRows.reverse();
           aapl.forEach(processDatum);
 
           // process and create chart
@@ -70,7 +70,7 @@ function run(svg, data, Plottable) {
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
+                                  .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
           if (typeof line_aapl.autorange === "function") {
             line_aapl.autorange("y");
           } else {
@@ -80,7 +80,7 @@ function run(svg, data, Plottable) {
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
                                   .y(function(d) { return d["Adj Close"]; }, yScale_goog)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
+                                  .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
           if (typeof line_aapl.autorange === "function") {
             line_goog.autorange("y");
           } else {

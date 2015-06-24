@@ -12,7 +12,6 @@
   },
   "rules": {
     "no-eval": 0,
-    "no-shadow": 0,
     "quotes": 0,
     "no-unused-vars": 0,
     "no-multi-spaces": 0,
