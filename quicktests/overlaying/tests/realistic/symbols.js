@@ -36,7 +36,7 @@ function run(svg, data, Plottable){
   .y(function(d) { return d.y; }, yScale)
   .size(symbolSize)
   .symbol(fourSymbolAccessor)
-  .attr("fill", function(datum){return datum.y>0?(datum.x>0?"#00bb00":"#bbbbbb"):(datum.x>0?"#bbbbbb":"#bb0000");});
+  .attr("fill", function(datum) { return datum.y > 0 ? (datum.x > 0 ? "#00bb00" : "#bbbbbb") : (datum.x > 0 ? "#bbbbbb" : "#bb0000"); });
 
   var title = new Plottable.Components.Label("n = new point, d = delete point");
   var cs = new Plottable.Scales.Color();
@@ -101,26 +101,26 @@ function run(svg, data, Plottable){
   var key = new Plottable.Interactions.Key();
   if (typeof key.onKeyPress === "function") {
     key.onKeyPress(78, function(keyData){
-      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(d);
+      keyData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(keyData);
     });
 
     key.onKeyPress(68, function(keyData){
-      if(d.length > 0){
-        d.splice(d.length-1,1);
-        dataset.data(d);
+      if(keyData.length > 0){
+        keyData.splice(keyData.length - 1,1);
+        dataset.data(keyData);
       }
     });
   } else {
     key.onKey(78, function(keyData){
-      d.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(d);
+      keyData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(keyData);
     });
 
     key.onKey(68, function(keyData){
-      if(d.length > 0){
-        d.splice(d.length-1,1);
-        dataset.data(d);
+      if(keyData.length > 0){
+        keyData.splice(keyData.length - 1,1);
+        dataset.data(keyData);
       }
     });
   }

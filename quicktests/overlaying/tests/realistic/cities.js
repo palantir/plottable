@@ -12,7 +12,7 @@ function run(svg, data, Plottable) {
 
   var csRange = [];
   for(var i = 0; i < 30; i++){
-    var c = '#'+Math.floor(Math.random()*16777215).toString(16);
+    var c = '#' + Math.floor(Math.random() * 16777215).toString(16);
     csRange.push(c);
   }
 

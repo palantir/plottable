@@ -28,6 +28,9 @@ export class Drawer {
   protected _className: string;
   private _dataset: Dataset;
 
+  private _cachedSelectionValid = false;
+  private _cachedSelection: d3.Selection<any>;
+
   /**
    * A Drawer draws svg elements based on the input Dataset.
    *
@@ -54,6 +57,7 @@ export class Drawer {
       return this._renderArea;
     }
     this._renderArea = area;
+    this._cachedSelectionValid = false;
     return this;
   }
 
@@ -72,7 +76,7 @@ export class Drawer {
    * @param{any[]} data The data to be drawn
    */
   private _bindSelectionData(data: any[]) {
-    var dataElements = this._selection().data(data);
+    var dataElements = this.selection().data(data);
     dataElements.enter().append(this._svgElementName);
     dataElements.exit().remove();
     this._applyDefaultAttributes(dataElements);
@@ -90,7 +94,7 @@ export class Drawer {
    * @param{AppliedDrawStep} step The step, how data should be drawn.
    */
   private _drawStep(step: Drawers.AppliedDrawStep) {
-    var selection = this._selection();
+    var selection = this.selection();
     var colorAttributes = ["fill", "stroke"];
     colorAttributes.forEach((colorAttribute) => {
       if (step.attrToAppliedProjector[colorAttribute] != null) {
@@ -99,7 +103,7 @@ export class Drawer {
     });
     step.animator.animate(selection, step.attrToAppliedProjector);
     if (this._className != null) {
-      this._selection().classed(this._className, true);
+      this.selection().classed(this._className, true);
     }
   }
 
@@ -145,6 +149,7 @@ export class Drawer {
     });
 
     this._bindSelectionData(data);
+    this._cachedSelectionValid = false;
 
     var delay = 0;
     appliedDrawSteps.forEach((drawStep, i) => {
@@ -155,8 +160,12 @@ export class Drawer {
     return this;
   }
 
-  private _selection() {
-    return this.renderArea().selectAll(this.selector());
+  public selection() {
+    if (!this._cachedSelectionValid) {
+      this._cachedSelection = this.renderArea().selectAll(this.selector());
+      this._cachedSelectionValid = true;
+    }
+    return this._cachedSelection;
   }
 
   /**
@@ -170,7 +179,7 @@ export class Drawer {
    * Returns the D3 selection corresponding to the datum with the specified index.
    */
   public selectionForIndex(index: number): d3.Selection<any> {
-    return d3.select(this._selection()[0][index]);
+    return d3.select(this.selection()[0][index]);
   }
 
 }

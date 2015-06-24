@@ -1,6 +1,8 @@
 Plottable.js [![Builds](https://api.travis-ci.org/repositories/palantir/plottable.png?branch=master)](https://travis-ci.org/palantir/plottable)
 ============
 
+[![Join the chat at https://gitter.im/palantir/plottable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/palantir/plottable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Overview
 ---
 
@@ -9,19 +11,19 @@ more flexible than standard-template charts provided by charting libraries. You 
 
 Philosophy
 ---
-Plottable's core philosophy is "Composition over Configuration", so a lot of the API flexibility is in choosing which `Components` to use, and how to arrange them in `Tables`, rather than setting high-level properties on the charts. If you find you need a feature that doesn't exist, consider writing a new `Component` that implements it as a plugin. This way, you can get your custom functionality and still benefit from the rest of the library. Drop a line at our [Google group](https://groups.google.com/forum/#!forum/plottablejs) if you want help implementing a plugin.
+Plottable's core philosophy is "Composition over Configuration", so a lot of the API flexibility is in choosing which `Components` to use, and how to arrange them in `Tables`, rather than setting high-level properties on the charts. If you find you need a feature that doesn't exist, consider writing a new `Component` that implements the functionality. This way, you can get your custom functionality and still benefit from the rest of the library.
 
 Plottable.js is being developed by [Palantir Technologies](http://palantir.com/). It's developed in [Typescript](http://typescriptlang.org/), and released in Javascript.
 
 Quick Start
 ---
 
-- Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`
-- Check out [examples](http://plottablejs.org/examples/), read the [docs](http://plottablejs.org/tutorials/) and visit the [website](http://plottablejs.org/)
+- Download [plottable.zip](plottable.zip) or get it via Bower: `bower install --save plottable`.
+- Check out [examples](http://plottablejs.org/examples/), read the [tutorials](http://plottablejs.org/tutorials/), and visit the [website](http://plottablejs.org/).
 
 We Want To Help!
 ---
-If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out.
+If you run into any problems using Plottable, please let us know. We want Plottable to be easy-to-use, so if you are getting confused, it is our fault, not yours. [Create an issue](https://github.com/palantir/plottable/issues) and we'll be happy to help you out, or drop by our [Gitter room](https://gitter.im/palantir/plottable).
 
 Development
 ---

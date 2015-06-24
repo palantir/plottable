@@ -25,16 +25,16 @@ function run(svg, data, Plottable) {
   plot.addDataset(ds);
   plot.x(function(d){ return d.G; }, xScale)
       .y(function(d){ return d.A; }, yScale)
-      .size(function(d){ return 6 + d.Rk/10; })
+      .size(function(d){ return 6 + d.Rk / 10; })
       .attr("fill", function(d){
         var A = +d.A;
         var G = +d.G;
 
-        var slope = A/G;
+        var slope = A / G;
         var slope_offset = 0;
-        if (slope > 80/33.14 ) { slope_offset = 3; }
+        if (slope > 80 / 33.14 ) { slope_offset = 3; }
         else if (slope > 1 ) { slope_offset = 2; }
-        else if (slope > 33.14/80 ) {slope_offset = 1; }
+        else if (slope > 33.14 / 80 ) {slope_offset = 1; }
 
         var zone = A + G;
         var zone_offset = 0;

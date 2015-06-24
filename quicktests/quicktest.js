@@ -38,7 +38,7 @@ function runSingleQuicktest(container, quickTest, data, Plottable) {
   try {
     quickTest.run(div, data, Plottable);
   } catch (err) {
-    setTimeout(function() {throw err;}, 0);
+    setTimeout(function() {throw err; }, 0);
   }
 }
 
@@ -151,7 +151,7 @@ function setup() {
       for(var i = 0; i < data.length; i++){
         branchOptions["val" + i] = data[i].name;
       }
-      var names = data.map(function(x) {return x.name;});
+      var names = data.map(function(x) {return x.name; });
       names.push("#local");
       populateDropdown($('#leftBranch'), names, "develop");
       populateDropdown($('#rightBranch'), names, "#local");
@@ -185,7 +185,7 @@ function go() {
       if (quicktestCategory === "#all" || quicktestCategory === undefined) {
         return true;
       } else {
-        return q.categories.map(function(s) {return s.toLowerCase();}).indexOf(quicktestCategory.toLowerCase()) !== -1;
+        return q.categories.map(function(s) {return s.toLowerCase(); }).indexOf(quicktestCategory.toLowerCase()) !== -1;
       }
     });
   }).then(function(qts) {

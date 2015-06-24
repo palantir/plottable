@@ -14,10 +14,10 @@ function expandSidebar(){
       left: '0%'
     });
     content.animate({
-      left: '20%',
+      left: '20%'
     });
     controls.animate({
-      width: '80%',
+      width: '80%'
     });
   }
   else{
@@ -30,7 +30,7 @@ function expandSidebar(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%',
+      width: '100%'
     });
   }
 }
@@ -55,7 +55,7 @@ var plotheight;
 //functions
 
 function togglePlotDisplay(className){
-  var classSelector = "."+className;
+  var classSelector = "." + className;
   var displayStatus = $(classSelector).css("display") === "none" ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
@@ -77,7 +77,6 @@ function setupBindings(){
   }).mousemove(function(e) {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
-      
       $("#help-description").css({ top: helpY + 28, left: windowWidth - 360 });
   });
 }
@@ -101,7 +100,7 @@ function populateSidebarList(){
 function renderPlots(plottablePlots){
   plottablePlots.forEach(function(plot){
     var plotDivName = "." + plot.constructor.name;
-    var plotDiv = d3.select(plotDivName); 
+    var plotDiv = d3.select(plotDivName);
     var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
     var chart = new Plottable.Component.Table([[plot]]);
     chart.renderTo(box);
@@ -116,7 +115,7 @@ function addAllDatasets(plot, arr, numOfDatasets){
     arr.forEach(function(dataset){
       plot.addDataset(dataset);
     });
-  } 
+  }
   return plot;
 }
 
@@ -170,7 +169,7 @@ function generatePlots(dataType){
           .project("y", "x", yScale)
           .attr("fill", "type", colorScale)
           .animate(true);
-      
+
       plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
@@ -180,12 +179,12 @@ function generatePlots(dataType){
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
-    
+
   });
   renderPlots(plottablePlots);
 }
 
-var orderByX = function(a,b){ 
+var orderByX = function(a,b){
   return a.x - b.x;
 };
 
@@ -213,7 +212,7 @@ function makeRandomData(numPoints, series, scaleFactor) {
 }
 
 function prepareSingleData(data){
-  data[0].map(function(element){element.type = ""+ element.x;});
+  data[0].map(function(element){ element.type = "" + element.x; });
   return data;
 }
 

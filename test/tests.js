@@ -3908,6 +3908,30 @@ describe("Plots", function () {
             Plottable.Utils.Window.warn = oldWarn;
             svg.remove();
         });
+        describe("Labels", function () {
+            it("labels are shown and hidden appropriately", function () {
+                piePlot.removeDataset(simpleDataset);
+                var data = [
+                    { key: "A", value: 1 },
+                    { key: "B", value: 50 },
+                    { key: "C", value: 1 },
+                    { key: "D", value: 50 },
+                    { key: "E", value: 1 },
+                    { key: "F", value: 50 }
+                ];
+                var dataset = new Plottable.Dataset(data);
+                piePlot.addDataset(dataset).labelsEnabled(true);
+                $(".label-area").children("g").each(function (i) {
+                    if (i % 2 === 0) {
+                        assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
+                    }
+                    else {
+                        assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
+                    }
+                });
+                svg.remove();
+            });
+        });
     });
     describe("fail safe tests", function () {
         it("undefined, NaN and non-numeric strings not be represented in a Pie Chart", function () {
@@ -8341,7 +8365,10 @@ describe("Utils", function () {
             set.add(values[1]);
             var index = 0;
             set.forEach(function (value1, value2, passedSet) {
-                assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                // HACKHACK: Safari bug #21489317: Safari passes undefined instead of a duplicate value for value2.
+                if (value2 !== undefined) {
+                    assert.strictEqual(value1, value2, "The two value arguments passed to the callback are the same");
+                }
                 assert.strictEqual(value1, values[index], "Value " + index + " is the expected one");
                 assert.strictEqual(passedSet, set, "The correct Set is passed as the third argument");
                 index++;
@@ -8693,6 +8720,45 @@ describe("Utils", function () {
             var expectedStackExtents = [-5, 100];
             assert.deepEqual(stackExtents[0], expectedStackExtents[0], "Fred has the smallest minimum stack");
             assert.deepEqual(stackExtents[1], expectedStackExtents[1], "Fred has the largest maximum stack");
+        });
+    });
+});
+
+///<reference path="../testReference.ts" />
+var assert = chai.assert;
+describe("Utils.Window", function () {
+    describe("deprecated()", function () {
+        var oldWarn;
+        before(function () {
+            oldWarn = Plottable.Utils.Window.warn;
+        });
+        after(function () {
+            Plottable.Utils.Window.warn = oldWarn;
+        });
+        it("deprecated() issues a warning", function () {
+            var warningTriggered = false;
+            Plottable.Utils.Window.warn = function (msg) {
+                warningTriggered = true;
+            };
+            Plottable.Utils.Window.deprecated("deprecatedMethod", "v0.77.2");
+            assert.isTrue(warningTriggered, "the warning has been triggered");
+        });
+        it("deprecated() calling method name, version and message are correct", function () {
+            var callingMethod = "reallyOutdatedCallerMethod";
+            var version = "v0.77.2";
+            var message = "hadoop is doopey";
+            var warningTriggered = false;
+            Plottable.Utils.Window.warn = function (msg) {
+                assert.isNotNull(msg.match(new RegExp(callingMethod)), "The method name exists in the message " + msg);
+                assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
+                assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
+                assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
+                var regEx = new RegExp(message + "$");
+                assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
+                warningTriggered = true;
+            };
+            Plottable.Utils.Window.deprecated(callingMethod, version, message);
+            assert.isTrue(warningTriggered, "the warning has been triggered");
         });
     });
 });
@@ -9638,6 +9704,7 @@ describe("Interactions", function () {
         var eventTarget;
         var xScale;
         var yScale;
+        var panZoomInteraction;
         beforeEach(function () {
             svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
             var component = new Plottable.Component();
@@ -9646,7 +9713,10 @@ describe("Interactions", function () {
             xScale.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
             yScale = new Plottable.Scales.Linear();
             yScale.domain([0, SVG_HEIGHT / 2]).range([0, SVG_HEIGHT]);
-            (new Plottable.Interactions.PanZoom(xScale, yScale)).attachTo(component);
+            panZoomInteraction = new Plottable.Interactions.PanZoom();
+            panZoomInteraction.addXScale(xScale);
+            panZoomInteraction.addYScale(yScale);
+            panZoomInteraction.attachTo(component);
             eventTarget = component.background();
         });
         describe("Panning", function () {
@@ -9668,6 +9738,19 @@ describe("Interactions", function () {
                 TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
                 assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
                 assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (mouse)");
+                svg.remove();
+            });
+            it("dragging a certain amount will translate multiple scales correctly (mouse)", function () {
+                var xScale2 = new Plottable.Scales.Linear();
+                xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+                panZoomInteraction.addXScale(xScale2);
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
+                TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
+                TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (mouse)");
+                assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (mouse)");
                 svg.remove();
             });
             it("dragging a certain amount will translate the scale correctly (touch)", function () {
@@ -9696,6 +9779,19 @@ describe("Interactions", function () {
                 assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 2, SVG_HEIGHT], "yScale pans to the correct domain via drag (touch)");
                 svg.remove();
             });
+            it("dragging a certain amount will translate multiple scales correctly (touch)", function () {
+                var xScale2 = new Plottable.Scales.Linear();
+                xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+                panZoomInteraction.addXScale(xScale2);
+                var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+                var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+                TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
+                TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
+                TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
+                assert.deepEqual(xScale.domain(), [SVG_WIDTH / 2, SVG_WIDTH], "xScale pans to the correct domain via drag (touch)");
+                assert.deepEqual(xScale2.domain(), [SVG_WIDTH * 2, SVG_WIDTH * 4], "xScale2 pans to the correct domain via drag (touch)");
+                svg.remove();
+            });
         });
         it("mousewheeling a certain amount will magnify the scale correctly", function () {
             // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
@@ -9709,6 +9805,23 @@ describe("Interactions", function () {
             TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
             assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
             assert.deepEqual(yScale.domain(), [-SVG_HEIGHT / 8, SVG_HEIGHT * 7 / 8], "yScale zooms to the correct domain via scroll");
+            svg.remove();
+        });
+        it("mousewheeling a certain amount will magnify multiple scales correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var xScale2 = new Plottable.Scales.Linear();
+            xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+            panZoomInteraction.addXScale(xScale2);
+            var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var deltaY = 500;
+            TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY);
+            assert.deepEqual(xScale.domain(), [-SVG_WIDTH / 8, SVG_WIDTH * 7 / 8], "xScale zooms to the correct domain via scroll");
+            assert.deepEqual(xScale2.domain(), [-SVG_WIDTH / 2, SVG_WIDTH * 7 / 2], "xScale2 zooms to the correct domain via scroll");
             svg.remove();
         });
         it("pinching a certain amount will magnify the scale correctly", function () {
@@ -9726,6 +9839,54 @@ describe("Interactions", function () {
             TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
             assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
             assert.deepEqual(yScale.domain(), [SVG_HEIGHT / 16, SVG_HEIGHT * 5 / 16], "yScale transforms to the correct domain via pinch");
+            svg.remove();
+        });
+        it("pinching a certain amount will magnify multiple scales correctly", function () {
+            // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+            // https://github.com/ariya/phantomjs/issues/11289
+            if (window.PHANTOMJS) {
+                svg.remove();
+                return;
+            }
+            var xScale2 = new Plottable.Scales.Linear();
+            xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
+            panZoomInteraction.addXScale(xScale2);
+            var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+            var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+            TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint, startPoint2], [0, 1]);
+            var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+            TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1]);
+            TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1]);
+            assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
+            assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 4, SVG_WIDTH * 5 / 4], "xScale2 transforms to the correct domain via pinch");
+            svg.remove();
+        });
+        it("Setting the xScales in batch is the same as adding one at a time", function () {
+            var xScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addXScale(xScale2);
+            var xScales = panZoomInteraction.xScales();
+            panZoomInteraction.xScales([xScale, xScale2]);
+            assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
+            svg.remove();
+        });
+        it("Setting the yScales in batch is the same as adding one at a time", function () {
+            var yScale2 = new Plottable.Scales.Linear();
+            panZoomInteraction.addYScale(yScale2);
+            var yScales = panZoomInteraction.yScales();
+            panZoomInteraction.yScales([yScale, yScale2]);
+            assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
+            svg.remove();
+        });
+        it("Adding an already existent xScale does nothing", function () {
+            var oldXScaleNumber = panZoomInteraction.xScales().length;
+            panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
+            assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
+            svg.remove();
+        });
+        it("Adding an already existent yScale does nothing", function () {
+            var oldYScaleNumber = panZoomInteraction.yScales().length;
+            panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
+            assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
             svg.remove();
         });
     });

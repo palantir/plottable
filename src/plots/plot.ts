@@ -20,6 +20,21 @@ export module Plots {
   }
 }
 
+/**
+ * Computing the selection of an entity is an expensive operation. This object aims to
+ * reproduce the behavior of the Plots.PlotEntity, excluding the selection, but including
+ * drawer and validDatumIndex, which can be used to compute the selection.
+ */
+interface LightweightPlotEntity {
+  datum: any;
+  position: Point;
+  dataset: Dataset;
+  index: number;
+  component: Plot;
+  drawer: Plottable.Drawer;
+  validDatumIndex: number;
+}
+
 export class Plot extends Component {
   protected static _ANIMATION_MAX_DURATION = 600;
 
@@ -451,27 +466,45 @@ export class Plot extends Component {
    * @return {Plots.PlotEntity[]}
    */
   public entities(datasets = this.datasets()): Plots.PlotEntity[] {
-    var entities: Plots.PlotEntity[] = [];
+    return this._lightweightEntities(datasets).map((entity) => this._lightweightPlotEntityToPlotEntity(entity));
+  }
+
+  private _lightweightEntities(datasets = this.datasets()) {
+    var lightweightEntities: LightweightPlotEntity[] = [];
     datasets.forEach((dataset) => {
       var drawer = this._datasetToDrawer.get(dataset);
       var validDatumIndex = 0;
+
       dataset.data().forEach((datum: any, datasetIndex: number) => {
         var position = this._pixelPoint(datum, datasetIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
         }
-        entities.push({
+        lightweightEntities.push({
           datum: datum,
           index: datasetIndex,
           dataset: dataset,
           position: position,
-          selection: drawer.selectionForIndex(validDatumIndex),
-          component: this
+          component: this,
+          drawer: drawer,
+          validDatumIndex: validDatumIndex
         });
         validDatumIndex++;
       });
     });
-    return entities;
+    return lightweightEntities;
+  }
+
+  private _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
+    var plotEntity: Plots.PlotEntity = {
+      datum: entity.datum,
+      position: entity.position,
+      dataset: entity.dataset,
+      index: entity.index,
+      component: entity.component,
+      selection: entity.drawer.selectionForIndex(entity.validDatumIndex)
+    };
+    return plotEntity;
   }
 
   /**
@@ -482,23 +515,30 @@ export class Plot extends Component {
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
     var closestDistanceSquared = Infinity;
-    var closest: Plots.PlotEntity;
-    this.entities().forEach((entity) => {
-      if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+    var closestPointEntity: LightweightPlotEntity;
+    var entities = this._lightweightEntities();
+    entities.forEach((entity) => {
+      if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
         return;
       }
 
       var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
-        closest = entity;
+        closestPointEntity = entity;
       }
     });
 
-    return closest;
+    return this._lightweightPlotEntityToPlotEntity(closestPointEntity);
   }
 
   protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+    Utils.Window.deprecated("Plot._visibleOnPlot()", "v1.1.0");
+    return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
+      pixelPoint.x > this.width() || pixelPoint.y > this.height());
+  }
+
+  protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
     return !(pixelPoint.x < 0 || pixelPoint.y < 0 ||
       pixelPoint.x > this.width() || pixelPoint.y > this.height());
   }

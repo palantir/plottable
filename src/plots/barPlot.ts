@@ -254,7 +254,7 @@ export module Plots {
 
       var closest: PlotEntity;
       this.entities().forEach((entity) => {
-        if (!this._visibleOnPlot(entity.datum, entity.position, entity.selection)) {
+        if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
           return;
         }
         var primaryDist = 0;
@@ -291,9 +291,28 @@ export module Plots {
     }
 
     protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean {
+      Utils.Window.deprecated("Bar._visibleOnPlot()", "v1.1.0");
       var xRange = { min: 0, max: this.width() };
       var yRange = { min: 0, max: this.height() };
       var barBBox = Utils.DOM.elementBBox(selection);
+
+      return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
+    }
+
+    protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset) {
+      var xRange = { min: 0, max: this.width() };
+      var yRange = { min: 0, max: this.height() };
+
+      var attrToProjector = this._generateAttrToProjector();
+      var width = attrToProjector["width"](datum, index, dataset);
+      var height = attrToProjector["height"](datum, index, dataset);
+
+      var barBBox = {
+        x: pixelPoint.x - width / 2,
+        y: pixelPoint.y,
+        width: width,
+        height: height
+      };
 
       return Plottable.Utils.DOM.intersectsBBox(xRange, yRange, barBBox);
     }

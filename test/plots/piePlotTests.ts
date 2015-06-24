@@ -244,6 +244,27 @@ describe("Plots", () => {
       Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
     });
+
+    describe("Labels", () => {
+      it("labels are shown and hidden appropriately", () => {
+        piePlot.removeDataset(simpleDataset);
+        var data = [
+          { key: "A", value: 1 }, { key: "B", value: 50 },
+          { key: "C", value: 1 }, { key: "D", value: 50 },
+          { key: "E", value: 1 }, { key: "F", value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset).labelsEnabled(true);
+        $(".label-area").children("g").each(function(i) {
+          if (i % 2 === 0) {
+            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
+          }
+        });
+        svg.remove();
+      });
+    });
   });
 
   describe("fail safe tests", () => {
