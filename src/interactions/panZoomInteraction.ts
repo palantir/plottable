@@ -120,7 +120,8 @@ export module Interactions {
       var scaleAtMaxExtent = (scale: QuantitativeScale<any>) => {
         var scaleDomain = scale.domain();
         var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-        return scaleExtent >= this._maxDomainExtents.get(scale);
+        var maxDomainExtent = this._maxDomainExtents.get(scale);
+        return maxDomainExtent == null || scaleExtent >= maxDomainExtent;
       };
       return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
     }
@@ -129,7 +130,8 @@ export module Interactions {
       var scaleAtMinExtent = (scale: QuantitativeScale<any>) => {
         var scaleDomain = scale.domain();
         var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-        return scaleExtent <= this._minDomainExtents.get(scale);
+        var minDomainExtent = this._minDomainExtents.get(scale);
+        return minDomainExtent == null || scaleExtent <= minDomainExtent;
       };
       return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
     }
@@ -184,12 +186,12 @@ export module Interactions {
       var domainExtent = Math.abs(<any> domainToConstrain[1] - <any> domainToConstrain[0]);
 
       var minDomainExtent = this._minDomainExtents.get(scale);
-      if (domainExtent < minDomainExtent) {
+      if (minDomainExtent != null && domainExtent < minDomainExtent) {
         return scale.constrainedDomain(domainToConstrain, minDomainExtent);
       }
 
       var maxDomainExtent = this._maxDomainExtents.get(scale);
-      if (domainExtent > maxDomainExtent) {
+      if (maxDomainExtent != null && domainExtent > maxDomainExtent) {
         return scale.constrainedDomain(domainToConstrain, maxDomainExtent);
       }
 
@@ -299,7 +301,6 @@ export module Interactions {
      */
     public addXScale(xScale: QuantitativeScale<any>) {
       this._xScales.add(xScale);
-      this._ensureDefaultDomainExtents(xScale);
       return this;
     }
 
@@ -322,17 +323,7 @@ export module Interactions {
      */
     public addYScale(yScale: QuantitativeScale<any>) {
       this._yScales.add(yScale);
-      this._ensureDefaultDomainExtents(yScale);
       return this;
-    }
-
-    private _ensureDefaultDomainExtents(scale: QuantitativeScale<any>) {
-      if (this._minDomainExtents.get(scale) == null) {
-        this._minDomainExtents.set(scale, 0);
-      }
-      if (this._maxDomainExtents.get(scale) == null) {
-        this._maxDomainExtents.set(scale, scale.domainTypeMaximum());
-      }
     }
 
     /**
