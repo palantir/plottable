@@ -2791,6 +2791,32 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            function Segment(dataset) {
+                _super.call(this, dataset);
+                this._svgElementName = "line";
+            }
+            Segment.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+            };
+            return Segment;
+        })(Plottable.Drawer);
+        Drawers.Segment = Segment;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -8262,6 +8288,74 @@ var Plottable;
             return StackedBar;
         })(Plots.Bar);
         Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            function Segment() {
+                _super.call(this);
+                this.addClass("segment-plot");
+            }
+            Segment.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Segment(dataset);
+            };
+            Segment.prototype._generateAttrToProjector = function () {
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                return attrToProjector;
+            };
+            Segment.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) }];
+            };
+            Segment.prototype.x2 = function (x2) {
+                if (x2 == null) {
+                    return this._propertyBindings.get(Segment._X2_KEY);
+                }
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty(Segment._X2_KEY, x2, xScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype.y2 = function (y2) {
+                if (y2 == null) {
+                    return this._propertyBindings.get(Segment._Y2_KEY);
+                }
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
+                attrToProjector["y2"] = Plottable.Plot._scaledAccessor(this.y2());
+                return attrToProjector;
+            };
+            Segment._X2_KEY = "x2";
+            Segment._Y2_KEY = "y2";
+            return Segment;
+        })(Plottable.XYPlot);
+        Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
