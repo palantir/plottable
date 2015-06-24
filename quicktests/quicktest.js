@@ -81,7 +81,7 @@ function loadTheQuicktests(quicktestsJSONArray) {
 }
 
 function loadListOfQuicktests() {
-  return new Promise(function (f) {
+  return new Promise(function (f, r) {
     d3.json("/quicktests/list_of_quicktests.json", function (error, json) {
       if (json !== undefined) {
         f(json);

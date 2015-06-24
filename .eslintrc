@@ -1,8 +1,7 @@
 {
   "env": {
     "browser": true,
-    "jquery": true,
-    "node": true
+    "jquery": true
   },
   "globals": {
     "d3": true,
