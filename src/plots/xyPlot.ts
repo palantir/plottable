@@ -22,6 +22,8 @@ export class XYPlot<X, Y> extends Plot {
   private _fastPanZoomKnownDomainX: X[] = [null, null];
   private _fastPanZoomKnownDomainY: Y[] = [null, null];
 
+  public tempScrollTimeout = 500;
+
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
    *
@@ -61,7 +63,7 @@ export class XYPlot<X, Y> extends Plot {
         this._fastPanZoomDeltaY = 0;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-      }, 500);
+      }, this.tempScrollTimeout);
     }
   }
 
@@ -86,7 +88,7 @@ export class XYPlot<X, Y> extends Plot {
         this._fastPanZoomDeltaY = 0;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-      }, 500);
+      }, this.tempScrollTimeout);
     }
   }
 

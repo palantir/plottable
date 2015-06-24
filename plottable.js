@@ -6524,6 +6524,7 @@ var Plottable;
             this._fastPanZoomScaleY = 1;
             this._fastPanZoomKnownDomainX = [null, null];
             this._fastPanZoomKnownDomainY = [null, null];
+            this.tempScrollTimeout = 500;
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
@@ -6547,7 +6548,7 @@ var Plottable;
                     _this._fastPanZoomDeltaY = 0;
                     _this.render();
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-                }, 500);
+                }, this.tempScrollTimeout);
             }
         };
         XYPlot.prototype._fastPanZoomOnY = function (scale) {
@@ -6567,7 +6568,7 @@ var Plottable;
                     _this._fastPanZoomDeltaY = 0;
                     _this.render();
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-                }, 500);
+                }, this.tempScrollTimeout);
             }
         };
         XYPlot.prototype.performanceEnabled = function (performanceEnabled) {
