@@ -3085,6 +3085,26 @@ declare module Plottable {
             protected _createDrawer(dataset: Dataset): Drawers.Segment;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             /**
+             * Gets the AccessorScaleBinding for X
+             */
+            x(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X to a constant value or the result of an Accessor.
+             *
+             * @param {X|Accessor<X>} x
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets X to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {X|Accessor<X>} x
+             * @param {Scale<X, number>} xScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+            /**
              * Gets the AccessorScaleBinding for X2
              */
             x2(): AccessorScaleBinding<X, number>;
@@ -3096,6 +3116,26 @@ declare module Plottable {
              * @returns {Plots.Segment} The calling Segment Plot
              */
             x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y
+             */
+            y(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y to a constant value or the result of an Accessor.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets Y to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @param {Scale<Y, number>} yScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
             /**
              * Gets the AccessorScaleBinding for Y2.
              */
