@@ -7,7 +7,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("/quicktests/overlaying/data/cities.csv").get(function(error, rows) {
-  var data = rows;
+  data = rows;
   var ds = new Plottable.Dataset(data);
 
   var csRange = [];

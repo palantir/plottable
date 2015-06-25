@@ -24,9 +24,9 @@ function run(svg, data, Plottable) {
                                   .x(function(d) { return d.name; }, xScale)
                                   .y(function(d) { return d.y; }, yScale);
 
-  var chart = new Plottable.Components.Table([
-                                            [yAxis, barPlot],
-                                            [null,  xAxis]]).renderTo(svg);
+  new Plottable.Components.Table([
+                                  [yAxis, barPlot],
+                                  [null,  xAxis]]).renderTo(svg);
 
   var clickInteraction = new Plottable.Interactions.Click();
   clickInteraction.attachTo(barPlot);

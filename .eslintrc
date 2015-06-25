@@ -1,8 +1,7 @@
 {
   "env": {
     "browser": true,
-    "jquery": true,
-    "node": true
+    "jquery": true
   },
   "globals": {
     "d3": true,
@@ -12,14 +11,14 @@
   },
   "rules": {
     "no-eval": 0,
-    "no-shadow": 0,
     "quotes": 0,
-    "no-unused-vars": 0,
+    "no-console": 0,
+    "no-unused-vars": [2, {"vars": "local"}],
     "no-multi-spaces": 0,
     "camelcase": 0,
     "comma-spacing": 0,
     "key-spacing": 0,
-    "no-use-before-define": 0,
+    "no-use-before-define": [2, "nofunc"],
     "strict": 0,
     "no-underscore-dangle": 0
   }
