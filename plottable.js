@@ -8316,17 +8316,6 @@ var Plottable;
             Segment.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
             };
-            Segment.prototype.x = function (x, xScale) {
-                if (x == null) {
-                    return _super.prototype.x.call(this);
-                }
-                if (xScale == null) {
-                    return _super.prototype.x.call(this, x);
-                }
-                else {
-                    return _super.prototype.x.call(this, x, xScale);
-                }
-            };
             Segment.prototype.x2 = function (x2) {
                 if (x2 == null) {
                     return this._propertyBindings.get(Segment._X2_KEY);
@@ -8336,17 +8325,6 @@ var Plottable;
                 this._bindProperty(Segment._X2_KEY, x2, xScale);
                 this.render();
                 return this;
-            };
-            Segment.prototype.y = function (y, yScale) {
-                if (y == null) {
-                    return _super.prototype.y.call(this);
-                }
-                if (yScale == null) {
-                    return _super.prototype.y.call(this, y);
-                }
-                else {
-                    return _super.prototype.y.call(this, y, yScale);
-                }
             };
             Segment.prototype.y2 = function (y2) {
                 if (y2 == null) {

@@ -6941,13 +6941,13 @@ describe("Plots", function () {
             yScale = new Plottable.Scales.Linear();
         });
         it("renders vertical lines when x2 is not set", function () {
-            var plot = new Plottable.Plots.Segment().x(function (d) {
+            var plot = new Plottable.Plots.Segment().y2(function (d) {
+                return d.y2;
+            }).x(function (d) {
                 return d.x;
             }, xScale).y(function (d) {
                 return d.y;
-            }, yScale).y2(function (d) {
-                return d.y2;
-            }).addDataset(new Plottable.Dataset(data)).renderTo(svg);
+            }, yScale).addDataset(new Plottable.Dataset(data)).renderTo(svg);
             renderArea = plot._renderArea;
             renderArea.selectAll("line")[0].forEach(function (line) {
                 var lineSelection = d3.select(line);
@@ -6956,11 +6956,11 @@ describe("Plots", function () {
             svg.remove();
         });
         it("renders horizontal lines when y2 is not set", function () {
-            var plot = new Plottable.Plots.Segment().x(function (d) {
-                return d.x;
-            }, xScale).x2(function (d) {
+            var plot = new Plottable.Plots.Segment().x2(function (d) {
                 return d.x2;
-            }).y(function (d) {
+            }).x(function (d) {
+                return d.x;
+            }, xScale).y(function (d) {
                 return d.y;
             }, yScale).addDataset(new Plottable.Dataset(data)).renderTo(svg);
             renderArea = plot._renderArea;

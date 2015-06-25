@@ -25,37 +25,6 @@ export module Plots {
     }
 
     /**
-     * Gets the AccessorScaleBinding for X
-     */
-    public x(): AccessorScaleBinding<X, number>;
-    /**
-     * Sets X to a constant value or the result of an Accessor.
-     *
-     * @param {X|Accessor<X>} x
-     * @returns {Plots.Segment} The calling Segment Plot.
-     */
-    public x(x: number | Accessor<number>): Plots.Segment<X, Y>;
-    /**
-     * Sets X to a scaled constant value or scaled result of an Accessor.
-     * The provided Scale will account for the values when autoDomain()-ing.
-     *
-     * @param {X|Accessor<X>} x
-     * @param {Scale<X, number>} xScale
-     * @returns {Plots.Segment} The calling Segment Plot.
-     */
-    public x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
-    public x(x?: number | Accessor<number> | X | Accessor<X>, xScale?: Scale<X, number>): any {
-      if (x == null) {
-        return super.x();
-      }
-      if (xScale == null) {
-        return super.x(<number | Accessor<number>>x);
-      } else {
-        return super.x(<X | Accessor<X>>x, xScale);
-      }
-    }
-
-    /**
      * Gets the AccessorScaleBinding for X2
      */
     public x2(): AccessorScaleBinding<X, number>;
@@ -77,37 +46,6 @@ export module Plots {
       this._bindProperty(Segment._X2_KEY, x2, xScale);
       this.render();
       return this;
-    }
-
-    /**
-     * Gets the AccessorScaleBinding for Y
-     */
-    public y(): AccessorScaleBinding<Y, number>;
-    /**
-     * Sets Y to a constant value or the result of an Accessor.
-     *
-     * @param {Y|Accessor<Y>} y
-     * @returns {Plots.Segment} The calling Segment Plot.
-     */
-    public y(y: number | Accessor<number>): Plots.Segment<X, Y>;
-    /**
-     * Sets Y to a scaled constant value or scaled result of an Accessor.
-     * The provided Scale will account for the values when autoDomain()-ing.
-     *
-     * @param {Y|Accessor<Y>} y
-     * @param {Scale<Y, number>} yScale
-     * @returns {Plots.Segment} The calling Segment Plot.
-     */
-    public y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
-    public y(y?: number | Accessor<number> | Y | Accessor<Y>, yScale?: Scale<Y, number>): any {
-      if (y == null) {
-        return super.y();
-      }
-      if (yScale == null) {
-        return super.y(<number | Accessor<number>>y);
-      } else {
-        return super.y(<Y | Accessor<Y>>y, yScale);
-      }
     }
 
     /**

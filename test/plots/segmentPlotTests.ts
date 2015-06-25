@@ -20,9 +20,9 @@ describe("Plots", () => {
 	});
 	it("renders vertical lines when x2 is not set", () => {
 	  var plot = new Plottable.Plots.Segment()
+		.y2(function(d) { return d.y2; })
 	  	.x(function(d) { return d.x; }, xScale)
 		.y(function(d) { return d.y; }, yScale)
-		.y2(function(d) { return d.y2; })
 		.addDataset(new Plottable.Dataset(data))
 		.renderTo(svg);
  	  renderArea = (<any> plot)._renderArea;
@@ -34,8 +34,8 @@ describe("Plots", () => {
 	});
 	it ("renders horizontal lines when y2 is not set", () => {
 	  var plot = new Plottable.Plots.Segment()
-	  	.x(function(d) { return d.x; }, xScale)
 		.x2(function(d) { return d.x2; })
+	  	.x(function(d) { return d.x; }, xScale)
 		.y(function(d) { return d.y; }, yScale)
 		.addDataset(new Plottable.Dataset(data))
 		.renderTo(svg);
