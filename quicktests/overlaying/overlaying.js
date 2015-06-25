@@ -72,7 +72,6 @@ var firstBranch;
 var secondBranch;
 var svgWidth;
 var svgHeight;
-var sidebarPopulated = false;
 
 //METHODS
 
@@ -148,8 +147,6 @@ function populateTotalSidebarList(paths){
 
   setupCheckboxBinding();
   $(":checkbox").attr("checked" , true);
-  sidebarPopulated = true;
-
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -172,7 +169,6 @@ function populateSidebarList(paths, testsInCategory, category){
   $(":checkbox").attr("checked", false);
   setupCheckboxBinding();
   setCategoryCheckbox(category, true);
-  sidebarPopulated = true;
 }
 
 //initializing methods
@@ -193,7 +189,7 @@ function setupBindings(){
   }, function() {
       // Hover out code
       $("#test-category-descriptions").css("display", "none");
-  }).mousemove(function(e) {
+  }).mousemove(function() {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
       $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
@@ -336,7 +332,6 @@ function clearTests(){
   plottableBranches = [];
   resetDisplayProperties();
   d3.selectAll(".quicktest, .sidebar-quicktest-category ").remove();
-  sidebarPopulated = false;
 }
 
 function initialize(){

@@ -45,14 +45,14 @@ function run(svg, data, Plottable){
   cs.range(["#00bb00", "#bbbbbb", "#bbbbbb", "#bb0000"]);
 
   if (typeof legend.symbol === "function") {
-    legend.symbol(function (d, i) {
+    legend.symbol(function (d) {
       if(d === "x+y+") { return triangleUpFactory; }
       if(d === "x+y-") { return crossFactory; }
       if(d === "x-y+") { return circleFactory; }
       if(d === "x-y-") { return triangleDownFactory; }
     });
   } else {
-    legend.symbolFactoryAccessor(function (d, i) {
+    legend.symbolFactoryAccessor(function (d) {
       if(d === "x+y+") { return triangleUpFactory; }
       if(d === "x+y-") { return crossFactory; }
       if(d === "x-y+") { return circleFactory; }
@@ -100,27 +100,27 @@ function run(svg, data, Plottable){
 
   var key = new Plottable.Interactions.Key();
   if (typeof key.onKeyPress === "function") {
-    key.onKeyPress(78, function(keyData){
-      keyData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(keyData);
+    key.onKeyPress(78, function(){
+      plotData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(plotData);
     });
 
-    key.onKeyPress(68, function(keyData){
-      if(keyData.length > 0){
-        keyData.splice(keyData.length - 1,1);
-        dataset.data(keyData);
+    key.onKeyPress(68, function(){
+      if(plotData.length > 0){
+        plotData.splice(plotData.length - 1,1);
+        dataset.data(plotData);
       }
     });
   } else {
-    key.onKey(78, function(keyData){
-      keyData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
-      dataset.data(keyData);
+    key.onKey(78, function(){
+      plotData.push({x: Math.random() - 0.5, y: Math.random() - 0.5});
+      dataset.data(plotData);
     });
 
-    key.onKey(68, function(keyData){
-      if(keyData.length > 0){
-        keyData.splice(keyData.length - 1,1);
-        dataset.data(keyData);
+    key.onKey(68, function(){
+      if(plotData.length > 0){
+        plotData.splice(plotData.length - 1,1);
+        dataset.data(plotData);
       }
     });
   }

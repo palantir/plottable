@@ -45,7 +45,6 @@ var multipleDatasetPlots = [P.Line, P.Area, P.Scatter];
 var stackedPlots = [P.StackedBar, P.StackedArea, P.ClusteredBar];
 var stackedHorizontalPlots = [P.StackedBar, P.ClusteredBar];
 var piePlots = [P.Pie];
-var otherPlots = [P.Grid];
 
 var plots = singlePlots.concat(singleHorizontalPlots, multipleDatasetPlots, stackedPlots, piePlots);
 var div = d3.select(".results");
@@ -74,7 +73,7 @@ function setupBindings(){
   }, function() {
       // Hover out code
       $("#help-description").css("display", "none");
-  }).mousemove(function(e) {
+  }).mousemove(function() {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
       $("#help-description").css({ top: helpY + 28, left: windowWidth - 360 });
@@ -234,8 +233,6 @@ function prepareStackedData(data){
 }
 
 function prepareData(seriesNumber){
-  var data = [{x: "0", y: 0, type: "0"}];
-
   var categories = 5; //change this number for more/less data in multiple & stacked dataset
   var series = seriesNumber; //change this number for more/less stack
   var alldata = [];

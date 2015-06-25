@@ -23,7 +23,7 @@ function run(svg, data, Plottable) {
   plot.addDataset(ds2);
   plot.size(function(d, i, dataset) { return dataset.metadata().size; });
   plot.attr("fill", function(d, i, dataset) { return dataset.metadata().color; });
-  plot.x(function(d, i, dataset) { return d.x; }, xScale);
+  plot.x(function(d) { return d.x; }, xScale);
   plot.y(function(d) { return d.y; }, yScale);
 
   var chart = new Plottable.Components.Table([

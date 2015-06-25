@@ -28,7 +28,7 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var cb = function(x, y){
+  var cb = function(){
     var d = dataset.data();
     dataset.data(d);
   };
