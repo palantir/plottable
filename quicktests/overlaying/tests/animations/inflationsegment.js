@@ -71,7 +71,7 @@ function run(svg, data, Plottable) {
       .addDataset(new Plottable.Dataset(segment_data))
       .attr("stroke", "#ff0000")
       .attr("stroke-width", 4)
-      .attr("stroke-dasharray", 1)
+      .attr("stroke-dasharray", 4)
       .animated(true);
     plot_array.push(segmentPlot);
   }

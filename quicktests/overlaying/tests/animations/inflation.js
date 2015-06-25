@@ -62,7 +62,9 @@ function run(svg, data, Plottable) {
               .addDataset(avg_ds)
               .x(function(datum) { return datum.x; }, xScale)
               .y(function(datum) { return datum.y; }, yScale)
-              .attr("stroke", "#FF0000")
+              .attr("stroke", "#ff0000")
+              .attr("stroke-width", 4)
+              .attr("stroke-dasharray", 4)
               .animated(true);
     plot_array.push(lineRenderer);
   };
@@ -79,7 +81,7 @@ function run(svg, data, Plottable) {
       var d = plot.datasets()[0].data();
       plot.datasets()[0].data(d);
     }).attachTo(plot);
- }
+ };
 
   for( var i = 0; i < plot_array.length; i++){
     var plot = plot_array[i];
