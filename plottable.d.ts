@@ -2541,7 +2541,20 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        /**
+         * Returns the lazy domain change setting on the plot
+         * @return {boolean} The lazy domain change setting
+         */
         lazyDomainChange(): boolean;
+        /**
+         * Sets / unsets the lazy domain change on the plot.
+         * Activating this option improves the performance of plot interaction (pan / zoom) by
+         * performing lazy renders, only after the interaction has stopped. Because re-rendering
+         * is no longer performed during the interaction, the zooming might experience a small
+         * resolution degradation, before the lazy re-render is performed.
+         *
+         * This option is intended for cases where performance is an issue.
+         */
         lazyDomainChange(lazyDomainChange: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
