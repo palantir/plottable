@@ -48,7 +48,6 @@ export module Plots {
       if (x == null) {
         return super.x();
       }
-
       if (xScale == null) {
         super.x(<number | Accessor<number>>x);
       } else {
@@ -59,7 +58,6 @@ export module Plots {
           this._bindProperty(Segment._X2_KEY, x2, xScale);
         }
       }
-
       return this;
     }
 
@@ -81,7 +79,6 @@ export module Plots {
       }
       var xBinding = this.x();
       var xScale = xBinding && xBinding.scale;
-
       this._bindProperty(Segment._X2_KEY, x2, xScale);
       this.render();
       return this;
@@ -121,7 +118,6 @@ export module Plots {
           this._bindProperty(Segment._Y2_KEY, y2, yScale);
         }
       }
-
       return this;
     }
 
@@ -141,11 +137,9 @@ export module Plots {
       if (y2 == null) {
         return this._propertyBindings.get(Segment._Y2_KEY);
       }
-
       var yBinding = this.y();
       var yScale = yBinding && yBinding.scale;
       this._bindProperty(Segment._Y2_KEY, y2, yScale);
-
       this.render();
       return this;
     }
