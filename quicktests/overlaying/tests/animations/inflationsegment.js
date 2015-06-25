@@ -58,7 +58,7 @@ function run(svg, data, Plottable) {
       total += d[month].y;
     }
     var average = total / 12;
-    //segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
+    segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
 
   for (var year = 0; year < data.length; year++){
