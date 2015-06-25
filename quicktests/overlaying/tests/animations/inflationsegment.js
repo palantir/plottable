@@ -38,6 +38,7 @@ function run(svg, data, Plottable) {
    xAxis.formatter(yearFormatter);
 
   var plot_array = [];
+  var segment_data = [];
 
   var add_year = function(y){
     var dataset = new Plottable.Dataset(data[y]);
@@ -57,35 +58,23 @@ function run(svg, data, Plottable) {
       total += d[month].y;
     }
     var average = total / 12;
-    var avg_data = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
-    var avg_ds = new Plottable.Dataset(avg_data);
-    var lineRenderer = new Plottable.Plots.Line()
-              .addDataset(avg_ds)
-              .x(function(d, i) { return d.x; }, xScale)
-              .y(function(d) { return d.y; }, yScale)
-              .attr("stroke", "#FF0000")
-              .animated(true);
-    plot_array.push(lineRenderer);
+    //segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
 
   for (var year = 0; year < data.length; year++){
     add_year(year);
     year_average(year);
+    var segmentPlot = new Plottable.Plots.Segment()
+      .x(function(d) { return d.x; }, xScale)
+      .y(function(d) { return d.y; }, yScale)
+      .x2(function(d) { return d.x2; })
+      .addDataset(new Plottable.Dataset(segment_data))
+      .attr("stroke", "#ff0000")
+      .animated(true);
+    plot_array.push(segmentPlot);
   }
 
   var group = new Plottable.Components.Group(plot_array);
-
- var add_click = function(plot){
-      new Plottable.Interactions.Click().onClick(function(){
-      var d = plot.datasets()[0].data();
-      plot.datasets()[0].data(d);
-    }).attachTo(plot);
- }
-
-  for( var i = 0; i < plot_array.length; i++){
-    var plot = plot_array[i];
-
-  }
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
                                                  [null,  xAxis]]);
