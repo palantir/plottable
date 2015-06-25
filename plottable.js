@@ -8339,9 +8339,9 @@ var Plottable;
             Segment.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
-                attrToProjector["x2"] = Plottable.Plot._scaledAccessor(this.x2());
+                attrToProjector["x2"] = this.x2() == null ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.x2());
                 attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
-                attrToProjector["y2"] = Plottable.Plot._scaledAccessor(this.y2());
+                attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
                 return attrToProjector;
             };
             Segment._X2_KEY = "x2";

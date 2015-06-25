@@ -74,9 +74,9 @@ export module Plots {
     protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector = super._propertyProjectors();
       attrToProjector["x1"] = Plot._scaledAccessor(this.x());
-      attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
+      attrToProjector["x2"] = this.x2() == null ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.x2());
       attrToProjector["y1"] = Plot._scaledAccessor(this.y());
-      attrToProjector["y2"] = Plot._scaledAccessor(this.y2());
+      attrToProjector["y2"] = this.y2() == null ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.y2());
       return attrToProjector;
     }
   }
