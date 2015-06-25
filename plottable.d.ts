@@ -1311,7 +1311,6 @@ declare module Plottable {
     module Drawers {
         class Segment extends Drawer {
             constructor(dataset: Dataset);
-            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         }
     }
 }
@@ -3084,11 +3083,18 @@ declare module Plottable {
              */
             constructor();
             protected _createDrawer(dataset: Dataset): Drawers.Segment;
-            protected _generateAttrToProjector(): {
-                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
-            };
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * Gets the AccessorScaleBinding for X2
+             */
             x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot
+             */
             x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
             /**
              * Gets the AccessorScaleBinding for Y2.
@@ -3099,7 +3105,7 @@ declare module Plottable {
              * If a Scale has been set for Y, it will also be used to scale Y2.
              *
              * @param {number|Accessor<number>|Y|Accessor<Y>} y2
-             * @returns {Plots.Rectangle} The calling Rectangle Plot.
+             * @returns {Plots.Segment} The calling Segment Plot.
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;

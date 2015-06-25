@@ -24,7 +24,17 @@ export module Plots {
       return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
+    /**
+     * Gets the AccessorScaleBinding for X2
+     */
     public x2(): AccessorScaleBinding<X, number>;
+    /**
+     * Sets X2 to a constant number or the result of an Accessor.
+     * If a Scale has been set for X, it will also be used to scale X2.
+     * 
+     * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+     * @returns {Plots.Segment} The calling Segment Plot
+     */
     public x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
     public x2(x2?: number | Accessor<number> | X | Accessor<X>): any {
     if (x2 == null) {
@@ -47,7 +57,7 @@ export module Plots {
      * If a Scale has been set for Y, it will also be used to scale Y2.
      *
      * @param {number|Accessor<number>|Y|Accessor<Y>} y2
-     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     * @returns {Plots.Segment} The calling Segment Plot.
      */
     public y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
     public y2(y2?: number | Accessor<number> | Y | Accessor<Y>): any {

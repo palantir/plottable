@@ -2807,9 +2807,6 @@ var Plottable;
                 _super.call(this, dataset);
                 this._svgElementName = "line";
             }
-            Segment.prototype._applyDefaultAttributes = function (selection) {
-                _super.prototype._applyDefaultAttributes.call(this, selection);
-            };
             return Segment;
         })(Plottable.Drawer);
         Drawers.Segment = Segment;
@@ -8316,12 +8313,8 @@ var Plottable;
             Segment.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Segment(dataset);
             };
-            Segment.prototype._generateAttrToProjector = function () {
-                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                return attrToProjector;
-            };
             Segment.prototype._generateDrawSteps = function () {
-                return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN) }];
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
             };
             Segment.prototype.x2 = function (x2) {
                 if (x2 == null) {
