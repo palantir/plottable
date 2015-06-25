@@ -6516,49 +6516,49 @@ var Plottable;
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
             this._lazyDomainChange = false;
-            this._lazyDomainingKnownDomainX = [null, null];
-            this._lazyDomainingKnownDomainY = [null, null];
+            this._lazyDomainChangeCachedDomainX = [null, null];
+            this._lazyDomainChangeCachedDomainY = [null, null];
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            var _lazyDomainingTimeoutReference = 0;
-            var _lazyDomainingDeltaX = 0;
-            var _lazyDomainingDeltaY = 0;
-            var _lazyDomainingScaleX = 1;
-            var _lazyDomainingScaleY = 1;
-            var _lazyDomainingSeenDomainX = null;
-            var _lazyDomainingSeenDomainY = null;
-            var tempScrollTimeout = 500;
-            this._fastPanZoomOnXCallback = function (scale) {
+            var _timeoutReference = 0;
+            var _deltaX = 0;
+            var _deltaY = 0;
+            var _scalingX = 1;
+            var _scalingY = 1;
+            var _lastSeenDomainX = null;
+            var _lastSeenDomainY = null;
+            var _lazyDomainChangeTimeout = 500;
+            this._lazyDomainChangeCallbackX = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
-                _lazyDomainingSeenDomainX = scale.domain();
-                _lazyDomainingScaleX = (scale.scale(_this._lazyDomainingKnownDomainX[1]) - scale.scale(_this._lazyDomainingKnownDomainX[0])) / (scale.scale(_lazyDomainingSeenDomainX[1]) - scale.scale(_lazyDomainingSeenDomainX[0]));
-                _lazyDomainingDeltaX = scale.scale(_this._lazyDomainingKnownDomainX[0]) - scale.scale(_lazyDomainingSeenDomainX[0]);
+                _lastSeenDomainX = scale.domain();
+                _scalingX = (scale.scale(_this._lazyDomainChangeCachedDomainX[1]) - scale.scale(_this._lazyDomainChangeCachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
+                _deltaX = scale.scale(_this._lazyDomainChangeCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
                 _triggerLazyDomainChange();
             };
-            this._fastPanZoomOnYCallback = function (scale) {
+            this._lazyDomainChangeCallbackY = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
-                _lazyDomainingSeenDomainY = scale.domain();
-                _lazyDomainingScaleY = (scale.scale(_this._lazyDomainingKnownDomainY[1]) - scale.scale(_this._lazyDomainingKnownDomainY[0])) / (scale.scale(_lazyDomainingSeenDomainY[1]) - scale.scale(_lazyDomainingSeenDomainY[0]));
-                _lazyDomainingDeltaY = scale.scale(_this._lazyDomainingKnownDomainY[0]) - scale.scale(_lazyDomainingSeenDomainY[0]) * _lazyDomainingScaleY;
+                _lastSeenDomainY = scale.domain();
+                _scalingY = (scale.scale(_this._lazyDomainChangeCachedDomainY[1]) - scale.scale(_this._lazyDomainChangeCachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
+                _deltaY = scale.scale(_this._lazyDomainChangeCachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY;
                 _triggerLazyDomainChange();
             };
             var _triggerLazyDomainChange = function () {
                 if (_this._renderArea != null) {
-                    _this._renderArea.attr("transform", "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" + "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
-                    clearTimeout(_lazyDomainingTimeoutReference);
-                    _lazyDomainingTimeoutReference = setTimeout(function () {
-                        _this._lazyDomainingKnownDomainX = _lazyDomainingSeenDomainX;
-                        _this._lazyDomainingKnownDomainY = _lazyDomainingSeenDomainY;
-                        _lazyDomainingDeltaX = 0;
-                        _lazyDomainingDeltaY = 0;
+                    _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
+                    clearTimeout(_timeoutReference);
+                    _timeoutReference = setTimeout(function () {
+                        _this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
+                        _this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+                        _deltaX = 0;
+                        _deltaY = 0;
                         _this.render();
                         _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-                    }, tempScrollTimeout);
+                    }, _lazyDomainChangeTimeout);
                 }
             };
         }
@@ -6568,23 +6568,23 @@ var Plottable;
             }
             if (lazyDomainChange) {
                 if (this.x() && this.x().scale) {
-                    this._lazyDomainingKnownDomainX = this.x().scale.domain();
-                    this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
+                    this._lazyDomainChangeCachedDomainX = this.x().scale.domain();
+                    this.x().scale.onUpdate(this._lazyDomainChangeCallbackX);
                     this.x().scale.offUpdate(this._renderCallback);
                 }
                 if (this.y() && this.y().scale) {
-                    this._lazyDomainingKnownDomainY = this.y().scale.domain();
-                    this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
+                    this._lazyDomainChangeCachedDomainY = this.y().scale.domain();
+                    this.y().scale.onUpdate(this._lazyDomainChangeCallbackY);
                     this.y().scale.offUpdate(this._renderCallback);
                 }
             }
             else {
                 if (this.x() && this.x().scale) {
-                    this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
+                    this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
                     this.x().scale.onUpdate(this._renderCallback);
                 }
                 if (this.y() && this.y().scale) {
-                    this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
+                    this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
                     this.y().scale.onUpdate(this._renderCallback);
                 }
             }
@@ -6640,7 +6640,7 @@ var Plottable;
             _super.prototype._uninstallScaleForKey.call(this, scale, key);
             var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
             scale.offUpdate(adjustCallback);
-            var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback : this._fastPanZoomOnYCallback;
+            var fastPanZoomCallback = key === XYPlot._X_KEY ? this._lazyDomainChangeCallbackX : this._lazyDomainChangeCallbackY;
             scale.offUpdate(fastPanZoomCallback);
         };
         XYPlot.prototype._installScaleForKey = function (scale, key) {
@@ -6650,12 +6650,12 @@ var Plottable;
             if (this._lazyDomainChange) {
                 scale.offUpdate(this._renderCallback);
                 if (key === XYPlot._X_KEY) {
-                    scale.onUpdate(this._fastPanZoomOnXCallback);
-                    this._lazyDomainingKnownDomainX = scale.domain();
+                    scale.onUpdate(this._lazyDomainChangeCallbackX);
+                    this._lazyDomainChangeCachedDomainX = scale.domain();
                 }
                 else {
-                    scale.onUpdate(this._fastPanZoomOnYCallback);
-                    this._lazyDomainingKnownDomainY = scale.domain();
+                    scale.onUpdate(this._lazyDomainChangeCallbackY);
+                    this._lazyDomainChangeCachedDomainY = scale.domain();
                 }
             }
         };
@@ -6663,11 +6663,11 @@ var Plottable;
             _super.prototype.destroy.call(this);
             if (this.x().scale) {
                 this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-                this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
+                this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
             }
             if (this.y().scale) {
                 this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-                this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
+                this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
             }
             return this;
         };

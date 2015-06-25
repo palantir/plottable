@@ -10,11 +10,11 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
   private _lazyDomainChange = false;
-  private _fastPanZoomOnXCallback: ScaleCallback<Scale<X, any>>;
-  private _fastPanZoomOnYCallback: ScaleCallback<Scale<Y, any>>;
+  private _lazyDomainChangeCallbackX: ScaleCallback<Scale<X, any>>;
+  private _lazyDomainChangeCallbackY: ScaleCallback<Scale<Y, any>>;
 
-  private _lazyDomainingKnownDomainX: X[] = [null, null];
-  private _lazyDomainingKnownDomainY: Y[] = [null, null];
+  private _lazyDomainChangeCachedDomainX: X[] = [null, null];
+  private _lazyDomainChangeCachedDomainY: Y[] = [null, null];
 
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
@@ -30,38 +30,38 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    var _lazyDomainingTimeoutReference = 0;
-    var _lazyDomainingDeltaX = 0;
-    var _lazyDomainingDeltaY = 0;
-    var _lazyDomainingScaleX = 1;
-    var _lazyDomainingScaleY = 1;
-    var _lazyDomainingSeenDomainX: X[] = null;
-    var _lazyDomainingSeenDomainY: Y[] = null;
-    var tempScrollTimeout = 500;
+    var _timeoutReference = 0;
+    var _deltaX = 0;
+    var _deltaY = 0;
+    var _scalingX = 1;
+    var _scalingY = 1;
+    var _lastSeenDomainX: X[] = null;
+    var _lastSeenDomainY: Y[] = null;
+    var _lazyDomainChangeTimeout = 500;
 
-    this._fastPanZoomOnXCallback = (scale) => {
+    this._lazyDomainChangeCallbackX = (scale) => {
       if (!this._isAnchored) {
         return;
       }
 
-      _lazyDomainingSeenDomainX = scale.domain();
-      _lazyDomainingScaleX = (scale.scale(this._lazyDomainingKnownDomainX[1]) - scale.scale(this._lazyDomainingKnownDomainX[0])) /
-        (scale.scale(_lazyDomainingSeenDomainX[1]) - scale.scale(_lazyDomainingSeenDomainX[0]));
-      _lazyDomainingDeltaX = scale.scale(this._lazyDomainingKnownDomainX[0]) - scale.scale(_lazyDomainingSeenDomainX[0]);
+      _lastSeenDomainX = scale.domain();
+      _scalingX = (scale.scale(this._lazyDomainChangeCachedDomainX[1]) - scale.scale(this._lazyDomainChangeCachedDomainX[0])) /
+        (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
+      _deltaX = scale.scale(this._lazyDomainChangeCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
 
       _triggerLazyDomainChange();
     };
 
-    this._fastPanZoomOnYCallback = (scale) => {
+    this._lazyDomainChangeCallbackY = (scale) => {
       if (!this._isAnchored) {
         return;
       }
 
-      _lazyDomainingSeenDomainY = scale.domain();
-      _lazyDomainingScaleY = (scale.scale(this._lazyDomainingKnownDomainY[1]) - scale.scale(this._lazyDomainingKnownDomainY[0])) /
-        (scale.scale(_lazyDomainingSeenDomainY[1]) - scale.scale(_lazyDomainingSeenDomainY[0]));
-      _lazyDomainingDeltaY = scale.scale(this._lazyDomainingKnownDomainY[0]) -
-        scale.scale(_lazyDomainingSeenDomainY[0]) * _lazyDomainingScaleY;
+      _lastSeenDomainY = scale.domain();
+      _scalingY = (scale.scale(this._lazyDomainChangeCachedDomainY[1]) - scale.scale(this._lazyDomainChangeCachedDomainY[0])) /
+        (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
+      _deltaY = scale.scale(this._lazyDomainChangeCachedDomainY[0]) -
+        scale.scale(_lastSeenDomainY[0]) * _scalingY;
 
       _triggerLazyDomainChange();
     };
@@ -69,17 +69,17 @@ export class XYPlot<X, Y> extends Plot {
     var _triggerLazyDomainChange = () => {
       if (this._renderArea != null) {
         this._renderArea.attr("transform",
-          "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" +
-          "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
-        clearTimeout(_lazyDomainingTimeoutReference);
-        _lazyDomainingTimeoutReference = setTimeout(() => {
-          this._lazyDomainingKnownDomainX = _lazyDomainingSeenDomainX;
-          this._lazyDomainingKnownDomainY = _lazyDomainingSeenDomainY;
-          _lazyDomainingDeltaX = 0;
-          _lazyDomainingDeltaY = 0;
+          "translate(" + _deltaX + ", " + _deltaY + ")" +
+          "scale(" + _scalingX + ", " + _scalingY + ")");
+        clearTimeout(_timeoutReference);
+        _timeoutReference = setTimeout(() => {
+          this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
+          this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+          _deltaX = 0;
+          _deltaY = 0;
           this.render();
           this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-        }, tempScrollTimeout);
+        }, _lazyDomainChangeTimeout);
       }
     };
   }
@@ -93,22 +93,22 @@ export class XYPlot<X, Y> extends Plot {
 
     if (lazyDomainChange) {
       if (this.x() && this.x().scale) {
-        this._lazyDomainingKnownDomainX = this.x().scale.domain();
-        this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
+        this._lazyDomainChangeCachedDomainX = this.x().scale.domain();
+        this.x().scale.onUpdate(this._lazyDomainChangeCallbackX);
         this.x().scale.offUpdate(this._renderCallback);
       }
       if (this.y() && this.y().scale) {
-        this._lazyDomainingKnownDomainY = this.y().scale.domain();
-        this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
+        this._lazyDomainChangeCachedDomainY = this.y().scale.domain();
+        this.y().scale.onUpdate(this._lazyDomainChangeCallbackY);
         this.y().scale.offUpdate(this._renderCallback);
       }
     } else {
       if (this.x() && this.x().scale) {
-        this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
+        this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
         this.x().scale.onUpdate(this._renderCallback);
       }
       if (this.y() && this.y().scale) {
-        this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
+        this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
         this.y().scale.onUpdate(this._renderCallback);
       }
     }
@@ -214,8 +214,8 @@ export class XYPlot<X, Y> extends Plot {
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
 
-    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._fastPanZoomOnXCallback
-                                                    : this._fastPanZoomOnYCallback;
+    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._lazyDomainChangeCallbackX
+                                                    : this._lazyDomainChangeCallbackY;
     scale.offUpdate(fastPanZoomCallback);
   }
 
@@ -228,11 +228,11 @@ export class XYPlot<X, Y> extends Plot {
     if (this._lazyDomainChange) {
       scale.offUpdate(this._renderCallback);
       if (key === XYPlot._X_KEY) {
-        scale.onUpdate(this._fastPanZoomOnXCallback);
-        this._lazyDomainingKnownDomainX = scale.domain();
+        scale.onUpdate(this._lazyDomainChangeCallbackX);
+        this._lazyDomainChangeCachedDomainX = scale.domain();
       } else {
-        scale.onUpdate(this._fastPanZoomOnYCallback);
-        this._lazyDomainingKnownDomainY = scale.domain();
+        scale.onUpdate(this._lazyDomainChangeCallbackY);
+        this._lazyDomainChangeCachedDomainY = scale.domain();
       }
     }
   }
@@ -241,11 +241,11 @@ export class XYPlot<X, Y> extends Plot {
     super.destroy();
     if (this.x().scale) {
       this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-      this.x().scale.offUpdate(this._fastPanZoomOnXCallback);
+      this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
     }
     if (this.y().scale) {
       this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-      this.y().scale.offUpdate(this._fastPanZoomOnYCallback);
+      this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
     }
     return this;
   }
