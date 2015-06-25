@@ -2541,8 +2541,8 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
-        performanceEnabled(): boolean;
-        performanceEnabled(performanceEnabled: boolean): XYPlot<X, Y>;
+        lazyDomainChange(): boolean;
+        lazyDomainChange(lazyDomainChange: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
          */

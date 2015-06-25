@@ -6515,33 +6515,33 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            this._performanceEnabled = false;
-            this._fastPanZoomKnownDomainX = [null, null];
-            this._fastPanZoomKnownDomainY = [null, null];
+            this._lazyDomainChange = false;
+            this._lazyDomainingKnownDomainX = [null, null];
+            this._lazyDomainingKnownDomainY = [null, null];
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            var _fastPanZoomTimeoutReferenceX = 0;
-            var _fastPanZoomTimeoutReferenceY = 0;
-            var _fastPanZoomDeltaX = 0;
-            var _fastPanZoomDeltaY = 0;
-            var _fastPanZoomScaleX = 1;
-            var _fastPanZoomScaleY = 1;
+            var _lazyDomainingTimeoutReferenceX = 0;
+            var _lazyDomainingTimeoutReferenceY = 0;
+            var _lazyDomainingDeltaX = 0;
+            var _lazyDomainingDeltaY = 0;
+            var _lazyDomainingScaleX = 1;
+            var _lazyDomainingScaleY = 1;
             var tempScrollTimeout = 500;
             this._fastPanZoomOnXCallback = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
                 var domain = scale.domain();
-                _fastPanZoomScaleX = (scale.scale(_this._fastPanZoomKnownDomainX[1]) - scale.scale(_this._fastPanZoomKnownDomainX[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-                _fastPanZoomDeltaX = scale.scale(_this._fastPanZoomKnownDomainX[0]) - scale.scale(domain[0]);
+                _lazyDomainingScaleX = (scale.scale(_this._lazyDomainingKnownDomainX[1]) - scale.scale(_this._lazyDomainingKnownDomainX[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
+                _lazyDomainingDeltaX = scale.scale(_this._lazyDomainingKnownDomainX[0]) - scale.scale(domain[0]);
                 if (_this._renderArea != null) {
-                    _this._renderArea.attr("transform", "translate(" + _fastPanZoomDeltaX + ", " + _fastPanZoomDeltaY + ")" + "scale(" + _fastPanZoomScaleX + ", " + _fastPanZoomScaleY + ")");
-                    clearTimeout(_fastPanZoomTimeoutReferenceX);
-                    _fastPanZoomTimeoutReferenceX = setTimeout(function () {
-                        _this._fastPanZoomKnownDomainX = domain;
-                        _fastPanZoomDeltaX = 0;
-                        _fastPanZoomDeltaY = 0;
+                    _this._renderArea.attr("transform", "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" + "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
+                    clearTimeout(_lazyDomainingTimeoutReferenceX);
+                    _lazyDomainingTimeoutReferenceX = setTimeout(function () {
+                        _this._lazyDomainingKnownDomainX = domain;
+                        _lazyDomainingDeltaX = 0;
+                        _lazyDomainingDeltaY = 0;
                         _this.render();
                         _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                     }, tempScrollTimeout);
@@ -6552,33 +6552,33 @@ var Plottable;
                     return;
                 }
                 var domain = scale.domain();
-                _fastPanZoomScaleY = (scale.scale(_this._fastPanZoomKnownDomainY[1]) - scale.scale(_this._fastPanZoomKnownDomainY[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-                _fastPanZoomDeltaY = scale.scale(_this._fastPanZoomKnownDomainY[0]) - scale.scale(domain[0]) * _fastPanZoomScaleY;
+                _lazyDomainingScaleY = (scale.scale(_this._lazyDomainingKnownDomainY[1]) - scale.scale(_this._lazyDomainingKnownDomainY[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
+                _lazyDomainingDeltaY = scale.scale(_this._lazyDomainingKnownDomainY[0]) - scale.scale(domain[0]) * _lazyDomainingScaleY;
                 if (!_this._renderArea != null) {
-                    _this._renderArea.attr("transform", "translate(" + _fastPanZoomDeltaX + ", " + _fastPanZoomDeltaY + ")" + "scale(" + _fastPanZoomScaleX + ", " + _fastPanZoomScaleY + ")");
-                    clearTimeout(_fastPanZoomTimeoutReferenceY);
-                    _fastPanZoomTimeoutReferenceY = setTimeout(function () {
-                        _this._fastPanZoomKnownDomainY = domain;
-                        _fastPanZoomDeltaX = 0;
-                        _fastPanZoomDeltaY = 0;
+                    _this._renderArea.attr("transform", "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" + "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
+                    clearTimeout(_lazyDomainingTimeoutReferenceY);
+                    _lazyDomainingTimeoutReferenceY = setTimeout(function () {
+                        _this._lazyDomainingKnownDomainY = domain;
+                        _lazyDomainingDeltaX = 0;
+                        _lazyDomainingDeltaY = 0;
                         _this.render();
                         _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                     }, tempScrollTimeout);
                 }
             };
         }
-        XYPlot.prototype.performanceEnabled = function (performanceEnabled) {
-            if (performanceEnabled == null) {
-                return this._performanceEnabled;
+        XYPlot.prototype.lazyDomainChange = function (lazyDomainChange) {
+            if (lazyDomainChange == null) {
+                return this._lazyDomainChange;
             }
-            if (performanceEnabled) {
+            if (lazyDomainChange) {
                 if (this.x() && this.x().scale) {
-                    this._fastPanZoomKnownDomainX = this.x().scale.domain();
+                    this._lazyDomainingKnownDomainX = this.x().scale.domain();
                     this.x().scale.onUpdate(this._fastPanZoomOnXCallback);
                     this.x().scale.offUpdate(this._renderCallback);
                 }
                 if (this.y() && this.y().scale) {
-                    this._fastPanZoomKnownDomainY = this.y().scale.domain();
+                    this._lazyDomainingKnownDomainY = this.y().scale.domain();
                     this.y().scale.onUpdate(this._fastPanZoomOnYCallback);
                     this.y().scale.offUpdate(this._renderCallback);
                 }
@@ -6593,7 +6593,7 @@ var Plottable;
                     this.y().scale.onUpdate(this._renderCallback);
                 }
             }
-            this._performanceEnabled = performanceEnabled;
+            this._lazyDomainChange = lazyDomainChange;
             return this;
         };
         XYPlot.prototype.x = function (x, xScale) {
@@ -6652,15 +6652,15 @@ var Plottable;
             _super.prototype._installScaleForKey.call(this, scale, key);
             var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback : this._adjustXDomainOnChangeFromYCallback;
             scale.onUpdate(adjustCallback);
-            if (this._performanceEnabled) {
+            if (this._lazyDomainChange) {
                 scale.offUpdate(this._renderCallback);
                 if (key === XYPlot._X_KEY) {
                     scale.onUpdate(this._fastPanZoomOnXCallback);
-                    this._fastPanZoomKnownDomainX = scale.domain();
+                    this._lazyDomainingKnownDomainX = scale.domain();
                 }
                 else {
                     scale.onUpdate(this._fastPanZoomOnYCallback);
-                    this._fastPanZoomKnownDomainY = scale.domain();
+                    this._lazyDomainingKnownDomainY = scale.domain();
                 }
             }
         };
