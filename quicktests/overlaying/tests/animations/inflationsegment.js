@@ -70,6 +70,8 @@ function run(svg, data, Plottable) {
       .x2(function(d) { return d.x2; })
       .addDataset(new Plottable.Dataset(segment_data))
       .attr("stroke", "#ff0000")
+      .attr("stroke-width", 4)
+      .attr("stroke-dasharray", 1)
       .animated(true);
     plot_array.push(segmentPlot);
   }
