@@ -158,8 +158,3 @@ svg.plottable {
   stroke: #CCC;
   stroke-width: 1px;
 }
-
-.plottable .segment-plot line {
-  stroke: #555;
-  stroke-width: 1px;
-}

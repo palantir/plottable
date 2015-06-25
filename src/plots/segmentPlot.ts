@@ -14,6 +14,8 @@ export module Plots {
     constructor() {
       super();
       this.addClass("segment-plot");
+      this.attr("stroke", new Scales.Color().range()[0]);
+      this.attr("stroke-width", "2px");
     }
 
     protected _createDrawer(dataset: Dataset) {

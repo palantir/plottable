@@ -8309,6 +8309,8 @@ var Plottable;
             function Segment() {
                 _super.call(this);
                 this.addClass("segment-plot");
+                this.attr("stroke", new Plottable.Scales.Color().range()[0]);
+                this.attr("stroke-width", "2px");
             }
             Segment.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Segment(dataset);
