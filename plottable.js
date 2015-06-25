@@ -6529,6 +6529,20 @@ var Plottable;
             var _lastSeenDomainX = null;
             var _lastSeenDomainY = null;
             var _lazyDomainChangeTimeout = 500;
+            var _triggerLazyDomainChange = function () {
+                if (_this._renderArea != null) {
+                    _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
+                    clearTimeout(_timeoutReference);
+                    _timeoutReference = setTimeout(function () {
+                        _this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
+                        _this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+                        _deltaX = 0;
+                        _deltaY = 0;
+                        _this.render();
+                        _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+                    }, _lazyDomainChangeTimeout);
+                }
+            };
             this._lazyDomainChangeCallbackX = function (scale) {
                 if (!_this._isAnchored) {
                     return;
@@ -6546,20 +6560,6 @@ var Plottable;
                 _scalingY = (scale.scale(_this._lazyDomainChangeCachedDomainY[1]) - scale.scale(_this._lazyDomainChangeCachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
                 _deltaY = scale.scale(_this._lazyDomainChangeCachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY;
                 _triggerLazyDomainChange();
-            };
-            var _triggerLazyDomainChange = function () {
-                if (_this._renderArea != null) {
-                    _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
-                    clearTimeout(_timeoutReference);
-                    _timeoutReference = setTimeout(function () {
-                        _this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
-                        _this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
-                        _deltaX = 0;
-                        _deltaY = 0;
-                        _this.render();
-                        _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-                    }, _lazyDomainChangeTimeout);
-                }
             };
         }
         XYPlot.prototype.lazyDomainChange = function (lazyDomainChange) {

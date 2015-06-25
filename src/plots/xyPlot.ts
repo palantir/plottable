@@ -39,6 +39,23 @@ export class XYPlot<X, Y> extends Plot {
     var _lastSeenDomainY: Y[] = null;
     var _lazyDomainChangeTimeout = 500;
 
+    var _triggerLazyDomainChange = () => {
+      if (this._renderArea != null) {
+        this._renderArea.attr("transform",
+          "translate(" + _deltaX + ", " + _deltaY + ")" +
+          "scale(" + _scalingX + ", " + _scalingY + ")");
+        clearTimeout(_timeoutReference);
+        _timeoutReference = setTimeout(() => {
+          this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
+          this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+          _deltaX = 0;
+          _deltaY = 0;
+          this.render();
+          this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+        }, _lazyDomainChangeTimeout);
+      }
+    };
+
     this._lazyDomainChangeCallbackX = (scale) => {
       if (!this._isAnchored) {
         return;
@@ -64,23 +81,6 @@ export class XYPlot<X, Y> extends Plot {
         scale.scale(_lastSeenDomainY[0]) * _scalingY;
 
       _triggerLazyDomainChange();
-    };
-
-    var _triggerLazyDomainChange = () => {
-      if (this._renderArea != null) {
-        this._renderArea.attr("transform",
-          "translate(" + _deltaX + ", " + _deltaY + ")" +
-          "scale(" + _scalingX + ", " + _scalingY + ")");
-        clearTimeout(_timeoutReference);
-        _timeoutReference = setTimeout(() => {
-          this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
-          this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
-          _deltaX = 0;
-          _deltaY = 0;
-          this.render();
-          this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-        }, _lazyDomainChangeTimeout);
-      }
     };
   }
 
