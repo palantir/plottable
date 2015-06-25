@@ -20,13 +20,8 @@ export module Plots {
       return new Drawers.Segment(dataset);
     }
 
-    protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
-      return attrToProjector;
-    }
-
     protected _generateDrawSteps(): Drawers.DrawStep[] {
-      return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator(Plots.Animator.MAIN)}];
+      return [{attrToProjector: this._generateAttrToProjector(), animator: new Animators.Null()}];
     }
 
     public x2(): AccessorScaleBinding<X, number>;
