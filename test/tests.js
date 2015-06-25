@@ -6935,7 +6935,6 @@ describe("Plots", function () {
             { x: 2, y: 2, x2: 3, y2: 5 },
             { x: 3, y: 3, x2: 5, y2: 2 }
         ];
-        var dataset;
         beforeEach(function () {
             svg = TestMethods.generateSVG(500, 500);
             xScale = new Plottable.Scales.Linear();

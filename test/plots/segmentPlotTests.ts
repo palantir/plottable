@@ -11,9 +11,8 @@ describe("Plots", () => {
 	var data = [
 	  { x: 1, y: 1, x2: 4, y2: 4 },
 	  { x: 2, y: 2, x2: 3, y2: 5 },
-	  { x: 3, y: 3, x2: 5, y2: 2 }	
+	  { x: 3, y: 3, x2: 5, y2: 2 }
 	];
-	var dataset: Plottable.Dataset;
 	beforeEach(() => {
 	  svg = TestMethods.generateSVG(500, 500);
 	  xScale = new Plottable.Scales.Linear();
@@ -44,7 +43,7 @@ describe("Plots", () => {
 	  renderArea.selectAll("line")[0].forEach((line) => {
 		var lineSelection = d3.select(line);
 		assert.strictEqual(lineSelection.attr("y1"), lineSelection.attr("y2"), "line is horizontal");
-	  });		
+	  });
 	  svg.remove();
 	});
   });

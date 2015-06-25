@@ -73,7 +73,7 @@ export module Plots {
       }
       var xBinding = this.x();
       var xScale = xBinding && xBinding.scale;
-  
+
       this._bindProperty(Segment._X2_KEY, x2, xScale);
       this.render();
       return this;
@@ -107,7 +107,7 @@ export module Plots {
         return super.y(<number | Accessor<number>>y);
       } else {
         return super.y(<Y | Accessor<Y>>y, yScale);
-      }     
+      }
     }
 
     /**
