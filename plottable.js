@@ -6521,44 +6521,39 @@ var Plottable;
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
-            var _lazyDomainingTimeoutReferenceX = 0;
-            var _lazyDomainingTimeoutReferenceY = 0;
+            var _lazyDomainingTimeoutReference = 0;
             var _lazyDomainingDeltaX = 0;
             var _lazyDomainingDeltaY = 0;
             var _lazyDomainingScaleX = 1;
             var _lazyDomainingScaleY = 1;
+            var _lazyDomainingSeenDomainX = null;
+            var _lazyDomainingSeenDomainY = null;
             var tempScrollTimeout = 500;
             this._fastPanZoomOnXCallback = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
-                var domain = scale.domain();
-                _lazyDomainingScaleX = (scale.scale(_this._lazyDomainingKnownDomainX[1]) - scale.scale(_this._lazyDomainingKnownDomainX[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-                _lazyDomainingDeltaX = scale.scale(_this._lazyDomainingKnownDomainX[0]) - scale.scale(domain[0]);
-                if (_this._renderArea != null) {
-                    _this._renderArea.attr("transform", "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" + "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
-                    clearTimeout(_lazyDomainingTimeoutReferenceX);
-                    _lazyDomainingTimeoutReferenceX = setTimeout(function () {
-                        _this._lazyDomainingKnownDomainX = domain;
-                        _lazyDomainingDeltaX = 0;
-                        _lazyDomainingDeltaY = 0;
-                        _this.render();
-                        _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-                    }, tempScrollTimeout);
-                }
+                _lazyDomainingSeenDomainX = scale.domain();
+                _lazyDomainingScaleX = (scale.scale(_this._lazyDomainingKnownDomainX[1]) - scale.scale(_this._lazyDomainingKnownDomainX[0])) / (scale.scale(_lazyDomainingSeenDomainX[1]) - scale.scale(_lazyDomainingSeenDomainX[0]));
+                _lazyDomainingDeltaX = scale.scale(_this._lazyDomainingKnownDomainX[0]) - scale.scale(_lazyDomainingSeenDomainX[0]);
+                _triggerLazyDomainChange();
             };
             this._fastPanZoomOnYCallback = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
-                var domain = scale.domain();
-                _lazyDomainingScaleY = (scale.scale(_this._lazyDomainingKnownDomainY[1]) - scale.scale(_this._lazyDomainingKnownDomainY[0])) / (scale.scale(domain[1]) - scale.scale(domain[0]));
-                _lazyDomainingDeltaY = scale.scale(_this._lazyDomainingKnownDomainY[0]) - scale.scale(domain[0]) * _lazyDomainingScaleY;
-                if (!_this._renderArea != null) {
+                _lazyDomainingSeenDomainY = scale.domain();
+                _lazyDomainingScaleY = (scale.scale(_this._lazyDomainingKnownDomainY[1]) - scale.scale(_this._lazyDomainingKnownDomainY[0])) / (scale.scale(_lazyDomainingSeenDomainY[1]) - scale.scale(_lazyDomainingSeenDomainY[0]));
+                _lazyDomainingDeltaY = scale.scale(_this._lazyDomainingKnownDomainY[0]) - scale.scale(_lazyDomainingSeenDomainY[0]) * _lazyDomainingScaleY;
+                _triggerLazyDomainChange();
+            };
+            var _triggerLazyDomainChange = function () {
+                if (_this._renderArea != null) {
                     _this._renderArea.attr("transform", "translate(" + _lazyDomainingDeltaX + ", " + _lazyDomainingDeltaY + ")" + "scale(" + _lazyDomainingScaleX + ", " + _lazyDomainingScaleY + ")");
-                    clearTimeout(_lazyDomainingTimeoutReferenceY);
-                    _lazyDomainingTimeoutReferenceY = setTimeout(function () {
-                        _this._lazyDomainingKnownDomainY = domain;
+                    clearTimeout(_lazyDomainingTimeoutReference);
+                    _lazyDomainingTimeoutReference = setTimeout(function () {
+                        _this._lazyDomainingKnownDomainX = _lazyDomainingSeenDomainX;
+                        _this._lazyDomainingKnownDomainY = _lazyDomainingSeenDomainY;
                         _lazyDomainingDeltaX = 0;
                         _lazyDomainingDeltaY = 0;
                         _this.render();
