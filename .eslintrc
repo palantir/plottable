@@ -18,7 +18,7 @@
     "camelcase": 0,
     "comma-spacing": 0,
     "key-spacing": 0,
-    "no-use-before-define": 0,
+    "no-use-before-define": [2, "nofunc"],
     "strict": 0,
     "no-underscore-dangle": 0
   }
