@@ -1,4 +1,5 @@
 /*jshint strict:false */
+/*eslint strict: 0*/
 
 var require;
 
