@@ -40,20 +40,22 @@ export class XYPlot<X, Y> extends Plot {
     var _lazyDomainChangeTimeout = 500;
 
     var _triggerLazyDomainChange = () => {
-      if (this._renderArea != null) {
-        this._renderArea.attr("transform",
-          "translate(" + _deltaX + ", " + _deltaY + ")" +
-          "scale(" + _scalingX + ", " + _scalingY + ")");
-        clearTimeout(_timeoutReference);
-        _timeoutReference = setTimeout(() => {
-          this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
-          this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
-          _deltaX = 0;
-          _deltaY = 0;
-          this.render();
-          this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-        }, _lazyDomainChangeTimeout);
+      if (this._renderArea == null) {
+        return;
       }
+
+      this._renderArea.attr("transform",
+        "translate(" + _deltaX + ", " + _deltaY + ")" +
+        "scale(" + _scalingX + ", " + _scalingY + ")");
+      clearTimeout(_timeoutReference);
+      _timeoutReference = setTimeout(() => {
+        this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
+        this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+        _deltaX = 0;
+        _deltaY = 0;
+        this.render();
+        this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+      }, _lazyDomainChangeTimeout);
     };
 
     this._lazyDomainChangeCallbackX = (scale) => {
@@ -82,6 +84,17 @@ export class XYPlot<X, Y> extends Plot {
 
       _triggerLazyDomainChange();
     };
+
+    this._renderCallback = (scale) => {
+      if (this.lazyDomainChange() && this.x() && this.x().scale === scale) {
+        this._lazyDomainChangeCallbackX(scale);
+      } else if (this.lazyDomainChange() && this.y() && this.y().scale === scale) {
+        this._lazyDomainChangeCallbackY(scale);
+      } else {
+        this.render();
+      }
+    };
+
   }
 
   /**
@@ -107,22 +120,9 @@ export class XYPlot<X, Y> extends Plot {
     if (lazyDomainChange) {
       if (this.x() && this.x().scale) {
         this._lazyDomainChangeCachedDomainX = this.x().scale.domain();
-        this.x().scale.onUpdate(this._lazyDomainChangeCallbackX);
-        this.x().scale.offUpdate(this._renderCallback);
       }
       if (this.y() && this.y().scale) {
         this._lazyDomainChangeCachedDomainY = this.y().scale.domain();
-        this.y().scale.onUpdate(this._lazyDomainChangeCallbackY);
-        this.y().scale.offUpdate(this._renderCallback);
-      }
-    } else {
-      if (this.x() && this.x().scale) {
-        this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
-        this.x().scale.onUpdate(this._renderCallback);
-      }
-      if (this.y() && this.y().scale) {
-        this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
-        this.y().scale.onUpdate(this._renderCallback);
       }
     }
 
@@ -226,10 +226,6 @@ export class XYPlot<X, Y> extends Plot {
     var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
-
-    var fastPanZoomCallback = key === XYPlot._X_KEY ? this._lazyDomainChangeCallbackX
-                                                    : this._lazyDomainChangeCallbackY;
-    scale.offUpdate(fastPanZoomCallback);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
@@ -237,28 +233,15 @@ export class XYPlot<X, Y> extends Plot {
     var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
-
-    if (this._lazyDomainChange) {
-      scale.offUpdate(this._renderCallback);
-      if (key === XYPlot._X_KEY) {
-        scale.onUpdate(this._lazyDomainChangeCallbackX);
-        this._lazyDomainChangeCachedDomainX = scale.domain();
-      } else {
-        scale.onUpdate(this._lazyDomainChangeCallbackY);
-        this._lazyDomainChangeCachedDomainY = scale.domain();
-      }
-    }
   }
 
   public destroy() {
     super.destroy();
     if (this.x().scale) {
       this.x().scale.offUpdate(this._adjustYDomainOnChangeFromXCallback);
-      this.x().scale.offUpdate(this._lazyDomainChangeCallbackX);
     }
     if (this.y().scale) {
       this.y().scale.offUpdate(this._adjustXDomainOnChangeFromYCallback);
-      this.y().scale.offUpdate(this._lazyDomainChangeCallbackY);
     }
     return this;
   }
