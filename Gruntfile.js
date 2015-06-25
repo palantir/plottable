@@ -1,3 +1,5 @@
+/*eslint-env node */
+
 module.exports = function(grunt) {
   "use strict";
 
@@ -385,7 +387,7 @@ module.exports = function(grunt) {
   var updateQuickTestsJSON = function() {
     var qtJSON = [];
     var rawtests = grunt.file.expand("quicktests/overlaying/tests/**/*.js");
-    rawtests.forEach(function(value, index, array){
+    rawtests.forEach(function(value){
       qtJSON.push({path: value});
     });
     qtJSON = JSON.stringify(qtJSON);
