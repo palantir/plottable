@@ -6529,8 +6529,6 @@ var Plottable;
             var _lastSeenDomainX = null;
             var _lastSeenDomainY = null;
             var _lazyDomainChangeTimeout = 500;
-            var _lazyDomainChangeCallbackX;
-            var _lazyDomainChangeCallbackY;
             var _triggerLazyDomainChange = function () {
                 if (_this._renderArea == null) {
                     return;
@@ -6546,7 +6544,7 @@ var Plottable;
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                 }, _lazyDomainChangeTimeout);
             };
-            _lazyDomainChangeCallbackX = function (scale) {
+            var _lazyDomainChangeCallbackX = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
@@ -6555,7 +6553,7 @@ var Plottable;
                 _deltaX = scale.scale(_this._lazyDomainChangeCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
                 _triggerLazyDomainChange();
             };
-            _lazyDomainChangeCallbackY = function (scale) {
+            var _lazyDomainChangeCallbackY = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
