@@ -10,9 +10,6 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
   private _lazyDomainChange = false;
-  private _lazyDomainChangeCallbackX: ScaleCallback<Scale<X, any>>;
-  private _lazyDomainChangeCallbackY: ScaleCallback<Scale<Y, any>>;
-
   private _lazyDomainChangeCachedDomainX: X[] = [null, null];
   private _lazyDomainChangeCachedDomainY: Y[] = [null, null];
 
@@ -38,6 +35,8 @@ export class XYPlot<X, Y> extends Plot {
     var _lastSeenDomainX: X[] = null;
     var _lastSeenDomainY: Y[] = null;
     var _lazyDomainChangeTimeout = 500;
+    var _lazyDomainChangeCallbackX: ScaleCallback<Scale<X, any>>;
+    var _lazyDomainChangeCallbackY: ScaleCallback<Scale<Y, any>>;
 
     var _triggerLazyDomainChange = () => {
       if (this._renderArea == null) {
@@ -58,7 +57,7 @@ export class XYPlot<X, Y> extends Plot {
       }, _lazyDomainChangeTimeout);
     };
 
-    this._lazyDomainChangeCallbackX = (scale) => {
+    _lazyDomainChangeCallbackX = (scale) => {
       if (!this._isAnchored) {
         return;
       }
@@ -71,7 +70,7 @@ export class XYPlot<X, Y> extends Plot {
       _triggerLazyDomainChange();
     };
 
-    this._lazyDomainChangeCallbackY = (scale) => {
+    _lazyDomainChangeCallbackY = (scale) => {
       if (!this._isAnchored) {
         return;
       }
@@ -87,9 +86,9 @@ export class XYPlot<X, Y> extends Plot {
 
     this._renderCallback = (scale) => {
       if (this.lazyDomainChange() && this.x() && this.x().scale === scale) {
-        this._lazyDomainChangeCallbackX(scale);
+        _lazyDomainChangeCallbackX(scale);
       } else if (this.lazyDomainChange() && this.y() && this.y().scale === scale) {
-        this._lazyDomainChangeCallbackY(scale);
+        _lazyDomainChangeCallbackY(scale);
       } else {
         this.render();
       }

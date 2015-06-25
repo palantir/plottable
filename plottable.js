@@ -6529,6 +6529,8 @@ var Plottable;
             var _lastSeenDomainX = null;
             var _lastSeenDomainY = null;
             var _lazyDomainChangeTimeout = 500;
+            var _lazyDomainChangeCallbackX;
+            var _lazyDomainChangeCallbackY;
             var _triggerLazyDomainChange = function () {
                 if (_this._renderArea == null) {
                     return;
@@ -6544,7 +6546,7 @@ var Plottable;
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                 }, _lazyDomainChangeTimeout);
             };
-            this._lazyDomainChangeCallbackX = function (scale) {
+            _lazyDomainChangeCallbackX = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
@@ -6553,7 +6555,7 @@ var Plottable;
                 _deltaX = scale.scale(_this._lazyDomainChangeCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
                 _triggerLazyDomainChange();
             };
-            this._lazyDomainChangeCallbackY = function (scale) {
+            _lazyDomainChangeCallbackY = function (scale) {
                 if (!_this._isAnchored) {
                     return;
                 }
@@ -6564,10 +6566,10 @@ var Plottable;
             };
             this._renderCallback = function (scale) {
                 if (_this.lazyDomainChange() && _this.x() && _this.x().scale === scale) {
-                    _this._lazyDomainChangeCallbackX(scale);
+                    _lazyDomainChangeCallbackX(scale);
                 }
                 else if (_this.lazyDomainChange() && _this.y() && _this.y().scale === scale) {
-                    _this._lazyDomainChangeCallbackY(scale);
+                    _lazyDomainChangeCallbackY(scale);
                 }
                 else {
                     _this.render();
