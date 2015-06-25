@@ -8316,6 +8316,23 @@ var Plottable;
             Segment.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
             };
+            Segment.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                    var x2Binding = this.x2();
+                    var x2 = x2Binding && x2Binding.accessor;
+                    if (x2 != null) {
+                        this._bindProperty(Segment._X2_KEY, x2, xScale);
+                    }
+                }
+                return this;
+            };
             Segment.prototype.x2 = function (x2) {
                 if (x2 == null) {
                     return this._propertyBindings.get(Segment._X2_KEY);
@@ -8324,6 +8341,23 @@ var Plottable;
                 var xScale = xBinding && xBinding.scale;
                 this._bindProperty(Segment._X2_KEY, x2, xScale);
                 this.render();
+                return this;
+            };
+            Segment.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    var y2Binding = this.y2();
+                    var y2 = y2Binding && y2Binding.accessor;
+                    if (y2 != null) {
+                        this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                    }
+                }
                 return this;
             };
             Segment.prototype.y2 = function (y2) {
