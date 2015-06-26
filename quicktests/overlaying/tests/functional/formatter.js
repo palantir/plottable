@@ -54,8 +54,8 @@ function run(svg, data, Plottable) {
     yAxis.formatter(Plottable.Formatters.fixed(2));
   }
   function currency_frmt() {
-    xAxis.formatter(Plottable.Formatters.currency(2, '$', true));
-    yAxis.formatter(Plottable.Formatters.currency(2, '$', true));
+    xAxis.formatter(Plottable.Formatters.currency(2, "$", true));
+    yAxis.formatter(Plottable.Formatters.currency(2, "$", true));
   }
   function percentage_frmt() {
     xAxis.formatter(Plottable.Formatters.percentage(2));

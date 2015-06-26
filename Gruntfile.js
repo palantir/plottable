@@ -8,7 +8,7 @@ module.exports = function(grunt) {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
       outDir: "build/src/",
       options: {
-        target: 'es5',
+        target: "es5",
         noImplicitAny: true,
         sourceMap: false,
         declaration: true,
@@ -21,7 +21,7 @@ module.exports = function(grunt) {
       outDir: "build/test/",
       // watch: "test",
       options: {
-        target: 'es5',
+        target: "es5",
         sourceMap: false,
         noImplicitAny: true,
         declaration: false,
@@ -39,8 +39,8 @@ module.exports = function(grunt) {
 
   var bumpJSON = {
     options: {
-      files: ['package.json', 'bower.json'],
-      updateConfigs: ['pkg'],
+      files: ["package.json", "bower.json"],
+      updateConfigs: ["pkg"],
       commit: false,
       createTag: false,
       push: false,
@@ -48,10 +48,10 @@ module.exports = function(grunt) {
     }
   };
 
-  var FILES_TO_COMMIT = ['plottable.js',
-                         'plottable.min.js',
-                         'plottable.d.ts',
-                         'test/tests.js',
+  var FILES_TO_COMMIT = ["plottable.js",
+                         "plottable.min.js",
+                         "plottable.d.ts",
+                         "test/tests.js",
                          "plottable.css",
                          "plottable.zip",
                          "bower.json",
@@ -199,21 +199,21 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      files: ['Gruntfile.js', 'quicktests/**/*.js'],
+      files: ["Gruntfile.js", "quicktests/**/*.js"],
       options: {
-        jshintrc: '.jshintrc'
+        jshintrc: ".jshintrc"
       }
     },
     jscs: {
-      files: ['Gruntfile.js', 'quicktests/**/*.js'],
+      files: ["Gruntfile.js", "quicktests/**/*.js"],
       options: {
-        config: '.jscsrc'
+        config: ".jscsrc"
       }
     },
     eslint: {
-      target: ['Gruntfile.js', 'quicktests/**/*.js'],
+      target: ["Gruntfile.js", "quicktests/**/*.js"],
       options: {
-        configFile: '.eslintrc'
+        configFile: ".eslintrc"
       }
     },
     parallelize: {
@@ -239,7 +239,7 @@ module.exports = function(grunt) {
       }
     },
     blanket_mocha: {
-      all: ['test/coverage.html'],
+      all: ["test/coverage.html"],
       options: {
         threshold: 70
       }
@@ -279,20 +279,20 @@ module.exports = function(grunt) {
     compress: {
       main: {
         options: {
-          archive: 'plottable.zip'
+          archive: "plottable.zip"
         },
         files: [
-        {src: 'plottable.js'  , dest: '.'},
-        {src: 'plottable.min.js', dest: '.'},
-        {src: 'plottable.d.ts', dest: '.'},
-        {src: 'plottable.css' , dest: '.'},
-        {src: 'README.md'     , dest: '.'},
-        {src: 'LICENSE'       , dest: '.'}]
+        {src: "plottable.js"  , dest: "."},
+        {src: "plottable.min.js", dest: "."},
+        {src: "plottable.d.ts", dest: "."},
+        {src: "plottable.css" , dest: "."},
+        {src: "README.md"     , dest: "."},
+        {src: "LICENSE"       , dest: "."}]
       }
     },
     uglify: {
       main: {
-        files: {'plottable.min.js': ['plottable.js']}
+        files: {"plottable.min.js": ["plottable.js"]}
       }
     },
     shell: {
@@ -300,11 +300,11 @@ module.exports = function(grunt) {
         command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
       }
     },
-    'saucelabs-mocha': {
+    "saucelabs-mocha": {
       all: {
         options: {
-          urls: ['http://127.0.0.1:9999/test/tests.html'],
-          testname: 'Plottable Sauce Unit Tests',
+          urls: ["http://127.0.0.1:9999/test/tests.html"],
+          testname: "Plottable Sauce Unit Tests",
           browsers: browsers,
           build: process.env.TRAVIS_JOB_ID,
           "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
@@ -316,7 +316,7 @@ module.exports = function(grunt) {
   // project configuration
   grunt.initConfig(configJSON);
 
-  require('load-grunt-tasks')(grunt);
+  require("load-grunt-tasks")(grunt);
 
   // default task (this is what runs when a task isn't specified)
   grunt.registerTask("update_ts_files", updateTsFiles);
