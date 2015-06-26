@@ -166,75 +166,14 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
-        var extentIncreasing = zoomAmount > 1;
-
         this.xScales().forEach((xScale) => {
-          var constrainZoomAmount = 1;
-          var lowerBound = extentIncreasing ? constrainZoomAmount : 0;
-          var upperBound = extentIncreasing ? Infinity : constrainZoomAmount;
-          var iterations = 5;
-          var magnifyTransform = (rangeValue: number) => xScale.invert(translatedP.x - (translatedP.x - rangeValue) * constrainZoomAmount);
-          for (var i = 0; i < iterations; i++) {
-            var transformedDomain = xScale.range().map(magnifyTransform);
-            var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
-            if (extentIncreasing) {
-              var maxDomainExtent = this.maxDomainExtent(xScale);
-              if (maxDomainExtent == null) { return; }
-              if (transformedDomainExtent <= maxDomainExtent) {
-                lowerBound = constrainZoomAmount;
-                constrainZoomAmount = upperBound === Infinity ? constrainZoomAmount * 2 : (upperBound + constrainZoomAmount) / 2;
-              } else {
-                upperBound = constrainZoomAmount;
-                constrainZoomAmount = (lowerBound + constrainZoomAmount) / 2;
-              }
-            } else {
-              var minDomainExtent = this.minDomainExtent(xScale);
-              if (minDomainExtent == null) { return; }
-              if (transformedDomainExtent >= minDomainExtent) {
-                upperBound = constrainZoomAmount;
-                constrainZoomAmount = (lowerBound + constrainZoomAmount) / 2;
-              } else {
-                lowerBound = constrainZoomAmount;
-                constrainZoomAmount = (upperBound + constrainZoomAmount) / 2;
-              }
-            }
-          }
-          zoomAmount = (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainZoomAmount);
+          zoomAmount = this._constrainedZoomAmount(xScale, translatedP.x, zoomAmount);
         });
 
         this.yScales().forEach((yScale) => {
-          var constrainZoom = 1;
-          var lowerBound = extentIncreasing ? constrainZoom : 0;
-          var upperBound = extentIncreasing ? Infinity : constrainZoom;
-          var iterations = 5;
-          var magnifyTransform = (rangeValue: number) => yScale.invert(translatedP.y - (translatedP.y - rangeValue) * constrainZoom);
-          for (var i = 0; i < iterations; i++) {
-            var transformedDomain = yScale.range().map(magnifyTransform);
-            var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
-            if (extentIncreasing) {
-              var maxDomainExtent = this.maxDomainExtent(yScale);
-              if (maxDomainExtent == null) { return; }
-              if (transformedDomainExtent <= maxDomainExtent) {
-                lowerBound = constrainZoom;
-                constrainZoom = upperBound === Infinity ? constrainZoom * 2 : (upperBound + constrainZoom) / 2;
-              } else {
-                upperBound = constrainZoom;
-                constrainZoom = (lowerBound + constrainZoom) / 2;
-              }
-            } else {
-              var minDomainExtent = this.minDomainExtent(yScale);
-              if (minDomainExtent == null) { return; }
-              if (transformedDomainExtent >= minDomainExtent) {
-                upperBound = constrainZoom;
-                constrainZoom = (lowerBound + constrainZoom) / 2;
-              } else {
-                lowerBound = constrainZoom;
-                constrainZoom = (upperBound + constrainZoom) / 2;
-              }
-            }
-          }
-          zoomAmount = (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainZoom);
+          zoomAmount = this._constrainedZoomAmount(yScale, translatedP.y, zoomAmount);
         });
+
         this.xScales().forEach((xScale) => {
           this._magnifyScale(xScale, zoomAmount, translatedP.x);
         });
@@ -242,6 +181,34 @@ export module Interactions {
           this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
       }
+    }
+
+    private _constrainedZoomAmount(scale: QuantitativeScale<any>, centerValue: number, zoomAmount: number) {
+      var extentIncreasing = zoomAmount > 1;
+
+      var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
+      if (boundingDomainExtent == null) { return zoomAmount; }
+
+      var constrainedZoomAmount = 1;
+      var lowerBound = extentIncreasing ? constrainedZoomAmount : 0;
+      var upperBound = extentIncreasing ? Infinity : constrainedZoomAmount;
+      var iterations = 20;
+      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * constrainedZoomAmount);
+      for (var i = 0; i < iterations; i++) {
+        var transformedDomain = scale.range().map(magnifyTransform);
+        var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
+        if (transformedDomainExtent === boundingDomainExtent) { return constrainedZoomAmount; }
+
+        var transformedExtentIncreasing = transformedDomainExtent > boundingDomainExtent;
+        if (extentIncreasing === transformedDomainExtent < boundingDomainExtent) {
+          lowerBound = constrainedZoomAmount;
+          constrainedZoomAmount = upperBound === Infinity ? constrainedZoomAmount * 2 : (upperBound + constrainedZoomAmount) / 2;
+        } else {
+          upperBound = constrainedZoomAmount;
+          constrainedZoomAmount = (lowerBound + constrainedZoomAmount) / 2;
+        }
+      }
+      return (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainedZoomAmount);
     }
 
     private _setupDragInteraction() {
@@ -254,80 +221,19 @@ export module Interactions {
           return;
         }
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-        var positiveTranslateX = translateAmountX > 0;
+
         this.xScales().forEach((xScale) => {
-          if (xScale instanceof Scales.ModifiedLog) {
-            var constrainTranslate = positiveTranslateX ? 1 : -1;
-            var lowerBound = positiveTranslateX ? 0 : -Infinity;
-            var upperBound = positiveTranslateX ? Infinity : 0;
-            var iterations = 5;
-            for (var i = 0; i < iterations; i++) {
-              var translateTransform = (rangeValue: number) => xScale.invert(rangeValue + constrainTranslate);
-              var constrainedDomain = xScale.range().map(translateTransform);
-              var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
-              var minDomainExtent = this.minDomainExtent(xScale) || 0;
-              var maxDomainExtent = this.maxDomainExtent(xScale) || Infinity;
-              if (constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent) {
-                if (positiveTranslateX) {
-                  lowerBound = constrainTranslate;
-                  constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
-                } else {
-                  upperBound = constrainTranslate;
-                  constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
-                }
-              } else {
-                if (positiveTranslateX) {
-                  upperBound = constrainTranslate;
-                  constrainTranslate = (constrainTranslate + lowerBound) / 2;
-                } else {
-                  lowerBound = constrainTranslate;
-                  constrainTranslate = (constrainTranslate + upperBound) / 2;
-                }
-              }
-            }
-            translateAmountX = (positiveTranslateX ? Math.min : Math.max)(translateAmountX, constrainTranslate);
-          }
+          translateAmountX = this._constrainedPanAmount(xScale, translateAmountX, translateAmountX > 0);
         });
+
         this.xScales().forEach((xScale) => {
           this._translateScale(xScale, translateAmountX);
         });
 
         var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
 
-        var positiveTranslateY = endPoint.y > startPoint.y;
         this.yScales().forEach((yScale) => {
-          if (yScale instanceof Scales.ModifiedLog) {
-            var constrainTranslate = positiveTranslateY ? 1 : -1;
-            var lowerBound = positiveTranslateY ? 0 : -Infinity;
-            var upperBound = positiveTranslateY ? Infinity : 0;
-            var iterations = 5;
-            for (var i = 0; i < iterations; i++) {
-              var translateTransform = (rangeValue: number) => yScale.invert(rangeValue + constrainTranslate);
-              var constrainedDomain = yScale.range().map(translateTransform);
-              var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
-              var minDomainExtent = this.minDomainExtent(yScale) || 0;
-              var maxDomainExtent = this.maxDomainExtent(yScale) || Infinity;
-              if (constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent) {
-                if (positiveTranslateY) {
-                  lowerBound = constrainTranslate;
-                  constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
-                } else {
-                  upperBound = constrainTranslate;
-                  constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
-                }
-              } else {
-                if (positiveTranslateY) {
-                  upperBound = constrainTranslate;
-                  constrainTranslate = (constrainTranslate + lowerBound) / 2;
-                } else {
-                  lowerBound = constrainTranslate;
-                  constrainTranslate = (constrainTranslate + upperBound) / 2;
-                }
-              }
-            }
-          }
-
-          translateAmountX = (positiveTranslateY ? Math.min : Math.max)(translateAmountY, constrainTranslate);
+          translateAmountY = this._constrainedPanAmount(yScale, translateAmountY, translateAmountY > 0);
         });
 
         this.yScales().forEach((yScale) => {
@@ -335,6 +241,33 @@ export module Interactions {
         });
         lastDragPoint = endPoint;
       });
+    }
+
+    private _constrainedPanAmount(scale: QuantitativeScale<any>, panAmount: number, positiveTranslate: boolean) {
+      if (scale instanceof Scales.ModifiedLog) {
+        var minDomainExtent = this.minDomainExtent(scale) || 0;
+        var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
+        var constrainTranslate = positiveTranslate ? 1 : -1;
+        var lowerBound = positiveTranslate ? 0 : -Infinity;
+        var upperBound = positiveTranslate ? Infinity : 0;
+        var iterations = 20;
+        var translateTransform = (rangeValue: number) => scale.invert(rangeValue + constrainTranslate);
+        for (var i = 0; i < iterations; i++) {
+          var constrainedDomain = scale.range().map(translateTransform);
+          var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
+          var insideExtent = constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent;
+          if (positiveTranslate === insideExtent) {
+            lowerBound = constrainTranslate;
+            constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
+          } else {
+            upperBound = constrainTranslate;
+            constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
+          }
+        }
+        return (positiveTranslate ? Math.min : Math.max)(panAmount, constrainTranslate);
+      }
+
+      return panAmount;
     }
 
     /**
