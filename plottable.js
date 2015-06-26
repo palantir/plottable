@@ -9552,9 +9552,22 @@ var Plottable;
                     _this.xScales().forEach(function (xScale) {
                         _this._translateScale(xScale, translateAmountX);
                     });
+                    var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
                     _this.yScales().forEach(function (yScale) {
-                        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        _this._translateScale(yScale, -dragAmountY);
+                        if (yScale instanceof Plottable.Scales.ModifiedLog) {
+                            var domainGrowing = endPoint.y > startPoint.y === yScale.domain()[1] > yScale.domain()[0];
+                            var base = yScale._base;
+                            var log = function (value) { return Math.log(value) / Math.log(base); };
+                            var m = (yScale.range()[1] - yScale.range()[0]) / (log(yScale.domain()[1]) - log(yScale.domain()[0]));
+                            var b = yScale.range()[1] - m * log(yScale.domain()[1]);
+                            var domainExtent = Math.pow(base, (yScale.range()[1] - b) / m) - Math.pow(base, (yScale.range()[0] - b) / m);
+                            var constrainingDomainExtent = domainGrowing ? _this.maxDomainExtent(yScale) : _this.minDomainExtent(yScale);
+                            var constrainFunction = domainGrowing ? Math.min : Math.max;
+                            translateAmountX = constrainFunction(translateAmountX, m * (log(constrainingDomainExtent) - log(domainExtent)));
+                        }
+                    });
+                    _this.yScales().forEach(function (yScale) {
+                        _this._translateScale(yScale, translateAmountY);
                     });
                     lastDragPoint = endPoint;
                 });
