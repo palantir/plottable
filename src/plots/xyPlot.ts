@@ -10,8 +10,8 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
   private _deferredRendering = false;
-  private _performanceCachedDomainX: X[] = [null, null];
-  private _performanceCachedDomainY: Y[] = [null, null];
+  private _cachedDomainX: X[] = [null, null];
+  private _cachedDomainY: Y[] = [null, null];
 
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
@@ -45,8 +45,8 @@ export class XYPlot<X, Y> extends Plot {
         "scale(" + _scalingX + ", " + _scalingY + ")");
       clearTimeout(_timeoutReference);
       _timeoutReference = setTimeout(() => {
-        this._performanceCachedDomainX = _lastSeenDomainX;
-        this._performanceCachedDomainY = _lastSeenDomainY;
+        this._cachedDomainX = _lastSeenDomainX;
+        this._cachedDomainY = _lastSeenDomainY;
         _deltaX = 0;
         _deltaY = 0;
         this.render();
@@ -59,9 +59,9 @@ export class XYPlot<X, Y> extends Plot {
         return;
       }
       _lastSeenDomainX = scale.domain();
-      _scalingX = (scale.scale(this._performanceCachedDomainX[1]) - scale.scale(this._performanceCachedDomainX[0])) /
+      _scalingX = (scale.scale(this._cachedDomainX[1]) - scale.scale(this._cachedDomainX[0])) /
         (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
-      _deltaX = scale.scale(this._performanceCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
+      _deltaX = scale.scale(this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
 
       _registerDeferredRendering();
     };
@@ -71,9 +71,9 @@ export class XYPlot<X, Y> extends Plot {
         return;
       }
       _lastSeenDomainY = scale.domain();
-      _scalingY = (scale.scale(this._performanceCachedDomainY[1]) - scale.scale(this._performanceCachedDomainY[0])) /
+      _scalingY = (scale.scale(this._cachedDomainY[1]) - scale.scale(this._cachedDomainY[0])) /
         (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
-      _deltaY = scale.scale(this._performanceCachedDomainY[0]) -
+      _deltaY = scale.scale(this._cachedDomainY[0]) -
         scale.scale(_lastSeenDomainY[0]) * _scalingY;
 
       _registerDeferredRendering();
@@ -112,10 +112,10 @@ export class XYPlot<X, Y> extends Plot {
 
     if (deferredRendering) {
       if (this.x() && this.x().scale) {
-        this._performanceCachedDomainX = this.x().scale.domain();
+        this._cachedDomainX = this.x().scale.domain();
       }
       if (this.y() && this.y().scale) {
-        this._performanceCachedDomainY = this.y().scale.domain();
+        this._cachedDomainY = this.y().scale.domain();
       }
     }
 

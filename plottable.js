@@ -6516,8 +6516,8 @@ var Plottable;
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
             this._deferredRendering = false;
-            this._performanceCachedDomainX = [null, null];
-            this._performanceCachedDomainY = [null, null];
+            this._cachedDomainX = [null, null];
+            this._cachedDomainY = [null, null];
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
@@ -6536,8 +6536,8 @@ var Plottable;
                 _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
                 clearTimeout(_timeoutReference);
                 _timeoutReference = setTimeout(function () {
-                    _this._performanceCachedDomainX = _lastSeenDomainX;
-                    _this._performanceCachedDomainY = _lastSeenDomainY;
+                    _this._cachedDomainX = _lastSeenDomainX;
+                    _this._cachedDomainY = _lastSeenDomainY;
                     _deltaX = 0;
                     _deltaY = 0;
                     _this.render();
@@ -6549,8 +6549,8 @@ var Plottable;
                     return;
                 }
                 _lastSeenDomainX = scale.domain();
-                _scalingX = (scale.scale(_this._performanceCachedDomainX[1]) - scale.scale(_this._performanceCachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
-                _deltaX = scale.scale(_this._performanceCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
+                _scalingX = (scale.scale(_this._cachedDomainX[1]) - scale.scale(_this._cachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
+                _deltaX = scale.scale(_this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
                 _registerDeferredRendering();
             };
             var _lazyDomainChangeCallbackY = function (scale) {
@@ -6558,8 +6558,8 @@ var Plottable;
                     return;
                 }
                 _lastSeenDomainY = scale.domain();
-                _scalingY = (scale.scale(_this._performanceCachedDomainY[1]) - scale.scale(_this._performanceCachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
-                _deltaY = scale.scale(_this._performanceCachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY;
+                _scalingY = (scale.scale(_this._cachedDomainY[1]) - scale.scale(_this._cachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
+                _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY;
                 _registerDeferredRendering();
             };
             this._renderCallback = function (scale) {
@@ -6580,10 +6580,10 @@ var Plottable;
             }
             if (deferredRendering) {
                 if (this.x() && this.x().scale) {
-                    this._performanceCachedDomainX = this.x().scale.domain();
+                    this._cachedDomainX = this.x().scale.domain();
                 }
                 if (this.y() && this.y().scale) {
-                    this._performanceCachedDomainY = this.y().scale.domain();
+                    this._cachedDomainY = this.y().scale.domain();
                 }
             }
             this._deferredRendering = deferredRendering;
