@@ -85,7 +85,7 @@ function run(svg, data, Plottable) {
 
   for( var i = 0; i < plot_array.length; i++){
     var plot = plot_array[i];
-
+    add_click(plot);
   }
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],

@@ -27,7 +27,6 @@ function makeData() {
 
 function run(svg, data, Plottable) {
   "use strict";
-  var doAnimate = true;
   var xScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
@@ -44,7 +43,7 @@ function run(svg, data, Plottable) {
     var dataset = new Plottable.Dataset(data[y]);
     var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
-              .x(function(d, i) { return d.x + y * 12; }, xScale)
+              .x(function(d) { return d.x + y * 12; }, xScale)
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#000000")
               .animated(true);
@@ -61,13 +60,17 @@ function run(svg, data, Plottable) {
     segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
 
+  var get_x = function(d) { return d.x; };
+  var get_x2 = function(d) { return d.x2; };
+  var get_y = function(d) { return d.y; };
+
   for (var year = 0; year < data.length; year++){
     add_year(year);
     year_average(year);
     var segmentPlot = new Plottable.Plots.Segment()
-      .x(function(d) { return d.x; }, xScale)
-      .y(function(d) { return d.y; }, yScale)
-      .x2(function(d) { return d.x2; })
+      .x(get_x, xScale)
+      .y(get_y, yScale)
+      .x2(get_x2, xScale)
       .addDataset(new Plottable.Dataset(segment_data))
       .attr("stroke", "#ff0000")
       .attr("stroke-width", 4)
