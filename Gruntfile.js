@@ -282,12 +282,12 @@ module.exports = function(grunt) {
           archive: 'plottable.zip'
         },
         files: [
-        {src: 'plottable.js', dest: '.'},
+        {src: 'plottable.js',     dest: '.'},
         {src: 'plottable.min.js', dest: '.'},
-        {src: 'plottable.d.ts', dest: '.'},
-        {src: 'plottable.css', dest: '.'},
-        {src: 'README.md', dest: '.'},
-        {src: 'LICENSE', dest: '.'}]
+        {src: 'plottable.d.ts',   dest: '.'},
+        {src: 'plottable.css',    dest: '.'},
+        {src: 'README.md',        dest: '.'},
+        {src: 'LICENSE',          dest: '.'}]
       }
     },
     uglify: {
