@@ -1117,6 +1117,15 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    /**
+     * This field is deprecated and will be removed in v2.0.0.
+     *
+     * The number of milliseconds between midnight one day and the next is
+     * not a fixed quantity.
+     *
+     * use Date#setDate(Date#getDate() + n) instead.
+     *
+     */
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters;
     (function (Formatters) {
@@ -1311,6 +1320,7 @@ var Plottable;
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
+            Plottable.Utils.Window.deprecated("relativeDate()", "1.2", "Not safe for use with time zones.");
             return function (d) {
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
@@ -2252,15 +2262,21 @@ var Plottable;
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype._defaultExtent = function () {
-                var endTimeValue = new Date().valueOf();
-                var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+                var now = new Date();
+                var endTimeValue = now.valueOf();
+                now.setDate(now.getDate() - 1);
+                var startTimeValue = now.valueOf();
                 return [new Date(startTimeValue), new Date(endTimeValue)];
             };
             Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
                 var startTime = singleValueDomain[0].getTime();
                 var endTime = singleValueDomain[1].getTime();
                 if (startTime === endTime) {
-                    return [new Date(startTime - Plottable.MILLISECONDS_IN_ONE_DAY), new Date(endTime + Plottable.MILLISECONDS_IN_ONE_DAY)];
+                    var startDate = new Date(startTime);
+                    startDate.setDate(startDate.getDate() - 1);
+                    var endDate = new Date(endTime);
+                    endDate.setDate(endDate.getDate() + 1);
+                    return [startDate, endDate];
                 }
                 return singleValueDomain;
             };
