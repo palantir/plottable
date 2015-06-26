@@ -33,7 +33,7 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var hoverCircle = plot._foregroundContainer.append("circle").attr({
+  var hoverCircle = plot.foreground().append("circle").attr({
                                                "stroke": "black",
                                                "fill": "none",
                                                "r": 15
