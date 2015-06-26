@@ -66,6 +66,7 @@ declare module Plottable {
          * https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map
          */
         class Map<K, V> {
+            constructor();
             set(key: K, value: V): Map<K, V>;
             get(key: K): V;
             has(key: K): boolean;
@@ -328,6 +329,17 @@ declare module Plottable {
              * setTimeout appears out-of-sync with the rest of the plot.
              */
             function setTimeout(f: Function, time: number, ...args: any[]): number;
+            /**
+             * Sends a deprecation warning to the console. The warning includes the name of the deprecated method,
+             * version number of the deprecation, and an optional message.
+             *
+             * To be used in the first line of a deprecated method.
+             *
+             * @param {string} callingMethod The name of the method being deprecated
+             * @param {string} version The version when the tagged method became obsolete
+             * @param {string?} message Optional message to be shown with the warning
+             */
+            function deprecated(callingMethod: string, version: string, message?: string): void;
         }
     }
 }
@@ -1233,6 +1245,7 @@ declare module Plottable {
          * @param{DrawStep[]} drawSteps The list of steps, which needs to be drawn
          */
         draw(data: any[], drawSteps: Drawers.DrawStep[]): Drawer;
+        selection(): d3.Selection<any>;
         /**
          * Returns the CSS selector for this Drawer's visual elements.
          */
@@ -1288,6 +1301,15 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Symbol extends Drawer {
+            constructor(dataset: Dataset);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawers {
+        class Segment extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -2426,6 +2448,7 @@ declare module Plottable {
          */
         entityNearest(queryPoint: Point): Plots.PlotEntity;
         protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+        protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
         protected _uninstallScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _installScaleForKey(scale: Scale<any, any>, key: string): void;
         protected _propertyProjectors(): AttributeToProjector;
@@ -2509,12 +2532,27 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             outerRadius<R>(outerRadius: R | Accessor<R>, scale: Scale<R, number>): Plots.Pie;
+            /**
+             * Get whether slice labels are enabled.
+             *
+             * @returns {boolean} Whether slices should display labels or not.
+             */
+            labelsEnabled(): boolean;
+            /**
+             * Sets whether labels are enabled.
+             *
+             * @param {boolean} labelsEnabled
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelsEnabled(enabled: boolean): Pie;
+            entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: number;
                 y: number;
             };
+            protected _additionalPaint(time: number): void;
         }
     }
 }
@@ -2746,6 +2784,7 @@ declare module Plottable {
             symbol(symbol: Accessor<SymbolFactory>): Plots.Scatter<X, Y>;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
         }
     }
@@ -2777,6 +2816,7 @@ declare module Plottable {
              * @return "vertical" | "horizontal"
              */
             orientation(): string;
+            render(): Bar<X, Y>;
             protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
             protected _setup(): void;
             /**
@@ -2794,6 +2834,8 @@ declare module Plottable {
              * @returns {Bar} The calling Bar Plot.
              */
             baselineValue(value: X | Y): Bar<X, Y>;
+            addDataset(dataset: Dataset): Bar<X, Y>;
+            removeDataset(dataset: Dataset): Bar<X, Y>;
             /**
              * Get whether bar labels are enabled.
              *
@@ -2832,6 +2874,7 @@ declare module Plottable {
              */
             entityNearest(queryPoint: Point): PlotEntity;
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
+            protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             /**
              * Gets the Entities at a particular Point.
              *
@@ -2873,6 +2916,7 @@ declare module Plottable {
                 x: any;
                 y: any;
             };
+            protected _uninstallScaleForKey(scale: Scale<any, number>, key: string): void;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
         }
     }
@@ -3024,6 +3068,87 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class Segment<X, Y> extends XYPlot<X, Y> {
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            constructor();
+            protected _createDrawer(dataset: Dataset): Drawers.Segment;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * Gets the AccessorScaleBinding for X
+             */
+            x(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X to a constant value or the result of an Accessor.
+             *
+             * @param {X|Accessor<X>} x
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets X to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {X|Accessor<X>} x
+             * @param {Scale<X, number>} xScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2
+             */
+            x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot
+             */
+            x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y
+             */
+            y(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y to a constant value or the result of an Accessor.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets Y to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @param {Scale<Y, number>} yScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
+            y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }
@@ -3411,6 +3536,17 @@ declare module Plottable {
          */
         detachFrom(component: Component): Interaction;
         /**
+         * Gets whether this Interaction is enabled.
+         */
+        enabled(): boolean;
+        /**
+         * Enables or disables this Interaction.
+         *
+         * @param {boolean} enabled Whether the Interaction should be enabled.
+         * @return {Interaction} The calling Interaction.
+         */
+        enabled(enabled: boolean): Interaction;
+        /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *
          * @param {Point} p A Point in <svg>-space coordinates.
@@ -3573,6 +3709,54 @@ declare module Plottable {
             constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>);
             protected _anchor(component: Component): void;
             protected _unanchor(): void;
+            /**
+             * Gets the x scales for this PanZoom Interaction.
+             */
+            xScales(): QuantitativeScale<any>[];
+            /**
+             * Sets the x scales for this PanZoom Interaction.
+             *
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            /**
+             * Gets the y scales for this PanZoom Interaction.
+             */
+            yScales(): QuantitativeScale<any>[];
+            /**
+             * Sets the y scales for this PanZoom Interaction.
+             *
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
+            /**
+             * Adds an x scale to this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            addXScale(xScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Removes an x scale from this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} An x scale to remove
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            removeXScale(xScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Adds a y scale to this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} A y scale to add
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            addYScale(yScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Removes a y scale from this PanZoom Interaction
+             *
+             * @param {QuantitativeScale<any>} A y scale to remove
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            removeYScale(yScale: QuantitativeScale<any>): PanZoom;
         }
     }
 }

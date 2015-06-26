@@ -15,35 +15,37 @@
 
 ///<reference path="animators/easingAnimatorTests.ts" />
 
-///<reference path="components/baseAxisTests.ts" />
-///<reference path="components/timeAxisTests.ts" />
-///<reference path="components/numericAxisTests.ts" />
-///<reference path="components/categoryAxisTests.ts" />
+///<reference path="axes/baseAxisTests.ts" />
+///<reference path="axes/timeAxisTests.ts" />
+///<reference path="axes/numericAxisTests.ts" />
+///<reference path="axes/categoryAxisTests.ts" />
+
 ///<reference path="components/gridlinesTests.ts" />
 ///<reference path="components/labelTests.ts" />
 ///<reference path="components/legendTests.ts" />
 ///<reference path="components/interpolatedColorLegendTests.ts" />
 ///<reference path="components/selectionBoxLayerTests.ts" />
+///<reference path="components/groupTests.ts" />
+///<reference path="components/componentTests.ts" />
+///<reference path="components/tableTests.ts" />
 
-///<reference path="components/plots/plotTests.ts" />
-///<reference path="components/plots/xyPlotTests.ts" />
-///<reference path="components/plots/piePlotTests.ts" />
-///<reference path="components/plots/linePlotTests.ts" />
-///<reference path="components/plots/areaPlotTests.ts" />
-///<reference path="components/plots/barPlotTests.ts" />
-///<reference path="components/plots/rectanglePlotTests.ts" />
-///<reference path="components/plots/scatterPlotTests.ts" />
-///<reference path="components/plots/stackedPlotTests.ts" />
-///<reference path="components/plots/stackedAreaPlotTests.ts" />
-///<reference path="components/plots/stackedBarPlotTests.ts" />
-///<reference path="components/plots/clusteredBarPlotTests.ts" />
+///<reference path="plots/plotTests.ts" />
+///<reference path="plots/xyPlotTests.ts" />
+///<reference path="plots/piePlotTests.ts" />
+///<reference path="plots/linePlotTests.ts" />
+///<reference path="plots/areaPlotTests.ts" />
+///<reference path="plots/barPlotTests.ts" />
+///<reference path="plots/rectanglePlotTests.ts" />
+///<reference path="plots/scatterPlotTests.ts" />
+///<reference path="plots/stackedPlotTests.ts" />
+///<reference path="plots/stackedAreaPlotTests.ts" />
+///<reference path="plots/stackedBarPlotTests.ts" />
+///<reference path="plots/clusteredBarPlotTests.ts" />
+///<reference path="plots/segmentPlotTests.ts" />
 
 ///<reference path="core/metadataTests.ts" />
 ///<reference path="core/renderControllerTests.ts" />
-///<reference path="core/componentGroupTests.ts" />
-///<reference path="core/componentTests.ts" />
 ///<reference path="core/datasetTests.ts" />
-///<reference path="core/tableTests.ts" />
 ///<reference path="core/formattersTests.ts" />
 
 ///<reference path="scales/scaleTests.ts" />
@@ -61,6 +63,7 @@
 ///<reference path="utils/callbackSetTests.ts" />
 ///<reference path="utils/arrayUtilsTests.ts" />
 ///<reference path="utils/stackingUtilsTests.ts" />
+///<reference path="utils/windowUtilsTests.ts" />
 
 ///<reference path="interactions/interactionTests.ts" />
 ///<reference path="interactions/keyInteractionTests.ts" />

@@ -1,13 +1,12 @@
 function makeData() {
   "use strict";
-
 }
 
 function run(svg, data, Plottable) {
   "use strict";
 
-  d3.csv("../overlaying/tests/baseball.csv").get(function(error, rows) {
-  var data = rows;
+  d3.csv("/quicktests/overlaying/data/baseball.csv").get(function(error, rows) {
+  data = rows;
   var dataset = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear();
@@ -47,7 +46,6 @@ function run(svg, data, Plottable) {
               .y(projectTigers, yScale)
               .attr("fill", "#001742");
 
-
   var cs = new Plottable.Scales.Color();
   cs.range(["#bbbbbb", "#888888", "#DE4406"]);
   cs.domain(["Payroll range across MLB", "Average payroll", "Tigers payroll"]);
@@ -67,7 +65,6 @@ function run(svg, data, Plottable) {
       else { return circleFactory; }
     });
   }
-
 
   var plots = new Plottable.Components.Group([bandPlot, avgPlot, tigerLine, tigerScatter]);
   var table = new Plottable.Components.Table([[null, legend],

@@ -62,7 +62,7 @@
         "property-declaration": "nospace",
         "variable-declaration": "nospace"
     }],
-    "variable-name": false,
+    "variable-name": [true, "allow-leading-underscore"],
     "whitespace": [true,
         "check-branch",
         "check-decl",

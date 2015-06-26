@@ -21,10 +21,10 @@ function run(svg, data, Plottable) {
   var EmpIDTitle = new Plottable.Components.Label("Emp ID");
 
   var DOWFormatter = function(d) {
-      return DOW[d%7];
+      return DOW[d % 7];
   };
   var EmpIDFormatter = function(d) {
-      return Emp[d%7];
+      return Emp[d % 7];
   };
 
   var plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));

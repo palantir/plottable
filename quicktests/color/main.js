@@ -14,10 +14,10 @@ function expandSidebar(){
       left: '0%'
     });
     content.animate({
-      left: '20%',
+      left: '20%'
     });
     controls.animate({
-      width: '80%',
+      width: '80%'
     });
   }
   else{
@@ -30,7 +30,7 @@ function expandSidebar(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%',
+      width: '100%'
     });
   }
 }
@@ -45,7 +45,6 @@ var multipleDatasetPlots = [P.Line, P.Area, P.Scatter];
 var stackedPlots = [P.StackedBar, P.StackedArea, P.ClusteredBar];
 var stackedHorizontalPlots = [P.StackedBar, P.ClusteredBar];
 var piePlots = [P.Pie];
-var otherPlots = [P.Grid];
 
 var plots = singlePlots.concat(singleHorizontalPlots, multipleDatasetPlots, stackedPlots, piePlots);
 var div = d3.select(".results");
@@ -55,7 +54,7 @@ var plotheight;
 //functions
 
 function togglePlotDisplay(className){
-  var classSelector = "."+className;
+  var classSelector = "." + className;
   var displayStatus = $(classSelector).css("display") === "none" ? "inline-block" : "none";
   $(classSelector).css("display", displayStatus);
 }
@@ -74,10 +73,9 @@ function setupBindings(){
   }, function() {
       // Hover out code
       $("#help-description").css("display", "none");
-  }).mousemove(function(e) {
+  }).mousemove(function() {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
-      
       $("#help-description").css({ top: helpY + 28, left: windowWidth - 360 });
   });
 }
@@ -101,7 +99,7 @@ function populateSidebarList(){
 function renderPlots(plottablePlots){
   plottablePlots.forEach(function(plot){
     var plotDivName = "." + plot.constructor.name;
-    var plotDiv = d3.select(plotDivName); 
+    var plotDiv = d3.select(plotDivName);
     var box = plotDiv.append("svg").attr("height", plotheight).attr("width", plotwidth);
     var chart = new Plottable.Component.Table([[plot]]);
     chart.renderTo(box);
@@ -116,11 +114,11 @@ function addAllDatasets(plot, arr, numOfDatasets){
     arr.forEach(function(dataset){
       plot.addDataset(dataset);
     });
-  } 
+  }
   return plot;
 }
 
-function generatePlots(plots, dataType){
+function generatePlots(dataType){
   var plottablePlots = [];
   plots.forEach(function(PlotType){
     var xScale = new Plottable.Scale.Category();
@@ -131,7 +129,6 @@ function generatePlots(plots, dataType){
       .project("x", "x", xScale)
       .project("y", "y", yScale)
       .animate(true);
-
 
     if (singlePlots.indexOf(PlotType) > -1) { //if single dataset plot
       plot = addAllDatasets(plot, dataType[0], "single");
@@ -171,7 +168,7 @@ function generatePlots(plots, dataType){
           .project("y", "x", yScale)
           .attr("fill", "type", colorScale)
           .animate(true);
-      
+
       plot = addAllDatasets(plot, dataType[2], "multiple");
       plottablePlots.push(plot);
     }
@@ -181,12 +178,12 @@ function generatePlots(plots, dataType){
       plot = addAllDatasets(plot, dataType[0], "single");
       plottablePlots.push(plot);
     }
-    
+
   });
   renderPlots(plottablePlots);
 }
 
-var orderByX = function(a,b){ 
+var orderByX = function(a,b){
   return a.x - b.x;
 };
 
@@ -214,7 +211,7 @@ function makeRandomData(numPoints, series, scaleFactor) {
 }
 
 function prepareSingleData(data){
-  data[0].map(function(element){element.type = ""+ element.x;});
+  data[0].map(function(element){ element.type = "" + element.x; });
   return data;
 }
 
@@ -236,8 +233,6 @@ function prepareStackedData(data){
 }
 
 function prepareData(seriesNumber){
-  var data = [{x: "0", y: 0, type: "0"}];
-
   var categories = 5; //change this number for more/less data in multiple & stacked dataset
   var series = seriesNumber; //change this number for more/less stack
   var alldata = [];
@@ -256,7 +251,7 @@ function initialize(){
 
   d3.selectAll("svg").remove();
   var dataArray = prepareData(seriesNumber);
-  generatePlots(plots, dataArray);
+  generatePlots(dataArray);
 }
 
 //setup page

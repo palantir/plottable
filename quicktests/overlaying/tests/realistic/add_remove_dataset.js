@@ -6,7 +6,7 @@ function makeData() {
     for (var i = 0; i < n; i++) {
       toReturn[i] = {
         x: startValue + i,
-        y: i > 0 ? toReturn[i-1].y + Math.random()*2-1 : Math.random() * 5
+        y: i > 0 ? toReturn[i - 1].y + Math.random() * 2 - 1 : Math.random() * 5
       };
     }
     return toReturn;
@@ -39,7 +39,7 @@ function run(svg, data, Plottable) {
   var addButton = new Plottable.Components.Label("Add Dataset");
   addButton.xAlignment("left").padding(5);
   new Plottable.Interactions.Click()
-    .onClick(function(p) {
+    .onClick(function() {
       var numDatasets = plot.datasets().length;
       if (numDatasets >= 10) {
         return;
@@ -52,7 +52,7 @@ function run(svg, data, Plottable) {
   var removeButton = new Plottable.Components.Label("Remove Dataset");
   removeButton.xAlignment("right").padding(5);
   new Plottable.Interactions.Click()
-    .onClick(function(p) {
+    .onClick(function() {
       var datasets = plot.datasets();
       if (datasets.length > 0) {
         plot.removeDataset(datasets[datasets.length - 1]);

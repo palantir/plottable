@@ -9,7 +9,6 @@ function run(svg, data, Plottable) {
 
   var doAnimate = true;
 
-
   var xScale = new Plottable.Scales.Linear();
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
 
@@ -29,7 +28,7 @@ function run(svg, data, Plottable) {
 
   chart.renderTo(svg);
 
-  var cb = function(x, y){
+  var cb = function(){
     var d = dataset.data();
     dataset.data(d);
   };

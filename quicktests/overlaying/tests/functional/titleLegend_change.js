@@ -33,7 +33,6 @@ function run(svg, data, Plottable) {
   var xAxis = new Plottable.Axes.Numeric(xScale, "bottom");
   var yAxis = new Plottable.Axes.Numeric(yScale, "left");
 
-
   var colorProjector = function(d, i, dataset) {
     return dataset.metadata().name;
   };
@@ -60,17 +59,6 @@ function run(svg, data, Plottable) {
   renderGrape.attr("fill", colorProjector, colorScale1);
 
   var renderArea = new Plottable.Components.Group([scatterPlot, linePlot]);
-  function emptyTitle() {
-    title1.text("");
-  }
-
-  function smallTitle() {
-    title1.text("tiny");
-  }
-
-  function longTitle() {
-    title1.text("abcdefghij klmnopqrs tuvwxyz ABCDEF GHIJK LMNOP QRSTUV WXYZ");
-  }
 
   function noPlots() {
     colorScale1.domain([]);
@@ -109,6 +97,18 @@ function run(svg, data, Plottable) {
   legend1.maxEntriesPerRow(1);
   var titleTable = new Plottable.Components.Table([[title1, legend1]]);
 
+  function emptyTitle() {
+    title1.text("");
+  }
+
+  function smallTitle() {
+    title1.text("tiny");
+  }
+
+  function longTitle() {
+    title1.text("abcdefghij klmnopqrs tuvwxyz ABCDEF GHIJK LMNOP QRSTUV WXYZ");
+  }
+
   var noTitleLabel  = new Plottable.Components.Label("no title", 0);
   var shortTitleLabel  = new Plottable.Components.Label("tiny title", 0);
   var longTitleLabel  = new Plottable.Components.Label("long title", 0);
@@ -129,13 +129,10 @@ function run(svg, data, Plottable) {
 
   basicTable.renderTo(svg);
 
-
   new Plottable.Interactions.Click().onClick(emptyTitle).attachTo(noTitleLabel);
   new Plottable.Interactions.Click().onClick(smallTitle).attachTo(shortTitleLabel);
   new Plottable.Interactions.Click().onClick(longTitle).attachTo(longTitleLabel);
   new Plottable.Interactions.Click().onClick(noPlots).attachTo(noPlotsLabel);
   new Plottable.Interactions.Click().onClick(twoPlots).attachTo(shortLegendLabel);
   new Plottable.Interactions.Click().onClick(sixPlots).attachTo(tallLegendLabel);
-
-
 }
