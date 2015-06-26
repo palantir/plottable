@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         removeComments: false
       }
     },
-    verify_d_ts: {
+    verifyDefinitionFiles: {
       src: ["typings/d3/d3.d.ts",
             "typings/touch-events/touch-events.d.ts",
             "plottable.d.ts",
@@ -62,18 +62,18 @@ module.exports = function(grunt) {
   var nestedBraceMatch = ": \\{[^{}]*\\}";
   var typeNameMatch = ": [^;]*";
   var finalMatch = "((" + nestedBraceMatch + ")|(" + typeNameMatch + "))?\\n?;";
-  var jsdoc_init = "\\n *\\/\\*\\* *\\n";
-  var jsdoc_mid = "( *\\*[^\\n]*\\n)+";
-  var jsdoc_end = " *\\*\\/ *";
-  var jsdoc = "(" + jsdoc_init + jsdoc_mid + jsdoc_end + ")?";
+  var jsdocInit = "\\n *\\/\\*\\* *\\n";
+  var jsdocMid = "( *\\*[^\\n]*\\n)+";
+  var jsdocEnd = " *\\*\\/ *";
+  var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
 
   var sedJSON = {
-    private_definitions: {
+    privateDefinitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
       path: "build/plottable.d.ts"
     },
-    plottable_multifile: {
+    plottableMultifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/src/$1.js");',
       path: "plottable_multifile.js"
@@ -83,7 +83,7 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts"
     },
-    tests_multifile: {
+    testsMultifile: {
       pattern: '/// *<reference path="([^."]*).ts" */>',
       replacement: 'synchronousRequire("/build/test/$1.js");',
       path: "test/tests_multifile.js"
@@ -93,7 +93,7 @@ module.exports = function(grunt) {
       replacement: '/// <reference path="../$1" />',
       path: "build/sublime.d.ts"
     },
-    version_number: {
+    versionNumber: {
       pattern: "@VERSION",
       replacement: "<%= pkg.version %>",
       path: "plottable.js"
@@ -158,11 +158,11 @@ module.exports = function(grunt) {
         src: ["license_header.txt", "plottable.js"],
         dest: "plottable.js"
       },
-      plottable_multifile: {
+      plottableMultifile: {
         src: ["synchronousRequire.js", "src/reference.ts"],
         dest: "plottable_multifile.js"
       },
-      tests_multifile: {
+      testsMultifile: {
         src: ["synchronousRequire.js", "test/testReference.ts"],
         dest: "test/tests_multifile.js"
       },
@@ -238,7 +238,7 @@ module.exports = function(grunt) {
         "files": ["quicktests/overlaying/tests/**/*.js"]
       }
     },
-    blanket_mocha: {
+    "blanket_mocha": {
       all: ['test/coverage.html'],
       options: {
         threshold: 70
@@ -326,12 +326,12 @@ module.exports = function(grunt) {
   });
   grunt.registerTask("test-compile", [
                                   "ts:test",
-                                  "concat:tests_multifile",
-                                  "sed:tests_multifile",
+                                  "concat:testsMultifile",
+                                  "sed:testsMultifile",
                                   "concat:tests"
                                   ]);
   grunt.registerTask("default", "launch");
-  var compile_task = [
+  var compileTask = [
       "update_ts_files",
       "update_test_ts_files",
       "ts:dev",
@@ -339,19 +339,19 @@ module.exports = function(grunt) {
       "concat:svgtypewriter",
       "concat:definitions",
       "sed:definitions",
-      "sed:private_definitions",
+      "sed:privateDefinitions",
       "umd:all",
       "concat:header",
-      "sed:version_number",
+      "sed:versionNumber",
       "definitions_prod",
       "test-compile",
-      "concat:plottable_multifile",
-      "sed:plottable_multifile",
+      "concat:plottableMultifile",
+      "sed:plottableMultifile",
       "clean:tscommand",
       "update-qt"
   ];
 
-  grunt.registerTask("dev-compile", compile_task);
+  grunt.registerTask("dev-compile", compileTask);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
@@ -361,7 +361,7 @@ module.exports = function(grunt) {
                                   "dev-compile",
                                   "blanket_mocha",
                                   "parallelize:tslint",
-                                  "ts:verify_d_ts",
+                                  "ts:verifyDefinitionFiles",
                                   "uglify",
                                   "compress"
                                   ]);
@@ -370,7 +370,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verify_d_ts", "jscs", "eslint"]);
+  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verifyDefinitionFiles", "jscs", "eslint"]);
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {

@@ -2,7 +2,7 @@
 function makeData() {
   "use strict";
   var inflationData = function(years, baseline, resistance){
-    var dataset_array = [];
+    var datasets = [];
     var current = baseline;
     var up = true;
     for( var i = 0; i < years; i++){
@@ -16,9 +16,9 @@ function makeData() {
         current = obj.y;
         data.push(obj);
       }
-      dataset_array.push(data);
+      datasets.push(data);
     }
-    return dataset_array;
+    return datasets;
   };
 
   var d = inflationData(5, 2, 0.4);
@@ -36,9 +36,9 @@ function run(svg, data, Plottable) {
    var yearFormatter = function(d) { return Math.floor(d / 12) + 1999; };
    xAxis.formatter(yearFormatter);
 
-  var plot_array = [];
+  var plots = [];
 
-  var add_year = function(y){
+  var addYear = function(y){
     var dataset = new Plottable.Dataset(data[y]);
     var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
@@ -46,46 +46,46 @@ function run(svg, data, Plottable) {
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#000000")
               .animated(true);
-    plot_array.push(lineRenderer);
+    plots.push(lineRenderer);
   };
 
-  var year_average = function(y){
+  var yearAverage = function(y){
     var d = data[y];
     var total = 0;
     for (var month = 0; month < 12; month++){
       total += d[month].y;
     }
     var average = total / 12;
-    var avg_data = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
-    var avg_ds = new Plottable.Dataset(avg_data);
+    var avgData = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
+    var avgDataset = new Plottable.Dataset(avgData);
     var lineRenderer = new Plottable.Plots.Line()
-              .addDataset(avg_ds)
+              .addDataset(avgDataset)
               .x(function(datum) { return datum.x; }, xScale)
               .y(function(datum) { return datum.y; }, yScale)
               .attr("stroke", "#ff0000")
               .attr("stroke-width", 4)
               .attr("stroke-dasharray", 4)
               .animated(true);
-    plot_array.push(lineRenderer);
+    plots.push(lineRenderer);
   };
 
   for (var year = 0; year < data.length; year++){
-    add_year(year);
-    year_average(year);
+    addYear(year);
+    yearAverage(year);
   }
 
-  var group = new Plottable.Components.Group(plot_array);
+  var group = new Plottable.Components.Group(plots);
 
- var add_click = function(plot){
+ var addClick = function(plot){
       new Plottable.Interactions.Click().onClick(function(){
       var d = plot.datasets()[0].data();
       plot.datasets()[0].data(d);
     }).attachTo(plot);
  };
 
-  for( var i = 0; i < plot_array.length; i++){
-    var plot = plot_array[i];
-    add_click(plot);
+  for( var i = 0; i < plots.length; i++){
+    var plot = plots[i];
+    addClick(plot);
   }
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
