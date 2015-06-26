@@ -17,7 +17,6 @@
     "no-multi-spaces": 0,
     "camelcase": 0,
     "comma-spacing": 0,
-    "key-spacing": 0,
     "no-use-before-define": 0,
     "strict": 0
   }

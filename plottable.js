@@ -2791,6 +2791,29 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            function Segment(dataset) {
+                _super.call(this, dataset);
+                this._svgElementName = "line";
+            }
+            return Segment;
+        })(Plottable.Drawer);
+        Drawers.Segment = Segment;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -8262,6 +8285,106 @@ var Plottable;
             return StackedBar;
         })(Plots.Bar);
         Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            function Segment() {
+                _super.call(this);
+                this.addClass("segment-plot");
+                this.attr("stroke", new Plottable.Scales.Color().range()[0]);
+                this.attr("stroke-width", "2px");
+            }
+            Segment.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Segment(dataset);
+            };
+            Segment.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
+            };
+            Segment.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                    var x2Binding = this.x2();
+                    var x2 = x2Binding && x2Binding.accessor;
+                    if (x2 != null) {
+                        this._bindProperty(Segment._X2_KEY, x2, xScale);
+                    }
+                }
+                return this;
+            };
+            Segment.prototype.x2 = function (x2) {
+                if (x2 == null) {
+                    return this._propertyBindings.get(Segment._X2_KEY);
+                }
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty(Segment._X2_KEY, x2, xScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    var y2Binding = this.y2();
+                    var y2 = y2Binding && y2Binding.accessor;
+                    if (y2 != null) {
+                        this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                    }
+                }
+                return this;
+            };
+            Segment.prototype.y2 = function (y2) {
+                if (y2 == null) {
+                    return this._propertyBindings.get(Segment._Y2_KEY);
+                }
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["x2"] = this.x2() == null ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.x2());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
+                attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
+                return attrToProjector;
+            };
+            Segment._X2_KEY = "x2";
+            Segment._Y2_KEY = "y2";
+            return Segment;
+        })(Plottable.XYPlot);
+        Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
