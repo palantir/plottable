@@ -116,26 +116,6 @@ export module Interactions {
       }
     }
 
-    private _scalesAtMaxExtent() {
-      var scaleAtMaxExtent = (scale: QuantitativeScale<any>) => {
-        var scaleDomain = scale.domain();
-        var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-        var maxDomainExtent = this._maxDomainExtents.get(scale);
-        return maxDomainExtent != null && scaleExtent >= maxDomainExtent;
-      };
-      return this.xScales().some(scaleAtMaxExtent) || this.yScales().some(scaleAtMaxExtent);
-    }
-
-    private _scalesAtMinExtent() {
-      var scaleAtMinExtent = (scale: QuantitativeScale<any>) => {
-        var scaleDomain = scale.domain();
-        var scaleExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-        var minDomainExtent = this._minDomainExtents.get(scale);
-        return minDomainExtent != null && scaleExtent <= minDomainExtent;
-      };
-      return this.xScales().some(scaleAtMinExtent) || this.yScales().some(scaleAtMinExtent);
-    }
-
     private _centerPoint() {
       var points = this._touchIds.values();
       var firstTouchPoint = points[0];
@@ -170,30 +150,12 @@ export module Interactions {
 
     private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
-      var transformedDomain = scale.range().map(magnifyTransform);
-      var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
-      scale.domain(constrainedDomain);
+      scale.domain(scale.range().map(magnifyTransform));
     }
 
     private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
-    }
-
-    private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
-      var domainExtent = Math.abs(<any> domainToConstrain[1] - <any> domainToConstrain[0]);
-
-      var minDomainExtent = this._minDomainExtents.get(scale);
-      if (minDomainExtent != null && domainExtent < minDomainExtent) {
-        return scale.constrainedDomain(domainToConstrain, minDomainExtent);
-      }
-
-      var maxDomainExtent = this._maxDomainExtents.get(scale);
-      if (maxDomainExtent != null && domainExtent > maxDomainExtent) {
-        return scale.constrainedDomain(domainToConstrain, maxDomainExtent);
-      }
-
-      return domainToConstrain;
     }
 
     private _handleWheelEvent(p: Point, e: WheelEvent) {
@@ -204,13 +166,75 @@ export module Interactions {
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
 
-        if (zoomAmount < 1 && this._scalesAtMinExtent()) {
-          return;
-        }
+        var extentIncreasing = zoomAmount > 1;
 
-        if (zoomAmount > 1 && this._scalesAtMaxExtent()) {
-          return;
-        }
+        this.xScales().forEach((xScale) => {
+          var constrainZoomAmount = 1;
+          var lowerBound = extentIncreasing ? constrainZoomAmount : 0;
+          var upperBound = extentIncreasing ? Infinity : constrainZoomAmount;
+          var iterations = 5;
+          var magnifyTransform = (rangeValue: number) => xScale.invert(translatedP.x - (translatedP.x - rangeValue) * constrainZoomAmount);
+          for (var i = 0; i < iterations; i++) {
+            var transformedDomain = xScale.range().map(magnifyTransform);
+            var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
+            if (extentIncreasing) {
+              var maxDomainExtent = this.maxDomainExtent(xScale);
+              if (maxDomainExtent == null) { return; }
+              if (transformedDomainExtent <= maxDomainExtent) {
+                lowerBound = constrainZoomAmount;
+                constrainZoomAmount = upperBound === Infinity ? constrainZoomAmount * 2 : (upperBound + constrainZoomAmount) / 2;
+              } else {
+                upperBound = constrainZoomAmount;
+                constrainZoomAmount = (lowerBound + constrainZoomAmount) / 2;
+              }
+            } else {
+              var minDomainExtent = this.minDomainExtent(xScale);
+              if (minDomainExtent == null) { return; }
+              if (transformedDomainExtent >= minDomainExtent) {
+                upperBound = constrainZoomAmount;
+                constrainZoomAmount = (lowerBound + constrainZoomAmount) / 2;
+              } else {
+                lowerBound = constrainZoomAmount;
+                constrainZoomAmount = (upperBound + constrainZoomAmount) / 2;
+              }
+            }
+          }
+          zoomAmount = (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainZoomAmount);
+        });
+
+        this.yScales().forEach((yScale) => {
+          var constrainZoom = 1;
+          var lowerBound = extentIncreasing ? constrainZoom : 0;
+          var upperBound = extentIncreasing ? Infinity : constrainZoom;
+          var iterations = 5;
+          var magnifyTransform = (rangeValue: number) => yScale.invert(translatedP.y - (translatedP.y - rangeValue) * constrainZoom);
+          for (var i = 0; i < iterations; i++) {
+            var transformedDomain = yScale.range().map(magnifyTransform);
+            var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
+            if (extentIncreasing) {
+              var maxDomainExtent = this.maxDomainExtent(yScale);
+              if (maxDomainExtent == null) { return; }
+              if (transformedDomainExtent <= maxDomainExtent) {
+                lowerBound = constrainZoom;
+                constrainZoom = upperBound === Infinity ? constrainZoom * 2 : (upperBound + constrainZoom) / 2;
+              } else {
+                upperBound = constrainZoom;
+                constrainZoom = (lowerBound + constrainZoom) / 2;
+              }
+            } else {
+              var minDomainExtent = this.minDomainExtent(yScale);
+              if (minDomainExtent == null) { return; }
+              if (transformedDomainExtent >= minDomainExtent) {
+                upperBound = constrainZoom;
+                constrainZoom = (lowerBound + constrainZoom) / 2;
+              } else {
+                lowerBound = constrainZoom;
+                constrainZoom = (upperBound + constrainZoom) / 2;
+              }
+            }
+          }
+          zoomAmount = (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainZoom);
+        });
         this.xScales().forEach((xScale) => {
           this._magnifyScale(xScale, zoomAmount, translatedP.x);
         });
@@ -230,18 +254,38 @@ export module Interactions {
           return;
         }
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
+        var positiveTranslateX = translateAmountX > 0;
         this.xScales().forEach((xScale) => {
           if (xScale instanceof Scales.ModifiedLog) {
-            var domainGrowing = endPoint.x < startPoint.x === xScale.domain()[1] > xScale.domain()[0];
-            var base = (<any> xScale)._base;
-            var log = (value: number) => Math.log(value) / Math.log(base);
-            var m = (xScale.range()[1] - xScale.range()[0]) / (log(xScale.domain()[1]) - log(xScale.domain()[0]));
-            var b = xScale.range()[1] - m * log(xScale.domain()[1]);
-            var domainExtent = Math.pow(base, (xScale.range()[1] - b) / m) - Math.pow(base, (xScale.range()[0] - b) / m);
-
-            var constrainingDomainExtent = domainGrowing ? this.maxDomainExtent(xScale) : this.minDomainExtent(xScale);
-            var constrainFunction = domainGrowing ? Math.min : Math.max;
-            translateAmountX = constrainFunction(translateAmountX, m * (log(constrainingDomainExtent) - log(domainExtent)));
+            var constrainTranslate = positiveTranslateX ? 1 : -1;
+            var lowerBound = positiveTranslateX ? 0 : -Infinity;
+            var upperBound = positiveTranslateX ? Infinity : 0;
+            var iterations = 5;
+            for (var i = 0; i < iterations; i++) {
+              var translateTransform = (rangeValue: number) => xScale.invert(rangeValue + constrainTranslate);
+              var constrainedDomain = xScale.range().map(translateTransform);
+              var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
+              var minDomainExtent = this.minDomainExtent(xScale) || 0;
+              var maxDomainExtent = this.maxDomainExtent(xScale) || Infinity;
+              if (constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent) {
+                if (positiveTranslateX) {
+                  lowerBound = constrainTranslate;
+                  constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
+                } else {
+                  upperBound = constrainTranslate;
+                  constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
+                }
+              } else {
+                if (positiveTranslateX) {
+                  upperBound = constrainTranslate;
+                  constrainTranslate = (constrainTranslate + lowerBound) / 2;
+                } else {
+                  lowerBound = constrainTranslate;
+                  constrainTranslate = (constrainTranslate + upperBound) / 2;
+                }
+              }
+            }
+            translateAmountX = (positiveTranslateX ? Math.min : Math.max)(translateAmountX, constrainTranslate);
           }
         });
         this.xScales().forEach((xScale) => {
@@ -249,20 +293,43 @@ export module Interactions {
         });
 
         var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+
+        var positiveTranslateY = endPoint.y > startPoint.y;
         this.yScales().forEach((yScale) => {
           if (yScale instanceof Scales.ModifiedLog) {
-            var domainGrowing = endPoint.y > startPoint.y === yScale.domain()[1] > yScale.domain()[0];
-            var base = (<any> yScale)._base;
-            var log = (value: number) => Math.log(value) / Math.log(base);
-            var m = (yScale.range()[1] - yScale.range()[0]) / (log(yScale.domain()[1]) - log(yScale.domain()[0]));
-            var b = yScale.range()[1] - m * log(yScale.domain()[1]);
-            var domainExtent = Math.pow(base, (yScale.range()[1] - b) / m) - Math.pow(base, (yScale.range()[0] - b) / m);
-
-            var constrainingDomainExtent = domainGrowing ? this.maxDomainExtent(yScale) : this.minDomainExtent(yScale);
-            var constrainFunction = domainGrowing ? Math.min : Math.max;
-            translateAmountX = constrainFunction(translateAmountX, m * (log(constrainingDomainExtent) - log(domainExtent)));
+            var constrainTranslate = positiveTranslateY ? 1 : -1;
+            var lowerBound = positiveTranslateY ? 0 : -Infinity;
+            var upperBound = positiveTranslateY ? Infinity : 0;
+            var iterations = 5;
+            for (var i = 0; i < iterations; i++) {
+              var translateTransform = (rangeValue: number) => yScale.invert(rangeValue + constrainTranslate);
+              var constrainedDomain = yScale.range().map(translateTransform);
+              var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
+              var minDomainExtent = this.minDomainExtent(yScale) || 0;
+              var maxDomainExtent = this.maxDomainExtent(yScale) || Infinity;
+              if (constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent) {
+                if (positiveTranslateY) {
+                  lowerBound = constrainTranslate;
+                  constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
+                } else {
+                  upperBound = constrainTranslate;
+                  constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
+                }
+              } else {
+                if (positiveTranslateY) {
+                  upperBound = constrainTranslate;
+                  constrainTranslate = (constrainTranslate + lowerBound) / 2;
+                } else {
+                  lowerBound = constrainTranslate;
+                  constrainTranslate = (constrainTranslate + upperBound) / 2;
+                }
+              }
+            }
           }
+
+          translateAmountX = (positiveTranslateY ? Math.min : Math.max)(translateAmountY, constrainTranslate);
         });
+
         this.yScales().forEach((yScale) => {
           this._translateScale(yScale, translateAmountY);
         });
