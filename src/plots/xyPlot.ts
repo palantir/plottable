@@ -91,12 +91,12 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   /**
-   * Returns the lazy domain change setting on the plot
-   * @return {boolean} The lazy domain change setting
+   * Returns the whether or not the rendering is deferred for performance boost.
+   * @return {boolean} The deferred rendering option
    */
   public deferredRendering(): boolean;
   /**
-   * Sets / unsets the lazy domain change on the plot.
+   * Sets / unsets the deferred rendering option
    * Activating this option improves the performance of plot interaction (pan / zoom) by
    * performing lazy renders, only after the interaction has stopped. Because re-rendering
    * is no longer performed during the interaction, the zooming might experience a small
