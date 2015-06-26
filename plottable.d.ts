@@ -2545,7 +2545,7 @@ declare module Plottable {
          * Returns the lazy domain change setting on the plot
          * @return {boolean} The lazy domain change setting
          */
-        lazyDomainChange(): boolean;
+        deferredRendering(): boolean;
         /**
          * Sets / unsets the lazy domain change on the plot.
          * Activating this option improves the performance of plot interaction (pan / zoom) by
@@ -2555,7 +2555,7 @@ declare module Plottable {
          *
          * This option is intended for cases where performance is an issue.
          */
-        lazyDomainChange(lazyDomainChange: boolean): XYPlot<X, Y>;
+        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
          */

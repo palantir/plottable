@@ -9,9 +9,9 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
-  private _lazyDomainChange = false;
-  private _lazyDomainChangeCachedDomainX: X[] = [null, null];
-  private _lazyDomainChangeCachedDomainY: Y[] = [null, null];
+  private _deferredRendering = false;
+  private _performanceCachedDomainX: X[] = [null, null];
+  private _performanceCachedDomainY: Y[] = [null, null];
 
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
@@ -27,16 +27,16 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    var _timeoutReference = 0;
     var _deltaX = 0;
     var _deltaY = 0;
     var _scalingX = 1;
     var _scalingY = 1;
     var _lastSeenDomainX: X[] = null;
     var _lastSeenDomainY: Y[] = null;
-    var _lazyDomainChangeTimeout = 500;
+    var _timeoutReference = 0;
+    var _deferredRenderingTimeout = 500;
 
-    var _triggerLazyDomainChange = () => {
+    var _registerDeferredRendering = () => {
       if (this._renderArea == null) {
         return;
       }
@@ -45,13 +45,13 @@ export class XYPlot<X, Y> extends Plot {
         "scale(" + _scalingX + ", " + _scalingY + ")");
       clearTimeout(_timeoutReference);
       _timeoutReference = setTimeout(() => {
-        this._lazyDomainChangeCachedDomainX = _lastSeenDomainX;
-        this._lazyDomainChangeCachedDomainY = _lastSeenDomainY;
+        this._performanceCachedDomainX = _lastSeenDomainX;
+        this._performanceCachedDomainY = _lastSeenDomainY;
         _deltaX = 0;
         _deltaY = 0;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
-      }, _lazyDomainChangeTimeout);
+      }, _deferredRenderingTimeout);
     };
 
     var _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
@@ -59,11 +59,11 @@ export class XYPlot<X, Y> extends Plot {
         return;
       }
       _lastSeenDomainX = scale.domain();
-      _scalingX = (scale.scale(this._lazyDomainChangeCachedDomainX[1]) - scale.scale(this._lazyDomainChangeCachedDomainX[0])) /
+      _scalingX = (scale.scale(this._performanceCachedDomainX[1]) - scale.scale(this._performanceCachedDomainX[0])) /
         (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
-      _deltaX = scale.scale(this._lazyDomainChangeCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
+      _deltaX = scale.scale(this._performanceCachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
 
-      _triggerLazyDomainChange();
+      _registerDeferredRendering();
     };
 
     var _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
@@ -71,18 +71,18 @@ export class XYPlot<X, Y> extends Plot {
         return;
       }
       _lastSeenDomainY = scale.domain();
-      _scalingY = (scale.scale(this._lazyDomainChangeCachedDomainY[1]) - scale.scale(this._lazyDomainChangeCachedDomainY[0])) /
+      _scalingY = (scale.scale(this._performanceCachedDomainY[1]) - scale.scale(this._performanceCachedDomainY[0])) /
         (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
-      _deltaY = scale.scale(this._lazyDomainChangeCachedDomainY[0]) -
+      _deltaY = scale.scale(this._performanceCachedDomainY[0]) -
         scale.scale(_lastSeenDomainY[0]) * _scalingY;
 
-      _triggerLazyDomainChange();
+      _registerDeferredRendering();
     };
 
     this._renderCallback = (scale) => {
-      if (this.lazyDomainChange() && this.x() && this.x().scale === scale) {
+      if (this.deferredRendering() && this.x() && this.x().scale === scale) {
         _lazyDomainChangeCallbackX(scale);
-      } else if (this.lazyDomainChange() && this.y() && this.y().scale === scale) {
+      } else if (this.deferredRendering() && this.y() && this.y().scale === scale) {
         _lazyDomainChangeCallbackY(scale);
       } else {
         this.render();
@@ -94,7 +94,7 @@ export class XYPlot<X, Y> extends Plot {
    * Returns the lazy domain change setting on the plot
    * @return {boolean} The lazy domain change setting
    */
-  public lazyDomainChange(): boolean;
+  public deferredRendering(): boolean;
   /**
    * Sets / unsets the lazy domain change on the plot.
    * Activating this option improves the performance of plot interaction (pan / zoom) by
@@ -104,22 +104,22 @@ export class XYPlot<X, Y> extends Plot {
    *
    * This option is intended for cases where performance is an issue.
    */
-  public lazyDomainChange(lazyDomainChange: boolean): XYPlot<X, Y>;
-  public lazyDomainChange(lazyDomainChange?: boolean): any {
-    if (lazyDomainChange == null) {
-      return this._lazyDomainChange;
+  public deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
+  public deferredRendering(deferredRendering?: boolean): any {
+    if (deferredRendering == null) {
+      return this._deferredRendering;
     }
 
-    if (lazyDomainChange) {
+    if (deferredRendering) {
       if (this.x() && this.x().scale) {
-        this._lazyDomainChangeCachedDomainX = this.x().scale.domain();
+        this._performanceCachedDomainX = this.x().scale.domain();
       }
       if (this.y() && this.y().scale) {
-        this._lazyDomainChangeCachedDomainY = this.y().scale.domain();
+        this._performanceCachedDomainY = this.y().scale.domain();
       }
     }
 
-    this._lazyDomainChange = lazyDomainChange;
+    this._deferredRendering = deferredRendering;
     return this;
   }
 
