@@ -146,7 +146,7 @@ function populateTotalSidebarList(paths){
   });
 
   setupCheckboxBinding();
-  $(":checkbox").attr("checked" , true);
+  $(":checkbox").attr("checked", true);
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -215,7 +215,7 @@ function runQuickTest(result, svg, data, branch){
 
 function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
-    var name = path.replace(/\w*\/|\.js/g , '');
+    var name = path.replace(/\w*\/|\.js/g, '');
     d3.text("http://localhost:9999/" + path, function(error, text) {
       if (error !== null) {
         console.warn("Tried to load nonexistant quicktest ");

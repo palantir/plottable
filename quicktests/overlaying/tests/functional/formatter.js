@@ -35,8 +35,8 @@ function run(svg, data, Plottable) {
   var plot = new Plottable.Plots.Line().addDataset(dataseries1);
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
-  var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle],[CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
-  var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
+  var formatChoices = new Plottable.Components.Table([[IdTitle, GenTitle, FixTitle], [CurrTitle, null, PerTitle], [SITitle, null, CustTitle]]);
+  var bigTable = new Plottable.Components.Table([[basicTable], [formatChoices]]);
   formatChoices.xAlignment("center");
 
   bigTable.renderTo(svg);
