@@ -51,7 +51,6 @@ module.exports = function(grunt) {
   var FILES_TO_COMMIT = ['plottable.js',
                          'plottable.min.js',
                          'plottable.d.ts',
-                         'test/tests.js',
                          "plottable.css",
                          "plottable.zip",
                          "bower.json",
