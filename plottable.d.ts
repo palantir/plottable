@@ -1308,6 +1308,15 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Drawers {
+        class Segment extends Drawer {
+            constructor(dataset: Dataset);
+        }
+    }
+}
+
+
+declare module Plottable {
     type ComponentCallback = (component: Component) => void;
     module Components {
         class Alignment {
@@ -3059,6 +3068,87 @@ declare module Plottable {
             protected _onDatasetUpdate(): StackedBar<X, Y>;
             protected _updateExtentsForProperty(property: string): void;
             protected _extentsForProperty(attr: string): any[];
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Plots {
+        class Segment<X, Y> extends XYPlot<X, Y> {
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            constructor();
+            protected _createDrawer(dataset: Dataset): Drawers.Segment;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * Gets the AccessorScaleBinding for X
+             */
+            x(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X to a constant value or the result of an Accessor.
+             *
+             * @param {X|Accessor<X>} x
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets X to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {X|Accessor<X>} x
+             * @param {Scale<X, number>} xScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2
+             */
+            x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot
+             */
+            x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y
+             */
+            y(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y to a constant value or the result of an Accessor.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets Y to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @param {Scale<Y, number>} yScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
+            y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
+            protected _propertyProjectors(): AttributeToProjector;
         }
     }
 }

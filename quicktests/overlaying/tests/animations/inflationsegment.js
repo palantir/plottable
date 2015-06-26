@@ -37,6 +37,7 @@ function run(svg, data, Plottable) {
    xAxis.formatter(yearFormatter);
 
   var plot_array = [];
+  var segment_data = [];
 
   var add_year = function(y){
     var dataset = new Plottable.Dataset(data[y]);
@@ -56,37 +57,29 @@ function run(svg, data, Plottable) {
       total += d[month].y;
     }
     var average = total / 12;
-    var avg_data = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
-    var avg_ds = new Plottable.Dataset(avg_data);
-    var lineRenderer = new Plottable.Plots.Line()
-              .addDataset(avg_ds)
-              .x(function(datum) { return datum.x; }, xScale)
-              .y(function(datum) { return datum.y; }, yScale)
-              .attr("stroke", "#ff0000")
-              .attr("stroke-width", 4)
-              .attr("stroke-dasharray", 4)
-              .animated(true);
-    plot_array.push(lineRenderer);
+    segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
+
+  var get_x = function(d) { return d.x; };
+  var get_x2 = function(d) { return d.x2; };
+  var get_y = function(d) { return d.y; };
 
   for (var year = 0; year < data.length; year++){
     add_year(year);
     year_average(year);
+    var segmentPlot = new Plottable.Plots.Segment()
+      .x(get_x, xScale)
+      .y(get_y, yScale)
+      .x2(get_x2, xScale)
+      .addDataset(new Plottable.Dataset(segment_data))
+      .attr("stroke", "#ff0000")
+      .attr("stroke-width", 4)
+      .attr("stroke-dasharray", 4)
+      .animated(true);
+    plot_array.push(segmentPlot);
   }
 
   var group = new Plottable.Components.Group(plot_array);
-
- var add_click = function(plot){
-      new Plottable.Interactions.Click().onClick(function(){
-      var d = plot.datasets()[0].data();
-      plot.datasets()[0].data(d);
-    }).attachTo(plot);
- };
-
-  for( var i = 0; i < plot_array.length; i++){
-    var plot = plot_array[i];
-    add_click(plot);
-  }
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
                                                  [null,  xAxis]]);
