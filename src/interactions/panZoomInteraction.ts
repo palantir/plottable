@@ -177,9 +177,7 @@ export module Interactions {
 
     private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
-      var transformedDomain = scale.range().map(translateTransform);
-      var constrainedDomain = this._constrainedDomain(scale, transformedDomain);
-      scale.domain(constrainedDomain);
+      scale.domain(scale.range().map(translateTransform));
     }
 
     private _constrainedDomain<D>(scale: QuantitativeScale<D>, domainToConstrain: D[]) {
@@ -231,9 +229,23 @@ export module Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
+        var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
         this.xScales().forEach((xScale) => {
-          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          this._translateScale(xScale, -dragAmountX);
+          if (xScale instanceof Scales.ModifiedLog) {
+            var domainGrowing = endPoint.x < startPoint.x === xScale.domain()[1] > xScale.domain()[0];
+            var base = (<any> xScale)._base;
+            var log = (value: number) => Math.log(value) / Math.log(base);
+            var m = (xScale.range()[1] - xScale.range()[0]) / (log(xScale.domain()[1]) - log(xScale.domain()[0]));
+            var b = xScale.range()[1] - m * log(xScale.domain()[1]);
+            var domainExtent = Math.pow(base, (xScale.range()[1] - b) / m) - Math.pow(base, (xScale.range()[0] - b) / m);
+
+            var constrainingDomainExtent = domainGrowing ? this.maxDomainExtent(xScale) : this.minDomainExtent(xScale);
+            var constrainFunction = domainGrowing ? Math.min : Math.max;
+            translateAmountX = constrainFunction(translateAmountX, m * (log(constrainingDomainExtent) - log(domainExtent)));
+          }
+        });
+        this.xScales().forEach((xScale) => {
+          this._translateScale(xScale, translateAmountX);
         });
         this.yScales().forEach((yScale) => {
           var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
