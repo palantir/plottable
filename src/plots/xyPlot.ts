@@ -9,6 +9,10 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
+  private _deferredRendering = false;
+  private _cachedDomainX: X[] = [null, null];
+  private _cachedDomainY: Y[] = [null, null];
+
   /**
    * An XYPlot is a Plot that displays data along two primary directions, X and Y.
    *
@@ -22,6 +26,100 @@ export class XYPlot<X, Y> extends Plot {
 
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
+
+    var _deltaX = 0;
+    var _deltaY = 0;
+    var _scalingX = 1;
+    var _scalingY = 1;
+    var _lastSeenDomainX: X[] = null;
+    var _lastSeenDomainY: Y[] = null;
+    var _timeoutReference = 0;
+    var _deferredRenderingTimeout = 500;
+
+    var _registerDeferredRendering = () => {
+      if (this._renderArea == null) {
+        return;
+      }
+      this._renderArea.attr("transform",
+        "translate(" + _deltaX + ", " + _deltaY + ")" +
+        "scale(" + _scalingX + ", " + _scalingY + ")");
+      clearTimeout(_timeoutReference);
+      _timeoutReference = setTimeout(() => {
+        this._cachedDomainX = _lastSeenDomainX;
+        this._cachedDomainY = _lastSeenDomainY;
+        _deltaX = 0;
+        _deltaY = 0;
+        this.render();
+        this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+      }, _deferredRenderingTimeout);
+    };
+
+    var _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
+      if (!this._isAnchored) {
+        return;
+      }
+      _lastSeenDomainX = scale.domain();
+      _scalingX = (scale.scale(this._cachedDomainX[1]) - scale.scale(this._cachedDomainX[0])) /
+        (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
+      _deltaX = scale.scale(this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
+
+      _registerDeferredRendering();
+    };
+
+    var _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
+      if (!this._isAnchored) {
+        return;
+      }
+      _lastSeenDomainY = scale.domain();
+      _scalingY = (scale.scale(this._cachedDomainY[1]) - scale.scale(this._cachedDomainY[0])) /
+        (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
+      _deltaY = scale.scale(this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
+
+      _registerDeferredRendering();
+    };
+
+    this._renderCallback = (scale) => {
+      if (this.deferredRendering() && this.x() && this.x().scale === scale) {
+        _lazyDomainChangeCallbackX(scale);
+      } else if (this.deferredRendering() && this.y() && this.y().scale === scale) {
+        _lazyDomainChangeCallbackY(scale);
+      } else {
+        this.render();
+      }
+    };
+  }
+
+  /**
+   * Returns the whether or not the rendering is deferred for performance boost.
+   * @return {boolean} The deferred rendering option
+   */
+  public deferredRendering(): boolean;
+  /**
+   * Sets / unsets the deferred rendering option
+   * Activating this option improves the performance of plot interaction (pan / zoom) by
+   * performing lazy renders, only after the interaction has stopped. Because re-rendering
+   * is no longer performed during the interaction, the zooming might experience a small
+   * resolution degradation, before the lazy re-render is performed.
+   *
+   * This option is intended for cases where performance is an issue.
+   */
+  public deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
+  public deferredRendering(deferredRendering?: boolean): any {
+    if (deferredRendering == null) {
+      return this._deferredRendering;
+    }
+
+    if (deferredRendering) {
+      if (this.x() && this.x().scale) {
+        this._cachedDomainX = this.x().scale.domain();
+      }
+      if (this.y() && this.y().scale) {
+        this._cachedDomainY = this.y().scale.domain();
+      }
+    }
+
+    this._deferredRendering = deferredRendering;
+    return this;
   }
 
   /**
@@ -51,10 +149,6 @@ export class XYPlot<X, Y> extends Plot {
     this._bindProperty(XYPlot._X_KEY, x, xScale);
     if (this._autoAdjustYScaleDomain) {
       this._updateYExtentsAndAutodomain();
-    }
-
-    if (xScale != null) {
-      xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
     }
 
     this.render();
@@ -89,10 +183,6 @@ export class XYPlot<X, Y> extends Plot {
     this._bindProperty(XYPlot._Y_KEY, y, yScale);
     if (this._autoAdjustXScaleDomain) {
       this._updateXExtentsAndAutodomain();
-    }
-
-    if (yScale != null) {
-      yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
     }
 
     this.render();

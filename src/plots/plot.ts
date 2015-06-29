@@ -49,7 +49,7 @@ export class Plot extends Component {
   private _animate = false;
   private _animators: {[animator: string]: Animator} = {};
 
-  private _renderCallback: ScaleCallback<Scale<any, any>>;
+  protected _renderCallback: ScaleCallback<Scale<any, any>>;
   private _onDatasetUpdateCallback: DatasetCallback;
 
   protected _propertyExtents: d3.Map<any[]>;
