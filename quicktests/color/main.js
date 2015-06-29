@@ -11,26 +11,26 @@ function expandSidebar(){
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
     sidebar.animate({
-      left: '0%'
+      left: "0%"
     });
     content.animate({
-      left: '20%'
+      left: "20%"
     });
     controls.animate({
-      width: '80%'
+      width: "80%"
     });
   }
   else{
     sidebar.animate({
-      left: '-20%'
+      left: "-20%"
     });
     content.animate({
-      left: '0'
+      left: "0"
     }, function(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%'
+      width: "100%"
     });
   }
 }
@@ -69,7 +69,7 @@ function setupBindings(){
 
   //help button tooltip
   $("#help").hover(function(){
-    $("#help-description").fadeIn('fast');
+    $("#help-description").fadeIn("fast");
   }, function() {
       // Hover out code
       $("#help-description").css("display", "none");

@@ -124,8 +124,8 @@ function generateHeightWeightData(n) {
 
 function deepCopy(from, to){
   "use strict";
-  var deepCopyXY = function(d){
-    to.push({'x': d.x, 'y': d.y});
+  var deepCopyXY = function(d) {
+    to.push({ "x": d.x, "y": d.y });
   };
   from.forEach(deepCopyXY);
 }
