@@ -9429,8 +9429,6 @@ var Plottable;
                         _this._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
                         _this._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
                     });
-                }
-                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
                     this.yScales().forEach(function (yScale) {
                         _this._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
                         _this._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);

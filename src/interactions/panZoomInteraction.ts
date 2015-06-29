@@ -107,8 +107,7 @@ export module Interactions {
           this._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
           this._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
         });
-      }
-      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+
         this.yScales().forEach((yScale) => {
           this._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
           this._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
