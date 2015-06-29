@@ -2,7 +2,7 @@
 function makeData() {
   "use strict";
   var inflationData = function(years, baseline, resistance){
-    var dataset_array = [];
+    var datasets = [];
     var current = baseline;
     var up = true;
     for( var i = 0; i < years; i++){
@@ -16,9 +16,9 @@ function makeData() {
         current = obj.y;
         data.push(obj);
       }
-      dataset_array.push(data);
+      datasets.push(data);
     }
-    return dataset_array;
+    return datasets;
   };
 
   var d = inflationData(5, 2, 0.4);
@@ -36,10 +36,10 @@ function run(svg, data, Plottable) {
    var yearFormatter = function(d) { return Math.floor(d / 12) + 1999; };
    xAxis.formatter(yearFormatter);
 
-  var plot_array = [];
-  var segment_data = [];
+  var plots = [];
+  var segmentData = [];
 
-  var add_year = function(y){
+  var addYear = function(y){
     var dataset = new Plottable.Dataset(data[y]);
     var lineRenderer = new Plottable.Plots.Line()
               .addDataset(dataset)
@@ -47,39 +47,39 @@ function run(svg, data, Plottable) {
               .y(function(d) { return d.y; }, yScale)
               .attr("stroke", "#000000")
               .animated(true);
-    plot_array.push(lineRenderer);
+    plots.push(lineRenderer);
   };
 
-  var year_average = function(y){
+  var yearAverage = function(y){
     var d = data[y];
     var total = 0;
     for (var month = 0; month < 12; month++){
       total += d[month].y;
     }
     var average = total / 12;
-    segment_data.push({x: y * 12, y: average, x2: y * 12 + 11});
+    segmentData.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
 
-  var get_x = function(d) { return d.x; };
-  var get_x2 = function(d) { return d.x2; };
-  var get_y = function(d) { return d.y; };
+  var getX = function(d) { return d.x; };
+  var getX2 = function(d) { return d.x2; };
+  var getY = function(d) { return d.y; };
 
   for (var year = 0; year < data.length; year++){
-    add_year(year);
-    year_average(year);
+    addYear(year);
+    yearAverage(year);
     var segmentPlot = new Plottable.Plots.Segment()
-      .x(get_x, xScale)
-      .y(get_y, yScale)
-      .x2(get_x2, xScale)
-      .addDataset(new Plottable.Dataset(segment_data))
+      .x(getX, xScale)
+      .y(getY, yScale)
+      .x2(getX2, xScale)
+      .addDataset(new Plottable.Dataset(segmentData))
       .attr("stroke", "#ff0000")
       .attr("stroke-width", 4)
       .attr("stroke-dasharray", 4)
       .animated(true);
-    plot_array.push(segmentPlot);
+    plots.push(segmentPlot);
   }
 
-  var group = new Plottable.Components.Group(plot_array);
+  var group = new Plottable.Components.Group(plots);
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
                                                  [null,  xAxis]]);

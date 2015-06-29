@@ -7,7 +7,7 @@
     "d3": true,
     "Plottable": true,
     "makeRandomData": true,
-    "deep_copy": true
+    "deepCopy": true
   },
   "rules": {
     "no-eval": 0,
@@ -15,7 +15,6 @@
     "no-console": 0,
     "no-unused-vars": [2, {"vars": "local"}],
     "no-multi-spaces": 0,
-    "camelcase": 0,
     "comma-spacing": 0,
     "no-use-before-define": [2, "nofunc"],
     "strict": 0
