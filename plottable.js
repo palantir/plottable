@@ -6549,8 +6549,8 @@ var Plottable;
                     return;
                 }
                 _lastSeenDomainX = scale.domain();
-                _scalingX = (scale.scale(_this._cachedDomainX[1]) - scale.scale(_this._cachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
-                _deltaX = scale.scale(_this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
+                _scalingX = (scale.scale(_this._cachedDomainX[1]) - scale.scale(_this._cachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
+                _deltaX = scale.scale(_this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
                 _registerDeferredRendering();
             };
             var _lazyDomainChangeCallbackY = function (scale) {
@@ -6558,8 +6558,8 @@ var Plottable;
                     return;
                 }
                 _lastSeenDomainY = scale.domain();
-                _scalingY = (scale.scale(_this._cachedDomainY[1]) - scale.scale(_this._cachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
-                _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY;
+                _scalingY = (scale.scale(_this._cachedDomainY[1]) - scale.scale(_this._cachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
+                _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
                 _registerDeferredRendering();
             };
             this._renderCallback = function (scale) {

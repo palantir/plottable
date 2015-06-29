@@ -60,8 +60,8 @@ export class XYPlot<X, Y> extends Plot {
       }
       _lastSeenDomainX = scale.domain();
       _scalingX = (scale.scale(this._cachedDomainX[1]) - scale.scale(this._cachedDomainX[0])) /
-        (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0]));
-      _deltaX = scale.scale(this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]);
+        (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
+      _deltaX = scale.scale(this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
 
       _registerDeferredRendering();
     };
@@ -72,9 +72,8 @@ export class XYPlot<X, Y> extends Plot {
       }
       _lastSeenDomainY = scale.domain();
       _scalingY = (scale.scale(this._cachedDomainY[1]) - scale.scale(this._cachedDomainY[0])) /
-        (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0]));
-      _deltaY = scale.scale(this._cachedDomainY[0]) -
-        scale.scale(_lastSeenDomainY[0]) * _scalingY;
+        (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
+      _deltaY = scale.scale(this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
 
       _registerDeferredRendering();
     };
