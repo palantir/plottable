@@ -234,10 +234,10 @@ describe("Plots", () => {
         var rect = d3.select(this);
         var expectedY = yScale.scale(data1[index].y);
         var actualY = TestMethods.numAttr(rect, "y");
-        assert.strictEqual(actualY, expectedY, "y attribute set correctly (dataset 1, datum " + index + ")");
+        assert.closeTo(actualY, expectedY, 0.1, "y attribute set correctly (dataset 1, datum " + index + ")");
         var expectedHeight = yScale.scale(0) - expectedY;
         var actualHeight = TestMethods.numAttr(rect, "height");
-        assert.strictEqual(actualHeight, expectedHeight, "height attribute set correctly (dataset 1, datum " + index + ")");
+        assert.closeTo(actualHeight, expectedHeight, 0.1, "height attribute set correctly (dataset 1, datum " + index + ")");
       });
 
       var dataset2Rects = plot.content().selectAll("." + dataset2.metadata().id);
@@ -245,10 +245,10 @@ describe("Plots", () => {
         var rect = d3.select(this);
         var expectedY = yScale.scale(data2[index].y + data1[index].y);
         var actualY = TestMethods.numAttr(rect, "y");
-        assert.strictEqual(actualY, expectedY, "y attribute set correctly (dataset 2, datum " + index + ")");
+        assert.closeTo(actualY, expectedY, 0.1, "y attribute set correctly (dataset 2, datum " + index + ")");
         var expectedHeight = yScale.scale(data1[index].y) - expectedY;
         var actualHeight = TestMethods.numAttr(rect, "height");
-        assert.strictEqual(actualHeight, expectedHeight, "height attribute set correctly (dataset 2, datum " + index + ")");
+        assert.closeTo(actualHeight, expectedHeight, 0.1, "height attribute set correctly (dataset 2, datum " + index + ")");
       });
 
       svg.remove();
@@ -282,10 +282,10 @@ describe("Plots", () => {
         var rect = d3.select(this);
         var expectedX = xScale.scale(0);
         var actualX = TestMethods.numAttr(rect, "x");
-        assert.strictEqual(actualX, expectedX, "x attribute set correctly (dataset 1, datum " + index + ")");
+        assert.closeTo(actualX, expectedX, 0.1, "x attribute set correctly (dataset 1, datum " + index + ")");
         var expectedWidth = xScale.scale(data1[index].x) - expectedX;
         var actualWidth = TestMethods.numAttr(rect, "width");
-        assert.strictEqual(actualWidth, expectedWidth, "width attribute set correctly (dataset 1, datum " + index + ")");
+        assert.closeTo(actualWidth, expectedWidth, 0.1, "width attribute set correctly (dataset 1, datum " + index + ")");
       });
 
       var dataset2Rects = plot.content().selectAll("." + dataset2.metadata().id);
@@ -293,10 +293,10 @@ describe("Plots", () => {
         var rect = d3.select(this);
         var expectedX = xScale.scale(data1[index].x);
         var actualX = TestMethods.numAttr(rect, "x");
-        assert.strictEqual(actualX, expectedX, "x attribute set correctly (dataset 2, datum " + index + ")");
+        assert.closeTo(actualX, expectedX, 0.1, "x attribute set correctly (dataset 2, datum " + index + ")");
         var expectedWidth = xScale.scale(data2[index].x + data1[index].x) - expectedX;
         var actualWidth = TestMethods.numAttr(rect, "width");
-        assert.strictEqual(actualWidth, expectedWidth, "width attribute set correctly (dataset 2, datum " + index + ")");
+        assert.closeTo(actualWidth, expectedWidth, 0.1, "width attribute set correctly (dataset 2, datum " + index + ")");
       });
 
       svg.remove();
