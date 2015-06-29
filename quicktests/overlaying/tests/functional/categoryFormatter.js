@@ -36,18 +36,18 @@ function run(svg, data, Plottable) {
 
   bigTable.renderTo(svg);
 
-  function identity_frmt() {
+  function useIdentityFormatter() {
     xAxis.formatter(Plottable.Formatters.identity());
   }
-  function dow_frmt() {
+  function useDOWFormatter() {
      xAxis.formatter(DOWFormatter);
   }
-  function emp_frmt() {
+  function useEmpIdFormatter() {
      xAxis.formatter(EmpIDFormatter);
   }
 
-  new Plottable.Interactions.Click().onClick(identity_frmt).attachTo(IdTitle);
-  new Plottable.Interactions.Click().onClick(dow_frmt).attachTo(DowTitle);
-  new Plottable.Interactions.Click().onClick(emp_frmt).attachTo(EmpIDTitle);
+  new Plottable.Interactions.Click().onClick(useIdentityFormatter).attachTo(IdTitle);
+  new Plottable.Interactions.Click().onClick(useDOWFormatter).attachTo(DowTitle);
+  new Plottable.Interactions.Click().onClick(useEmpIdFormatter).attachTo(EmpIDTitle);
 
 }

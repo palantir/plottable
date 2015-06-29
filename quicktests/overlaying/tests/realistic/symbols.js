@@ -9,7 +9,7 @@ function run(svg, data, Plottable){
   "use strict";
 
   var plotData = [];
-  deep_copy(data[0], plotData);
+  deepCopy(data[0], plotData);
   var dataset = new Plottable.Dataset(plotData);
 
   var xScale = new Plottable.Scales.Linear();
