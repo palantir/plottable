@@ -122,10 +122,10 @@ function generateHeightWeightData(n) {
   return data;
 }
 
-function deep_copy(from, to){
+function deepCopy(from, to){
   "use strict";
-  var deep_copy_xy = function(d){
-    to.push({x: d.x, y: d.y});
+  var deepCopyXY = function(d) {
+    to.push({ "x": d.x, "y": d.y });
   };
-  from.forEach(deep_copy_xy);
+  from.forEach(deepCopyXY);
 }

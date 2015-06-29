@@ -7,14 +7,14 @@ function makeData() {
 function run(svg, data, Plottable) {
   "use strict";
 
-    var large_x = function(d){
+    var largeX = function(d){
          d.x = d.x * 100000000;
     };
 
-  var big_numbers = [];
-  deep_copy(data[0], big_numbers);
-  big_numbers.forEach(large_x);
-  var dataseries1 = new Plottable.Dataset(big_numbers);
+  var bigNumbers = [];
+  deepCopy(data[0], bigNumbers);
+  bigNumbers.forEach(largeX);
+  var dataseries1 = new Plottable.Dataset(bigNumbers);
 
   //Axis
   var xScale = new Plottable.Scales.Linear();
@@ -41,41 +41,41 @@ function run(svg, data, Plottable) {
 
   bigTable.renderTo(svg);
 
-  function identity_frmt() {
+  function useIdentityFormatter() {
     xAxis.formatter(Plottable.Formatters.identity());
     yAxis.formatter(Plottable.Formatters.identity());
   }
-  function general_frmt() {
+  function useGeneralFormatter() {
     xAxis.formatter(Plottable.Formatters.general(2));
     yAxis.formatter(Plottable.Formatters.general(2));
   }
-  function fixed_frmt() {
+  function useFixedFormatter() {
     xAxis.formatter(Plottable.Formatters.fixed(2));
     yAxis.formatter(Plottable.Formatters.fixed(2));
   }
-  function currency_frmt() {
+  function useCurrencyFormatter() {
     xAxis.formatter(Plottable.Formatters.currency(2, "$", true));
     yAxis.formatter(Plottable.Formatters.currency(2, "$", true));
   }
-  function percentage_frmt() {
+  function usePercentageFormatter() {
     xAxis.formatter(Plottable.Formatters.percentage(2));
     yAxis.formatter(Plottable.Formatters.percentage(2));
   }
-  function SI_frmt() {
+  function useSIFormatter() {
      xAxis.formatter(Plottable.Formatters.siSuffix(2));
      yAxis.formatter(Plottable.Formatters.siSuffix(2));
   }
-  function custom_frmt() {
+  function useCustomFormatter() {
      xAxis.formatter(custFormatter);
      yAxis.formatter(custFormatter);
   }
 
-  new Plottable.Interactions.Click().onClick(identity_frmt).attachTo(IdTitle);
-  new Plottable.Interactions.Click().onClick(general_frmt).attachTo(GenTitle);
-  new Plottable.Interactions.Click().onClick(fixed_frmt).attachTo(FixTitle);
-  new Plottable.Interactions.Click().onClick(currency_frmt).attachTo(CurrTitle);
-  new Plottable.Interactions.Click().onClick(percentage_frmt).attachTo(PerTitle);
-  new Plottable.Interactions.Click().onClick(SI_frmt).attachTo(SITitle);
-  new Plottable.Interactions.Click().onClick(custom_frmt).attachTo(CustTitle);
+  new Plottable.Interactions.Click().onClick(useIdentityFormatter).attachTo(IdTitle);
+  new Plottable.Interactions.Click().onClick(useGeneralFormatter).attachTo(GenTitle);
+  new Plottable.Interactions.Click().onClick(useFixedFormatter).attachTo(FixTitle);
+  new Plottable.Interactions.Click().onClick(useCurrencyFormatter).attachTo(CurrTitle);
+  new Plottable.Interactions.Click().onClick(usePercentageFormatter).attachTo(PerTitle);
+  new Plottable.Interactions.Click().onClick(useSIFormatter).attachTo(SITitle);
+  new Plottable.Interactions.Click().onClick(useCustomFormatter).attachTo(CustTitle);
 
 }
