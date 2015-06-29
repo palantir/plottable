@@ -77,6 +77,7 @@ export module Plots {
       var heightF = (d: any, i: number, dataset: Dataset) => {
         return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
       };
+      attrToProjector[this._isVertical ? "height" : "width"] = heightF;
 
       var attrFunction = (d: any, i: number, dataset: Dataset) =>
         +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset);
