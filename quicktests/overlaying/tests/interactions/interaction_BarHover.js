@@ -44,6 +44,6 @@ function run(svg, data, Plottable) {
       title.text("Who?");
     }
   });
-  pointer.onPointerExit(function(p) { title.text("Who?"); });
+  pointer.onPointerExit(function() { title.text("Who?"); });
   pointer.attachTo(plot);
 }

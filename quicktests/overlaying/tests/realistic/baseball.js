@@ -6,7 +6,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("/quicktests/overlaying/data/baseball.csv").get(function(error, rows) {
-  var data = rows;
+  data = rows;
   var dataset = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear();

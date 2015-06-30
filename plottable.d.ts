@@ -358,6 +358,10 @@ declare module Plottable {
              * Computes the position relative to the <svg> in svg-coordinate-space.
              */
             computePosition(clientX: number, clientY: number): Point;
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            insideSVG(e: Event): boolean;
         }
     }
 }
@@ -1301,6 +1305,15 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Symbol extends Drawer {
+            constructor(dataset: Dataset);
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Drawers {
+        class Segment extends Drawer {
             constructor(dataset: Dataset);
         }
     }
@@ -2319,6 +2332,7 @@ declare module Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2561,6 +2575,21 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        /**
+         * Returns the whether or not the rendering is deferred for performance boost.
+         * @return {boolean} The deferred rendering option
+         */
+        deferredRendering(): boolean;
+        /**
+         * Sets / unsets the deferred rendering option
+         * Activating this option improves the performance of plot interaction (pan / zoom) by
+         * performing lazy renders, only after the interaction has stopped. Because re-rendering
+         * is no longer performed during the interaction, the zooming might experience a small
+         * resolution degradation, before the lazy re-render is performed.
+         *
+         * This option is intended for cases where performance is an issue.
+         */
+        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
          */
@@ -3065,6 +3094,87 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Plots {
+        class Segment<X, Y> extends XYPlot<X, Y> {
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            constructor();
+            protected _createDrawer(dataset: Dataset): Drawers.Segment;
+            protected _generateDrawSteps(): Drawers.DrawStep[];
+            /**
+             * Gets the AccessorScaleBinding for X
+             */
+            x(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X to a constant value or the result of an Accessor.
+             *
+             * @param {X|Accessor<X>} x
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets X to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {X|Accessor<X>} x
+             * @param {Scale<X, number>} xScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            x(x: X | Accessor<X>, xScale: Scale<X, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for X2
+             */
+            x2(): AccessorScaleBinding<X, number>;
+            /**
+             * Sets X2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for X, it will also be used to scale X2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot
+             */
+            x2(x2: number | Accessor<number> | X | Accessor<X>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y
+             */
+            y(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y to a constant value or the result of an Accessor.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: number | Accessor<number>): Plots.Segment<X, Y>;
+            /**
+             * Sets Y to a scaled constant value or scaled result of an Accessor.
+             * The provided Scale will account for the values when autoDomain()-ing.
+             *
+             * @param {Y|Accessor<Y>} y
+             * @param {Scale<Y, number>} yScale
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y(y: Y | Accessor<Y>, yScale: Scale<Y, number>): Plots.Segment<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for Y2.
+             */
+            y2(): AccessorScaleBinding<Y, number>;
+            /**
+             * Sets Y2 to a constant number or the result of an Accessor.
+             * If a Scale has been set for Y, it will also be used to scale Y2.
+             *
+             * @param {number|Accessor<number>|Y|Accessor<Y>} y2
+             * @returns {Plots.Segment} The calling Segment Plot.
+             */
+            y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
+            protected _propertyProjectors(): AttributeToProjector;
+        }
+    }
+}
+
+
+declare module Plottable {
     interface Animator {
         /**
          * Applies the supplied attributes to a d3.Selection with some animation.
@@ -3445,6 +3555,17 @@ declare module Plottable {
          * @returns {Interaction} The calling Interaction.
          */
         detachFrom(component: Component): Interaction;
+        /**
+         * Gets whether this Interaction is enabled.
+         */
+        enabled(): boolean;
+        /**
+         * Enables or disables this Interaction.
+         *
+         * @param {boolean} enabled Whether the Interaction should be enabled.
+         * @return {Interaction} The calling Interaction.
+         */
+        enabled(enabled: boolean): Interaction;
         /**
          * Translates an <svg>-coordinate-space point to Component-space coordinates.
          *

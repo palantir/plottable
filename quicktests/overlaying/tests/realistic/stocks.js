@@ -19,8 +19,8 @@ function run(svg, data, Plottable) {
 
       // load AAPL
       d3.csv("/quicktests/overlaying/data/AAPL_20140401_20140901.csv")
-        .get(function(error, rows) {
-          var aapl = rows.reverse();
+        .get(function(aaplError, aaplRows) {
+          var aapl = aaplRows.reverse();
           aapl.forEach(processDatum);
 
           // process and create chart
@@ -45,7 +45,6 @@ function run(svg, data, Plottable) {
           }
 
           var extentFcnA = function() { return [new Date("2014-08-22"), new Date("2014-08-25")]; };
-          var extentFcnB = function() { return [new Date("2013-08-22"), new Date("2015-08-25")]; };
 
           var xScale = new Plottable.Scales.Time();
           xScale.addIncludedValuesProvider(extentFcnA);
@@ -53,65 +52,56 @@ function run(svg, data, Plottable) {
           var xAxis = new Plottable.Axes.Time(xScale, "bottom");
           var xAxisTop = new Plottable.Axes.Time(xScale, "top");
 
-          var yScale_aapl = new Plottable.Scales.Linear();
-          var yAxis_aapl = new Plottable.Axes.Numeric(yScale_aapl, "right").showEndTickLabels(true);
-          var label_aapl = new Plottable.Components.AxisLabel("AAPL").angle(90);
+          var yScaleAAPL = new Plottable.Scales.Linear();
+          var yAxisAAPL = new Plottable.Axes.Numeric(yScaleAAPL, "right").showEndTickLabels(true);
+          var labelAAPL = new Plottable.Components.AxisLabel("AAPL").angle(90);
 
-          var yScale_goog = new Plottable.Scales.Linear();
-          var yAxis_goog = new Plottable.Axes.Numeric(yScale_goog, "left").xAlignment("right").showEndTickLabels(true);
-          var label_goog = new Plottable.Components.AxisLabel("GOOG").angle(-90);
+          var yScaleGOOG = new Plottable.Scales.Linear();
+          var yAxisGOOG = new Plottable.Axes.Numeric(yScaleGOOG, "left").xAlignment("right").showEndTickLabels(true);
+          var labelGOOG = new Plottable.Components.AxisLabel("GOOG").angle(-90);
 
           var colorScale = new Plottable.Scales.Color();
 
           var aaplSource = new Plottable.Dataset(aapl, {name: "AAPL"} );
           var googSource = new Plottable.Dataset(goog, {name: "GOOG"} );
 
-          var line_aapl = new Plottable.Plots.Line().animated(true)
+          var lineAAPL = new Plottable.Plots.Line().animated(true)
                                   .addDataset(aaplSource)
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["Adj Close"]; }, yScale_aapl)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-          if (typeof line_aapl.autorange === "function") {
-            line_aapl.autorange("y");
-          } else {
-            line_aapl.autorangeMode("y");
-          }
-          var line_goog = new Plottable.Plots.Line().animated(true)
+                                  .y(function(d) { return d["Adj Close"]; }, yScaleAAPL)
+                                  .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
+          lineAAPL.autorangeMode("y");
+          var lineGOOG = new Plottable.Plots.Line().animated(true)
                                   .addDataset(googSource)
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["Adj Close"]; }, yScale_goog)
-                                  .attr("stroke", function(d, i, dataset) { return dataset.metadata().name; }, colorScale);
-          if (typeof line_aapl.autorange === "function") {
-            line_goog.autorange("y");
-          } else {
-            line_goog.autorangeMode("y");
-          }
+                                  .y(function(d) { return d["Adj Close"]; }, yScaleGOOG)
+                                  .attr("stroke", function(d, index, dataset) { return dataset.metadata().name; }, colorScale);
+          lineGOOG.autorangeMode("y");
 
           // should be one line plot, pending #917
 
           var legend = new Plottable.Components.Legend(colorScale);
           legend.maxEntriesPerRow(1);
           legend.yAlignment("top");
-          var plotArea = new Plottable.Components.Group([line_aapl, line_goog, legend]);
+          var plotArea = new Plottable.Components.Group([lineAAPL, lineGOOG, legend]);
 
-          var yScale_diff = new Plottable.Scales.Linear();
-          var yAxis_diff = new Plottable.Axes.Numeric(yScale_diff, "left");
+          var yScaleDiff = new Plottable.Scales.Linear();
 
           var DAY_MILLIS = 24 * 60 * 60 * 1000;
-          var bar_diff = new Plottable.Plots.Bar("vertical").animated(true)
+          var barDiff = new Plottable.Plots.Bar("vertical").animated(true)
                                   .addDataset(new Plottable.Dataset(diffData))
                                   .x(function(d) { return d.Date; }, xScale)
-                                  .y(function(d) { return d["net change"]; }, yScale_diff)
+                                  .y(function(d) { return d["net change"]; }, yScaleDiff)
                                   .attr("width", function() { return xScale.scale(DAY_MILLIS) - xScale.scale(0); })
                                   .attr("fill", function(d) {
                                     return d["net change"] > 0 ? colorScale.range()[2] : colorScale.range()[6];
                                   });
 
           var table = new Plottable.Components.Table([
-                            [null      , null      , xAxisTop, null      , null      ],
-                            [label_goog, yAxis_goog, plotArea, yAxis_aapl, label_aapl],
-                            [null      , null      , bar_diff, null      , null      ],
-                            [null      , null      , xAxis   , null      , null      ]]);
+                            [null,       null,       xAxisTop, null,       null],
+                            [labelGOOG,  yAxisGOOG,   plotArea, yAxisAAPL,  labelAAPL],
+                            [null,       null,       barDiff,  null,       null],
+                            [null,       null,       xAxis,    null,       null]]);
 
           table.rowWeight(2, 0.3);
 

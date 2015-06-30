@@ -12,14 +12,10 @@ function run(svg, data, Plottable) {
 
     var xScale = new Plottable.Scales.Linear();
     var yScale = new Plottable.Scales.Linear();
-    var xAxis0 = new Plottable.Axes.Numeric(xScale, "bottom");
-    var xAxis1 = new Plottable.Axes.Numeric(xScale, "bottom");
     var xAxis2 = new Plottable.Axes.Numeric(xScale, "bottom");
     var xAxis3 = new Plottable.Axes.Numeric(xScale, "bottom");
     var yAxis0 = new Plottable.Axes.Numeric(yScale, "left");
-    var yAxis1 = new Plottable.Axes.Numeric(yScale, "left");
     var yAxis2 = new Plottable.Axes.Numeric(yScale, "left");
-    var yAxis3 = new Plottable.Axes.Numeric(yScale, "left");
 
     //test Component constructor (default, should be no issues)
 

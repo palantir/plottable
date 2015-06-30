@@ -14,32 +14,32 @@ function toggleSidebar(){
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
     sidebar.animate({
-      left: '0%'
+      left: "0%"
     });
     content.animate({
-      left: '20%'
+      left: "20%"
     });
     controls.animate({
-      width: '80%'
+      width: "80%"
     });
     sizeControls.animate({
-      width: '80%'
+      width: "80%"
     });
   }
   else{
     sidebar.animate({
-      left: '-20%'
+      left: "-20%"
     });
     content.animate({
-      left: '0'
+      left: "0"
     }, function(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%'
+      width: "100%"
     });
     sizeControls.animate({
-      width: '100%'
+      width: "100%"
     });
   }
 }
@@ -72,7 +72,6 @@ var firstBranch;
 var secondBranch;
 var svgWidth;
 var svgHeight;
-var sidebarPopulated = false;
 
 //METHODS
 
@@ -110,7 +109,7 @@ function setupCheckboxBinding(){
 
 function populateTotalSidebarList(paths){
   //IF CATEGORY IS ALL ******
-  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, ''); });
+  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, ""); });
 
   //ex. animations/animate_area
   var hash = {};
@@ -139,17 +138,15 @@ function populateTotalSidebarList(paths){
 
     object.value.forEach(function(quicktest){
       var singleQuicktestName = quicktest;
-      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-      var endOlString = "</li>";
-      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endLiString = "</li>";
+      var quicktestStringHTML = startLiString + singleQuicktestName + endLiString;
       $("#" + categoryName).append(quicktestStringHTML);
     });
   });
 
   setupCheckboxBinding();
-  $(":checkbox").attr("checked" , true);
-  sidebarPopulated = true;
-
+  $(":checkbox").attr("checked", true);
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -164,15 +161,14 @@ function populateSidebarList(paths, testsInCategory, category){
 
     allQuickTests.forEach(function(quicktest){
       var singleQuicktestName = quicktest.value;
-      var startOlString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
-      var endOlString = "</li>";
-      var quicktestStringHTML = startOlString + singleQuicktestName + endOlString;
+      var startLiString = "<li class=\"sidebar-quicktest\"> <input class=\"quicktest-checkbox\" type=\"checkbox\">";
+      var endLiString = "</li>";
+      var quicktestStringHTML = startLiString + singleQuicktestName + endLiString;
       $("#" + categoryName).append(quicktestStringHTML);
     });
   $(":checkbox").attr("checked", false);
   setupCheckboxBinding();
   setCategoryCheckbox(category, true);
-  sidebarPopulated = true;
 }
 
 //initializing methods
@@ -181,7 +177,7 @@ function setupBindings(){
   // show/hide according to hotkey events
   window.onkeyup = function(e){
     var key = e.keyCode || e.which;
-    var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
+    var inputActive = $("#branch1, #branch2, #width, #height").is(":focus");
     if(inputActive){return; }
 
     var visibleQuickTests = $(".quicktest").filter(":visible").toArray();
@@ -189,11 +185,11 @@ function setupBindings(){
   };
 
   $("#help").hover(function(){
-    $("#test-category-descriptions").fadeIn('fast');
+    $("#test-category-descriptions").fadeIn("fast");
   }, function() {
       // Hover out code
       $("#test-category-descriptions").css("display", "none");
-  }).mousemove(function(e) {
+  }).mousemove(function() {
       var windowWidth = window.innerWidth;
       var helpY = $("#help").position().top;
       $("#test-category-descriptions").css({ top: helpY + 28, left: windowWidth - 360 });
@@ -217,10 +213,9 @@ function runQuickTest(result, svg, data, branch){
   }
 }
 
-function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
-  var div = d3.select("#results");
+function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
-    var name = path.replace(/\w*\/|\.js/g , '');
+    var name = path.replace(/\w*\/|\.js/g, "");
     d3.text("http://localhost:9999/" + path, function(error, text) {
       if (error !== null) {
         console.warn("Tried to load nonexistant quicktest ");
@@ -238,15 +233,13 @@ function loadAllQuickTests(quicktestsPaths, firstBranch, secondBranch){
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstBranch);
-      runQuickTest(result, secondsvg, data, secondBranch);
+      runQuickTest(result, firstsvg, data, firstQTBranch);
+      runQuickTest(result, secondsvg, data, secondQTBranch);
     });
   });
 }
 //load each quicktest locally, eval it, then run quicktest
-function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondBranch){
-
-  var div = d3.select("#results");
+function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secondQTBranch){
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
@@ -267,8 +260,8 @@ function loadQuickTestsInCategory(quickTestNames, category, firstBranch, secondB
       var secondsvg = div.append("div").attr("class", "second").append("svg").attr({width: svgWidth, height: svgHeight});
       var data = result.makeData();
 
-      runQuickTest(result, firstsvg, data, firstBranch);
-      runQuickTest(result, secondsvg, data, secondBranch);
+      runQuickTest(result, firstsvg, data, firstQTBranch);
+      runQuickTest(result, secondsvg, data, secondQTBranch);
     });
   });
 }
@@ -280,7 +273,7 @@ function filterQuickTests(category, branchList){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path; });
     if (category !== "all"){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });
-      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ''); });
+      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ""); });
       loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
       populateSidebarList(paths, testsInCategory, category);
     }
@@ -314,8 +307,8 @@ function loadPlottableBranches(category, branchList){
       plottableBranches[branchName1] =  $.extend(true, {}, Plottable);
       Plottable = null;
 
-      $.getScript(listOfUrl[1], function(data, testStatus){ //load second
-        if(textStatus === "success"){
+      $.getScript(listOfUrl[1], function(innerData, innerTestStatus){ //load second
+        if(innerTestStatus === "success"){
           plottableBranches[branchName2] = $.extend(true, {}, Plottable);
           Plottable = null;
           filterQuickTests(category, branchList);
@@ -339,7 +332,6 @@ function clearTests(){
   plottableBranches = [];
   resetDisplayProperties();
   d3.selectAll(".quicktest, .sidebar-quicktest-category ").remove();
-  sidebarPopulated = false;
 }
 
 function initialize(){

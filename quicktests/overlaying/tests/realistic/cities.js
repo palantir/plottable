@@ -7,12 +7,12 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("/quicktests/overlaying/data/cities.csv").get(function(error, rows) {
-  var data = rows;
+  data = rows;
   var ds = new Plottable.Dataset(data);
 
   var csRange = [];
   for(var i = 0; i < 30; i++){
-    var c = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    var c = "#" + Math.floor(Math.random() * 16777215).toString(16);
     csRange.push(c);
   }
 

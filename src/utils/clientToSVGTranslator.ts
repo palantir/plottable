@@ -70,6 +70,13 @@ export module Utils {
 
       return scaledPosition;
     }
+
+    /**
+     * Checks whether event happened inside <svg> element.
+     */
+    public insideSVG(e: Event): boolean {
+      return Utils.DOM.boundingSVG(<SVGElement>e.target) === this._svg;
+    }
   }
 }
 }

@@ -1,5 +1,5 @@
 /*!
-Plottable 1.0.0 (https://github.com/palantir/plottable)
+Plottable 1.1.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -854,6 +854,12 @@ var Plottable;
                 };
                 return scaledPosition;
             };
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            ClientToSVGTranslator.prototype.insideSVG = function (e) {
+                return Utils.DOM.boundingSVG(e.target) === this._svg;
+            };
             ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
             return ClientToSVGTranslator;
         })();
@@ -876,7 +882,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.0.0";
+    Plottable.version = "1.1.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2787,6 +2793,29 @@ var Plottable;
             return Symbol;
         })(Plottable.Drawer);
         Drawers.Symbol = Symbol;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            function Segment(dataset) {
+                _super.call(this, dataset);
+                this._svgElementName = "line";
+            }
+            return Segment;
+        })(Plottable.Drawer);
+        Drawers.Segment = Segment;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6645,10 +6674,80 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
+            this._deferredRendering = false;
+            this._cachedDomainX = [null, null];
+            this._cachedDomainY = [null, null];
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+            var _deltaX = 0;
+            var _deltaY = 0;
+            var _scalingX = 1;
+            var _scalingY = 1;
+            var _lastSeenDomainX = null;
+            var _lastSeenDomainY = null;
+            var _timeoutReference = 0;
+            var _deferredRenderingTimeout = 500;
+            var _registerDeferredRendering = function () {
+                if (_this._renderArea == null) {
+                    return;
+                }
+                _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
+                clearTimeout(_timeoutReference);
+                _timeoutReference = setTimeout(function () {
+                    _this._cachedDomainX = _lastSeenDomainX;
+                    _this._cachedDomainY = _lastSeenDomainY;
+                    _deltaX = 0;
+                    _deltaY = 0;
+                    _this.render();
+                    _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+                }, _deferredRenderingTimeout);
+            };
+            var _lazyDomainChangeCallbackX = function (scale) {
+                if (!_this._isAnchored) {
+                    return;
+                }
+                _lastSeenDomainX = scale.domain();
+                _scalingX = (scale.scale(_this._cachedDomainX[1]) - scale.scale(_this._cachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
+                _deltaX = scale.scale(_this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
+                _registerDeferredRendering();
+            };
+            var _lazyDomainChangeCallbackY = function (scale) {
+                if (!_this._isAnchored) {
+                    return;
+                }
+                _lastSeenDomainY = scale.domain();
+                _scalingY = (scale.scale(_this._cachedDomainY[1]) - scale.scale(_this._cachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
+                _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
+                _registerDeferredRendering();
+            };
+            this._renderCallback = function (scale) {
+                if (_this.deferredRendering() && _this.x() && _this.x().scale === scale) {
+                    _lazyDomainChangeCallbackX(scale);
+                }
+                else if (_this.deferredRendering() && _this.y() && _this.y().scale === scale) {
+                    _lazyDomainChangeCallbackY(scale);
+                }
+                else {
+                    _this.render();
+                }
+            };
         }
+        XYPlot.prototype.deferredRendering = function (deferredRendering) {
+            if (deferredRendering == null) {
+                return this._deferredRendering;
+            }
+            if (deferredRendering) {
+                if (this.x() && this.x().scale) {
+                    this._cachedDomainX = this.x().scale.domain();
+                }
+                if (this.y() && this.y().scale) {
+                    this._cachedDomainY = this.y().scale.domain();
+                }
+            }
+            this._deferredRendering = deferredRendering;
+            return this;
+        };
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
                 return this._propertyBindings.get(XYPlot._X_KEY);
@@ -6656,9 +6755,6 @@ var Plottable;
             this._bindProperty(XYPlot._X_KEY, x, xScale);
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
-            }
-            if (xScale != null) {
-                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             this.render();
             return this;
@@ -6670,9 +6766,6 @@ var Plottable;
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
-            }
-            if (yScale != null) {
-                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
             return this;
@@ -8224,6 +8317,7 @@ var Plottable;
                 var heightF = function (d, i, dataset) {
                     return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
                 };
+                attrToProjector[this._isVertical ? "height" : "width"] = heightF;
                 var attrFunction = function (d, i, dataset) { return +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset); };
                 attrToProjector[valueAttr] = function (d, i, dataset) { return _this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset); };
                 return attrToProjector;
@@ -8262,6 +8356,106 @@ var Plottable;
             return StackedBar;
         })(Plots.Bar);
         Plots.StackedBar = StackedBar;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Segment = (function (_super) {
+            __extends(Segment, _super);
+            /**
+             * A Segment Plot displays line segments based on the data.
+             *
+             * @constructor
+             */
+            function Segment() {
+                _super.call(this);
+                this.addClass("segment-plot");
+                this.attr("stroke", new Plottable.Scales.Color().range()[0]);
+                this.attr("stroke-width", "2px");
+            }
+            Segment.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Segment(dataset);
+            };
+            Segment.prototype._generateDrawSteps = function () {
+                return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
+            };
+            Segment.prototype.x = function (x, xScale) {
+                if (x == null) {
+                    return _super.prototype.x.call(this);
+                }
+                if (xScale == null) {
+                    _super.prototype.x.call(this, x);
+                }
+                else {
+                    _super.prototype.x.call(this, x, xScale);
+                    var x2Binding = this.x2();
+                    var x2 = x2Binding && x2Binding.accessor;
+                    if (x2 != null) {
+                        this._bindProperty(Segment._X2_KEY, x2, xScale);
+                    }
+                }
+                return this;
+            };
+            Segment.prototype.x2 = function (x2) {
+                if (x2 == null) {
+                    return this._propertyBindings.get(Segment._X2_KEY);
+                }
+                var xBinding = this.x();
+                var xScale = xBinding && xBinding.scale;
+                this._bindProperty(Segment._X2_KEY, x2, xScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype.y = function (y, yScale) {
+                if (y == null) {
+                    return _super.prototype.y.call(this);
+                }
+                if (yScale == null) {
+                    _super.prototype.y.call(this, y);
+                }
+                else {
+                    _super.prototype.y.call(this, y, yScale);
+                    var y2Binding = this.y2();
+                    var y2 = y2Binding && y2Binding.accessor;
+                    if (y2 != null) {
+                        this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                    }
+                }
+                return this;
+            };
+            Segment.prototype.y2 = function (y2) {
+                if (y2 == null) {
+                    return this._propertyBindings.get(Segment._Y2_KEY);
+                }
+                var yBinding = this.y();
+                var yScale = yBinding && yBinding.scale;
+                this._bindProperty(Segment._Y2_KEY, y2, yScale);
+                this.render();
+                return this;
+            };
+            Segment.prototype._propertyProjectors = function () {
+                var attrToProjector = _super.prototype._propertyProjectors.call(this);
+                attrToProjector["x1"] = Plottable.Plot._scaledAccessor(this.x());
+                attrToProjector["x2"] = this.x2() == null ? Plottable.Plot._scaledAccessor(this.x()) : Plottable.Plot._scaledAccessor(this.x2());
+                attrToProjector["y1"] = Plottable.Plot._scaledAccessor(this.y());
+                attrToProjector["y2"] = this.y2() == null ? Plottable.Plot._scaledAccessor(this.y()) : Plottable.Plot._scaledAccessor(this.y2());
+                return attrToProjector;
+            };
+            Segment._X2_KEY = "x2";
+            Segment._Y2_KEY = "y2";
+            return Segment;
+        })(Plottable.XYPlot);
+        Plots.Segment = Segment;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
@@ -8478,12 +8672,12 @@ var Plottable;
                 this._wheelCallbacks = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
-                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks, "page"); };
                 this._eventToCallback["mouseover"] = processMoveCallback;
                 this._eventToCallback["mousemove"] = processMoveCallback;
                 this._eventToCallback["mouseout"] = processMoveCallback;
                 this._eventToCallback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
-                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks, "page"); };
                 this._eventToCallback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
                 this._eventToCallback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
@@ -8607,11 +8801,17 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
-                var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
-                if (newMousePosition != null) {
-                    this._lastMousePosition = newMousePosition;
-                    callbackSet.callCallbacks(this.lastMousePosition(), event);
+            Mouse.prototype._measureAndDispatch = function (event, callbackSet, scope) {
+                if (scope === void 0) { scope = "element"; }
+                if (scope !== "page" && scope !== "element") {
+                    throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+                }
+                if (scope === "page" || this._translator.insideSVG(event)) {
+                    var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+                    if (newMousePosition != null) {
+                        this._lastMousePosition = newMousePosition;
+                        callbackSet.callCallbacks(this.lastMousePosition(), event);
+                    }
                 }
             };
             /**
@@ -8863,6 +9063,7 @@ var Plottable;
         function Interaction() {
             var _this = this;
             this._anchorCallback = function (component) { return _this._anchor(component); };
+            this._enabled = true;
         }
         Interaction.prototype._anchor = function (component) {
             this._isAnchored = true;
@@ -8878,12 +9079,15 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.attachTo = function (component) {
-            if (this._componentAttachedTo) {
-                this.detachFrom(this._componentAttachedTo);
-            }
+            this._disconnect();
             this._componentAttachedTo = component;
-            component.onAnchor(this._anchorCallback);
+            this._connect();
             return this;
+        };
+        Interaction.prototype._connect = function () {
+            if (this.enabled() && this._componentAttachedTo != null && !this._isAnchored) {
+                this._componentAttachedTo.onAnchor(this._anchorCallback);
+            }
         };
         /**
          * Detaches this Interaction from the Component.
@@ -8893,11 +9097,29 @@ var Plottable;
          * @returns {Interaction} The calling Interaction.
          */
         Interaction.prototype.detachFrom = function (component) {
+            this._disconnect();
+            this._componentAttachedTo = null;
+            return this;
+        };
+        Interaction.prototype._disconnect = function () {
             if (this._isAnchored) {
                 this._unanchor();
             }
-            this._componentAttachedTo = null;
-            component.offAnchor(this._anchorCallback);
+            if (this._componentAttachedTo != null) {
+                this._componentAttachedTo.offAnchor(this._anchorCallback);
+            }
+        };
+        Interaction.prototype.enabled = function (enabled) {
+            if (enabled == null) {
+                return this._enabled;
+            }
+            this._enabled = enabled;
+            if (this._enabled) {
+                this._connect();
+            }
+            else {
+                this._disconnect();
+            }
             return this;
         };
         /**

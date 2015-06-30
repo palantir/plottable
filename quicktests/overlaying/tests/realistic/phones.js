@@ -73,7 +73,7 @@ function run(svg, data, Plottable) {
   var RoKDataset = new Plottable.Dataset(data.korea);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 1]);
-  var xScale_reverse = new Plottable.Scales.Linear().domain([1, 0]);
+  var xScaleReverse = new Plottable.Scales.Linear().domain([1, 0]);
   var yScale = new Plottable.Scales.Category();
 
   var AusLabels = new Plottable.Axes.Category(yScale, "left")
@@ -110,7 +110,7 @@ function run(svg, data, Plottable) {
   };
   var AusFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(AusDataset)
-      .x(filterFeatureX, xScale_reverse)
+      .x(filterFeatureX, xScaleReverse)
       .y(filterFeatureY, yScale)
       .attr("fill", AusColor);
 
@@ -122,7 +122,7 @@ function run(svg, data, Plottable) {
 
   var IndFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(IndDataset)
-      .x(filterFeatureX, xScale_reverse)
+      .x(filterFeatureX, xScaleReverse)
       .y(filterFeatureY, yScale)
       .attr("fill", IndColor);
 
@@ -134,7 +134,7 @@ function run(svg, data, Plottable) {
 
   var RoKFeaturePlot = new Plottable.Plots.Bar("horizontal")
       .addDataset(RoKDataset)
-      .x(filterFeatureX, xScale_reverse)
+      .x(filterFeatureX, xScaleReverse)
       .y(filterFeatureY, yScale)
       .attr("fill", RoKColor);
 

@@ -37,6 +37,7 @@ function run(svg, data, Plottable) {
    xAxis.formatter(yearFormatter);
 
   var plots = [];
+  var segmentData = [];
 
   var addYear = function(y){
     var dataset = new Plottable.Dataset(data[y]);
@@ -56,37 +57,29 @@ function run(svg, data, Plottable) {
       total += d[month].y;
     }
     var average = total / 12;
-    var avgData = [{x: y * 12, y: average}, {x: y * 12 + 11, y: average}];
-    var avgDataset = new Plottable.Dataset(avgData);
-    var lineRenderer = new Plottable.Plots.Line()
-              .addDataset(avgDataset)
-              .x(function(datum) { return datum.x; }, xScale)
-              .y(function(datum) { return datum.y; }, yScale)
-              .attr("stroke", "#ff0000")
-              .attr("stroke-width", 4)
-              .attr("stroke-dasharray", 4)
-              .animated(true);
-    plots.push(lineRenderer);
+    segmentData.push({x: y * 12, y: average, x2: y * 12 + 11});
   };
+
+  var getX = function(d) { return d.x; };
+  var getX2 = function(d) { return d.x2; };
+  var getY = function(d) { return d.y; };
 
   for (var year = 0; year < data.length; year++){
     addYear(year);
     yearAverage(year);
+    var segmentPlot = new Plottable.Plots.Segment()
+      .x(getX, xScale)
+      .y(getY, yScale)
+      .x2(getX2, xScale)
+      .addDataset(new Plottable.Dataset(segmentData))
+      .attr("stroke", "#ff0000")
+      .attr("stroke-width", 4)
+      .attr("stroke-dasharray", 4)
+      .animated(true);
+    plots.push(segmentPlot);
   }
 
   var group = new Plottable.Components.Group(plots);
-
- var addClick = function(plot){
-      new Plottable.Interactions.Click().onClick(function(){
-      var d = plot.datasets()[0].data();
-      plot.datasets()[0].data(d);
-    }).attachTo(plot);
- };
-
-  for( var i = 0; i < plots.length; i++){
-    var plot = plots[i];
-    addClick(plot);
-  }
 
   var lineChart = new Plottable.Components.Table([[yAxis, group],
                                                  [null,  xAxis]]);

@@ -30,24 +30,24 @@ function run(svg, data, Plottable) {
   var plot = new Plottable.Plots.Bar().addDataset(new Plottable.Dataset(data));
   plot.x(function(d) { return d.x; }, xScale).y(function(d) { return d.y; }, yScale);
   var basicTable = new Plottable.Components.Table([[yAxis, plot], [null, xAxis]]);
-  var formatChoices = new Plottable.Components.Table([[IdTitle],[DowTitle],[EmpIDTitle]]);
-  var bigTable = new Plottable.Components.Table([[basicTable],[formatChoices]]);
+  var formatChoices = new Plottable.Components.Table([[IdTitle], [DowTitle], [EmpIDTitle]]);
+  var bigTable = new Plottable.Components.Table([[basicTable], [formatChoices]]);
   formatChoices.xAlignment("center");
 
   bigTable.renderTo(svg);
 
-  function identity_frmt() {
+  function useIdentityFormatter() {
     xAxis.formatter(Plottable.Formatters.identity());
   }
-  function dow_frmt() {
+  function useDOWFormatter() {
      xAxis.formatter(DOWFormatter);
   }
-  function emp_frmt() {
+  function useEmpIdFormatter() {
      xAxis.formatter(EmpIDFormatter);
   }
 
-  new Plottable.Interactions.Click().onClick(identity_frmt).attachTo(IdTitle);
-  new Plottable.Interactions.Click().onClick(dow_frmt).attachTo(DowTitle);
-  new Plottable.Interactions.Click().onClick(emp_frmt).attachTo(EmpIDTitle);
+  new Plottable.Interactions.Click().onClick(useIdentityFormatter).attachTo(IdTitle);
+  new Plottable.Interactions.Click().onClick(useDOWFormatter).attachTo(DowTitle);
+  new Plottable.Interactions.Click().onClick(useEmpIdFormatter).attachTo(EmpIDTitle);
 
 }

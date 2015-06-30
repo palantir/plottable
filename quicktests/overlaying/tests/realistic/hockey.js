@@ -6,7 +6,7 @@ function run(svg, data, Plottable) {
   "use strict";
 
   d3.csv("/quicktests/overlaying/data/hockey.csv").get(function(error, rows) {
-  var data = rows;
+  data = rows;
   var ds = new Plottable.Dataset(data);
 
   var xScale = new Plottable.Scales.Linear().domain([0, 80]);
@@ -31,25 +31,25 @@ function run(svg, data, Plottable) {
         var G = +d.G;
 
         var slope = A / G;
-        var slope_offset = 0;
-        if (slope > 80 / 33.14 ) { slope_offset = 3; }
-        else if (slope > 1 ) { slope_offset = 2; }
-        else if (slope > 33.14 / 80 ) {slope_offset = 1; }
+        var slopeOffset = 0;
+        if (slope > 80 / 33.14 ) { slopeOffset = 3; }
+        else if (slope > 1 ) { slopeOffset = 2; }
+        else if (slope > 33.14 / 80 ) {slopeOffset = 1; }
 
         var zone = A + G;
-        var zone_offset = 0;
-        if (zone > 20) { zone_offset = 1; }
-        if (zone > 40) { zone_offset = 2; }
-        if (zone > 60) { zone_offset = 3; }
+        var zoneOffset = 0;
+        if (zone > 20) { zoneOffset = 1; }
+        if (zone > 40) { zoneOffset = 2; }
+        if (zone > 60) { zoneOffset = 3; }
 
-        return colorRange[slope_offset * 4 + zone_offset];
+        return colorRange[slopeOffset * 4 + zoneOffset];
       });
 
   var x = function(d){ return d.x; };
   var y = function(d){ return d.y; };
 
-  var styleLinePlot = function(plot){
-    plot.x(x, xScale).y(y, yScale)
+  var styleLinePlot = function(linePlot){
+    linePlot.x(x, xScale).y(y, yScale)
     .attr("stroke", "#dddddd").attr("stroke-dasharray", 4);
   };
 
