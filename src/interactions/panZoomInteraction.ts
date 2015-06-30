@@ -106,11 +106,11 @@ export module Interactions {
       var pinchFactor = 1;
 
       this.xScales().forEach((xScale) => {
-        pinchFactor = this._constrainedPinchAmount(xScale, pinchFactor, oldPoints);
+        pinchFactor = this._constrainedPinchAmount(xScale, pinchFactor, oldPoints, true);
       });
 
       this.yScales().forEach((yScale) => {
-        pinchFactor = this._constrainedPinchAmount(yScale, pinchFactor, oldPoints);
+        pinchFactor = this._constrainedPinchAmount(yScale, pinchFactor, oldPoints, false);
       });
 
       var constrainedPinchPoints = this._pinchFactorTouchPoints(oldPoints, pinchFactor);
@@ -134,13 +134,13 @@ export module Interactions {
       }
     }
 
-    private _constrainedPinchAmount(scale: QuantitativeScale<any>, pinchAmount: number, oldPoints: Point[]) {
+    private _constrainedPinchAmount(scale: QuantitativeScale<any>, pinchAmount: number, oldPoints: Point[], isX: boolean) {
       var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
       var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
       var minDomainExtent = this.minDomainExtent(scale) || 0;
       var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
       var constrainedPinchFactor = 1;
-      var centerValue = oldCenterPoint.x;
+      var centerValue = isX ? oldCenterPoint.x : oldCenterPoint.y;
       var points = this._touchIds.values();
       var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
 
@@ -149,7 +149,8 @@ export module Interactions {
         var newCornerConstrainedDistance = PanZoom._pointDistance(newPoints[0], newPoints[1]);
         if (newCornerConstrainedDistance === 0) { return rangeValue; }
         var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
-        var translateAmount = oldCenterPoint.x - ((newPoints[0].x + newPoints[1].x) / 2);
+        var newPointsCenter = isX ? ((newPoints[0].x + newPoints[1].x) / 2) : ((newPoints[0].y + newPoints[1].y) / 2);
+        var translateAmount = centerValue - newPointsCenter;
         return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount + translateAmount);
       };
       var iterations = 20;
