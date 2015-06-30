@@ -135,13 +135,13 @@ export module Interactions {
     }
 
     private _constrainedPinchAmount(scale: QuantitativeScale<any>, pinchAmount: number, oldPoints: Point[], key: string) {
-      var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-      var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
       var minDomainExtent = this.minDomainExtent(scale) || 0;
       var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
       var constrainedPinchFactor = 1;
-      var centerValue = oldCenterPoint[key];
+      var centerValue = PanZoom._centerPoint(oldPoints[0], oldPoints[1])[key];
+
       var points = this._touchIds.values();
+      var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
       var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
 
       var pinchTransform = (rangeValue: number) => {

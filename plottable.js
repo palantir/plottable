@@ -9430,13 +9430,12 @@ var Plottable;
             };
             PanZoom.prototype._constrainedPinchAmount = function (scale, pinchAmount, oldPoints, key) {
                 var _this = this;
-                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-                var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
                 var minDomainExtent = this.minDomainExtent(scale) || 0;
                 var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
                 var constrainedPinchFactor = 1;
-                var centerValue = oldCenterPoint[key];
+                var centerValue = PanZoom._centerPoint(oldPoints[0], oldPoints[1])[key];
                 var points = this._touchIds.values();
+                var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
                 var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
                 var pinchTransform = function (rangeValue) {
                     var newPoints = _this._pinchFactorTouchPoints(oldPoints, constrainedPinchFactor);
@@ -9445,7 +9444,7 @@ var Plottable;
                         return rangeValue;
                     }
                     var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
-                    var newPointsCenter = ((newPoints[0][key] + newPoints[1][key]) / 2);
+                    var newPointsCenter = (newPoints[0][key] + newPoints[1][key]) / 2;
                     var translateAmount = centerValue - newPointsCenter;
                     return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount + translateAmount);
                 };
