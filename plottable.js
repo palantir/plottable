@@ -9419,7 +9419,7 @@ var Plottable;
                 var pointDiffs = points.map(function (point, i) {
                     return { x: point.x - oldPoints[i].x, y: point.y - oldPoints[i].y };
                 });
-                var constrainedPoints = oldPoints.forEach(function (oldPoint, i) {
+                var constrainedPoints = oldPoints.map(function (oldPoint, i) {
                     return {
                         x: pointDiffs[i].x * magnifyAmount + oldPoint.x,
                         y: pointDiffs[i].y * magnifyAmount + oldPoint.y
@@ -9557,9 +9557,6 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addXScale = function (xScale) {
-                if (this._nonLinearScaleWithExtents(xScale)) {
-                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
-                }
                 this._xScales.add(xScale);
                 return this;
             };
@@ -9580,9 +9577,6 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
-                if (this._nonLinearScaleWithExtents(yScale)) {
-                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
-                }
                 this._yScales.add(yScale);
                 return this;
             };
@@ -9600,12 +9594,18 @@ var Plottable;
                 if (minDomainExtent == null) {
                     return this._minDomainExtents.get(quantitativeScale);
                 }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
                 this._minDomainExtents.set(quantitativeScale, minDomainExtent);
                 return this;
             };
             PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
                 if (maxDomainExtent == null) {
                     return this._maxDomainExtents.get(quantitativeScale);
+                }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
                 }
                 this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;

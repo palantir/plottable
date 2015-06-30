@@ -121,7 +121,7 @@ export module Interactions {
       });
 
       var pointDiffs = points.map((point, i) => { return { x: point.x - oldPoints[i].x, y: point.y - oldPoints[i].y }; });
-      var constrainedPoints = oldPoints.forEach((oldPoint, i) => {
+      var constrainedPoints = oldPoints.map((oldPoint, i) => {
         return {
           x: pointDiffs[i].x * magnifyAmount + oldPoint.x,
           y: pointDiffs[i].y * magnifyAmount + oldPoint.y
@@ -300,9 +300,6 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addXScale(xScale: QuantitativeScale<any>) {
-      if (this._nonLinearScaleWithExtents(xScale)) {
-        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
-      }
       this._xScales.add(xScale);
       return this;
     }
@@ -325,9 +322,6 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addYScale(yScale: QuantitativeScale<any>) {
-      if (this._nonLinearScaleWithExtents(yScale)) {
-        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
-      }
       this._yScales.add(yScale);
       return this;
     }
@@ -349,6 +343,9 @@ export module Interactions {
       if (minDomainExtent == null) {
         return this._minDomainExtents.get(quantitativeScale);
       }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
       this._minDomainExtents.set(quantitativeScale, minDomainExtent);
       return this;
     }
@@ -358,6 +355,9 @@ export module Interactions {
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
       if (maxDomainExtent == null) {
         return this._maxDomainExtents.get(quantitativeScale);
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
       this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
       return this;
