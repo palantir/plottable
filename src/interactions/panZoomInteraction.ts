@@ -112,6 +112,10 @@ export module Interactions {
 
       var magnifyAmount = oldCornerDistance / newCornerDistance;
 
+      var normalizedPointDiffs = points.map((point, i) => {
+        return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
+      });
+
       this.xScales().forEach((xScale) => {
         magnifyAmount = this._constrainedZoomAmount(xScale, magnifyAmount);
       });
@@ -120,11 +124,10 @@ export module Interactions {
         magnifyAmount = this._constrainedZoomAmount(yScale, magnifyAmount);
       });
 
-      var pointDiffs = points.map((point, i) => { return { x: point.x - oldPoints[i].x, y: point.y - oldPoints[i].y }; });
       var constrainedPoints = oldPoints.map((oldPoint, i) => {
         return {
-          x: pointDiffs[i].x * magnifyAmount + oldPoint.x,
-          y: pointDiffs[i].y * magnifyAmount + oldPoint.y
+          x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
+          y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
         };
       });
 

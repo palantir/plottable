@@ -155,13 +155,6 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify the scale correctly", () => {
-      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-      // https://github.com/ariya/phantomjs/issues/11289
-      if ( window.PHANTOMJS ) {
-        svg.remove();
-        return;
-      }
-
       var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
       var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
@@ -175,13 +168,6 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify multiple scales correctly", () => {
-      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-      // https://github.com/ariya/phantomjs/issues/11289
-      if ( window.PHANTOMJS ) {
-        svg.remove();
-        return;
-      }
-
       var xScale2 = new Plottable.Scales.Linear();
       xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
       panZoomInteraction.addXScale(xScale2);
@@ -256,13 +242,6 @@ describe("Interactions", () => {
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
-        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-        // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
-          svg.remove();
-          return;
-        }
-
         var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
@@ -304,13 +283,6 @@ describe("Interactions", () => {
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
-        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-        // https://github.com/ariya/phantomjs/issues/11289
-        if ( window.PHANTOMJS ) {
-          svg.remove();
-          return;
-        }
-
         var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
         var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
