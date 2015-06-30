@@ -692,6 +692,16 @@ describe("Plots", () => {
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "texts were immediately removed");
       });
+
+      it("labels are rendered correctly across platforms", () => {
+        dataset = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 64000000 }, { x: "zoo", y: 12345678 }]);
+        plot.addDataset(dataset);
+        plot.labelsEnabled(true);
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both texts drawn");
+        svg.remove();
+      });
     });
 
     describe("selections()", () => {
