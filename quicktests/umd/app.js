@@ -1,4 +1,4 @@
-/*eslint-env node */
+/*eslint-env amd */
 
 require.config({
   paths: {
