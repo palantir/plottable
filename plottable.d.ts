@@ -358,6 +358,10 @@ declare module Plottable {
              * Computes the position relative to the <svg> in svg-coordinate-space.
              */
             computePosition(clientX: number, clientY: number): Point;
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            insideSVG(e: Event): boolean;
         }
     }
 }

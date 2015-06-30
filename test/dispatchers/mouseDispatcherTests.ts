@@ -86,6 +86,51 @@ describe("Dispatchers", () => {
       md.offMouseMove(callback);
     });
 
+    it("doesn't call callbacks for clicks if obscured by overlay", () => {
+      var targetWidth = 400, targetHeight = 400;
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetX = 17;
+      var targetY = 76;
+
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
+
+      var callbackWasCalled = false;
+      var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
+
+      md.onMouseDown(callback);
+      TestMethods.triggerFakeMouseEvent("mousedown", target, targetX, targetY);
+      assert.isTrue(callbackWasCalled, "callback was called on mousedown");
+
+      var position = (function(el){
+          for (var lx = 0, ly = 0;
+                   el != null;
+                   el = (el.offsetParent || el.parentNode)) {
+               lx += (el.offsetLeft || el.clientLeft || 0);
+               ly += (el.offsetTop || el.clientTop || 0);
+          }
+          return {x: lx, y: ly};
+      })(target[0][0]);
+      var overlay = TestMethods.getSVGParent().append("div")
+            .style({
+              height: "400px",
+              width: "400px",
+              position: "absolute",
+              top: position.y + "px",
+              left: position.x + "px"
+            });
+
+      callbackWasCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", overlay, targetX, targetY);
+      assert.isFalse(callbackWasCalled, "callback was not called on mousedown on overlay");
+
+      md.offMouseDown(callback);
+      target.remove();
+      overlay.remove();
+    });
+
     it("calls callbacks on mouseover, mousemove, and mouseout", () => {
       var targetWidth = 400, targetHeight = 400;
       var target = TestMethods.generateSVG(targetWidth, targetHeight);

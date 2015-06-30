@@ -854,6 +854,12 @@ var Plottable;
                 };
                 return scaledPosition;
             };
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            ClientToSVGTranslator.prototype.insideSVG = function (e) {
+                return Utils.DOM.boundingSVG(e.target) === this._svg;
+            };
             ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
             return ClientToSVGTranslator;
         })();
@@ -8666,12 +8672,12 @@ var Plottable;
                 this._wheelCallbacks = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
-                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks, "page"); };
                 this._eventToCallback["mouseover"] = processMoveCallback;
                 this._eventToCallback["mousemove"] = processMoveCallback;
                 this._eventToCallback["mouseout"] = processMoveCallback;
                 this._eventToCallback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
-                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks, "page"); };
                 this._eventToCallback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
                 this._eventToCallback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
@@ -8795,11 +8801,17 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
-                var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
-                if (newMousePosition != null) {
-                    this._lastMousePosition = newMousePosition;
-                    callbackSet.callCallbacks(this.lastMousePosition(), event);
+            Mouse.prototype._measureAndDispatch = function (event, callbackSet, scope) {
+                if (scope === void 0) { scope = "element"; }
+                if (scope !== "page" && scope !== "element") {
+                    throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+                }
+                if (scope === "page" || this._translator.insideSVG(event)) {
+                    var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+                    if (newMousePosition != null) {
+                        this._lastMousePosition = newMousePosition;
+                        callbackSet.callCallbacks(this.lastMousePosition(), event);
+                    }
                 }
             };
             /**
