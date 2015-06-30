@@ -9575,47 +9575,21 @@ var Plottable;
                         return;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    _this.xScales().forEach(function (xScale) {
-                        translateAmountX = _this._constrainedPanAmount(xScale, translateAmountX, translateAmountX > 0);
-                    });
+                    var nonLinearPanningWithExtents = function (scale) {
+                        return _this.minDomainExtent(scale) != null && _this.maxDomainExtent(scale) != null && !(scale instanceof Plottable.Scales.Linear) && !(scale instanceof Plottable.Scales.Time);
+                    };
+                    if (_this.xScales().concat(_this.yScales()).some(nonLinearPanningWithExtents)) {
+                        Plottable.Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
+                    }
                     _this.xScales().forEach(function (xScale) {
                         _this._translateScale(xScale, translateAmountX);
                     });
                     var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
                     _this.yScales().forEach(function (yScale) {
-                        translateAmountY = _this._constrainedPanAmount(yScale, translateAmountY, translateAmountY > 0);
-                    });
-                    _this.yScales().forEach(function (yScale) {
                         _this._translateScale(yScale, translateAmountY);
                     });
                     lastDragPoint = endPoint;
                 });
-            };
-            PanZoom.prototype._constrainedPanAmount = function (scale, panAmount, positiveTranslate) {
-                if (scale instanceof Plottable.Scales.ModifiedLog) {
-                    var minDomainExtent = this.minDomainExtent(scale) || 0;
-                    var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
-                    var constrainTranslate = positiveTranslate ? 1 : -1;
-                    var lowerBound = positiveTranslate ? 0 : -Infinity;
-                    var upperBound = positiveTranslate ? Infinity : 0;
-                    var iterations = 20;
-                    var translateTransform = function (rangeValue) { return scale.invert(rangeValue + constrainTranslate); };
-                    for (var i = 0; i < iterations; i++) {
-                        var constrainedDomain = scale.range().map(translateTransform);
-                        var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
-                        var insideExtent = constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent;
-                        if (positiveTranslate === insideExtent) {
-                            lowerBound = constrainTranslate;
-                            constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
-                        }
-                        else {
-                            upperBound = constrainTranslate;
-                            constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
-                        }
-                    }
-                    return (positiveTranslate ? Math.min : Math.max)(panAmount, constrainTranslate);
-                }
-                return panAmount;
             };
             PanZoom.prototype.xScales = function (xScales) {
                 var _this = this;

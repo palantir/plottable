@@ -291,9 +291,14 @@ export module Interactions {
         }
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
-        this.xScales().forEach((xScale) => {
-          translateAmountX = this._constrainedPanAmount(xScale, translateAmountX, translateAmountX > 0);
-        });
+        var nonLinearPanningWithExtents = (scale: QuantitativeScale<any>) => {
+          return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
+              !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
+        };
+
+        if (this.xScales().concat(this.yScales()).some(nonLinearPanningWithExtents)) {
+          Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
+        }
 
         this.xScales().forEach((xScale) => {
           this._translateScale(xScale, translateAmountX);
@@ -302,41 +307,10 @@ export module Interactions {
         var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
 
         this.yScales().forEach((yScale) => {
-          translateAmountY = this._constrainedPanAmount(yScale, translateAmountY, translateAmountY > 0);
-        });
-
-        this.yScales().forEach((yScale) => {
           this._translateScale(yScale, translateAmountY);
         });
         lastDragPoint = endPoint;
       });
-    }
-
-    private _constrainedPanAmount(scale: QuantitativeScale<any>, panAmount: number, positiveTranslate: boolean) {
-      if (scale instanceof Scales.ModifiedLog) {
-        var minDomainExtent = this.minDomainExtent(scale) || 0;
-        var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
-        var constrainTranslate = positiveTranslate ? 1 : -1;
-        var lowerBound = positiveTranslate ? 0 : -Infinity;
-        var upperBound = positiveTranslate ? Infinity : 0;
-        var iterations = 20;
-        var translateTransform = (rangeValue: number) => scale.invert(rangeValue + constrainTranslate);
-        for (var i = 0; i < iterations; i++) {
-          var constrainedDomain = scale.range().map(translateTransform);
-          var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
-          var insideExtent = constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent;
-          if (positiveTranslate === insideExtent) {
-            lowerBound = constrainTranslate;
-            constrainTranslate = upperBound === Infinity ? constrainTranslate * 2 : (constrainTranslate + upperBound) / 2;
-          } else {
-            upperBound = constrainTranslate;
-            constrainTranslate = lowerBound === -Infinity ? constrainTranslate * 2 : (constrainTranslate + lowerBound) / 2;
-          }
-        }
-        return (positiveTranslate ? Math.min : Math.max)(panAmount, constrainTranslate);
-      }
-
-      return panAmount;
     }
 
     /**
