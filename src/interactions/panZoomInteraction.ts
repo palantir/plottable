@@ -138,7 +138,9 @@ export module Interactions {
       var minDomainExtent = this.minDomainExtent(scale) || 0;
       var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
       var constrainedPinchFactor = 1;
-      var centerValue = PanZoom._centerPoint(oldPoints[0], oldPoints[1])[key];
+      var centerPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+      var keyFunction = (point: Point) => key === "x" ? point.x : point.y;
+      var centerValue = keyFunction(centerPoint);
 
       var points = this._touchIds.values();
       var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
@@ -149,7 +151,7 @@ export module Interactions {
         var newCornerConstrainedDistance = PanZoom._pointDistance(newPoints[0], newPoints[1]);
         if (newCornerConstrainedDistance === 0) { return rangeValue; }
         var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
-        var newPointsCenter = (newPoints[0][key] + newPoints[1][key]) / 2;
+        var newPointsCenter = (keyFunction(newPoints[0]) + keyFunction(newPoints[1])) / 2;
         var translateAmount = centerValue - newPointsCenter;
         return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount + translateAmount);
       };
