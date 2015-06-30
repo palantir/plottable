@@ -9404,81 +9404,37 @@ var Plottable;
                         _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
-                var pinchFactor = 1;
+                var points = this._touchIds.values();
+                var newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
+                if (newCornerDistance === 0) {
+                    return;
+                }
+                var magnifyAmount = oldCornerDistance / newCornerDistance;
                 this.xScales().forEach(function (xScale) {
-                    pinchFactor = _this._constrainedPinchAmount(xScale, pinchFactor, oldPoints, "x");
+                    magnifyAmount = _this._constrainedZoomAmount(xScale, magnifyAmount);
                 });
                 this.yScales().forEach(function (yScale) {
-                    pinchFactor = _this._constrainedPinchAmount(yScale, pinchFactor, oldPoints, "y");
+                    magnifyAmount = _this._constrainedZoomAmount(yScale, magnifyAmount);
                 });
-                var constrainedPinchPoints = this._pinchFactorTouchPoints(oldPoints, pinchFactor);
-                var constrainedCornerDistance = PanZoom._pointDistance(constrainedPinchPoints[0], constrainedPinchPoints[1]);
-                if (constrainedCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    var magnifyAmount = oldCornerDistance / constrainedCornerDistance;
-                    var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-                    var translateAmountX = oldCenterPoint.x - ((constrainedPinchPoints[0].x + constrainedPinchPoints[1].x) / 2);
-                    this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
-                        _this._translateScale(xScale, translateAmountX);
-                    });
-                    var translateAmountY = oldCenterPoint.y - ((constrainedPinchPoints[0].y + constrainedPinchPoints[1].y) / 2);
-                    this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, oldCornerDistance / constrainedCornerDistance, oldCenterPoint.y);
-                        _this._translateScale(yScale, translateAmountY);
-                    });
-                }
-            };
-            PanZoom.prototype._constrainedPinchAmount = function (scale, pinchAmount, oldPoints, key) {
-                var _this = this;
-                var minDomainExtent = this.minDomainExtent(scale) || 0;
-                var maxDomainExtent = this.maxDomainExtent(scale) || Infinity;
-                var constrainedPinchFactor = 1;
-                var centerPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-                var keyFunction = function (point) { return key === "x" ? point.x : point.y; };
-                var centerValue = keyFunction(centerPoint);
-                var points = this._touchIds.values();
-                var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
-                var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
-                var pinchTransform = function (rangeValue) {
-                    var newPoints = _this._pinchFactorTouchPoints(oldPoints, constrainedPinchFactor);
-                    var newCornerConstrainedDistance = PanZoom._pointDistance(newPoints[0], newPoints[1]);
-                    if (newCornerConstrainedDistance === 0) {
-                        return rangeValue;
-                    }
-                    var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
-                    var newPointsCenter = (keyFunction(newPoints[0]) + keyFunction(newPoints[1])) / 2;
-                    var translateAmount = centerValue - newPointsCenter;
-                    return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount + translateAmount);
-                };
-                var iterations = 20;
-                var lowerBound = 0;
-                var upperBound = Infinity;
-                for (var i = 0; i < iterations; i++) {
-                    var constrainedDomain = scale.range().map(pinchTransform);
-                    var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
-                    if (constrainedDomainExtent === minDomainExtent || constrainedDomainExtent === maxDomainExtent) {
-                        return constrainedPinchFactor;
-                    }
-                    var insideExtent = constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent;
-                    if (expanding === insideExtent) {
-                        lowerBound = constrainedPinchFactor;
-                        constrainedPinchFactor = upperBound === Infinity ? constrainedPinchFactor * 2 : (upperBound + constrainedPinchFactor) / 2;
-                    }
-                    else {
-                        upperBound = constrainedPinchFactor;
-                        constrainedPinchFactor = (lowerBound + constrainedPinchFactor) / 2;
-                    }
-                }
-                return (expanding ? Math.min : Math.max)(pinchAmount, constrainedPinchFactor);
-            };
-            PanZoom.prototype._pinchFactorTouchPoints = function (oldPoints, pinchFactor) {
+                var pointDiffs = points.map(function (point, i) {
+                    return { x: point.x - oldPoints[i].x, y: point.y - oldPoints[i].y };
+                });
+                var constrainedPoints = oldPoints.forEach(function (oldPoint, i) {
+                    return {
+                        x: pointDiffs[i].x * magnifyAmount + oldPoint.x,
+                        y: pointDiffs[i].y * magnifyAmount + oldPoint.y
+                    };
+                });
                 var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
-                var points = this._touchIds.values();
-                var pointDiffs = points.map(function (point) {
-                    return { x: point.x - oldCenterPoint.x, y: point.y - oldCenterPoint.y };
+                var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
+                this.xScales().forEach(function (xScale) {
+                    _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
+                    _this._translateScale(xScale, translateAmountX);
                 });
-                return pointDiffs.map(function (pointDiff) {
-                    return { x: pointDiff.x * pinchFactor + oldCenterPoint.x, y: pointDiff.y * pinchFactor + oldCenterPoint.y };
+                var translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
+                this.yScales().forEach(function (yScale) {
+                    _this._magnifyScale(yScale, magnifyAmount, oldCenterPoint.y);
+                    _this._translateScale(yScale, translateAmountY);
                 });
             };
             PanZoom._centerPoint = function (point1, point2) {
@@ -9517,10 +9473,10 @@ var Plottable;
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     this.xScales().forEach(function (xScale) {
-                        zoomAmount = _this._constrainedZoomAmount(xScale, translatedP.x, zoomAmount);
+                        zoomAmount = _this._constrainedZoomAmount(xScale, zoomAmount);
                     });
                     this.yScales().forEach(function (yScale) {
-                        zoomAmount = _this._constrainedZoomAmount(yScale, translatedP.y, zoomAmount);
+                        zoomAmount = _this._constrainedZoomAmount(yScale, zoomAmount);
                     });
                     this.xScales().forEach(function (xScale) {
                         _this._magnifyScale(xScale, zoomAmount, translatedP.x);
@@ -9530,7 +9486,7 @@ var Plottable;
                     });
                 }
             };
-            PanZoom.prototype._constrainedZoomAmount = function (scale, centerValue, zoomAmount) {
+            PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
                 var extentIncreasing = zoomAmount > 1;
                 var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
                 if (boundingDomainExtent == null) {
