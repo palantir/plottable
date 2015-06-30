@@ -1,7 +1,4 @@
-/*jshint strict:false */
-/*eslint strict: 0*/
-
-var require;
+/*eslint-env node */
 
 require.config({
   paths: {
@@ -11,6 +8,7 @@ require.config({
 });
 
 require(["d3"], function(d3) {
+  "use strict";
   require(["plottable"], function(Plottable) {
     var output = d3.select("#output");
     output.text(String(window.Plottable));
