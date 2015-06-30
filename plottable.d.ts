@@ -358,6 +358,10 @@ declare module Plottable {
              * Computes the position relative to the <svg> in svg-coordinate-space.
              */
             computePosition(clientX: number, clientY: number): Point;
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            insideSVG(e: Event): boolean;
         }
     }
 }
@@ -2328,6 +2332,7 @@ declare module Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2570,6 +2575,21 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        /**
+         * Returns the whether or not the rendering is deferred for performance boost.
+         * @return {boolean} The deferred rendering option
+         */
+        deferredRendering(): boolean;
+        /**
+         * Sets / unsets the deferred rendering option
+         * Activating this option improves the performance of plot interaction (pan / zoom) by
+         * performing lazy renders, only after the interaction has stopped. Because re-rendering
+         * is no longer performed during the interaction, the zooming might experience a small
+         * resolution degradation, before the lazy re-render is performed.
+         *
+         * This option is intended for cases where performance is an issue.
+         */
+        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
          */

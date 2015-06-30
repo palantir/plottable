@@ -1,5 +1,5 @@
 /*!
-Plottable 1.0.0 (https://github.com/palantir/plottable)
+Plottable 1.1.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -854,6 +854,12 @@ var Plottable;
                 };
                 return scaledPosition;
             };
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            ClientToSVGTranslator.prototype.insideSVG = function (e) {
+                return Utils.DOM.boundingSVG(e.target) === this._svg;
+            };
             ClientToSVGTranslator._TRANSLATOR_KEY = "__Plottable_ClientToSVGTranslator";
             return ClientToSVGTranslator;
         })();
@@ -876,7 +882,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.0.0";
+    Plottable.version = "1.1.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -6668,10 +6674,80 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
+            this._deferredRendering = false;
+            this._cachedDomainX = [null, null];
+            this._cachedDomainY = [null, null];
             this.addClass("xy-plot");
             this._adjustYDomainOnChangeFromXCallback = function (scale) { return _this._adjustYDomainOnChangeFromX(); };
             this._adjustXDomainOnChangeFromYCallback = function (scale) { return _this._adjustXDomainOnChangeFromY(); };
+            var _deltaX = 0;
+            var _deltaY = 0;
+            var _scalingX = 1;
+            var _scalingY = 1;
+            var _lastSeenDomainX = null;
+            var _lastSeenDomainY = null;
+            var _timeoutReference = 0;
+            var _deferredRenderingTimeout = 500;
+            var _registerDeferredRendering = function () {
+                if (_this._renderArea == null) {
+                    return;
+                }
+                _this._renderArea.attr("transform", "translate(" + _deltaX + ", " + _deltaY + ")" + "scale(" + _scalingX + ", " + _scalingY + ")");
+                clearTimeout(_timeoutReference);
+                _timeoutReference = setTimeout(function () {
+                    _this._cachedDomainX = _lastSeenDomainX;
+                    _this._cachedDomainY = _lastSeenDomainY;
+                    _deltaX = 0;
+                    _deltaY = 0;
+                    _this.render();
+                    _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
+                }, _deferredRenderingTimeout);
+            };
+            var _lazyDomainChangeCallbackX = function (scale) {
+                if (!_this._isAnchored) {
+                    return;
+                }
+                _lastSeenDomainX = scale.domain();
+                _scalingX = (scale.scale(_this._cachedDomainX[1]) - scale.scale(_this._cachedDomainX[0])) / (scale.scale(_lastSeenDomainX[1]) - scale.scale(_lastSeenDomainX[0])) || 1;
+                _deltaX = scale.scale(_this._cachedDomainX[0]) - scale.scale(_lastSeenDomainX[0]) || 0;
+                _registerDeferredRendering();
+            };
+            var _lazyDomainChangeCallbackY = function (scale) {
+                if (!_this._isAnchored) {
+                    return;
+                }
+                _lastSeenDomainY = scale.domain();
+                _scalingY = (scale.scale(_this._cachedDomainY[1]) - scale.scale(_this._cachedDomainY[0])) / (scale.scale(_lastSeenDomainY[1]) - scale.scale(_lastSeenDomainY[0])) || 1;
+                _deltaY = scale.scale(_this._cachedDomainY[0]) - scale.scale(_lastSeenDomainY[0]) * _scalingY || 0;
+                _registerDeferredRendering();
+            };
+            this._renderCallback = function (scale) {
+                if (_this.deferredRendering() && _this.x() && _this.x().scale === scale) {
+                    _lazyDomainChangeCallbackX(scale);
+                }
+                else if (_this.deferredRendering() && _this.y() && _this.y().scale === scale) {
+                    _lazyDomainChangeCallbackY(scale);
+                }
+                else {
+                    _this.render();
+                }
+            };
         }
+        XYPlot.prototype.deferredRendering = function (deferredRendering) {
+            if (deferredRendering == null) {
+                return this._deferredRendering;
+            }
+            if (deferredRendering) {
+                if (this.x() && this.x().scale) {
+                    this._cachedDomainX = this.x().scale.domain();
+                }
+                if (this.y() && this.y().scale) {
+                    this._cachedDomainY = this.y().scale.domain();
+                }
+            }
+            this._deferredRendering = deferredRendering;
+            return this;
+        };
         XYPlot.prototype.x = function (x, xScale) {
             if (x == null) {
                 return this._propertyBindings.get(XYPlot._X_KEY);
@@ -6679,9 +6755,6 @@ var Plottable;
             this._bindProperty(XYPlot._X_KEY, x, xScale);
             if (this._autoAdjustYScaleDomain) {
                 this._updateYExtentsAndAutodomain();
-            }
-            if (xScale != null) {
-                xScale.onUpdate(this._adjustYDomainOnChangeFromXCallback);
             }
             this.render();
             return this;
@@ -6693,9 +6766,6 @@ var Plottable;
             this._bindProperty(XYPlot._Y_KEY, y, yScale);
             if (this._autoAdjustXScaleDomain) {
                 this._updateXExtentsAndAutodomain();
-            }
-            if (yScale != null) {
-                yScale.onUpdate(this._adjustXDomainOnChangeFromYCallback);
             }
             this.render();
             return this;
@@ -8247,6 +8317,7 @@ var Plottable;
                 var heightF = function (d, i, dataset) {
                     return Math.abs(getEnd(d, i, dataset) - getStart(d, i, dataset));
                 };
+                attrToProjector[this._isVertical ? "height" : "width"] = heightF;
                 var attrFunction = function (d, i, dataset) { return +primaryAccessor(d, i, dataset) < 0 ? getStart(d, i, dataset) : getEnd(d, i, dataset); };
                 attrToProjector[valueAttr] = function (d, i, dataset) { return _this._isVertical ? attrFunction(d, i, dataset) : attrFunction(d, i, dataset) - heightF(d, i, dataset); };
                 return attrToProjector;
@@ -8601,12 +8672,12 @@ var Plottable;
                 this._wheelCallbacks = new Plottable.Utils.CallbackSet();
                 this._dblClickCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks, this._dblClickCallbacks];
-                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
+                var processMoveCallback = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks, "page"); };
                 this._eventToCallback["mouseover"] = processMoveCallback;
                 this._eventToCallback["mousemove"] = processMoveCallback;
                 this._eventToCallback["mouseout"] = processMoveCallback;
                 this._eventToCallback["mousedown"] = function (e) { return _this._measureAndDispatch(e, _this._downCallbacks); };
-                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks); };
+                this._eventToCallback["mouseup"] = function (e) { return _this._measureAndDispatch(e, _this._upCallbacks, "page"); };
                 this._eventToCallback["wheel"] = function (e) { return _this._measureAndDispatch(e, _this._wheelCallbacks); };
                 this._eventToCallback["dblclick"] = function (e) { return _this._measureAndDispatch(e, _this._dblClickCallbacks); };
             }
@@ -8730,11 +8801,17 @@ var Plottable;
              * Computes the mouse position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Mouse.prototype._measureAndDispatch = function (event, callbackSet) {
-                var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
-                if (newMousePosition != null) {
-                    this._lastMousePosition = newMousePosition;
-                    callbackSet.callCallbacks(this.lastMousePosition(), event);
+            Mouse.prototype._measureAndDispatch = function (event, callbackSet, scope) {
+                if (scope === void 0) { scope = "element"; }
+                if (scope !== "page" && scope !== "element") {
+                    throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+                }
+                if (scope === "page" || this._translator.insideSVG(event)) {
+                    var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+                    if (newMousePosition != null) {
+                        this._lastMousePosition = newMousePosition;
+                        callbackSet.callCallbacks(this.lastMousePosition(), event);
+                    }
                 }
             };
             /**

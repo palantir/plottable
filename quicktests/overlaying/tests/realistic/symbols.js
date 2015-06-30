@@ -9,7 +9,7 @@ function run(svg, data, Plottable){
   "use strict";
 
   var plotData = [];
-  deep_copy(data[0], plotData);
+  deepCopy(data[0], plotData);
   var dataset = new Plottable.Dataset(plotData);
 
   var xScale = new Plottable.Scales.Linear();
@@ -107,7 +107,7 @@ function run(svg, data, Plottable){
 
     key.onKeyPress(68, function(){
       if(plotData.length > 0){
-        plotData.splice(plotData.length - 1,1);
+        plotData.splice(plotData.length - 1, 1);
         dataset.data(plotData);
       }
     });
@@ -119,7 +119,7 @@ function run(svg, data, Plottable){
 
     key.onKey(68, function(){
       if(plotData.length > 0){
-        plotData.splice(plotData.length - 1,1);
+        plotData.splice(plotData.length - 1, 1);
         dataset.data(plotData);
       }
     });
