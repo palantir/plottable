@@ -251,33 +251,10 @@ export module Interactions {
       var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
       if (boundingDomainExtent == null) { return zoomAmount; }
 
-      if (scale instanceof Scales.Linear || scale instanceof Scales.Time) {
-        var scaleDomain = (<any> scale).domain();
-        var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
-        var compareF = extentIncreasing ? Math.min : Math.max;
-        return compareF(zoomAmount, boundingDomainExtent / domainExtent);
-      }
-
-      var constrainedZoomAmount = 1;
-      var lowerBound = extentIncreasing ? constrainedZoomAmount : 0;
-      var upperBound = extentIncreasing ? Infinity : constrainedZoomAmount;
-      var iterations = 20;
-      var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * constrainedZoomAmount);
-      var scaleRange = scale.range();
-      for (var i = 0; i < iterations; i++) {
-        var transformedDomain = scaleRange.map(magnifyTransform);
-        var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
-        if (transformedDomainExtent === boundingDomainExtent) { return constrainedZoomAmount; }
-
-        if (extentIncreasing === transformedDomainExtent < boundingDomainExtent) {
-          lowerBound = constrainedZoomAmount;
-          constrainedZoomAmount = upperBound === Infinity ? constrainedZoomAmount * 2 : (upperBound + constrainedZoomAmount) / 2;
-        } else {
-          upperBound = constrainedZoomAmount;
-          constrainedZoomAmount = (lowerBound + constrainedZoomAmount) / 2;
-        }
-      }
-      return (extentIncreasing ? Math.min : Math.max)(zoomAmount, constrainedZoomAmount);
+      var scaleDomain = scale.domain();
+      var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+      var compareF = extentIncreasing ? Math.min : Math.max;
+      return compareF(zoomAmount, boundingDomainExtent / domainExtent);
     }
 
     private _setupDragInteraction() {
