@@ -9496,13 +9496,21 @@ var Plottable;
                 if (boundingDomainExtent == null) {
                     return zoomAmount;
                 }
+                if (scale instanceof Plottable.Scales.Linear || scale instanceof Plottable.Scales.Time) {
+                    var scaleDomain = scale.domain();
+                    var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+                    var compareF = extentIncreasing ? Math.min : Math.max;
+                    var constrainedZoomAmount = boundingDomainExtent / domainExtent;
+                    return compareF(zoomAmount, constrainedZoomAmount);
+                }
                 var constrainedZoomAmount = 1;
                 var lowerBound = extentIncreasing ? constrainedZoomAmount : 0;
                 var upperBound = extentIncreasing ? Infinity : constrainedZoomAmount;
                 var iterations = 20;
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * constrainedZoomAmount); };
+                var scaleRange = scale.range();
                 for (var i = 0; i < iterations; i++) {
-                    var transformedDomain = scale.range().map(magnifyTransform);
+                    var transformedDomain = scaleRange.map(magnifyTransform);
                     var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
                     if (transformedDomainExtent === boundingDomainExtent) {
                         return constrainedZoomAmount;
