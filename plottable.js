@@ -9575,9 +9575,6 @@ var Plottable;
                         return;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    if (_this.xScales().concat(_this.yScales()).some(function (scale) { return _this._nonLinearScaleWithExtents(scale); })) {
-                        Plottable.Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
-                    }
                     _this.xScales().forEach(function (xScale) {
                         _this._translateScale(xScale, translateAmountX);
                     });
@@ -9628,6 +9625,9 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addXScale = function (xScale) {
+                if (this._nonLinearScaleWithExtents(xScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
                 this._xScales.add(xScale);
                 return this;
             };
@@ -9648,6 +9648,9 @@ var Plottable;
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             PanZoom.prototype.addYScale = function (yScale) {
+                if (this._nonLinearScaleWithExtents(yScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
                 this._yScales.add(yScale);
                 return this;
             };

@@ -291,10 +291,6 @@ export module Interactions {
         }
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
-        if (this.xScales().concat(this.yScales()).some((scale) => this._nonLinearScaleWithExtents(scale))) {
-          Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
-        }
-
         this.xScales().forEach((xScale) => {
           this._translateScale(xScale, translateAmountX);
         });
@@ -370,6 +366,9 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addXScale(xScale: QuantitativeScale<any>) {
+      if (this._nonLinearScaleWithExtents(xScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
       this._xScales.add(xScale);
       return this;
     }
@@ -392,6 +391,9 @@ export module Interactions {
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public addYScale(yScale: QuantitativeScale<any>) {
+      if (this._nonLinearScaleWithExtents(yScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
       this._yScales.add(yScale);
       return this;
     }
