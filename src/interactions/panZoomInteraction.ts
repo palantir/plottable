@@ -91,8 +91,7 @@ export module Interactions {
       }
 
       var oldPoints = this._touchIds.values();
-      var oldCenterPoint = PanZoom._centerPoint(this._touchIds.values()[0], this._touchIds.values()[1]);
-      var oldCornerDistance = PanZoom._pointDistance(this._touchIds.values()[0], this._touchIds.values()[1]);
+      var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
 
       if (oldCornerDistance === 0) {
         return;
@@ -104,8 +103,6 @@ export module Interactions {
         }
       });
 
-      var points = this._touchIds.values();
-      var pointDiffs = points.map((point) => { return { x: point.x - oldCenterPoint.x, y: point.y - oldCenterPoint.y }; });
       var pinchFactor = 1;
 
       this.xScales().forEach((xScale) => {
@@ -116,14 +113,12 @@ export module Interactions {
         pinchFactor = this._constrainedPinchAmount(yScale, pinchFactor, oldPoints);
       });
 
-      var constrainedPinchPoints = pointDiffs.map((pointDiff) => {
-            return { x: pointDiff.x * pinchFactor + oldCenterPoint.x,
-                     y: pointDiff.y * pinchFactor + oldCenterPoint.y };
-      });
+      var constrainedPinchPoints = this._pinchFactorTouchPoints(oldPoints, pinchFactor);
       var constrainedCornerDistance = PanZoom._pointDistance(constrainedPinchPoints[0], constrainedPinchPoints[1]);
 
       if (constrainedCornerDistance !== 0 && oldCornerDistance !== 0) {
         var magnifyAmount = oldCornerDistance / constrainedCornerDistance;
+        var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
 
         var translateAmountX = oldCenterPoint.x - ((constrainedPinchPoints[0].x + constrainedPinchPoints[1].x) / 2);
         this.xScales().forEach((xScale) => {
@@ -149,12 +144,8 @@ export module Interactions {
       var points = this._touchIds.values();
       var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
 
-      var pointDiffs = points.map((point) => { return { x: point.x - oldCenterPoint.x, y: point.y - oldCenterPoint.y }; });
       var pinchTransform = (rangeValue: number) => {
-        var newPoints = pointDiffs.map((pointDiff) => {
-          return { x: pointDiff.x * constrainedPinchFactor + oldCenterPoint.x,
-                   y: pointDiff.y * constrainedPinchFactor + oldCenterPoint.y };
-        });
+        var newPoints = this._pinchFactorTouchPoints(oldPoints, constrainedPinchFactor);
         var newCornerConstrainedDistance = PanZoom._pointDistance(newPoints[0], newPoints[1]);
         if (newCornerConstrainedDistance === 0) { return rangeValue; }
         var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
@@ -180,6 +171,16 @@ export module Interactions {
         }
       }
       return (expanding ? Math.min : Math.max)(pinchAmount, constrainedPinchFactor);
+    }
+
+    private _pinchFactorTouchPoints(oldPoints: Point[], pinchFactor: number) {
+      var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+      var points = this._touchIds.values();
+      var pointDiffs = points.map((point) => { return { x: point.x - oldCenterPoint.x, y: point.y - oldCenterPoint.y }; });
+      return pointDiffs.map((pointDiff) => {
+          return { x: pointDiff.x * pinchFactor + oldCenterPoint.x,
+                   y: pointDiff.y * pinchFactor + oldCenterPoint.y };
+      });
     }
 
     private static _centerPoint(point1: Point, point2: Point) {
