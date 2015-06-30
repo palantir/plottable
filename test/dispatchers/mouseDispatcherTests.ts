@@ -104,15 +104,14 @@ describe("Dispatchers", () => {
       TestMethods.triggerFakeMouseEvent("mousedown", target, targetX, targetY);
       assert.isTrue(callbackWasCalled, "callback was called on mousedown");
 
-      var position = (function(el){
-          for (var lx = 0, ly = 0;
-                   el != null;
-                   el = (el.offsetParent || el.parentNode)) {
-               lx += (el.offsetLeft || el.clientLeft || 0);
-               ly += (el.offsetTop || el.clientTop || 0);
-          }
-          return {x: lx, y: ly};
-      })(target[0][0]);
+      var element = <HTMLElement> target[0][0];
+      var position = { x: 0, y: 0 };
+      while (element != null) {
+        position.x += (element.offsetLeft || element.clientLeft || 0);
+        position.y += (element.offsetTop || element.clientTop || 0);
+        element = <HTMLElement> (element.offsetParent || element.parentNode);
+      }
+
       var overlay = TestMethods.getSVGParent().append("div")
             .style({
               height: "400px",
