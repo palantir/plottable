@@ -9575,10 +9575,7 @@ var Plottable;
                         return;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
-                    var nonLinearPanningWithExtents = function (scale) {
-                        return _this.minDomainExtent(scale) != null && _this.maxDomainExtent(scale) != null && !(scale instanceof Plottable.Scales.Linear) && !(scale instanceof Plottable.Scales.Time);
-                    };
-                    if (_this.xScales().concat(_this.yScales()).some(nonLinearPanningWithExtents)) {
+                    if (_this.xScales().concat(_this.yScales()).some(function (scale) { return _this._nonLinearScaleWithExtents(scale); })) {
                         Plottable.Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
                     }
                     _this.xScales().forEach(function (xScale) {
@@ -9590,6 +9587,9 @@ var Plottable;
                     });
                     lastDragPoint = endPoint;
                 });
+            };
+            PanZoom.prototype._nonLinearScaleWithExtents = function (scale) {
+                return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null && !(scale instanceof Plottable.Scales.Linear) && !(scale instanceof Plottable.Scales.Time);
             };
             PanZoom.prototype.xScales = function (xScales) {
                 var _this = this;

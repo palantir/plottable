@@ -291,12 +291,7 @@ export module Interactions {
         }
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
-        var nonLinearPanningWithExtents = (scale: QuantitativeScale<any>) => {
-          return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
-              !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
-        };
-
-        if (this.xScales().concat(this.yScales()).some(nonLinearPanningWithExtents)) {
+        if (this.xScales().concat(this.yScales()).some((scale) => this._nonLinearScaleWithExtents(scale))) {
           Utils.Window.warn("Panning with extents on a nonlinear scale will not obey extents.");
         }
 
@@ -311,6 +306,11 @@ export module Interactions {
         });
         lastDragPoint = endPoint;
       });
+    }
+
+    private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
+      return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
+             !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
     }
 
     /**
