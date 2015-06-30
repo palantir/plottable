@@ -672,8 +672,8 @@ describe("Plots", () => {
       });
 
       it("labels are rendered correctly across platforms", () => {
-        dataset = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 64000000 }, { x: "zoo", y: 12345678 }]);
-        plot.addDataset(dataset);
+        plot.removeDataset(dataset);
+        plot.addDataset(new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 64000000 }, { x: "zoo", y: 12345678 }]));
         plot.labelsEnabled(true);
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
