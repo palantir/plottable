@@ -9790,6 +9790,8 @@ var Plottable;
              */
             PanZoom.prototype.removeXScale = function (xScale) {
                 this._xScales.delete(xScale);
+                this._minDomainExtents.delete(xScale);
+                this._maxDomainExtents.delete(xScale);
                 return this;
             };
             /**
@@ -9810,6 +9812,8 @@ var Plottable;
              */
             PanZoom.prototype.removeYScale = function (yScale) {
                 this._yScales.delete(yScale);
+                this._minDomainExtents.delete(yScale);
+                this._maxDomainExtents.delete(yScale);
                 return this;
             };
             PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {

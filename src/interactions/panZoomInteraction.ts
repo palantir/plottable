@@ -312,6 +312,8 @@ export module Interactions {
      */
     public removeXScale(xScale: QuantitativeScale<any>) {
       this._xScales.delete(xScale);
+      this._minDomainExtents.delete(xScale);
+      this._maxDomainExtents.delete(xScale);
       return this;
     }
 
@@ -334,6 +336,8 @@ export module Interactions {
      */
     public removeYScale(yScale: QuantitativeScale<any>) {
       this._yScales.delete(yScale);
+      this._minDomainExtents.delete(yScale);
+      this._maxDomainExtents.delete(yScale);
       return this;
     }
 
