@@ -9394,44 +9394,90 @@ var Plottable;
                 if (this._touchIds.size() < 2) {
                     return;
                 }
-                var oldCenterPoint = this._centerPoint();
-                var oldCornerDistance = this._cornerDistance();
+                var oldCenterPoint = PanZoom._centerPoint(this._touchIds.values()[0], this._touchIds.values()[1]);
+                var oldCornerDistance = PanZoom._pointDistance(this._touchIds.values()[0], this._touchIds.values()[1]);
+                if (oldCornerDistance === 0) {
+                    return;
+                }
                 ids.forEach(function (id) {
                     if (_this._touchIds.has(id.toString())) {
                         _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
-                var newCenterPoint = this._centerPoint();
-                var newCornerDistance = this._cornerDistance();
-                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
+                var points = this._touchIds.values();
+                var expanding = PanZoom._pointDistance(points[0], points[1]) > oldCornerDistance;
+                var pointDiffs = points.map(function (point) {
+                    return { x: point.x - oldCenterPoint.x, y: point.y - oldCenterPoint.y };
+                });
+                var pinchFactor = 1;
+                this.xScales().forEach(function (xScale) {
+                    var minDomainExtent = _this.minDomainExtent(xScale) || 0;
+                    var maxDomainExtent = _this.maxDomainExtent(xScale) || Infinity;
+                    var constrainedPinchFactor = 1;
+                    var centerValue = oldCenterPoint.x;
+                    var pinchTransform = function (rangeValue) {
+                        var newPoints = pointDiffs.map(function (pointDiff) {
+                            return { x: pointDiff.x * constrainedPinchFactor + oldCenterPoint.x, y: pointDiff.y * constrainedPinchFactor + oldCenterPoint.y };
+                        });
+                        var newCornerConstrainedDistance = PanZoom._pointDistance(newPoints[0], newPoints[1]);
+                        if (newCornerConstrainedDistance === 0) {
+                            return;
+                        }
+                        var magnifyAmount = oldCornerDistance / newCornerConstrainedDistance;
+                        var translateAmount = oldCenterPoint.x - ((newPoints[0].x + newPoints[1].x) / 2);
+                        return xScale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount + translateAmount);
+                    };
+                    var iterations = 20;
+                    var lowerBound = 0;
+                    var upperBound = Infinity;
+                    for (var i = 0; i < iterations; i++) {
+                        var constrainedDomain = xScale.range().map(pinchTransform);
+                        var constrainedDomainExtent = Math.abs(constrainedDomain[1] - constrainedDomain[0]);
+                        if (constrainedDomainExtent === minDomainExtent || constrainedDomainExtent === maxDomainExtent) {
+                            return constrainedPinchFactor;
+                        }
+                        var insideExtent = constrainedDomainExtent >= minDomainExtent && constrainedDomainExtent <= maxDomainExtent;
+                        if (expanding === insideExtent) {
+                            lowerBound = constrainedPinchFactor;
+                            constrainedPinchFactor = upperBound === Infinity ? constrainedPinchFactor * 2 : (upperBound + constrainedPinchFactor) / 2;
+                        }
+                        else {
+                            upperBound = constrainedPinchFactor;
+                            constrainedPinchFactor = (lowerBound + constrainedPinchFactor) / 2;
+                        }
+                    }
+                    pinchFactor = (expanding ? Math.min : Math.max)(pinchFactor, constrainedPinchFactor);
+                });
+                var constrainedPinchPoints = pointDiffs.map(function (pointDiff) {
+                    return { x: pointDiff.x * pinchFactor + oldCenterPoint.x, y: pointDiff.y * pinchFactor + oldCenterPoint.y };
+                });
+                var constrainedCornerDistance = PanZoom._pointDistance(constrainedPinchPoints[0], constrainedPinchPoints[1]);
+                if (constrainedCornerDistance !== 0 && oldCornerDistance !== 0) {
+                    var magnifyAmount = oldCornerDistance / constrainedCornerDistance;
+                    var translateAmountX = oldCenterPoint.x - ((constrainedPinchPoints[0].x + constrainedPinchPoints[1].x) / 2);
                     this.xScales().forEach(function (xScale) {
-                        _this._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                        _this._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
+                        _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
+                        _this._translateScale(xScale, translateAmountX);
                     });
+                    var translateAmountY = oldCenterPoint.y - ((constrainedPinchPoints[0].y + constrainedPinchPoints[1].y) / 2);
                     this.yScales().forEach(function (yScale) {
-                        _this._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                        _this._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
+                        _this._magnifyScale(yScale, oldCornerDistance / constrainedCornerDistance, oldCenterPoint.y);
+                        _this._translateScale(yScale, translateAmountY);
                     });
                 }
             };
-            PanZoom.prototype._centerPoint = function () {
-                var points = this._touchIds.values();
-                var firstTouchPoint = points[0];
-                var secondTouchPoint = points[1];
-                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+            PanZoom._centerPoint = function (point1, point2) {
+                var leftX = Math.min(point1.x, point2.x);
+                var rightX = Math.max(point1.x, point2.x);
+                var topY = Math.min(point1.y, point2.y);
+                var bottomY = Math.max(point1.y, point2.y);
                 return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
             };
-            PanZoom.prototype._cornerDistance = function () {
-                var points = this._touchIds.values();
-                var firstTouchPoint = points[0];
-                var secondTouchPoint = points[1];
-                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+            PanZoom._pointDistance = function (point1, point2) {
+                var leftX = Math.min(point1.x, point2.x);
+                var rightX = Math.max(point1.x, point2.x);
+                var topY = Math.min(point1.y, point2.y);
+                var bottomY = Math.max(point1.y, point2.y);
                 return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
             };
             PanZoom.prototype._handleTouchEnd = function (ids, idToPoint, e) {
