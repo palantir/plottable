@@ -919,7 +919,6 @@ declare module Plottable {
          * @return {QuantitativeScale} The calling QuantitativeScale.
          */
         tickGenerator(generator: Scales.TickGenerators.TickGenerator<D>): QuantitativeScale<D>;
-        constrainedDomain(domainToConstrain: D[], extent: D): D[];
     }
 }
 
@@ -941,7 +940,6 @@ declare module Plottable {
             invert(value: number): number;
             defaultTicks(): number[];
             protected _niceDomain(domain: number[], count?: number): number[];
-            constrainedDomain(domainToConstrain: number[], extent: number): number[];
         }
     }
 }
@@ -981,7 +979,6 @@ declare module Plottable {
             protected _getRange(): number[];
             protected _setRange(values: number[]): void;
             defaultTicks(): number[];
-            constrainedDomain(domainToConstrain: number[], extent: number): number[];
         }
     }
 }
@@ -1127,7 +1124,6 @@ declare module Plottable {
              * If the provided TimeInterval is incorrect, the default is d3.time.year
              */
             static timeIntervalToD3Time(timeInterval: string): d3.time.Interval;
-            constrainedDomain(domainToConstrain: Date[], extent: Date): Date[];
         }
     }
 }

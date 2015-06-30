@@ -192,8 +192,7 @@ export module Interactions {
         var scaleDomain = (<any> scale).domain();
         var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
         var compareF = extentIncreasing ? Math.min : Math.max;
-        var constrainedZoomAmount = boundingDomainExtent / domainExtent;
-        return compareF(zoomAmount, constrainedZoomAmount);
+        return compareF(zoomAmount, boundingDomainExtent / domainExtent);
       }
 
       var constrainedZoomAmount = 1;
@@ -207,7 +206,6 @@ export module Interactions {
         var transformedDomainExtent = Math.abs(transformedDomain[1] - transformedDomain[0]);
         if (transformedDomainExtent === boundingDomainExtent) { return constrainedZoomAmount; }
 
-        var transformedExtentIncreasing = transformedDomainExtent > boundingDomainExtent;
         if (extentIncreasing === transformedDomainExtent < boundingDomainExtent) {
           lowerBound = constrainedZoomAmount;
           constrainedZoomAmount = upperBound === Infinity ? constrainedZoomAmount * 2 : (upperBound + constrainedZoomAmount) / 2;

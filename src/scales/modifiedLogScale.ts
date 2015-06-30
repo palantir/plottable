@@ -199,13 +199,6 @@ export module Scales {
     public defaultTicks(): number[] {
       return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
     }
-
-    public constrainedDomain(domainToConstrain: number[], extent: number) {
-      var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
-      var domainMin = domainCenter - extent / 2;
-      var domainMax = domainCenter + extent / 2;
-      return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
-    }
   }
 }
 }

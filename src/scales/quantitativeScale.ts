@@ -287,9 +287,5 @@ export class QuantitativeScale<D> extends Scale<D, number> {
       return this;
     }
   }
-
-  public constrainedDomain(domainToConstrain: D[], extent: D): D[] {
-    throw new Error("Subclasses should override constrainedDomain");
-  }
 }
 }

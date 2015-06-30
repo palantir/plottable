@@ -1726,9 +1726,6 @@ var Plottable;
                 return this;
             }
         };
-        QuantitativeScale.prototype.constrainedDomain = function (domainToConstrain, extent) {
-            throw new Error("Subclasses should override constrainedDomain");
-        };
         QuantitativeScale._DEFAULT_NUM_TICKS = 10;
         return QuantitativeScale;
     })(Plottable.Scale);
@@ -1787,12 +1784,6 @@ var Plottable;
             };
             Linear.prototype._niceDomain = function (domain, count) {
                 return this._d3Scale.copy().domain(domain).nice(count).domain();
-            };
-            Linear.prototype.constrainedDomain = function (domainToConstrain, extent) {
-                var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
-                var domainMin = domainCenter - extent / 2;
-                var domainMax = domainCenter + extent / 2;
-                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return Linear;
         })(Plottable.QuantitativeScale);
@@ -1983,12 +1974,6 @@ var Plottable;
             };
             ModifiedLog.prototype.defaultTicks = function () {
                 return this._d3Scale.ticks(Scales.ModifiedLog._DEFAULT_NUM_TICKS);
-            };
-            ModifiedLog.prototype.constrainedDomain = function (domainToConstrain, extent) {
-                var domainCenter = (domainToConstrain[0] + domainToConstrain[1]) / 2;
-                var domainMin = domainCenter - extent / 2;
-                var domainMax = domainCenter + extent / 2;
-                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return ModifiedLog;
         })(Plottable.QuantitativeScale);
@@ -2326,12 +2311,6 @@ var Plottable;
                     default:
                         throw Error("TimeInterval specified does not exist: " + timeInterval);
                 }
-            };
-            Time.prototype.constrainedDomain = function (domainToConstrain, extent) {
-                var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
-                var domainMin = new Date(domainCenter - extent.valueOf() / 2);
-                var domainMax = new Date(domainCenter + extent.valueOf() / 2);
-                return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
             };
             return Time;
         })(Plottable.QuantitativeScale);
@@ -9500,8 +9479,7 @@ var Plottable;
                     var scaleDomain = scale.domain();
                     var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
                     var compareF = extentIncreasing ? Math.min : Math.max;
-                    var constrainedZoomAmount = boundingDomainExtent / domainExtent;
-                    return compareF(zoomAmount, constrainedZoomAmount);
+                    return compareF(zoomAmount, boundingDomainExtent / domainExtent);
                 }
                 var constrainedZoomAmount = 1;
                 var lowerBound = extentIncreasing ? constrainedZoomAmount : 0;
@@ -9515,7 +9493,6 @@ var Plottable;
                     if (transformedDomainExtent === boundingDomainExtent) {
                         return constrainedZoomAmount;
                     }
-                    var transformedExtentIncreasing = transformedDomainExtent > boundingDomainExtent;
                     if (extentIncreasing === transformedDomainExtent < boundingDomainExtent) {
                         lowerBound = constrainedZoomAmount;
                         constrainedZoomAmount = upperBound === Infinity ? constrainedZoomAmount * 2 : (upperBound + constrainedZoomAmount) / 2;

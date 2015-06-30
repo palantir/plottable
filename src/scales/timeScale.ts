@@ -108,14 +108,6 @@ export module Scales {
         throw Error("TimeInterval specified does not exist: " + timeInterval);
       }
     }
-
-    public constrainedDomain(domainToConstrain: Date[], extent: Date) {
-      var domainCenter = (domainToConstrain[0].valueOf() + domainToConstrain[1].valueOf()) / 2;
-      var domainMin = new Date(domainCenter - extent.valueOf() / 2);
-      var domainMax = new Date(domainCenter + extent.valueOf() / 2);
-      return domainToConstrain[1] > domainToConstrain[0] ? [domainMin, domainMax] : [domainMax, domainMin];
-    }
-
   }
 }
 }
