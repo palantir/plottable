@@ -369,6 +369,9 @@ export module Interactions {
       if (minDomainExtent == null) {
         return this._minDomainExtents.get(quantitativeScale);
       }
+      if (minDomainExtent.valueOf() < 0) {
+        throw new Error("extent must be non-negative");
+      }
       if (this._nonLinearScaleWithExtents(quantitativeScale)) {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
@@ -400,6 +403,9 @@ export module Interactions {
     public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
       if (maxDomainExtent == null) {
         return this._maxDomainExtents.get(quantitativeScale);
+      }
+      if (maxDomainExtent.valueOf() < 0) {
+        throw new Error("extent must be non-negative");
       }
       if (this._nonLinearScaleWithExtents(quantitativeScale)) {
         Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");

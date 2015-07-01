@@ -9820,6 +9820,9 @@ var Plottable;
                 if (minDomainExtent == null) {
                     return this._minDomainExtents.get(quantitativeScale);
                 }
+                if (minDomainExtent.valueOf() < 0) {
+                    throw new Error("extent must be non-negative");
+                }
                 if (this._nonLinearScaleWithExtents(quantitativeScale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
                 }
@@ -9829,6 +9832,9 @@ var Plottable;
             PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
                 if (maxDomainExtent == null) {
                     return this._maxDomainExtents.get(quantitativeScale);
+                }
+                if (maxDomainExtent.valueOf() < 0) {
+                    throw new Error("extent must be non-negative");
                 }
                 if (this._nonLinearScaleWithExtents(quantitativeScale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
