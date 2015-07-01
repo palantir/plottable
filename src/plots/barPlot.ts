@@ -215,7 +215,7 @@ export module Plots {
       var drawer = super._createNodesForDataset(dataset);
       drawer.renderArea().classed(Bar._BAR_AREA_CLASS, true);
       var labelArea = this._renderArea.append("g").classed(Bar._LABEL_AREA_CLASS, true);
-      var measurer = new SVGTypewriter.Measurers.CacheCharacterMeasurer(labelArea);
+      var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       this._labelConfig.set(dataset, { labelArea: labelArea, measurer: measurer, writer: writer });
       return drawer;
@@ -432,6 +432,7 @@ export module Plots {
         var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         var secondaryAttrAvailableSpace = this._isVertical ? w : h;
         var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+        console.log(measurement, h, w);
         if (measurement.height <= h && measurement.width <= w) {
           var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
           if (!positive) { offset = offset * -1; }
