@@ -3777,6 +3777,48 @@ declare module Plottable {
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             removeYScale(yScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Gets the minimum domain extent for the scale, specifying the minimum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The minimum domain extent for the scale.
+             */
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the minimum domain extent for the scale, specifying the minimum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} minDomainExtent The minimum domain extent for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+            /**
+             * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The maximum domain extent for the scale.
+             */
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the maximum domain extent for the scale, specifying the maximum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} minDomainExtent The maximum domain extent for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
         }
     }
 }
