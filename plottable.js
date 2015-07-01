@@ -9823,6 +9823,10 @@ var Plottable;
                 if (minDomainExtent.valueOf() < 0) {
                     throw new Error("extent must be non-negative");
                 }
+                var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+                if (maxExtentForScale != null && minDomainExtent.valueOf() > maxExtentForScale.valueOf()) {
+                    throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
+                }
                 if (this._nonLinearScaleWithExtents(quantitativeScale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
                 }
@@ -9833,8 +9837,12 @@ var Plottable;
                 if (maxDomainExtent == null) {
                     return this._maxDomainExtents.get(quantitativeScale);
                 }
-                if (maxDomainExtent.valueOf() < 0) {
-                    throw new Error("extent must be non-negative");
+                if (maxDomainExtent.valueOf() <= 0) {
+                    throw new Error("extent must be positive");
+                }
+                var minExtentForScale = this.minDomainExtent(quantitativeScale);
+                if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
+                    throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
                 }
                 if (this._nonLinearScaleWithExtents(quantitativeScale)) {
                     Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");

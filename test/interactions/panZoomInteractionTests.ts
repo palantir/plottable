@@ -229,6 +229,13 @@ describe("Interactions", () => {
         svg.remove();
       });
 
+      it("can't be larger than maxDomainExtent() for the same Scale", () => {
+        var maximumDomainExtent = minimumDomainExtent * 2;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, maximumDomainExtent * 2), Error);
+        svg.remove();
+      });
+
       it("Mousewheeling in cannot go beyond the specified domainExtent", () => {
         // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
         // https://github.com/ariya/phantomjs/issues/11289
@@ -269,8 +276,16 @@ describe("Interactions", () => {
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
       });
 
-      it("Rejects negative extents", () => {
+      it("Rejects non-positive extents", () => {
         assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error);
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error);
+        svg.remove();
+      });
+
+      it("can't be smaller than minDomainExtent() for the same Scale", () => {
+        var minimumDomainExtent = maximumDomainExtent / 2;
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, minimumDomainExtent / 2), Error);
         svg.remove();
       });
 
