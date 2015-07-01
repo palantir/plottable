@@ -4338,13 +4338,6 @@ var Plottable;
                 if (!this._isSetup) {
                     return;
                 }
-                if (!this._isHorizontal()) {
-                    var reComputedWidth = this._computeWidth();
-                    if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
-                        this.redraw();
-                        return;
-                    }
-                }
                 this.render();
             };
             Numeric.prototype.renderImmediately = function () {
