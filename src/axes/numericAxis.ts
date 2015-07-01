@@ -70,10 +70,32 @@ export module Axes {
       }
     }
 
+    private oldTextLength = 0;
     protected _rescale() {
       if (!this._isSetup) {
         return;
       }
+
+      var tickValues = this._getTickValues();
+      var textLengths = tickValues.map((v: any) => {
+        return String(v).length;
+      });
+
+      var maxTextLength = Utils.Math.max(textLengths, 0);
+
+      if (maxTextLength !== this.oldTextLength) {
+        this.redraw();
+        this.oldTextLength = maxTextLength;
+        return;
+      }
+
+      // if (!this._isHorizontal()) {
+      //   var reComputedWidth = this._computeWidth();
+      //   if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
+      //     this.redraw();
+      //     return;
+      //   }
+      // }
 
       this.render();
     }
