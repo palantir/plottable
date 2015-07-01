@@ -12,7 +12,6 @@
   "rules": {
     "no-eval": 0,
     "quotes": [2, "double", "avoid-escape"],
-    "no-console": 0,
     "no-unused-vars": [2, {"vars": "local"}],
     "no-multi-spaces": 0,
     "no-use-before-define": [2, "nofunc"]
