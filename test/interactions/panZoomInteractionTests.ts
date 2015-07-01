@@ -232,7 +232,8 @@ describe("Interactions", () => {
       it("can't be larger than maxDomainExtent() for the same Scale", () => {
         var maximumDomainExtent = minimumDomainExtent * 2;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
-        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, maximumDomainExtent * 2), Error);
+        var tooBigMinimumDomainExtent = maximumDomainExtent * 2;
+        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error);
         svg.remove();
       });
 
@@ -285,7 +286,8 @@ describe("Interactions", () => {
       it("can't be smaller than minDomainExtent() for the same Scale", () => {
         var minimumDomainExtent = maximumDomainExtent / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
-        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, minimumDomainExtent / 2), Error);
+        var tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error);
         svg.remove();
       });
 
