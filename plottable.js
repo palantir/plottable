@@ -9824,7 +9824,7 @@ var Plottable;
                     throw new Error("extent must be non-negative");
                 }
                 var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
-                if (maxExtentForScale != null && minDomainExtent.valueOf() > maxExtentForScale.valueOf()) {
+                if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
                     throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
                 }
                 if (this._nonLinearScaleWithExtents(quantitativeScale)) {
