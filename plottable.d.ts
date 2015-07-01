@@ -3198,6 +3198,28 @@ declare module Plottable {
 }
 
 
+/**
+ * LIST OF ITEMS TO ADDRESS
+ * ========================
+ * - Autoscaling the yAxis so it isn't all screwy
+ * - Horizontal/vertical cases
+ */
+declare module Plottable {
+    module Plots {
+        class Waterfall<X, Y> extends XYPlot<X, Y> {
+            constructor();
+            total(): Plots.AccessorScaleBinding<any, boolean>;
+            total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
+            total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
+            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _generateAttrToProjector(): {
+                [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
+            };
+        }
+    }
+}
+
+
 declare module Plottable {
     interface Animator {
         /**

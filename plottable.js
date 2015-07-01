@@ -8517,6 +8517,112 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+/**
+ * LIST OF ITEMS TO ADDRESS
+ * ========================
+ * - Autoscaling the yAxis so it isn't all screwy
+ * - Horizontal/vertical cases
+ */
+var Plottable;
+(function (Plottable) {
+    var Plots;
+    (function (Plots) {
+        var Waterfall = (function (_super) {
+            __extends(Waterfall, _super);
+            function Waterfall() {
+                _super.call(this);
+                this.addClass("waterfall-plot");
+            }
+            Waterfall.prototype.total = function (total, scale) {
+                if (total === undefined) {
+                    return this._propertyBindings.get(Waterfall._TOTAL_KEY);
+                }
+                this._bindProperty(Waterfall._TOTAL_KEY, total, scale);
+                return this;
+            };
+            Waterfall.prototype._createDrawer = function (dataset) {
+                return new Plottable.Drawers.Rectangle(dataset);
+            };
+            Waterfall.prototype._generateAttrToProjector = function () {
+                var _this = this;
+                var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
+                var xAccessor = Plottable.Plot._scaledAccessor(this.x());
+                var yAccessor = Plottable.Plot._scaledAccessor(this.y());
+                var totalAccessor = Plottable.Plot._scaledAccessor(this.total());
+                var width = this.x().scale.rangeBand();
+                attrToProjector["x"] = function (d, i, dataset) {
+                    return xAccessor(d, i, dataset) - width / 2;
+                };
+                attrToProjector["y"] = function (d, i, dataset) {
+                    var isTotal = totalAccessor(d, i, dataset);
+                    if (isTotal) {
+                        return yAccessor(d, i, dataset);
+                    }
+                    else {
+                        var currentSubtotal = _this._subtotal(i, dataset);
+                        var priorSubtotal = _this._subtotal(i - 1, dataset);
+                        if (currentSubtotal > priorSubtotal) {
+                            return _this.y().scale.scale(currentSubtotal);
+                        }
+                        else {
+                            return _this.y().scale.scale(priorSubtotal);
+                        }
+                    }
+                };
+                attrToProjector["height"] = function (d, i, dataset) {
+                    var isTotal = totalAccessor(d, i, dataset);
+                    var currentValue = _this.y().accessor(d, i, dataset);
+                    if (isTotal) {
+                        return Math.abs(_this.y().scale.scale(currentValue) - _this.y().scale.scale(0));
+                    }
+                    else {
+                        var currentSubtotal = _this._subtotal(i, dataset);
+                        var priorSubtotal = _this._subtotal(i - 1, dataset);
+                        var height = Math.abs(_this.y().scale.scale(currentSubtotal) - _this.y().scale.scale(priorSubtotal));
+                        return height;
+                    }
+                    return yAccessor(d, i, dataset);
+                };
+                attrToProjector["width"] = function (d, i, dataset) {
+                    return width;
+                };
+                attrToProjector["class"] = function (d, i, dataset) {
+                    var isTotal = totalAccessor(d, i, dataset);
+                    if (isTotal) {
+                        return "waterfall-total";
+                    }
+                    else {
+                        var delta = _this.y().accessor(d, i, dataset);
+                        return delta > 0 ? "waterfall-growth" : "waterfall-decline";
+                    }
+                };
+                return attrToProjector;
+            };
+            Waterfall.prototype._subtotal = function (index, dataset) {
+                var data = dataset.data();
+                var subtotal = 0;
+                var totalAccessor = this.total().accessor;
+                while (!totalAccessor(data[index], index, dataset) && index >= 0) {
+                    subtotal += this.y().accessor(data[index], index, dataset);
+                    index -= 1;
+                }
+                subtotal += this.y().accessor(data[index], index, dataset);
+                return subtotal;
+            };
+            Waterfall._TOTAL_KEY = "total";
+            return Waterfall;
+        })(Plottable.XYPlot);
+        Plots.Waterfall = Waterfall;
+    })(Plots = Plottable.Plots || (Plottable.Plots = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
 
 ///<reference path="../reference.ts" />
 var Plottable;
