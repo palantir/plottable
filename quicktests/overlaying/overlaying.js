@@ -217,10 +217,6 @@ function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
     var name = path.replace(/\w*\/|\.js/g, "");
     d3.text("http://localhost:9999/" + path, function(error, text) {
-      if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest ");
-        return;
-      }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
@@ -243,10 +239,6 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
   quickTestNames.forEach(function(q) { //for each quicktest
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
-      if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest " + name);
-        return;
-      }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
                "})();" +
@@ -314,9 +306,6 @@ function loadPlottableBranches(category, branchList){
           filterQuickTests(category, branchList);
         }
       });
-    }
-    else if(textStatus === "error"){
-      console.log("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
   });
 }
