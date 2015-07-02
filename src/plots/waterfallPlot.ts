@@ -31,8 +31,13 @@ export module Plots {
       return this;
     }
 
-    protected _createDrawer(dataset: Dataset) {
-      return new Drawers.Rectangle(dataset);
+    protected _extentsForProperty(attr: string) {
+      var primaryAttr = "y";
+      if (attr === primaryAttr) {
+        return [this._extent];
+      } else {
+        return super._extentsForProperty(attr);
+      }
     }
 
     protected _generateAttrToProjector() {
@@ -81,15 +86,6 @@ export module Plots {
       };
 
       return attrToProjector;
-    }
-
-    protected _extentsForProperty(attr: string) {
-      var primaryAttr = "y";
-      if (attr === primaryAttr) {
-        return [this._extent];
-      } else {
-        return super._extentsForProperty(attr);
-      }
     }
 
     protected _onDatasetUpdate() {

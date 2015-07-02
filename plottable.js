@@ -8489,8 +8489,14 @@ var Plottable;
                 this._bindProperty(Waterfall._TOTAL_KEY, total, scale);
                 return this;
             };
-            Waterfall.prototype._createDrawer = function (dataset) {
-                return new Plottable.Drawers.Rectangle(dataset);
+            Waterfall.prototype._extentsForProperty = function (attr) {
+                var primaryAttr = "y";
+                if (attr === primaryAttr) {
+                    return [this._extent];
+                }
+                else {
+                    return _super.prototype._extentsForProperty.call(this, attr);
+                }
             };
             Waterfall.prototype._generateAttrToProjector = function () {
                 var _this = this;
@@ -8538,15 +8544,6 @@ var Plottable;
                     }
                 };
                 return attrToProjector;
-            };
-            Waterfall.prototype._extentsForProperty = function (attr) {
-                var primaryAttr = "y";
-                if (attr === primaryAttr) {
-                    return [this._extent];
-                }
-                else {
-                    return _super.prototype._extentsForProperty.call(this, attr);
-                }
             };
             Waterfall.prototype._onDatasetUpdate = function () {
                 this._updateSubtotals();
