@@ -8531,14 +8531,34 @@ var Plottable;
             __extends(Waterfall, _super);
             function Waterfall() {
                 _super.call(this);
+                this._connectorsEnabled = false;
                 this.addClass("waterfall-plot");
             }
+            Waterfall.prototype.connectorsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._connectorsEnabled;
+                }
+                this._connectorsEnabled = enabled;
+                return this;
+            };
             Waterfall.prototype.total = function (total, scale) {
                 if (total === undefined) {
                     return this._propertyBindings.get(Waterfall._TOTAL_KEY);
                 }
                 this._bindProperty(Waterfall._TOTAL_KEY, total, scale);
                 return this;
+            };
+            Waterfall.prototype._additionalPaint = function (time) {
+                var _this = this;
+                this._connectorArea.selectAll("line").remove();
+                if (this._connectorsEnabled) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawConnectors(); }, time);
+                }
+            };
+            Waterfall.prototype._createNodesForDataset = function (dataset) {
+                var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
+                this._connectorArea = this._renderArea.append("g").classed("connector-area", true);
+                return drawer;
             };
             Waterfall.prototype._extentsForProperty = function (attr) {
                 var primaryAttr = "y";
@@ -8587,11 +8607,11 @@ var Plottable;
                 attrToProjector["class"] = function (d, i, dataset) {
                     var isTotal = totalAccessor(d, i, dataset);
                     if (isTotal) {
-                        return "waterfall-total";
+                        return Waterfall._BAR_TOTAL_CLASS;
                     }
                     else {
                         var delta = _this.y().accessor(d, i, dataset);
-                        return delta > 0 ? "waterfall-growth" : "waterfall-decline";
+                        return delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS;
                     }
                 };
                 return attrToProjector;
@@ -8622,6 +8642,19 @@ var Plottable;
                 });
                 this._extent = [min, max];
             };
+            Waterfall.prototype._drawConnectors = function () {
+                var attrToProjector = this._generateAttrToProjector();
+                var dataset = this.datasets()[0];
+                for (var datumIndex = 1; datumIndex < dataset.data().length; datumIndex++) {
+                    var prevIndex = datumIndex - 1;
+                    var datum = dataset.data()[datumIndex];
+                    var prevDatum = dataset.data()[prevIndex];
+                    var x = attrToProjector["x"](prevDatum, prevIndex, dataset);
+                    var x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
+                    var y = this._subtotals[datumIndex] <= this._subtotals[prevIndex] ? attrToProjector["y"](datum, datumIndex, dataset) : attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
+                    this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true).attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
+                }
+            };
             Waterfall.prototype._updateSubtotals = function () {
                 var datasets = this.datasets();
                 if (datasets.length > 0) {
@@ -8630,6 +8663,10 @@ var Plottable;
                     this._calculateSubtotalsAndExtent(dataset);
                 }
             };
+            Waterfall._BAR_DECLINE_CLASS = "waterfall-decline";
+            Waterfall._BAR_GROWTH_CLASS = "waterfall-growth";
+            Waterfall._BAR_TOTAL_CLASS = "waterfall-total";
+            Waterfall._CONNECTOR_CLASS = "connector";
             Waterfall._TOTAL_KEY = "total";
             return Waterfall;
         })(Plots.Bar);
