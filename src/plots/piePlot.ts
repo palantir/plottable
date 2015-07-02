@@ -35,13 +35,13 @@ export module Plots {
       return this;
     }
 
-    public addDataset(dataset: Dataset) {
+    public addDataset(dataset: Dataset, callUpdateHandler: boolean = true) {
       if (this.datasets().length === 1) {
         Utils.Window.warn("Only one dataset is supported in Pie plots");
         return this;
       }
       this._updatePieAngles();
-      super.addDataset(dataset);
+      super.addDataset(dataset, callUpdateHandler);
       return this;
     }
 
@@ -183,9 +183,9 @@ export module Plots {
 
     /*
      * Gets the Entities at a particular Point.
-     * 
+     *
      * @param {Point} p
-     * @param {PlotEntity[]} 
+     * @param {PlotEntity[]}
      */
     public entitiesAt(queryPoint: Point) {
       var center = { x: this.width() / 2, y: this.height() / 2 };

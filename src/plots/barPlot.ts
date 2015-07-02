@@ -153,9 +153,9 @@ export module Plots {
       return this;
     }
 
-    public addDataset(dataset: Dataset) {
+    public addDataset(dataset: Dataset, callUpdateHandler: boolean = true) {
       dataset.onUpdate(this._updateBarPixelWidthCallback);
-      super.addDataset(dataset);
+      super.addDataset(dataset, callUpdateHandler);
       this._updateBarPixelWidth();
       return this;
     }
