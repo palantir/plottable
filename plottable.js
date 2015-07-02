@@ -8541,11 +8541,11 @@ var Plottable;
                 this._connectorsEnabled = enabled;
                 return this;
             };
-            Waterfall.prototype.total = function (total, scale) {
+            Waterfall.prototype.total = function (total) {
                 if (total === undefined) {
                     return this._propertyBindings.get(Waterfall._TOTAL_KEY);
                 }
-                this._bindProperty(Waterfall._TOTAL_KEY, total, scale);
+                this._bindProperty(Waterfall._TOTAL_KEY, total, null);
                 return this;
             };
             Waterfall.prototype._additionalPaint = function (time) {
@@ -8604,13 +8604,17 @@ var Plottable;
                     }
                 };
                 attrToProjector["class"] = function (d, i, dataset) {
+                    var baseClass = "";
+                    if (_this.attr("class") !== null) {
+                        baseClass = _this.attr("class").accessor(d, i, dataset) + " ";
+                    }
                     var isTotal = totalAccessor(d, i, dataset);
                     if (isTotal) {
-                        return Waterfall._BAR_TOTAL_CLASS;
+                        return baseClass + Waterfall._BAR_TOTAL_CLASS;
                     }
                     else {
                         var delta = _this.y().accessor(d, i, dataset);
-                        return delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS;
+                        return baseClass + (delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS);
                     }
                 };
                 return attrToProjector;

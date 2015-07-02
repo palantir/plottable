@@ -47,24 +47,15 @@ export module Plots {
     /**
      * Sets total to a constant number or the result of an Accessor
      * 
-     * @param {boolean|Accessor<number>}
+     * @param {Accessor<boolean>}
      * @returns {Waterfall} The calling Waterfall Plot.
      */
-    public total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
-    /**
-     * Sets total to a scaled constant value or scaled result of an Accessor.
-     * The provided Scale will account for the values when autoDomain()-ing
-     * 
-     * @param {T|Accessor<T>}
-     * @param {Scale<T, number>} scale
-     * @returns {Waterfall} The calling Waterfall Plot.
-     */
-    public total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
-    public total<T>(total?: boolean | Accessor<boolean> | T | Accessor<T>, scale?: Scale<T, boolean>): any {
+    public total(total: Accessor<boolean>): Waterfall<X, Y>;
+    public total<T>(total?: Accessor<boolean> | T | Accessor<T>): any {
       if (total === undefined) {
         return this._propertyBindings.get(Waterfall._TOTAL_KEY);
       }
-      this._bindProperty(Waterfall._TOTAL_KEY, total, scale);
+      this._bindProperty(Waterfall._TOTAL_KEY, total, null);
       return this;
     }
 
@@ -125,12 +116,16 @@ export module Plots {
       };
 
       attrToProjector["class"] = (d, i, dataset) => {
+        var baseClass = "";
+        if (this.attr("class") !== null) {
+          baseClass = this.attr("class").accessor(d, i, dataset) + " ";
+        }
         var isTotal = totalAccessor(d, i, dataset);
         if (isTotal) {
-          return Waterfall._BAR_TOTAL_CLASS;
+          return baseClass + Waterfall._BAR_TOTAL_CLASS;
         } else {
           var delta  = this.y().accessor(d, i, dataset);
-          return delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS;
+          return baseClass + (delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS);
         }
       };
 

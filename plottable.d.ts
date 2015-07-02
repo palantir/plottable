@@ -3222,19 +3222,10 @@ declare module Plottable {
             /**
              * Sets total to a constant number or the result of an Accessor
              *
-             * @param {boolean|Accessor<number>}
+             * @param {Accessor<boolean>}
              * @returns {Waterfall} The calling Waterfall Plot.
              */
-            total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
-            /**
-             * Sets total to a scaled constant value or scaled result of an Accessor.
-             * The provided Scale will account for the values when autoDomain()-ing
-             *
-             * @param {T|Accessor<T>}
-             * @param {Scale<T, number>} scale
-             * @returns {Waterfall} The calling Waterfall Plot.
-             */
-            total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
+            total(total: Accessor<boolean>): Waterfall<X, Y>;
             protected _additionalPaint(time: number): void;
             protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _extentsForProperty(attr: string): any[];
