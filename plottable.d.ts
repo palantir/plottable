@@ -3174,12 +3174,6 @@ declare module Plottable {
 }
 
 
-/**
- * LIST OF ITEMS TO ADDRESS
- * ========================
- * - Autoscaling the yAxis so it isn't all screwy
- * - Horizontal/vertical cases
- */
 declare module Plottable {
     module Plots {
         class Waterfall<X, Y> extends Bar<X, Y> {

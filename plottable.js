@@ -8466,12 +8466,6 @@ var __extends = this.__extends || function (d, b) {
     __.prototype = b.prototype;
     d.prototype = new __();
 };
-/**
- * LIST OF ITEMS TO ADDRESS
- * ========================
- * - Autoscaling the yAxis so it isn't all screwy
- * - Horizontal/vertical cases
- */
 var Plottable;
 (function (Plottable) {
     var Plots;
