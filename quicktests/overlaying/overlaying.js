@@ -14,32 +14,32 @@ function toggleSidebar(){
   if(sidebar.position().left !== 0){
     sidebar.css("visibility", "visible");
     sidebar.animate({
-      left: '0%'
+      left: "0%"
     });
     content.animate({
-      left: '20%'
+      left: "20%"
     });
     controls.animate({
-      width: '80%'
+      width: "80%"
     });
     sizeControls.animate({
-      width: '80%'
+      width: "80%"
     });
   }
   else{
     sidebar.animate({
-      left: '-20%'
+      left: "-20%"
     });
     content.animate({
-      left: '0'
+      left: "0"
     }, function(){
       sidebar.css("visibility", "hidden");
     });
     controls.animate({
-      width: '100%'
+      width: "100%"
     });
     sizeControls.animate({
-      width: '100%'
+      width: "100%"
     });
   }
 }
@@ -109,7 +109,7 @@ function setupCheckboxBinding(){
 
 function populateTotalSidebarList(paths){
   //IF CATEGORY IS ALL ******
-  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, ''); });
+  var testsPaths = paths.map(function(path) {return path.replace(/.*tests\/|\.js/g, ""); });
 
   //ex. animations/animate_area
   var hash = {};
@@ -146,7 +146,7 @@ function populateTotalSidebarList(paths){
   });
 
   setupCheckboxBinding();
-  $(":checkbox").attr("checked" , true);
+  $(":checkbox").attr("checked", true);
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -177,7 +177,7 @@ function setupBindings(){
   // show/hide according to hotkey events
   window.onkeyup = function(e){
     var key = e.keyCode || e.which;
-    var inputActive = $("#branch1, #branch2, #width, #height").is(':focus');
+    var inputActive = $("#branch1, #branch2, #width, #height").is(":focus");
     if(inputActive){return; }
 
     var visibleQuickTests = $(".quicktest").filter(":visible").toArray();
@@ -185,7 +185,7 @@ function setupBindings(){
   };
 
   $("#help").hover(function(){
-    $("#test-category-descriptions").fadeIn('fast');
+    $("#test-category-descriptions").fadeIn("fast");
   }, function() {
       // Hover out code
       $("#test-category-descriptions").css("display", "none");
@@ -215,11 +215,10 @@ function runQuickTest(result, svg, data, branch){
 
 function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
-    var name = path.replace(/\w*\/|\.js/g , '');
+    var name = path.replace(/\w*\/|\.js/g, "");
     d3.text("http://localhost:9999/" + path, function(error, text) {
       if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest ");
-        return;
+        throw new Error("Tried to load nonexistant quicktest.");
       }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
@@ -244,8 +243,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
       if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest " + name);
-        return;
+        throw new Error("Tried to load nonexistant quicktest.");
       }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
@@ -273,7 +271,7 @@ function filterQuickTests(category, branchList){
     var paths = data.map(function(quickTestObj) {return quickTestObj.path; });
     if (category !== "all"){
       var pathsInCategory = paths.filter(function(path) {return path.indexOf("tests/" + category) !== -1; });
-      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ''); });
+      var testsInCategory = pathsInCategory.map(function(path) {return path.replace(/.*\/|\.js/g, ""); });
       loadQuickTestsInCategory(testsInCategory, category, branchList[0], branchList[1]);
       populateSidebarList(paths, testsInCategory, category);
     }
@@ -314,9 +312,8 @@ function loadPlottableBranches(category, branchList){
           filterQuickTests(category, branchList);
         }
       });
-    }
-    else if(textStatus === "error"){
-      console.log("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
+    } else if (textStatus === "error"){
+      throw new Error("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
   });
 }

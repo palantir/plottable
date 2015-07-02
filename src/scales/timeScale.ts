@@ -108,7 +108,6 @@ export module Scales {
         throw Error("TimeInterval specified does not exist: " + timeInterval);
       }
     }
-
   }
 }
 }
