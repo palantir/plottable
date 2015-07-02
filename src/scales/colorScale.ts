@@ -8,6 +8,8 @@ export module Scales {
     // The maximum number of colors we are getting from CSS stylesheets
     private static _MAXIMUM_COLORS_FROM_CSS = 256;
 
+    private static _plottableColorCache: string[] = null;
+
     private _d3Scale: d3.scale.Ordinal<string, string>;
 
     /**
@@ -24,7 +26,10 @@ export module Scales {
       switch (scaleType) {
         case null:
         case undefined:
-          scale = d3.scale.ordinal<string, string>().range(Color._getPlottableColors());
+          if (Color._plottableColorCache == null) {
+            Color._plottableColorCache = Color._getPlottableColors();
+          }
+          scale = d3.scale.ordinal<string, string>().range(Color._plottableColorCache);
           break;
         case "Category10":
         case "category10":
@@ -59,6 +64,10 @@ export module Scales {
     // Duplicated from OrdinalScale._getExtent - should be removed in #388
     protected _getExtent(): string[] {
       return Utils.Array.uniq(this._getAllIncludedValues());
+    }
+
+    public static invalidateColorCache(): void {
+      Color._plottableColorCache = null;
     }
 
     private static _getPlottableColors(): string[] {
