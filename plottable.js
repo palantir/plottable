@@ -2214,7 +2214,6 @@ var Plottable;
             Color._LOOP_LIGHTEN_FACTOR = 1.6;
             // The maximum number of colors we are getting from CSS stylesheets
             Color._MAXIMUM_COLORS_FROM_CSS = 256;
-            Color._plottableColorCache = null;
             return Color;
         })(Plottable.Scale);
         Scales.Color = Color;

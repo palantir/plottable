@@ -142,6 +142,23 @@ describe("Scales", () => {
         "Unloading the CSS should cause color scales fallback to default colors");
     });
 
+     it("caches CSS specified colors unless the cache is invalidated", () => {
+      var style = d3.select("body").append("style");
+      style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+      Plottable.Scales.Color.invalidateColorCache();
+      var scale = new Plottable.Scales.Color();
+      style.remove();
+
+      assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
+
+      var scaleCached = new Plottable.Scales.Color();
+      assert.strictEqual(scaleCached.range()[0], "#ff0000", "The red color should still be cached");
+
+      Plottable.Scales.Color.invalidateColorCache();
+      var scaleFresh = new Plottable.Scales.Color();
+      assert.strictEqual(scaleFresh.range()[0], "#5279c7", "Invalidating the cache should reset the red color to the default");
+    });
+
     it("should try to recover from malicious CSS styleseets", () => {
       var defaultNumberOfColors = 10;
 

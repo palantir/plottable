@@ -8,7 +8,7 @@ export module Scales {
     // The maximum number of colors we are getting from CSS stylesheets
     private static _MAXIMUM_COLORS_FROM_CSS = 256;
 
-    private static _plottableColorCache: string[] = null;
+    private static _plottableColorCache: string[];
 
     private _d3Scale: d3.scale.Ordinal<string, string>;
 
@@ -66,7 +66,7 @@ export module Scales {
       return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
-    public static invalidateColorCache(): void {
+    public static invalidateColorCache() {
       Color._plottableColorCache = null;
     }
 
