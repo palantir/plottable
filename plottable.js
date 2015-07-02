@@ -10567,6 +10567,13 @@ var Plottable;
             DragBoxLayer.prototype.dragInteraction = function () {
                 return this._dragInteraction;
             };
+            DragBoxLayer.prototype.enabled = function (enabled) {
+                if (enabled == null) {
+                    return this._dragInteraction.enabled();
+                }
+                this._dragInteraction.enabled(enabled);
+                return this;
+            };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);
         Components.DragBoxLayer = DragBoxLayer;

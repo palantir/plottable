@@ -4050,6 +4050,14 @@ declare module Plottable {
              * Gets the internal Interactions.Drag of the DragBoxLayer.
              */
             dragInteraction(): Interactions.Drag;
+            /**
+             * Enables or disables the interaction and drag box.
+             */
+            enabled(enabled: boolean): DragBoxLayer;
+            /**
+             * Gets the enabled state.
+             */
+            enabled(): boolean;
         }
     }
 }
