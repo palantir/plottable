@@ -39,8 +39,25 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
+     */
     public total(): Plots.AccessorScaleBinding<any, boolean>;
+    /**
+     * TBD
+     * 
+     * @param {boolean|Accessor<number>}
+     * @returns {Waterfall} The calling Waterfall Plot.
+     */
     public total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
+    /**
+     * TBD
+     * The provided Scale will account for the values when autoDomain()-ing
+     * 
+     * @param {T|Accessor<T>}
+     * @param {Scale<T, number>} scale
+     * @returns {Waterfall} The calling Waterfall Plot.
+     */
     public total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
     public total<T>(total?: boolean | Accessor<boolean> | T | Accessor<T>, scale?: Scale<T, boolean>): any {
       if (total === undefined) {

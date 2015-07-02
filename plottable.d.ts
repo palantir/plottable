@@ -3191,8 +3191,25 @@ declare module Plottable {
              * @returns {Waterfall} The calling Waterfall Plot.
              */
             connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
+            /**
+             * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
+             */
             total(): Plots.AccessorScaleBinding<any, boolean>;
+            /**
+             * TBD
+             *
+             * @param {boolean|Accessor<number>}
+             * @returns {Waterfall} The calling Waterfall Plot.
+             */
             total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
+            /**
+             * TBD
+             * The provided Scale will account for the values when autoDomain()-ing
+             *
+             * @param {T|Accessor<T>}
+             * @param {Scale<T, number>} scale
+             * @returns {Waterfall} The calling Waterfall Plot.
+             */
             total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
             protected _additionalPaint(time: number): void;
             protected _createNodesForDataset(dataset: Dataset): Drawer;

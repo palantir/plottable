@@ -163,3 +163,15 @@ svg.plottable {
   stroke: #CCC;
   stroke-width: 1px;
 }
+
+.plottable .waterfall-plot .waterfall-total {
+  fill: #5279c7;
+}
+
+.plottable .waterfall-plot .waterfall-growth {
+  fill: #63c261;
+}
+
+.plottable .waterfall-plot .waterfall-decline {
+  fill: #fd373e;
+}
