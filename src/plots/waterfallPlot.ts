@@ -1,12 +1,5 @@
 ///<reference path="../reference.ts" />
 
-/**
- * LIST OF ITEMS TO ADDRESS
- * ========================
- * - Autoscaling the yAxis so it isn't all screwy
- * - Horizontal/vertical cases
- */
-
 module Plottable {
 export module Plots {
   export class Waterfall<X, Y> extends Bar<X, Y> {
