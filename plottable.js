@@ -8557,7 +8557,7 @@ var Plottable;
             };
             Waterfall.prototype._createNodesForDataset = function (dataset) {
                 var drawer = _super.prototype._createNodesForDataset.call(this, dataset);
-                this._connectorArea = this._renderArea.append("g").classed("connector-area", true);
+                this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
                 return drawer;
             };
             Waterfall.prototype._extentsForProperty = function (attr) {
@@ -8572,21 +8572,21 @@ var Plottable;
             Waterfall.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var yAccessor = Plottable.Plot._scaledAccessor(this.y());
+                var yScale = this.y().scale;
                 var totalAccessor = Plottable.Plot._scaledAccessor(this.total());
                 attrToProjector["y"] = function (d, i, dataset) {
                     var isTotal = totalAccessor(d, i, dataset);
                     if (isTotal) {
-                        return yAccessor(d, i, dataset);
+                        return Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
                     }
                     else {
                         var currentSubtotal = _this._subtotals[i];
                         var priorSubtotal = _this._subtotals[i - 1];
                         if (currentSubtotal > priorSubtotal) {
-                            return _this.y().scale.scale(currentSubtotal);
+                            return yScale.scale(currentSubtotal);
                         }
                         else {
-                            return _this.y().scale.scale(priorSubtotal);
+                            return yScale.scale(priorSubtotal);
                         }
                     }
                 };
@@ -8594,15 +8594,14 @@ var Plottable;
                     var isTotal = totalAccessor(d, i, dataset);
                     var currentValue = _this.y().accessor(d, i, dataset);
                     if (isTotal) {
-                        return Math.abs(_this.y().scale.scale(currentValue) - _this.y().scale.scale(0));
+                        return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
                     }
                     else {
                         var currentSubtotal = _this._subtotals[i];
                         var priorSubtotal = _this._subtotals[i - 1];
-                        var height = Math.abs(_this.y().scale.scale(currentSubtotal) - _this.y().scale.scale(priorSubtotal));
+                        var height = Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
                         return height;
                     }
-                    return yAccessor(d, i, dataset);
                 };
                 attrToProjector["class"] = function (d, i, dataset) {
                     var isTotal = totalAccessor(d, i, dataset);
@@ -8667,6 +8666,7 @@ var Plottable;
             Waterfall._BAR_GROWTH_CLASS = "waterfall-growth";
             Waterfall._BAR_TOTAL_CLASS = "waterfall-total";
             Waterfall._CONNECTOR_CLASS = "connector";
+            Waterfall._CONNECTOR_AREA_CLASS = "connector-area";
             Waterfall._TOTAL_KEY = "total";
             return Waterfall;
         })(Plots.Bar);

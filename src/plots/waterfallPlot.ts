@@ -7,6 +7,7 @@ export module Plots {
     private static _BAR_GROWTH_CLASS = "waterfall-growth";
     private static _BAR_TOTAL_CLASS = "waterfall-total";
     private static _CONNECTOR_CLASS = "connector";
+    private static _CONNECTOR_AREA_CLASS = "connector-area";
     private static _TOTAL_KEY = "total";
     private _connectorArea: d3.Selection<void>;
     private _connectorsEnabled = false;
@@ -42,16 +43,16 @@ export module Plots {
     /**
      * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
      */
-    public total(): Plots.AccessorScaleBinding<any, boolean>;
+    public total<T>(): Plots.AccessorScaleBinding<T, boolean>;
     /**
-     * TBD
+     * Sets total to a constant number or the result of an Accessor
      * 
      * @param {boolean|Accessor<number>}
      * @returns {Waterfall} The calling Waterfall Plot.
      */
     public total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
     /**
-     * TBD
+     * Sets total to a scaled constant value or scaled result of an Accessor.
      * The provided Scale will account for the values when autoDomain()-ing
      * 
      * @param {T|Accessor<T>}
@@ -76,7 +77,7 @@ export module Plots {
 
     protected _createNodesForDataset(dataset: Dataset) {
       var drawer = super._createNodesForDataset(dataset);
-      this._connectorArea = this._renderArea.append("g").classed("connector-area", true);
+      this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
       return drawer;
     }
 
@@ -92,20 +93,20 @@ export module Plots {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-      var yAccessor = Plot._scaledAccessor(this.y());
+      var yScale = this.y().scale;
       var totalAccessor = Plot._scaledAccessor(this.total());
 
       attrToProjector["y"] = (d, i, dataset) => {
         var isTotal = totalAccessor(d, i, dataset);
         if (isTotal) {
-          return yAccessor(d, i, dataset);
+          return Plot._scaledAccessor(this.y())(d, i, dataset);
         } else {
           var currentSubtotal = this._subtotals[i];
           var priorSubtotal = this._subtotals[i - 1];
           if (currentSubtotal > priorSubtotal) {
-            return this.y().scale.scale(<any> currentSubtotal);
+            return yScale.scale(<any> currentSubtotal);
           } else {
-            return this.y().scale.scale(<any> priorSubtotal);
+            return yScale.scale(<any> priorSubtotal);
           }
         }
       };
@@ -114,14 +115,13 @@ export module Plots {
         var isTotal = totalAccessor(d, i, dataset);
         var currentValue = this.y().accessor(d, i, dataset);
         if (isTotal) {
-          return Math.abs(this.y().scale.scale(<any> currentValue) - this.y().scale.scale(<any> 0));
+          return Math.abs(yScale.scale(<any> currentValue) - yScale.scale(<any> 0));
         } else {
           var currentSubtotal = this._subtotals[i];
           var priorSubtotal = this._subtotals[i - 1];
-          var height = Math.abs(this.y().scale.scale(<any> currentSubtotal) - this.y().scale.scale(<any> priorSubtotal));
+          var height = Math.abs(yScale.scale(<any> currentSubtotal) - yScale.scale(<any> priorSubtotal));
           return height;
         }
-        return yAccessor(d, i, dataset);
       };
 
       attrToProjector["class"] = (d, i, dataset) => {
