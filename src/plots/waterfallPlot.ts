@@ -9,9 +9,11 @@
 
 module Plottable {
 export module Plots {
-  export class Waterfall<X, Y> extends XYPlot<X, Y> {
+  export class Waterfall<X, Y> extends Bar<X, Y> {
 
     private static _TOTAL_KEY = "total";
+    private _extent: number[];
+    private _subtotals: number[];
 
     constructor() {
       super();
@@ -36,22 +38,16 @@ export module Plots {
     protected _generateAttrToProjector() {
       var attrToProjector = super._generateAttrToProjector();
 
-      var xAccessor = Plot._scaledAccessor(this.x());
       var yAccessor = Plot._scaledAccessor(this.y());
       var totalAccessor = Plot._scaledAccessor(this.total());
-      var width = (<Scales.Category> <any> this.x().scale).rangeBand();
-
-      attrToProjector["x"] = (d, i, dataset) => {
-        return xAccessor(d, i, dataset) - width / 2;
-      };
 
       attrToProjector["y"] = (d, i, dataset) => {
         var isTotal = totalAccessor(d, i, dataset);
         if (isTotal) {
           return yAccessor(d, i, dataset);
         } else {
-          var currentSubtotal = this._subtotal(i, dataset);
-          var priorSubtotal = this._subtotal(i - 1, dataset);
+          var currentSubtotal = this._subtotals[i];
+          var priorSubtotal = this._subtotals[i - 1];
           if (currentSubtotal > priorSubtotal) {
             return this.y().scale.scale(<any> currentSubtotal);
           } else {
@@ -66,16 +62,12 @@ export module Plots {
         if (isTotal) {
           return Math.abs(this.y().scale.scale(<any> currentValue) - this.y().scale.scale(<any> 0));
         } else {
-          var currentSubtotal = this._subtotal(i, dataset);
-          var priorSubtotal = this._subtotal(i - 1, dataset);
+          var currentSubtotal = this._subtotals[i];
+          var priorSubtotal = this._subtotals[i - 1];
           var height = Math.abs(this.y().scale.scale(<any> currentSubtotal) - this.y().scale.scale(<any> priorSubtotal));
           return height;
         }
         return yAccessor(d, i, dataset);
-      };
-
-      attrToProjector["width"] = (d, i, dataset) => {
-        return width;
       };
 
       attrToProjector["class"] = (d, i, dataset) => {
@@ -91,16 +83,49 @@ export module Plots {
       return attrToProjector;
     }
 
-    private _subtotal(index: number, dataset: Dataset) {
-      var data = dataset.data();
-      var subtotal = 0;
-      var totalAccessor = this.total().accessor;
-      while (!totalAccessor(data[index], index, dataset) && index >= 0) {
-        subtotal += this.y().accessor(data[index], index, dataset);
-        index -= 1;
+    protected _extentsForProperty(attr: string) {
+      var primaryAttr = "y";
+      if (attr === primaryAttr) {
+        return [this._extent];
+      } else {
+        return super._extentsForProperty(attr);
       }
-      subtotal += this.y().accessor(data[index], index, dataset);
-      return subtotal;
+    }
+
+    protected _onDatasetUpdate() {
+      this._updateSubtotals();
+      super._onDatasetUpdate();
+      return this;
+    }
+
+    private _calculateSubtotalsAndExtent(dataset: Dataset) {
+      var min = Number.MAX_VALUE;
+      var max = Number.MIN_VALUE;
+      var total = 0;
+      dataset.data().forEach((datum, index) => {
+        var currentValue = this.y().accessor(datum, index, dataset);
+        var isTotal = this.total().accessor(datum, index, dataset);
+        if (!isTotal || index === 0) {
+          total += currentValue;
+        }
+        this._subtotals.push(total);
+        if (total < min) {
+          min = total;
+        }
+        if (total > max) {
+          max = total;
+        }
+      });
+      this._extent = [min, max];
+    }
+
+    private _updateSubtotals() {
+      var datasets = this.datasets();
+      if (datasets.length > 0) {
+        var dataset = datasets[datasets.length - 1];
+        this._subtotals = new Array();
+        this._calculateSubtotalsAndExtent(dataset);
+      }
     }
   }
 }

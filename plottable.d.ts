@@ -3182,7 +3182,7 @@ declare module Plottable {
  */
 declare module Plottable {
     module Plots {
-        class Waterfall<X, Y> extends XYPlot<X, Y> {
+        class Waterfall<X, Y> extends Bar<X, Y> {
             constructor();
             total(): Plots.AccessorScaleBinding<any, boolean>;
             total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
@@ -3191,6 +3191,8 @@ declare module Plottable {
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
+            protected _extentsForProperty(attr: string): any[];
+            protected _onDatasetUpdate(): Waterfall<X, Y>;
         }
     }
 }
