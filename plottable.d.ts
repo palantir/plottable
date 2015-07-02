@@ -3178,9 +3178,24 @@ declare module Plottable {
     module Plots {
         class Waterfall<X, Y> extends Bar<X, Y> {
             constructor();
+            /**
+             * Gets whether connectors are enabled.
+             *
+             * @returns {boolean} Whether connectors should be shown or not.
+             */
+            connectorsEnabled(): boolean;
+            /**
+             * Sets whether connectors are enabled.
+             *
+             * @param {boolean} enabled
+             * @returns {Waterfall} The calling Waterfall Plot.
+             */
+            connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
             total(): Plots.AccessorScaleBinding<any, boolean>;
             total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
             total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
+            protected _additionalPaint(time: number): void;
+            protected _createNodesForDataset(dataset: Dataset): Drawer;
             protected _extentsForProperty(attr: string): any[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
