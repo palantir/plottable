@@ -10,7 +10,6 @@
 module Plottable {
 export module Plots {
   export class Waterfall<X, Y> extends Bar<X, Y> {
-
     private static _TOTAL_KEY = "total";
     private _extent: number[];
     private _subtotals: number[];
