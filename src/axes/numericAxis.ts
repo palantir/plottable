@@ -7,6 +7,7 @@ export module Axes {
     private _tickLabelPositioning = "center";
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
+    private _maxLabelTextLength = 0;
 
     /**
      * Constructs a Numeric Axis.
@@ -76,8 +77,15 @@ export module Axes {
       }
 
       if (!this._isHorizontal()) {
-        var reComputedWidth = this._computeWidth();
-        if (reComputedWidth > this.width() || reComputedWidth < (this.width() - this.margin())) {
+        var tickValues = this._getTickValues();
+        var textLengths = tickValues.map((v: any) => {
+          return String(v).length;
+        });
+
+        var maxTextLength = Utils.Math.max(textLengths, 0);
+
+        if (maxTextLength !== this._maxLabelTextLength) {
+          this._maxLabelTextLength = maxTextLength;
           this.redraw();
           return;
         }
@@ -263,19 +271,12 @@ export module Axes {
     }
 
     private _hideEndTickLabels() {
-      var boundingBox = (<Element> this._boundingBox.node()).getBoundingClientRect();
       var tickLabels = this._tickLabelContainer.selectAll("." + Axis.TICK_LABEL_CLASS);
-      if (tickLabels[0].length === 0) {
+      if (tickLabels.empty()) {
         return;
       }
-      var firstTickLabel = <Element> tickLabels[0][0];
-      if (!Utils.DOM.clientRectInside(firstTickLabel.getBoundingClientRect(), boundingBox)) {
-        d3.select(firstTickLabel).style("visibility", "hidden");
-      }
-      var lastTickLabel = <Element> tickLabels[0][tickLabels[0].length - 1];
-      if (!Utils.DOM.clientRectInside(lastTickLabel.getBoundingClientRect(), boundingBox)) {
-        d3.select(lastTickLabel).style("visibility", "hidden");
-      }
+      d3.select(tickLabels[0][0]).style("visibility", "hidden");
+      d3.select(tickLabels[0][tickLabels[0].length - 1]).style("visibility", "hidden");
     }
 
     // Responsible for hiding any tick labels that break out of the bounding container
