@@ -8552,21 +8552,16 @@ var Plottable;
             Waterfall.prototype._generateAttrToProjector = function () {
                 var _this = this;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
-                var xAccessor = Plottable.Plot._scaledAccessor(this.x());
                 var yAccessor = Plottable.Plot._scaledAccessor(this.y());
                 var totalAccessor = Plottable.Plot._scaledAccessor(this.total());
-                var width = this.x().scale.rangeBand();
-                attrToProjector["x"] = function (d, i, dataset) {
-                    return xAccessor(d, i, dataset) - width / 2;
-                };
                 attrToProjector["y"] = function (d, i, dataset) {
                     var isTotal = totalAccessor(d, i, dataset);
                     if (isTotal) {
                         return yAccessor(d, i, dataset);
                     }
                     else {
-                        var currentSubtotal = _this._subtotal(i, dataset);
-                        var priorSubtotal = _this._subtotal(i - 1, dataset);
+                        var currentSubtotal = _this._subtotals[i];
+                        var priorSubtotal = _this._subtotals[i - 1];
                         if (currentSubtotal > priorSubtotal) {
                             return _this.y().scale.scale(currentSubtotal);
                         }
@@ -8582,15 +8577,12 @@ var Plottable;
                         return Math.abs(_this.y().scale.scale(currentValue) - _this.y().scale.scale(0));
                     }
                     else {
-                        var currentSubtotal = _this._subtotal(i, dataset);
-                        var priorSubtotal = _this._subtotal(i - 1, dataset);
+                        var currentSubtotal = _this._subtotals[i];
+                        var priorSubtotal = _this._subtotals[i - 1];
                         var height = Math.abs(_this.y().scale.scale(currentSubtotal) - _this.y().scale.scale(priorSubtotal));
                         return height;
                     }
                     return yAccessor(d, i, dataset);
-                };
-                attrToProjector["width"] = function (d, i, dataset) {
-                    return width;
                 };
                 attrToProjector["class"] = function (d, i, dataset) {
                     var isTotal = totalAccessor(d, i, dataset);
@@ -8604,20 +8596,52 @@ var Plottable;
                 };
                 return attrToProjector;
             };
-            Waterfall.prototype._subtotal = function (index, dataset) {
-                var data = dataset.data();
-                var subtotal = 0;
-                var totalAccessor = this.total().accessor;
-                while (!totalAccessor(data[index], index, dataset) && index >= 0) {
-                    subtotal += this.y().accessor(data[index], index, dataset);
-                    index -= 1;
+            Waterfall.prototype._extentsForProperty = function (attr) {
+                var primaryAttr = "y";
+                if (attr === primaryAttr) {
+                    return [this._extent];
                 }
-                subtotal += this.y().accessor(data[index], index, dataset);
-                return subtotal;
+                else {
+                    return _super.prototype._extentsForProperty.call(this, attr);
+                }
+            };
+            Waterfall.prototype._onDatasetUpdate = function () {
+                this._updateSubtotals();
+                _super.prototype._onDatasetUpdate.call(this);
+                return this;
+            };
+            Waterfall.prototype._calculateSubtotalsAndExtent = function (dataset) {
+                var _this = this;
+                var min = Number.MAX_VALUE;
+                var max = Number.MIN_VALUE;
+                var total = 0;
+                dataset.data().forEach(function (datum, index) {
+                    var currentValue = _this.y().accessor(datum, index, dataset);
+                    var isTotal = _this.total().accessor(datum, index, dataset);
+                    if (!isTotal || index === 0) {
+                        total += currentValue;
+                    }
+                    _this._subtotals.push(total);
+                    if (total < min) {
+                        min = total;
+                    }
+                    if (total > max) {
+                        max = total;
+                    }
+                });
+                this._extent = [min, max];
+            };
+            Waterfall.prototype._updateSubtotals = function () {
+                var datasets = this.datasets();
+                if (datasets.length > 0) {
+                    var dataset = datasets[datasets.length - 1];
+                    this._subtotals = new Array();
+                    this._calculateSubtotalsAndExtent(dataset);
+                }
             };
             Waterfall._TOTAL_KEY = "total";
             return Waterfall;
-        })(Plottable.XYPlot);
+        })(Plots.Bar);
         Plots.Waterfall = Waterfall;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
