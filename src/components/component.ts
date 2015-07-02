@@ -49,6 +49,9 @@ export class Component {
   private _onAnchorCallbacks = new Utils.CallbackSet<ComponentCallback>();
   private _onDetachCallbacks = new Utils.CallbackSet<ComponentCallback>();
 
+  private _onRenderCallbacks = new Utils.CallbackSet<Function>();
+
+
   public constructor() {
     this._cssClasses.add("component");
   }
@@ -283,6 +286,14 @@ export class Component {
     this.computeLayout();
     this.render();
     return this;
+  }
+
+  public onRender(callback: Function) {
+    this._onRenderCallbacks.add(callback);
+  }
+
+  public dispatchRender() {
+    this._onRenderCallbacks.callCallbacks();
   }
 
   /**

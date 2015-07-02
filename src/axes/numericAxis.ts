@@ -204,6 +204,7 @@ export module Axes {
           this._tickLabelPositioning === "right") {
         this._hideTickMarksWithoutLabel();
       }
+
       return this;
     }
 

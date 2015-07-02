@@ -101,6 +101,7 @@ export module RenderController {
       _componentsNeedingRender.forEach((component: Component) => {
         try {
           component.renderImmediately();
+          component.dispatchRender();
         } catch (err) {
           // throw error with timeout to avoid interrupting further renders
           window.setTimeout(() => { throw err; }, 0);
