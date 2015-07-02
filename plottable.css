@@ -159,7 +159,7 @@ svg.plottable {
   stroke-width: 1px;
 }
 
-.plottable .waterfall-plot line {
+.plottable .waterfall-plot line.connector {
   stroke: #CCC;
   stroke-width: 1px;
 }
