@@ -3211,11 +3211,10 @@ declare module Plottable {
             total(): Plots.AccessorScaleBinding<any, boolean>;
             total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
             total<T>(total: boolean | Accessor<T>, scale: Scale<T, boolean>): Waterfall<X, Y>;
-            protected _createDrawer(dataset: Dataset): Drawers.Rectangle;
+            protected _extentsForProperty(attr: string): any[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
-            protected _extentsForProperty(attr: string): any[];
             protected _onDatasetUpdate(): Waterfall<X, Y>;
         }
     }
