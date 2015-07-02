@@ -1123,7 +1123,7 @@ var Plottable;
      * The number of milliseconds between midnight one day and the next is
      * not a fixed quantity.
      *
-     * use Date#setDate(Date#getDate() + n) instead.
+     * use date.setDate(Date.getDate() + n) instead.
      *
      */
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
@@ -1320,7 +1320,7 @@ var Plottable;
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
-            Plottable.Utils.Window.deprecated("relativeDate()", "1.2", "Not safe for use with time zones.");
+            Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
             return function (d) {
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;

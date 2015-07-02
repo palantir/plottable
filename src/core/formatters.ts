@@ -10,7 +10,7 @@ export type Formatter = (d: any) => string;
  * The number of milliseconds between midnight one day and the next is 
  * not a fixed quantity.
  * 
- * use Date#setDate(Date.getDate() + n) instead.
+ * use date.setDate(Date.getDate() + n) instead.
  * 
  */
 export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
@@ -208,7 +208,7 @@ export module Formatters {
    * @returns {Formatter} A formatter for time/date values.
    */
   export function relativeDate(baseValue: number = 0, increment: number = MILLISECONDS_IN_ONE_DAY, label: string = "") {
-    Plottable.Utils.Window.deprecated("relativeDate()", "1.2", "Not safe for use with time zones.");
+    Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
     return (d: any) => {
       var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
       return relativeDate.toString() + label;
