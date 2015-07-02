@@ -3194,16 +3194,16 @@ declare module Plottable {
             /**
              * Gets the AccessorScaleBinding for whether a bar represents a total or a delta.
              */
-            total(): Plots.AccessorScaleBinding<any, boolean>;
+            total<T>(): Plots.AccessorScaleBinding<T, boolean>;
             /**
-             * TBD
+             * Sets total to a constant number or the result of an Accessor
              *
              * @param {boolean|Accessor<number>}
              * @returns {Waterfall} The calling Waterfall Plot.
              */
             total(total: boolean | Accessor<boolean>): Waterfall<X, Y>;
             /**
-             * TBD
+             * Sets total to a scaled constant value or scaled result of an Accessor.
              * The provided Scale will account for the values when autoDomain()-ing
              *
              * @param {T|Accessor<T>}
