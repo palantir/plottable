@@ -3069,8 +3069,6 @@ var Plottable;
             }
             this.computeLayout();
             this.render();
-            // flush so that consumers can immediately attach to stuff we create in the DOM
-            Plottable.RenderController.flush();
             return this;
         };
         Component.prototype.xAlignment = function (xAlignment) {

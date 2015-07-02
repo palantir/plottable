@@ -282,8 +282,6 @@ export class Component {
     }
     this.computeLayout();
     this.render();
-    // flush so that consumers can immediately attach to stuff we create in the DOM
-    RenderController.flush();
     return this;
   }
 
