@@ -6539,7 +6539,7 @@ var Plottable;
                 var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)); });
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 if (pie.some(function (slice) { return slice.value < 0; })) {
-                    Plottable.Utils.Window.warn("Negative values will not render correctly in a pie chart.");
+                    Plottable.Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
                 }
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });

@@ -236,7 +236,7 @@ export module Plots {
       var data = dataset.data().filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)));
       var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       if (pie.some((slice) => slice.value < 0)) {
-        Utils.Window.warn("Negative values will not render correctly in a pie chart.");
+        Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
       }
       this._startAngles = pie.map((slice) => slice.startAngle);
       this._endAngles = pie.map((slice) => slice.endAngle);
