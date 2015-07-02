@@ -596,7 +596,7 @@ declare module Plottable {
      * The number of milliseconds between midnight one day and the next is
      * not a fixed quantity.
      *
-     * use date.setDate(Date.getDate() + n) instead.
+     * Use date.setDate(date.getDate() + number_of_days) instead.
      *
      */
     var MILLISECONDS_IN_ONE_DAY: number;

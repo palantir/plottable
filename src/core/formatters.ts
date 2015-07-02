@@ -10,7 +10,7 @@ export type Formatter = (d: any) => string;
  * The number of milliseconds between midnight one day and the next is 
  * not a fixed quantity.
  * 
- * use date.setDate(Date.getDate() + n) instead.
+ * Use date.setDate(date.getDate() + number_of_days) instead.
  * 
  */
 export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
