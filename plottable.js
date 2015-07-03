@@ -8574,35 +8574,41 @@ var Plottable;
                 var attrToProjector = _super.prototype._generateAttrToProjector.call(this);
                 var yScale = this.y().scale;
                 var totalAccessor = Plottable.Plot._scaledAccessor(this.total());
-                attrToProjector["y"] = function (d, i, dataset) {
-                    var isTotal = totalAccessor(d, i, dataset);
-                    if (isTotal) {
-                        return Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
-                    }
-                    else {
-                        var currentSubtotal = _this._subtotals[i];
-                        var priorSubtotal = _this._subtotals[i - 1];
-                        if (currentSubtotal > priorSubtotal) {
-                            return yScale.scale(currentSubtotal);
+                var yAttr = this.attr("y");
+                if (yAttr === undefined) {
+                    attrToProjector["y"] = function (d, i, dataset) {
+                        var isTotal = totalAccessor(d, i, dataset);
+                        if (isTotal) {
+                            return Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
                         }
                         else {
-                            return yScale.scale(priorSubtotal);
+                            var currentSubtotal = _this._subtotals[i];
+                            var priorSubtotal = _this._subtotals[i - 1];
+                            if (currentSubtotal > priorSubtotal) {
+                                return yScale.scale(currentSubtotal);
+                            }
+                            else {
+                                return yScale.scale(priorSubtotal);
+                            }
                         }
-                    }
-                };
-                attrToProjector["height"] = function (d, i, dataset) {
-                    var isTotal = totalAccessor(d, i, dataset);
-                    var currentValue = _this.y().accessor(d, i, dataset);
-                    if (isTotal) {
-                        return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
-                    }
-                    else {
-                        var currentSubtotal = _this._subtotals[i];
-                        var priorSubtotal = _this._subtotals[i - 1];
-                        var height = Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
-                        return height;
-                    }
-                };
+                    };
+                }
+                var heightAttr = this.attr("height");
+                if (heightAttr === undefined) {
+                    attrToProjector["height"] = function (d, i, dataset) {
+                        var isTotal = totalAccessor(d, i, dataset);
+                        var currentValue = _this.y().accessor(d, i, dataset);
+                        if (isTotal) {
+                            return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
+                        }
+                        else {
+                            var currentSubtotal = _this._subtotals[i];
+                            var priorSubtotal = _this._subtotals[i - 1];
+                            var height = Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
+                            return height;
+                        }
+                    };
+                }
                 attrToProjector["class"] = function (d, i, dataset) {
                     var baseClass = "";
                     if (_this.attr("class") !== null) {
