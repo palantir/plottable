@@ -87,33 +87,39 @@ export module Plots {
       var yScale = this.y().scale;
       var totalAccessor = Plot._scaledAccessor(this.total());
 
-      attrToProjector["y"] = (d, i, dataset) => {
-        var isTotal = totalAccessor(d, i, dataset);
-        if (isTotal) {
-          return Plot._scaledAccessor(this.y())(d, i, dataset);
-        } else {
-          var currentSubtotal = this._subtotals[i];
-          var priorSubtotal = this._subtotals[i - 1];
-          if (currentSubtotal > priorSubtotal) {
-            return yScale.scale(<any> currentSubtotal);
+      var yAttr = this.attr("y");
+      if (yAttr === undefined) {
+        attrToProjector["y"] = (d, i, dataset) => {
+          var isTotal = totalAccessor(d, i, dataset);
+          if (isTotal) {
+            return Plot._scaledAccessor(this.y())(d, i, dataset);
           } else {
-            return yScale.scale(<any> priorSubtotal);
+            var currentSubtotal = this._subtotals[i];
+            var priorSubtotal = this._subtotals[i - 1];
+            if (currentSubtotal > priorSubtotal) {
+              return yScale.scale(<any> currentSubtotal);
+            } else {
+              return yScale.scale(<any> priorSubtotal);
+            }
           }
-        }
-      };
+        };        
+      }
 
-      attrToProjector["height"] = (d, i, dataset) => {
-        var isTotal = totalAccessor(d, i, dataset);
-        var currentValue = this.y().accessor(d, i, dataset);
-        if (isTotal) {
-          return Math.abs(yScale.scale(<any> currentValue) - yScale.scale(<any> 0));
-        } else {
-          var currentSubtotal = this._subtotals[i];
-          var priorSubtotal = this._subtotals[i - 1];
-          var height = Math.abs(yScale.scale(<any> currentSubtotal) - yScale.scale(<any> priorSubtotal));
-          return height;
-        }
-      };
+      var heightAttr = this.attr("height");
+      if (heightAttr === undefined) {
+        attrToProjector["height"] = (d, i, dataset) => {
+          var isTotal = totalAccessor(d, i, dataset);
+          var currentValue = this.y().accessor(d, i, dataset);
+          if (isTotal) {
+            return Math.abs(yScale.scale(<any> currentValue) - yScale.scale(<any> 0));
+          } else {
+            var currentSubtotal = this._subtotals[i];
+            var priorSubtotal = this._subtotals[i - 1];
+            var height = Math.abs(yScale.scale(<any> currentSubtotal) - yScale.scale(<any> priorSubtotal));
+            return height;
+          }
+        };        
+      }
 
       attrToProjector["class"] = (d, i, dataset) => {
         var baseClass = "";
