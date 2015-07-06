@@ -52,7 +52,7 @@ describe("Plots", () => {
           if (currentTotal || currentValue < 0) {
             assert.isTrue(+previousBar.attr("y") === +currentBar.attr("y"), "bars are top/top aligned");
           } else {
-            assert.isTrue(+previousBar.attr("y") === +currentBar.attr("y") + +currentBar.attr("height"),
+            assert.closeTo(+previousBar.attr("y") - (+currentBar.attr("y") + +currentBar.attr("height")), 0, 1,
               "bars are top/bottom aligned");
           }
         } else {
@@ -60,16 +60,16 @@ describe("Plots", () => {
             if (currentTotal || currentValue < 0) {
               assert.isTrue(+previousBar.attr("y") === +currentBar.attr("y"), "bars are top/top aligned");
             } else {
-              assert.isTrue(+previousBar.attr("y") === +currentBar.attr("y") + +currentBar.attr("height"),
+              assert.closeTo(+previousBar.attr("y") - (+currentBar.attr("y") + +currentBar.attr("height")), 0, 1,
                 "bars are top/bottom aligned");
             }
           } else {
             if (currentTotal || currentValue < 0) {
-              assert.isTrue(+previousBar.attr("y") + +previousBar.attr("height") === +currentBar.attr("y"),
+              assert.closeTo(+previousBar.attr("y") + +previousBar.attr("height") - +currentBar.attr("y"), 0, 1,
                 "bars are bottom/top aligned");
             } else {
-              assert.isTrue(+previousBar.attr("y") + +previousBar.attr("height") ===
-                +currentBar.attr("y") + +currentBar.attr("height"), "bars are bottom/bottom aligned");
+              assert.closeTo((+previousBar.attr("y") + +previousBar.attr("height")) -
+                (+currentBar.attr("y") + +currentBar.attr("height")), 0, 1, "bars are bottom/bottom aligned");
             }
           }
         }
@@ -110,10 +110,10 @@ describe("Plots", () => {
         var firstHeight = +firstBar.attr("height");
         var secondY = +secondBar.attr("y");
         var secondHeight = +secondBar.attr("height");
-        if (firstY === secondY || firstY === secondY + secondHeight) {
+        if (firstY === secondY || Math.abs(secondY + secondHeight - firstY) < 1) {
           assert.isTrue(firstY === +selection.attr("y1"), "connector is aligned to bars");
         } else {
-          assert.isTrue(firstY + firstHeight === +selection.attr("y1"), "connector is aligned to bars");
+          assert.closeTo(firstY + firstHeight - +selection.attr("y1"), 0, 1, "connector is aligned to bars");
         }
       });
       svg.remove();
