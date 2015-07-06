@@ -92,7 +92,7 @@ export module Plots {
         attrToProjector["y"] = (d, i, dataset) => {
           var isTotal = totalAccessor(d, i, dataset);
           if (isTotal) {
-            return Plot._scaledAccessor(this.y())(d, i, dataset);
+            return Math.min(Plot._scaledAccessor(this.y())(d, i, dataset), yScale.scale(0));
           } else {
             var currentSubtotal = this._subtotals[i];
             var priorSubtotal = this._subtotals[i - 1];
@@ -173,7 +173,7 @@ export module Plots {
         var prevDatum = dataset.data()[prevIndex];
         var x = attrToProjector["x"](prevDatum, prevIndex, dataset);
         var x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
-        var y = this._subtotals[datumIndex] <= this._subtotals[prevIndex] ?
+        var y = this._subtotals[datumIndex] <= this._subtotals[prevIndex] && this._subtotals[prevIndex] > 0 ?
           attrToProjector["y"](datum, datumIndex, dataset) :
           attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
         this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true)
