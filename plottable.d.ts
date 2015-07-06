@@ -3212,7 +3212,7 @@ declare module Plottable {
              * Sets whether connectors are enabled.
              *
              * @param {boolean} enabled
-             * @returns {Waterfall} The calling Waterfall Plot.
+             * @returns {Plots.Waterfall} The calling Waterfall Plot.
              */
             connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
             /**
@@ -3223,7 +3223,7 @@ declare module Plottable {
              * Sets total to a constant number or the result of an Accessor
              *
              * @param {Accessor<boolean>}
-             * @returns {Waterfall} The calling Waterfall Plot.
+             * @returns {Plots.Waterfall} The calling Waterfall Plot.
              */
             total(total: Accessor<boolean>): Waterfall<X, Y>;
             protected _additionalPaint(time: number): void;
