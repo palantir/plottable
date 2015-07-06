@@ -9,7 +9,7 @@ describe("Plots", () => {
     var xScale: Plottable.Scales.Category;
     var yScale: Plottable.Scales.Linear;
     var plot: Plottable.Plots.Waterfall<string, number>;
-    var renderArea: d3.Selection<void>
+    var renderArea: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
 	  var data = [
