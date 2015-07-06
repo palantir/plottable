@@ -51,7 +51,7 @@ export module Plots {
      * @returns {Waterfall} The calling Waterfall Plot.
      */
     public total(total: Accessor<boolean>): Waterfall<X, Y>;
-    public total<T>(total?: Accessor<boolean> | T | Accessor<T>): any {
+    public total(total?: Accessor<boolean>): any {
       if (total == null) {
         return this._propertyBindings.get(Waterfall._TOTAL_KEY);
       }
