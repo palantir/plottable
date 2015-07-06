@@ -123,7 +123,7 @@ export module Plots {
 
       attrToProjector["class"] = (d, i, dataset) => {
         var baseClass = "";
-        if (this.attr("class") !== null) {
+        if (this.attr("class") !== undefined) {
           baseClass = this.attr("class").accessor(d, i, dataset) + " ";
         }
         var isTotal = totalAccessor(d, i, dataset);

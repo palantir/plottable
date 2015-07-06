@@ -8611,7 +8611,7 @@ var Plottable;
                 }
                 attrToProjector["class"] = function (d, i, dataset) {
                     var baseClass = "";
-                    if (_this.attr("class") !== null) {
+                    if (_this.attr("class") !== undefined) {
                         baseClass = _this.attr("class").accessor(d, i, dataset) + " ";
                     }
                     var isTotal = totalAccessor(d, i, dataset);
