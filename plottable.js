@@ -8579,7 +8579,7 @@ var Plottable;
                     attrToProjector["y"] = function (d, i, dataset) {
                         var isTotal = totalAccessor(d, i, dataset);
                         if (isTotal) {
-                            return Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset);
+                            return Math.min(Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset), yScale.scale(0));
                         }
                         else {
                             var currentSubtotal = _this._subtotals[i];
@@ -8659,7 +8659,7 @@ var Plottable;
                     var prevDatum = dataset.data()[prevIndex];
                     var x = attrToProjector["x"](prevDatum, prevIndex, dataset);
                     var x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
-                    var y = this._subtotals[datumIndex] <= this._subtotals[prevIndex] ? attrToProjector["y"](datum, datumIndex, dataset) : attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
+                    var y = this._subtotals[datumIndex] <= this._subtotals[prevIndex] && this._subtotals[prevIndex] > 0 ? attrToProjector["y"](datum, datumIndex, dataset) : attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
                     this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true).attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
                 }
             };
