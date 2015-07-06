@@ -29,11 +29,11 @@ describe("BaseAxis", () => {
     var verticalAxis = new Plottable.Axis(scale, "right");
     verticalAxis.renderTo(svg);
 
-    var expectedWidth = verticalAxis.tickLength() + verticalAxis.margin(); // tick length and margin by default
+    var expectedWidth = verticalAxis.innerTickLength() + verticalAxis.margin(); // innerTickLength and margin by default
     assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
 
     verticalAxis.margin(20);
-    expectedWidth = verticalAxis.tickLength() + verticalAxis.margin();
+    expectedWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
     assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the margin size updates the width");
 
     svg.remove();
@@ -47,11 +47,11 @@ describe("BaseAxis", () => {
     var horizontalAxis = new Plottable.Axis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
-    var expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin(); // tick length and margin by default
+    var expectedHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin(); // innerTickLength and margin by default
     assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
 
     horizontalAxis.margin(20);
-    expectedHeight = horizontalAxis.tickLength() + horizontalAxis.margin();
+    expectedHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
     assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the margin size updates the height");
 
     svg.remove();
@@ -121,7 +121,7 @@ describe("BaseAxis", () => {
     svg.remove();
   });
 
-  it("tickLength()", () => {
+  it("innerTickLength()", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -136,12 +136,12 @@ describe("BaseAxis", () => {
     assert.strictEqual(secondTickMark.attr("x1"), "50");
     assert.strictEqual(secondTickMark.attr("x2"), "50");
     assert.strictEqual(secondTickMark.attr("y1"), "0");
-    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()));
+    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.innerTickLength()));
 
-    baseAxis.tickLength(10);
-    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.tickLength()), "tick length was updated");
+    baseAxis.innerTickLength(10);
+    assert.strictEqual(secondTickMark.attr("y2"), String(baseAxis.innerTickLength()), "inner tick length was updated");
 
-    assert.throws(() => baseAxis.tickLength(-1), "must be positive");
+    assert.throws(() => baseAxis.innerTickLength(-1), "must be positive");
 
     svg.remove();
   });
@@ -172,7 +172,7 @@ describe("BaseAxis", () => {
     svg.remove();
   });
 
-  it("height is adjusted to greater of tickLength or endTickLength", () => {
+  it("height is adjusted to greater of innerTickLength or endTickLength", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
     var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -181,16 +181,16 @@ describe("BaseAxis", () => {
     baseAxis.showEndTickLabels(true);
     baseAxis.renderTo(svg);
 
-    var expectedHeight = Math.max(baseAxis.tickLength(), baseAxis.endTickLength()) + baseAxis.margin();
+    var expectedHeight = Math.max(baseAxis.innerTickLength(), baseAxis.endTickLength()) + baseAxis.margin();
     assert.strictEqual(baseAxis.height(), expectedHeight, "height should be equal to the maximum of the two");
 
-    baseAxis.tickLength(20);
-    assert.strictEqual(baseAxis.height(), 20 + baseAxis.margin(), "height should increase to tick length");
+    baseAxis.innerTickLength(20);
+    assert.strictEqual(baseAxis.height(), 20 + baseAxis.margin(), "height should increase to inner tick length");
 
     baseAxis.endTickLength(30);
     assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should increase to end tick length");
 
-    baseAxis.tickLength(10);
+    baseAxis.innerTickLength(10);
     assert.strictEqual(baseAxis.height(), 30 + baseAxis.margin(), "height should not decrease");
 
     svg.remove();
