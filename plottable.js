@@ -8478,7 +8478,7 @@ var Plottable;
                 this.addClass("waterfall-plot");
             }
             Waterfall.prototype.connectorsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._connectorsEnabled;
                 }
                 this._connectorsEnabled = enabled;

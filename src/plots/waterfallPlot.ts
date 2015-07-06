@@ -29,11 +29,11 @@ export module Plots {
      * Sets whether connectors are enabled.
      * 
      * @param {boolean} enabled
-     * @returns {Waterfall} The calling Waterfall Plot.
+     * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */
     public connectorsEnabled(enabled: boolean): Waterfall<X, Y>;
     public connectorsEnabled(enabled?: boolean): any {
-      if (enabled === undefined) {
+      if (enabled == null) {
         return this._connectorsEnabled;
       }
       this._connectorsEnabled = enabled;
@@ -48,7 +48,7 @@ export module Plots {
      * Sets total to a constant number or the result of an Accessor
      * 
      * @param {Accessor<boolean>}
-     * @returns {Waterfall} The calling Waterfall Plot.
+     * @returns {Plots.Waterfall} The calling Waterfall Plot.
      */
     public total(total: Accessor<boolean>): Waterfall<X, Y>;
     public total(total?: Accessor<boolean>): any {
