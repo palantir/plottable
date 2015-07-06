@@ -29,12 +29,12 @@ describe("BaseAxis", () => {
     var verticalAxis = new Plottable.Axis(scale, "right");
     verticalAxis.renderTo(svg);
 
-    var expectedWidth = verticalAxis.innerTickLength() + verticalAxis.margin(); // innerTickLength and margin by default
-    assert.strictEqual(verticalAxis.width(), expectedWidth, "calling width() with no arguments returns currently used width");
+    var defaultWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
+    assert.strictEqual(verticalAxis.width(), defaultWidth, "calling width() with no arguments returns currently used width");
 
     verticalAxis.margin(20);
-    expectedWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
-    assert.strictEqual(verticalAxis.width(), expectedWidth, "changing the margin size updates the width");
+    defaultWidth = verticalAxis.innerTickLength() + verticalAxis.margin();
+    assert.strictEqual(verticalAxis.width(), defaultWidth, "changing the margin size updates the width");
 
     svg.remove();
   });
@@ -47,12 +47,12 @@ describe("BaseAxis", () => {
     var horizontalAxis = new Plottable.Axis(scale, "bottom");
     horizontalAxis.renderTo(svg);
 
-    var expectedHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin(); // innerTickLength and margin by default
-    assert.strictEqual(horizontalAxis.height(), expectedHeight, "calling height() with no arguments returns currently used height");
+    var defaultHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
+    assert.strictEqual(horizontalAxis.height(), defaultHeight, "calling height() with no arguments returns currently used height");
 
     horizontalAxis.margin(20);
-    expectedHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
-    assert.strictEqual(horizontalAxis.height(), expectedHeight, "changing the margin size updates the height");
+    defaultHeight = horizontalAxis.innerTickLength() + horizontalAxis.margin();
+    assert.strictEqual(horizontalAxis.height(), defaultHeight, "changing the margin size updates the height");
 
     svg.remove();
   });
