@@ -3726,7 +3726,14 @@ var Plottable;
             this.redraw();
             return this;
         };
+        Axis.prototype.tickLength = function (length) {
+            Plottable.Utils.Window.deprecated("tickLength()", "v1.2.0", "Renamed to innerTickLength()");
+            return this._tickLength(length);
+        };
         Axis.prototype.innerTickLength = function (length) {
+            return this._tickLength(length);
+        };
+        Axis.prototype._tickLength = function (length) {
             if (length == null) {
                 return this._innerTickLength;
             }
