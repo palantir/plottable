@@ -277,7 +277,7 @@ export class Axis<D> extends Component {
   }
 
   /**
-   * This method is deprecated. Use innerTickLength() instead.
+   * @deprecated As of release 1.3, replaced by innerTickLength()
    *
    * Gets the tick mark length in pixels.
    */
@@ -290,8 +290,8 @@ export class Axis<D> extends Component {
    */
   public tickLength(length: number): Axis<D>;
   public tickLength(length?: number): any {
-    Utils.Window.deprecated("tickLength()", "v1.2.0", "Renamed to innerTickLength()");
-    return this._tickLength(length);
+    Utils.Window.deprecated("tickLength()", "v1.3.0", "Replaced by innerTickLength()");
+    return this.innerTickLength(length);
   }
 
   /**
@@ -306,10 +306,6 @@ export class Axis<D> extends Component {
    */
   public innerTickLength(length: number): Axis<D>;
   public innerTickLength(length?: number): any {
-    return this._tickLength(length);
-  }
-
-  private _tickLength(length?: number): any {
     if (length == null) {
       return this._innerTickLength;
     } else {
