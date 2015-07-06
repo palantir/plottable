@@ -2139,7 +2139,10 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Color._getPlottableColors());
+                        if (Color._plottableColorCache == null) {
+                            Color._plottableColorCache = Color._getPlottableColors();
+                        }
+                        scale = d3.scale.ordinal().range(Color._plottableColorCache);
                         break;
                     case "Category10":
                     case "category10":
@@ -2172,6 +2175,9 @@ var Plottable;
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
+            };
+            Color.invalidateColorCache = function () {
+                Color._plottableColorCache = null;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];

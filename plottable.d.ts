@@ -1087,6 +1087,7 @@ declare module Plottable {
             constructor(scaleType?: string);
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
+            static invalidateColorCache(): void;
             /**
              * Returns the color-string corresponding to a given string.
              * If there are not enough colors in the range(), a lightened version of an existing color will be used.
