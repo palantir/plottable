@@ -594,6 +594,15 @@ declare module Plottable {
 
 declare module Plottable {
     type Formatter = (d: any) => string;
+    /**
+     * This field is deprecated and will be removed in v2.0.0.
+     *
+     * The number of milliseconds between midnight one day and the next is
+     * not a fixed quantity.
+     *
+     * Use date.setDate(date.getDate() + number_of_days) instead.
+     *
+     */
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
         /**
