@@ -8542,7 +8542,7 @@ var Plottable;
                 return this;
             };
             Waterfall.prototype.total = function (total) {
-                if (total === undefined) {
+                if (total == null) {
                     return this._propertyBindings.get(Waterfall._TOTAL_KEY);
                 }
                 this._bindProperty(Waterfall._TOTAL_KEY, total, null);
@@ -8575,7 +8575,7 @@ var Plottable;
                 var yScale = this.y().scale;
                 var totalAccessor = Plottable.Plot._scaledAccessor(this.total());
                 var yAttr = this.attr("y");
-                if (yAttr === undefined) {
+                if (yAttr == null) {
                     attrToProjector["y"] = function (d, i, dataset) {
                         var isTotal = totalAccessor(d, i, dataset);
                         if (isTotal) {
@@ -8594,7 +8594,7 @@ var Plottable;
                     };
                 }
                 var heightAttr = this.attr("height");
-                if (heightAttr === undefined) {
+                if (heightAttr == null) {
                     attrToProjector["height"] = function (d, i, dataset) {
                         var isTotal = totalAccessor(d, i, dataset);
                         var currentValue = _this.y().accessor(d, i, dataset);
@@ -8604,8 +8604,7 @@ var Plottable;
                         else {
                             var currentSubtotal = _this._subtotals[i];
                             var priorSubtotal = _this._subtotals[i - 1];
-                            var height = Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
-                            return height;
+                            return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
                         }
                     };
                 }

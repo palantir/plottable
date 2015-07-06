@@ -3200,7 +3200,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Plots {
-        class Waterfall<X, Y> extends Bar<X, Y> {
+        class Waterfall<X, Y> extends Bar<X, number> {
             constructor();
             /**
              * Gets whether connectors are enabled.

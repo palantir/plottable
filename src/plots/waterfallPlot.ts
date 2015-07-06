@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Plots {
-  export class Waterfall<X, Y> extends Bar<X, Y> {
+  export class Waterfall<X, Y> extends Bar<X, number> {
     private static _BAR_DECLINE_CLASS = "waterfall-decline";
     private static _BAR_GROWTH_CLASS = "waterfall-growth";
     private static _BAR_TOTAL_CLASS = "waterfall-total";
@@ -52,7 +52,7 @@ export module Plots {
      */
     public total(total: Accessor<boolean>): Waterfall<X, Y>;
     public total<T>(total?: Accessor<boolean> | T | Accessor<T>): any {
-      if (total === undefined) {
+      if (total == null) {
         return this._propertyBindings.get(Waterfall._TOTAL_KEY);
       }
       this._bindProperty(Waterfall._TOTAL_KEY, total, null);
@@ -88,7 +88,7 @@ export module Plots {
       var totalAccessor = Plot._scaledAccessor(this.total());
 
       var yAttr = this.attr("y");
-      if (yAttr === undefined) {
+      if (yAttr == null) {
         attrToProjector["y"] = (d, i, dataset) => {
           var isTotal = totalAccessor(d, i, dataset);
           if (isTotal) {
@@ -97,33 +97,32 @@ export module Plots {
             var currentSubtotal = this._subtotals[i];
             var priorSubtotal = this._subtotals[i - 1];
             if (currentSubtotal > priorSubtotal) {
-              return yScale.scale(<any> currentSubtotal);
+              return yScale.scale(currentSubtotal);
             } else {
-              return yScale.scale(<any> priorSubtotal);
+              return yScale.scale(priorSubtotal);
             }
           }
         };
       }
 
       var heightAttr = this.attr("height");
-      if (heightAttr === undefined) {
+      if (heightAttr == null) {
         attrToProjector["height"] = (d, i, dataset) => {
           var isTotal = totalAccessor(d, i, dataset);
           var currentValue = this.y().accessor(d, i, dataset);
           if (isTotal) {
-            return Math.abs(yScale.scale(<any> currentValue) - yScale.scale(<any> 0));
+            return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
           } else {
             var currentSubtotal = this._subtotals[i];
             var priorSubtotal = this._subtotals[i - 1];
-            var height = Math.abs(yScale.scale(<any> currentSubtotal) - yScale.scale(<any> priorSubtotal));
-            return height;
+            return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
           }
         };
       }
 
       attrToProjector["class"] = (d, i, dataset) => {
         var baseClass = "";
-        if (this.attr("class") !== undefined) {
+        if (this.attr("class") != null) {
           baseClass = this.attr("class").accessor(d, i, dataset) + " ";
         }
         var isTotal = totalAccessor(d, i, dataset);
