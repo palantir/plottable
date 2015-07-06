@@ -23,7 +23,7 @@ export class Axis<D> extends Component {
   protected _computedWidth: number;
   protected _computedHeight: number;
   private _endTickLength = 5;
-  private _tickLength = 5;
+  private _innerTickLength = 5;
   private _tickLabelPadding = 10;
   private _margin = 15;
   private _showEndTickLabels = false;
@@ -203,7 +203,7 @@ export class Axis<D> extends Component {
       tickMarkAttrHash["y2"] = scalingFunction;
     }
 
-    var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+    var tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
 
     switch (this._orientation) {
       case "bottom":
@@ -279,22 +279,22 @@ export class Axis<D> extends Component {
   /**
    * Gets the tick mark length in pixels.
    */
-  public tickLength(): number;
+  public innerTickLength(): number;
   /**
    * Sets the tick mark length in pixels.
    *
    * @param {number} length
    * @returns {Axis} The calling Axis.
    */
-  public tickLength(length: number): Axis<D>;
-  public tickLength(length?: number): any {
+  public innerTickLength(length: number): Axis<D>;
+  public innerTickLength(length?: number): any {
     if (length == null) {
-      return this._tickLength;
+      return this._innerTickLength;
     } else {
       if (length < 0) {
-        throw new Error("tick length must be positive");
+        throw new Error("inner tick length must be positive");
       }
-      this._tickLength = length;
+      this._innerTickLength = length;
       this.redraw();
       return this;
     }
@@ -326,9 +326,9 @@ export class Axis<D> extends Component {
 
   protected _maxLabelTickLength() {
     if (this.showEndTickLabels()) {
-      return Math.max(this.tickLength(), this.endTickLength());
+      return Math.max(this.innerTickLength(), this.endTickLength());
     } else {
-      return this.tickLength();
+      return this.innerTickLength();
     }
   }
 

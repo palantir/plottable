@@ -1692,14 +1692,14 @@ declare module Plottable {
         /**
          * Gets the tick mark length in pixels.
          */
-        tickLength(): number;
+        innerTickLength(): number;
         /**
          * Sets the tick mark length in pixels.
          *
          * @param {number} length
          * @returns {Axis} The calling Axis.
          */
-        tickLength(length: number): Axis<D>;
+        innerTickLength(length: number): Axis<D>;
         /**
          * Gets the end tick mark length in pixels.
          */

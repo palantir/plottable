@@ -3531,7 +3531,7 @@ var Plottable;
             var _this = this;
             _super.call(this);
             this._endTickLength = 5;
-            this._tickLength = 5;
+            this._innerTickLength = 5;
             this._tickLabelPadding = 10;
             this._margin = 15;
             this._showEndTickLabels = false;
@@ -3678,7 +3678,7 @@ var Plottable;
                 tickMarkAttrHash["y1"] = scalingFunction;
                 tickMarkAttrHash["y2"] = scalingFunction;
             }
-            var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+            var tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
             switch (this._orientation) {
                 case "bottom":
                     tickMarkAttrHash["y2"] = tickLength;
@@ -3726,15 +3726,15 @@ var Plottable;
             this.redraw();
             return this;
         };
-        Axis.prototype.tickLength = function (length) {
+        Axis.prototype.innerTickLength = function (length) {
             if (length == null) {
-                return this._tickLength;
+                return this._innerTickLength;
             }
             else {
                 if (length < 0) {
-                    throw new Error("tick length must be positive");
+                    throw new Error("inner tick length must be positive");
                 }
-                this._tickLength = length;
+                this._innerTickLength = length;
                 this.redraw();
                 return this;
             }
@@ -3754,10 +3754,10 @@ var Plottable;
         };
         Axis.prototype._maxLabelTickLength = function () {
             if (this.showEndTickLabels()) {
-                return Math.max(this.tickLength(), this.endTickLength());
+                return Math.max(this.innerTickLength(), this.endTickLength());
             }
             else {
-                return this.tickLength();
+                return this.innerTickLength();
             }
         };
         Axis.prototype.tickLabelPadding = function (padding) {
@@ -4040,11 +4040,11 @@ var Plottable;
                 var offset = this._tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
                 if (this.orientation() === "bottom") {
                     attr["y1"] = offset;
-                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
+                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]);
                 }
                 else {
                     attr["y1"] = this.height() - offset;
-                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]));
+                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]));
                 }
                 tickMarks.attr(attr);
                 if (this.orientation() === "bottom") {
