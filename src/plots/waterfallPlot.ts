@@ -102,7 +102,7 @@ export module Plots {
               return yScale.scale(<any> priorSubtotal);
             }
           }
-        };        
+        };
       }
 
       var heightAttr = this.attr("height");
@@ -118,7 +118,7 @@ export module Plots {
             var height = Math.abs(yScale.scale(<any> currentSubtotal) - yScale.scale(<any> priorSubtotal));
             return height;
           }
-        };        
+        };
       }
 
       attrToProjector["class"] = (d, i, dataset) => {
