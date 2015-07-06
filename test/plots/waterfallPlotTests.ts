@@ -12,7 +12,7 @@ describe("Plots", () => {
     var renderArea: d3.Selection<void>;
     var SVG_WIDTH = 600;
     var SVG_HEIGHT = 400;
-	  var data = [
+    var data = [
       { x: "A", y: 20, t: "total" },
       { x: "B", y: -5, t: "delta" },
       { x: "C", y: 10, t: "delta" },
@@ -35,6 +35,7 @@ describe("Plots", () => {
       plot.renderTo(svg);
       renderArea = (<any> plot)._renderArea;
     });
+
     it("adjacent bars share correct edge", () => {
       var bars = renderArea.selectAll("rect")[0];
       var data = dataset.data();
@@ -76,6 +77,7 @@ describe("Plots", () => {
       }
       svg.remove();
     });
+
     it("bars are classed correctly", () => {
       var bars = renderArea.selectAll("rect")[0];
       var data = dataset.data();
@@ -96,12 +98,13 @@ describe("Plots", () => {
       });
       svg.remove();
     });
+
     it("renders connector lines correctly", () => {
       plot.connectorsEnabled(true);
       plot.renderTo(svg);
       var bars = renderArea.selectAll("rect")[0];
       var connectors = renderArea.selectAll("line.connector")[0];
-      assert.isTrue(bars.length - 1 === connectors.length, "there is one more bar than num. connectors");
+      assert.isTrue(bars.length - 1 === connectors.length, "there is one more bar than number of connectors");
       connectors.forEach((connector, index) => {
         var selection = d3.select(connector);
         var firstBar = d3.select(bars[index]);
