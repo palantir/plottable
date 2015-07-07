@@ -4903,11 +4903,6 @@ var Plottable;
         Components.Label = Label;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
-            /**
-             * @constructor
-             * @param {string} [text]
-             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
-             */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
                 this.addClass(TitleLabel.TITLE_LABEL_CLASS);
@@ -4918,11 +4913,6 @@ var Plottable;
         Components.TitleLabel = TitleLabel;
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
-            /**
-             * @constructor
-             * @param {string} [text]
-             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
-             */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
                 this.addClass(AxisLabel.AXIS_LABEL_CLASS);

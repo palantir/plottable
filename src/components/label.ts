@@ -162,10 +162,13 @@ export module Components {
     public static TITLE_LABEL_CLASS = "title-label";
     /**
      * @constructor
+     * @param {number} [text]
      * @param {string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text?: string, angle?: number) {
+    constructor(text: number, angle: number); 
+    constructor(text: string, angle: number);
+    constructor(text?, angle?) {
       super(text, angle);
       this.addClass(TitleLabel.TITLE_LABEL_CLASS);
     }
@@ -175,10 +178,13 @@ export module Components {
     public static AXIS_LABEL_CLASS = "axis-label";
     /**
      * @constructor
+     * @param {number} [text]
      * @param {string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text?: string, angle?: number) {
+    constructor(text: number, angle: number); 
+    constructor(text: string, angle: number);
+    constructor(text?, angle?) {
       super(text, angle);
       this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }
