@@ -8556,7 +8556,7 @@ var Plottable;
                         else {
                             var currentSubtotal = _this._subtotals[i];
                             if (i === 0) {
-                                return Math.abs(yScale.scale(Math.abs(currentValue)) - yScale.scale(0));
+                                return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(currentSubtotal - currentValue));
                             }
                             else {
                                 var priorSubtotal = _this._subtotals[i - 1];
@@ -8606,14 +8606,14 @@ var Plottable;
                         max = total;
                     }
                     if (startValue === -Infinity && isTotal) {
-                        var adjustment = currentValue - total;
+                        var startTotal = currentValue - total;
                         for (var i = 0; i < _this._subtotals.length; i++) {
-                            _this._subtotals[i] += adjustment;
+                            _this._subtotals[i] += startTotal;
                         }
                         startValue = _this._subtotals[i];
-                        total += adjustment;
-                        min += adjustment;
-                        max += adjustment;
+                        total += startTotal;
+                        min += startTotal;
+                        max += startTotal;
                     }
                 });
                 this._extent = [min, max];
