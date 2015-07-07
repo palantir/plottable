@@ -86,6 +86,50 @@ describe("Dispatchers", () => {
       md.offMouseMove(callback);
     });
 
+    it("doesn't call callbacks for clicks if obscured by overlay", () => {
+      var targetWidth = 400, targetHeight = 400;
+      var target = TestMethods.generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      var targetX = 17;
+      var targetY = 76;
+
+      var md = Plottable.Dispatchers.Mouse.getDispatcher(<SVGElement> target.node());
+
+      var callbackWasCalled = false;
+      var callback = (p: Plottable.Point, e: MouseEvent) => callbackWasCalled = true;
+
+      md.onMouseDown(callback);
+      TestMethods.triggerFakeMouseEvent("mousedown", target, targetX, targetY);
+      assert.isTrue(callbackWasCalled, "callback was called on mousedown");
+
+      var element = <HTMLElement> target[0][0];
+      var position = { x: 0, y: 0 };
+      while (element != null) {
+        position.x += (element.offsetLeft || element.clientLeft || 0);
+        position.y += (element.offsetTop || element.clientTop || 0);
+        element = <HTMLElement> (element.offsetParent || element.parentNode);
+      }
+
+      var overlay = TestMethods.getSVGParent().append("div")
+            .style({
+              height: "400px",
+              width: "400px",
+              position: "absolute",
+              top: position.y + "px",
+              left: position.x + "px"
+            });
+
+      callbackWasCalled = false;
+      TestMethods.triggerFakeMouseEvent("mousedown", overlay, targetX, targetY);
+      assert.isFalse(callbackWasCalled, "callback was not called on mousedown on overlay");
+
+      md.offMouseDown(callback);
+      target.remove();
+      overlay.remove();
+    });
+
     it("calls callbacks on mouseover, mousemove, and mouseout", () => {
       var targetWidth = 400, targetHeight = 400;
       var target = TestMethods.generateSVG(targetWidth, targetHeight);

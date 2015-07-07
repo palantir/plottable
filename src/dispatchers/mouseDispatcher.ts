@@ -54,12 +54,12 @@ export module Dispatchers {
       this._callbacks = [this._moveCallbacks, this._downCallbacks, this._upCallbacks, this._wheelCallbacks,
                          this._dblClickCallbacks];
 
-      var processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks);
+      var processMoveCallback = (e: MouseEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
       this._eventToCallback["mouseover"] = processMoveCallback;
       this._eventToCallback["mousemove"] = processMoveCallback;
       this._eventToCallback["mouseout"] = processMoveCallback;
       this._eventToCallback["mousedown"] = (e: MouseEvent) => this._measureAndDispatch(e, this._downCallbacks);
-      this._eventToCallback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks);
+      this._eventToCallback["mouseup"] = (e: MouseEvent) => this._measureAndDispatch(e, this._upCallbacks, "page");
       this._eventToCallback["wheel"] = (e: WheelEvent) => this._measureAndDispatch(e, this._wheelCallbacks);
       this._eventToCallback["dblclick"] = (e: MouseEvent) => this._measureAndDispatch(e, this._dblClickCallbacks);
     }
@@ -178,11 +178,16 @@ export module Dispatchers {
      * Computes the mouse position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndDispatch(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>) {
-      var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
-      if (newMousePosition != null) {
-        this._lastMousePosition = newMousePosition;
-        callbackSet.callCallbacks(this.lastMousePosition(), event);
+    private _measureAndDispatch(event: MouseEvent, callbackSet: Utils.CallbackSet<MouseCallback>, scope: string = "element") {
+      if (scope !== "page" && scope !== "element") {
+        throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+      }
+      if (scope === "page" || this._translator.insideSVG(event)) {
+        var newMousePosition = this._translator.computePosition(event.clientX, event.clientY);
+        if (newMousePosition != null) {
+          this._lastMousePosition = newMousePosition;
+          callbackSet.callCallbacks(this.lastMousePosition(), event);
+        }
       }
     }
 

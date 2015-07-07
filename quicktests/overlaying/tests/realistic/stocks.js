@@ -98,10 +98,10 @@ function run(svg, data, Plottable) {
                                   });
 
           var table = new Plottable.Components.Table([
-                            [null      , null      , xAxisTop, null      , null      ],
-                            [labelGOOG, yAxisGOOG, plotArea, yAxisAAPL, labelAAPL],
-                            [null      , null      , barDiff , null      , null      ],
-                            [null      , null      , xAxis   , null      , null      ]]);
+                            [null,       null,       xAxisTop, null,       null],
+                            [labelGOOG,  yAxisGOOG,   plotArea, yAxisAAPL,  labelAAPL],
+                            [null,       null,       barDiff,  null,       null],
+                            [null,       null,       xAxis,    null,       null]]);
 
           table.rowWeight(2, 0.3);
 

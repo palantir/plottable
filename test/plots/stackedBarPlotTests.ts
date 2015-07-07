@@ -205,6 +205,104 @@ describe("Plots", () => {
     });
   });
 
+  describe("Stacked Bar Plot on ModifiedLog Scale", () => {
+    it("stacks correctly on a ModifiedLog Scale (vertical)", () => {
+      var data1 = [
+        { x: "A", y: 10 },
+        { x: "B", y: 100 }
+      ];
+      var data2 = [
+        { x: "A", y: 10 },
+        { x: "B", y: 100 }
+      ];
+
+      var dataset1 = new Plottable.Dataset(data1, { id: "dataset1" });
+      var dataset2 = new Plottable.Dataset(data2, { id: "dataset2" });
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.ModifiedLog();
+      var plot = new Plottable.Plots.StackedBar();
+      plot.x((d) => d.x, xScale);
+      plot.y((d) => d.y, yScale);
+      plot.attr("class", (d, i, dataset) => dataset.metadata().id);
+      plot.addDataset(dataset1);
+      plot.addDataset(dataset2);
+      plot.renderTo(svg);
+
+      var dataset1Rects = plot.content().selectAll("." + dataset1.metadata().id);
+      dataset1Rects.each(function (datum, index) {
+        var rect = d3.select(this);
+        var expectedY = yScale.scale(data1[index].y);
+        var actualY = TestMethods.numAttr(rect, "y");
+        assert.closeTo(actualY, expectedY, 0.1, "y attribute set correctly (dataset 1, datum " + index + ")");
+        var expectedHeight = yScale.scale(0) - expectedY;
+        var actualHeight = TestMethods.numAttr(rect, "height");
+        assert.closeTo(actualHeight, expectedHeight, 0.1, "height attribute set correctly (dataset 1, datum " + index + ")");
+      });
+
+      var dataset2Rects = plot.content().selectAll("." + dataset2.metadata().id);
+      dataset2Rects.each(function (datum, index) {
+        var rect = d3.select(this);
+        var expectedY = yScale.scale(data2[index].y + data1[index].y);
+        var actualY = TestMethods.numAttr(rect, "y");
+        assert.closeTo(actualY, expectedY, 0.1, "y attribute set correctly (dataset 2, datum " + index + ")");
+        var expectedHeight = yScale.scale(data1[index].y) - expectedY;
+        var actualHeight = TestMethods.numAttr(rect, "height");
+        assert.closeTo(actualHeight, expectedHeight, 0.1, "height attribute set correctly (dataset 2, datum " + index + ")");
+      });
+
+      svg.remove();
+    });
+
+    it("stacks correctly on a ModifiedLog Scale (horizontal)", () => {
+      var data1 = [
+        { y: "A", x: 10 },
+        { y: "B", x: 100 }
+      ];
+      var data2 = [
+        { y: "A", x: 10 },
+        { y: "B", x: 100 }
+      ];
+
+      var dataset1 = new Plottable.Dataset(data1, { id: "dataset1" });
+      var dataset2 = new Plottable.Dataset(data2, { id: "dataset2" });
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.ModifiedLog();
+      var yScale = new Plottable.Scales.Category();
+      var plot = new Plottable.Plots.StackedBar("horizontal");
+      plot.y((d) => d.y, yScale);
+      plot.x((d) => d.x, xScale);
+      plot.attr("class", (d, i, dataset) => dataset.metadata().id);
+      plot.addDataset(dataset1);
+      plot.addDataset(dataset2);
+      plot.renderTo(svg);
+
+      var dataset1Rects = plot.content().selectAll("." + dataset1.metadata().id);
+      dataset1Rects.each(function (datum, index) {
+        var rect = d3.select(this);
+        var expectedX = xScale.scale(0);
+        var actualX = TestMethods.numAttr(rect, "x");
+        assert.closeTo(actualX, expectedX, 0.1, "x attribute set correctly (dataset 1, datum " + index + ")");
+        var expectedWidth = xScale.scale(data1[index].x) - expectedX;
+        var actualWidth = TestMethods.numAttr(rect, "width");
+        assert.closeTo(actualWidth, expectedWidth, 0.1, "width attribute set correctly (dataset 1, datum " + index + ")");
+      });
+
+      var dataset2Rects = plot.content().selectAll("." + dataset2.metadata().id);
+      dataset2Rects.each(function (datum, index) {
+        var rect = d3.select(this);
+        var expectedX = xScale.scale(data1[index].x);
+        var actualX = TestMethods.numAttr(rect, "x");
+        assert.closeTo(actualX, expectedX, 0.1, "x attribute set correctly (dataset 2, datum " + index + ")");
+        var expectedWidth = xScale.scale(data2[index].x + data1[index].x) - expectedX;
+        var actualWidth = TestMethods.numAttr(rect, "width");
+        assert.closeTo(actualWidth, expectedWidth, 0.1, "width attribute set correctly (dataset 2, datum " + index + ")");
+      });
+
+      svg.remove();
+    });
+  });
+
   describe("Horizontal Stacked Bar Plot", () => {
     var svg: d3.Selection<void>;
     var dataset1: Plottable.Dataset;

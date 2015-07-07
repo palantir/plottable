@@ -82,7 +82,7 @@ function setupBindings(){
 
 function populatePlotList(){
   plots.forEach(function(plot){
-    div.append("div").attr("class","single-plot " + plot.name);
+    div.append("div").attr("class", "single-plot " + plot.name);
   });
 }
 
@@ -108,7 +108,7 @@ function renderPlots(plottablePlots){
 
 function addAllDatasets(plot, arr, numOfDatasets){
   if (numOfDatasets === "single") {
-    plot.addDataset("d1" , arr[0]);
+    plot.addDataset("d1", arr[0]);
   }
   if (numOfDatasets === "multiple") {
     arr.forEach(function(dataset){
@@ -183,7 +183,7 @@ function generatePlots(dataType){
   renderPlots(plottablePlots);
 }
 
-var orderByX = function(a,b){
+var orderByX = function(a, b){
   return a.x - b.x;
 };
 

@@ -38,8 +38,10 @@ export module Scales {
     }
 
     protected _defaultExtent(): Date[] {
-      var endTimeValue = new Date().valueOf();
-      var startTimeValue = endTimeValue - MILLISECONDS_IN_ONE_DAY;
+      var now = new Date();
+      var endTimeValue = now.valueOf();
+      now.setDate(now.getDate() - 1);
+      var startTimeValue = now.valueOf();
       return [new Date(startTimeValue), new Date(endTimeValue)];
     }
 
@@ -47,7 +49,11 @@ export module Scales {
       var startTime = singleValueDomain[0].getTime();
       var endTime = singleValueDomain[1].getTime();
       if (startTime === endTime) {
-        return [new Date(startTime - MILLISECONDS_IN_ONE_DAY), new Date(endTime + MILLISECONDS_IN_ONE_DAY)];
+        var startDate = new Date(startTime);
+        startDate.setDate(startDate.getDate() - 1);
+        var endDate = new Date(endTime);
+        endDate.setDate(endDate.getDate() + 1);
+        return [startDate, endDate];
       }
       return singleValueDomain;
     }
@@ -108,7 +114,6 @@ export module Scales {
         throw Error("TimeInterval specified does not exist: " + timeInterval);
       }
     }
-
   }
 }
 }

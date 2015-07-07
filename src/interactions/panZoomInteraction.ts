@@ -22,6 +22,9 @@ export module Interactions {
     private _touchEndCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
     private _touchCancelCallback = (ids: number[], idToPoint: Point[], e: TouchEvent) => this._handleTouchEnd(ids, idToPoint, e);
 
+    private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
+    private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -33,17 +36,18 @@ export module Interactions {
     constructor(xScale?: QuantitativeScale<any>, yScale?: QuantitativeScale<any>) {
       super();
       this._xScales = new Utils.Set<QuantitativeScale<any>>();
-      if (xScale != null) {
-        this._xScales.add(xScale);
-      }
       this._yScales = new Utils.Set<QuantitativeScale<any>>();
-      if (yScale != null) {
-        this._yScales.add(yScale);
-      }
-
       this._dragInteraction = new Interactions.Drag();
       this._setupDragInteraction();
       this._touchIds = d3.map<Point>();
+      this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      if (xScale != null) {
+        this.addXScale(xScale);
+      }
+      if (yScale != null) {
+        this.addYScale(yScale);
+      }
     }
 
     protected _anchor(component: Component) {
@@ -86,8 +90,12 @@ export module Interactions {
         return;
       }
 
-      var oldCenterPoint = this._centerPoint();
-      var oldCornerDistance = this._cornerDistance();
+      var oldPoints = this._touchIds.values();
+      var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
+
+      if (oldCornerDistance === 0) {
+        return;
+      }
 
       ids.forEach((id) => {
         if (this._touchIds.has(id.toString())) {
@@ -95,45 +103,63 @@ export module Interactions {
         }
       });
 
-      var newCenterPoint = this._centerPoint();
-      var newCornerDistance = this._cornerDistance();
+      var points = this._touchIds.values();
+      var newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
 
-      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this.xScales().forEach((xScale) => {
-          PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-          PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
-        });
+      if (newCornerDistance === 0) {
+        return;
       }
-      if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-        this.yScales().forEach((yScale) => {
-          PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-          PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
-        });
-      }
+
+      var magnifyAmount = oldCornerDistance / newCornerDistance;
+
+      var normalizedPointDiffs = points.map((point, i) => {
+        return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
+      });
+
+      this.xScales().forEach((xScale) => {
+        magnifyAmount = this._constrainedZoomAmount(xScale, magnifyAmount);
+      });
+
+      this.yScales().forEach((yScale) => {
+        magnifyAmount = this._constrainedZoomAmount(yScale, magnifyAmount);
+      });
+
+      var constrainedPoints = oldPoints.map((oldPoint, i) => {
+        return {
+          x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
+          y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
+        };
+      });
+
+      var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+
+      var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
+      this.xScales().forEach((xScale) => {
+        this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
+        this._translateScale(xScale, translateAmountX);
+      });
+
+      var translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
+      this.yScales().forEach((yScale) => {
+        this._magnifyScale(yScale, magnifyAmount, oldCenterPoint.y);
+        this._translateScale(yScale, translateAmountY);
+      });
     }
 
-    private _centerPoint() {
-      var points = this._touchIds.values();
-      var firstTouchPoint = points[0];
-      var secondTouchPoint = points[1];
-
-      var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-      var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-      var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-      var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+    private static _centerPoint(point1: Point, point2: Point) {
+      var leftX = Math.min(point1.x, point2.x);
+      var rightX = Math.max(point1.x, point2.x);
+      var topY = Math.min(point1.y, point2.y);
+      var bottomY = Math.max(point1.y, point2.y);
 
       return {x: (leftX + rightX) / 2, y: (bottomY + topY) / 2};
     }
 
-    private _cornerDistance() {
-      var points = this._touchIds.values();
-      var firstTouchPoint = points[0];
-      var secondTouchPoint = points[1];
-
-      var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-      var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-      var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-      var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+    private static _pointDistance(point1: Point, point2: Point) {
+      var leftX = Math.min(point1.x, point2.x);
+      var rightX = Math.max(point1.x, point2.x);
+      var topY = Math.min(point1.y, point2.y);
+      var bottomY = Math.max(point1.y, point2.y);
 
       return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
     }
@@ -144,12 +170,12 @@ export module Interactions {
       });
     }
 
-    private static _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
+    private _magnifyScale<D>(scale: QuantitativeScale<D>, magnifyAmount: number, centerValue: number) {
       var magnifyTransform = (rangeValue: number) => scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount);
       scale.domain(scale.range().map(magnifyTransform));
     }
 
-    private static _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
+    private _translateScale<D>(scale: QuantitativeScale<D>, translateAmount: number) {
       var translateTransform = (rangeValue: number) => scale.invert(rangeValue + translateAmount);
       scale.domain(scale.range().map(translateTransform));
     }
@@ -161,13 +187,34 @@ export module Interactions {
 
         var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
         var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
+
         this.xScales().forEach((xScale) => {
-          PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+          zoomAmount = this._constrainedZoomAmount(xScale, zoomAmount);
+        });
+
+        this.yScales().forEach((yScale) => {
+          zoomAmount = this._constrainedZoomAmount(yScale, zoomAmount);
+        });
+
+        this.xScales().forEach((xScale) => {
+          this._magnifyScale(xScale, zoomAmount, translatedP.x);
         });
         this.yScales().forEach((yScale) => {
-          PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+          this._magnifyScale(yScale, zoomAmount, translatedP.y);
         });
       }
+    }
+
+    private _constrainedZoomAmount(scale: QuantitativeScale<any>, zoomAmount: number) {
+      var extentIncreasing = zoomAmount > 1;
+
+      var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
+      if (boundingDomainExtent == null) { return zoomAmount; }
+
+      var scaleDomain = scale.domain();
+      var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+      var compareF = extentIncreasing ? Math.min : Math.max;
+      return compareF(zoomAmount, boundingDomainExtent / domainExtent);
     }
 
     private _setupDragInteraction() {
@@ -179,16 +226,24 @@ export module Interactions {
         if (this._touchIds.size() >= 2) {
           return;
         }
+        var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
+
         this.xScales().forEach((xScale) => {
-          var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-          PanZoom._translateScale(xScale, -dragAmountX);
+          this._translateScale(xScale, translateAmountX);
         });
+
+        var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+
         this.yScales().forEach((yScale) => {
-          var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-          PanZoom._translateScale(yScale, -dragAmountY);
+          this._translateScale(yScale, translateAmountY);
         });
         lastDragPoint = endPoint;
       });
+    }
+
+    private _nonLinearScaleWithExtents(scale: QuantitativeScale<any>) {
+      return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null &&
+             !(scale instanceof Scales.Linear) && !(scale instanceof Scales.Time);
     }
 
     /**
@@ -260,6 +315,8 @@ export module Interactions {
      */
     public removeXScale(xScale: QuantitativeScale<any>) {
       this._xScales.delete(xScale);
+      this._minDomainExtents.delete(xScale);
+      this._maxDomainExtents.delete(xScale);
       return this;
     }
 
@@ -282,6 +339,86 @@ export module Interactions {
      */
     public removeYScale(yScale: QuantitativeScale<any>) {
       this._yScales.delete(yScale);
+      this._minDomainExtents.delete(yScale);
+      this._maxDomainExtents.delete(yScale);
+      return this;
+    }
+
+    /**
+     * Gets the minimum domain extent for the scale, specifying the minimum allowable amount
+     * between the ends of the domain.
+     *
+     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The minimum domain extent for the scale.
+     */
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the minimum domain extent for the scale, specifying the minimum allowable amount
+     * between the ends of the domain.
+     *
+     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} minDomainExtent The minimum domain extent for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+    public minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent?: D): any {
+      if (minDomainExtent == null) {
+        return this._minDomainExtents.get(quantitativeScale);
+      }
+      if (minDomainExtent.valueOf() < 0) {
+        throw new Error("extent must be non-negative");
+      }
+      var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+      if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
+        throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._minDomainExtents.set(quantitativeScale, minDomainExtent);
+      return this;
+    }
+
+    /**
+     * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
+     * between the ends of the domain.
+     *
+     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @returns {D} The maximum domain extent for the scale.
+     */
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+    /**
+     * Sets the maximum domain extent for the scale, specifying the maximum allowable amount
+     * between the ends of the domain.
+     *
+     * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+     *
+     * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+     * @param {D} minDomainExtent The maximum domain extent for the scale.
+     * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+     */
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
+    public maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent?: D): any {
+      if (maxDomainExtent == null) {
+        return this._maxDomainExtents.get(quantitativeScale);
+      }
+      if (maxDomainExtent.valueOf() <= 0) {
+        throw new Error("extent must be positive");
+      }
+      var minExtentForScale = this.minDomainExtent(quantitativeScale);
+      if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
+        throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
+      this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
       return this;
     }
   }

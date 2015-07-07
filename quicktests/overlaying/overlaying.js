@@ -146,7 +146,7 @@ function populateTotalSidebarList(paths){
   });
 
   setupCheckboxBinding();
-  $(":checkbox").attr("checked" , true);
+  $(":checkbox").attr("checked", true);
 }
 
 function populateSidebarList(paths, testsInCategory, category){
@@ -215,11 +215,10 @@ function runQuickTest(result, svg, data, branch){
 
 function loadAllQuickTests(quicktestsPaths, firstQTBranch, secondQTBranch){
   quicktestsPaths.forEach(function(path) { //for each quicktest
-    var name = path.replace(/\w*\/|\.js/g , "");
+    var name = path.replace(/\w*\/|\.js/g, "");
     d3.text("http://localhost:9999/" + path, function(error, text) {
       if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest ");
-        return;
+        throw new Error("Tried to load nonexistant quicktest.");
       }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
@@ -244,8 +243,7 @@ function loadQuickTestsInCategory(quickTestNames, category, firstQTBranch, secon
     var name = q;
     d3.text("/quicktests/overlaying/tests/" + category + "/" + name + ".js", function(error, text) {
       if (error !== null) {
-        console.warn("Tried to load nonexistant quicktest " + name);
-        return;
+        throw new Error("Tried to load nonexistant quicktest.");
       }
       text = "(function(){" + text +
           "\nreturn {makeData: makeData, run: run};" +
@@ -314,9 +312,8 @@ function loadPlottableBranches(category, branchList){
           filterQuickTests(category, branchList);
         }
       });
-    }
-    else if(textStatus === "error"){
-      console.log("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
+    } else if (textStatus === "error"){
+      throw new Error("could not retrieve Plottable branch, check if url " + listOfUrl[0] + " is correct!");
     }
   });
 }

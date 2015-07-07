@@ -358,6 +358,10 @@ declare module Plottable {
              * Computes the position relative to the <svg> in svg-coordinate-space.
              */
             computePosition(clientX: number, clientY: number): Point;
+            /**
+             * Checks whether event happened inside <svg> element.
+             */
+            insideSVG(e: Event): boolean;
         }
     }
 }
@@ -590,6 +594,15 @@ declare module Plottable {
 
 declare module Plottable {
     type Formatter = (d: any) => string;
+    /**
+     * This field is deprecated and will be removed in v2.0.0.
+     *
+     * The number of milliseconds between midnight one day and the next is
+     * not a fixed quantity.
+     *
+     * Use date.setDate(date.getDate() + number_of_days) instead.
+     *
+     */
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
         /**
@@ -1074,6 +1087,7 @@ declare module Plottable {
             constructor(scaleType?: string);
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
+            static invalidateColorCache(): void;
             /**
              * Returns the color-string corresponding to a given string.
              * If there are not enough colors in the range(), a lightened version of an existing color will be used.
@@ -2328,6 +2342,7 @@ declare module Plottable {
     class Plot extends Component {
         protected static _ANIMATION_MAX_DURATION: number;
         protected _renderArea: d3.Selection<void>;
+        protected _renderCallback: ScaleCallback<Scale<any, any>>;
         protected _propertyExtents: d3.Map<any[]>;
         protected _propertyBindings: d3.Map<Plots.AccessorScaleBinding<any, any>>;
         /**
@@ -2570,6 +2585,21 @@ declare module Plottable {
          * @param {Scale} yScale The y scale to use.
          */
         constructor();
+        /**
+         * Returns the whether or not the rendering is deferred for performance boost.
+         * @return {boolean} The deferred rendering option
+         */
+        deferredRendering(): boolean;
+        /**
+         * Sets / unsets the deferred rendering option
+         * Activating this option improves the performance of plot interaction (pan / zoom) by
+         * performing lazy renders, only after the interaction has stopped. Because re-rendering
+         * is no longer performed during the interaction, the zooming might experience a small
+         * resolution degradation, before the lazy re-render is performed.
+         *
+         * This option is intended for cases where performance is an issue.
+         */
+        deferredRendering(deferredRendering: boolean): XYPlot<X, Y>;
         /**
          * Gets the AccessorScaleBinding for X.
          */
@@ -3757,6 +3787,48 @@ declare module Plottable {
              * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
              */
             removeYScale(yScale: QuantitativeScale<any>): PanZoom;
+            /**
+             * Gets the minimum domain extent for the scale, specifying the minimum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The minimum domain extent for the scale.
+             */
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the minimum domain extent for the scale, specifying the minimum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} minDomainExtent The minimum domain extent for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            minDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, minDomainExtent: D): Interactions.PanZoom;
+            /**
+             * Gets the maximum domain extent for the scale, specifying the maximum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @returns {D} The maximum domain extent for the scale.
+             */
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>): D;
+            /**
+             * Sets the maximum domain extent for the scale, specifying the maximum allowable amount
+             * between the ends of the domain.
+             *
+             * Note that extents will mainly work on scales that work linearly like Linear Scale and Time Scale
+             *
+             * @param {QuantitativeScale<any>} quantitativeScale The scale to query
+             * @param {D} minDomainExtent The maximum domain extent for the scale.
+             * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
+             */
+            maxDomainExtent<D>(quantitativeScale: QuantitativeScale<D>, maxDomainExtent: D): Interactions.PanZoom;
         }
     }
 }
