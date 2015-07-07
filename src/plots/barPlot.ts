@@ -444,13 +444,13 @@ export module Plots {
           var showLabel = true;
           var labelPosition = {
             x: x + w / 2 - measurement.width / 2,
-            y: positive? y : y + h
+            y: positive ? y : y + h
           };
           if (labelPosition.x < 0 || labelPosition.x + measurement.width > +this._boundingBox.attr("width") ||
               labelPosition.y < 0 || labelPosition.y + measurement.height > +this._boundingBox.attr("height")) {
             showLabel = false;
           }
-  
+
           var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           var className = dark ? "dark-label" : "light-label";
           g.classed(className, true);

@@ -339,10 +339,10 @@ export module Plots {
             showLabel = false;
           }
         }
-        
+
         if (showLabel) {
           var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-          showLabel = sliceIndices.every((index) => index === datumIndex);          
+          showLabel = sliceIndices.every((index) => index === datumIndex);
         }
 
         var color = attrToProjector["fill"](datum, datumIndex, dataset);
