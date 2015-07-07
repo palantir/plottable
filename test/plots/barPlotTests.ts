@@ -718,10 +718,11 @@ describe("Plots", () => {
         var texts = svg.selectAll("text")[0];
         texts.forEach((text, i) => {
           var selection = d3.select(text);
+          var visibility = selection.style("visibility");
           if (i === 1) {
-            assert.isTrue(selection.style("visibility") === "visible", "bar label is visible");
+            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label is visible");
           } else {
-            assert.isTrue(selection.style("visibility") === "hidden", "bar label is hidden");
+            assert.isTrue(visibility === "hidden", "bar label is hidden");
           }
         });
         svg.remove();
