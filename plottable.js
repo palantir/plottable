@@ -8577,12 +8577,21 @@ var Plottable;
                 var yAttr = this.attr("y");
                 if (yAttr == null) {
                     attrToProjector["y"] = function (d, i, dataset) {
+                        var currentValue = _this.y().accessor(d, i, dataset);
                         var isTotal = totalAccessor(d, i, dataset);
                         if (isTotal) {
-                            return Math.min(Plottable.Plot._scaledAccessor(_this.y())(d, i, dataset), yScale.scale(0));
+                            return Math.min(yScale.scale(currentValue), yScale.scale(0));
                         }
                         else {
                             var currentSubtotal = _this._subtotals[i];
+                            if (i === 0) {
+                                if (currentValue < 0) {
+                                    return yScale.scale(currentSubtotal - currentValue);
+                                }
+                                else {
+                                    return yScale.scale(currentSubtotal);
+                                }
+                            }
                             var priorSubtotal = _this._subtotals[i - 1];
                             if (currentSubtotal > priorSubtotal) {
                                 return yScale.scale(currentSubtotal);
@@ -8603,8 +8612,13 @@ var Plottable;
                         }
                         else {
                             var currentSubtotal = _this._subtotals[i];
-                            var priorSubtotal = _this._subtotals[i - 1];
-                            return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
+                            if (i === 0) {
+                                return Math.abs(yScale.scale(Math.abs(currentValue)) - yScale.scale(0));
+                            }
+                            else {
+                                var priorSubtotal = _this._subtotals[i - 1];
+                                return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
+                            }
                         }
                     };
                 }
@@ -8634,6 +8648,7 @@ var Plottable;
                 var min = Number.MAX_VALUE;
                 var max = Number.MIN_VALUE;
                 var total = 0;
+                var startValue = -Infinity;
                 dataset.data().forEach(function (datum, index) {
                     var currentValue = _this.y().accessor(datum, index, dataset);
                     var isTotal = _this.total().accessor(datum, index, dataset);
@@ -8646,6 +8661,17 @@ var Plottable;
                     }
                     if (total > max) {
                         max = total;
+                    }
+                    // First time hitting a total, backfill values
+                    if (startValue == -Infinity && isTotal) {
+                        var adjustment = currentValue - total;
+                        for (var i = 0; i < _this._subtotals.length; i++) {
+                            _this._subtotals[i] += adjustment;
+                        }
+                        startValue = _this._subtotals[i];
+                        total += adjustment;
+                        min += adjustment;
+                        max += adjustment;
                     }
                 });
                 this._extent = [min, max];

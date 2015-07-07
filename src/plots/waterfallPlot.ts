@@ -90,11 +90,19 @@ export module Plots {
       var yAttr = this.attr("y");
       if (yAttr == null) {
         attrToProjector["y"] = (d, i, dataset) => {
+          var currentValue = this.y().accessor(d, i, dataset);
           var isTotal = totalAccessor(d, i, dataset);
           if (isTotal) {
-            return Math.min(Plot._scaledAccessor(this.y())(d, i, dataset), yScale.scale(0));
+            return Math.min(yScale.scale(currentValue), yScale.scale(0));
           } else {
             var currentSubtotal = this._subtotals[i];
+            if (i === 0) {
+              if (currentValue < 0) {
+                return yScale.scale(currentSubtotal - currentValue);
+              } else {
+                return yScale.scale(currentSubtotal);
+              }
+            }
             var priorSubtotal = this._subtotals[i - 1];
             if (currentSubtotal > priorSubtotal) {
               return yScale.scale(currentSubtotal);
@@ -114,8 +122,12 @@ export module Plots {
             return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
           } else {
             var currentSubtotal = this._subtotals[i];
-            var priorSubtotal = this._subtotals[i - 1];
-            return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
+            if (i === 0) {
+              return Math.abs(yScale.scale(Math.abs(currentValue)) - yScale.scale(0));
+            } else {
+              var priorSubtotal = this._subtotals[i - 1];
+              return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));              
+            }
           }
         };
       }
@@ -147,9 +159,10 @@ export module Plots {
       var min = Number.MAX_VALUE;
       var max = Number.MIN_VALUE;
       var total = 0;
+      var startValue = -Infinity;
       dataset.data().forEach((datum, index) => {
         var currentValue = this.y().accessor(datum, index, dataset);
-        var isTotal = this.total().accessor(datum, index, dataset);
+        var isTotal = this.total().accessor(datum, index, dataset);        
         if (!isTotal || index === 0) {
           total += currentValue;
         }
@@ -159,6 +172,17 @@ export module Plots {
         }
         if (total > max) {
           max = total;
+        }
+        // First time hitting a total, backfill values
+        if (startValue == -Infinity && isTotal) {
+          var adjustment = currentValue - total;
+          for (var i = 0; i < this._subtotals.length; i++) {
+            this._subtotals[i] += adjustment;
+          }
+          startValue = this._subtotals[i];
+          total += adjustment;
+          min += adjustment;
+          max += adjustment;
         }
       });
       this._extent = [min, max];
