@@ -189,4 +189,22 @@ describe("Labels", () => {
     var testLabel = new Plottable.Components.Label("testing label");
     assert.throws(() => testLabel.padding(-10), Error, "Cannot be less than 0");
   });
+
+  it("TitleLabel can takes number as displayText", () => {
+    var svg = TestMethods.generateSVG(100, 100);
+    var label = new Plottable.Components.TitleLabel(1);
+    label.renderTo(svg);
+    var text = (<any> label)._content.select("text");
+    assert.strictEqual(text.text(), "1", "text equal to input number");
+    svg.remove();
+  });
+
+  it("AxisLabel can takes number as displayText", () => {
+    var svg = TestMethods.generateSVG(100, 100);
+    var label = new Plottable.Components.AxisLabel(1);
+    label.renderTo(svg);
+    var text = (<any> label)._content.select("text");
+    assert.strictEqual(text.text(), "1", "text equal to input number");
+    svg.remove();
+  });
 });
