@@ -4829,6 +4829,9 @@ var Plottable;
                     return this._text;
                 }
                 else {
+                    if (typeof displayText == "number") {
+                        displayText = displayText.toString();
+                    }
                     this._text = displayText;
                     this.redraw();
                     return this;

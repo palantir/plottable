@@ -54,14 +54,19 @@ export module Components {
     /**
      * Sets the Label's text.
      *
+     * @param {nubmer} displayText
      * @param {string} displayText
      * @returns {Label} The calling Label.
      */
+    public text(displayText: number): Label;
     public text(displayText: string): Label;
-    public text(displayText?: string): any {
+    public text(displayText?): any {
       if (displayText === undefined) {
         return this._text;
       } else {
+        if (typeof displayText == "number") {
+          displayText = displayText.toString();
+        }
         this._text = displayText;
         this.redraw();
         return this;
