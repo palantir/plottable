@@ -8605,8 +8605,7 @@ var Plottable;
                     if (total > max) {
                         max = total;
                     }
-                    // First time hitting a total, backfill values
-                    if (startValue == -Infinity && isTotal) {
+                    if (startValue === -Infinity && isTotal) {
                         var adjustment = currentValue - total;
                         for (var i = 0; i < _this._subtotals.length; i++) {
                             _this._subtotals[i] += adjustment;

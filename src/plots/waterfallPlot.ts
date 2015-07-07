@@ -126,7 +126,7 @@ export module Plots {
               return Math.abs(yScale.scale(Math.abs(currentValue)) - yScale.scale(0));
             } else {
               var priorSubtotal = this._subtotals[i - 1];
-              return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));              
+              return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
             }
           }
         };
@@ -162,7 +162,7 @@ export module Plots {
       var startValue = -Infinity;
       dataset.data().forEach((datum, index) => {
         var currentValue = this.y().accessor(datum, index, dataset);
-        var isTotal = this.total().accessor(datum, index, dataset);        
+        var isTotal = this.total().accessor(datum, index, dataset);
         if (!isTotal || index === 0) {
           total += currentValue;
         }
@@ -173,8 +173,7 @@ export module Plots {
         if (total > max) {
           max = total;
         }
-        // First time hitting a total, backfill values
-        if (startValue == -Infinity && isTotal) {
+        if (startValue === -Infinity && isTotal) {
           var adjustment = currentValue - total;
           for (var i = 0; i < this._subtotals.length; i++) {
             this._subtotals[i] += adjustment;
