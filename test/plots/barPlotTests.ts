@@ -694,6 +694,40 @@ describe("Plots", () => {
       });
     });
 
+    describe("Vertical Bar Plot label visibility", () => {
+      var svg: d3.Selection<void>;
+      var plot: Plottable.Plots.Bar<number, number>;
+      var xScale: Plottable.Scales.Linear;
+      var yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        plot = new Plottable.Plots.Bar<number, number>();
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+      });
+
+      it("hides labels outside of the visible render area", () => {
+        var data = [{ x: 1, y: -10.1 }, { x: 2, y: -5.3 }, { x: 3, y: -2.8 }];
+        xScale.domain([1, 3]);
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.labelsEnabled(true);
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0];
+        texts.forEach((text, i) => {
+          var selection = d3.select(text);
+          if (i == 1) {
+            assert.isTrue(selection.style("visibility") === "visible", "bar label is visible");
+          } else {
+            assert.isTrue(selection.style("visibility") === "hidden", "bar label is hidden");
+          }
+        });
+        svg.remove();
+      });
+    });
+
     describe("selections()", () => {
       var verticalBarPlot: Plottable.Plots.Bar<string, number>;
       var dataset: Plottable.Dataset;

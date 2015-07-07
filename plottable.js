@@ -1,5 +1,5 @@
 /*!
-Plottable 1.0.0 (https://github.com/palantir/plottable)
+Plottable 1.1.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -876,7 +876,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.0.0";
+    Plottable.version = "1.1.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -6620,8 +6620,17 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
+                    var showLabel = true;
+                    for (var i = 0; i < corners.length; i++) {
+                        if (Math.abs(corners[i].x) > absoluteCenter.x || Math.abs(corners[i].y) > absoluteCenter.y) {
+                            showLabel = false;
+                        }
+                    }
+                    if (showLabel) {
+                        var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                        showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    }
                     var color = attrToProjector["fill"](datum, datumIndex, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
@@ -7494,9 +7503,18 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var showLabel = true;
+                        var labelPosition = {
+                            x: x + w / 2 - measurement.width / 2,
+                            y: positive ? y : y + h
+                        };
+                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > +_this._boundingBox.attr("width") || labelPosition.y < 0 || labelPosition.y + measurement.height > +_this._boundingBox.attr("height")) {
+                            showLabel = false;
+                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.style("visibility", showLabel ? "inherit" : "hidden");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {

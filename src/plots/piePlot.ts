@@ -332,8 +332,18 @@ export module Plots {
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-        var showLabel = sliceIndices.every((index) => index === datumIndex);
+        var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
+        var showLabel = true;
+        for (var i = 0; i < corners.length; i++) {
+          if (Math.abs(corners[i].x) > absoluteCenter.x || Math.abs(corners[i].y) > absoluteCenter.y) {
+            showLabel = false;
+          }
+        }
+        
+        if (showLabel) {
+          var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+          showLabel = sliceIndices.every((index) => index === datumIndex);          
+        }
 
         var color = attrToProjector["fill"](datum, datumIndex, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
