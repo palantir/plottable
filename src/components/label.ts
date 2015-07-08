@@ -15,10 +15,10 @@ export module Components {
      * A Label is a Component that displays a single line of text.
      *
      * @constructor
-     * @param {number|string} [displayText=""] The text of the Label.
+     * @param {number | string} [displayText=""] The text of the Label.
      * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
      */
-    constructor(displayText: number|string = "", angle: number = 0) {
+    constructor(displayText: number | string = "", angle = 0) {
       super();
       this.addClass("label");
       this.text(displayText);
@@ -54,11 +54,11 @@ export module Components {
     /**
      * Sets the Label's text.
      *
-     * @param {nubmer|string} displayText
+     * @param {number | string} displayText
      * @returns {Label} The calling Label.
      */
-    public text(displayText: number|string): Label;
-    public text(displayText?: number|string): any {
+    public text(displayText: number | string): Label;
+    public text(displayText?: number | string): any {
       if (displayText === undefined) {
         return this._text;
       } else {
@@ -157,10 +157,10 @@ export module Components {
     public static TITLE_LABEL_CLASS = "title-label";
     /**
      * @constructor
-     * @param {number|string} [text]
+     * @param {number | string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text?: number|string, angle?: number) {
+    constructor(text?: number | string, angle?: number) {
       super(text, angle);
       this.addClass(TitleLabel.TITLE_LABEL_CLASS);
     }
@@ -170,10 +170,10 @@ export module Components {
     public static AXIS_LABEL_CLASS = "axis-label";
     /**
      * @constructor
-     * @param {number|string} [text]
+     * @param {number | string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text?: number|string, angle?: number) {
+    constructor(text?: number | string, angle?: number) {
       super(text, angle);
       this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }

@@ -1935,7 +1935,7 @@ declare module Plottable {
              * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {number|string} [displayText=""] The text of the Label.
+             * @param {number | string} [displayText=""] The text of the Label.
              * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
             constructor(displayText?: number | string, angle?: number);
@@ -1948,7 +1948,7 @@ declare module Plottable {
             /**
              * Sets the Label's text.
              *
-             * @param {nubmer|string} displayText
+             * @param {number | string} displayText
              * @returns {Label} The calling Label.
              */
             text(displayText: number | string): Label;
@@ -1982,7 +1982,7 @@ declare module Plottable {
             static TITLE_LABEL_CLASS: string;
             /**
              * @constructor
-             * @param {number|string} [text]
+             * @param {number | string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: number | string, angle?: number);
@@ -1991,7 +1991,7 @@ declare module Plottable {
             static AXIS_LABEL_CLASS: string;
             /**
              * @constructor
-             * @param {number|string} [text]
+             * @param {number | string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             constructor(text?: number | string, angle?: number);
