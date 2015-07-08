@@ -273,10 +273,9 @@ describe("Plots", () => {
         piePlot.sectorValue(function(d) { return d; });
         piePlot.addDataset(dataset).labelsEnabled(true).outerRadius(500);
         var texts = svg.selectAll("text")[0];
-        console.log(texts);
         texts.forEach((text, index) => {
           var visibility = d3.select(text).style("visibility");
-          if (index == 1) {
+          if (index === 1) {
             assert.strictEqual(visibility, "hidden", "label hidden when cut off");
           } else {
             assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
