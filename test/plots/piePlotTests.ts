@@ -264,6 +264,26 @@ describe("Plots", () => {
         });
         svg.remove();
       });
+
+      it("labels outside of the render area are hidden", () => {
+        piePlot.detach();
+        piePlot.removeDataset(simpleDataset);
+        var data = [5000, 5000, 5000];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.sectorValue(function(d) { return d; });
+        piePlot.addDataset(dataset).labelsEnabled(true).outerRadius(500);
+        var texts = svg.selectAll("text")[0];
+        console.log(texts);
+        texts.forEach((text, index) => {
+          var visibility = d3.select(text).style("visibility");
+          if (index == 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when cut off");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+          }
+        });
+        svg.remove();
+      });
     });
   });
 
