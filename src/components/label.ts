@@ -54,20 +54,14 @@ export module Components {
     /**
      * Sets the Label's text.
      *
-     * @param {nubmer} displayText
-     * @param {string} displayText
+     * @param {nubmer | string} displayText
      * @returns {Label} The calling Label.
      */
-    public text(displayText: number): Label;
-    public text(displayText: string): Label;
-    public text(displayText?): any {
+    public text(displayText?: number | string): Label {
       if (displayText === undefined) {
         return this._text;
       } else {
-        if (typeof displayText == "number") {
-          displayText = displayText.toString();
-        }
-        this._text = displayText;
+        this._text = "" + displayText;
         this.redraw();
         return this;
       }
@@ -162,13 +156,10 @@ export module Components {
     public static TITLE_LABEL_CLASS = "title-label";
     /**
      * @constructor
-     * @param {number} [text]
-     * @param {string} [text]
+     * @param {number | string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text: number, angle: number); 
-    constructor(text: string, angle: number);
-    constructor(text?, angle?) {
+    constructor(text?: number | string, angle?: number) {
       super(text, angle);
       this.addClass(TitleLabel.TITLE_LABEL_CLASS);
     }
@@ -178,13 +169,10 @@ export module Components {
     public static AXIS_LABEL_CLASS = "axis-label";
     /**
      * @constructor
-     * @param {number} [text]
-     * @param {string} [text]
+     * @param {number | string} [text]
      * @param {number} [angle] One of -90/0/90. 0 is horizontal.
      */
-    constructor(text: number, angle: number); 
-    constructor(text: string, angle: number);
-    constructor(text?, angle?) {
+    constructor(text?: number | string, angle?: number) {
       super(text, angle);
       this.addClass(AxisLabel.AXIS_LABEL_CLASS);
     }

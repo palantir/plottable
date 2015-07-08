@@ -4824,15 +4824,18 @@ var Plottable;
                 this._writer = new SVGTypewriter.Writers.Writer(this._measurer, this._wrapper);
                 this.text(this._text);
             };
+            /**
+             * Sets the Label's text.
+             *
+             * @param {nubmer | string} displayText
+             * @returns {Label} The calling Label.
+             */
             Label.prototype.text = function (displayText) {
                 if (displayText === undefined) {
                     return this._text;
                 }
                 else {
-                    if (typeof displayText == "number") {
-                        displayText = displayText.toString();
-                    }
-                    this._text = displayText;
+                    this._text = "" + displayText;
                     this.redraw();
                     return this;
                 }
@@ -4903,6 +4906,11 @@ var Plottable;
         Components.Label = Label;
         var TitleLabel = (function (_super) {
             __extends(TitleLabel, _super);
+            /**
+             * @constructor
+             * @param {number | string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
+             */
             function TitleLabel(text, angle) {
                 _super.call(this, text, angle);
                 this.addClass(TitleLabel.TITLE_LABEL_CLASS);
@@ -4913,6 +4921,11 @@ var Plottable;
         Components.TitleLabel = TitleLabel;
         var AxisLabel = (function (_super) {
             __extends(AxisLabel, _super);
+            /**
+             * @constructor
+             * @param {number | string} [text]
+             * @param {number} [angle] One of -90/0/90. 0 is horizontal.
+             */
             function AxisLabel(text, angle) {
                 _super.call(this, text, angle);
                 this.addClass(AxisLabel.AXIS_LABEL_CLASS);
