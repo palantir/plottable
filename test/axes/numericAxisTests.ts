@@ -403,7 +403,7 @@ describe("NumericAxis", () => {
     yScale.domain([175, 185]);
     var yAxis = new Plottable.Axes.Numeric(yScale, "left")
                                   .tickLabelPosition("top")
-                                  .tickLength(50);
+                                  .innerTickLength(50);
     yAxis.renderTo(svg);
 
     var tickLabels = (<any> yAxis)._element.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS)

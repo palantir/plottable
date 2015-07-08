@@ -410,11 +410,11 @@ export module Axes {
       var offset = this._tierHeights.slice(0, index).reduce((translate: number, height: number) => translate + height, 0);
       if (this.orientation() === "bottom") {
         attr["y1"] = offset;
-        attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
+        attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]);
       } else {
         attr["y1"] = this.height() - offset;
         attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ?
-                                                  this.tickLength() : this._tierHeights[index]));
+                                                  this.innerTickLength() : this._tierHeights[index]));
       }
       tickMarks.attr(attr);
       if (this.orientation() === "bottom") {

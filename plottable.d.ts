@@ -1700,6 +1700,8 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
+         * @deprecated As of release 1.3, replaced by innerTickLength()
+         *
          * Gets the tick mark length in pixels.
          */
         tickLength(): number;
@@ -1710,6 +1712,17 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis<D>;
+        /**
+         * Gets the tick mark length in pixels.
+         */
+        innerTickLength(): number;
+        /**
+         * Sets the tick mark length in pixels.
+         *
+         * @param {number} length
+         * @returns {Axis} The calling Axis.
+         */
+        innerTickLength(length: number): Axis<D>;
         /**
          * Gets the end tick mark length in pixels.
          */
