@@ -194,7 +194,7 @@ describe("Labels", () => {
     var label: Plottable.Components.Label;
     assert.doesNotThrow(() => {
       label = new Plottable.Components.Label(1);
-    }, Error, "Label does not crash on invalid values");
+    }, Error, "Label does not crash on numeric values");
     assert.strictEqual(label.text(), "1", "text equal to input number");
   });
 });
