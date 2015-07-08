@@ -173,6 +173,14 @@ export module Plots {
         if (total > max) {
           max = total;
         }
+        if (isTotal) {
+          if (currentValue < min) {
+            min = currentValue;
+          }
+          if (currentValue > max) {
+            max = currentValue;
+          }
+        }
         if (startValue === -Infinity && isTotal) {
           var startTotal = currentValue - total;
           for (var i = 0; i < this._subtotals.length; i++) {
