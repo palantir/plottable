@@ -191,9 +191,10 @@ describe("Labels", () => {
   });
 
   it("Label can takes number as displayText", () => {
+    var label: Plottable.Components.Label;
     assert.doesNotThrow(() => {
-      var label = new Plottable.Components.Label(1);
-      assert.strictEqual(label.text(), "1", "text equal to input number");
+      label = new Plottable.Components.Label(1);
     }, Error, "Label does not crash on invalid values");
+    assert.strictEqual(label.text(), "1", "text equal to input number");
   });
 });
