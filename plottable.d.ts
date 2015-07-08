@@ -1935,10 +1935,10 @@ declare module Plottable {
              * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {string} [displayText=""] The text of the Label.
+             * @param {number|string} [displayText=""] The text of the Label.
              * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
-            constructor(displayText?: string, angle?: number);
+            constructor(displayText?: number | string, angle?: number);
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             protected _setup(): void;
             /**
@@ -1948,10 +1948,10 @@ declare module Plottable {
             /**
              * Sets the Label's text.
              *
-             * @param {string} displayText
+             * @param {nubmer|string} displayText
              * @returns {Label} The calling Label.
              */
-            text(displayText: string): Label;
+            text(displayText: number | string): Label;
             /**
              * Gets the angle of the Label in degrees.
              */
@@ -1982,19 +1982,19 @@ declare module Plottable {
             static TITLE_LABEL_CLASS: string;
             /**
              * @constructor
-             * @param {string} [text]
+             * @param {number|string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
-            constructor(text?: string, angle?: number);
+            constructor(text?: number | string, angle?: number);
         }
         class AxisLabel extends Label {
             static AXIS_LABEL_CLASS: string;
             /**
              * @constructor
-             * @param {string} [text]
+             * @param {number|string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
-            constructor(text?: string, angle?: number);
+            constructor(text?: number | string, angle?: number);
         }
     }
 }
