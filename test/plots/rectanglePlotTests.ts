@@ -3,17 +3,17 @@
 var assert = chai.assert;
 
 describe("Plots", () => {
-  describe("RectanglePlot", () => {
-    var SVG_WIDTH = 300;
-    var SVG_HEIGHT = 300;
-    var DATA = [
-      { x: 0, y: 0, x2: 1, y2: 1 },
-      { x: 1, y: 1, x2: 2, y2: 2 },
-      { x: 2, y: 2, x2: 3, y2: 3 },
-      { x: 3, y: 3, x2: 4, y2: 4 },
-      { x: 4, y: 4, x2: 5, y2: 5 }
-    ];
+  var SVG_WIDTH = 300;
+  var SVG_HEIGHT = 300;
+  var DATA = [
+    { x: 0, y: 0, x2: 1, y2: 1 },
+    { x: 1, y: 1, x2: 2, y2: 2 },
+    { x: 2, y: 2, x2: 3, y2: 3 },
+    { x: 3, y: 3, x2: 4, y2: 4 },
+    { x: 4, y: 4, x2: 5, y2: 5 }
+  ];
 
+  describe("RectanglePlot", () => {
     var VERIFY_CELLS = (cells: d3.Selection<any>) => {
       assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: any, i: number) {
@@ -38,6 +38,32 @@ describe("Plots", () => {
                    .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
+    });
+
+    it("retrieves the correct entity under a point", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dataset = new Plottable.Dataset(DATA);
+      var plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2)
+        .addDataset(dataset).renderTo(svg);
+      var renderArea: d3.Selection<any> = (<any> plot)._renderArea;
+      var entities = (<Plottable.Plots.Rectangle<number, number>> plot).entitiesAt({ x: 140, y: 140 });
+      assert.lengthOf(entities, 1, "a single entity is retrieved at (140, 140)");
+      assert.equal(entities[0].index, 2, "entity retrieved is at index 2");
+    });
+
+    it("retrieves correct entities under a point", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+      var plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2)
+        .addDataset(dataset).renderTo(svg);
     });
   });
 
@@ -305,8 +331,6 @@ describe("Plots", () => {
 
         svg.remove();
       });
-
     });
-
   });
 });

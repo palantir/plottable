@@ -213,6 +213,46 @@ export module Plots {
       return this;
     }
 
+    /*
+     * Gets the Entities at a particular Point.
+     * 
+     * @param {Point} p
+     * @param {PlotEntity[]} 
+     */
+    public entitiesAt(p: Point) {
+      console.log(p);
+      var results: PlotEntity[] = [];
+      var entities = this.entities();
+      var xScale: Scale<any, number> = this.x().scale;
+      var yScale: Scale<any, number> = this.y().scale;
+      for (var i = 0; i < entities.length; i++) {
+        var entity = entities[i];
+        var x = xScale.scale(this.x().accessor(entity.datum, entity.index, entity.dataset));
+        var y = yScale.scale(this.y().accessor(entity.datum, entity.index, entity.dataset));
+        var x2 = x;
+        if (this.x2()) {
+          x2 = xScale.scale(this.x2().accessor(entity.datum, entity.index, entity.dataset));
+        } else {
+          var rangeBand = (<Plottable.Scales.Category> xScale).rangeBand();
+          x -= rangeBand / 2;
+          x2 += rangeBand / 2;
+        }
+        var y2 = y;
+        if (this.y2()) {
+          y2 = yScale.scale(this.y2().accessor(entity.datum, entity.index, entity.dataset));
+        } else {
+          var rangeBand = (<Plottable.Scales.Category> yScale).rangeBand();
+          y -= rangeBand / 2;
+          y2 += rangeBand / 2;
+        }
+        if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) &&
+            ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {
+          results.push(entity);
+        }
+      }
+      return results;
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {
@@ -264,7 +304,6 @@ export module Plots {
       });
       return dataToDraw;
     }
-
   }
 }
 }
