@@ -32,7 +32,7 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
-    it("enabled() properly modifies the state", () => {
+    it("enabled(boolean) properly modifies the state", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Components.DragBoxLayer();
       assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
