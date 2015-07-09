@@ -7092,7 +7092,6 @@ var Plottable;
              * @param {PlotEntity[]}
              */
             Rectangle.prototype.entitiesAt = function (p) {
-                console.log(p);
                 var results = [];
                 var entities = this.entities();
                 var xScale = this.x().scale;
@@ -7106,18 +7105,18 @@ var Plottable;
                         x2 = xScale.scale(this.x2().accessor(entity.datum, entity.index, entity.dataset));
                     }
                     else {
-                        var rangeBand = xScale.rangeBand();
-                        x -= rangeBand / 2;
-                        x2 += rangeBand / 2;
+                        var xRangeBand = xScale.rangeBand();
+                        x -= xRangeBand / 2;
+                        x2 += xRangeBand / 2;
                     }
                     var y2 = y;
                     if (this.y2()) {
                         y2 = yScale.scale(this.y2().accessor(entity.datum, entity.index, entity.dataset));
                     }
                     else {
-                        var rangeBand = yScale.rangeBand();
-                        y -= rangeBand / 2;
-                        y2 += rangeBand / 2;
+                        var yRangeBand = yScale.rangeBand();
+                        y -= yRangeBand / 2;
+                        y2 += yRangeBand / 2;
                     }
                     if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) && ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {
                         results.push(entity);

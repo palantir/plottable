@@ -220,7 +220,6 @@ export module Plots {
      * @param {PlotEntity[]} 
      */
     public entitiesAt(p: Point) {
-      console.log(p);
       var results: PlotEntity[] = [];
       var entities = this.entities();
       var xScale: Scale<any, number> = this.x().scale;
@@ -233,17 +232,17 @@ export module Plots {
         if (this.x2()) {
           x2 = xScale.scale(this.x2().accessor(entity.datum, entity.index, entity.dataset));
         } else {
-          var rangeBand = (<Plottable.Scales.Category> xScale).rangeBand();
-          x -= rangeBand / 2;
-          x2 += rangeBand / 2;
+          var xRangeBand = (<Plottable.Scales.Category> xScale).rangeBand();
+          x -= xRangeBand / 2;
+          x2 += xRangeBand / 2;
         }
         var y2 = y;
         if (this.y2()) {
           y2 = yScale.scale(this.y2().accessor(entity.datum, entity.index, entity.dataset));
         } else {
-          var rangeBand = (<Plottable.Scales.Category> yScale).rangeBand();
-          y -= rangeBand / 2;
-          y2 += rangeBand / 2;
+          var yRangeBand = (<Plottable.Scales.Category> yScale).rangeBand();
+          y -= yRangeBand / 2;
+          y2 += yRangeBand / 2;
         }
         if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) &&
             ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {

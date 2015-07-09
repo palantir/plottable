@@ -49,21 +49,33 @@ describe("Plots", () => {
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2)
         .addDataset(dataset).renderTo(svg);
-      var renderArea: d3.Selection<any> = (<any> plot)._renderArea;
       var entities = (<Plottable.Plots.Rectangle<number, number>> plot).entitiesAt({ x: 140, y: 140 });
       assert.lengthOf(entities, 1, "a single entity is retrieved at (140, 140)");
-      assert.equal(entities[0].index, 2, "entity retrieved is at index 2");
+      assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
+      svg.remove();
     });
 
     it("retrieves correct entities under a point", () => {
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-
+      var dataset = new Plottable.Dataset([
+        { x: 1, y: 1, x2: 3, y2: 3 },
+        { x: 2, y: 2, x2: 4, y2: 4 }
+      ]);
       var plot = new Plottable.Plots.Rectangle()
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2)
         .addDataset(dataset).renderTo(svg);
+      var entities = (<Plottable.Plots.Rectangle<number, number>> plot).entitiesAt({ x: 150, y: 150 });
+      assert.lengthOf(entities, 2, "two entities are retrieved at (150, 150)");
+      entities = (<Plottable.Plots.Rectangle<number, number>> plot).entitiesAt({ x: 200, y: 50 });
+      assert.lengthOf(entities, 1, "one entity is retrieved at (200, 50)");
+      assert.strictEqual(entities[0].index, 1, "entity retrieved is at index 1");
+      entities = (<Plottable.Plots.Rectangle<number, number>> plot).entitiesAt({ x: 50, y: 200 });
+      assert.lengthOf(entities, 1, "one entity is retrieved at (50, 200)");
+      assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
+      svg.remove();
     });
   });
 
