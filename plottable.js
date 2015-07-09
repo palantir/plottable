@@ -1,5 +1,5 @@
 /*!
-Plottable 1.1.0 (https://github.com/palantir/plottable)
+Plottable 1.2.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -882,7 +882,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.1.0";
+    Plottable.version = "1.2.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -6539,7 +6539,7 @@ var Plottable;
                 var data = dataset.data().filter(function (d, i) { return Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)); });
                 var pie = d3.layout.pie().sort(null).value(function (d, i) { return sectorValueAccessor(d, i, dataset); })(data);
                 if (pie.some(function (slice) { return slice.value < 0; })) {
-                    Plottable.Utils.Window.warn("Negative values will not render correctly in a pie chart.");
+                    Plottable.Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
                 }
                 this._startAngles = pie.map(function (slice) { return slice.startAngle; });
                 this._endAngles = pie.map(function (slice) { return slice.endAngle; });
@@ -9773,16 +9773,18 @@ var Plottable;
                 this._touchEndCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._touchCancelCallback = function (ids, idToPoint, e) { return _this._handleTouchEnd(ids, idToPoint, e); };
                 this._xScales = new Plottable.Utils.Set();
-                if (xScale != null) {
-                    this._xScales.add(xScale);
-                }
                 this._yScales = new Plottable.Utils.Set();
-                if (yScale != null) {
-                    this._yScales.add(yScale);
-                }
                 this._dragInteraction = new Interactions.Drag();
                 this._setupDragInteraction();
                 this._touchIds = d3.map();
+                this._minDomainExtents = new Plottable.Utils.Map();
+                this._maxDomainExtents = new Plottable.Utils.Map();
+                if (xScale != null) {
+                    this.addXScale(xScale);
+                }
+                if (yScale != null) {
+                    this.addYScale(yScale);
+                }
             }
             PanZoom.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -9817,46 +9819,61 @@ var Plottable;
                 if (this._touchIds.size() < 2) {
                     return;
                 }
-                var oldCenterPoint = this._centerPoint();
-                var oldCornerDistance = this._cornerDistance();
+                var oldPoints = this._touchIds.values();
+                var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
+                if (oldCornerDistance === 0) {
+                    return;
+                }
                 ids.forEach(function (id) {
                     if (_this._touchIds.has(id.toString())) {
                         _this._touchIds.set(id.toString(), _this._translateToComponentSpace(idToPoint[id]));
                     }
                 });
-                var newCenterPoint = this._centerPoint();
-                var newCornerDistance = this._cornerDistance();
-                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this.xScales().forEach(function (xScale) {
-                        PanZoom._magnifyScale(xScale, oldCornerDistance / newCornerDistance, oldCenterPoint.x);
-                        PanZoom._translateScale(xScale, oldCenterPoint.x - newCenterPoint.x);
-                    });
-                }
-                if (newCornerDistance !== 0 && oldCornerDistance !== 0) {
-                    this.yScales().forEach(function (yScale) {
-                        PanZoom._magnifyScale(yScale, oldCornerDistance / newCornerDistance, oldCenterPoint.y);
-                        PanZoom._translateScale(yScale, oldCenterPoint.y - newCenterPoint.y);
-                    });
-                }
-            };
-            PanZoom.prototype._centerPoint = function () {
                 var points = this._touchIds.values();
-                var firstTouchPoint = points[0];
-                var secondTouchPoint = points[1];
-                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+                var newCornerDistance = PanZoom._pointDistance(points[0], points[1]);
+                if (newCornerDistance === 0) {
+                    return;
+                }
+                var magnifyAmount = oldCornerDistance / newCornerDistance;
+                var normalizedPointDiffs = points.map(function (point, i) {
+                    return { x: (point.x - oldPoints[i].x) / magnifyAmount, y: (point.y - oldPoints[i].y) / magnifyAmount };
+                });
+                this.xScales().forEach(function (xScale) {
+                    magnifyAmount = _this._constrainedZoomAmount(xScale, magnifyAmount);
+                });
+                this.yScales().forEach(function (yScale) {
+                    magnifyAmount = _this._constrainedZoomAmount(yScale, magnifyAmount);
+                });
+                var constrainedPoints = oldPoints.map(function (oldPoint, i) {
+                    return {
+                        x: normalizedPointDiffs[i].x * magnifyAmount + oldPoint.x,
+                        y: normalizedPointDiffs[i].y * magnifyAmount + oldPoint.y
+                    };
+                });
+                var oldCenterPoint = PanZoom._centerPoint(oldPoints[0], oldPoints[1]);
+                var translateAmountX = oldCenterPoint.x - ((constrainedPoints[0].x + constrainedPoints[1].x) / 2);
+                this.xScales().forEach(function (xScale) {
+                    _this._magnifyScale(xScale, magnifyAmount, oldCenterPoint.x);
+                    _this._translateScale(xScale, translateAmountX);
+                });
+                var translateAmountY = oldCenterPoint.y - ((constrainedPoints[0].y + constrainedPoints[1].y) / 2);
+                this.yScales().forEach(function (yScale) {
+                    _this._magnifyScale(yScale, magnifyAmount, oldCenterPoint.y);
+                    _this._translateScale(yScale, translateAmountY);
+                });
+            };
+            PanZoom._centerPoint = function (point1, point2) {
+                var leftX = Math.min(point1.x, point2.x);
+                var rightX = Math.max(point1.x, point2.x);
+                var topY = Math.min(point1.y, point2.y);
+                var bottomY = Math.max(point1.y, point2.y);
                 return { x: (leftX + rightX) / 2, y: (bottomY + topY) / 2 };
             };
-            PanZoom.prototype._cornerDistance = function () {
-                var points = this._touchIds.values();
-                var firstTouchPoint = points[0];
-                var secondTouchPoint = points[1];
-                var leftX = Math.min(firstTouchPoint.x, secondTouchPoint.x);
-                var rightX = Math.max(firstTouchPoint.x, secondTouchPoint.x);
-                var topY = Math.min(firstTouchPoint.y, secondTouchPoint.y);
-                var bottomY = Math.max(firstTouchPoint.y, secondTouchPoint.y);
+            PanZoom._pointDistance = function (point1, point2) {
+                var leftX = Math.min(point1.x, point2.x);
+                var rightX = Math.max(point1.x, point2.x);
+                var topY = Math.min(point1.y, point2.y);
+                var bottomY = Math.max(point1.y, point2.y);
                 return Math.sqrt(Math.pow(rightX - leftX, 2) + Math.pow(bottomY - topY, 2));
             };
             PanZoom.prototype._handleTouchEnd = function (ids, idToPoint, e) {
@@ -9865,27 +9882,45 @@ var Plottable;
                     _this._touchIds.remove(id.toString());
                 });
             };
-            PanZoom._magnifyScale = function (scale, magnifyAmount, centerValue) {
+            PanZoom.prototype._magnifyScale = function (scale, magnifyAmount, centerValue) {
                 var magnifyTransform = function (rangeValue) { return scale.invert(centerValue - (centerValue - rangeValue) * magnifyAmount); };
                 scale.domain(scale.range().map(magnifyTransform));
             };
-            PanZoom._translateScale = function (scale, translateAmount) {
+            PanZoom.prototype._translateScale = function (scale, translateAmount) {
                 var translateTransform = function (rangeValue) { return scale.invert(rangeValue + translateAmount); };
                 scale.domain(scale.range().map(translateTransform));
             };
             PanZoom.prototype._handleWheelEvent = function (p, e) {
+                var _this = this;
                 var translatedP = this._translateToComponentSpace(p);
                 if (this._isInsideComponent(translatedP)) {
                     e.preventDefault();
                     var deltaPixelAmount = e.deltaY * (e.deltaMode ? PanZoom._PIXELS_PER_LINE : 1);
                     var zoomAmount = Math.pow(2, deltaPixelAmount * .002);
                     this.xScales().forEach(function (xScale) {
-                        PanZoom._magnifyScale(xScale, zoomAmount, translatedP.x);
+                        zoomAmount = _this._constrainedZoomAmount(xScale, zoomAmount);
                     });
                     this.yScales().forEach(function (yScale) {
-                        PanZoom._magnifyScale(yScale, zoomAmount, translatedP.y);
+                        zoomAmount = _this._constrainedZoomAmount(yScale, zoomAmount);
+                    });
+                    this.xScales().forEach(function (xScale) {
+                        _this._magnifyScale(xScale, zoomAmount, translatedP.x);
+                    });
+                    this.yScales().forEach(function (yScale) {
+                        _this._magnifyScale(yScale, zoomAmount, translatedP.y);
                     });
                 }
+            };
+            PanZoom.prototype._constrainedZoomAmount = function (scale, zoomAmount) {
+                var extentIncreasing = zoomAmount > 1;
+                var boundingDomainExtent = extentIncreasing ? this.maxDomainExtent(scale) : this.minDomainExtent(scale);
+                if (boundingDomainExtent == null) {
+                    return zoomAmount;
+                }
+                var scaleDomain = scale.domain();
+                var domainExtent = Math.abs(scaleDomain[1] - scaleDomain[0]);
+                var compareF = extentIncreasing ? Math.min : Math.max;
+                return compareF(zoomAmount, boundingDomainExtent / domainExtent);
             };
             PanZoom.prototype._setupDragInteraction = function () {
                 var _this = this;
@@ -9896,16 +9931,19 @@ var Plottable;
                     if (_this._touchIds.size() >= 2) {
                         return;
                     }
+                    var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
                     _this.xScales().forEach(function (xScale) {
-                        var dragAmountX = endPoint.x - (lastDragPoint == null ? startPoint.x : lastDragPoint.x);
-                        PanZoom._translateScale(xScale, -dragAmountX);
+                        _this._translateScale(xScale, translateAmountX);
                     });
+                    var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
                     _this.yScales().forEach(function (yScale) {
-                        var dragAmountY = endPoint.y - (lastDragPoint == null ? startPoint.y : lastDragPoint.y);
-                        PanZoom._translateScale(yScale, -dragAmountY);
+                        _this._translateScale(yScale, translateAmountY);
                     });
                     lastDragPoint = endPoint;
                 });
+            };
+            PanZoom.prototype._nonLinearScaleWithExtents = function (scale) {
+                return this.minDomainExtent(scale) != null && this.maxDomainExtent(scale) != null && !(scale instanceof Plottable.Scales.Linear) && !(scale instanceof Plottable.Scales.Time);
             };
             PanZoom.prototype.xScales = function (xScales) {
                 var _this = this;
@@ -9955,6 +9993,8 @@ var Plottable;
              */
             PanZoom.prototype.removeXScale = function (xScale) {
                 this._xScales.delete(xScale);
+                this._minDomainExtents.delete(xScale);
+                this._maxDomainExtents.delete(xScale);
                 return this;
             };
             /**
@@ -9975,6 +10015,42 @@ var Plottable;
              */
             PanZoom.prototype.removeYScale = function (yScale) {
                 this._yScales.delete(yScale);
+                this._minDomainExtents.delete(yScale);
+                this._maxDomainExtents.delete(yScale);
+                return this;
+            };
+            PanZoom.prototype.minDomainExtent = function (quantitativeScale, minDomainExtent) {
+                if (minDomainExtent == null) {
+                    return this._minDomainExtents.get(quantitativeScale);
+                }
+                if (minDomainExtent.valueOf() < 0) {
+                    throw new Error("extent must be non-negative");
+                }
+                var maxExtentForScale = this.maxDomainExtent(quantitativeScale);
+                if (maxExtentForScale != null && maxExtentForScale.valueOf() < minDomainExtent.valueOf()) {
+                    throw new Error("minDomainExtent must be smaller than maxDomainExtent for the same Scale");
+                }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
+                this._minDomainExtents.set(quantitativeScale, minDomainExtent);
+                return this;
+            };
+            PanZoom.prototype.maxDomainExtent = function (quantitativeScale, maxDomainExtent) {
+                if (maxDomainExtent == null) {
+                    return this._maxDomainExtents.get(quantitativeScale);
+                }
+                if (maxDomainExtent.valueOf() <= 0) {
+                    throw new Error("extent must be positive");
+                }
+                var minExtentForScale = this.minDomainExtent(quantitativeScale);
+                if (minExtentForScale != null && maxDomainExtent.valueOf() < minExtentForScale.valueOf()) {
+                    throw new Error("maxDomainExtent must be larger than minDomainExtent for the same Scale");
+                }
+                if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+                    Plottable.Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+                }
+                this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;
             };
             /**

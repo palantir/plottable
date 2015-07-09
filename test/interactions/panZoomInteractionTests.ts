@@ -155,13 +155,6 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify the scale correctly", () => {
-      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-      // https://github.com/ariya/phantomjs/issues/11289
-      if ( window.PHANTOMJS ) {
-        svg.remove();
-        return;
-      }
-
       var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
       var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
@@ -175,13 +168,6 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify multiple scales correctly", () => {
-      // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
-      // https://github.com/ariya/phantomjs/issues/11289
-      if ( window.PHANTOMJS ) {
-        svg.remove();
-        return;
-      }
-
       var xScale2 = new Plottable.Scales.Linear();
       xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
       panZoomInteraction.addXScale(xScale2);
@@ -227,6 +213,114 @@ describe("Interactions", () => {
       panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
       assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
       svg.remove();
+    });
+
+    describe("minDomainExtent", () => {
+
+      var minimumDomainExtent: number;
+
+      beforeEach(() => {
+        minimumDomainExtent = SVG_WIDTH / 4;
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+      });
+
+      it("Rejects negative extents", () => {
+        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, -1), Error);
+        svg.remove();
+      });
+
+      it("can't be larger than maxDomainExtent() for the same Scale", () => {
+        var maximumDomainExtent = minimumDomainExtent * 2;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+        var tooBigMinimumDomainExtent = maximumDomainExtent * 2;
+        assert.throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error);
+        svg.remove();
+      });
+
+      it("Mousewheeling in cannot go beyond the specified domainExtent", () => {
+        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+        // https://github.com/ariya/phantomjs/issues/11289
+        if ( window.PHANTOMJS ) {
+          svg.remove();
+          return;
+        }
+
+        var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        var deltaY = -3000;
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via scroll");
+        svg.remove();
+      });
+
+      it("Pinching in cannot go beyond the specified domainExtent", () => {
+        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+
+        var endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT};
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via pinch");
+        svg.remove();
+      });
+
+    });
+
+    describe("maxDomainExtent", () => {
+      var maximumDomainExtent: number;
+
+      beforeEach(() => {
+        maximumDomainExtent = SVG_WIDTH;
+        panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
+      });
+
+      it("Rejects non-positive extents", () => {
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, -1), Error);
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, 0), Error);
+        svg.remove();
+      });
+
+      it("can't be smaller than minDomainExtent() for the same Scale", () => {
+        var minimumDomainExtent = maximumDomainExtent / 2;
+        panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
+        var tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
+        assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error);
+        svg.remove();
+      });
+
+      it("Mousewheeling out cannot go beyond the specified domainExtent", () => {
+        // HACKHACK PhantomJS doesn't implement fake creation of WheelEvents
+        // https://github.com/ariya/phantomjs/issues/11289
+        if ( window.PHANTOMJS ) {
+          svg.remove();
+          return;
+        }
+
+        var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        var deltaY = 3000;
+
+        TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
+        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via scroll");
+        svg.remove();
+      });
+
+      it("Pinching in cannot go beyond the specified domainExtent", () => {
+        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+
+        var endPoint = { x: 5 * SVG_WIDTH / 16, y: 5 * SVG_HEIGHT / 16 };
+        TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+        TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via pinch");
+        svg.remove();
+      });
+
     });
 
   });
