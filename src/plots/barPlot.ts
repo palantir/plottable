@@ -447,10 +447,10 @@ export module Plots {
           };
 
           if (this._isVertical) {
-            labelPosition.x = x + w / 2 - measurement.width / 2;          
+            labelPosition.x = x + w / 2 - measurement.width / 2;
           } else {
             if (!positive) {
-              labelPosition.x = x + w - measurement.width;            
+              labelPosition.x = x + w - measurement.width;
             } else {
               labelPosition.x = x;
             }
