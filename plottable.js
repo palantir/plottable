@@ -1250,6 +1250,41 @@ var Plottable;
         }
         Formatters.siSuffix = siSuffix;
         /**
+         *
+         */
+        function shortScale(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            var suffixes = "KMBTQ";
+            var efmt = d3.format("." + precision + "e");
+            var ffmt = d3.format("." + precision + "f");
+            var max = Math.pow(10, (3 * suffixes.length) + precision + 1);
+            var min = Math.pow(10, -precision - 1);
+            return function (d) {
+                var ad = Math.abs(d);
+                if (ad < min || ad >= max) {
+                    return efmt(d);
+                }
+                var factor = 1;
+                var idx = -1;
+                while (ad >= (1000 * factor) && idx < (suffixes.length - 1)) {
+                    idx += 1;
+                    factor *= 1000;
+                }
+                var output = ffmt(d);
+                if (idx > -1) {
+                    output = ffmt(d / factor) + suffixes[idx];
+                }
+                if (idx < suffixes.length - 1 && output.substr(0, 5) === "1000.") {
+                    factor *= 1000;
+                    idx += 1;
+                    output = ffmt(d / factor) + suffixes[idx];
+                }
+                return output;
+            };
+        }
+        Formatters.shortScale = shortScale;
+        /**
          * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.

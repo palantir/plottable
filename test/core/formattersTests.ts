@@ -168,6 +168,24 @@ describe("Formatters", () => {
     });
   });
 
+  describe("shortScale", () => {
+    it("shortens long numbers", () => {
+      var fmtr = Plottable.Formatters.shortScale();
+      assert.strictEqual(fmtr(1), "1.000", "small numbers format simply");
+      assert.strictEqual(fmtr(2e3), "2.000K", "thousands numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(2e6), "2.000M", "millions numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(2e9), "2.000B", "billions numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(2e12), "2.000T", "trillions magnitude numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(2e15), "2.000Q", "quadrillions numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(999.999), "999.999", "boundary cases are correct");
+      assert.strictEqual(fmtr(999.99999), "1.000K", "rounding cases are correct");
+      assert.strictEqual(fmtr(1000000), "1.000M", "boundary cases are correct");
+      assert.strictEqual(fmtr(-2e9), "-2.000B", "negative numbers format using short scale magnitudes");
+      assert.strictEqual(fmtr(1e37), "1.000e+37", "large magnitute number use scientific notation");
+      assert.strictEqual(fmtr(1e-7), "1.000e-7", "small magnitude numbers use scientific notation");
+    });
+  });
+
   describe("relativeDate", () => {
     it("uses reasonable defaults", () => {
       var relativeDateFormatter = Plottable.Formatters.relativeDate();

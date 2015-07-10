@@ -661,6 +661,10 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
+         *
+         */
+        function shortScale(precision?: number): (d: any) => string;
+        /**
          * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
