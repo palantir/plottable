@@ -151,11 +151,14 @@ export module Formatters {
         idx += 1;
         factor *= 1000;
       }
-      var output = ffmt(d);
-      if (idx > -1) {
+      var output;
+      if (idx === -1) {
+        output = ffmt(d);
+      } else {
         output = ffmt(d / factor) + suffixes[idx];
       }
-      if (idx < suffixes.length - 1 && output.substr(0, 5) === "1000.") {
+      // catch rounding by the underlying d3 formatter
+      if (idx < suffixes.length - 1 && ((d > 0 && output.substr(0, 5) === "1000.") || (d < 0 && output.substr(0, 6) === "-1000."))) {
         factor *= 1000;
         idx += 1;
         output = ffmt(d / factor) + suffixes[idx];
