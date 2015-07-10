@@ -51,7 +51,7 @@ describe("Category Axes", () => {
     svg.remove();
   });
 
-  it("width accounts for margin. ticklength, and padding on vertical axes", () => {
+  it("width accounts for margin. innerTickLength, and padding on vertical axes", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axes.Category(xScale, "left");
@@ -66,13 +66,13 @@ describe("Category Axes", () => {
     assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing margin increases width");
 
     axisWidth = ca.width();
-    ca.tickLength(ca.tickLength() + 5);
-    assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing tickLength increases width");
+    ca.innerTickLength(ca.innerTickLength() + 5);
+    assert.closeTo(ca.width(), axisWidth + 5, 2, "increasing innerTickLength increases width");
 
     svg.remove();
   });
 
-  it("height accounts for margin. ticklength, and padding on horizontal axes", () => {
+  it("height accounts for margin. innerTickLength, and padding on horizontal axes", () => {
     var svg = TestMethods.generateSVG(400, 400);
     var xScale = new Plottable.Scales.Category().domain(["foo", "bar", "baz"]).range([400, 0]);
     var ca = new Plottable.Axes.Category(xScale, "bottom");
@@ -87,8 +87,8 @@ describe("Category Axes", () => {
     assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing margin increases height");
 
     axisHeight = ca.height();
-    ca.tickLength(ca.tickLength() + 5);
-    assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing ticklength increases height");
+    ca.innerTickLength(ca.innerTickLength() + 5);
+    assert.closeTo(ca.height(), axisHeight + 5, 2, "increasing innerTickLength increases height");
 
     svg.remove();
   });

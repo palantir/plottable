@@ -594,6 +594,15 @@ declare module Plottable {
 
 declare module Plottable {
     type Formatter = (d: any) => string;
+    /**
+     * This field is deprecated and will be removed in v2.0.0.
+     *
+     * The number of milliseconds between midnight one day and the next is
+     * not a fixed quantity.
+     *
+     * Use date.setDate(date.getDate() + number_of_days) instead.
+     *
+     */
     var MILLISECONDS_IN_ONE_DAY: number;
     module Formatters {
         /**
@@ -1078,6 +1087,7 @@ declare module Plottable {
             constructor(scaleType?: string);
             extentOfValues(values: string[]): string[];
             protected _getExtent(): string[];
+            static invalidateColorCache(): void;
             /**
              * Returns the color-string corresponding to a given string.
              * If there are not enough colors in the range(), a lightened version of an existing color will be used.
@@ -1690,6 +1700,8 @@ declare module Plottable {
          */
         formatter(formatter: Formatter): Axis<D>;
         /**
+         * @deprecated As of release 1.3, replaced by innerTickLength()
+         *
          * Gets the tick mark length in pixels.
          */
         tickLength(): number;
@@ -1700,6 +1712,17 @@ declare module Plottable {
          * @returns {Axis} The calling Axis.
          */
         tickLength(length: number): Axis<D>;
+        /**
+         * Gets the tick mark length in pixels.
+         */
+        innerTickLength(): number;
+        /**
+         * Sets the tick mark length in pixels.
+         *
+         * @param {number} length
+         * @returns {Axis} The calling Axis.
+         */
+        innerTickLength(length: number): Axis<D>;
         /**
          * Gets the end tick mark length in pixels.
          */
@@ -3986,6 +4009,14 @@ declare module Plottable {
              * Gets the internal Interactions.Drag of the DragBoxLayer.
              */
             dragInteraction(): Interactions.Drag;
+            /**
+             * Enables or disables the interaction and drag box.
+             */
+            enabled(enabled: boolean): DragBoxLayer;
+            /**
+             * Gets the enabled state.
+             */
+            enabled(): boolean;
         }
     }
 }

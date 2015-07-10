@@ -1,5 +1,5 @@
 /*!
-Plottable 1.2.0 (https://github.com/palantir/plottable)
+Plottable 1.3.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -882,7 +882,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.2.0";
+    Plottable.version = "1.3.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1123,6 +1123,15 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
+    /**
+     * This field is deprecated and will be removed in v2.0.0.
+     *
+     * The number of milliseconds between midnight one day and the next is
+     * not a fixed quantity.
+     *
+     * Use date.setDate(date.getDate() + number_of_days) instead.
+     *
+     */
     Plottable.MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
     var Formatters;
     (function (Formatters) {
@@ -1317,6 +1326,7 @@ var Plottable;
             if (baseValue === void 0) { baseValue = 0; }
             if (increment === void 0) { increment = Plottable.MILLISECONDS_IN_ONE_DAY; }
             if (label === void 0) { label = ""; }
+            Plottable.Utils.Window.deprecated("relativeDate()", "1.3", "Not safe for use with time zones.");
             return function (d) {
                 var relativeDate = Math.round((d.valueOf() - baseValue) / increment);
                 return relativeDate.toString() + label;
@@ -2129,7 +2139,10 @@ var Plottable;
                 switch (scaleType) {
                     case null:
                     case undefined:
-                        scale = d3.scale.ordinal().range(Color._getPlottableColors());
+                        if (Color._plottableColorCache == null) {
+                            Color._plottableColorCache = Color._getPlottableColors();
+                        }
+                        scale = d3.scale.ordinal().range(Color._plottableColorCache);
                         break;
                     case "Category10":
                     case "category10":
@@ -2162,6 +2175,9 @@ var Plottable;
             // Duplicated from OrdinalScale._getExtent - should be removed in #388
             Color.prototype._getExtent = function () {
                 return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
+            };
+            Color.invalidateColorCache = function () {
+                Color._plottableColorCache = null;
             };
             Color._getPlottableColors = function () {
                 var plottableDefaultColors = [];
@@ -2258,15 +2274,21 @@ var Plottable;
                 return _super.prototype._setDomain.call(this, values);
             };
             Time.prototype._defaultExtent = function () {
-                var endTimeValue = new Date().valueOf();
-                var startTimeValue = endTimeValue - Plottable.MILLISECONDS_IN_ONE_DAY;
+                var now = new Date();
+                var endTimeValue = now.valueOf();
+                now.setDate(now.getDate() - 1);
+                var startTimeValue = now.valueOf();
                 return [new Date(startTimeValue), new Date(endTimeValue)];
             };
             Time.prototype._expandSingleValueDomain = function (singleValueDomain) {
                 var startTime = singleValueDomain[0].getTime();
                 var endTime = singleValueDomain[1].getTime();
                 if (startTime === endTime) {
-                    return [new Date(startTime - Plottable.MILLISECONDS_IN_ONE_DAY), new Date(endTime + Plottable.MILLISECONDS_IN_ONE_DAY)];
+                    var startDate = new Date(startTime);
+                    startDate.setDate(startDate.getDate() - 1);
+                    var endDate = new Date(endTime);
+                    endDate.setDate(endDate.getDate() + 1);
+                    return [startDate, endDate];
                 }
                 return singleValueDomain;
             };
@@ -3531,7 +3553,7 @@ var Plottable;
             var _this = this;
             _super.call(this);
             this._endTickLength = 5;
-            this._tickLength = 5;
+            this._innerTickLength = 5;
             this._tickLabelPadding = 10;
             this._margin = 15;
             this._showEndTickLabels = false;
@@ -3678,7 +3700,7 @@ var Plottable;
                 tickMarkAttrHash["y1"] = scalingFunction;
                 tickMarkAttrHash["y2"] = scalingFunction;
             }
-            var tickLength = isEndTickMark ? this._endTickLength : this._tickLength;
+            var tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
             switch (this._orientation) {
                 case "bottom":
                     tickMarkAttrHash["y2"] = tickLength;
@@ -3727,14 +3749,18 @@ var Plottable;
             return this;
         };
         Axis.prototype.tickLength = function (length) {
+            Plottable.Utils.Window.deprecated("tickLength()", "v1.3.0", "Replaced by innerTickLength()");
+            return this.innerTickLength(length);
+        };
+        Axis.prototype.innerTickLength = function (length) {
             if (length == null) {
-                return this._tickLength;
+                return this._innerTickLength;
             }
             else {
                 if (length < 0) {
-                    throw new Error("tick length must be positive");
+                    throw new Error("inner tick length must be positive");
                 }
-                this._tickLength = length;
+                this._innerTickLength = length;
                 this.redraw();
                 return this;
             }
@@ -3754,10 +3780,10 @@ var Plottable;
         };
         Axis.prototype._maxLabelTickLength = function () {
             if (this.showEndTickLabels()) {
-                return Math.max(this.tickLength(), this.endTickLength());
+                return Math.max(this.innerTickLength(), this.endTickLength());
             }
             else {
-                return this.tickLength();
+                return this.innerTickLength();
             }
         };
         Axis.prototype.tickLabelPadding = function (padding) {
@@ -4040,11 +4066,11 @@ var Plottable;
                 var offset = this._tierHeights.slice(0, index).reduce(function (translate, height) { return translate + height; }, 0);
                 if (this.orientation() === "bottom") {
                     attr["y1"] = offset;
-                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]);
+                    attr["y2"] = offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]);
                 }
                 else {
                     attr["y1"] = this.height() - offset;
-                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.tickLength() : this._tierHeights[index]));
+                    attr["y2"] = this.height() - (offset + (this._tierLabelPositions[index] === "center" ? this.innerTickLength() : this._tierHeights[index]));
                 }
                 tickMarks.attr(attr);
                 if (this.orientation() === "bottom") {
@@ -4424,15 +4450,7 @@ var Plottable;
                 var tickLabels = this._tickLabelContainer.selectAll("." + Plottable.Axis.TICK_LABEL_CLASS).data(tickLabelValues);
                 tickLabels.enter().append("text").classed(Plottable.Axis.TICK_LABEL_CLASS, true);
                 tickLabels.exit().remove();
-                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) {
-                    var formattedText = _this.formatter()(s);
-                    if (!_this._isHorizontal()) {
-                        var availableTextSpace = _this.width() - _this.tickLabelPadding();
-                        availableTextSpace -= _this._tickLabelPositioning === "center" ? _this._maxLabelTickLength() : 0;
-                        formattedText = _this._wrapper.wrap(formattedText, _this._measurer, availableTextSpace).wrappedText;
-                    }
-                    return formattedText;
-                });
+                tickLabels.style("text-anchor", tickLabelTextAnchor).style("visibility", "inherit").attr(tickLabelAttrHash).text(function (s) { return _this.formatter()(s); });
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 this._showAllTickMarks();
@@ -10306,6 +10324,13 @@ var Plottable;
              */
             DragBoxLayer.prototype.dragInteraction = function () {
                 return this._dragInteraction;
+            };
+            DragBoxLayer.prototype.enabled = function (enabled) {
+                if (enabled == null) {
+                    return this._dragInteraction.enabled();
+                }
+                this._dragInteraction.enabled(enabled);
+                return this;
             };
             return DragBoxLayer;
         })(Components.SelectionBoxLayer);

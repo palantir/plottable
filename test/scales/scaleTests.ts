@@ -128,8 +128,10 @@ describe("Scales", () => {
     it("accepts CSS specified colors", () => {
       var style = d3.select("body").append("style");
       style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+      Plottable.Scales.Color.invalidateColorCache();
       var scale = new Plottable.Scales.Color();
       style.remove();
+      Plottable.Scales.Color.invalidateColorCache();
       assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
       assert.strictEqual(scale.range()[1], "#fd373e", "The second color of the color scale should be the same");
 
@@ -138,6 +140,23 @@ describe("Scales", () => {
         "Unloading the CSS should not modify the first scale color (this will not be the case if we support dynamic CSS");
       assert.strictEqual(defaultScale.range()[0], "#5279c7",
         "Unloading the CSS should cause color scales fallback to default colors");
+    });
+
+     it("caches CSS specified colors unless the cache is invalidated", () => {
+      var style = d3.select("body").append("style");
+      style.html(".plottable-colors-0 {background-color: #ff0000 !important; }");
+      Plottable.Scales.Color.invalidateColorCache();
+      var scale = new Plottable.Scales.Color();
+      style.remove();
+
+      assert.strictEqual(scale.range()[0], "#ff0000", "User has specified red color for first color scale color");
+
+      var scaleCached = new Plottable.Scales.Color();
+      assert.strictEqual(scaleCached.range()[0], "#ff0000", "The red color should still be cached");
+
+      Plottable.Scales.Color.invalidateColorCache();
+      var scaleFresh = new Plottable.Scales.Color();
+      assert.strictEqual(scaleFresh.range()[0], "#5279c7", "Invalidating the cache should reset the red color to the default");
     });
 
     it("should try to recover from malicious CSS styleseets", () => {
@@ -149,8 +168,10 @@ describe("Scales", () => {
 
       var maliciousStyle = d3.select("body").append("style");
       maliciousStyle.html("* {background-color: #fff000;}");
+      Plottable.Scales.Color.invalidateColorCache();
       var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
+      Plottable.Scales.Color.invalidateColorCache();
       var colorRange = affectedScale.range();
       assert.strictEqual(colorRange.length, defaultNumberOfColors + 1,
         "it should detect the end of the given colors and the fallback to the * selector, " +
@@ -169,8 +190,10 @@ describe("Scales", () => {
 
       var maliciousStyle = d3.select("body").append("style");
       maliciousStyle.html("[class^='plottable-'] {background-color: pink;}");
+      Plottable.Scales.Color.invalidateColorCache();
       var affectedScale = new Plottable.Scales.Color();
       maliciousStyle.remove();
+      Plottable.Scales.Color.invalidateColorCache();
       var maximumColorsFromCss = (<any> Plottable.Scales.Color)._MAXIMUM_COLORS_FROM_CSS;
       assert.strictEqual(affectedScale.range().length, maximumColorsFromCss,
         "current malicious CSS countermeasure is to cap maximum number of colors to 256");

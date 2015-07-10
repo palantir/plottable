@@ -176,15 +176,7 @@ export module Axes {
       tickLabels.style("text-anchor", tickLabelTextAnchor)
                 .style("visibility", "inherit")
                 .attr(tickLabelAttrHash)
-                .text((s: any) => {
-                  var formattedText = this.formatter()(s);
-                  if (!this._isHorizontal()) {
-                    var availableTextSpace = this.width() - this.tickLabelPadding();
-                    availableTextSpace -= this._tickLabelPositioning === "center" ? this._maxLabelTickLength() : 0;
-                    formattedText = this._wrapper.wrap(formattedText, this._measurer, availableTextSpace).wrappedText;
-                  }
-                  return formattedText;
-                });
+                .text((s: any) => this.formatter()(s));
 
       var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
       this._tickLabelContainer.attr("transform", labelGroupTransform);
