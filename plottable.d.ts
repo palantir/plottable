@@ -661,6 +661,18 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes (thousands, millions, billions, trillions,
+         * quadrillions).
+         *
+         * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
+         * formatter are primarily expected to be
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         *
+         * @returns {Formatter} A formatter for large numbers.
+         *
          *
          */
         function shortScale(precision?: number): (d: any) => string;

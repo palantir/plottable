@@ -1250,6 +1250,18 @@ var Plottable;
         }
         Formatters.siSuffix = siSuffix;
         /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes (thousands, millions, billions, trillions,
+         * quadrillions).
+         *
+         * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
+         * formatter are primarily expected to be
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         *
+         * @returns {Formatter} A formatter for large numbers.
+         *
          *
          */
         function shortScale(precision) {
@@ -1271,14 +1283,14 @@ var Plottable;
                     idx += 1;
                     factor *= 1000;
                 }
-                var output;
+                var output = "";
                 if (idx === -1) {
                     output = ffmt(d);
                 }
                 else {
                     output = ffmt(d / factor) + suffixes[idx];
                 }
-                // catch rounding 
+                // catch rounding by the underlying d3 formatter
                 if (idx < suffixes.length - 1 && ((d > 0 && output.substr(0, 5) === "1000.") || (d < 0 && output.substr(0, 6) === "-1000."))) {
                     factor *= 1000;
                     idx += 1;

@@ -6,12 +6,12 @@ export type Formatter = (d: any) => string;
 
 /**
  * This field is deprecated and will be removed in v2.0.0.
- * 
- * The number of milliseconds between midnight one day and the next is 
+ *
+ * The number of milliseconds between midnight one day and the next is
  * not a fixed quantity.
- * 
+ *
  * Use date.setDate(date.getDate() + number_of_days) instead.
- * 
+ *
  */
 export var MILLISECONDS_IN_ONE_DAY = 24 * 60 * 60 * 1000;
 
@@ -131,7 +131,19 @@ export module Formatters {
   }
 
   /**
-   * 
+   * Creates a formatter for values that displays abbreviated values
+   * and uses standard short scale suffixes (thousands, millions, billions, trillions,
+   * quadrillions).
+   *
+   * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
+   * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
+   * formatter are primarily expected to be ranges of common currency values.
+   *
+   * @param {number} [precision] the number of decimal places to show (default 3)
+   *
+   * @returns {Formatter} A formatter for large numbers.
+   *
+   *
    */
   export function shortScale(precision = 3) {
     verifyPrecision(precision);
@@ -151,7 +163,7 @@ export module Formatters {
         idx += 1;
         factor *= 1000;
       }
-      var output;
+      var output = "";
       if (idx === -1) {
         output = ffmt(d);
       } else {
