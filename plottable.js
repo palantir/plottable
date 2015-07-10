@@ -7776,6 +7776,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
+                this._interpolationFunction = "linear";
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -7785,6 +7786,13 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.interpolate = function (interpolate) {
+                if (interpolate == null) {
+                    return this._interpolationFunction;
+                }
+                this._interpolationFunction = interpolate;
+                return this;
+            };
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
@@ -7858,7 +7866,7 @@ var Plottable;
                     return positionX != null && !Plottable.Utils.Math.isNaN(positionX) && positionY != null && !Plottable.Utils.Math.isNaN(positionY);
                 };
                 return function (datum, index, dataset) {
-                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
+                    return d3.svg.line().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).interpolate(_this.interpolate()).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
                 };
             };
             Line.prototype._getDataToDraw = function () {
@@ -8027,7 +8035,7 @@ var Plottable;
                     return Plottable.Utils.Math.isValidNumber(positionX) && Plottable.Utils.Math.isValidNumber(positionY);
                 };
                 return function (datum, index, dataset) {
-                    var areaGenerator = d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); }).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
+                    var areaGenerator = d3.svg.area().x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); }).y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); }).y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); }).interpolate(_this.interpolate()).defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
                     return areaGenerator(datum);
                 };
             };
