@@ -506,6 +506,38 @@ describe("Plots", () => {
         svg.remove();
       });
 
+      it("hides labels properly on the right", () => {
+        barPlot.labelsEnabled(true);
+        xScale.domainMax(0.95);
+        var texts = svg.selectAll("text")[0];
+        texts.forEach((text, i) => {
+          var selection = d3.select(text);
+          var visibility = selection.style("visibility");
+          if (i === 1) {
+            assert.include(["visible", "inherit"], visibility, "label at index 1 is visible");
+          } else {
+            assert.strictEqual(visibility, "hidden", "label at index " + (i + 1) + " is not visible");
+          }
+        });
+        svg.remove();
+      });
+
+      it("hides labels properly on the left", () => {
+        barPlot.labelsEnabled(true);
+        xScale.domainMin(-1.4);
+        var texts = svg.selectAll("text")[0];
+        texts.forEach((text, i) => {
+          var selection = d3.select(text);
+          var visibility = selection.style("visibility");
+          if (i === 1) {
+            assert.strictEqual(visibility, "hidden", "label at index 1 is not visible");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label at index " + (i + 1) + " is visible");
+          }
+        });
+        svg.remove();
+      });
+
       describe("entities()", () => {
         describe("position", () => {
           it("entities() pixel points corrected for negative-valued bars", () => {

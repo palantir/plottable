@@ -7586,9 +7586,20 @@ var Plottable;
                         }
                         var showLabel = true;
                         var labelPosition = {
-                            x: x + w / 2 - measurement.width / 2,
+                            x: x,
                             y: positive ? y : y + h - measurement.height
                         };
+                        if (_this._isVertical) {
+                            labelPosition.x = x + w / 2 - measurement.width / 2;
+                        }
+                        else {
+                            if (!positive) {
+                                labelPosition.x = x + w - measurement.width;
+                            }
+                            else {
+                                labelPosition.x = x;
+                            }
+                        }
                         if (labelPosition.x < 0 || labelPosition.x + measurement.width > +_this._boundingBox.attr("width") || labelPosition.y < 0 || labelPosition.y + measurement.height > +_this._boundingBox.attr("height")) {
                             showLabel = false;
                         }
