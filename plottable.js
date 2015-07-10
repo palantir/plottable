@@ -6641,12 +6641,9 @@ var Plottable;
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
                     var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
-                    var showLabel = true;
-                    for (var i = 0; i < corners.length; i++) {
-                        if (Math.abs(corners[i].x) > absoluteCenter.x || Math.abs(corners[i].y) > absoluteCenter.y) {
-                            showLabel = false;
-                        }
-                    }
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) > absoluteCenter.x || Math.abs(corner.y) > absoluteCenter.y ? false : true;
+                    });
                     if (showLabel) {
                         var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
                         showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
@@ -7590,7 +7587,7 @@ var Plottable;
                         var showLabel = true;
                         var labelPosition = {
                             x: x + w / 2 - measurement.width / 2,
-                            y: positive ? y : y + h
+                            y: positive ? y : y + h - measurement.height
                         };
                         if (labelPosition.x < 0 || labelPosition.x + measurement.width > +_this._boundingBox.attr("width") || labelPosition.y < 0 || labelPosition.y + measurement.height > +_this._boundingBox.attr("height")) {
                             showLabel = false;

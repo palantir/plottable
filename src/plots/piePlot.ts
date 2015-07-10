@@ -333,12 +333,9 @@ export module Plots {
         ];
 
         var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
-        var showLabel = true;
-        for (var i = 0; i < corners.length; i++) {
-          if (Math.abs(corners[i].x) > absoluteCenter.x || Math.abs(corners[i].y) > absoluteCenter.y) {
-            showLabel = false;
-          }
-        }
+        var showLabel = corners.every((corner) => {
+          return Math.abs(corner.x) > absoluteCenter.x || Math.abs(corner.y) > absoluteCenter.y ? false : true;
+        });
 
         if (showLabel) {
           var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));

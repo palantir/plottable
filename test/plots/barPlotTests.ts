@@ -707,22 +707,40 @@ describe("Plots", () => {
         plot = new Plottable.Plots.Bar<number, number>();
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
+        plot.labelsEnabled(true);
       });
 
-      it("hides labels outside of the visible render area", () => {
+      it("hides labels outside of the visible render area (horizontal)", () => {
         var data = [{ x: 1, y: -10.1 }, { x: 2, y: -5.3 }, { x: 3, y: -2.8 }];
         xScale.domain([1, 3]);
         plot.addDataset(new Plottable.Dataset(data));
-        plot.labelsEnabled(true);
         plot.renderTo(svg);
         var texts = svg.selectAll("text")[0];
         texts.forEach((text, i) => {
           var selection = d3.select(text);
           var visibility = selection.style("visibility");
           if (i === 1) {
-            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label is visible");
+            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label at index 1 is visible");
           } else {
-            assert.isTrue(visibility === "hidden", "bar label is hidden");
+            assert.isTrue(visibility === "hidden", "bar label " + i + " is hidden");
+          }
+        });
+        svg.remove();
+      });
+
+      it("hides labels outside of the visible render area (vertical)", () => {
+        var data = [{ x: 1, y: -10.1 }, { x: 2, y: -5.3 }, { x: 3, y: -2.8 }];
+        yScale.domain([-11, -2.5]);
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.renderTo(svg);
+        var texts = svg.selectAll("text")[0];
+        texts.forEach((text, i) => {
+          var selection = d3.select(text);
+          var visibility = selection.style("visibility");
+          if (i === 2) {
+            assert.isTrue(visibility === "hidden", "bar label at index 2 is hidden");
+          } else {
+            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label " + i + " is visible");
           }
         });
         svg.remove();
