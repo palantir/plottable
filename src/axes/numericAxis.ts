@@ -5,6 +5,7 @@ export module Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
+    private _approximateTextWidth = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
@@ -29,21 +30,36 @@ export module Axes {
     }
 
     protected _computeWidth() {
+      var maxTextWidth = this._approximateTextWidth ? this._computeApproximateTextWidth() : this._computeExactTextWidth()
+
+      if (this._tickLabelPositioning === "center") {
+        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+      } else {
+        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+      }
+
+      return this._computedWidth;
+    }
+
+    private _computeExactTextWidth(): number {
       var tickValues = this._getTickValues();
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this.formatter()(v);
         return this._measurer.measure(formattedValue).width;
       });
 
-      var maxTextLength = Utils.Math.max(textLengths, 0);
+      return Utils.Math.max(textLengths, 0);
+    }
 
-      if (this._tickLabelPositioning === "center") {
-        this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
-      } else {
-        this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
-      }
+    private _computeApproximateTextWidth(): number {
+      var tickValues = this._getTickValues();
+      var mWidth = this._measurer.measure('M').width;
+      var textLengths = tickValues.map((v: any) => {
+        var formattedValue = this.formatter()(v);
+        return formattedValue.length * mWidth;
+      });
 
-      return this._computedWidth;
+      return Utils.Math.max(textLengths, 0);
     }
 
     protected _computeHeight() {
@@ -259,6 +275,26 @@ export module Axes {
         this._tickLabelPositioning = positionLC;
         this.redraw();
         return this;
+      }
+    }
+
+    /**
+     * Gets the approximate text width setting.
+     *
+     * @returns {boolean} The current approximate text width setting.
+     */
+    public approximateTextWidth(): boolean;
+    /**
+     * Sets the approximate text width setting.
+     *
+     * @param {boolean} enable faster but less accurate computation of text widths.
+     */
+    public approximateTextWidth(enable: boolean);
+    public approximateTextWidth(enable?: boolean): boolean {
+      if (enable == null) {
+        return this._approximateTextWidth;
+      } else {
+        this._approximateTextWidth = enable;
       }
     }
 

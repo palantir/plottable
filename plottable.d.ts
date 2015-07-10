@@ -1900,6 +1900,18 @@ declare module Plottable {
              * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
+            /**
+             * Gets the approximate text width setting.
+             *
+             * @returns {boolean} The current approximate text width setting.
+             */
+            approximateTextWidth(): boolean;
+            /**
+             * Sets the approximate text width setting.
+             *
+             * @param {boolean} enable faster but less accurate computation of text widths.
+             */
+            approximateTextWidth(enable: boolean): any;
         }
     }
 }
