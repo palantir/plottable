@@ -19,6 +19,7 @@ export module Components {
     private _padding = 5;
     private _colorScale: Scales.Color;
     private _opacityScale: Scales.Opacity;
+    private _setOpacityToText: boolean;
     private _applyOpacityToText: boolean;
     private _maxEntriesPerRow: number;
     private _comparator: (a: string, b: string) => number;
@@ -26,7 +27,8 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
-    private _redrawCallback: ScaleCallback<Scales.Color>;
+    private _redrawColorCallback: ScaleCallback<Scales.Color>;
+    private _redrawOpacityCallback: ScaleCallback<Scales.Opacity>;
 
     /**
      * The Legend consists of a series of entries, each with a color and label taken from the Color Scale.
@@ -44,10 +46,13 @@ export module Components {
       }
 
       this._colorScale = colorScale;
+      this._redrawColorCallback = (scale) => this.redraw();
+      this._colorScale.onUpdate(this._redrawColorCallback);
+
       this._opacityScale = new Scales.Opacity(); // default scale maps all values to opacity 1.0
       this._applyOpacityToText = false;
-      this._redrawCallback = (scale) => this.redraw();
-      this._colorScale.onUpdate(this._redrawCallback);
+      this._redrawOpacityCallback = (scale) => this.redraw();
+      this._opacityScale.onUpdate(this._redrawOpacityCallback);
 
       this.xAlignment("right").yAlignment("top");
       this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
@@ -126,9 +131,9 @@ export module Components {
     public colorScale(colorScale: Scales.Color): Legend;
     public colorScale(colorScale?: Scales.Color): any {
       if (colorScale != null) {
-        this._colorScale.offUpdate(this._redrawCallback);
+        this._colorScale.offUpdate(this._redrawColorCallback);
         this._colorScale = colorScale;
-        this._colorScale.onUpdate(this._redrawCallback);
+        this._colorScale.onUpdate(this._redrawColorCallback);
         this.redraw();
         return this;
       } else {
@@ -151,9 +156,9 @@ export module Components {
     public opacityScale(opacityScale: Scales.Opacity): Legend;
     public opacityScale(opacityScale?: Scales.Opacity): any {
       if (opacityScale != null) {
-        this._opacityScale.offUpdate(this._redrawCallback);
+        this._opacityScale.offUpdate(this._redrawOpacityCallback);
         this._opacityScale = opacityScale;
-        this._opacityScale.onUpdate(this._redrawCallback);
+        this._opacityScale.onUpdate(this._redrawOpacityCallback);
         this.redraw();
         return this;
       } else {
@@ -174,7 +179,7 @@ export module Components {
      * @returns {Legend} The calling Legend.
      */
     public setOpacityToText(setOpacityToText: boolean): Legend;
-    public setOpacityToText(setOpacityToText: boolean): any {
+    public setOpacityToText(setOpacityToText?: boolean): any {
       if (setOpacityToText != null) {
         this._setOpacityToText = setOpacityToText;
         this.redraw();
@@ -186,7 +191,8 @@ export module Components {
 
     public destroy() {
       super.destroy();
-      this._colorScale.offUpdate(this._redrawCallback);
+      this._colorScale.offUpdate(this._redrawColorCallback);
+      this._opacityScale.offUpdate(this._redrawOpacityCallback);
     }
 
     private _calculateLayoutInfo(availableWidth: number, availableHeight: number) {

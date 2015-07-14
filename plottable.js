@@ -5020,10 +5020,12 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._colorScale = colorScale;
+                this._redrawColorCallback = function (scale) { return _this.redraw(); };
+                this._colorScale.onUpdate(this._redrawColorCallback);
                 this._opacityScale = new Plottable.Scales.Opacity(); // default scale maps all values to opacity 1.0
                 this._applyOpacityToText = false;
-                this._redrawCallback = function (scale) { return _this.redraw(); };
-                this._colorScale.onUpdate(this._redrawCallback);
+                this._redrawOpacityCallback = function (scale) { return _this.redraw(); };
+                this._opacityScale.onUpdate(this._redrawOpacityCallback);
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
@@ -5059,9 +5061,9 @@ var Plottable;
             };
             Legend.prototype.colorScale = function (colorScale) {
                 if (colorScale != null) {
-                    this._colorScale.offUpdate(this._redrawCallback);
+                    this._colorScale.offUpdate(this._redrawColorCallback);
                     this._colorScale = colorScale;
-                    this._colorScale.onUpdate(this._redrawCallback);
+                    this._colorScale.onUpdate(this._redrawColorCallback);
                     this.redraw();
                     return this;
                 }
@@ -5071,9 +5073,9 @@ var Plottable;
             };
             Legend.prototype.opacityScale = function (opacityScale) {
                 if (opacityScale != null) {
-                    this._opacityScale.offUpdate(this._redrawCallback);
+                    this._opacityScale.offUpdate(this._redrawOpacityCallback);
                     this._opacityScale = opacityScale;
-                    this._opacityScale.onUpdate(this._redrawCallback);
+                    this._opacityScale.onUpdate(this._redrawOpacityCallback);
                     this.redraw();
                     return this;
                 }
@@ -5093,7 +5095,8 @@ var Plottable;
             };
             Legend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
-                this._colorScale.offUpdate(this._redrawCallback);
+                this._colorScale.offUpdate(this._redrawColorCallback);
+                this._opacityScale.offUpdate(this._redrawOpacityCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;

@@ -27,11 +27,11 @@ export module Scales {
       return this._d3Scale(value);
     }
 
-    public extentOfValues(values: number[]): number[] {
+    public extentOfValues(values: string[]): string[] {
       return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
-    protected _getExtent(): number[] {
+    protected _getExtent(): string[] {
       return Utils.Array.uniq(this._getAllIncludedValues());
     }
 
@@ -39,7 +39,7 @@ export module Scales {
       return this._d3Scale.domain();
     }
 
-    protected _setBackingScaleDomain(values: number[]) {
+    protected _setBackingScaleDomain(values: string[]) {
       this._d3Scale.domain(values);
     }
 
@@ -47,7 +47,7 @@ export module Scales {
       return this._d3Scale.range();
     }
 
-    protected _setRange(values: R[]) {
+    protected _setRange(values: number[]) {
       return this._d3Scale.range(values);
     }
 
