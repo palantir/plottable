@@ -1107,6 +1107,20 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
+        class Opacity extends Scale<string, number> {
+            /**
+             * An Opacity Scale maps string values to opacity values between 0 and 1.
+             *
+             * @constructor
+             */
+            constructor();
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Scales {
         class Time extends QuantitativeScale<Date> {
             /**
              * A Time Scale maps Date objects to numbers.

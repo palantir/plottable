@@ -18,6 +18,8 @@ export module Components {
 
     private _padding = 5;
     private _colorScale: Scales.Color;
+    private _opacityScale: Scales.Opacity;
+    private _applyOpacityToText: boolean;
     private _maxEntriesPerRow: number;
     private _comparator: (a: string, b: string) => number;
     private _measurer: SVGTypewriter.Measurers.Measurer;
@@ -42,6 +44,8 @@ export module Components {
       }
 
       this._colorScale = colorScale;
+      this._opacityScale = new Scales.Opacity(); // default scale maps all values to opacity 1.0
+      this._applyOpacityToText = false;
       this._redrawCallback = (scale) => this.redraw();
       this._colorScale.onUpdate(this._redrawCallback);
 
@@ -129,6 +133,54 @@ export module Components {
         return this;
       } else {
         return this._colorScale;
+      }
+    }
+
+    /**
+     * Gets the Opacity Scale.
+     *
+     * @returns {Scales.Opacity}
+     */
+    public opacityScale(): Scales.Opacity;
+    /**
+     * Sets the Opacity Scale.
+     *
+     * @param {Scales.Opacity} scale
+     * @returns {Legend} The calling Legend.
+     */
+    public opacityScale(opacityScale: Scales.Opacity): Legend;
+    public opacityScale(opacityScale?: Scales.Opacity): any {
+      if (opacityScale != null) {
+        this._opacityScale.offUpdate(this._redrawCallback);
+        this._opacityScale = opacityScale;
+        this._opacityScale.onUpdate(this._redrawCallback);
+        this.redraw();
+        return this;
+      } else {
+        return this._opacityScale;
+      }
+    }
+
+    /**
+     * Returns whether the opacity scale should apply to the text in the legend
+     *
+     * @returns {boolean}
+     */
+    public setOpacityToText(): boolean;
+    /**
+     * Sets whether the opacity scale should apply to the text in the legend
+     *
+     * @param {boolean} setOpacityToText
+     * @returns {Legend} The calling Legend.
+     */
+    public setOpacityToText(setOpacityToText: boolean): Legend;
+    public setOpacityToText(setOpacityToText: boolean): any {
+      if (setOpacityToText != null) {
+        this._setOpacityToText = setOpacityToText;
+        this.redraw();
+        return this;
+      } else {
+        return this._setOpacityToText;
       }
     }
 
@@ -280,6 +332,7 @@ export module Components {
       entries.select("path").attr("d", (d: any, i: number) => this.symbol()(d, i)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._colorScale.scale(value) )
+                            .attr("opacity", (value: string) => this._opacityScale.scale(value) )
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
@@ -288,6 +341,7 @@ export module Components {
       textContainers.append("title").text((value: string) => value);
       var self = this;
       textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)")
+                    .attr("opacity", (value: string) => this._setOpacityToText ? this._opacityScale.scale(value) : 1)
                     .each(function(value: string) {
                       var container = d3.select(this);
                       var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
