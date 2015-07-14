@@ -90,7 +90,7 @@ describe("Formatters", () => {
     });
   });
 
-  describe("mutliTime", () => {
+  describe("multiTime", () => {
     it("uses reasonable defaults", () => {
       var timeFormatter = Plottable.Formatters.multiTime();
       // year, month, day, hours, minutes, seconds, milliseconds
