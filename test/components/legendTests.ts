@@ -32,7 +32,7 @@ describe("Legend", () => {
       assert.strictEqual(text, d, "the text node has correct text");
       var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
-      assert.strictEqual(symbol.attr("opacity"), '1', "the symbol's opacity defaults to 1");
+      assert.strictEqual(symbol.attr("opacity"), "1", "the symbol's opacity defaults to 1");
     });
     svg.remove();
   });
@@ -244,13 +244,13 @@ describe("Legend", () => {
     rows.each(function(d: any, i: number) {
       var d3this = d3.select(this);
       var textContainer = d3this.select(".text-container");
-      assert.strictEqual(textContainer.attr("opacity"), '1', "the text by default still has opacity 1");
+      assert.strictEqual(textContainer.attr("opacity"), "1", "the text by default still has opacity 1");
       var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("opacity"), String(opacity.scale(d)), "the symbol's opacity follows the opacity scale");
     });
 
     legend.setOpacityToText(true).redraw();
-    var rows = (<any> legend)._content.selectAll(entrySelector);
+    rows = (<any> legend)._content.selectAll(entrySelector);
 
     rows.each(function(d: any, i: number) {
       var d3this = d3.select(this);

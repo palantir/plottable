@@ -201,7 +201,6 @@ describe("Scales", () => {
 
   });
 
-
   describe("Opacity Scales", () => {
     it("default scale maps all values to opacity 1", () => {
       var scale = new Plottable.Scales.Opacity();
@@ -214,14 +213,13 @@ describe("Scales", () => {
     it("scale cycles through range values if range is larger than domain", () => {
       var scale = new Plottable.Scales.Opacity();
       scale.domain(["foo", "bar", "baz", "qux"]);
-      scale.range([0.2, 0.7])
+      scale.range([0.2, 0.7]);
       assert.strictEqual(0.2, scale.scale("foo"));
       assert.strictEqual(0.7, scale.scale("bar"));
       assert.strictEqual(0.2, scale.scale("baz"));
       assert.strictEqual(0.7, scale.scale("qux"));
     });
   });
-
 
   describe("Interpolated Color Scales", () => {
     it("default scale uses reds and a linear scale type", () => {
