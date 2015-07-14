@@ -1425,6 +1425,8 @@ declare module Plottable {
          * @returns {Component} The calling Component.
          */
         renderTo(element: String | d3.Selection<void>): Component;
+        onRender(callback: Function): void;
+        dispatchRender(): void;
         /**
          * Gets the x alignment of the Component.
          */

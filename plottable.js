@@ -1097,6 +1097,7 @@ var Plottable;
                 _componentsNeedingRender.forEach(function (component) {
                     try {
                         component.renderImmediately();
+                        component.dispatchRender();
                     }
                     catch (err) {
                         // throw error with timeout to avoid interrupting further renders
@@ -2872,6 +2873,7 @@ var Plottable;
             this._destroyed = false;
             this._onAnchorCallbacks = new Plottable.Utils.CallbackSet();
             this._onDetachCallbacks = new Plottable.Utils.CallbackSet();
+            this._onRenderCallbacks = new Plottable.Utils.CallbackSet();
             this._cssClasses.add("component");
         }
         /**
@@ -3091,9 +3093,13 @@ var Plottable;
             }
             this.computeLayout();
             this.render();
-            // flush so that consumers can immediately attach to stuff we create in the DOM
-            Plottable.RenderController.flush();
             return this;
+        };
+        Component.prototype.onRender = function (callback) {
+            this._onRenderCallbacks.add(callback);
+        };
+        Component.prototype.dispatchRender = function () {
+            this._onRenderCallbacks.callCallbacks();
         };
         Component.prototype.xAlignment = function (xAlignment) {
             if (xAlignment == null) {
@@ -4454,14 +4460,16 @@ var Plottable;
                 var labelGroupTransform = "translate(" + labelGroupTransformX + ", " + labelGroupTransformY + ")";
                 this._tickLabelContainer.attr("transform", labelGroupTransform);
                 this._showAllTickMarks();
-                if (!this.showEndTickLabels()) {
-                    this._hideEndTickLabels();
-                }
-                this._hideOverflowingTickLabels();
-                this._hideOverlappingTickLabels();
-                if (this._tickLabelPositioning === "bottom" || this._tickLabelPositioning === "top" || this._tickLabelPositioning === "left" || this._tickLabelPositioning === "right") {
-                    this._hideTickMarksWithoutLabel();
-                }
+                this.onRender(function () {
+                    if (!_this.showEndTickLabels()) {
+                        _this._hideEndTickLabels();
+                    }
+                    _this._hideOverflowingTickLabels();
+                    _this._hideOverlappingTickLabels();
+                    if (_this._tickLabelPositioning === "bottom" || _this._tickLabelPositioning === "top" || _this._tickLabelPositioning === "left" || _this._tickLabelPositioning === "right") {
+                        _this._hideTickMarksWithoutLabel();
+                    }
+                });
                 return this;
             };
             Numeric.prototype._showAllTickMarks = function () {
