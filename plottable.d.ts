@@ -3193,6 +3193,7 @@ declare module Plottable {
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
