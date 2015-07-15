@@ -6977,6 +6977,8 @@ var Plottable;
              */
             function Rectangle() {
                 _super.call(this);
+                this._xExtent = [];
+                this._yExtent = [];
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
@@ -7130,6 +7132,45 @@ var Plottable;
                     dataToDraw.set(dataset, data);
                 });
                 return dataToDraw;
+            };
+            Rectangle.prototype._extentsForProperty = function (attr) {
+                if (attr === "x" && this.x2() == null || attr === "y" && this.y2() == null) {
+                    return _super.prototype._extentsForProperty.call(this, attr);
+                }
+                else {
+                    return [this._aggregatedExtentForProperty(attr)];
+                }
+            };
+            Rectangle.prototype._aggregatedExtentForProperty = function (attr) {
+                var _this = this;
+                var filter = this._filterForProperty((attr === "y" || attr === "y2") ? "y" : "x");
+                var xValues = [];
+                var yValues = [];
+                var datasets = this.datasets();
+                datasets.forEach(function (dataset) {
+                    dataset.data().forEach(function (datum, index) {
+                        if (filter != null && !filter(datum, index, dataset)) {
+                            return;
+                        }
+                        if (attr === "y" || attr === "y2") {
+                            var yAccessor = _this.y().accessor;
+                            yValues.push(yAccessor(datum, index, dataset));
+                            if (_this.y2()) {
+                                var y2Accessor = _this.y2().accessor;
+                                yValues.push(y2Accessor(datum, index, dataset));
+                            }
+                        }
+                        else {
+                            var xAccessor = _this.x().accessor;
+                            xValues.push(xAccessor(datum, index, dataset));
+                            if (_this.x2()) {
+                                var x2Accessor = _this.x2().accessor;
+                                xValues.push(x2Accessor(datum, index, dataset));
+                            }
+                        }
+                    });
+                });
+                return (attr === "y" || attr === "y2") ? [Plottable.Utils.Math.min(yValues, 0), Plottable.Utils.Math.max(yValues, 0)] : [Plottable.Utils.Math.min(xValues, 0), Plottable.Utils.Math.max(xValues, 0)];
             };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";

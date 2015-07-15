@@ -2777,6 +2777,7 @@ declare module Plottable {
                 y: any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
