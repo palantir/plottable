@@ -6977,8 +6977,6 @@ var Plottable;
              */
             function Rectangle() {
                 _super.call(this);
-                this._xExtent = [];
-                this._yExtent = [];
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }

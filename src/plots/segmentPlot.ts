@@ -179,16 +179,16 @@ export module Plots {
             yValues.push(yAccessor(datum, index, dataset));
             if (this.y2()) {
               var y2Accessor = this.y2().accessor;
-              yValues.push(y2Accessor(datum, index, dataset));        
+              yValues.push(y2Accessor(datum, index, dataset));
             }
           } else {
             var xAccessor = this.x().accessor;
             xValues.push(xAccessor(datum, index, dataset));
             if (this.x2()) {
               var x2Accessor = this.x2().accessor;
-              xValues.push(x2Accessor(datum, index, dataset));          
+              xValues.push(x2Accessor(datum, index, dataset));
             }
-          }          
+          }
         });
       });
       return (attr === "y" || attr === "y2") ? [Utils.Math.min(yValues, 0), Utils.Math.max(yValues, 0)] :
