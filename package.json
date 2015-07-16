@@ -19,7 +19,7 @@
     "grunt-tslint": "2.2.0-beta",
     "tslint": "2.2.0-beta",
     "grunt-contrib-concat": "~0.3.0",
-    "grunt-mocha-phantomjs": "0.6.1",
+    "grunt-mocha-phantomjs": "0.6.2",
     "grunt-contrib-connect": "~0.6.0",
     "grunt-blanket-mocha": "~0.4.0",
     "grunt-saucelabs": "8.6.0",
