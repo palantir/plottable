@@ -284,7 +284,41 @@ module.exports = function(grunt) {
     }
   };
 
-  var configJSON = {
+  var uglifyConfig = {
+    main: {
+      files: {"plottable.min.js": ["plottable.js"]}
+    }
+  };
+
+  var shellConfig = {
+    sublime: {
+      command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
+    }
+  };
+
+  var saucelabsMochaConfig = {
+    all: {
+      options: {
+        urls: ["http://127.0.0.1:9999/test/tests.html"],
+        testname: "Plottable Sauce Unit Tests",
+        browsers: [{
+          browserName: "firefox",
+          platform: "linux"
+        }, {
+          browserName: "chrome",
+          platform: "linux"
+        }, {
+          browserName: "internet explorer",
+          version: "9",
+          platform: "WIN7"
+        }],
+        build: process.env.TRAVIS_JOB_ID,
+        "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
+      }
+    }
+  };
+
+  grunt.initConfig({
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
     umd: umdConfig,
@@ -302,41 +336,10 @@ module.exports = function(grunt) {
     sed: sedConfig,
     gitcommit: gitcommitConfig,
     compress: compressConfig,
-    uglify: {
-      main: {
-        files: {"plottable.min.js": ["plottable.js"]}
-      }
-    },
-    shell: {
-      sublime: {
-        command: "(echo 'src/reference.ts'; find typings -name '*.d.ts') > build/sublime.d.ts"
-      }
-    },
-    "saucelabs-mocha": {
-      all: {
-        options: {
-          urls: ["http://127.0.0.1:9999/test/tests.html"],
-          testname: "Plottable Sauce Unit Tests",
-          browsers: [{
-            browserName: "firefox",
-            platform: "linux"
-          }, {
-            browserName: "chrome",
-            platform: "linux"
-          }, {
-            browserName: "internet explorer",
-            version: "9",
-            platform: "WIN7"
-          }],
-          build: process.env.TRAVIS_JOB_ID,
-          "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
-        }
-      }
-    }
-  };
-
-  // project configuration
-  grunt.initConfig(configJSON);
+    uglify: uglifyConfig,
+    shell: shellConfig,
+    "saucelabs-mocha": saucelabsMochaConfig
+  });
 
   require("load-grunt-tasks")(grunt);
 
@@ -353,7 +356,6 @@ module.exports = function(grunt) {
     "concat:tests"
   ]);
   grunt.registerTask("default", "launch");
-
   grunt.registerTask("dev-compile", [
     "update_ts_files",
     "update_test_ts_files",
