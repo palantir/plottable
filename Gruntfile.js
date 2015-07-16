@@ -3,7 +3,7 @@
 module.exports = function(grunt) {
   "use strict";
 
-  var tsJSON = {
+  var tsConfig = {
     dev: {
       src: ["src/**/*.ts", "typings/**/*.d.ts"],
       outDir: "build/src/",
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
     }
   };
 
-  var bumpJSON = {
+  var bumpConfig = {
     options: {
       files: ["package.json", "bower.json"],
       updateConfigs: ["pkg"],
@@ -70,7 +70,7 @@ module.exports = function(grunt) {
   var jsdocEnd = " *\\*\\/ *";
   var jsdoc = "(" + jsdocInit + jsdocMid + jsdocEnd + ")?";
 
-  var sedJSON = {
+  var sedConfig = {
     privateDefinitions: {
       pattern: jsdoc + prefixMatch + "private " + varNameMatch + finalMatch,
       replacement: "",
@@ -146,7 +146,7 @@ module.exports = function(grunt) {
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
-    bump: bumpJSON,
+    bump: bumpConfig,
     umd: {
       all: {
         src: "plottable.js",
@@ -190,7 +190,7 @@ module.exports = function(grunt) {
         dest: "plottable.js"
       }
     },
-    ts: tsJSON,
+    ts: tsConfig,
     tslint: {
       options: {
         configuration: grunt.file.readJSON("tslint.json")
@@ -258,7 +258,7 @@ module.exports = function(grunt) {
     clean: {
       tscommand: ["tscommand*.tmp.txt"]
     },
-    sed: sedJSON,
+    sed: sedConfig,
     gitcommit: {
       version: {
         options: {
