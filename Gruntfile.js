@@ -210,6 +210,80 @@ module.exports = function(grunt) {
     }
   };
 
+  var watchConfig = {
+    options: {
+      livereload: true
+    },
+    rebuild: {
+      tasks: ["dev-compile"],
+      files: ["src/**/*.ts", "examples/**/*.ts"]
+    },
+    tests: {
+      tasks: ["test-compile"],
+      files: ["test/**/*.ts"]
+    },
+    quicktests: {
+      tasks: ["update-quicktests"],
+      files: ["quicktests/overlaying/tests/**/*.js"]
+    }
+  };
+
+  var blanket_mochaConfig = {
+    all: ["test/coverage.html"],
+    options: {
+      threshold: 70
+    }
+  };
+
+  var connectConfig = {
+    server: {
+      options: {
+        port: 9999,
+        hostname: "*",
+        base: "",
+        livereload: true
+      }
+    }
+  };
+
+  var cleanConfig = {
+    tscommand: ["tscommand*.tmp.txt"]
+  };
+
+  var gitcommitConfig = {
+    version: {
+      options: {
+        message: "Release version <%= pkg.version %>"
+      },
+      files: {
+        src: FILES_TO_COMMIT
+      }
+    },
+    built: {
+      options: {
+        message: "Update built files"
+      },
+      files: {
+        src: FILES_TO_COMMIT
+      }
+    }
+  };
+
+  var compressConfig = {
+    main: {
+      options: {
+        archive: "plottable.zip"
+      },
+      files: [
+      {src: "plottable.js",     dest: "."},
+      {src: "plottable.min.js", dest: "."},
+      {src: "plottable.d.ts",   dest: "."},
+      {src: "plottable.css",    dest: "."},
+      {src: "README.md",        dest: "."},
+      {src: "LICENSE",          dest: "."}]
+    }
+  }
+
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
@@ -221,75 +295,13 @@ module.exports = function(grunt) {
     jscs: jscsConfig,
     eslint: eslintConfig,
     parallelize: parallelizeConfig,
-    watch: {
-      "options": {
-        livereload: true
-      },
-      "rebuild": {
-        "tasks": ["dev-compile"],
-        "files": ["src/**/*.ts", "examples/**/*.ts"]
-      },
-      "tests": {
-        "tasks": ["test-compile"],
-        "files": ["test/**/*.ts"]
-      },
-      "quicktests": {
-        "tasks": ["update-quicktests"],
-        "files": ["quicktests/overlaying/tests/**/*.js"]
-      }
-    },
-    "blanket_mocha": {
-      all: ["test/coverage.html"],
-      options: {
-        threshold: 70
-      }
-    },
-    connect: {
-      server: {
-        options: {
-          port: 9999,
-          hostname: "*",
-          base: "",
-          livereload: true
-        }
-      }
-    },
-    clean: {
-      tscommand: ["tscommand*.tmp.txt"]
-    },
+    watch: watchConfig,
+    blanket_mocha: blanket_mochaConfig,
+    connect: connectConfig,
+    clean: cleanConfig,
     sed: sedConfig,
-    gitcommit: {
-      version: {
-        options: {
-          message: "Release version <%= pkg.version %>"
-        },
-        files: {
-          src: FILES_TO_COMMIT
-        }
-      },
-      built: {
-        options: {
-          message: "Update built files"
-        },
-        files: {
-          src: FILES_TO_COMMIT
-        }
-      }
-    },
-    compress: {
-      main: {
-        options: {
-          archive: "plottable.zip"
-        },
-        files: [
-        {src: "plottable.js",     dest: "."},
-        {src: "plottable.min.js", dest: "."},
-        {src: "plottable.d.ts",   dest: "."},
-        {src: "plottable.css",    dest: "."},
-        {src: "README.md",        dest: "."},
-        {src: "LICENSE",          dest: "."}]
-      }
-    },
+    gitcommit: gitcommitConfig,
+    compress: compressConfig,
     uglify: {
       main: {
         files: {"plottable.min.js": ["plottable.js"]}
