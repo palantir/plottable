@@ -152,20 +152,20 @@ module.exports = function(grunt) {
     },
     plottable: {
       src: tsFiles.map(function(s) {
-            return "build/src/" + s.replace(".ts", ".js");
-        }),
+        return "build/src/" + s.replace(".ts", ".js");
+      }),
       dest: "plottable.js"
     },
     tests: {
       src: testTsFiles.map(function(s) {
-            return "build/test/" + s.replace(".ts", ".js");
-        }),
+        return "build/test/" + s.replace(".ts", ".js");
+      }),
       dest: "test/tests.js"
     },
     definitions: {
       src: tsFiles.map(function(s) {
-            return "build/src/" + s.replace(".ts", ".d.ts");
-        }),
+        return "build/src/" + s.replace(".ts", ".d.ts");
+      }),
       dest: "build/plottable.d.ts"
     },
     svgtypewriter: {
@@ -275,12 +275,13 @@ module.exports = function(grunt) {
         archive: "plottable.zip"
       },
       files: [
-      {src: "plottable.js",     dest: "."},
-      {src: "plottable.min.js", dest: "."},
-      {src: "plottable.d.ts",   dest: "."},
-      {src: "plottable.css",    dest: "."},
-      {src: "README.md",        dest: "."},
-      {src: "LICENSE",          dest: "."}]
+        {src: "plottable.js",     dest: "."},
+        {src: "plottable.min.js", dest: "."},
+        {src: "plottable.d.ts",   dest: "."},
+        {src: "plottable.css",    dest: "."},
+        {src: "README.md",        dest: "."},
+        {src: "LICENSE",          dest: "."}
+      ]
     }
   };
 
