@@ -47,13 +47,15 @@ module.exports = function(grunt) {
     }
   };
 
-  var FILES_TO_COMMIT = ["plottable.js",
-                         "plottable.min.js",
-                         "plottable.d.ts",
-                         "plottable.css",
-                         "plottable.zip",
-                         "bower.json",
-                         "package.json"];
+  var FILES_TO_COMMIT = [
+    "plottable.js",
+    "plottable.min.js",
+    "plottable.d.ts",
+    "plottable.css",
+    "plottable.zip",
+    "bower.json",
+    "package.json"
+  ];
 
   var prefixMatch = "\\n *(function |var |static )?";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
@@ -106,26 +108,24 @@ module.exports = function(grunt) {
   // on each recompile
   var updateTsFiles = function() {
     tsFiles = grunt.file.read("src/reference.ts")
-                  .split("\n")
-                  .filter(function(s) {
-                    return s !== "";
-                  })
-                  .map(function(s) {
-                    return s.match(/"(.*\.ts)"/)[1];
-                  });
+      .split("\n")
+      .filter(function(s) {
+        return s !== "";
+      }).map(function(s) {
+        return s.match(/"(.*\.ts)"/)[1];
+      });
   };
   updateTsFiles();
 
   var testTsFiles;
   var updateTestTsFiles = function() {
     testTsFiles = grunt.file.read("test/testReference.ts")
-                  .split("\n")
-                  .filter(function(s) {
-                    return s !== "";
-                  })
-                  .map(function(s) {
-                    return s.match(/"(.*\.ts)"/)[1];
-                  });
+      .split("\n")
+      .filter(function(s) {
+        return s !== "";
+      }).map(function(s) {
+        return s.match(/"(.*\.ts)"/)[1];
+      });
   };
   updateTestTsFiles();
 
@@ -232,7 +232,7 @@ module.exports = function(grunt) {
         "files": ["test/**/*.ts"]
       },
       "quicktests": {
-        "tasks": ["update-qt"],
+        "tasks": ["update-quicktests"],
         "files": ["quicktests/overlaying/tests/**/*.js"]
       }
     },
@@ -323,52 +323,59 @@ module.exports = function(grunt) {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
   grunt.registerTask("test-compile", [
-                                  "ts:test",
-                                  "concat:testsMultifile",
-                                  "sed:testsMultifile",
-                                  "concat:tests"
-                                  ]);
+    "ts:test",
+    "concat:testsMultifile",
+    "sed:testsMultifile",
+    "concat:tests"
+  ]);
   grunt.registerTask("default", "launch");
-  var compileTask = [
-      "update_ts_files",
-      "update_test_ts_files",
-      "ts:dev",
-      "concat:plottable",
-      "concat:svgtypewriter",
-      "concat:definitions",
-      "sed:definitions",
-      "sed:privateDefinitions",
-      "umd:all",
-      "concat:header",
-      "sed:versionNumber",
-      "definitions_prod",
-      "test-compile",
-      "concat:plottableMultifile",
-      "sed:plottableMultifile",
-      "clean:tscommand",
-      "update-qt"
-  ];
 
-  grunt.registerTask("dev-compile", compileTask);
+  grunt.registerTask("dev-compile", [
+    "update_ts_files",
+    "update_test_ts_files",
+    "ts:dev",
+    "concat:plottable",
+    "concat:svgtypewriter",
+    "concat:definitions",
+    "sed:definitions",
+    "sed:privateDefinitions",
+    "umd:all",
+    "concat:header",
+    "sed:versionNumber",
+    "definitions_prod",
+    "test-compile",
+    "concat:plottableMultifile",
+    "sed:plottableMultifile",
+    "clean:tscommand",
+    "update-quicktests"
+  ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
   grunt.registerTask("dist-compile", [
-                                  "dev-compile",
-                                  "blanket_mocha",
-                                  "parallelize:tslint",
-                                  "ts:verifyDefinitionFiles",
-                                  "uglify",
-                                  "compress"
-                                  ]);
+    "dev-compile",
+    "blanket_mocha",
+    "parallelize:tslint",
+    "ts:verifyDefinitionFiles",
+    "uglify",
+    "compress"
+  ]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-
   grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", ["dev-compile", "blanket_mocha", "parallelize:tslint", "jshint", "ts:verifyDefinitionFiles", "jscs", "eslint"]);
+  grunt.registerTask("test", [
+    "dev-compile",
+    "blanket_mocha",
+    "parallelize:tslint",
+    "jshint",
+    "ts:verifyDefinitionFiles",
+    "jscs",
+    "eslint"
+  ]);
+
   // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
   var travisTests = ["test"];
   if (process.env.SAUCE_USERNAME) {
@@ -378,21 +385,19 @@ module.exports = function(grunt) {
   grunt.registerTask("bm", ["blanket_mocha"]);
 
   grunt.registerTask("sublime", [
-                                  "shell:sublime",
-                                  "sed:sublime"
-                                  ]);
+    "shell:sublime",
+    "sed:sublime"
+  ]);
 
-  var updateQuickTestsJSON = function() {
+  grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];
     var rawtests = grunt.file.expand("quicktests/overlaying/tests/**/*.js");
-    rawtests.forEach(function(value){
-      qtJSON.push({path: value});
+    rawtests.forEach(function(value) {
+      qtJSON.push({ path: value });
     });
     qtJSON = JSON.stringify(qtJSON);
     qtJSON = qtJSON.split(",").join(",\n") + "\n";
     grunt.file.write("quicktests/overlaying/list_of_quicktests.json", qtJSON);
-  };
-
-  grunt.registerTask("update-qt", updateQuickTestsJSON);
+  });
 
 };
