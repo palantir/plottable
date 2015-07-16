@@ -228,7 +228,7 @@ module.exports = function(grunt) {
     }
   };
 
-  var blanket_mochaConfig = {
+  var blanketMochaConfig = {
     all: ["test/coverage.html"],
     options: {
       threshold: 70
@@ -296,7 +296,7 @@ module.exports = function(grunt) {
     eslint: eslintConfig,
     parallelize: parallelizeConfig,
     watch: watchConfig,
-    blanket_mocha: blanket_mochaConfig,
+    "blanket_mocha": blanketMochaConfig,
     connect: connectConfig,
     clean: cleanConfig,
     sed: sedConfig,
