@@ -31,7 +31,6 @@ module.exports = function(grunt) {
     },
     verifyDefinitionFiles: {
       src: ["typings/d3/d3.d.ts",
-            "typings/touch-events/touch-events.d.ts",
             "plottable.d.ts",
             "bower_components/svg-typewriter/svgtypewriter.d.ts"]
     }
