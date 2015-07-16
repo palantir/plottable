@@ -129,96 +129,98 @@ module.exports = function(grunt) {
   };
   updateTestTsFiles();
 
-  var browsers = [{
-    browserName: "firefox",
-    platform: "linux"
-  }, {
-    browserName: "chrome",
-    platform: "linux"
-  }, {
-    browserName: "internet explorer",
-    version: "9",
-    platform: "WIN7"
-  }];
+  var umdConfig = {
+    all: {
+      src: "plottable.js",
+      template: "unit",
+      objectToExport: "Plottable"
+    }
+  };
+
+  var concatConfig = {
+    header: {
+      src: ["license_header.txt", "plottable.js"],
+      dest: "plottable.js"
+    },
+    plottableMultifile: {
+      src: ["synchronousRequire.js", "src/reference.ts"],
+      dest: "plottable_multifile.js"
+    },
+    testsMultifile: {
+      src: ["synchronousRequire.js", "test/testReference.ts"],
+      dest: "test/tests_multifile.js"
+    },
+    plottable: {
+      src: tsFiles.map(function(s) {
+            return "build/src/" + s.replace(".ts", ".js");
+        }),
+      dest: "plottable.js"
+    },
+    tests: {
+      src: testTsFiles.map(function(s) {
+            return "build/test/" + s.replace(".ts", ".js");
+        }),
+      dest: "test/tests.js"
+    },
+    definitions: {
+      src: tsFiles.map(function(s) {
+            return "build/src/" + s.replace(".ts", ".d.ts");
+        }),
+      dest: "build/plottable.d.ts"
+    },
+    svgtypewriter: {
+      src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
+      dest: "plottable.js"
+    }
+  };
+
+  var tslintConfig = {
+    options: {
+      configuration: grunt.file.readJSON("tslint.json")
+    },
+    all: {
+      src: ["src/**/*.ts", "test/**/*.ts"]
+    }
+  };
+
+  var jshintConfig = {
+    files: ["Gruntfile.js", "quicktests/**/*.js"],
+    options: {
+      jshintrc: ".jshintrc"
+    }
+  };
+
+  var jscsConfig = {
+    files: ["Gruntfile.js", "quicktests/**/*.js"],
+    options: {
+      config: ".jscsrc"
+    }
+  };
+
+  var eslintConfig = {
+    target: ["Gruntfile.js", "quicktests/**/*.js"],
+    options: {
+      configFile: ".eslintrc"
+    }
+  };
+
+  var parallelizeConfig = {
+    tslint: {
+      all: 4
+    }
+  };
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
     bump: bumpConfig,
-    umd: {
-      all: {
-        src: "plottable.js",
-        template: "unit",
-        objectToExport: "Plottable"
-      }
-    },
-    concat: {
-      header: {
-        src: ["license_header.txt", "plottable.js"],
-        dest: "plottable.js"
-      },
-      plottableMultifile: {
-        src: ["synchronousRequire.js", "src/reference.ts"],
-        dest: "plottable_multifile.js"
-      },
-      testsMultifile: {
-        src: ["synchronousRequire.js", "test/testReference.ts"],
-        dest: "test/tests_multifile.js"
-      },
-      plottable: {
-        src: tsFiles.map(function(s) {
-              return "build/src/" + s.replace(".ts", ".js");
-          }),
-        dest: "plottable.js"
-      },
-      tests: {
-        src: testTsFiles.map(function(s) {
-              return "build/test/" + s.replace(".ts", ".js");
-          }),
-        dest: "test/tests.js"
-      },
-      definitions: {
-        src: tsFiles.map(function(s) {
-              return "build/src/" + s.replace(".ts", ".d.ts");
-          }),
-        dest: "build/plottable.d.ts"
-      },
-      svgtypewriter: {
-        src: ["plottable.js", "bower_components/svg-typewriter/svgtypewriter.js"],
-        dest: "plottable.js"
-      }
-    },
+    umd: umdConfig,
+    concat: concatConfig,
     ts: tsConfig,
-    tslint: {
-      options: {
-        configuration: grunt.file.readJSON("tslint.json")
-      },
-      all: {
-        src: ["src/**/*.ts", "test/**/*.ts"]
-      }
-    },
-    jshint: {
-      files: ["Gruntfile.js", "quicktests/**/*.js"],
-      options: {
-        jshintrc: ".jshintrc"
-      }
-    },
-    jscs: {
-      files: ["Gruntfile.js", "quicktests/**/*.js"],
-      options: {
-        config: ".jscsrc"
-      }
-    },
-    eslint: {
-      target: ["Gruntfile.js", "quicktests/**/*.js"],
-      options: {
-        configFile: ".eslintrc"
-      }
-    },
-    parallelize: {
-      tslint: {
-        all: 4
-      }
-    },
+    tslint: tslintConfig,
+    jshint: jshintConfig,
+    jscs: jscsConfig,
+    eslint: eslintConfig,
+    parallelize: parallelizeConfig,
     watch: {
       "options": {
         livereload: true
@@ -303,7 +305,17 @@ module.exports = function(grunt) {
         options: {
           urls: ["http://127.0.0.1:9999/test/tests.html"],
           testname: "Plottable Sauce Unit Tests",
-          browsers: browsers,
+          browsers: [{
+            browserName: "firefox",
+            platform: "linux"
+          }, {
+            browserName: "chrome",
+            platform: "linux"
+          }, {
+            browserName: "internet explorer",
+            version: "9",
+            platform: "WIN7"
+          }],
           build: process.env.TRAVIS_JOB_ID,
           "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
         }
