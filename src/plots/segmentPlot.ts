@@ -154,6 +154,46 @@ export module Plots {
       attrToProjector["y2"] = this.y2() == null ? Plot._scaledAccessor(this.y()) : Plot._scaledAccessor(this.y2());
       return attrToProjector;
     }
+
+    protected _extentsForProperty(attr: string) {
+      if (attr === "x" && this.x2() == null ||
+          attr === "y" && this.y2() == null) {
+        return super._extentsForProperty(attr);
+      } else {
+        return [this._aggregatedExtentForProperty(attr)];
+      }
+    }
+
+    private _aggregatedExtentForProperty(attr: string) {
+      var filter = this._filterForProperty((attr === "y" || attr === "y2") ? "y" : "x");
+      var xValues: number[] = [];
+      var yValues: number[] = [];
+      var datasets = this.datasets();
+      datasets.forEach((dataset) => {
+        dataset.data().forEach((datum, index) => {
+          if (filter != null && !filter(datum, index, dataset)) {
+            return;
+          }
+          if (attr === "y" || attr === "y2") {
+            var yAccessor = this.y().accessor;
+            yValues.push(yAccessor(datum, index, dataset));
+            if (this.y2()) {
+              var y2Accessor = this.y2().accessor;
+              yValues.push(y2Accessor(datum, index, dataset));
+            }
+          } else {
+            var xAccessor = this.x().accessor;
+            xValues.push(xAccessor(datum, index, dataset));
+            if (this.x2()) {
+              var x2Accessor = this.x2().accessor;
+              xValues.push(x2Accessor(datum, index, dataset));
+            }
+          }
+        });
+      });
+      return (attr === "y" || attr === "y2") ? [Utils.Math.min(yValues, 0), Utils.Math.max(yValues, 0)] :
+                                               [Utils.Math.min(xValues, 0), Utils.Math.max(xValues, 0)];
+    }
   }
 }
 }

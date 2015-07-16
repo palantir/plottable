@@ -2777,6 +2777,7 @@ declare module Plottable {
                 y: any;
             };
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
@@ -3192,6 +3193,7 @@ declare module Plottable {
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Segment<X, Y>;
             protected _propertyProjectors(): AttributeToProjector;
+            protected _extentsForProperty(attr: string): any[];
         }
     }
 }
