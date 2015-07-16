@@ -282,7 +282,7 @@ module.exports = function(grunt) {
       {src: "README.md",        dest: "."},
       {src: "LICENSE",          dest: "."}]
     }
-  }
+  };
 
   var configJSON = {
     pkg: grunt.file.readJSON("package.json"),
