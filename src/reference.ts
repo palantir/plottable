@@ -69,6 +69,7 @@
 /// <reference path="plots/stackedAreaPlot.ts" />
 /// <reference path="plots/stackedBarPlot.ts" />
 /// <reference path="plots/segmentPlot.ts" />
+/// <reference path="plots/waterfallPlot.ts" />
 
 /// <reference path="animators/animator.ts" />
 /// <reference path="animators/nullAnimator.ts" />
