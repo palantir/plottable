@@ -1107,6 +1107,34 @@ declare module Plottable {
 
 declare module Plottable {
     module Scales {
+        class Opacity extends Scale<string, number> {
+            /**
+             * An Opacity Scale maps string values to opacity values between 0 and 1.
+             *
+             * @constructor
+             */
+            constructor();
+            /**
+             * Returns the opacity corresponding to a given string.
+             * If there are not enough opacities in the range(), the scale will recycle values from the start of the range.
+             *
+             * @param {string} value
+             * @returns {number}
+             */
+            scale(value: string): number;
+            extentOfValues(values: string[]): string[];
+            protected _getExtent(): string[];
+            protected _getDomain(): string[];
+            protected _setBackingScaleDomain(values: string[]): void;
+            protected _getRange(): number[];
+            protected _setRange(values: number[]): d3.scale.Ordinal<string, number>;
+        }
+    }
+}
+
+
+declare module Plottable {
+    module Scales {
         class Time extends QuantitativeScale<Date> {
             /**
              * A Time Scale maps Date objects to numbers.
@@ -2076,6 +2104,32 @@ declare module Plottable {
              * @returns {Legend} The calling Legend.
              */
             colorScale(colorScale: Scales.Color): Legend;
+            /**
+             * Gets the Opacity Scale.
+             *
+             * @returns {Scales.Opacity}
+             */
+            opacityScale(): Scales.Opacity;
+            /**
+             * Sets the Opacity Scale.
+             *
+             * @param {Scales.Opacity} scale
+             * @returns {Legend} The calling Legend.
+             */
+            opacityScale(opacityScale: Scales.Opacity): Legend;
+            /**
+             * Returns whether the opacity scale should apply to the text in the legend
+             *
+             * @returns {boolean}
+             */
+            setOpacityToText(): boolean;
+            /**
+             * Sets whether the opacity scale should apply to the text in the legend
+             *
+             * @param {boolean} setOpacityToText
+             * @returns {Legend} The calling Legend.
+             */
+            setOpacityToText(setOpacityToText: boolean): Legend;
             destroy(): void;
             requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest;
             /**

@@ -29,6 +29,7 @@
 /// <reference path="scales/modifiedLogScale.ts" />
 /// <reference path="scales/categoryScale.ts" />
 /// <reference path="scales/colorScale.ts" />
+/// <reference path="scales/opacityScale.ts" />
 /// <reference path="scales/timeScale.ts" />
 /// <reference path="scales/interpolatedColorScale.ts" />
 /// <reference path="scales/tickGenerators.ts" />

@@ -2241,6 +2241,62 @@ var Plottable;
 (function (Plottable) {
     var Scales;
     (function (Scales) {
+        var Opacity = (function (_super) {
+            __extends(Opacity, _super);
+            /**
+             * An Opacity Scale maps string values to opacity values between 0 and 1.
+             *
+             * @constructor
+             */
+            function Opacity() {
+                _super.call(this);
+                this._d3Scale = d3.scale.ordinal().range([1]);
+            }
+            /**
+             * Returns the opacity corresponding to a given string.
+             * If there are not enough opacities in the range(), the scale will recycle values from the start of the range.
+             *
+             * @param {string} value
+             * @returns {number}
+             */
+            Opacity.prototype.scale = function (value) {
+                return this._d3Scale(value);
+            };
+            Opacity.prototype.extentOfValues = function (values) {
+                return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
+            };
+            Opacity.prototype._getExtent = function () {
+                return Plottable.Utils.Array.uniq(this._getAllIncludedValues());
+            };
+            Opacity.prototype._getDomain = function () {
+                return this._d3Scale.domain();
+            };
+            Opacity.prototype._setBackingScaleDomain = function (values) {
+                this._d3Scale.domain(values);
+            };
+            Opacity.prototype._getRange = function () {
+                return this._d3Scale.range();
+            };
+            Opacity.prototype._setRange = function (values) {
+                return this._d3Scale.range(values);
+            };
+            return Opacity;
+        })(Plottable.Scale);
+        Scales.Opacity = Opacity;
+    })(Scales = Plottable.Scales || (Plottable.Scales = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = this.__extends || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Scales;
+    (function (Scales) {
         var Time = (function (_super) {
             __extends(Time, _super);
             /**
@@ -4964,8 +5020,12 @@ var Plottable;
                     throw new Error("Legend requires a colorScale");
                 }
                 this._colorScale = colorScale;
-                this._redrawCallback = function (scale) { return _this.redraw(); };
-                this._colorScale.onUpdate(this._redrawCallback);
+                this._redrawColorCallback = function (scale) { return _this.redraw(); };
+                this._colorScale.onUpdate(this._redrawColorCallback);
+                this._opacityScale = new Plottable.Scales.Opacity(); // default scale maps all values to opacity 1.0
+                this._applyOpacityToText = false;
+                this._redrawOpacityCallback = function (scale) { return _this.redraw(); };
+                this._opacityScale.onUpdate(this._redrawOpacityCallback);
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
@@ -5001,9 +5061,9 @@ var Plottable;
             };
             Legend.prototype.colorScale = function (colorScale) {
                 if (colorScale != null) {
-                    this._colorScale.offUpdate(this._redrawCallback);
+                    this._colorScale.offUpdate(this._redrawColorCallback);
                     this._colorScale = colorScale;
-                    this._colorScale.onUpdate(this._redrawCallback);
+                    this._colorScale.onUpdate(this._redrawColorCallback);
                     this.redraw();
                     return this;
                 }
@@ -5011,9 +5071,32 @@ var Plottable;
                     return this._colorScale;
                 }
             };
+            Legend.prototype.opacityScale = function (opacityScale) {
+                if (opacityScale != null) {
+                    this._opacityScale.offUpdate(this._redrawOpacityCallback);
+                    this._opacityScale = opacityScale;
+                    this._opacityScale.onUpdate(this._redrawOpacityCallback);
+                    this.redraw();
+                    return this;
+                }
+                else {
+                    return this._opacityScale;
+                }
+            };
+            Legend.prototype.setOpacityToText = function (setOpacityToText) {
+                if (setOpacityToText != null) {
+                    this._setOpacityToText = setOpacityToText;
+                    this.redraw();
+                    return this;
+                }
+                else {
+                    return this._setOpacityToText;
+                }
+            };
             Legend.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
-                this._colorScale.offUpdate(this._redrawCallback);
+                this._colorScale.offUpdate(this._redrawColorCallback);
+                this._opacityScale.offUpdate(this._redrawOpacityCallback);
             };
             Legend.prototype._calculateLayoutInfo = function (availableWidth, availableHeight) {
                 var _this = this;
@@ -5136,13 +5219,13 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); }).attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")").attr("fill", function (value) { return _this._colorScale.scale(value); }).attr("opacity", function (value) { return _this._opacityScale.scale(value); }).classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
                 textContainers.append("title").text(function (value) { return value; });
                 var self = this;
-                textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)").each(function (value) {
+                textContainers.attr("transform", "translate(" + layout.textHeight + ", 0)").attr("opacity", function (value) { return _this._setOpacityToText ? _this._opacityScale.scale(value) : 1; }).each(function (value) {
                     var container = d3.select(this);
                     var maxTextLength = layout.entryLengths.get(value) - layout.textHeight - padding;
                     var writeOptions = {
