@@ -6238,7 +6238,7 @@ var Plottable;
         Plot.prototype._updateExtentsForKey = function (key, bindings, extents, filter) {
             var _this = this;
             var accScaleBinding = bindings.get(key);
-            if (accScaleBinding.accessor == null) {
+            if (accScaleBinding == null || accScaleBinding.accessor == null) {
                 return;
             }
             extents.set(key, this.datasets().map(function (dataset) { return _this._computeExtent(dataset, accScaleBinding, filter); }));
@@ -7113,6 +7113,24 @@ var Plottable;
             };
             Rectangle.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles") }];
+            };
+            Rectangle.prototype._updateExtentsForProperty = function (property) {
+                _super.prototype._updateExtentsForProperty.call(this, property);
+                if (property === "x") {
+                    _super.prototype._updateExtentsForProperty.call(this, "x2");
+                }
+                else if (property === "y") {
+                    _super.prototype._updateExtentsForProperty.call(this, "y2");
+                }
+            };
+            Rectangle.prototype._filterForProperty = function (property) {
+                if (property === "x2") {
+                    return _super.prototype._filterForProperty.call(this, "x");
+                }
+                else if (property === "y2") {
+                    return _super.prototype._filterForProperty.call(this, "y");
+                }
+                return _super.prototype._filterForProperty.call(this, property);
             };
             Rectangle.prototype.x = function (x, xScale) {
                 if (x == null) {
@@ -8583,6 +8601,24 @@ var Plottable;
             };
             Segment.prototype._generateDrawSteps = function () {
                 return [{ attrToProjector: this._generateAttrToProjector(), animator: new Plottable.Animators.Null() }];
+            };
+            Segment.prototype._updateExtentsForProperty = function (property) {
+                _super.prototype._updateExtentsForProperty.call(this, property);
+                if (property === "x") {
+                    _super.prototype._updateExtentsForProperty.call(this, "x2");
+                }
+                else if (property === "y") {
+                    _super.prototype._updateExtentsForProperty.call(this, "y2");
+                }
+            };
+            Segment.prototype._filterForProperty = function (property) {
+                if (property === "x2") {
+                    return _super.prototype._filterForProperty.call(this, "x");
+                }
+                else if (property === "y2") {
+                    return _super.prototype._filterForProperty.call(this, "y");
+                }
+                return _super.prototype._filterForProperty.call(this, property);
             };
             Segment.prototype.x = function (x, xScale) {
                 if (x == null) {

@@ -2707,6 +2707,8 @@ declare module Plottable {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
             };
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected _updateExtentsForProperty(property: string): void;
+            protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
             /**
              * Gets the AccessorScaleBinding for X.
              */
@@ -3128,6 +3130,8 @@ declare module Plottable {
             constructor();
             protected _createDrawer(dataset: Dataset): Drawers.Segment;
             protected _generateDrawSteps(): Drawers.DrawStep[];
+            protected _updateExtentsForProperty(property: string): void;
+            protected _filterForProperty(property: string): (datum: any, index: number, dataset: Dataset) => boolean;
             /**
              * Gets the AccessorScaleBinding for X
              */

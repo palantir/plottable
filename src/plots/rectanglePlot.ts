@@ -69,6 +69,24 @@ export module Plots {
       return [{attrToProjector: this._generateAttrToProjector(), animator: this._getAnimator("rectangles")}];
     }
 
+    protected _updateExtentsForProperty(property: string) {
+      super._updateExtentsForProperty(property);
+      if (property === "x") {
+        super._updateExtentsForProperty("x2");
+      } else if (property === "y") {
+        super._updateExtentsForProperty("y2");
+      }
+    }
+
+    protected _filterForProperty(property: string) {
+      if (property === "x2") {
+        return super._filterForProperty("x");
+      } else if (property === "y2") {
+        return super._filterForProperty("y");
+      }
+      return super._filterForProperty(property);
+    }
+
     /**
      * Gets the AccessorScaleBinding for X.
      */
