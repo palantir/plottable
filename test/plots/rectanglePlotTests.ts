@@ -40,7 +40,6 @@ describe("Plots", () => {
       svg.remove();
     });
 
-
     it("autorangeMode(\"x\")", () => {
       var staggeredData = [
         { y: "A", x: 0, x2: 1 },
