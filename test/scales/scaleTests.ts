@@ -13,7 +13,7 @@ describe("Scales", () => {
       callbackWasCalled = true;
     };
     scale.onUpdate(testCallback);
-    (<any> scale)._setBackingScaleDomain = () => null;
+    (<any> scale)._setBackingScaleDomain = () => { return; };
     scale.domain([0, 10]);
     assert.isTrue(callbackWasCalled, "The registered callback was called");
   });
@@ -21,7 +21,7 @@ describe("Scales", () => {
   it("Scale update listeners can be turned off", () => {
     var scale = new Plottable.Scale();
     (<any> scale)._d3Scale = d3.scale.identity();
-    (<any> scale)._setBackingScaleDomain = () => null;
+    (<any> scale)._setBackingScaleDomain = () => { return; };
 
     var callbackWasCalled = false;
     var testCallback = (listenable: Plottable.Scale<any, any>) => {
