@@ -262,7 +262,7 @@ export module Components {
 
       var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data((d) => d);
       var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-      entriesEnter.append("path");
+      entriesEnter.append("path").classed(Legend.LEGEND_SYMBOL_CLASS, true);
       entriesEnter.append("g").classed("text-container", true);
       entries.exit().remove();
 
@@ -277,10 +277,10 @@ export module Components {
         });
       });
 
-      entries.select("path").attr("d", (d: any, i: number) => this.symbol()(d, i)(layout.textHeight * 0.6))
+      this.content().selectAll("." + Legend.LEGEND_SYMBOL_CLASS)
+                            .attr("d", (d: any, i: number) => this.symbol()(d, i)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
-                            .attr("fill", (value: string) => this._colorScale.scale(value) )
-                            .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                            .attr("fill", (value: string) => this._colorScale.scale(value) );
 
       var padding = this._padding;
       var textContainers = entries.select("g.text-container");

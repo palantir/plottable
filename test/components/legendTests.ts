@@ -355,4 +355,25 @@ describe("Legend", () => {
 
     svg.remove();
   });
+
+  it("symbol() passes index correctly", () => {
+    var getFactory  = (i: number) => i == 0 ? squareFactory : circleFactory;
+
+    var domain = ["AA", "BB"];
+    color.domain(domain);
+    var squareFactory = Plottable.SymbolFactories.square();
+    var circleFactory = Plottable.SymbolFactories.circle();
+
+    legend.symbol((d: any, i: number) => getFactory(i));
+    legend.renderTo(svg);
+
+    var symbols = d3.selectAll(symbolSelector);
+    symbols.each(function(d: any, i: number) {
+      var element = d3.select(this);
+      var symbolSize = element.node().getBoundingClientRect().height;
+      assert.strictEqual(element.attr("d"), getFactory(i)(symbolSize));
+    });
+
+    svg.remove();
+  });
 });

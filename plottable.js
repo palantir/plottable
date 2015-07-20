@@ -5183,7 +5183,7 @@ var Plottable;
                 rows.attr("transform", function (d, i) { return "translate(0, " + (i * layout.textHeight + _this._padding) + ")"; });
                 var entries = rows.selectAll("g." + Legend.LEGEND_ENTRY_CLASS).data(function (d) { return d; });
                 var entriesEnter = entries.enter().append("g").classed(Legend.LEGEND_ENTRY_CLASS, true);
-                entriesEnter.append("path");
+                entriesEnter.append("path").classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 entriesEnter.append("g").classed("text-container", true);
                 entries.exit().remove();
                 var legendPadding = this._padding;
@@ -5196,10 +5196,10 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); })
+                this.content().selectAll("." + Legend.LEGEND_SYMBOL_CLASS)
+                    .attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
-                    .attr("fill", function (value) { return _this._colorScale.scale(value); })
-                    .classed(Legend.LEGEND_SYMBOL_CLASS, true);
+                    .attr("fill", function (value) { return _this._colorScale.scale(value); });
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
                 textContainers.text(""); // clear out previous results
