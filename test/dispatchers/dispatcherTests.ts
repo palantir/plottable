@@ -32,7 +32,7 @@ describe("Dispatchers", () => {
       var callbackWasCalled = false;
       (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
 
-      var callback = () => null;
+      var callback = () => { return; };
       var callbackSet = new Plottable.Utils.CallbackSet<Function>();
       callbackSet.add(callback);
       (<any> dispatcher)._callbacks = [callbackSet];
