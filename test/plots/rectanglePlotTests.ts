@@ -39,6 +39,67 @@ describe("Plots", () => {
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
       svg.remove();
     });
+
+    it("autorangeMode(\"x\")", () => {
+      var staggeredData = [
+        { y: "A", x: 0, x2: 1 },
+        { y: "B", x: 1, x2: 2 }
+      ];
+
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Category();
+      xScale.padProportion(0);
+
+      var plot = new Plottable.Plots.Rectangle();
+      plot.x(function(d) { return d.x; }, xScale);
+      plot.x2(function(d) { return d.x2; });
+      plot.y(function(d) { return d.y; }, yScale);
+      plot.addDataset(new Plottable.Dataset(staggeredData));
+      plot.autorangeMode("x");
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      plot.renderTo(svg);
+
+      assert.deepEqual(xScale.domain(), [0, 2], "y domain includes both visible segments");
+
+      yScale.domain(["A"]);
+      assert.deepEqual(xScale.domain(), [0, 1], "y domain includes only the visible segment (first)");
+
+      yScale.domain(["B"]);
+      assert.deepEqual(xScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
+
+      svg.remove();
+    });
+
+    it("autorangeMode(\"y\")", () => {
+      var staggeredData = [
+        { x: "A", y: 0, y2: 1 },
+        { x: "B", y: 1, y2: 2 }
+      ];
+
+      var xScale = new Plottable.Scales.Category();
+      var yScale = new Plottable.Scales.Linear();
+      yScale.padProportion(0);
+
+      var plot = new Plottable.Plots.Rectangle();
+      plot.x(function(d) { return d.x; }, xScale);
+      plot.y(function(d) { return d.y; }, yScale);
+      plot.y2(function(d) { return d.y2; });
+      plot.addDataset(new Plottable.Dataset(staggeredData));
+      plot.autorangeMode("y");
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      plot.renderTo(svg);
+
+      assert.deepEqual(yScale.domain(), [0, 2], "y domain includes both visible segments");
+
+      xScale.domain(["A"]);
+      assert.deepEqual(yScale.domain(), [0, 1], "y domain includes only the visible segment (first)");
+
+      xScale.domain(["B"]);
+      assert.deepEqual(yScale.domain(), [1, 2], "y domain includes only the visible segment (second)");
+
+      svg.remove();
+    });
+
   });
 
   describe("fail safe tests", () => {
