@@ -21,3 +21,6 @@ test/tests.js
 
 # Visual Studio Code
 .settings/
+
+# Typescript
+.baseDir.ts
