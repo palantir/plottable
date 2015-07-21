@@ -299,9 +299,6 @@ export class Plot extends Component {
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
-  private _temp1: any;
-  private _temp2: any;
-
   private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
     var accessor = accScaleBinding.accessor;
     var scale = accScaleBinding.scale;
