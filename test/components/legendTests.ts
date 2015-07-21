@@ -357,22 +357,18 @@ describe("Legend", () => {
   });
 
   it("symbol() passes index correctly", () => {
-    var domain = ["AA", "BB"];
+    var domain = ["AA", "BB", "CC"];
     color.domain(domain);
-    var squareFactory = Plottable.SymbolFactories.square();
-    var circleFactory = Plottable.SymbolFactories.circle();
-    var getFactory  = (i: number) => i === 0 ? squareFactory : circleFactory;
 
-    legend.symbol((d: any, i: number) => getFactory(i));
+    var expectedIndex = 0;
+    var symbolChecker = (d: any, index: number) => {
+      assert.strictEqual(index, expectedIndex, "message");
+      expectedIndex++;
+      return (size: number) => "";
+    };
+    legend.symbol(symbolChecker);
+
     legend.renderTo(svg);
-
-    var symbols = d3.selectAll(symbolSelector);
-    symbols.each(function(d: any, i: number) {
-      var element = d3.select(this);
-      var symbolSize = this.getBoundingClientRect().height;
-      assert.strictEqual(element.attr("d"), getFactory(i)(symbolSize));
-    });
-
     svg.remove();
   });
 });
