@@ -6168,17 +6168,71 @@ var Plottable;
             extents.set(key, this.datasets().map(function (dataset) { return _this._computeExtent(dataset, accScaleBinding, filter); }));
         };
         Plot.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+            var _this = this;
             var accessor = accScaleBinding.accessor;
             var scale = accScaleBinding.scale;
             if (scale == null) {
                 return [];
             }
             var data = dataset.data();
+            // if (filter != null) {
+            //   data = data.filter((d, i) => filter(d, i, dataset));
+            // }
+            var filteredData = [];
+            var justAdded = false;
+            var lastValue;
             if (filter != null) {
-                data = data.filter(function (d, i) { return filter(d, i, dataset); });
+                data.forEach(function (d, i) {
+                    if (filter(d, i, dataset)) {
+                        if (!justAdded && lastValue != null) {
+                            if (_this.x && _this.x().scale && _this.y && _this.y().scale) {
+                                var xScale = _this.x().scale;
+                                var yScale = _this.y().scale;
+                                var leftPoint = xScale.domain()[0];
+                                var befX = lastValue.x;
+                                var aftX = d.x;
+                                var x1 = leftPoint - befX;
+                                var x2 = aftX - befX;
+                                var y2 = d.y - lastValue.y;
+                                var y1 = x1 * y2 / x2;
+                                filteredData.push({
+                                    x: befX + x1,
+                                    y: lastValue.y + y1
+                                });
+                            }
+                        }
+                        filteredData.push(d);
+                        justAdded = true;
+                    }
+                    else {
+                        if (justAdded) {
+                            if (_this.x && _this.x().scale && _this.y && _this.y().scale) {
+                                var xScale = _this.x().scale;
+                                var yScale = _this.y().scale;
+                                var rightPoint = xScale.domain()[1];
+                                var befX = lastValue.x;
+                                var aftX = d.x;
+                                var x1 = rightPoint - befX;
+                                var x2 = aftX - befX;
+                                var y2 = d.y - lastValue.y;
+                                var y1 = x1 * y2 / x2;
+                                filteredData.push({
+                                    x: befX + x1,
+                                    y: lastValue.y + y1
+                                });
+                            }
+                        }
+                        justAdded = false;
+                    }
+                    lastValue = d;
+                });
+            }
+            else {
+                filteredData = data;
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
-            var mappedData = data.map(appliedAccessor);
+            var mappedData = filteredData.map(appliedAccessor);
+            // var mappedData = data.map(appliedAccessor);
             return scale.extentOfValues(mappedData);
         };
         /**

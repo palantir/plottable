@@ -299,6 +299,9 @@ export class Plot extends Component {
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
+  private _temp1: any;
+  private _temp2: any;
+
   private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
     var accessor = accScaleBinding.accessor;
     var scale = accScaleBinding.scale;
@@ -308,11 +311,84 @@ export class Plot extends Component {
     }
 
     var data = dataset.data();
+    // if (filter != null) {
+    //   data = data.filter((d, i) => filter(d, i, dataset));
+    // }
+
+    var filteredData: any[] = [];
+
+    var justAdded = false;
+    var lastValue: any;
+
     if (filter != null) {
-      data = data.filter((d, i) => filter(d, i, dataset));
+      data.forEach((d, i) => {
+        if (filter(d, i, dataset)) {
+          if (!justAdded && lastValue != null) {
+
+            if (this.x && this.x().scale && this.y && this.y().scale) {
+
+              var xScale = this.x().scale;
+              var yScale = this.y().scale;
+
+              var leftPoint = xScale.domain()[0];
+              var befX = lastValue.x;
+              var aftX = d.x;
+
+              var x1 = leftPoint - befX;
+              var x2 = aftX - befX;
+              var y2 = d.y - lastValue.y;
+
+              var y1 = x1 * y2 / x2;
+
+              filteredData.push({
+                x: befX + x1,
+                y: lastValue.y + y1
+              });
+            }
+
+            // filteredData.push(lastValue);
+          }
+          filteredData.push(d);
+          justAdded = true;
+        } else {
+          if (justAdded) {
+
+            if (this.x && this.x().scale && this.y && this.y().scale) {
+
+              var xScale = this.x().scale;
+              var yScale = this.y().scale;
+
+              var rightPoint = xScale.domain()[1];
+              var befX = lastValue.x;
+              var aftX = d.x;
+
+              var x1 = rightPoint - befX;
+              var x2 = aftX - befX;
+              var y2 = d.y - lastValue.y;
+
+              var y1 = x1 * y2 / x2;
+
+              filteredData.push({
+                x: befX + x1,
+                y: lastValue.y + y1
+              });
+            }
+
+            // filteredData.push(d);
+          }
+          justAdded = false;
+        }
+
+        lastValue = d;
+      });
+    } else {
+      filteredData = data;
     }
+
+
     var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
-    var mappedData = data.map(appliedAccessor);
+    var mappedData = filteredData.map(appliedAccessor);
+    // var mappedData = data.map(appliedAccessor);
 
     return scale.extentOfValues(mappedData);
   }
