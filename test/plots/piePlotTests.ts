@@ -24,7 +24,54 @@ describe("Plots", () => {
         piePlot = new Plottable.Plots.Pie();
       });
 
-      it("labels are hidden if slices are too small", () => {
+      it("updates labels when data changes", () => {
+        piePlot.sectorValue((d) => d.value);
+        piePlot.labelsEnabled(true);
+        var data1 = [
+          { value: 1 },
+          { value: 1 },
+          { value: 1 }
+        ];
+        var dataset = new Plottable.Dataset(data1);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labels = piePlot.content().selectAll("text");
+        labels.each(function() {
+          var labelText = d3.select(this).text();
+          assert.strictEqual(labelText, "1", "label has correct text");
+        });
+        var data2 = [
+          { value: 2 },
+          { value: 2 },
+          { value: 2 }
+        ];
+        dataset.data(data2);
+        labels = piePlot.content().selectAll("text");
+        labels.each(function() {
+          var labelText = d3.select(this).text();
+          assert.strictEqual(labelText, "2", "label text was updated");
+        });
+        svg.remove();
+      });
+
+      it("removes labels when they are disabled after rendering", () => {
+        piePlot.sectorValue((d) => d.value);
+        piePlot.labelsEnabled(true);
+        var data1 = [
+          { value: 1 },
+          { value: 1 },
+          { value: 1 }
+        ];
+        var dataset = new Plottable.Dataset(data1);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        piePlot.labelsEnabled(false);
+        var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), 0, "labels were removed");
+        svg.remove();
+      });
+
+      it("hides labels if slices are too small", () => {
         var data = [
           { key: "A", value: 1 }, { key: "B", value: 50 },
           { key: "C", value: 1 }, { key: "D", value: 50 },
