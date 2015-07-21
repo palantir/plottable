@@ -14,6 +14,37 @@ describe("Plots", () => {
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
     });
+
+    describe("Labels", () => {
+      var svg: d3.Selection<void>;
+      var piePlot: Plottable.Plots.Pie;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        piePlot = new Plottable.Plots.Pie();
+      });
+
+      it("labels are shown and hidden appropriately", () => {
+        var data = [
+          { key: "A", value: 1 }, { key: "B", value: 50 },
+          { key: "C", value: 1 }, { key: "D", value: 50 },
+          { key: "E", value: 1 }, { key: "F", value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.sectorValue((d) => d.value);
+        piePlot.addDataset(dataset);
+        piePlot.labelsEnabled(true);
+        piePlot.renderTo(svg);
+        $(".label-area").children("g").each(function(i) {
+          if (i % 2 === 0) {
+            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
+          }
+        });
+        svg.remove();
+      });
+    });
   });
 
   describe("PiePlot", () => {
@@ -243,27 +274,6 @@ describe("Plots", () => {
       assert.strictEqual(message, "Negative values will not render correctly in a Pie Plot.");
       Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
-    });
-
-    describe("Labels", () => {
-      it("labels are shown and hidden appropriately", () => {
-        piePlot.removeDataset(simpleDataset);
-        var data = [
-          { key: "A", value: 1 }, { key: "B", value: 50 },
-          { key: "C", value: 1 }, { key: "D", value: 50 },
-          { key: "E", value: 1 }, { key: "F", value: 50 }
-        ];
-        var dataset = new Plottable.Dataset(data);
-        piePlot.addDataset(dataset).labelsEnabled(true);
-        $(".label-area").children("g").each(function(i) {
-          if (i % 2 === 0) {
-            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
-          } else {
-            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
-          }
-        });
-        svg.remove();
-      });
     });
   });
 
