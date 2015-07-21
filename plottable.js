@@ -6692,6 +6692,8 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
+            // TODO: private
+            this._autorangeSmooth = false;
             this._deferredRendering = false;
             this._cachedDomainX = [null, null];
             this._cachedDomainY = [null, null];
@@ -6859,6 +6861,13 @@ var Plottable;
                 default:
                     throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
             }
+            return this;
+        };
+        XYPlot.prototype.autorangeSmooth = function (autorangeSmooth) {
+            if (autorangeSmooth == null) {
+                return this._autorangeSmooth;
+            }
+            this._autorangeSmooth = autorangeSmooth;
             return this;
         };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {

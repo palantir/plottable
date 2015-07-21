@@ -2590,6 +2590,7 @@ declare module Plottable {
     class XYPlot<X, Y> extends Plot {
         protected static _X_KEY: string;
         protected static _Y_KEY: string;
+        _autorangeSmooth: boolean;
         /**
          * An XYPlot is a Plot that displays data along two primary directions, X and Y.
          *
@@ -2672,6 +2673,8 @@ declare module Plottable {
          * @returns {XYPlot} The calling XYPlot.
          */
         autorangeMode(autorangeMode: string): XYPlot<X, Y>;
+        autorangeSmooth(): boolean;
+        autorangeSmooth(autorangeSmooth: boolean): XYPlot<X, Y>;
         computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XYPlot<X, Y>;
         /**
          * Adjusts the domains of both X and Y scales to show all data.

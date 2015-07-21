@@ -9,6 +9,9 @@ export class XYPlot<X, Y> extends Plot {
   private _adjustYDomainOnChangeFromXCallback: ScaleCallback<Scale<any, any>>;
   private _adjustXDomainOnChangeFromYCallback: ScaleCallback<Scale<any, any>>;
 
+  // TODO: private
+  public _autorangeSmooth = false;
+
   private _deferredRendering = false;
   private _cachedDomainX: X[] = [null, null];
   private _cachedDomainY: Y[] = [null, null];
@@ -281,6 +284,16 @@ export class XYPlot<X, Y> extends Plot {
       default:
         throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
     }
+    return this;
+  }
+
+  public autorangeSmooth(): boolean;
+  public autorangeSmooth(autorangeSmooth: boolean): XYPlot<X, Y>;
+  public autorangeSmooth(autorangeSmooth?: boolean): any {
+    if (autorangeSmooth == null) {
+      return this._autorangeSmooth;
+    }
+    this._autorangeSmooth = autorangeSmooth;
     return this;
   }
 
