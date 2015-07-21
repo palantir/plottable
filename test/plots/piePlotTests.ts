@@ -24,7 +24,7 @@ describe("Plots", () => {
         piePlot = new Plottable.Plots.Pie();
       });
 
-      it("labels are shown and hidden appropriately", () => {
+      it("labels are hidden if slices are too small", () => {
         var data = [
           { key: "A", value: 1 }, { key: "B", value: 50 },
           { key: "C", value: 1 }, { key: "D", value: 50 },
@@ -35,11 +35,13 @@ describe("Plots", () => {
         piePlot.addDataset(dataset);
         piePlot.labelsEnabled(true);
         piePlot.renderTo(svg);
-        $(".label-area").children("g").each(function(i) {
-          if (i % 2 === 0) {
-            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
+        var labelGs = piePlot.content().select(".label-area").selectAll(".label-area > g");
+        labelGs.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (data[i].value === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
           } else {
-            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
+            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
           }
         });
         svg.remove();
