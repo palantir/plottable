@@ -183,13 +183,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var jshintConfig = {
-    files: ["Gruntfile.js", "quicktests/**/*.js"],
-    options: {
-      jshintrc: ".jshintrc"
-    }
-  };
-
   var jscsConfig = {
     files: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
@@ -326,7 +319,6 @@ module.exports = function(grunt) {
     concat: concatConfig,
     ts: tsConfig,
     tslint: tslintConfig,
-    jshint: jshintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
     parallelize: parallelizeConfig,
@@ -397,7 +389,6 @@ module.exports = function(grunt) {
     "dev-compile",
     "blanket_mocha",
     "parallelize:tslint",
-    "jshint",
     "ts:verifyDefinitionFiles",
     "jscs",
     "eslint"
