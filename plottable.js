@@ -4386,7 +4386,7 @@ var Plottable;
             Numeric.prototype._computeApproximateTextWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
-                var mWidth = this._measurer.measure('M').width;
+                var mWidth = this._measurer.measure("M").width;
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
                     return formattedValue.length * mWidth;

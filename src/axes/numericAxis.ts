@@ -30,7 +30,7 @@ export module Axes {
     }
 
     protected _computeWidth() {
-      var maxTextWidth = this._approximateTextWidth ? this._computeApproximateTextWidth() : this._computeExactTextWidth()
+      var maxTextWidth = this._approximateTextWidth ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
@@ -53,7 +53,7 @@ export module Axes {
 
     private _computeApproximateTextWidth(): number {
       var tickValues = this._getTickValues();
-      var mWidth = this._measurer.measure('M').width;
+      var mWidth = this._measurer.measure("M").width;
       var textLengths = tickValues.map((v: any) => {
         var formattedValue = this.formatter()(v);
         return formattedValue.length * mWidth;
