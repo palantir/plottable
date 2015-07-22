@@ -5961,6 +5961,10 @@ var Plottable;
                     topLeft: { x: 0, y: 0 },
                     bottomRight: { x: 0, y: 0 }
                 };
+                this._boxDataBounds = {
+                    topLeft: { x: null, y: null },
+                    bottomRight: { x: null, y: null }
+                };
                 this.addClass("selection-box-layer");
                 this._renderCallback = function () { return _this.render(); };
             }
@@ -5996,14 +6000,23 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
+                this._boxDataBounds = {
+                    topLeft: {
+                        x: this._xScale ? this._xScale.invert(topLeft.x) : topLeft.x,
+                        y: this._yScale ? this._yScale.invert(topLeft.y) : topLeft.y
+                    },
+                    bottomRight: {
+                        x: this._xScale ? this._xScale.invert(bottomRight.x) : bottomRight.x,
+                        y: this._yScale ? this._yScale.invert(bottomRight.y) : bottomRight.y
+                    }
+                };
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
-                    var scaledBoxBounds = this._scaledBoxBounds();
-                    var t = scaledBoxBounds.topLeft.y;
-                    var b = scaledBoxBounds.bottomRight.y;
-                    var l = scaledBoxBounds.topLeft.x;
-                    var r = scaledBoxBounds.bottomRight.x;
+                    var t = this._yScale ? this._yScale.scale(this._boxDataBounds.topLeft.y) : this._boxBounds.topLeft.y;
+                    var b = this._yScale ? this._yScale.scale(this._boxDataBounds.bottomRight.y) : this._boxBounds.bottomRight.y;
+                    var l = this._xScale ? this._xScale.scale(this._boxDataBounds.topLeft.x) : this._boxBounds.topLeft.x;
+                    var r = this._xScale ? this._xScale.scale(this._boxDataBounds.bottomRight.x) : this._boxBounds.bottomRight.x;
                     this._boxArea.attr({
                         x: l, y: t, width: r - l, height: b - t
                     });
@@ -6013,29 +6026,6 @@ var Plottable;
                     this._box.remove();
                 }
                 return this;
-            };
-            SelectionBoxLayer.prototype._scaledBoxBounds = function () {
-                var _this = this;
-                var scalePoint = function (point) {
-                    return {
-                        x: _this._xScale ? _this._xScale.scale(point.x) : point.x,
-                        y: _this._yScale ? _this._yScale.scale(point.x) : point.y
-                    };
-                };
-                var scaledBoxBounds = {
-                    topLeft: scalePoint(this._boxBounds.topLeft),
-                    bottomRight: scalePoint(this._boxBounds.bottomRight)
-                };
-                return {
-                    topLeft: {
-                        x: Math.min(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
-                        y: Math.min(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
-                    },
-                    bottomRight: {
-                        x: Math.max(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
-                        y: Math.max(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
-                    }
-                };
             };
             SelectionBoxLayer.prototype.boxVisible = function (show) {
                 if (show == null) {
@@ -6057,6 +6047,16 @@ var Plottable;
                 }
                 this._xScale = xScale;
                 xScale.onUpdate(this._renderCallback);
+                this._boxDataBounds = {
+                    topLeft: {
+                        x: this._xScale.invert(this._boxBounds.topLeft.x),
+                        y: this._boxDataBounds.topLeft.y
+                    },
+                    bottomRight: {
+                        x: this._xScale.invert(this._boxBounds.bottomRight.x),
+                        y: this._boxDataBounds.bottomRight.y
+                    }
+                };
                 return this;
             };
             SelectionBoxLayer.prototype.yScale = function (yScale) {
@@ -6065,6 +6065,16 @@ var Plottable;
                 }
                 this._yScale = yScale;
                 yScale.onUpdate(this._renderCallback);
+                this._boxDataBounds = {
+                    topLeft: {
+                        x: this._boxDataBounds.topLeft.x,
+                        y: this._yScale.invert(this._boxBounds.topLeft.y)
+                    },
+                    bottomRight: {
+                        x: this._boxDataBounds.bottomRight.x,
+                        y: this._yScale.invert(this._boxBounds.bottomRight.y)
+                    }
+                };
                 return this;
             };
             return SelectionBoxLayer;

@@ -10,6 +10,10 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
+    private _boxDataBounds: Bounds = {
+      topLeft: { x: null, y: null },
+      bottomRight: { x: null, y: null }
+    };
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
     private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
@@ -68,15 +72,24 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
+      this._boxDataBounds = {
+        topLeft: {
+          x: this._xScale ? this._xScale.invert(topLeft.x) : topLeft.x,
+          y: this._yScale ? this._yScale.invert(topLeft.y) : topLeft.y
+        },
+        bottomRight: {
+          x: this._xScale ? this._xScale.invert(bottomRight.x) : bottomRight.x,
+          y: this._yScale ? this._yScale.invert(bottomRight.y) : bottomRight.y
+        }
+      };
     }
 
     public renderImmediately() {
       if (this._boxVisible) {
-        var scaledBoxBounds = this._scaledBoxBounds();
-        var t = scaledBoxBounds.topLeft.y;
-        var b = scaledBoxBounds.bottomRight.y;
-        var l = scaledBoxBounds.topLeft.x;
-        var r = scaledBoxBounds.bottomRight.x;
+        var t = this._yScale ? this._yScale.scale(this._boxDataBounds.topLeft.y) : this._boxBounds.topLeft.y;
+        var b = this._yScale ? this._yScale.scale(this._boxDataBounds.bottomRight.y) : this._boxBounds.bottomRight.y;
+        var l = this._xScale ? this._xScale.scale(this._boxDataBounds.topLeft.x) : this._boxBounds.topLeft.x;
+        var r = this._xScale ? this._xScale.scale(this._boxDataBounds.bottomRight.x) : this._boxBounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -86,29 +99,6 @@ export module Components {
         this._box.remove();
       }
       return this;
-    }
-
-    private _scaledBoxBounds() {
-      var scalePoint = (point: Point) => {
-        return {
-          x: this._xScale ? this._xScale.scale(point.x) : point.x,
-          y: this._yScale ? this._yScale.scale(point.x) : point.y
-        };
-      };
-      var scaledBoxBounds = {
-        topLeft: scalePoint(this._boxBounds.topLeft),
-        bottomRight: scalePoint(this._boxBounds.bottomRight)
-      };
-      return {
-        topLeft: {
-          x: Math.min(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
-          y: Math.min(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
-        },
-        bottomRight: {
-          x: Math.max(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
-          y: Math.max(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
-        }
-      };
     }
 
     /**
@@ -148,6 +138,16 @@ export module Components {
       }
       this._xScale = xScale;
       xScale.onUpdate(this._renderCallback);
+      this._boxDataBounds = {
+        topLeft: {
+          x: this._xScale.invert(this._boxBounds.topLeft.x),
+          y: this._boxDataBounds.topLeft.y
+        },
+        bottomRight: {
+          x: this._xScale.invert(this._boxBounds.bottomRight.x),
+          y: this._boxDataBounds.bottomRight.y
+        }
+      };
       return this;
     }
 
@@ -159,6 +159,16 @@ export module Components {
       }
       this._yScale = yScale;
       yScale.onUpdate(this._renderCallback);
+      this._boxDataBounds = {
+        topLeft: {
+          x: this._boxDataBounds.topLeft.x,
+          y: this._yScale.invert(this._boxBounds.topLeft.y)
+        },
+        bottomRight: {
+          x: this._boxDataBounds.bottomRight.x,
+          y: this._yScale.invert(this._boxBounds.bottomRight.y)
+        }
+      };
       return this;
     }
   }
