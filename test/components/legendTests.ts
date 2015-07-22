@@ -362,7 +362,7 @@ describe("Legend", () => {
 
     var expectedIndex = 0;
     var symbolChecker = (d: any, index: number) => {
-      assert.strictEqual(index, expectedIndex, "message");
+      assert.strictEqual(index, expectedIndex, "index passed in is correct");
       expectedIndex++;
       return (size: number) => "";
     };
