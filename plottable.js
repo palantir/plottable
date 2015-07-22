@@ -6534,8 +6534,8 @@ var Plottable;
                 return this;
             };
             Pie.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
+                _super.prototype._onDatasetUpdate.call(this);
             };
             Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);

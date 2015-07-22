@@ -53,8 +53,8 @@ export module Plots {
     }
 
     protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
       this._updatePieAngles();
+      super._onDatasetUpdate();
     }
 
     protected _createDrawer(dataset: Dataset) {
@@ -183,9 +183,9 @@ export module Plots {
 
     /*
      * Gets the Entities at a particular Point.
-     * 
+     *
      * @param {Point} p
-     * @param {PlotEntity[]} 
+     * @param {PlotEntity[]}
      */
     public entitiesAt(queryPoint: Point) {
       var center = { x: this.width() / 2, y: this.height() / 2 };
