@@ -11,8 +11,8 @@ export module Components {
       bottomRight: { x: 0, y: 0 }
     };
     private _boxDataBounds: Bounds = {
-      topLeft: { x: null, y: null },
-      bottomRight: { x: null, y: null }
+      topLeft: { x: 0, y: 0 },
+      bottomRight: { x: 0, y: 0 }
     };
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
@@ -72,16 +72,7 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-      this._boxDataBounds = {
-        topLeft: {
-          x: this._xScale ? this._xScale.invert(topLeft.x) : topLeft.x,
-          y: this._yScale ? this._yScale.invert(topLeft.y) : topLeft.y
-        },
-        bottomRight: {
-          x: this._xScale ? this._xScale.invert(bottomRight.x) : bottomRight.x,
-          y: this._yScale ? this._yScale.invert(bottomRight.y) : bottomRight.y
-        }
-      };
+      this._bindBoxDataBounds();
     }
 
     public renderImmediately() {
@@ -136,18 +127,12 @@ export module Components {
       if (xScale == null) {
         return this._xScale;
       }
+      if (this._xScale != null) {
+        this._xScale.offUpdate(this._renderCallback);
+      }
       this._xScale = xScale;
       xScale.onUpdate(this._renderCallback);
-      this._boxDataBounds = {
-        topLeft: {
-          x: this._xScale.invert(this._boxBounds.topLeft.x),
-          y: this._boxDataBounds.topLeft.y
-        },
-        bottomRight: {
-          x: this._xScale.invert(this._boxBounds.bottomRight.x),
-          y: this._boxDataBounds.bottomRight.y
-        }
-      };
+      this._bindBoxDataBounds();
       return this;
     }
 
@@ -157,19 +142,26 @@ export module Components {
       if (yScale == null) {
         return this._yScale;
       }
+      if (this._yScale != null) {
+        this._yScale.offUpdate(this._renderCallback);
+      }
       this._yScale = yScale;
       yScale.onUpdate(this._renderCallback);
+      this._bindBoxDataBounds();
+      return this;
+    }
+
+    private _bindBoxDataBounds() {
       this._boxDataBounds = {
         topLeft: {
-          x: this._boxDataBounds.topLeft.x,
-          y: this._yScale.invert(this._boxBounds.topLeft.y)
+          x: this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null,
+          y: this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null
         },
         bottomRight: {
-          x: this._boxDataBounds.bottomRight.x,
-          y: this._yScale.invert(this._boxBounds.bottomRight.y)
+          x: this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null,
+          y: this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null
         }
       };
-      return this;
     }
   }
 }
