@@ -56,6 +56,25 @@ describe("Plots", () => {
         piePlot = new Plottable.Plots.Pie();
       });
 
+      it("rendering twice does not erase or add labels", () => {
+        piePlot.sectorValue((d) => d.value);
+        piePlot.labelsEnabled(true);
+        var data = [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per slice");
+        piePlot.render();
+        labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per slice after re-render()ing");
+        svg.remove();
+      });
+
       it("updates labels when data changes", () => {
         piePlot.sectorValue((d) => d.value);
         piePlot.labelsEnabled(true);
