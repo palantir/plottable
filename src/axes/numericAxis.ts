@@ -54,7 +54,7 @@ export module Axes {
     private _computeApproximateTextWidth(): number {
       var tickValues = this._getTickValues();
       var mWidth = this._measurer.measure("M").width;
-      var textLengths = tickValues.map((v: any) => {
+      var textLengths = tickValues.map((v: number): number => {
         var formattedValue = this.formatter()(v);
         return formattedValue.length * mWidth;
       });
