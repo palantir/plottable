@@ -6673,11 +6673,9 @@ var Plottable;
             };
             Pie.prototype._additionalPaint = function (time) {
                 var _this = this;
+                this._renderArea.select(".label-area").remove();
                 if (this._labelsEnabled) {
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
-                }
-                else {
-                    this._renderArea.select(".label-area").remove();
                 }
             };
             Pie.prototype._sliceIndexForPoint = function (p) {
@@ -6707,10 +6705,7 @@ var Plottable;
             Pie.prototype._drawLabels = function () {
                 var _this = this;
                 var attrToProjector = this._generateAttrToProjector();
-                var labelArea = this._renderArea.select(".label-area");
-                if (labelArea.empty()) {
-                    labelArea = this._renderArea.append("g").classed("label-area", true);
-                }
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 var dataset = this.datasets()[0];

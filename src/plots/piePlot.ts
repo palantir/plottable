@@ -269,10 +269,9 @@ export module Plots {
     }
 
     protected _additionalPaint(time: number) {
+      this._renderArea.select(".label-area").remove();
       if (this._labelsEnabled) {
         Utils.Window.setTimeout(() => this._drawLabels(), time);
-      } else {
-        this._renderArea.select(".label-area").remove();
       }
     }
 
@@ -303,10 +302,7 @@ export module Plots {
 
     private _drawLabels() {
       var attrToProjector = this._generateAttrToProjector();
-      var labelArea = this._renderArea.select(".label-area");
-      if (labelArea.empty()) {
-        labelArea = this._renderArea.append("g").classed("label-area", true);
-      }
+      var labelArea = this._renderArea.append("g").classed("label-area", true);
       var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       var dataset = this.datasets()[0];
