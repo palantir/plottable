@@ -10,6 +10,8 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
+    private _xScale: QuantitativeScale<any>;
+    private _yScale: QuantitativeScale<any>;
 
     constructor() {
       super();
@@ -110,6 +112,26 @@ export module Components {
 
     public fixedHeight() {
       return true;
+    }
+
+    public xScale(): QuantitativeScale<any>;
+    public xScale(xScale: QuantitativeScale<any>): SelectionBoxLayer;
+    public xScale(xScale?: QuantitativeScale<any>): any {
+      if (xScale == null) {
+        return this._xScale;
+      }
+      this._xScale = xScale;
+      return this;
+    }
+
+    public yScale(): QuantitativeScale<any>;
+    public yScale(yScale: QuantitativeScale<any>): SelectionBoxLayer;
+    public yScale(yScale?: QuantitativeScale<any>): any {
+      if (yScale == null) {
+        return this._yScale;
+      }
+      this._yScale = yScale;
+      return this;
     }
   }
 }

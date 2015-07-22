@@ -6025,6 +6025,20 @@ var Plottable;
             SelectionBoxLayer.prototype.fixedHeight = function () {
                 return true;
             };
+            SelectionBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    return this._xScale;
+                }
+                this._xScale = xScale;
+                return this;
+            };
+            SelectionBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    return this._yScale;
+                }
+                this._yScale = yScale;
+                return this;
+            };
             return SelectionBoxLayer;
         })(Plottable.Component);
         Components.SelectionBoxLayer = SelectionBoxLayer;
