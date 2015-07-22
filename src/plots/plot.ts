@@ -308,14 +308,10 @@ export class Plot extends Component {
     }
 
     var data = dataset.data();
-    var filteredData: any[] = [];;
+    var filteredData: any[] = [];
     if (filter != null) {
       filteredData = data.filter((d, i) => filter(d, i, dataset));
     }
-
-    var justAdded = false;
-    var lastValue: any;
-
 
     var self = <any>this;
     if (self.x && self.x().scale && self.y && self.y().scale) {
@@ -326,16 +322,17 @@ export class Plot extends Component {
 
       var lastValue: any;
       data.forEach((d, i) => {
-
+        var x1: any;
+        var x2: any;
+        var y1: any;
+        var y2: any;
         if (lastValue) {
-
-          // console.log(lastValue.x, d.x);
           if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
 
-            var x1 = left - lastValue.x;
-            var x2 = d.x - lastValue.x;
-            var y2 = d.y - lastValue.y;
-            var y1 = x1 * y2 / x2;
+            x1 = left - lastValue.x;
+            x2 = d.x - lastValue.x;
+            y2 = d.y - lastValue.y;
+            y1 = x1 * y2 / x2;
 
             filteredData.push({
               x: lastValue.x + x1,
@@ -344,17 +341,16 @@ export class Plot extends Component {
           }
 
           if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-            var x1 = right - lastValue.x;
-            var x2 = d.x - lastValue.x;
-            var y2 = d.y - lastValue.y;
-            var y1 = x1 * y2 / x2;
+            x1 = right - lastValue.x;
+            x2 = d.x - lastValue.x;
+            y2 = d.y - lastValue.y;
+            y1 = x1 * y2 / x2;
 
             filteredData.push({
               x: lastValue.x + x1,
               y: lastValue.y + y1
             });
           }
-
         }
 
         westOfLeft = d.x < left;
@@ -364,79 +360,8 @@ export class Plot extends Component {
       });
     }
 
-    // if (filter != null) {
-    //   data.forEach((d, i) => {
-    //     if (filter(d, i, dataset)) {
-    //       if (!justAdded && lastValue != null) {
-
-    //         var self = <any>this;
-
-    //         if (self.x && self.x().scale && self.y && self.y().scale) {
-
-    //           var xScale = self.x().scale;
-    //           var yScale = self.y().scale;
-
-    //           var leftPoint = xScale.domain()[0];
-    //           var befX = lastValue.x;
-    //           var aftX = d.x;
-
-    //           var x1 = leftPoint - befX;
-    //           var x2 = aftX - befX;
-    //           var y2 = d.y - lastValue.y;
-
-    //           var y1 = x1 * y2 / x2;
-
-    //           filteredData.push({
-    //             x: befX + x1,
-    //             y: lastValue.y + y1
-    //           });
-    //         }
-
-    //         // filteredData.push(lastValue);
-    //       }
-    //       filteredData.push(d);
-    //       justAdded = true;
-    //     } else {
-    //       if (justAdded) {
-
-    //         var self = <any> this;
-
-    //         if (self.x && self.x().scale && self.y && self.y().scale) {
-
-    //           var xScale = self.x().scale;
-    //           var yScale = self.y().scale;
-
-    //           var rightPoint = xScale.domain()[1];
-    //           var befX = lastValue.x;
-    //           var aftX = d.x;
-
-    //           var x1 = rightPoint - befX;
-    //           var x2 = aftX - befX;
-    //           var y2 = d.y - lastValue.y;
-
-    //           var y1 = x1 * y2 / x2;
-
-    //           filteredData.push({
-    //             x: befX + x1,
-    //             y: lastValue.y + y1
-    //           });
-    //         }
-
-    //         // filteredData.push(d);
-    //       }
-    //       justAdded = false;
-    //     }
-
-    //     lastValue = d;
-    //   });
-    // } else {
-    //   filteredData = data;
-    // }
-
-
     var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
     var mappedData = filteredData.map(appliedAccessor);
-    // var mappedData = data.map(appliedAccessor);
 
     return scale.extentOfValues(mappedData);
   }
