@@ -15,6 +15,38 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("updates slices when data changes", () => {
+      var svg = TestMethods.generateSVG(500, 500);
+      var piePlot = new Plottable.Plots.Pie();
+      piePlot.sectorValue((d) => d.value);
+      var fourSliceData = [
+        { value: 1 },
+        { value: 1 },
+        { value: 1 },
+        { value: 1 }
+      ];
+      var dataset = new Plottable.Dataset(fourSliceData);
+      piePlot.addDataset(dataset);
+      piePlot.renderTo(svg);
+      var fourSlicePathStrings: String[] = [];
+      piePlot.content().selectAll("path").each(function() { fourSlicePathStrings.push(d3.select(this).attr("d")); });
+      assert.lengthOf(fourSlicePathStrings, 4, "one path per datum");
+
+      var twoSliceData = [
+        { value: 1 },
+        { value: 1 }
+      ];
+      dataset.data(twoSliceData);
+      var twoSlicePathStrings: String[] = [];
+      piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
+      assert.lengthOf(twoSliceData, 2, "one path per datum");
+
+      twoSlicePathStrings.forEach((pathString, index) => {
+        assert.notStrictEqual(pathString, fourSlicePathStrings[index], "slices were updated when data changed");
+      });
+      svg.remove();
+    });
+
     describe("Labels", () => {
       var svg: d3.Selection<void>;
       var piePlot: Plottable.Plots.Pie;
