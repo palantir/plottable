@@ -68,17 +68,18 @@ describe("Plots", () => {
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
         var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data1.length, "one label per datum");
         labels.each(function() {
           var labelText = d3.select(this).text();
           assert.strictEqual(labelText, "1", "label has correct text");
         });
         var data2 = [
           { value: 2 },
-          { value: 2 },
           { value: 2 }
         ];
         dataset.data(data2);
         labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data2.length, "one label per datum");
         labels.each(function() {
           var labelText = d3.select(this).text();
           assert.strictEqual(labelText, "2", "label text was updated");
