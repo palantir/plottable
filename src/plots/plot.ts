@@ -322,10 +322,12 @@ export class Plot extends Component {
         if (filter(d, i, dataset)) {
           if (!justAdded && lastValue != null) {
 
-            if (this.x && this.x().scale && this.y && this.y().scale) {
+            var self = <any>this;
 
-              var xScale = this.x().scale;
-              var yScale = this.y().scale;
+            if (self.x && self.x().scale && self.y && self.y().scale) {
+
+              var xScale = self.x().scale;
+              var yScale = self.y().scale;
 
               var leftPoint = xScale.domain()[0];
               var befX = lastValue.x;
@@ -350,10 +352,12 @@ export class Plot extends Component {
         } else {
           if (justAdded) {
 
-            if (this.x && this.x().scale && this.y && this.y().scale) {
+            var self = <any> this;
 
-              var xScale = this.x().scale;
-              var yScale = this.y().scale;
+            if (self.x && self.x().scale && self.y && self.y().scale) {
+
+              var xScale = self.x().scale;
+              var yScale = self.y().scale;
 
               var rightPoint = xScale.domain()[1];
               var befX = lastValue.x;

@@ -6261,9 +6261,10 @@ var Plottable;
                 data.forEach(function (d, i) {
                     if (filter(d, i, dataset)) {
                         if (!justAdded && lastValue != null) {
-                            if (_this.x && _this.x().scale && _this.y && _this.y().scale) {
-                                var xScale = _this.x().scale;
-                                var yScale = _this.y().scale;
+                            var self = _this;
+                            if (self.x && self.x().scale && self.y && self.y().scale) {
+                                var xScale = self.x().scale;
+                                var yScale = self.y().scale;
                                 var leftPoint = xScale.domain()[0];
                                 var befX = lastValue.x;
                                 var aftX = d.x;
@@ -6282,9 +6283,10 @@ var Plottable;
                     }
                     else {
                         if (justAdded) {
-                            if (_this.x && _this.x().scale && _this.y && _this.y().scale) {
-                                var xScale = _this.x().scale;
-                                var yScale = _this.y().scale;
+                            var self = _this;
+                            if (self.x && self.x().scale && self.y && self.y().scale) {
+                                var xScale = self.x().scale;
+                                var yScale = self.y().scale;
                                 var rightPoint = xScale.domain()[1];
                                 var befX = lastValue.x;
                                 var aftX = d.x;
