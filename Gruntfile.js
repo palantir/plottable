@@ -67,20 +67,10 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts"
     },
-    plottableMultifile: {
-      pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("/build/src/$1.js");',
-      path: "plottable_multifile.js"
-    },
     definitions: {
       pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
       path: "build/plottable.d.ts"
-    },
-    testsMultifile: {
-      pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("/build/test/$1.js");',
-      path: "test/tests_multifile.js"
     },
     sublime: {
       pattern: "(.*\\.ts)",
@@ -135,14 +125,6 @@ module.exports = function(grunt) {
     header: {
       src: ["license_header.txt", "plottable.js"],
       dest: "plottable.js"
-    },
-    plottableMultifile: {
-      src: ["synchronousRequire.js", "src/reference.ts"],
-      dest: "plottable_multifile.js"
-    },
-    testsMultifile: {
-      src: ["synchronousRequire.js", "test/testReference.ts"],
-      dest: "test/tests_multifile.js"
     },
     plottable: {
       src: tsFiles.map(function(s) {
@@ -397,12 +379,6 @@ module.exports = function(grunt) {
 
   // Tooling
   grunt.registerTask("sublime", ["shell:sublime", "sed:sublime"]);
-  grunt.registerTask("generateMultifile", [
-    "concat:plottableMultifile",
-    "sed:plottableMultifile",
-    "concat:testsMultifile",
-    "sed:testsMultifile"
-  ]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];

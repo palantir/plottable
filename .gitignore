@@ -1,18 +1,28 @@
-.DS_Store
-*.tmp.txt
-node_modules
-build
-plottable_multifile.js
-test/tests_multifile.js
-local/
+# Build files
+build/
+test/tests.js
+
+# Typescript
+.baseDir.ts
 .tscache/
+
+# Project specific
+node_modules/
+local/
 quicktests/github_token.txt
 quicktests/overlaying/list_of_quicktests.json
+
+# Mac
+.DS_Store
+*.tmp.txt
+
+# IntelliJ
 .idea/
-test/tests.js
+
 # Emacs
 .#*
-# vim
+
+# Vim
 *.swp
 *~
 
@@ -22,5 +32,3 @@ test/tests.js
 # Visual Studio Code
 .settings/
 
-# Typescript
-.baseDir.ts
