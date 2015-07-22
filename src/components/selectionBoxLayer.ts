@@ -12,10 +12,12 @@ export module Components {
     };
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
+    private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
+      this._renderCallback = () => this.render();
     }
 
     protected _setup() {
@@ -145,6 +147,7 @@ export module Components {
         return this._xScale;
       }
       this._xScale = xScale;
+      xScale.onUpdate(this._renderCallback);
       return this;
     }
 
@@ -155,6 +158,7 @@ export module Components {
         return this._yScale;
       }
       this._yScale = yScale;
+      yScale.onUpdate(this._renderCallback);
       return this;
     }
   }

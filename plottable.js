@@ -5954,6 +5954,7 @@ var Plottable;
         var SelectionBoxLayer = (function (_super) {
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
+                var _this = this;
                 _super.call(this);
                 this._boxVisible = false;
                 this._boxBounds = {
@@ -5961,6 +5962,7 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this.addClass("selection-box-layer");
+                this._renderCallback = function () { return _this.render(); };
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6054,6 +6056,7 @@ var Plottable;
                     return this._xScale;
                 }
                 this._xScale = xScale;
+                xScale.onUpdate(this._renderCallback);
                 return this;
             };
             SelectionBoxLayer.prototype.yScale = function (yScale) {
@@ -6061,6 +6064,7 @@ var Plottable;
                     return this._yScale;
                 }
                 this._yScale = yScale;
+                yScale.onUpdate(this._renderCallback);
                 return this;
             };
             return SelectionBoxLayer;
