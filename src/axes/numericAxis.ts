@@ -5,7 +5,7 @@ export module Axes {
   export class Numeric extends Axis<number> {
 
     private _tickLabelPositioning = "center";
-    private _approximateTextWidth = false;
+    private _usesTextWidthApproximation = false;
     private _measurer: SVGTypewriter.Measurers.Measurer;
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
 
@@ -30,7 +30,7 @@ export module Axes {
     }
 
     protected _computeWidth() {
-      var maxTextWidth = this._approximateTextWidth ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+      var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
 
       if (this._tickLabelPositioning === "center") {
         this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
@@ -283,18 +283,18 @@ export module Axes {
      *
      * @returns {boolean} The current approximate text width setting.
      */
-    public approximateTextWidth(): boolean;
+    public usesTextWidthApproximation(): boolean;
     /**
      * Sets the approximate text width setting.
      *
      * @param {boolean} enable faster but less accurate computation of text widths.
      */
-    public approximateTextWidth(enable: boolean);
-    public approximateTextWidth(enable?: boolean): boolean {
+    public usesTextWidthApproximation(enable: boolean);
+    public usesTextWidthApproximation(enable?: boolean): boolean {
       if (enable == null) {
-        return this._approximateTextWidth;
+        return this._usesTextWidthApproximation;
       } else {
-        this._approximateTextWidth = enable;
+        this._usesTextWidthApproximation = enable;
       }
     }
 

@@ -1905,13 +1905,13 @@ declare module Plottable {
              *
              * @returns {boolean} The current approximate text width setting.
              */
-            approximateTextWidth(): boolean;
+            usesTextWidthApproximation(): boolean;
             /**
              * Sets the approximate text width setting.
              *
              * @param {boolean} enable faster but less accurate computation of text widths.
              */
-            approximateTextWidth(enable: boolean): any;
+            usesTextWidthApproximation(enable: boolean): any;
         }
     }
 }

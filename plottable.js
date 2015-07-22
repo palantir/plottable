@@ -4356,7 +4356,7 @@ var Plottable;
             function Numeric(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
-                this._approximateTextWidth = false;
+                this._usesTextWidthApproximation = false;
                 this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
@@ -4365,7 +4365,7 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
-                var maxTextWidth = this._approximateTextWidth ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+                var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
                 if (this._tickLabelPositioning === "center") {
                     this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
                 }
@@ -4573,12 +4573,12 @@ var Plottable;
                     return this;
                 }
             };
-            Numeric.prototype.approximateTextWidth = function (enable) {
+            Numeric.prototype.usesTextWidthApproximation = function (enable) {
                 if (enable == null) {
-                    return this._approximateTextWidth;
+                    return this._usesTextWidthApproximation;
                 }
                 else {
-                    this._approximateTextWidth = enable;
+                    this._usesTextWidthApproximation = enable;
                 }
             };
             Numeric.prototype._hideEndTickLabels = function () {
