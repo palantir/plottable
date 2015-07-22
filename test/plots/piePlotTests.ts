@@ -30,7 +30,7 @@ describe("Plots", () => {
       piePlot.renderTo(svg);
       var fourSlicePathStrings: String[] = [];
       piePlot.content().selectAll("path").each(function() { fourSlicePathStrings.push(d3.select(this).attr("d")); });
-      assert.lengthOf(fourSlicePathStrings, 4, "one path per datum");
+      assert.lengthOf(fourSlicePathStrings, fourSliceData.length, "one path per datum");
 
       var twoSliceData = [
         { value: 1 },
@@ -39,7 +39,7 @@ describe("Plots", () => {
       dataset.data(twoSliceData);
       var twoSlicePathStrings: String[] = [];
       piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
-      assert.lengthOf(twoSliceData, 2, "one path per datum");
+      assert.lengthOf(twoSlicePathStrings, twoSliceData.length, "one path per datum");
 
       twoSlicePathStrings.forEach((pathString, index) => {
         assert.notStrictEqual(pathString, fourSlicePathStrings[index], "slices were updated when data changed");
@@ -117,8 +117,10 @@ describe("Plots", () => {
         var dataset = new Plottable.Dataset(data1);
         piePlot.addDataset(dataset);
         piePlot.renderTo(svg);
-        piePlot.labelsEnabled(false);
         var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data1.length, "one label per datum");
+        piePlot.labelsEnabled(false);
+        labels = piePlot.content().selectAll("text");
         assert.strictEqual(labels.size(), 0, "labels were removed");
         svg.remove();
       });
