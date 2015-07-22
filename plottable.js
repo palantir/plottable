@@ -5997,10 +5997,11 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
-                    var t = this._boxBounds.topLeft.y;
-                    var b = this._boxBounds.bottomRight.y;
-                    var l = this._boxBounds.topLeft.x;
-                    var r = this._boxBounds.bottomRight.x;
+                    var scaledBoxBounds = this._scaledBoxBounds();
+                    var t = scaledBoxBounds.topLeft.y;
+                    var b = scaledBoxBounds.bottomRight.y;
+                    var l = scaledBoxBounds.topLeft.x;
+                    var r = scaledBoxBounds.bottomRight.x;
                     this._boxArea.attr({
                         x: l, y: t, width: r - l, height: b - t
                     });
@@ -6010,6 +6011,29 @@ var Plottable;
                     this._box.remove();
                 }
                 return this;
+            };
+            SelectionBoxLayer.prototype._scaledBoxBounds = function () {
+                var _this = this;
+                var scalePoint = function (point) {
+                    return {
+                        x: _this._xScale ? _this._xScale.scale(point.x) : point.x,
+                        y: _this._yScale ? _this._yScale.scale(point.x) : point.y
+                    };
+                };
+                var scaledBoxBounds = {
+                    topLeft: scalePoint(this._boxBounds.topLeft),
+                    bottomRight: scalePoint(this._boxBounds.bottomRight)
+                };
+                return {
+                    topLeft: {
+                        x: Math.min(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
+                        y: Math.min(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
+                    },
+                    bottomRight: {
+                        x: Math.max(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
+                        y: Math.max(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
+                    }
+                };
             };
             SelectionBoxLayer.prototype.boxVisible = function (show) {
                 if (show == null) {

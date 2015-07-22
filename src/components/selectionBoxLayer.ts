@@ -70,10 +70,11 @@ export module Components {
 
     public renderImmediately() {
       if (this._boxVisible) {
-        var t = this._boxBounds.topLeft.y;
-        var b = this._boxBounds.bottomRight.y;
-        var l = this._boxBounds.topLeft.x;
-        var r = this._boxBounds.bottomRight.x;
+        var scaledBoxBounds = this._scaledBoxBounds();
+        var t = scaledBoxBounds.topLeft.y;
+        var b = scaledBoxBounds.bottomRight.y;
+        var l = scaledBoxBounds.topLeft.x;
+        var r = scaledBoxBounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -83,6 +84,29 @@ export module Components {
         this._box.remove();
       }
       return this;
+    }
+
+    private _scaledBoxBounds() {
+      var scalePoint = (point: Point) => {
+        return {
+          x: this._xScale ? this._xScale.scale(point.x) : point.x,
+          y: this._yScale ? this._yScale.scale(point.x) : point.y
+        };
+      };
+      var scaledBoxBounds = {
+        topLeft: scalePoint(this._boxBounds.topLeft),
+        bottomRight: scalePoint(this._boxBounds.bottomRight)
+      };
+      return {
+        topLeft: {
+          x: Math.min(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
+          y: Math.min(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
+        },
+        bottomRight: {
+          x: Math.max(scaledBoxBounds.topLeft.x, scaledBoxBounds.bottomRight.x),
+          y: Math.max(scaledBoxBounds.topLeft.y, scaledBoxBounds.bottomRight.y)
+        }
+      };
     }
 
     /**
