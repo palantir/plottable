@@ -277,9 +277,9 @@ export module Components {
         });
       });
 
-      entries.select("path").attr("d", (d: any, i: number) => this.symbol()(d, i)(layout.textHeight * 0.6))
+      entries.select("path").attr("d", (d: any, i: number, j: number) => this.symbol()(d, j)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
-                            .attr("fill", (value: string) => this._colorScale.scale(value) )
+                            .attr("fill", (value: string) => this._colorScale.scale(value))
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
