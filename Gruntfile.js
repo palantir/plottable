@@ -19,7 +19,6 @@ module.exports = function(grunt) {
     test: {
       src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
       outDir: "build/test/",
-      // watch: "test",
       options: {
         target: "es5",
         sourceMap: false,
@@ -32,10 +31,12 @@ module.exports = function(grunt) {
     verifyDefinitionFiles: {
       src: [
         "typings/d3/d3.d.ts",
-        "typings/touch-events/touch-events.d.ts",
         "plottable.d.ts",
         "bower_components/svg-typewriter/svgtypewriter.d.ts"
-      ]
+      ],
+      options: {
+        compiler: "./node_modules/typescript/bin/tsc"
+      }
     }
   };
 
@@ -49,16 +50,6 @@ module.exports = function(grunt) {
       prereleaseName: "rc"
     }
   };
-
-  var FILES_TO_COMMIT = [
-    "plottable.js",
-    "plottable.min.js",
-    "plottable.d.ts",
-    "plottable.css",
-    "plottable.zip",
-    "bower.json",
-    "package.json"
-  ];
 
   var prefixMatch = "\\n *(function |var |static )?";
   var varNameMatch = "[^(:;]*(\\([^)]*\\))?"; // catch function args too
@@ -76,20 +67,10 @@ module.exports = function(grunt) {
       replacement: "",
       path: "build/plottable.d.ts"
     },
-    plottableMultifile: {
-      pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("/build/src/$1.js");',
-      path: "plottable_multifile.js"
-    },
     definitions: {
       pattern: '/// *<reference path=[\'"].*[\'"] */>',
       replacement: "",
       path: "build/plottable.d.ts"
-    },
-    testsMultifile: {
-      pattern: '/// *<reference path="([^."]*).ts" */>',
-      replacement: 'synchronousRequire("/build/test/$1.js");',
-      path: "test/tests_multifile.js"
     },
     sublime: {
       pattern: "(.*\\.ts)",
@@ -145,14 +126,6 @@ module.exports = function(grunt) {
       src: ["license_header.txt", "plottable.js"],
       dest: "plottable.js"
     },
-    plottableMultifile: {
-      src: ["synchronousRequire.js", "src/reference.ts"],
-      dest: "plottable_multifile.js"
-    },
-    testsMultifile: {
-      src: ["synchronousRequire.js", "test/testReference.ts"],
-      dest: "test/tests_multifile.js"
-    },
     plottable: {
       src: tsFiles.map(function(s) {
         return "build/src/" + s.replace(".ts", ".js");
@@ -186,13 +159,6 @@ module.exports = function(grunt) {
     }
   };
 
-  var jshintConfig = {
-    files: ["Gruntfile.js", "quicktests/**/*.js"],
-    options: {
-      jshintrc: ".jshintrc"
-    }
-  };
-
   var jscsConfig = {
     files: ["Gruntfile.js", "quicktests/**/*.js"],
     options: {
@@ -215,11 +181,12 @@ module.exports = function(grunt) {
 
   var watchConfig = {
     options: {
-      livereload: true
+      livereload: true,
+      spawn: false
     },
     rebuild: {
-      tasks: ["dev-compile"],
-      files: ["src/**/*.ts", "examples/**/*.ts"]
+      tasks: ["src-compile"],
+      files: ["src/**/*.ts"]
     },
     tests: {
       tasks: ["test-compile"],
@@ -252,6 +219,16 @@ module.exports = function(grunt) {
   var cleanConfig = {
     tscommand: ["tscommand*.tmp.txt"]
   };
+
+  var FILES_TO_COMMIT = [
+    "plottable.js",
+    "plottable.min.js",
+    "plottable.d.ts",
+    "plottable.css",
+    "plottable.zip",
+    "bower.json",
+    "package.json"
+  ];
 
   var gitcommitConfig = {
     version: {
@@ -329,7 +306,6 @@ module.exports = function(grunt) {
     concat: concatConfig,
     ts: tsConfig,
     tslint: tslintConfig,
-    jshint: jshintConfig,
     jscs: jscsConfig,
     eslint: eslintConfig,
     parallelize: parallelizeConfig,
@@ -345,25 +321,29 @@ module.exports = function(grunt) {
     "saucelabs-mocha": saucelabsMochaConfig
   });
 
+  // Loads the tasks specified in package.json
   require("load-grunt-tasks")(grunt);
 
-  // default task (this is what runs when a task isn't specified)
   grunt.registerTask("update_ts_files", updateTsFiles);
   grunt.registerTask("update_test_ts_files", updateTestTsFiles);
+
   grunt.registerTask("definitions_prod", function() {
     grunt.file.copy("build/plottable.d.ts", "plottable.d.ts");
   });
-  grunt.registerTask("test-compile", [
-    "ts:test",
-    "concat:testsMultifile",
-    "sed:testsMultifile",
-    "concat:tests"
-  ]);
-  grunt.registerTask("default", "launch");
+
+  grunt.registerTask("test-compile", ["ts:test", "concat:tests"]);
+  grunt.registerTask("src-compile", ["ts:dev", "generateJS"]);
+
   grunt.registerTask("dev-compile", [
     "update_ts_files",
     "update_test_ts_files",
-    "ts:dev",
+    "src-compile",
+    "test-compile",
+    "clean:tscommand",
+    "update-quicktests"
+  ]);
+
+  grunt.registerTask("generateJS", [
     "concat:plottable",
     "concat:svgtypewriter",
     "concat:definitions",
@@ -372,52 +352,33 @@ module.exports = function(grunt) {
     "umd:all",
     "concat:header",
     "sed:versionNumber",
-    "definitions_prod",
-    "test-compile",
-    "concat:plottableMultifile",
-    "sed:plottableMultifile",
-    "clean:tscommand",
-    "update-quicktests"
+    "definitions_prod"
   ]);
 
   grunt.registerTask("release:patch", ["bump:patch", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:minor", ["bump:minor", "dist-compile", "gitcommit:version"]);
   grunt.registerTask("release:major", ["bump:major", "dist-compile", "gitcommit:version"]);
 
-  grunt.registerTask("dist-compile", [
-    "dev-compile",
-    "blanket_mocha",
-    "parallelize:tslint",
-    "ts:verifyDefinitionFiles",
-    "uglify",
-    "compress"
-  ]);
+  grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("launch", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("default", ["connect", "dev-compile", "watch"]);
+
+  grunt.registerTask("test", ["dev-compile", "test-local"]);
+  grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFiles", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
-  grunt.registerTask("test", [
-    "dev-compile",
-    "blanket_mocha",
-    "parallelize:tslint",
-    "jshint",
-    "ts:verifyDefinitionFiles",
-    "jscs",
-    "eslint"
-  ]);
 
-  // Disable saucelabs for external pull requests. Check if we can see the SAUCE_USERNAME
-  var travisTests = ["test"];
+  grunt.registerTask("lint", ["parallelize:tslint", "jscs", "eslint"]);
+
+  // Disable saucelabs on dev environments by checking if SAUCE_USERNAME is an environment variable
   if (process.env.SAUCE_USERNAME) {
-    travisTests.push("test-sauce");
+    grunt.registerTask("test-travis", ["dev-compile", "test-local", "test-sauce"]);
+  } else {
+    grunt.registerTask("test-travis", ["dev-compile", "test-local"]);
   }
-  grunt.registerTask("test-travis", travisTests);
-  grunt.registerTask("bm", ["blanket_mocha"]);
 
-  grunt.registerTask("sublime", [
-    "shell:sublime",
-    "sed:sublime"
-  ]);
+  // Tooling
+  grunt.registerTask("sublime", ["shell:sublime", "sed:sublime"]);
 
   grunt.registerTask("update-quicktests", function() {
     var qtJSON = [];
