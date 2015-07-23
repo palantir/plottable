@@ -178,6 +178,14 @@ export module Components {
       return this;
     }
 
+    public xDataValues() {
+      return [this._boxLeftDataValue, this._boxRightDataValue];
+    }
+
+    public yDataValues() {
+      return [this._boxTopDataValue, this._boxBottomDataValue];
+    }
+
     private _bindBoxDataValues() {
       this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
       this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;

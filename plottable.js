@@ -6063,6 +6063,12 @@ var Plottable;
                 this._bindBoxDataValues();
                 return this;
             };
+            SelectionBoxLayer.prototype.xDataValues = function () {
+                return [this._boxLeftDataValue, this._boxRightDataValue];
+            };
+            SelectionBoxLayer.prototype.yDataValues = function () {
+                return [this._boxTopDataValue, this._boxBottomDataValue];
+            };
             SelectionBoxLayer.prototype._bindBoxDataValues = function () {
                 this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
                 this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
