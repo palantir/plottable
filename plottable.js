@@ -7995,8 +7995,6 @@ var Plottable;
                 var right = xScale.scale(xScale.domain()[1]);
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    var westOfLeft;
-                    var westOfRight;
                     var lastValue;
                     var d;
                     var x1;
@@ -8010,21 +8008,19 @@ var Plottable;
                         var currY = yScale.scale(yAccessor(data[i], i, dataset));
                         d = data[i];
                         lastValue = data[i - 1];
-                        westOfLeft = xScale.scale(lastValue.x) < left;
-                        westOfRight = xScale.scale(lastValue.x) < right;
                         // If values crossed left edge
                         if (xScale.scale(lastValue.x) < left && xScale.scale(d.x) >= left) {
-                            x1 = left - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-                            x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-                            y2 = yScale.scale(yAccessor(d, i, dataset)) - yScale.scale(yAccessor(lastValue, i - 1, dataset));
+                            x1 = left - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
                             includedValues[0].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
                         }
                         // If values crossed right edge
                         if (xScale.scale(lastValue.x) < right && xScale.scale(d.x) >= right) {
-                            x1 = right - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-                            x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-                            y2 = yScale.scale(d.y) - yScale.scale(lastValue.y);
+                            x1 = right - prevX;
+                            x2 = currX - prevX;
+                            y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
                             includedValues[1].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
                         }

@@ -69,9 +69,6 @@ export module Plots {
 
         var data = dataset.data();
 
-        var westOfLeft: boolean;
-        var westOfRight: boolean;
-
         var lastValue: any;
         var d: any;
         var x1: any;
@@ -79,7 +76,6 @@ export module Plots {
         var y1: any;
         var y2: any;
         for (var i = 1; i < data.length; i++) {
-
           var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
           var currX = xScale.scale(xAccessor(data[i], i, dataset));
 
@@ -88,14 +84,12 @@ export module Plots {
 
           d = data[i];
           lastValue = data[i - 1];
-          westOfLeft = xScale.scale(lastValue.x) < left;
-          westOfRight = xScale.scale(lastValue.x) < right;
 
           // If values crossed left edge
           if (xScale.scale(lastValue.x) < left && xScale.scale(d.x) >= left) {
-            x1 = left - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-            x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-            y2 = yScale.scale(yAccessor(d, i, dataset)) - yScale.scale(yAccessor(lastValue, i - 1, dataset));
+            x1 = left - prevX;
+            x2 = currX - prevX;
+            y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
             includedValues[0].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
@@ -103,9 +97,9 @@ export module Plots {
 
           // If values crossed right edge
           if (xScale.scale(lastValue.x) < right && xScale.scale(d.x) >= right) {
-            x1 = right - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-            x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
-            y2 = yScale.scale(d.y) - yScale.scale(lastValue.y);
+            x1 = right - prevX;
+            x2 = currX - prevX;
+            y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
             includedValues[1].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
