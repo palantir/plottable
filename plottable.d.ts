@@ -2331,9 +2331,25 @@ declare module Plottable {
             boxVisible(show: boolean): SelectionBoxLayer;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * Gets the x scale for this SelectionBoxLayer.
+             */
             xScale(): QuantitativeScale<any>;
+            /**
+             * Sets the x scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
             xScale(xScale: QuantitativeScale<any>): SelectionBoxLayer;
+            /**
+             * Gets the y scale for this SelectionBoxLayer.
+             */
             yScale(): QuantitativeScale<any>;
+            /**
+             * Sets the y scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
             yScale(yScale: QuantitativeScale<any>): SelectionBoxLayer;
         }
     }

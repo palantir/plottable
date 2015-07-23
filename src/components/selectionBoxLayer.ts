@@ -121,7 +121,15 @@ export module Components {
       return true;
     }
 
+    /**
+     * Gets the x scale for this SelectionBoxLayer.
+     */
     public xScale(): QuantitativeScale<any>;
+    /**
+     * Sets the x scale for this SelectionBoxLayer.
+     * 
+     * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
     public xScale(xScale: QuantitativeScale<any>): SelectionBoxLayer;
     public xScale(xScale?: QuantitativeScale<any>): any {
       if (xScale == null) {
@@ -136,7 +144,15 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the y scale for this SelectionBoxLayer.
+     */
     public yScale(): QuantitativeScale<any>;
+    /**
+     * Sets the y scale for this SelectionBoxLayer.
+     * 
+     * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
     public yScale(yScale: QuantitativeScale<any>): SelectionBoxLayer;
     public yScale(yScale?: QuantitativeScale<any>): any {
       if (yScale == null) {
