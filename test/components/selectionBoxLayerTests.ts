@@ -151,4 +151,35 @@ describe("SelectionBoxLayer", () => {
 
     svg.remove();
   });
+
+  it("boxDataValue endpoints", () => {
+    var svgWidth = 500;
+    var svgHeight = 500;
+    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+
+    var xScale = new Plottable.Scales.Linear();
+    xScale.domain([0, 2000]);
+    xScale.range([0, svgHeight]);
+
+    var sbl = new Plottable.Components.SelectionBoxLayer();
+    sbl.xScale(xScale);
+    sbl.renderTo(svg);
+
+    var topLeft: Plottable.Point = {
+      x: 100,
+      y: 0
+    };
+    var bottomRight: Plottable.Point = {
+      x: 250,
+      y: 300
+    };
+    sbl.bounds({
+      topLeft: bottomRight,
+      bottomRight: topLeft
+    });
+
+    assert.strictEqual(sbl.boxLeftDataValue(), 400, "data value maps correctly");
+
+    svg.remove();
+  });
 });
