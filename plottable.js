@@ -7988,9 +7988,7 @@ var Plottable;
                     return [[], []];
                 }
                 var yScale = this.y().scale;
-                var yAccessor = this.y().accessor;
                 var xScale = this.x().scale;
-                var xAccessor = this.x().accessor;
                 var intersectionPoints = [[], []];
                 var left = xScale.scale(xScale.domain()[0]);
                 var right = xScale.scale(xScale.domain()[1]);
