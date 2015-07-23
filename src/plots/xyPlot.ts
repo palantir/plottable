@@ -351,74 +351,79 @@ export class XYPlot<X, Y> extends Plot {
     if (!this._projectorsReady()) { return; }
 
     if (this._autoAdjustYScaleDomain) {
-
-      if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
-
-        if (this._yDomainChangeIncludedValues) {
-          this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
-        }
-
-        var data = this.datasets()[0].data();
-
-        var includedValues: any[] = [];
-
-        var westOfLeft: boolean;
-        var westOfRight: boolean;
-        var left = <any>this.x().scale.domain()[0];
-        var right = <any>this.x().scale.domain()[1];
-
-        var lastValue: any;
-        data.forEach((d, i) => {
-          var x1: any;
-          var x2: any;
-          var y1: any;
-          var y2: any;
-          if (lastValue) {
-            if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-
-              x1 = left - lastValue.x;
-              x2 = d.x - lastValue.x;
-              y2 = d.y - lastValue.y;
-              y1 = x1 * y2 / x2;
-
-              includedValues.push({
-                x: lastValue.x + x1,
-                y: lastValue.y + y1
-              });
-            }
-
-            if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-              x1 = right - lastValue.x;
-              x2 = d.x - lastValue.x;
-              y2 = d.y - lastValue.y;
-              y1 = x1 * y2 / x2;
-
-              includedValues.push({
-                x: lastValue.x + x1,
-                y: lastValue.y + y1
-              });
-            }
-          }
-
-          westOfLeft = d.x < left;
-          westOfRight = d.x < right;
-          lastValue = d;
-        });
-
-        includedValues = includedValues.map((d) => d.y);
-
-        console.log(includedValues);
-
-
-        this._yDomainChangeIncludedValues = () => includedValues;
-        this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
-
-
-      }
+      this._ownMethod();
 
       this._updateYExtentsAndAutodomain();
     }
   }
+
+  private _ownMethod() {
+    if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+
+      if (this._yDomainChangeIncludedValues) {
+        this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+      }
+
+      var data = this.datasets()[0].data();
+
+      var includedValues: any[] = [];
+
+      var westOfLeft: boolean;
+      var westOfRight: boolean;
+      var left = <any>this.x().scale.domain()[0];
+      var right = <any>this.x().scale.domain()[1];
+
+      var lastValue: any;
+      data.forEach((d, i) => {
+        var x1: any;
+        var x2: any;
+        var y1: any;
+        var y2: any;
+        if (lastValue) {
+          if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+
+            x1 = left - lastValue.x;
+            x2 = d.x - lastValue.x;
+            y2 = d.y - lastValue.y;
+            y1 = x1 * y2 / x2;
+
+            includedValues.push({
+              x: lastValue.x + x1,
+              y: lastValue.y + y1
+            });
+          }
+
+          if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
+            x1 = right - lastValue.x;
+            x2 = d.x - lastValue.x;
+            y2 = d.y - lastValue.y;
+            y1 = x1 * y2 / x2;
+
+            includedValues.push({
+              x: lastValue.x + x1,
+              y: lastValue.y + y1
+            });
+          }
+        }
+
+        westOfLeft = d.x < left;
+        westOfRight = d.x < right;
+        lastValue = d;
+      });
+
+      includedValues = includedValues.map((d) => d.y);
+
+      console.log(includedValues);
+
+
+      this._yDomainChangeIncludedValues = () => includedValues;
+      this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+
+
+    }
+  }
+
+
   private _adjustXDomainOnChangeFromY() {
     if (!this._projectorsReady()) { return; }
     if (this._autoAdjustXScaleDomain) {
