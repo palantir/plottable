@@ -7972,7 +7972,7 @@ var Plottable;
                 _super.prototype._updateExtentsForProperty.call(this, property);
             };
             Line.prototype._ownMethod = function () {
-                if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+                if (this.x && this.x().scale && this.y && this.y().scale) {
                     if (this._yDomainChangeIncludedValues) {
                         this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
                     }
@@ -7983,6 +7983,7 @@ var Plottable;
                 }
             };
             Line.prototype._getEdgeIntersectionPoints = function () {
+                var _this = this;
                 if (!(this.x().scale instanceof Plottable.QuantitativeScale)) {
                     return [[], []];
                 }
@@ -7997,10 +7998,10 @@ var Plottable;
                     var data = dataset.data();
                     var x1, x2, y1, y2;
                     for (var i = 1; i < data.length; i++) {
-                        var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
-                        var currX = xScale.scale(xAccessor(data[i], i, dataset));
-                        var prevY = yScale.scale(yAccessor(data[i - 1], i - 1, dataset));
-                        var currY = yScale.scale(yAccessor(data[i], i, dataset));
+                        var prevX = currX || xScale.scale(_this.x().accessor(data[i - 1], i - 1, dataset));
+                        var prevY = currY || yScale.scale(_this.y().accessor(data[i - 1], i - 1, dataset));
+                        var currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
+                        var currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
                         // If values crossed left edge
                         if (prevX < left && left <= currX) {
                             x1 = left - prevX;

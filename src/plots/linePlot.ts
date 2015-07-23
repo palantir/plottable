@@ -36,7 +36,7 @@ export module Plots {
     private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<any>;
 
     private _ownMethod() {
-      if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+      if (this.x && this.x().scale && this.y && this.y().scale) {
 
         if (this._yDomainChangeIncludedValues) {
           this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
@@ -57,10 +57,7 @@ export module Plots {
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
-      var yAccessor = this.y().accessor;
-
       var xScale = this.x().scale;
-      var xAccessor = this.x().accessor;
 
       var intersectionPoints: number[][] = [[], []];
       var left = xScale.scale(xScale.domain()[0]);
@@ -71,11 +68,11 @@ export module Plots {
 
         var x1: any, x2: any, y1: any, y2: any;
         for (var i = 1; i < data.length; i++) {
-          var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
-          var currX = xScale.scale(xAccessor(data[i], i, dataset));
+          var prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
+          var prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
 
-          var prevY = yScale.scale(yAccessor(data[i - 1], i - 1, dataset));
-          var currY = yScale.scale(yAccessor(data[i], i, dataset));
+          var currX = xScale.scale(this.x().accessor(data[i], i, dataset));
+          var currY = yScale.scale(this.y().accessor(data[i], i, dataset));
 
           // If values crossed left edge
           if (prevX < left && left <= currX) {
