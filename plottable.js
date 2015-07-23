@@ -6534,8 +6534,8 @@ var Plottable;
                 return this;
             };
             Pie.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
+                _super.prototype._onDatasetUpdate.call(this);
             };
             Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
@@ -6673,6 +6673,7 @@ var Plottable;
             };
             Pie.prototype._additionalPaint = function (time) {
                 var _this = this;
+                this._renderArea.select(".label-area").remove();
                 if (this._labelsEnabled) {
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
