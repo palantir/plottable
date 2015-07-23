@@ -6066,7 +6066,7 @@ var Plottable;
             /**
              * Gets the data value backing the left edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             SelectionBoxLayer.prototype.boxLeftDataValue = function () {
                 return this._boxLeftDataValue;
@@ -6074,7 +6074,7 @@ var Plottable;
             /**
              * Gets the data value backing the right edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             SelectionBoxLayer.prototype.boxRightDataValue = function () {
                 return this._boxRightDataValue;
@@ -6082,7 +6082,7 @@ var Plottable;
             /**
              * Gets the data value backing the top edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             SelectionBoxLayer.prototype.boxTopDataValue = function () {
                 return this._boxTopDataValue;
@@ -6090,7 +6090,7 @@ var Plottable;
             /**
              * Gets the data value backing the bottom edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             SelectionBoxLayer.prototype.boxBottomDataValue = function () {
                 return this._boxBottomDataValue;

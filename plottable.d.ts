@@ -2362,7 +2362,7 @@ declare module Plottable {
             /**
              * Gets the data value backing the left edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             boxLeftDataValue(): number | {
                 valueOf(): number;
@@ -2370,7 +2370,7 @@ declare module Plottable {
             /**
              * Gets the data value backing the right edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             boxRightDataValue(): number | {
                 valueOf(): number;
@@ -2378,7 +2378,7 @@ declare module Plottable {
             /**
              * Gets the data value backing the top edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             boxTopDataValue(): number | {
                 valueOf(): number;
@@ -2386,7 +2386,7 @@ declare module Plottable {
             /**
              * Gets the data value backing the bottom edge of the box.
              *
-             * Returns null if the edge is not backed by a scale.
+             * Returns undefined if the edge is not backed by a scale.
              */
             boxBottomDataValue(): number | {
                 valueOf(): number;

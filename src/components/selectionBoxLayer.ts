@@ -181,7 +181,7 @@ export module Components {
     /**
      * Gets the data value backing the left edge of the box.
      *
-     * Returns null if the edge is not backed by a scale.
+     * Returns undefined if the edge is not backed by a scale.
      */
     public boxLeftDataValue() {
       return this._boxLeftDataValue;
@@ -190,7 +190,7 @@ export module Components {
     /**
      * Gets the data value backing the right edge of the box.
      *
-     * Returns null if the edge is not backed by a scale.
+     * Returns undefined if the edge is not backed by a scale.
      */
     public boxRightDataValue() {
       return this._boxRightDataValue;
@@ -199,7 +199,7 @@ export module Components {
     /**
      * Gets the data value backing the top edge of the box.
      *
-     * Returns null if the edge is not backed by a scale.
+     * Returns undefined if the edge is not backed by a scale.
      */
     public boxTopDataValue() {
       return this._boxTopDataValue;
@@ -208,7 +208,7 @@ export module Components {
     /**
      * Gets the data value backing the bottom edge of the box.
      *
-     * Returns null if the edge is not backed by a scale.
+     * Returns undefined if the edge is not backed by a scale.
      */
     public boxBottomDataValue() {
       return this._boxBottomDataValue;
