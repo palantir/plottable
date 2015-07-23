@@ -38,7 +38,7 @@ export module Plots {
     private _ownMethod() {
       if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
 
-        var yScale = this.y().scale;
+        var yScale = <QuantitativeScale<number>>this.y().scale;
         var yAccessor = this.y().accessor;
 
         var xScale = <QuantitativeScale<X>>this.x().scale;
@@ -55,8 +55,8 @@ export module Plots {
 
           var westOfLeft: boolean;
           var westOfRight: boolean;
-          var left = xScale.domain()[0];
-          var right = xScale.domain()[1];
+          var left = xScale.scale(xScale.domain()[0]);
+          var right = xScale.scale(xScale.domain()[1]);
 
           var lastValue: any;
           data.forEach((d, i) => {
@@ -65,39 +65,35 @@ export module Plots {
             var y1: any;
             var y2: any;
             if (lastValue) {
-              if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+              if ((westOfLeft === true && xScale.scale(d.x) >= left) !== (westOfLeft === false && xScale.scale(d.x) < left)) {
 
-                x1 = left - xAccessor(lastValue, i - 1, dataset);
-                x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
-                y2 = yAccessor(d, i, dataset) - yAccessor(lastValue, i - 1, dataset);
+                x1 = left - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                y2 = yScale.scale(yAccessor(d, i, dataset)) - yScale.scale(yAccessor(lastValue, i - 1, dataset));
                 y1 = x1 * y2 / x2;
 
-                includedValues.push({
-                  x: lastValue.x + x1,
-                  y: lastValue.y + y1
-                });
+                includedValues.push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
               }
 
-              if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                x1 = right - xAccessor(lastValue, i - 1, dataset);
-                x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
-                y2 = d.y - lastValue.y;
+              if ((westOfRight && xScale.scale(d.x) >= right) !== (!westOfRight && xScale.scale(d.x) < right)) {
+                console.log(1);
+
+                x1 = right - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                y2 = yScale.scale(d.y) - yScale.scale(lastValue.y);
                 y1 = x1 * y2 / x2;
 
-                includedValues.push({
-                  x: lastValue.x + x1,
-                  y: lastValue.y + y1
-                });
+                includedValues.push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
               }
             }
 
-            westOfLeft = d.x < left;
-            westOfRight = d.x < right;
+            westOfLeft = xScale.scale(d.x) < left;
+            westOfRight = xScale.scale(d.x) < right;
             lastValue = d;
           });
         });
 
-        includedValues = includedValues.map((d) => d.y);
+        // includedValues = includedValues.map((d) => d.y);
 
         console.log(includedValues);
 

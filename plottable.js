@@ -7985,8 +7985,8 @@ var Plottable;
                         var data = dataset.data();
                         var westOfLeft;
                         var westOfRight;
-                        var left = xScale.domain()[0];
-                        var right = xScale.domain()[1];
+                        var left = xScale.scale(xScale.domain()[0]);
+                        var right = xScale.scale(xScale.domain()[1]);
                         var lastValue;
                         data.forEach(function (d, i) {
                             var x1;
@@ -7994,33 +7994,28 @@ var Plottable;
                             var y1;
                             var y2;
                             if (lastValue) {
-                                if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-                                    x1 = left - xAccessor(lastValue, i - 1, dataset);
-                                    x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
-                                    y2 = yAccessor(d, i, dataset) - yAccessor(lastValue, i - 1, dataset);
+                                if ((westOfLeft === true && xScale.scale(d.x) >= left) !== (westOfLeft === false && xScale.scale(d.x) < left)) {
+                                    x1 = left - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                                    x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                                    y2 = yScale.scale(yAccessor(d, i, dataset)) - yScale.scale(yAccessor(lastValue, i - 1, dataset));
                                     y1 = x1 * y2 / x2;
-                                    includedValues.push({
-                                        x: lastValue.x + x1,
-                                        y: lastValue.y + y1
-                                    });
+                                    includedValues.push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
                                 }
-                                if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                                    x1 = right - xAccessor(lastValue, i - 1, dataset);
-                                    x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
-                                    y2 = d.y - lastValue.y;
+                                if ((westOfRight && xScale.scale(d.x) >= right) !== (!westOfRight && xScale.scale(d.x) < right)) {
+                                    console.log(1);
+                                    x1 = right - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                                    x2 = xScale.scale(xAccessor(d, i, dataset)) - xScale.scale(xAccessor(lastValue, i - 1, dataset));
+                                    y2 = yScale.scale(d.y) - yScale.scale(lastValue.y);
                                     y1 = x1 * y2 / x2;
-                                    includedValues.push({
-                                        x: lastValue.x + x1,
-                                        y: lastValue.y + y1
-                                    });
+                                    includedValues.push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
                                 }
                             }
-                            westOfLeft = d.x < left;
-                            westOfRight = d.x < right;
+                            westOfLeft = xScale.scale(d.x) < left;
+                            westOfRight = xScale.scale(d.x) < right;
                             lastValue = d;
                         });
                     });
-                    includedValues = includedValues.map(function (d) { return d.y; });
+                    // includedValues = includedValues.map((d) => d.y);
                     console.log(includedValues);
                     this._yDomainChangeIncludedValues = function () { return includedValues; };
                     yScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
