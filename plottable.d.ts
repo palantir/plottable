@@ -3607,6 +3607,19 @@ declare module Plottable {
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyDown(callback: KeyCallback): Key;
+            /** Registers a callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            onKeyUp(callback: KeyCallback): Key;
+            /**
+             * Removes the callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            offKeyUp(callback: KeyCallback): Key;
         }
     }
 }
@@ -3735,6 +3748,24 @@ declare module Plottable {
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             offKeyPress(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Adds a callback to be called when the key with the given keyCode is
+             * released and the user is moused over the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            onKeyRelease(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Removes a callback that would be called when the key with the given keyCode is
+             * released and the user is moused over the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            offKeyRelease(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }
