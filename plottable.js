@@ -6500,6 +6500,7 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
@@ -6581,6 +6582,16 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.labelFormatter = function (formatter) {
+                if (formatter == null) {
+                    return this._labelFormatter;
+                }
+                else {
+                    this._labelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -6711,7 +6722,7 @@ var Plottable;
                 var dataset = this.datasets()[0];
                 for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
                     var datum = dataset.data()[datumIndex];
-                    var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
+                    var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
                     var measurement = measurer.measure(value);
                     var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
                     var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
