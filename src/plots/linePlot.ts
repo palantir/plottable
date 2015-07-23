@@ -25,6 +25,88 @@ export module Plots {
       return new Plottable.Drawers.Line(dataset);
     }
 
+    protected _updateExtentsForProperty(property: string) {
+
+      if (property === "y") {
+        this._ownMethod();
+      }
+      super._updateExtentsForProperty(property);
+    }
+
+
+    private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<any>;
+
+    private _ownMethod() {
+      if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+
+        var changedScale = this.y().scale;
+        var changedAccessor = this.y().accessor;
+
+        var adjustingScale = this.x().scale;
+        var adjustingAccessor = this.x().accessor;
+
+        if (this._yDomainChangeIncludedValues) {
+          changedScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+        }
+
+        var includedValues: any[] = [];
+        this.datasets().forEach((dataset) => {
+
+          var data = dataset.data();
+
+          var westOfLeft: boolean;
+          var westOfRight: boolean;
+          var left = adjustingScale.domain()[0];
+          var right = adjustingScale.domain()[1];
+
+          var lastValue: any;
+          data.forEach((d, i) => {
+            var x1: any;
+            var x2: any;
+            var y1: any;
+            var y2: any;
+            if (lastValue) {
+              if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+
+                x1 = left - adjustingAccessor(lastValue, i - 1, dataset);
+                x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                y2 = changedAccessor(d, i, dataset) - changedAccessor(lastValue, i - 1, dataset);
+                y1 = x1 * y2 / x2;
+
+                includedValues.push({
+                  x: lastValue.x + x1,
+                  y: lastValue.y + y1
+                });
+              }
+
+              if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
+                x1 = right - adjustingAccessor(lastValue, i - 1, dataset);
+                x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                y2 = d.y - lastValue.y;
+                y1 = x1 * y2 / x2;
+
+                includedValues.push({
+                  x: lastValue.x + x1,
+                  y: lastValue.y + y1
+                });
+              }
+            }
+
+            westOfLeft = d.x < left;
+            westOfRight = d.x < right;
+            lastValue = d;
+          });
+        });
+
+        includedValues = includedValues.map((d) => d.y);
+
+        console.log(includedValues);
+
+        this._yDomainChangeIncludedValues = () => includedValues;
+        changedScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+      }
+    }
+
     protected _getResetYFunction() {
       // gets the y-value generator for the animation start point
       var yDomain = this.y().scale.domain();

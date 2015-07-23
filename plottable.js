@@ -7050,57 +7050,7 @@ var Plottable;
                 return;
             }
             if (this._autoAdjustYScaleDomain) {
-                this._ownMethod();
                 this._updateYExtentsAndAutodomain();
-            }
-        };
-        XYPlot.prototype._ownMethod = function () {
-            if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
-                if (this._yDomainChangeIncludedValues) {
-                    this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
-                }
-                var data = this.datasets()[0].data();
-                var includedValues = [];
-                var westOfLeft;
-                var westOfRight;
-                var left = this.x().scale.domain()[0];
-                var right = this.x().scale.domain()[1];
-                var lastValue;
-                data.forEach(function (d, i) {
-                    var x1;
-                    var x2;
-                    var y1;
-                    var y2;
-                    if (lastValue) {
-                        if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-                            x1 = left - lastValue.x;
-                            x2 = d.x - lastValue.x;
-                            y2 = d.y - lastValue.y;
-                            y1 = x1 * y2 / x2;
-                            includedValues.push({
-                                x: lastValue.x + x1,
-                                y: lastValue.y + y1
-                            });
-                        }
-                        if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                            x1 = right - lastValue.x;
-                            x2 = d.x - lastValue.x;
-                            y2 = d.y - lastValue.y;
-                            y1 = x1 * y2 / x2;
-                            includedValues.push({
-                                x: lastValue.x + x1,
-                                y: lastValue.y + y1
-                            });
-                        }
-                    }
-                    westOfLeft = d.x < left;
-                    westOfRight = d.x < right;
-                    lastValue = d;
-                });
-                includedValues = includedValues.map(function (d) { return d.y; });
-                console.log(includedValues);
-                this._yDomainChangeIncludedValues = function () { return includedValues; };
-                this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
             }
         };
         XYPlot.prototype._adjustXDomainOnChangeFromY = function () {
@@ -8014,6 +7964,67 @@ var Plottable;
             }
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
+            };
+            Line.prototype._updateExtentsForProperty = function (property) {
+                if (property === "y") {
+                    this._ownMethod();
+                }
+                _super.prototype._updateExtentsForProperty.call(this, property);
+            };
+            Line.prototype._ownMethod = function () {
+                if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+                    var changedScale = this.y().scale;
+                    var changedAccessor = this.y().accessor;
+                    var adjustingScale = this.x().scale;
+                    var adjustingAccessor = this.x().accessor;
+                    if (this._yDomainChangeIncludedValues) {
+                        changedScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                    }
+                    var includedValues = [];
+                    this.datasets().forEach(function (dataset) {
+                        var data = dataset.data();
+                        var westOfLeft;
+                        var westOfRight;
+                        var left = adjustingScale.domain()[0];
+                        var right = adjustingScale.domain()[1];
+                        var lastValue;
+                        data.forEach(function (d, i) {
+                            var x1;
+                            var x2;
+                            var y1;
+                            var y2;
+                            if (lastValue) {
+                                if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+                                    x1 = left - adjustingAccessor(lastValue, i - 1, dataset);
+                                    x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                                    y2 = changedAccessor(d, i, dataset) - changedAccessor(lastValue, i - 1, dataset);
+                                    y1 = x1 * y2 / x2;
+                                    includedValues.push({
+                                        x: lastValue.x + x1,
+                                        y: lastValue.y + y1
+                                    });
+                                }
+                                if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
+                                    x1 = right - adjustingAccessor(lastValue, i - 1, dataset);
+                                    x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                                    y2 = d.y - lastValue.y;
+                                    y1 = x1 * y2 / x2;
+                                    includedValues.push({
+                                        x: lastValue.x + x1,
+                                        y: lastValue.y + y1
+                                    });
+                                }
+                            }
+                            westOfLeft = d.x < left;
+                            westOfRight = d.x < right;
+                            lastValue = d;
+                        });
+                    });
+                    includedValues = includedValues.map(function (d) { return d.y; });
+                    console.log(includedValues);
+                    this._yDomainChangeIncludedValues = function () { return includedValues; };
+                    changedScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                }
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point

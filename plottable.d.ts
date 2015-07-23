@@ -2981,6 +2981,7 @@ declare module Plottable {
              */
             constructor();
             protected _createDrawer(dataset: Dataset): Drawer;
+            protected _updateExtentsForProperty(property: string): void;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
