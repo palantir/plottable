@@ -2351,6 +2351,7 @@ declare module Plottable {
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
             yScale<D>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            destroy(): void;
         }
     }
 }

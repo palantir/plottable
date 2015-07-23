@@ -184,6 +184,12 @@ export module Components {
       this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
       this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
     }
+
+    public destroy() {
+      super.destroy();
+      this.xScale().offUpdate(this._adjustBoundsCallback);
+      this.yScale().offUpdate(this._adjustBoundsCallback);
+    }
   }
 }
 }

@@ -6069,6 +6069,11 @@ var Plottable;
                 this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
                 this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
             };
+            SelectionBoxLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                this.xScale().offUpdate(this._adjustBoundsCallback);
+                this.yScale().offUpdate(this._adjustBoundsCallback);
+            };
             return SelectionBoxLayer;
         })(Plottable.Component);
         Components.SelectionBoxLayer = SelectionBoxLayer;
