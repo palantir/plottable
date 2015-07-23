@@ -15,7 +15,7 @@
     "grunt-cli": "0.1.6",
     "grunt-contrib-watch": "~0.5.3",
     "load-grunt-tasks": "~0.2.0",
-    "grunt-ts": "~1.12.1",
+    "grunt-ts": "4.2.0",
     "grunt-tslint": "2.2.0-beta",
     "tslint": "2.2.0-beta",
     "grunt-contrib-concat": "~0.3.0",
