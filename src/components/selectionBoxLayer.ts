@@ -10,13 +10,13 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-    private _boxLeftDataValue: any;
-    private _boxRightDataValue: any;
-    private _boxTopDataValue: any;
-    private _boxBottomDataValue: any;
-    private _xScale: QuantitativeScale<any>;
-    private _yScale: QuantitativeScale<any>;
-    private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<any>>;
+    private _boxLeftDataValue: number | { valueOf(): number };
+    private _boxRightDataValue: number | { valueOf(): number };
+    private _boxTopDataValue: number | { valueOf(): number };
+    private _boxBottomDataValue: number | { valueOf(): number };
+    private _xScale: QuantitativeScale<number | { valueOf(): number }>;
+    private _yScale: QuantitativeScale<number | { valueOf(): number }>;
+    private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
 
     constructor() {
       super();
@@ -135,14 +135,14 @@ export module Components {
     /**
      * Gets the x scale for this SelectionBoxLayer.
      */
-    public xScale<D>(): QuantitativeScale<D>;
+    public xScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
     /**
      * Sets the x scale for this SelectionBoxLayer.
      * 
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public xScale<D>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
-    public xScale<D>(xScale?: QuantitativeScale<D>): any {
+    public xScale<D extends number | { valueOf(): number }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+    public xScale<D extends number | { valueOf(): number }>(xScale?: QuantitativeScale<D>): any {
       if (xScale == null) {
         return this._xScale;
       }
@@ -150,7 +150,7 @@ export module Components {
         this._xScale.offUpdate(this._adjustBoundsCallback);
       }
       this._xScale = xScale;
-      xScale.onUpdate(this._adjustBoundsCallback);
+      this._xScale.onUpdate(this._adjustBoundsCallback);
       this._bindBoxDataValues();
       return this;
     }
@@ -158,14 +158,14 @@ export module Components {
     /**
      * Gets the y scale for this SelectionBoxLayer.
      */
-    public yScale<D>(): QuantitativeScale<D>;
+    public yScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
     /**
      * Sets the y scale for this SelectionBoxLayer.
      * 
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public yScale<D>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
-    public yScale<D>(yScale?: QuantitativeScale<D>): any {
+    public yScale<D extends number | { valueOf(): number }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+    public yScale<D extends number | { valueOf(): number }>(yScale?: QuantitativeScale<D>): any {
       if (yScale == null) {
         return this._yScale;
       }
@@ -173,17 +173,45 @@ export module Components {
         this._yScale.offUpdate(this._adjustBoundsCallback);
       }
       this._yScale = yScale;
-      yScale.onUpdate(this._adjustBoundsCallback);
+      this._yScale.onUpdate(this._adjustBoundsCallback);
       this._bindBoxDataValues();
       return this;
     }
 
-    public xDataValues() {
-      return [this._boxLeftDataValue, this._boxRightDataValue];
+    /**
+     * Gets the data values backing the left edge of the box.
+     *
+     * Returns null if the edge is not backed by a scale.
+     */
+    public boxLeftDataValue() {
+      return this._boxLeftDataValue;
     }
 
-    public yDataValues() {
-      return [this._boxTopDataValue, this._boxBottomDataValue];
+    /**
+     * Gets the data values backing the right edge of the box.
+     *
+     * Returns null if the edge is not backed by a scale.
+     */
+    public boxRightDataValue() {
+      return this._boxRightDataValue;
+    }
+
+    /**
+     * Gets the data values backing the top edge of the box.
+     *
+     * Returns null if the edge is not backed by a scale.
+     */
+    public boxTopDataValue() {
+      return this._boxTopDataValue;
+    }
+
+    /**
+     * Gets the data values backing the bottom edge of the box.
+     *
+     * Returns null if the edge is not backed by a scale.
+     */
+    public boxBottomDataValue() {
+      return this._boxBottomDataValue;
     }
 
     private _bindBoxDataValues() {

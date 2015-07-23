@@ -6047,7 +6047,7 @@ var Plottable;
                     this._xScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._xScale = xScale;
-                xScale.onUpdate(this._adjustBoundsCallback);
+                this._xScale.onUpdate(this._adjustBoundsCallback);
                 this._bindBoxDataValues();
                 return this;
             };
@@ -6059,15 +6059,41 @@ var Plottable;
                     this._yScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._yScale = yScale;
-                yScale.onUpdate(this._adjustBoundsCallback);
+                this._yScale.onUpdate(this._adjustBoundsCallback);
                 this._bindBoxDataValues();
                 return this;
             };
-            SelectionBoxLayer.prototype.xDataValues = function () {
-                return [this._boxLeftDataValue, this._boxRightDataValue];
+            /**
+             * Gets the data values backing the left edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.boxLeftDataValue = function () {
+                return this._boxLeftDataValue;
             };
-            SelectionBoxLayer.prototype.yDataValues = function () {
-                return [this._boxTopDataValue, this._boxBottomDataValue];
+            /**
+             * Gets the data values backing the right edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.boxRightDataValue = function () {
+                return this._boxRightDataValue;
+            };
+            /**
+             * Gets the data values backing the top edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.boxTopDataValue = function () {
+                return this._boxTopDataValue;
+            };
+            /**
+             * Gets the data values backing the bottom edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.boxBottomDataValue = function () {
+                return this._boxBottomDataValue;
             };
             SelectionBoxLayer.prototype._bindBoxDataValues = function () {
                 this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;

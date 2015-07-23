@@ -2334,25 +2334,63 @@ declare module Plottable {
             /**
              * Gets the x scale for this SelectionBoxLayer.
              */
-            xScale<D>(): QuantitativeScale<D>;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
             /**
              * Sets the x scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            xScale<D>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
             /**
              * Gets the y scale for this SelectionBoxLayer.
              */
-            yScale<D>(): QuantitativeScale<D>;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
             /**
              * Sets the y scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            yScale<D>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
-            xDataValues(): any[];
-            yDataValues(): any[];
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            /**
+             * Gets the data values backing the left edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            boxLeftDataValue(): number | {
+                valueOf(): number;
+            };
+            /**
+             * Gets the data values backing the right edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            boxRightDataValue(): number | {
+                valueOf(): number;
+            };
+            /**
+             * Gets the data values backing the top edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            boxTopDataValue(): number | {
+                valueOf(): number;
+            };
+            /**
+             * Gets the data values backing the bottom edge of the box.
+             *
+             * Returns null if the edge is not backed by a scale.
+             */
+            boxBottomDataValue(): number | {
+                valueOf(): number;
+            };
             destroy(): void;
         }
     }
