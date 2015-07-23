@@ -2360,7 +2360,7 @@ declare module Plottable {
                 valueOf(): number;
             }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
             /**
-             * Gets the data values backing the left edge of the box.
+             * Gets the data value backing the left edge of the box.
              *
              * Returns null if the edge is not backed by a scale.
              */
@@ -2368,7 +2368,7 @@ declare module Plottable {
                 valueOf(): number;
             };
             /**
-             * Gets the data values backing the right edge of the box.
+             * Gets the data value backing the right edge of the box.
              *
              * Returns null if the edge is not backed by a scale.
              */
@@ -2376,7 +2376,7 @@ declare module Plottable {
                 valueOf(): number;
             };
             /**
-             * Gets the data values backing the top edge of the box.
+             * Gets the data value backing the top edge of the box.
              *
              * Returns null if the edge is not backed by a scale.
              */
@@ -2384,7 +2384,7 @@ declare module Plottable {
                 valueOf(): number;
             };
             /**
-             * Gets the data values backing the bottom edge of the box.
+             * Gets the data value backing the bottom edge of the box.
              *
              * Returns null if the edge is not backed by a scale.
              */
