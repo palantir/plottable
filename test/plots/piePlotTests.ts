@@ -54,11 +54,11 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
         piePlot = new Plottable.Plots.Pie();
+        piePlot.sectorValue((d) => d.value);
+        piePlot.labelsEnabled(true);
       });
 
       it("rendering twice does not erase or add labels", () => {
-        piePlot.sectorValue((d) => d.value);
-        piePlot.labelsEnabled(true);
         var data = [
           { value: 1 },
           { value: 2 },
@@ -76,8 +76,6 @@ describe("Plots", () => {
       });
 
       it("updates labels when data changes", () => {
-        piePlot.sectorValue((d) => d.value);
-        piePlot.labelsEnabled(true);
         var data1 = [
           { value: 1 },
           { value: 1 },
@@ -107,8 +105,6 @@ describe("Plots", () => {
       });
 
       it("removes labels when they are disabled after rendering", () => {
-        piePlot.sectorValue((d) => d.value);
-        piePlot.labelsEnabled(true);
         var data1 = [
           { value: 1 },
           { value: 1 },
@@ -132,9 +128,7 @@ describe("Plots", () => {
           { key: "E", value: 1 }, { key: "F", value: 50 }
         ];
         var dataset = new Plottable.Dataset(data);
-        piePlot.sectorValue((d) => d.value);
         piePlot.addDataset(dataset);
-        piePlot.labelsEnabled(true);
         piePlot.renderTo(svg);
         var labelGs = piePlot.content().select(".label-area").selectAll(".label-area > g");
         labelGs.each(function(d, i) {
@@ -145,6 +139,22 @@ describe("Plots", () => {
             assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
           }
         });
+        svg.remove();
+      });
+
+      it("formatters are used properly", () => {
+        var data = [
+          { value: 5 },
+          { value: 15 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.labelFormatter((n: number) => n + "%");
+        piePlot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both labels are drawn");
+        assert.strictEqual(texts[0], "5%", "The formatter was used to format the first label");
+        assert.strictEqual(texts[1], "15%", "The formatter was used to format the second label");
         svg.remove();
       });
     });
