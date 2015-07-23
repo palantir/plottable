@@ -149,12 +149,12 @@ describe("Plots", () => {
         ];
         var dataset = new Plottable.Dataset(data);
         piePlot.addDataset(dataset);
-        piePlot.labelFormatter((n: number) => n + "%");
+        piePlot.labelFormatter((n: number) => n + " m");
         piePlot.renderTo(svg);
         var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both labels are drawn");
-        assert.strictEqual(texts[0], "5%", "The formatter was used to format the first label");
-        assert.strictEqual(texts[1], "15%", "The formatter was used to format the second label");
+        assert.strictEqual(texts[0], "5 m", "The formatter was used to format the first label");
+        assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
         svg.remove();
       });
     });
