@@ -2573,6 +2573,17 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             labelsEnabled(enabled: boolean): Pie;
+            /**
+             * Gets the Formatter for the labels.
+             */
+            labelFormatter(): Formatter;
+            /**
+             * Sets the Formatter for the labels.
+             *
+             * @param {Formatter} formatter
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelFormatter(formatter: Formatter): Pie;
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
