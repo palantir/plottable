@@ -2334,23 +2334,23 @@ declare module Plottable {
             /**
              * Gets the x scale for this SelectionBoxLayer.
              */
-            xScale(): QuantitativeScale<any>;
+            xScale<D>(): QuantitativeScale<D>;
             /**
              * Sets the x scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            xScale(xScale: QuantitativeScale<any>): SelectionBoxLayer;
+            xScale<D>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
             /**
              * Gets the y scale for this SelectionBoxLayer.
              */
-            yScale(): QuantitativeScale<any>;
+            yScale<D>(): QuantitativeScale<D>;
             /**
              * Sets the y scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            yScale(yScale: QuantitativeScale<any>): SelectionBoxLayer;
+            yScale<D>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
         }
     }
 }
