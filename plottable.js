@@ -8004,6 +8004,10 @@ var Plottable;
                     var y1;
                     var y2;
                     for (var i = 1; i < data.length; i++) {
+                        var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
+                        var currX = xScale.scale(xAccessor(data[i], i, dataset));
+                        var prevY = yScale.scale(yAccessor(data[i - 1], i - 1, dataset));
+                        var currY = yScale.scale(yAccessor(data[i], i, dataset));
                         d = data[i];
                         lastValue = data[i - 1];
                         westOfLeft = xScale.scale(lastValue.x) < left;
