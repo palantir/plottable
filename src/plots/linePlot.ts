@@ -102,10 +102,6 @@ export module Plots {
       return intersectionPoints;
     }
 
-    private _endOfDomainValues(): X|number[][] {
-      return [];
-    }
-
     protected _getResetYFunction() {
       // gets the y-value generator for the animation start point
       var yDomain = this.y().scale.domain();

@@ -8022,9 +8022,6 @@ var Plottable;
                 });
                 return intersectionPoints;
             };
-            Line.prototype._endOfDomainValues = function () {
-                return [];
-            };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point
                 var yDomain = this.y().scale.domain();
