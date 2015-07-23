@@ -5962,7 +5962,18 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this.addClass("selection-box-layer");
-                this._renderCallback = function () { return _this.render(); };
+                this._adjustBoundsCallback = function () {
+                    _this.bounds({
+                        topLeft: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxLeftDataValue) : _this._boxBounds.topLeft.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxTopDataValue) : _this._boxBounds.topLeft.y
+                        },
+                        bottomRight: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxRightDataValue) : _this._boxBounds.bottomRight.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxBottomDataValue) : _this._boxBounds.bottomRight.y
+                        }
+                    });
+                };
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6000,10 +6011,10 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
-                    var t = this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y;
-                    var b = this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y;
-                    var l = this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x;
-                    var r = this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x;
+                    var t = this._boxBounds.topLeft.y;
+                    var b = this._boxBounds.bottomRight.y;
+                    var l = this._boxBounds.topLeft.x;
+                    var r = this._boxBounds.bottomRight.x;
                     this._boxArea.attr({
                         x: l, y: t, width: r - l, height: b - t
                     });
@@ -6033,10 +6044,10 @@ var Plottable;
                     return this._xScale;
                 }
                 if (this._xScale != null) {
-                    this._xScale.offUpdate(this._renderCallback);
+                    this._xScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._xScale = xScale;
-                xScale.onUpdate(this._renderCallback);
+                xScale.onUpdate(this._adjustBoundsCallback);
                 this._bindBoxDataValues();
                 return this;
             };
@@ -6045,10 +6056,10 @@ var Plottable;
                     return this._yScale;
                 }
                 if (this._yScale != null) {
-                    this._yScale.offUpdate(this._renderCallback);
+                    this._yScale.offUpdate(this._adjustBoundsCallback);
                 }
                 this._yScale = yScale;
-                yScale.onUpdate(this._renderCallback);
+                yScale.onUpdate(this._adjustBoundsCallback);
                 this._bindBoxDataValues();
                 return this;
             };

@@ -16,12 +16,23 @@ export module Components {
     private _boxBottomDataValue: any;
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
-    private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
+    private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<any>>;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
-      this._renderCallback = () => this.render();
+      this._adjustBoundsCallback = () => {
+        this.bounds({
+          topLeft: {
+            x: this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x,
+            y: this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y
+          },
+          bottomRight: {
+            x: this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x,
+            y: this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y
+          }
+        });
+      };
     }
 
     protected _setup() {
@@ -77,10 +88,10 @@ export module Components {
 
     public renderImmediately() {
       if (this._boxVisible) {
-        var t = this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y;
-        var b = this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y;
-        var l = this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x;
-        var r = this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x;
+        var t = this._boxBounds.topLeft.y;
+        var b = this._boxBounds.bottomRight.y;
+        var l = this._boxBounds.topLeft.x;
+        var r = this._boxBounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -136,10 +147,10 @@ export module Components {
         return this._xScale;
       }
       if (this._xScale != null) {
-        this._xScale.offUpdate(this._renderCallback);
+        this._xScale.offUpdate(this._adjustBoundsCallback);
       }
       this._xScale = xScale;
-      xScale.onUpdate(this._renderCallback);
+      xScale.onUpdate(this._adjustBoundsCallback);
       this._bindBoxDataValues();
       return this;
     }
@@ -159,10 +170,10 @@ export module Components {
         return this._yScale;
       }
       if (this._yScale != null) {
-        this._yScale.offUpdate(this._renderCallback);
+        this._yScale.offUpdate(this._adjustBoundsCallback);
       }
       this._yScale = yScale;
-      yScale.onUpdate(this._renderCallback);
+      yScale.onUpdate(this._adjustBoundsCallback);
       this._bindBoxDataValues();
       return this;
     }
