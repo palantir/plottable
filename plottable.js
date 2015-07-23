@@ -6254,45 +6254,45 @@ var Plottable;
             if (filter != null) {
                 filteredData = data.filter(function (d, i) { return filter(d, i, dataset); });
             }
-            var self = this;
-            if (self.x && self.x().scale && self.y && self.y().scale) {
-                var westOfLeft;
-                var westOfRight;
-                var left = self.x().scale.domain()[0];
-                var right = self.x().scale.domain()[1];
-                var lastValue;
-                data.forEach(function (d, i) {
-                    var x1;
-                    var x2;
-                    var y1;
-                    var y2;
-                    if (lastValue) {
-                        if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-                            x1 = left - lastValue.x;
-                            x2 = d.x - lastValue.x;
-                            y2 = d.y - lastValue.y;
-                            y1 = x1 * y2 / x2;
-                            filteredData.push({
-                                x: lastValue.x + x1,
-                                y: lastValue.y + y1
-                            });
-                        }
-                        if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                            x1 = right - lastValue.x;
-                            x2 = d.x - lastValue.x;
-                            y2 = d.y - lastValue.y;
-                            y1 = x1 * y2 / x2;
-                            filteredData.push({
-                                x: lastValue.x + x1,
-                                y: lastValue.y + y1
-                            });
-                        }
-                    }
-                    westOfLeft = d.x < left;
-                    westOfRight = d.x < right;
-                    lastValue = d;
-                });
-            }
+            // var self = <any>this;
+            // if (self.x && self.x().scale && self.y && self.y().scale) {
+            //   var westOfLeft: boolean;
+            //   var westOfRight: boolean;
+            //   var left = self.x().scale.domain()[0];
+            //   var right = self.x().scale.domain()[1];
+            //   var lastValue: any;
+            //   data.forEach((d, i) => {
+            //     var x1: any;
+            //     var x2: any;
+            //     var y1: any;
+            //     var y2: any;
+            //     if (lastValue) {
+            //       if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+            //         x1 = left - lastValue.x;
+            //         x2 = d.x - lastValue.x;
+            //         y2 = d.y - lastValue.y;
+            //         y1 = x1 * y2 / x2;
+            //         filteredData.push({
+            //           x: lastValue.x + x1,
+            //           y: lastValue.y + y1
+            //         });
+            //       }
+            //       if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
+            //         x1 = right - lastValue.x;
+            //         x2 = d.x - lastValue.x;
+            //         y2 = d.y - lastValue.y;
+            //         y1 = x1 * y2 / x2;
+            //         filteredData.push({
+            //           x: lastValue.x + x1,
+            //           y: lastValue.y + y1
+            //         });
+            //       }
+            //     }
+            //     westOfLeft = d.x < left;
+            //     westOfRight = d.x < right;
+            //     lastValue = d;
+            //   });
+            // }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
             var mappedData = filteredData.map(appliedAccessor);
             return scale.extentOfValues(mappedData);
@@ -7050,6 +7050,53 @@ var Plottable;
                 return;
             }
             if (this._autoAdjustYScaleDomain) {
+                if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
+                    if (this._yDomainChangeIncludedValues) {
+                        this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                    }
+                    var data = this.datasets()[0].data();
+                    var includedValues = [];
+                    var westOfLeft;
+                    var westOfRight;
+                    var left = this.x().scale.domain()[0];
+                    var right = this.x().scale.domain()[1];
+                    var lastValue;
+                    data.forEach(function (d, i) {
+                        var x1;
+                        var x2;
+                        var y1;
+                        var y2;
+                        if (lastValue) {
+                            if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
+                                x1 = left - lastValue.x;
+                                x2 = d.x - lastValue.x;
+                                y2 = d.y - lastValue.y;
+                                y1 = x1 * y2 / x2;
+                                includedValues.push({
+                                    x: lastValue.x + x1,
+                                    y: lastValue.y + y1
+                                });
+                            }
+                            if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
+                                x1 = right - lastValue.x;
+                                x2 = d.x - lastValue.x;
+                                y2 = d.y - lastValue.y;
+                                y1 = x1 * y2 / x2;
+                                includedValues.push({
+                                    x: lastValue.x + x1,
+                                    y: lastValue.y + y1
+                                });
+                            }
+                        }
+                        westOfLeft = d.x < left;
+                        westOfRight = d.x < right;
+                        lastValue = d;
+                    });
+                    includedValues = includedValues.map(function (d) { return d.y; });
+                    console.log(includedValues);
+                    this._yDomainChangeIncludedValues = function () { return includedValues; };
+                    this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                }
                 this._updateYExtentsAndAutodomain();
             }
         };
