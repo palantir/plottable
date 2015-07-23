@@ -7976,13 +7976,13 @@ var Plottable;
                     if (this._yDomainChangeIncludedValues) {
                         this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
                     }
-                    var edgeIntersectionPoints = this._getEdgeIntersectionPoitns();
+                    var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
                     var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]);
                     this._yDomainChangeIncludedValues = function () { return includedValues; };
                     this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
                 }
             };
-            Line.prototype._getEdgeIntersectionPoitns = function () {
+            Line.prototype._getEdgeIntersectionPoints = function () {
                 if (!(this.x().scale instanceof Plottable.QuantitativeScale)) {
                     return [[], []];
                 }
@@ -7990,44 +7990,37 @@ var Plottable;
                 var yAccessor = this.y().accessor;
                 var xScale = this.x().scale;
                 var xAccessor = this.x().accessor;
-                var includedValues = [[], []];
+                var intersectionPoints = [[], []];
                 var left = xScale.scale(xScale.domain()[0]);
                 var right = xScale.scale(xScale.domain()[1]);
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
-                    var lastValue;
-                    var d;
-                    var x1;
-                    var x2;
-                    var y1;
-                    var y2;
+                    var x1, x2, y1, y2;
                     for (var i = 1; i < data.length; i++) {
                         var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
                         var currX = xScale.scale(xAccessor(data[i], i, dataset));
                         var prevY = yScale.scale(yAccessor(data[i - 1], i - 1, dataset));
                         var currY = yScale.scale(yAccessor(data[i], i, dataset));
-                        d = data[i];
-                        lastValue = data[i - 1];
                         // If values crossed left edge
-                        if (xScale.scale(lastValue.x) < left && xScale.scale(d.x) >= left) {
+                        if (prevX < left && left <= currX) {
                             x1 = left - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            includedValues[0].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
+                            intersectionPoints[0].push(yScale.invert(prevY + y1));
                         }
                         // If values crossed right edge
-                        if (xScale.scale(lastValue.x) < right && xScale.scale(d.x) >= right) {
+                        if (prevX < right && right <= currX) {
                             x1 = right - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            includedValues[1].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1));
+                            intersectionPoints[1].push(yScale.invert(prevY + y1));
                         }
                     }
                     ;
                 });
-                return includedValues;
+                return intersectionPoints;
             };
             Line.prototype._endOfDomainValues = function () {
                 return [];

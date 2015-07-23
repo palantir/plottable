@@ -42,7 +42,7 @@ export module Plots {
           this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
         }
 
-        var edgeIntersectionPoints = this._getEdgeIntersectionPoitns();
+        var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
         var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1])
 
         this._yDomainChangeIncludedValues = () => includedValues;
@@ -50,7 +50,7 @@ export module Plots {
       }
     }
 
-    private _getEdgeIntersectionPoitns(): number[][] {
+    private _getEdgeIntersectionPoints(): number[][] {
 
       if (!(this.x().scale instanceof QuantitativeScale)) {
         return [[], []];
@@ -59,22 +59,17 @@ export module Plots {
       var yScale = <QuantitativeScale<number>>this.y().scale;
       var yAccessor = this.y().accessor;
 
-      var xScale = <QuantitativeScale<X>>this.x().scale;
+      var xScale = this.x().scale;
       var xAccessor = this.x().accessor;
 
-      var includedValues: number[][] = [[], []];
+      var intersectionPoints: number[][] = [[], []];
       var left = xScale.scale(xScale.domain()[0]);
       var right = xScale.scale(xScale.domain()[1]);
       this.datasets().forEach((dataset) => {
 
         var data = dataset.data();
 
-        var lastValue: any;
-        var d: any;
-        var x1: any;
-        var x2: any;
-        var y1: any;
-        var y2: any;
+        var x1: any, x2: any, y1: any, y2: any;
         for (var i = 1; i < data.length; i++) {
           var prevX = xScale.scale(xAccessor(data[i - 1], i - 1, dataset));
           var currX = xScale.scale(xAccessor(data[i], i, dataset));
@@ -82,32 +77,29 @@ export module Plots {
           var prevY = yScale.scale(yAccessor(data[i - 1], i - 1, dataset));
           var currY = yScale.scale(yAccessor(data[i], i, dataset));
 
-          d = data[i];
-          lastValue = data[i - 1];
-
           // If values crossed left edge
-          if (xScale.scale(lastValue.x) < left && xScale.scale(d.x) >= left) {
+          if (prevX < left && left <= currX) {
             x1 = left - prevX;
             x2 = currX - prevX;
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            includedValues[0].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
+            intersectionPoints[0].push(yScale.invert(prevY + y1));
           }
 
           // If values crossed right edge
-          if (xScale.scale(lastValue.x) < right && xScale.scale(d.x) >= right) {
+          if (prevX < right && right <= currX) {
             x1 = right - prevX;
             x2 = currX - prevX;
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            includedValues[1].push(yScale.invert(yScale.scale(yAccessor(lastValue, i - 1, dataset)) + y1))
+            intersectionPoints[1].push(yScale.invert(prevY + y1));
           }
         };
       });
 
-      return includedValues;
+      return intersectionPoints;
     }
 
     private _endOfDomainValues(): X|number[][] {
