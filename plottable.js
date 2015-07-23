@@ -7973,20 +7973,20 @@ var Plottable;
             };
             Line.prototype._ownMethod = function () {
                 if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
-                    var changedScale = this.y().scale;
-                    var changedAccessor = this.y().accessor;
-                    var adjustingScale = this.x().scale;
-                    var adjustingAccessor = this.x().accessor;
+                    var yScale = this.y().scale;
+                    var yAccessor = this.y().accessor;
+                    var xScale = this.x().scale;
+                    var xAccessor = this.x().accessor;
                     if (this._yDomainChangeIncludedValues) {
-                        changedScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                        yScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
                     }
                     var includedValues = [];
                     this.datasets().forEach(function (dataset) {
                         var data = dataset.data();
                         var westOfLeft;
                         var westOfRight;
-                        var left = adjustingScale.domain()[0];
-                        var right = adjustingScale.domain()[1];
+                        var left = xScale.domain()[0];
+                        var right = xScale.domain()[1];
                         var lastValue;
                         data.forEach(function (d, i) {
                             var x1;
@@ -7995,9 +7995,9 @@ var Plottable;
                             var y2;
                             if (lastValue) {
                                 if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-                                    x1 = left - adjustingAccessor(lastValue, i - 1, dataset);
-                                    x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
-                                    y2 = changedAccessor(d, i, dataset) - changedAccessor(lastValue, i - 1, dataset);
+                                    x1 = left - xAccessor(lastValue, i - 1, dataset);
+                                    x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
+                                    y2 = yAccessor(d, i, dataset) - yAccessor(lastValue, i - 1, dataset);
                                     y1 = x1 * y2 / x2;
                                     includedValues.push({
                                         x: lastValue.x + x1,
@@ -8005,8 +8005,8 @@ var Plottable;
                                     });
                                 }
                                 if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                                    x1 = right - adjustingAccessor(lastValue, i - 1, dataset);
-                                    x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                                    x1 = right - xAccessor(lastValue, i - 1, dataset);
+                                    x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
                                     y2 = d.y - lastValue.y;
                                     y1 = x1 * y2 / x2;
                                     includedValues.push({
@@ -8023,8 +8023,11 @@ var Plottable;
                     includedValues = includedValues.map(function (d) { return d.y; });
                     console.log(includedValues);
                     this._yDomainChangeIncludedValues = function () { return includedValues; };
-                    changedScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+                    yScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
                 }
+            };
+            Line.prototype._endOfDomainValues = function () {
+                return [];
             };
             Line.prototype._getResetYFunction = function () {
                 // gets the y-value generator for the animation start point

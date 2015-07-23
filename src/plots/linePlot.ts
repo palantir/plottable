@@ -26,7 +26,6 @@ export module Plots {
     }
 
     protected _updateExtentsForProperty(property: string) {
-
       if (property === "y") {
         this._ownMethod();
       }
@@ -39,14 +38,14 @@ export module Plots {
     private _ownMethod() {
       if (this.x && this.x().scale && this.y && this.y().scale && this.datasets().length > 0) {
 
-        var changedScale = this.y().scale;
-        var changedAccessor = this.y().accessor;
+        var yScale = this.y().scale;
+        var yAccessor = this.y().accessor;
 
-        var adjustingScale = this.x().scale;
-        var adjustingAccessor = this.x().accessor;
+        var xScale = <QuantitativeScale<X>>this.x().scale;
+        var xAccessor = this.x().accessor;
 
         if (this._yDomainChangeIncludedValues) {
-          changedScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
+          yScale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
         }
 
         var includedValues: any[] = [];
@@ -56,8 +55,8 @@ export module Plots {
 
           var westOfLeft: boolean;
           var westOfRight: boolean;
-          var left = adjustingScale.domain()[0];
-          var right = adjustingScale.domain()[1];
+          var left = xScale.domain()[0];
+          var right = xScale.domain()[1];
 
           var lastValue: any;
           data.forEach((d, i) => {
@@ -68,9 +67,9 @@ export module Plots {
             if (lastValue) {
               if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
 
-                x1 = left - adjustingAccessor(lastValue, i - 1, dataset);
-                x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
-                y2 = changedAccessor(d, i, dataset) - changedAccessor(lastValue, i - 1, dataset);
+                x1 = left - xAccessor(lastValue, i - 1, dataset);
+                x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
+                y2 = yAccessor(d, i, dataset) - yAccessor(lastValue, i - 1, dataset);
                 y1 = x1 * y2 / x2;
 
                 includedValues.push({
@@ -80,8 +79,8 @@ export module Plots {
               }
 
               if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-                x1 = right - adjustingAccessor(lastValue, i - 1, dataset);
-                x2 = adjustingAccessor(d, i, dataset) - adjustingAccessor(lastValue, i - 1, dataset);
+                x1 = right - xAccessor(lastValue, i - 1, dataset);
+                x2 = xAccessor(d, i, dataset) - xAccessor(lastValue, i - 1, dataset);
                 y2 = d.y - lastValue.y;
                 y1 = x1 * y2 / x2;
 
@@ -103,8 +102,12 @@ export module Plots {
         console.log(includedValues);
 
         this._yDomainChangeIncludedValues = () => includedValues;
-        changedScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
+        yScale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
       }
+    }
+
+    private _endOfDomainValues(): X|number[][] {
+      return [];
     }
 
     protected _getResetYFunction() {
