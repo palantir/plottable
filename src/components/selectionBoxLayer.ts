@@ -10,10 +10,10 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
-    private _boxDataBounds: Bounds = {
-      topLeft: { x: 0, y: 0 },
-      bottomRight: { x: 0, y: 0 }
-    };
+    private _boxLeftDataValue: any;
+    private _boxRightDataValue: any;
+    private _boxTopDataValue: any;
+    private _boxBottomDataValue: any;
     private _xScale: QuantitativeScale<any>;
     private _yScale: QuantitativeScale<any>;
     private _renderCallback: ScaleCallback<QuantitativeScale<any>>;
@@ -72,15 +72,15 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
-      this._bindBoxDataBounds();
+      this._bindBoxDataValues();
     }
 
     public renderImmediately() {
       if (this._boxVisible) {
-        var t = this._yScale ? this._yScale.scale(this._boxDataBounds.topLeft.y) : this._boxBounds.topLeft.y;
-        var b = this._yScale ? this._yScale.scale(this._boxDataBounds.bottomRight.y) : this._boxBounds.bottomRight.y;
-        var l = this._xScale ? this._xScale.scale(this._boxDataBounds.topLeft.x) : this._boxBounds.topLeft.x;
-        var r = this._xScale ? this._xScale.scale(this._boxDataBounds.bottomRight.x) : this._boxBounds.bottomRight.x;
+        var t = this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y;
+        var b = this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y;
+        var l = this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x;
+        var r = this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x;
 
         this._boxArea.attr({
           x: l, y: t, width: r - l, height: b - t
@@ -132,7 +132,7 @@ export module Components {
       }
       this._xScale = xScale;
       xScale.onUpdate(this._renderCallback);
-      this._bindBoxDataBounds();
+      this._bindBoxDataValues();
       return this;
     }
 
@@ -147,21 +147,15 @@ export module Components {
       }
       this._yScale = yScale;
       yScale.onUpdate(this._renderCallback);
-      this._bindBoxDataBounds();
+      this._bindBoxDataValues();
       return this;
     }
 
-    private _bindBoxDataBounds() {
-      this._boxDataBounds = {
-        topLeft: {
-          x: this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null,
-          y: this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null
-        },
-        bottomRight: {
-          x: this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null,
-          y: this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null
-        }
-      };
+    private _bindBoxDataValues() {
+      this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
+      this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
+      this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
+      this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
     }
   }
 }
