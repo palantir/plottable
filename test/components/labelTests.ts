@@ -189,4 +189,12 @@ describe("Labels", () => {
     var testLabel = new Plottable.Components.Label("testing label");
     assert.throws(() => testLabel.padding(-10), Error, "Cannot be less than 0");
   });
+
+  it("Label can takes number as displayText", () => {
+    var label: Plottable.Components.Label;
+    assert.doesNotThrow(() => {
+      label = new Plottable.Components.Label(1);
+    }, Error, "Label does not crash on numeric values");
+    assert.strictEqual(label.text(), "1", "text equal to input number");
+  });
 });

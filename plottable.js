@@ -4857,7 +4857,7 @@ var Plottable;
              * A Label is a Component that displays a single line of text.
              *
              * @constructor
-             * @param {string} [displayText=""] The text of the Label.
+             * @param {number | string} [displayText=""] The text of the Label.
              * @param {number} [angle=0] The angle of the Label in degrees (-90/0/90). 0 is horizontal.
              */
             function Label(displayText, angle) {
@@ -4892,7 +4892,7 @@ var Plottable;
                     return this._text;
                 }
                 else {
-                    this._text = displayText;
+                    this._text = "" + displayText;
                     this.redraw();
                     return this;
                 }
@@ -4965,7 +4965,7 @@ var Plottable;
             __extends(TitleLabel, _super);
             /**
              * @constructor
-             * @param {string} [text]
+             * @param {number | string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             function TitleLabel(text, angle) {
@@ -4980,7 +4980,7 @@ var Plottable;
             __extends(AxisLabel, _super);
             /**
              * @constructor
-             * @param {string} [text]
+             * @param {number | string} [text]
              * @param {number} [angle] One of -90/0/90. 0 is horizontal.
              */
             function AxisLabel(text, angle) {
