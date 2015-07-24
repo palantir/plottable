@@ -9805,7 +9805,7 @@ var Plottable;
                 this._keyPressKeyCodeCallbacks = {};
                 this._keyReleaseKeyCodeCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
-                this._keyDowned = {};
+                this._downedKeys = new Plottable.Utils.Set();
                 this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
                 this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
@@ -9831,14 +9831,14 @@ var Plottable;
                     if (this._keyPressKeyCodeCallbacks[keyCode]) {
                         this._keyPressKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
                     }
-                    this._keyDowned[keyCode] = true;
+                    this._downedKeys.add(keyCode);
                 }
             };
             Key.prototype._handleKeyUpEvent = function (keyCode) {
-                if (this._keyDowned[keyCode] && this._keyReleaseKeyCodeCallbacks[keyCode]) {
+                if (this._downedKeys.has(keyCode) && this._keyReleaseKeyCodeCallbacks[keyCode]) {
                     this._keyReleaseKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
                 }
-                this._keyDowned[keyCode] = false;
+                this._downedKeys.delete(keyCode);
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is

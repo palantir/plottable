@@ -15,7 +15,7 @@ export module Interactions {
     private _keyReleaseKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
-    private _keyDowned: { [keyCode: number]: boolean } = {};
+    private _downedKeys = new Plottable.Utils.Set();
     private _keyDownCallback = (keyCode: number) => this._handleKeyDownEvent(keyCode);
     private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
@@ -47,15 +47,15 @@ export module Interactions {
         if (this._keyPressKeyCodeCallbacks[keyCode]) {
           this._keyPressKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
         }
-        this._keyDowned[keyCode] = true;
+        this._downedKeys.add(keyCode);
       }
     }
 
     private _handleKeyUpEvent(keyCode: number) {
-      if (this._keyDowned[keyCode] && this._keyReleaseKeyCodeCallbacks[keyCode]) {
+      if (this._downedKeys.has(keyCode) && this._keyReleaseKeyCodeCallbacks[keyCode]) {
         this._keyReleaseKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
       }
-      this._keyDowned[keyCode] = false;
+      this._downedKeys.delete(keyCode);
     }
 
     /**
