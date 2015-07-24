@@ -178,7 +178,7 @@ describe("Plots", () => {
           } else {
             assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
           }
-        })
+        });
 
         svg.remove();
       });
