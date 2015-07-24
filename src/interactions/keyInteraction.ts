@@ -11,8 +11,8 @@ export module Interactions {
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
     private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keyPressKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
-    private _keyReleaseKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyPressCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyReleaseCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
     private _downedKeys = new Plottable.Utils.Set();
@@ -44,16 +44,16 @@ export module Interactions {
     private _handleKeyDownEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
       if (this._isInsideComponent(p)) {
-        if (this._keyPressKeyCodeCallbacks[keyCode]) {
-          this._keyPressKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+        if (this._keyPressCallbacks[keyCode]) {
+          this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
         }
         this._downedKeys.add(keyCode);
       }
     }
 
     private _handleKeyUpEvent(keyCode: number) {
-      if (this._downedKeys.has(keyCode) && this._keyReleaseKeyCodeCallbacks[keyCode]) {
-        this._keyReleaseKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+      if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+        this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
       }
       this._downedKeys.delete(keyCode);
     }
@@ -67,10 +67,10 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKeyPress(keyCode: number, callback: KeyCallback) {
-      if (!this._keyPressKeyCodeCallbacks[keyCode]) {
-        this._keyPressKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      if (!this._keyPressCallbacks[keyCode]) {
+        this._keyPressCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
-      this._keyPressKeyCodeCallbacks[keyCode].add(callback);
+      this._keyPressCallbacks[keyCode].add(callback);
       return this;
     }
 
@@ -83,9 +83,9 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKeyPress(keyCode: number, callback: KeyCallback) {
-      this._keyPressKeyCodeCallbacks[keyCode].delete(callback);
-      if (this._keyPressKeyCodeCallbacks[keyCode].size === 0) {
-        delete this._keyPressKeyCodeCallbacks[keyCode];
+      this._keyPressCallbacks[keyCode].delete(callback);
+      if (this._keyPressCallbacks[keyCode].size === 0) {
+        delete this._keyPressCallbacks[keyCode];
       }
       return this;
     }
@@ -99,10 +99,10 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKeyRelease(keyCode: number, callback: KeyCallback) {
-      if (!this._keyReleaseKeyCodeCallbacks[keyCode]) {
-        this._keyReleaseKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      if (!this._keyReleaseCallbacks[keyCode]) {
+        this._keyReleaseCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
-      this._keyReleaseKeyCodeCallbacks[keyCode].add(callback);
+      this._keyReleaseCallbacks[keyCode].add(callback);
       return this;
     }
 
@@ -115,9 +115,9 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKeyRelease(keyCode: number, callback: KeyCallback) {
-      this._keyReleaseKeyCodeCallbacks[keyCode].delete(callback);
-      if (this._keyReleaseKeyCodeCallbacks[keyCode].size === 0) {
-        delete this._keyReleaseKeyCodeCallbacks[keyCode];
+      this._keyReleaseCallbacks[keyCode].delete(callback);
+      if (this._keyReleaseCallbacks[keyCode].size === 0) {
+        delete this._keyReleaseCallbacks[keyCode];
       }
       return this;
     }

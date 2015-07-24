@@ -53,13 +53,6 @@ describe("Interactions", () => {
         assert.isFalse(bCallbackCalled, "callback for \"b\" was not called when \"a\" key was pressed");
       });
 
-      it("only fires callback for \"b\" when \"b\" key is pressed", () => {
-        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
-        $target.simulate("keydown", { keyCode: bCode });
-        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"b\" key was pressed");
-        assert.isTrue(bCallbackCalled, "callback for \"b\" was called when \"b\" key was pressed");
-      });
-
       it("does not fire callback when the key is pressed outside of the component", () => {
         TestMethods.triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
         $target.simulate("keydown", { keyCode: aCode });
