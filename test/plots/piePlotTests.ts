@@ -157,6 +157,40 @@ describe("Plots", () => {
         assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
         svg.remove();
       });
+
+      it("labels are shown and hidden appropriately", () => {
+        var data = [
+          { key: "A", value: 1 }, { key: "B", value: 50 },
+          { key: "C", value: 1 }, { key: "D", value: 50 },
+          { key: "E", value: 1 }, { key: "F", value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        $(".label-area").children("g").each(function(i) {
+          if (i % 2 === 0) {
+            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
+          }
+        });
+        svg.remove();
+      });
+
+      it("labels outside of the render area are hidden", () => {
+        var data = [5000, 5000, 5000];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset).outerRadius(500);
+        var texts = svg.selectAll("text")[0];
+        texts.forEach((text, index) => {
+          var visibility = d3.select(text).style("visibility");
+          if (index === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when cut off");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+          }
+        });
+        svg.remove();
+      });
     });
   });
 
@@ -387,46 +421,6 @@ describe("Plots", () => {
       assert.strictEqual(message, "Negative values will not render correctly in a Pie Plot.");
       Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
-    });
-
-    describe("Labels", () => {
-      it("labels are shown and hidden appropriately", () => {
-        piePlot.removeDataset(simpleDataset);
-        var data = [
-          { key: "A", value: 1 }, { key: "B", value: 50 },
-          { key: "C", value: 1 }, { key: "D", value: 50 },
-          { key: "E", value: 1 }, { key: "F", value: 50 }
-        ];
-        var dataset = new Plottable.Dataset(data);
-        piePlot.addDataset(dataset).labelsEnabled(true);
-        $(".label-area").children("g").each(function(i) {
-          if (i % 2 === 0) {
-            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
-          } else {
-            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
-          }
-        });
-        svg.remove();
-      });
-
-      it("labels outside of the render area are hidden", () => {
-        piePlot.detach();
-        piePlot.removeDataset(simpleDataset);
-        var data = [5000, 5000, 5000];
-        var dataset = new Plottable.Dataset(data);
-        piePlot.sectorValue(function(d) { return d; });
-        piePlot.addDataset(dataset).labelsEnabled(true).outerRadius(500);
-        var texts = svg.selectAll("text")[0];
-        texts.forEach((text, index) => {
-          var visibility = d3.select(text).style("visibility");
-          if (index === 1) {
-            assert.strictEqual(visibility, "hidden", "label hidden when cut off");
-          } else {
-            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
-          }
-        });
-        svg.remove();
-      });
     });
   });
 
