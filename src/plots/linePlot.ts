@@ -61,10 +61,7 @@ export module Plots {
           extent[1] = maxIncludedValue;
         }
       }
-
-
       return extent;
-
     }
 
     private _getEdgeIntersectionPoints(): Point[][] {
@@ -84,12 +81,13 @@ export module Plots {
         var data = dataset.data();
 
         var x1: number, x2: number, y1: number, y2: number;
+        var prevX: number, prevY: number, currX: number, currY: number;
         for (var i = 1; i < data.length; i++) {
-          var prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
-          var prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
+          prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
+          prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
 
-          var currX = xScale.scale(this.x().accessor(data[i], i, dataset));
-          var currY = yScale.scale(this.y().accessor(data[i], i, dataset));
+          currX = xScale.scale(this.x().accessor(data[i], i, dataset));
+          currY = yScale.scale(this.y().accessor(data[i], i, dataset));
 
           // If values crossed left edge
           if (prevX < leftX && leftX <= currX) {

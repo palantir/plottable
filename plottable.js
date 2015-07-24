@@ -7956,11 +7956,12 @@ var Plottable;
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
                     var x1, x2, y1, y2;
+                    var prevX, prevY, currX, currY;
                     for (var i = 1; i < data.length; i++) {
-                        var prevX = currX || xScale.scale(_this.x().accessor(data[i - 1], i - 1, dataset));
-                        var prevY = currY || yScale.scale(_this.y().accessor(data[i - 1], i - 1, dataset));
-                        var currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
-                        var currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
+                        prevX = currX || xScale.scale(_this.x().accessor(data[i - 1], i - 1, dataset));
+                        prevY = currY || yScale.scale(_this.y().accessor(data[i - 1], i - 1, dataset));
+                        currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
+                        currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
                         // If values crossed left edge
                         if (prevX < leftX && leftX <= currX) {
                             x1 = leftX - prevX;
