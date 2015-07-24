@@ -11,10 +11,11 @@ export module Interactions {
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
     private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keydownKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
-    private _keyupKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyPressKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyReleaseKeyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
+    private _keyDowned: { [keyCode: number]: boolean } = {};
     private _keyDownCallback = (keyCode: number) => this._handleKeyDownEvent(keyCode);
     private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
@@ -42,16 +43,19 @@ export module Interactions {
 
     private _handleKeyDownEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-      if (this._isInsideComponent(p) && this._keydownKeyCodeCallbacks[keyCode]) {
-        this._keydownKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+      if (this._isInsideComponent(p)) {
+        if (this._keyPressKeyCodeCallbacks[keyCode]) {
+          this._keyPressKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+        }
+        this._keyDowned[keyCode] = true;
       }
     }
 
     private _handleKeyUpEvent(keyCode: number) {
-      var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-      if (this._isInsideComponent(p) && this._keyupKeyCodeCallbacks[keyCode]) {
-        this._keyupKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+      if (this._keyDowned[keyCode] && this._keyReleaseKeyCodeCallbacks[keyCode]) {
+        this._keyReleaseKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
       }
+      this._keyDowned[keyCode] = false;
     }
 
     /**
@@ -63,10 +67,10 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKeyPress(keyCode: number, callback: KeyCallback) {
-      if (!this._keydownKeyCodeCallbacks[keyCode]) {
-        this._keydownKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      if (!this._keyPressKeyCodeCallbacks[keyCode]) {
+        this._keyPressKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
-      this._keydownKeyCodeCallbacks[keyCode].add(callback);
+      this._keyPressKeyCodeCallbacks[keyCode].add(callback);
       return this;
     }
 
@@ -79,9 +83,9 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKeyPress(keyCode: number, callback: KeyCallback) {
-      this._keydownKeyCodeCallbacks[keyCode].delete(callback);
-      if (this._keydownKeyCodeCallbacks[keyCode].size === 0) {
-        delete this._keydownKeyCodeCallbacks[keyCode];
+      this._keyPressKeyCodeCallbacks[keyCode].delete(callback);
+      if (this._keyPressKeyCodeCallbacks[keyCode].size === 0) {
+        delete this._keyPressKeyCodeCallbacks[keyCode];
       }
       return this;
     }
@@ -95,10 +99,10 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKeyRelease(keyCode: number, callback: KeyCallback) {
-      if (!this._keyupKeyCodeCallbacks[keyCode]) {
-        this._keyupKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      if (!this._keyReleaseKeyCodeCallbacks[keyCode]) {
+        this._keyReleaseKeyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
-      this._keyupKeyCodeCallbacks[keyCode].add(callback);
+      this._keyReleaseKeyCodeCallbacks[keyCode].add(callback);
       return this;
     }
 
@@ -111,9 +115,9 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKeyRelease(keyCode: number, callback: KeyCallback) {
-      this._keyupKeyCodeCallbacks[keyCode].delete(callback);
-      if (this._keyupKeyCodeCallbacks[keyCode].size === 0) {
-        delete this._keyupKeyCodeCallbacks[keyCode];
+      this._keyReleaseKeyCodeCallbacks[keyCode].delete(callback);
+      if (this._keyReleaseKeyCodeCallbacks[keyCode].size === 0) {
+        delete this._keyReleaseKeyCodeCallbacks[keyCode];
       }
       return this;
     }

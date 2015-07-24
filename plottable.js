@@ -9802,9 +9802,10 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.apply(this, arguments);
-                this._keydownKeyCodeCallbacks = {};
-                this._keyupKeyCodeCallbacks = {};
+                this._keyPressKeyCodeCallbacks = {};
+                this._keyReleaseKeyCodeCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
+                this._keyDowned = {};
                 this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
                 this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
@@ -9826,15 +9827,18 @@ var Plottable;
             };
             Key.prototype._handleKeyDownEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p) && this._keydownKeyCodeCallbacks[keyCode]) {
-                    this._keydownKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+                if (this._isInsideComponent(p)) {
+                    if (this._keyPressKeyCodeCallbacks[keyCode]) {
+                        this._keyPressKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+                    }
+                    this._keyDowned[keyCode] = true;
                 }
             };
             Key.prototype._handleKeyUpEvent = function (keyCode) {
-                var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p) && this._keyupKeyCodeCallbacks[keyCode]) {
-                    this._keyupKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
+                if (this._keyDowned[keyCode] && this._keyReleaseKeyCodeCallbacks[keyCode]) {
+                    this._keyReleaseKeyCodeCallbacks[keyCode].callCallbacks(keyCode);
                 }
+                this._keyDowned[keyCode] = false;
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is
@@ -9845,10 +9849,10 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.onKeyPress = function (keyCode, callback) {
-                if (!this._keydownKeyCodeCallbacks[keyCode]) {
-                    this._keydownKeyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                if (!this._keyPressKeyCodeCallbacks[keyCode]) {
+                    this._keyPressKeyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
-                this._keydownKeyCodeCallbacks[keyCode].add(callback);
+                this._keyPressKeyCodeCallbacks[keyCode].add(callback);
                 return this;
             };
             /**
@@ -9860,9 +9864,9 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.offKeyPress = function (keyCode, callback) {
-                this._keydownKeyCodeCallbacks[keyCode].delete(callback);
-                if (this._keydownKeyCodeCallbacks[keyCode].size === 0) {
-                    delete this._keydownKeyCodeCallbacks[keyCode];
+                this._keyPressKeyCodeCallbacks[keyCode].delete(callback);
+                if (this._keyPressKeyCodeCallbacks[keyCode].size === 0) {
+                    delete this._keyPressKeyCodeCallbacks[keyCode];
                 }
                 return this;
             };
@@ -9875,10 +9879,10 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.onKeyRelease = function (keyCode, callback) {
-                if (!this._keyupKeyCodeCallbacks[keyCode]) {
-                    this._keyupKeyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                if (!this._keyReleaseKeyCodeCallbacks[keyCode]) {
+                    this._keyReleaseKeyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
-                this._keyupKeyCodeCallbacks[keyCode].add(callback);
+                this._keyReleaseKeyCodeCallbacks[keyCode].add(callback);
                 return this;
             };
             /**
@@ -9890,9 +9894,9 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.offKeyRelease = function (keyCode, callback) {
-                this._keyupKeyCodeCallbacks[keyCode].delete(callback);
-                if (this._keyupKeyCodeCallbacks[keyCode].size === 0) {
-                    delete this._keyupKeyCodeCallbacks[keyCode];
+                this._keyReleaseKeyCodeCallbacks[keyCode].delete(callback);
+                if (this._keyReleaseKeyCodeCallbacks[keyCode].size === 0) {
+                    delete this._keyReleaseKeyCodeCallbacks[keyCode];
                 }
                 return this;
             };
