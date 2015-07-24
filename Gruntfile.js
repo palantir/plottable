@@ -17,7 +17,7 @@ module.exports = function(grunt) {
       }
     },
     test: {
-      src: ["test/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
+      src: ["test/**/*.ts", "typings/**/*.d.ts", "build/plottable.d.ts"],
       outDir: "build/test/",
       options: {
         target: "es5",
