@@ -6779,8 +6779,6 @@ var Plottable;
             _super.call(this);
             this._autoAdjustXScaleDomain = false;
             this._autoAdjustYScaleDomain = false;
-            // TODO: private
-            this._autorangeSmooth = false;
             this._deferredRendering = false;
             this._cachedDomainX = [null, null];
             this._cachedDomainY = [null, null];
@@ -6953,13 +6951,6 @@ var Plottable;
                 default:
                     throw new Error("Invalid scale name '" + autorangeMode + "', must be 'x', 'y' or 'none'");
             }
-            return this;
-        };
-        XYPlot.prototype.autorangeSmooth = function (autorangeSmooth) {
-            if (autorangeSmooth == null) {
-                return this._autorangeSmooth;
-            }
-            this._autorangeSmooth = autorangeSmooth;
             return this;
         };
         XYPlot.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
@@ -7914,6 +7905,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
+                this._autorangeSmooth = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -7923,32 +7915,26 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.autorangeSmooth = function (autorangeSmooth) {
+                if (autorangeSmooth == null) {
+                    return this._autorangeSmooth;
+                }
+                this._autorangeSmooth = autorangeSmooth;
+                return this;
+            };
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
-            Line.prototype._updateExtentsForProperty = function (property) {
-                if (property === "y") {
-                }
-                _super.prototype._updateExtentsForProperty.call(this, property);
-            };
-            Line.prototype._addIntersectionPoints = function () {
-                if (this.x && this.x().scale && this.y && this.y().scale) {
-                    if (this._yDomainChangeIncludedValues) {
-                        this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
-                    }
-                    var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-                    var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
-                    this._yDomainChangeIncludedValues = function () { return includedValues; };
-                    this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
-                }
-            };
             Line.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
                 var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
-                if (this.x && this.x().scale && this.y && this.y().scale) {
+                if (this._autorangeSmooth && this.x && this.x().scale && this.y && this.y().scale) {
                     var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
                     var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
                     var maxIncludedValue = Math.max.apply(this, includedValues);
                     var minIncludedValue = Math.min.apply(this, includedValues);
+                    if (extent.length === 0) {
+                        extent = [minIncludedValue, maxIncludedValue];
+                    }
                     if (minIncludedValue < extent[0]) {
                         extent[0] = minIncludedValue;
                     }

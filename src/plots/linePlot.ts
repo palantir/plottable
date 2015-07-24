@@ -4,6 +4,8 @@ module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
 
+    private _autorangeSmooth = false;
+
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
      *
@@ -21,45 +23,35 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
+    public autorangeSmooth(): boolean;
+    public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+    public autorangeSmooth(autorangeSmooth?: boolean): any {
+      if (autorangeSmooth == null) {
+        return this._autorangeSmooth;
+      }
+      this._autorangeSmooth = autorangeSmooth;
+      return this;
+    }
+
     protected _createDrawer(dataset: Dataset): Drawer {
       return new Plottable.Drawers.Line(dataset);
-    }
-
-    protected _updateExtentsForProperty(property: string) {
-      if (property === "y") {
-        // this._addIntersectionPoints();
-      }
-      super._updateExtentsForProperty(property);
-    }
-
-
-    private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<number>;
-
-    private _addIntersectionPoints() {
-      if (this.x && this.x().scale && this.y && this.y().scale) {
-
-        if (this._yDomainChangeIncludedValues) {
-          this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
-        }
-
-        var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-        var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
-
-        this._yDomainChangeIncludedValues = () => includedValues;
-        this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
-      }
     }
 
     protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
 
       var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
-      if (this.x && this.x().scale && this.y && this.y().scale) {
+      if (this._autorangeSmooth && this.x && this.x().scale && this.y && this.y().scale) {
+
         var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
         var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
 
         var maxIncludedValue = Math.max.apply(this, includedValues);
         var minIncludedValue = Math.min.apply(this, includedValues);
+
+        if (extent.length === 0) {
+          extent = [minIncludedValue, maxIncludedValue];
+        }
 
         if (minIncludedValue < extent[0]) {
           extent[0] = minIncludedValue;
