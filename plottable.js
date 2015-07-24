@@ -6250,12 +6250,11 @@ var Plottable;
                 return [];
             }
             var data = dataset.data();
-            var filteredData = [];
             if (filter != null) {
-                filteredData = data.filter(function (d, i) { return filter(d, i, dataset); });
+                data = data.filter(function (d, i) { return filter(d, i, dataset); });
             }
             var appliedAccessor = function (d, i) { return accessor(d, i, dataset); };
-            var mappedData = filteredData.map(appliedAccessor);
+            var mappedData = data.map(appliedAccessor);
             return scale.extentOfValues(mappedData);
         };
         /**

@@ -308,12 +308,11 @@ export class Plot extends Component {
     }
 
     var data = dataset.data();
-    var filteredData: any[] = [];
     if (filter != null) {
-      filteredData = data.filter((d, i) => filter(d, i, dataset));
+      data = data.filter((d, i) => filter(d, i, dataset));
     }
     var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
-    var mappedData = filteredData.map(appliedAccessor);
+    var mappedData = data.map(appliedAccessor);
 
     return scale.extentOfValues(mappedData);
   }
