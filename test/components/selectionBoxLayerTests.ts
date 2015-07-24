@@ -98,8 +98,8 @@ describe("SelectionBoxLayer", () => {
       y: 300
     };
     sbl.bounds({
-      topLeft: bottomRight,
-      bottomRight: topLeft
+      topLeft: topLeft,
+      bottomRight: bottomRight
     });
 
     sbl.boxVisible(true);
@@ -136,8 +136,8 @@ describe("SelectionBoxLayer", () => {
       y: 300
     };
     sbl.bounds({
-      topLeft: bottomRight,
-      bottomRight: topLeft
+      topLeft: topLeft,
+      bottomRight: bottomRight
     });
 
     sbl.boxVisible(true);
@@ -174,11 +174,11 @@ describe("SelectionBoxLayer", () => {
       y: 300
     };
     sbl.bounds({
-      topLeft: bottomRight,
-      bottomRight: topLeft
+      topLeft: topLeft,
+      bottomRight: bottomRight
     });
 
-    assert.strictEqual(sbl.boxLeftDataValue(), 400, "data value maps correctly");
+    assert.strictEqual(sbl.boxXExtent()[0], 400, "data value maps correctly");
 
     svg.remove();
   });

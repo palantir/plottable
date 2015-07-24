@@ -6064,36 +6064,20 @@ var Plottable;
                 return this;
             };
             /**
-             * Gets the data value backing the left edge of the box.
+             * Gets the data values backing the left and right edges of the box.
              *
-             * Returns undefined if the edge is not backed by a scale.
+             * Returns an undefined array if the edges are not backed by a scale.
              */
-            SelectionBoxLayer.prototype.boxLeftDataValue = function () {
-                return this._boxLeftDataValue;
+            SelectionBoxLayer.prototype.boxXExtent = function () {
+                return [this._boxLeftDataValue, this._boxRightDataValue];
             };
             /**
-             * Gets the data value backing the right edge of the box.
+             * Gets the data values backing the top and bottom edges of the box.
              *
-             * Returns undefined if the edge is not backed by a scale.
+             * Returns an undefined array if the edges are not backed by a scale.
              */
-            SelectionBoxLayer.prototype.boxRightDataValue = function () {
-                return this._boxRightDataValue;
-            };
-            /**
-             * Gets the data value backing the top edge of the box.
-             *
-             * Returns undefined if the edge is not backed by a scale.
-             */
-            SelectionBoxLayer.prototype.boxTopDataValue = function () {
-                return this._boxTopDataValue;
-            };
-            /**
-             * Gets the data value backing the bottom edge of the box.
-             *
-             * Returns undefined if the edge is not backed by a scale.
-             */
-            SelectionBoxLayer.prototype.boxBottomDataValue = function () {
-                return this._boxBottomDataValue;
+            SelectionBoxLayer.prototype.boxYExtent = function () {
+                return [this._boxTopDataValue, this._boxBottomDataValue];
             };
             SelectionBoxLayer.prototype._bindBoxDataValues = function () {
                 this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;

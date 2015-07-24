@@ -179,39 +179,21 @@ export module Components {
     }
 
     /**
-     * Gets the data value backing the left edge of the box.
+     * Gets the data values backing the left and right edges of the box.
      *
-     * Returns undefined if the edge is not backed by a scale.
+     * Returns an undefined array if the edges are not backed by a scale.
      */
-    public boxLeftDataValue() {
-      return this._boxLeftDataValue;
+    public boxXExtent() {
+      return [this._boxLeftDataValue, this._boxRightDataValue];
     }
 
     /**
-     * Gets the data value backing the right edge of the box.
+     * Gets the data values backing the top and bottom edges of the box.
      *
-     * Returns undefined if the edge is not backed by a scale.
+     * Returns an undefined array if the edges are not backed by a scale.
      */
-    public boxRightDataValue() {
-      return this._boxRightDataValue;
-    }
-
-    /**
-     * Gets the data value backing the top edge of the box.
-     *
-     * Returns undefined if the edge is not backed by a scale.
-     */
-    public boxTopDataValue() {
-      return this._boxTopDataValue;
-    }
-
-    /**
-     * Gets the data value backing the bottom edge of the box.
-     *
-     * Returns undefined if the edge is not backed by a scale.
-     */
-    public boxBottomDataValue() {
-      return this._boxBottomDataValue;
+    public boxYExtent() {
+      return [this._boxTopDataValue, this._boxBottomDataValue];
     }
 
     private _bindBoxDataValues() {
