@@ -63,8 +63,6 @@ export module Plots {
           extent[1] = maxIncludedValue;
         }
       }
-      console.log(extent);
-
       return extent;
     }
 

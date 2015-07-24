@@ -341,15 +341,15 @@ describe("Plots", () => {
       xScale.domain([0.1, 1.1]);
 
       var data = [
-        {"x":0.0, "y":-1},
-        {"x":1.8, "y":-2},
-      ]
+        {"x": 0.0, "y": -1},
+        {"x": 1.8, "y": -2},
+      ];
 
-      var line = new Plottable.Plots.Line()
-        .x(function(d) { return d.x; }, xScale)
-        .y(function(d) { return d.y; }, yScale)
-        .addDataset(new Plottable.Dataset(data))
-        .autorangeMode("y")
+      var line = new Plottable.Plots.Line();
+      line.x(function(d) { return d.x; }, xScale);
+      line.y(function(d) { return d.y; }, yScale);
+      line.addDataset(new Plottable.Dataset(data));
+      line.autorangeMode("y");
 
       xScale.padProportion(0);
       yScale.padProportion(0);
@@ -360,6 +360,7 @@ describe("Plots", () => {
 
       line.autorangeSmooth(true);
       line.render();
+      // This is actually incorrect, but I don't know exact value to put in
       assert.deepEqual(yScale.domain(), [0, 1],
         "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
 
@@ -372,8 +373,6 @@ describe("Plots", () => {
     });
 
     it("autoDomaining works", () => {
-
-
       var svg = TestMethods.generateSVG(500, 500);
 
       var xScale = new Plottable.Scales.Linear();
@@ -382,15 +381,15 @@ describe("Plots", () => {
       xScale.domain([-0.1, 0.2]);
 
       var data = [
-        {"x":0.0, "y":-1},
-        {"x":1.8, "y":-2},
-      ]
+        {"x": 0.0, "y": -1},
+        {"x": 1.8, "y": -2},
+      ];
 
-      var line = new Plottable.Plots.Line()
-        .x(function(d) { return d.x; }, xScale)
-        .y(function(d) { return d.y; }, yScale)
-        .addDataset(new Plottable.Dataset(data))
-        .autorangeMode("y")
+      var line = new Plottable.Plots.Line();
+      line.x(function(d) { return d.x; }, xScale);
+      line.y(function(d) { return d.y; }, yScale);
+      line.addDataset(new Plottable.Dataset(data));
+      line.autorangeMode("y");
 
       line.renderTo(svg);
 

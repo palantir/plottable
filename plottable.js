@@ -7943,7 +7943,6 @@ var Plottable;
                         extent[1] = maxIncludedValue;
                     }
                 }
-                console.log(extent);
                 return extent;
             };
             Line.prototype._getEdgeIntersectionPoints = function () {
