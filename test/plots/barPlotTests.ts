@@ -506,38 +506,6 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("hides labels properly on the right", () => {
-        barPlot.labelsEnabled(true);
-        xScale.domainMax(0.95);
-        var texts = svg.selectAll("text")[0];
-        texts.forEach((text, i) => {
-          var selection = d3.select(text);
-          var visibility = selection.style("visibility");
-          if (i === 1) {
-            assert.include(["visible", "inherit"], visibility, "label at index 1 is visible");
-          } else {
-            assert.strictEqual(visibility, "hidden", "label at index " + (i + 1) + " is not visible");
-          }
-        });
-        svg.remove();
-      });
-
-      it("hides labels properly on the left", () => {
-        barPlot.labelsEnabled(true);
-        xScale.domainMin(-1.4);
-        var texts = svg.selectAll("text")[0];
-        texts.forEach((text, i) => {
-          var selection = d3.select(text);
-          var visibility = selection.style("visibility");
-          if (i === 1) {
-            assert.strictEqual(visibility, "hidden", "label at index 1 is not visible");
-          } else {
-            assert.include(["visible", "inherit"], visibility, "label at index " + (i + 1) + " is visible");
-          }
-        });
-        svg.remove();
-      });
-
       describe("entities()", () => {
         describe("position", () => {
           it("entities() pixel points corrected for negative-valued bars", () => {
@@ -642,7 +610,59 @@ describe("Plots", () => {
 
           svg.remove();
         });
+      });
+    });
 
+    describe("Horizontal Bar Plot label visibility", () => {
+      var svg: d3.Selection<void>;
+      var yScale: Plottable.Scales.Category;
+      var xScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<number, string>;
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(600, 400);
+        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        xScale = new Plottable.Scales.Linear();
+
+        var data = [
+          {y: "A", x: -1.5},
+          {y: "B", x: 1},
+        ];
+
+        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        barPlot.addDataset(new Plottable.Dataset(data));
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
+      });
+
+      it("hides labels properly on the right", () => {
+        xScale.domainMax(0.95);
+        var texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+
+        assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
+        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
+
+        svg.remove();
+      });
+
+      it("hides labels properly on the left", () => {
+        xScale.domainMin(-1.4);
+        var texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+
+        assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+        svg.remove();
       });
     });
 
@@ -731,23 +751,29 @@ describe("Plots", () => {
       var plot: Plottable.Plots.Bar<number, number>;
       var xScale: Plottable.Scales.Linear;
       var yScale: Plottable.Scales.Linear;
+      var data: any[];
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
+        data = [
+          { x: 1, y: -10.1 },
+          { x: 2, y: -5.3 },
+          { x: 3, y: -2.8 }
+        ];
         plot = new Plottable.Plots.Bar<number, number>();
         plot.x((d) => d.x, xScale);
         plot.y((d) => d.y, yScale);
+        plot.addDataset(new Plottable.Dataset(data));
         plot.labelsEnabled(true);
+        plot.renderTo(svg);
       });
 
       it("hides labels outside of the visible render area (horizontal)", () => {
-        var data = [{ x: 1, y: -10.1 }, { x: 2, y: -5.3 }, { x: 3, y: -2.8 }];
         xScale.domain([1, 3]);
-        plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
         var texts = svg.selectAll("text")[0];
+
         texts.forEach((text, i) => {
           var selection = d3.select(text);
           var visibility = selection.style("visibility");
@@ -761,10 +787,7 @@ describe("Plots", () => {
       });
 
       it("hides labels outside of the visible render area (vertical)", () => {
-        var data = [{ x: 1, y: -10.1 }, { x: 2, y: -5.3 }, { x: 3, y: -2.8 }];
         yScale.domain([-11, -2.5]);
-        plot.addDataset(new Plottable.Dataset(data));
-        plot.renderTo(svg);
         var texts = svg.selectAll("text")[0];
         texts.forEach((text, i) => {
           var selection = d3.select(text);
