@@ -7967,11 +7967,11 @@ var Plottable;
             };
             Line.prototype._updateExtentsForProperty = function (property) {
                 if (property === "y") {
-                    this._ownMethod();
+                    this._addIntersectionPoints();
                 }
                 _super.prototype._updateExtentsForProperty.call(this, property);
             };
-            Line.prototype._ownMethod = function () {
+            Line.prototype._addIntersectionPoints = function () {
                 if (this.x && this.x().scale && this.y && this.y().scale) {
                     if (this._yDomainChangeIncludedValues) {
                         this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
@@ -7990,8 +7990,8 @@ var Plottable;
                 var yScale = this.y().scale;
                 var xScale = this.x().scale;
                 var intersectionPoints = [[], []];
-                var left = xScale.scale(xScale.domain()[0]);
-                var right = xScale.scale(xScale.domain()[1]);
+                var leftX = xScale.scale(xScale.domain()[0]);
+                var rightX = xScale.scale(xScale.domain()[1]);
                 this.datasets().forEach(function (dataset) {
                     var data = dataset.data();
                     var x1, x2, y1, y2;
@@ -8001,24 +8001,24 @@ var Plottable;
                         var currX = xScale.scale(_this.x().accessor(data[i], i, dataset));
                         var currY = yScale.scale(_this.y().accessor(data[i], i, dataset));
                         // If values crossed left edge
-                        if (prevX < left && left <= currX) {
-                            x1 = left - prevX;
+                        if (prevX < leftX && leftX <= currX) {
+                            x1 = leftX - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
                             intersectionPoints[0].push({
-                                x: left,
+                                x: leftX,
                                 y: yScale.invert(prevY + y1)
                             });
                         }
                         // If values crossed right edge
-                        if (prevX < right && right <= currX) {
-                            x1 = right - prevX;
+                        if (prevX < rightX && rightX <= currX) {
+                            x1 = rightX - prevX;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
                             intersectionPoints[1].push({
-                                x: right,
+                                x: rightX,
                                 y: yScale.invert(prevY + y1)
                             });
                         }

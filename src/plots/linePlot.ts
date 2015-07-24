@@ -27,7 +27,7 @@ export module Plots {
 
     protected _updateExtentsForProperty(property: string) {
       if (property === "y") {
-        this._ownMethod();
+        this._addIntersectionPoints();
       }
       super._updateExtentsForProperty(property);
     }
@@ -35,7 +35,7 @@ export module Plots {
 
     private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<number>;
 
-    private _ownMethod() {
+    private _addIntersectionPoints() {
       if (this.x && this.x().scale && this.y && this.y().scale) {
 
         if (this._yDomainChangeIncludedValues) {
@@ -60,8 +60,8 @@ export module Plots {
       var xScale = this.x().scale;
 
       var intersectionPoints: Point[][] = [[], []];
-      var left = xScale.scale(xScale.domain()[0]);
-      var right = xScale.scale(xScale.domain()[1]);
+      var leftX = xScale.scale(xScale.domain()[0]);
+      var rightX = xScale.scale(xScale.domain()[1]);
       this.datasets().forEach((dataset) => {
 
         var data = dataset.data();
@@ -75,27 +75,27 @@ export module Plots {
           var currY = yScale.scale(this.y().accessor(data[i], i, dataset));
 
           // If values crossed left edge
-          if (prevX < left && left <= currX) {
-            x1 = left - prevX;
+          if (prevX < leftX && leftX <= currX) {
+            x1 = leftX - prevX;
             x2 = currX - prevX;
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
             intersectionPoints[0].push({
-              x: left,
+              x: leftX,
               y: yScale.invert(prevY + y1)
             });
           }
 
           // If values crossed right edge
-          if (prevX < right && right <= currX) {
-            x1 = right - prevX;
+          if (prevX < rightX && rightX <= currX) {
+            x1 = rightX - prevX;
             x2 = currX - prevX;
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
             intersectionPoints[1].push({
-              x: right,
+              x: rightX,
               y: yScale.invert(prevY + y1)
             });
           }
