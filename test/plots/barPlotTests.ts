@@ -751,16 +751,15 @@ describe("Plots", () => {
       var plot: Plottable.Plots.Bar<number, number>;
       var xScale: Plottable.Scales.Linear;
       var yScale: Plottable.Scales.Linear;
-      var data: any[];
 
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        data = [
-          { x: 1, y: -10.1 },
-          { x: 2, y: -5.3 },
-          { x: 3, y: -2.8 }
+        var data = [
+          { x: 1, y: 10.1 },
+          { x: 2, y: 5.3 },
+          { x: 3, y: 2.8 }
         ];
         plot = new Plottable.Plots.Bar<number, number>();
         plot.x((d) => d.x, xScale);
@@ -772,32 +771,34 @@ describe("Plots", () => {
 
       it("hides labels outside of the visible render area (horizontal)", () => {
         xScale.domain([1, 3]);
-        var texts = svg.selectAll("text")[0];
 
-        texts.forEach((text, i) => {
-          var selection = d3.select(text);
-          var visibility = selection.style("visibility");
-          if (i === 1) {
-            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label at index 1 is visible");
-          } else {
-            assert.isTrue(visibility === "hidden", "bar label " + i + " is hidden");
-          }
-        });
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+        var label3 = d3.select(texts[0][2]);
+
+        assert.strictEqual(label1.style("visibility"), "hidden", "Left label is cut off by the margin");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
+        assert.strictEqual(label3.style("visibility"), "hidden", "Right label is cut off by the margin");
+
         svg.remove();
       });
 
       it("hides labels outside of the visible render area (vertical)", () => {
-        yScale.domain([-11, -2.5]);
-        var texts = svg.selectAll("text")[0];
-        texts.forEach((text, i) => {
-          var selection = d3.select(text);
-          var visibility = selection.style("visibility");
-          if (i === 2) {
-            assert.isTrue(visibility === "hidden", "bar label at index 2 is hidden");
-          } else {
-            assert.isTrue(visibility === "visible" || visibility === "inherit", "bar label " + i + " is visible");
-          }
-        });
+        yScale.domain([2.5, 11]);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+        var label3 = d3.select(texts[0][2]);
+
+        assert.include(["visible", "inherit"], label1.style("visibility"), "Left label should still show");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
+        assert.strictEqual(label3.style("visibility"), "hidden", "Right label is cut off. bar is too short");
         svg.remove();
       });
     });
