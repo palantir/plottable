@@ -6064,22 +6064,20 @@ var Plottable;
                 return this;
             };
             /**
-             * Gets the data values for the Bounds of the box.
+             * Gets the data values backing the left and right edges of the box.
              *
-             * An undefined value will be returned if a scale is not backing a given edge, i.e.
-             * no xScale is backing the left / right edges of the box.
+             * Returns an undefined array if the edges are not backed by a scale.
              */
-            SelectionBoxLayer.prototype.dataBounds = function () {
-                return {
-                    topLeft: {
-                        x: this._boxLeftDataValue,
-                        y: this._boxTopDataValue
-                    },
-                    bottomRight: {
-                        x: this._boxRightDataValue,
-                        y: this._boxBottomDataValue
-                    }
-                };
+            SelectionBoxLayer.prototype.boxXExtent = function () {
+                return [this._boxLeftDataValue, this._boxRightDataValue];
+            };
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.boxYExtent = function () {
+                return [this._boxTopDataValue, this._boxBottomDataValue];
             };
             SelectionBoxLayer.prototype._bindBoxDataValues = function () {
                 this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;

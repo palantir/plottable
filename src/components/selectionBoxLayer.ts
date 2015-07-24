@@ -179,22 +179,21 @@ export module Components {
     }
 
     /**
-     * Gets the data values for the Bounds of the box.
+     * Gets the data values backing the left and right edges of the box.
      *
-     * An undefined value will be returned if a scale is not backing a given edge, i.e.
-     * no xScale is backing the left / right edges of the box.
+     * Returns an undefined array if the edges are not backed by a scale.
      */
-    public dataBounds() {
-      return {
-        topLeft: {
-          x: this._boxLeftDataValue,
-          y: this._boxTopDataValue
-        },
-        bottomRight: {
-          x: this._boxRightDataValue,
-          y: this._boxBottomDataValue
-        }
-      };
+    public boxXExtent() {
+      return [this._boxLeftDataValue, this._boxRightDataValue];
+    }
+
+    /**
+     * Gets the data values backing the top and bottom edges of the box.
+     *
+     * Returns an undefined array if the edges are not backed by a scale.
+     */
+    public boxYExtent() {
+      return [this._boxTopDataValue, this._boxBottomDataValue];
     }
 
     private _bindBoxDataValues() {
