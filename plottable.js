@@ -6744,7 +6744,7 @@ var Plottable;
                     ];
                     var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
                     var showLabel = corners.every(function (corner) {
-                        return Math.abs(corner.x) > absoluteCenter.x || Math.abs(corner.y) > absoluteCenter.y ? false : true;
+                        return Math.abs(corner.x) <= absoluteCenter.x && Math.abs(corner.y) <= absoluteCenter.y;
                     });
                     if (showLabel) {
                         var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
