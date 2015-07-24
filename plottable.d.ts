@@ -2360,21 +2360,29 @@ declare module Plottable {
                 valueOf(): number;
             }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
             /**
-             * Gets the data values backing the left and right edges of the box.
+             * Gets the data values for the Bounds of the box.
              *
-             * Returns an undefined array if the edges are not backed by a scale.
+             * An undefined value will be returned if a scale is not backing a given edge, i.e.
+             * no xScale is backing the left / right edges of the box.
              */
-            boxXExtent(): {
-                valueOf(): number;
-            }[];
-            /**
-             * Gets the data values backing the top and bottom edges of the box.
-             *
-             * Returns an undefined array if the edges are not backed by a scale.
-             */
-            boxYExtent(): {
-                valueOf(): number;
-            }[];
+            dataBounds(): {
+                topLeft: {
+                    x: number | {
+                        valueOf(): number;
+                    };
+                    y: number | {
+                        valueOf(): number;
+                    };
+                };
+                bottomRight: {
+                    x: number | {
+                        valueOf(): number;
+                    };
+                    y: number | {
+                        valueOf(): number;
+                    };
+                };
+            };
             destroy(): void;
         }
     }
