@@ -7977,14 +7977,14 @@ var Plottable;
                         this.y().scale.removeIncludedValuesProvider(this._yDomainChangeIncludedValues);
                     }
                     var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-                    var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]);
+                    var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
                     this._yDomainChangeIncludedValues = function () { return includedValues; };
                     this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
                 }
             };
             Line.prototype._getEdgeIntersectionPoints = function () {
                 var _this = this;
-                if (!(this.x().scale instanceof Plottable.QuantitativeScale)) {
+                if (!(this.y().scale instanceof Plottable.QuantitativeScale)) {
                     return [[], []];
                 }
                 var yScale = this.y().scale;
@@ -8006,7 +8006,10 @@ var Plottable;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            intersectionPoints[0].push(yScale.invert(prevY + y1));
+                            intersectionPoints[0].push({
+                                x: left,
+                                y: yScale.invert(prevY + y1)
+                            });
                         }
                         // If values crossed right edge
                         if (prevX < right && right <= currX) {
@@ -8014,7 +8017,10 @@ var Plottable;
                             x2 = currX - prevX;
                             y2 = currY - prevY;
                             y1 = x1 * y2 / x2;
-                            intersectionPoints[1].push(yScale.invert(prevY + y1));
+                            intersectionPoints[1].push({
+                                x: right,
+                                y: yScale.invert(prevY + y1)
+                            });
                         }
                     }
                     ;

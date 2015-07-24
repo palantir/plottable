@@ -33,7 +33,7 @@ export module Plots {
     }
 
 
-    private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<any>;
+    private _yDomainChangeIncludedValues: Scales.IncludedValuesProvider<number>;
 
     private _ownMethod() {
       if (this.x && this.x().scale && this.y && this.y().scale) {
@@ -43,30 +43,30 @@ export module Plots {
         }
 
         var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-        var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1])
+        var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
 
         this._yDomainChangeIncludedValues = () => includedValues;
         this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
       }
     }
 
-    private _getEdgeIntersectionPoints(): number[][] {
+    private _getEdgeIntersectionPoints(): Point[][] {
 
-      if (!(this.x().scale instanceof QuantitativeScale)) {
+      if (!(this.y().scale instanceof QuantitativeScale)) {
         return [[], []];
       }
 
       var yScale = <QuantitativeScale<number>>this.y().scale;
       var xScale = this.x().scale;
 
-      var intersectionPoints: number[][] = [[], []];
+      var intersectionPoints: Point[][] = [[], []];
       var left = xScale.scale(xScale.domain()[0]);
       var right = xScale.scale(xScale.domain()[1]);
       this.datasets().forEach((dataset) => {
 
         var data = dataset.data();
 
-        var x1: any, x2: any, y1: any, y2: any;
+        var x1: number, x2: number, y1: number, y2: number;
         for (var i = 1; i < data.length; i++) {
           var prevX = currX || xScale.scale(this.x().accessor(data[i - 1], i - 1, dataset));
           var prevY = currY || yScale.scale(this.y().accessor(data[i - 1], i - 1, dataset));
@@ -81,7 +81,10 @@ export module Plots {
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            intersectionPoints[0].push(yScale.invert(prevY + y1));
+            intersectionPoints[0].push({
+              x: left,
+              y: yScale.invert(prevY + y1)
+            });
           }
 
           // If values crossed right edge
@@ -91,7 +94,10 @@ export module Plots {
             y2 = currY - prevY;
             y1 = x1 * y2 / x2;
 
-            intersectionPoints[1].push(yScale.invert(prevY + y1));
+            intersectionPoints[1].push({
+              x: right,
+              y: yScale.invert(prevY + y1)
+            });
           }
         };
       });
