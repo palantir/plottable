@@ -355,4 +355,20 @@ describe("Legend", () => {
 
     svg.remove();
   });
+
+  it("symbol() passes index correctly", () => {
+    var domain = ["AA", "BB", "CC"];
+    color.domain(domain);
+
+    var expectedIndex = 0;
+    var symbolChecker = (d: any, index: number) => {
+      assert.strictEqual(index, expectedIndex, "index passed in is correct");
+      expectedIndex++;
+      return (size: number) => "";
+    };
+    legend.symbol(symbolChecker);
+
+    legend.renderTo(svg);
+    svg.remove();
+  });
 });

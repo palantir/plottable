@@ -74,9 +74,9 @@ declare module d3 {
              * Derive an attribute value for each node in the selection based on bound data.
              *
              * @param name The attribute name, optionally prefixed.
-             * @param value The function of the datum (the bound data item) and index (the position in the subgrouping) which computes the attribute value. If the function returns null, the attribute is removed.
+             * @param value The function of the datum (the bound data item), index (the position in the subgrouping), and inner index (overall position in nested selections) which computes the attribute value. If the function returns null, the attribute is removed.
              */
-            attr(name: string, value: (datum: Datum, index: number) => Primitive): Update<Datum>;
+            attr(name: string, value: (datum: Datum, index: number, innerIndex?: number) => Primitive): Update<Datum>;
 
             /**
              * Set multiple properties at once using an Object. D3 iterates over all enumerable properties and either sets or computes the attribute's value based on the corresponding entry in the Object.
@@ -386,7 +386,7 @@ declare module d3 {
             /**
              * Returns the first non-null element in the selection, or null otherwise.
              */
-            node(): EventTarget;
+            node(): Node;
 
             /**
              * Returns the total number of elements in the selection.
@@ -464,9 +464,9 @@ declare module d3 {
          * Derive an attribute value for each node in the selection based on bound data.
          *
          * @param name The attribute name, optionally prefixed.
-         * @param value The function of the datum (the bound data item) and index (the position in the subgrouping) which computes the attribute value. If the function returns null, the attribute is removed.
+         * @param value The function of the datum (the bound data item), index (the position in the subgrouping), and inner index (overall position in nested selections) which computes the attribute value. If the function returns null, the attribute is removed.
          */
-        attr(name: string, value: (datum: Datum, index: number) => Primitive): Selection<Datum>;
+        attr(name: string, value: (datum: Datum, index: number, innerIndex?: number) => Primitive): Selection<Datum>;
 
         /**
          * Set multiple properties at once using an Object. D3 iterates over all enumerable properties and either sets or computes the attribute's value based on the corresponding entry in the Object.
@@ -918,7 +918,13 @@ declare module d3 {
     }
 
     /**
-     * The current event's value. Use this variable in a handler registered with selection.on.
+     * Interface for any and all d3 events.
+     */
+    interface Event extends KeyboardEvent, MouseEvent {
+    }
+
+    /**
+     * The current event's value. Use this variable in a handler registered with `selection.on`.
      */
     export var event: Event;
 
@@ -1084,8 +1090,8 @@ declare module d3 {
     export function bisectRight<T>(array: T[], x: T, lo?: number, hi?: number): number;
 
     export function bisector<T, U>(accessor: (x: T) => U): {
-        left: (array: T[], x: T, lo?: number, hi?: number) => number;
-        right: (array: T[], x: T, lo?: number, hi?: number) => number;
+        left: (array: T[], x: U, lo?: number, hi?: number) => number;
+        right: (array: T[], x: U, lo?: number, hi?: number) => number;
     }
 
     export function bisector<T, U>(comparator: (a: T, b: U) => number): {
@@ -1774,7 +1780,7 @@ declare module d3 {
         export function format(specifier: string): Format;
 
         export module format {
-            export function multi(formats: Array<[string, (d: Date) => boolean]>): Format;
+            export function multi(formats: Array<[string, (d: Date) => boolean|number]>): Format;
             export function utc(specifier: string): Format;
             export var iso: Format;
         }
@@ -2529,6 +2535,7 @@ declare module d3 {
 
             tickFormat(): (t: any) => string;
             tickFormat(format: (t: any) => string): Axis;
+            tickFormat(format:string): Axis;
         }
 
         export function brush(): Brush<any>;
@@ -2713,6 +2720,7 @@ declare module d3 {
         timeFormat: {
             (specifier: string): time.Format;
             utc(specifier: string): time.Format;
+            multi(formats: Array<[string, (d: Date) => boolean|number]>): time.Format;
         }
     }
 
@@ -2802,7 +2810,7 @@ declare module d3 {
 
             nodes(root: T): T[];
 
-            links(nodes: T[]): cluster.Link<T>;
+            links(nodes: T[]): cluster.Link<T>[];
 
             children(): (node: T) => T[];
             children(accessor: (node: T) => T[]): Cluster<T>;

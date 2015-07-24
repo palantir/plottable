@@ -344,6 +344,22 @@ export module Components {
     public dragInteraction() {
       return this._dragInteraction;
     }
+
+    /**
+     * Enables or disables the interaction and drag box.
+     */
+    public enabled(enabled: boolean): DragBoxLayer;
+    /**
+     * Gets the enabled state.
+     */
+    public enabled(): boolean;
+    public enabled(enabled?: boolean): any {
+      if (enabled == null) {
+        return this._dragInteraction.enabled();
+      }
+      this._dragInteraction.enabled(enabled);
+      return this;
+    }
   }
 }
 }
