@@ -330,4 +330,80 @@ describe("Plots", () => {
       svg.remove();
     });
   });
+
+  describe("smooth autoranging", () => {
+    it("smooth autoranging works", () => {
+
+      var svg = TestMethods.generateSVG(500, 500);
+
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      xScale.domain([0.1, 1.1]);
+
+      var data = [
+        {"x":0.0, "y":-1},
+        {"x":1.8, "y":-2},
+      ]
+
+      var line = new Plottable.Plots.Line()
+        .x(function(d) { return d.x; }, xScale)
+        .y(function(d) { return d.y; }, yScale)
+        .addDataset(new Plottable.Dataset(data))
+        .autorangeMode("y")
+
+      xScale.padProportion(0);
+      yScale.padProportion(0);
+      line.renderTo(svg);
+
+      assert.deepEqual(yScale.domain(), [0, 1],
+        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+
+      line.autorangeSmooth(true);
+      line.render();
+      assert.deepEqual(yScale.domain(), [0, 1],
+        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+
+      line.autorangeSmooth(false);
+      assert.deepEqual(yScale.domain(), [0, 1],
+        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+
+      svg.remove();
+
+    });
+
+    it("autoDomaining works", () => {
+
+
+      var svg = TestMethods.generateSVG(500, 500);
+
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+
+      xScale.domain([-0.1, 0.2]);
+
+      var data = [
+        {"x":0.0, "y":-1},
+        {"x":1.8, "y":-2},
+      ]
+
+      var line = new Plottable.Plots.Line()
+        .x(function(d) { return d.x; }, xScale)
+        .y(function(d) { return d.y; }, yScale)
+        .addDataset(new Plottable.Dataset(data))
+        .autorangeMode("y")
+
+      line.renderTo(svg);
+
+      line.autorangeSmooth(true);
+      xScale.autoDomain();
+      assert.deepEqual(xScale.domain(), [-0.2, 2],
+        "autoDomain works even when autoranging is done smoothly");
+
+      line.autorangeSmooth(false);
+      assert.deepEqual(xScale.domain(), [-0.2, 2],
+        "autoDomain works when smooth autoranging is disabled back");
+
+      svg.remove();
+    });
+  });
 });

@@ -30,6 +30,8 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
+      this._updateExtentsForProperty("y");
+      this._updateExtentsForProperty("x");
       return this;
     }
 
@@ -41,7 +43,7 @@ export module Plots {
 
       var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
-      if (this._autorangeSmooth && this.x && this.x().scale && this.y && this.y().scale) {
+      if (this._autorangeSmooth && this.x() && this.x().scale && this.y() && this.y().scale) {
 
         var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
         var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
@@ -61,6 +63,8 @@ export module Plots {
           extent[1] = maxIncludedValue;
         }
       }
+      console.log(extent);
+
       return extent;
     }
 

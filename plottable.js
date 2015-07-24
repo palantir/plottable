@@ -7919,6 +7919,8 @@ var Plottable;
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
+                this._updateExtentsForProperty("y");
+                this._updateExtentsForProperty("x");
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
@@ -7926,7 +7928,7 @@ var Plottable;
             };
             Line.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
                 var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
-                if (this._autorangeSmooth && this.x && this.x().scale && this.y && this.y().scale) {
+                if (this._autorangeSmooth && this.x() && this.x().scale && this.y() && this.y().scale) {
                     var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
                     var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map(function (point) { return point.y; });
                     var maxIncludedValue = Math.max.apply(this, includedValues);
@@ -7941,6 +7943,7 @@ var Plottable;
                         extent[1] = maxIncludedValue;
                     }
                 }
+                console.log(extent);
                 return extent;
             };
             Line.prototype._getEdgeIntersectionPoints = function () {
