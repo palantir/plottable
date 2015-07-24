@@ -295,7 +295,7 @@ export class Plot extends Component {
   private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
       extents: d3.Map<any[]>, filter: Accessor<boolean>) {
     var accScaleBinding = bindings.get(key);
-    if (accScaleBinding.accessor == null) { return; }
+    if (accScaleBinding == null || accScaleBinding.accessor == null) { return; }
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
