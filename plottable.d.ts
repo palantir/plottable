@@ -2420,6 +2420,7 @@ declare module Plottable {
         protected _updateExtents(): void;
         protected _updateExtentsForProperty(property: string): void;
         protected _filterForProperty(property: string): Accessor<boolean>;
+        protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -2982,6 +2983,7 @@ declare module Plottable {
             constructor();
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _updateExtentsForProperty(property: string): void;
+            protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {

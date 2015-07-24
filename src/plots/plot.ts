@@ -299,7 +299,7 @@ export class Plot extends Component {
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
-  private _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+  protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
     var accessor = accScaleBinding.accessor;
     var scale = accScaleBinding.scale;
 
@@ -312,54 +312,6 @@ export class Plot extends Component {
     if (filter != null) {
       filteredData = data.filter((d, i) => filter(d, i, dataset));
     }
-
-    // var self = <any>this;
-    // if (self.x && self.x().scale && self.y && self.y().scale) {
-    //   var westOfLeft: boolean;
-    //   var westOfRight: boolean;
-    //   var left = self.x().scale.domain()[0];
-    //   var right = self.x().scale.domain()[1];
-
-    //   var lastValue: any;
-    //   data.forEach((d, i) => {
-    //     var x1: any;
-    //     var x2: any;
-    //     var y1: any;
-    //     var y2: any;
-    //     if (lastValue) {
-    //       if ((westOfLeft === true && d.x >= left) !== (westOfLeft === false && d.x < left)) {
-
-    //         x1 = left - lastValue.x;
-    //         x2 = d.x - lastValue.x;
-    //         y2 = d.y - lastValue.y;
-    //         y1 = x1 * y2 / x2;
-
-    //         filteredData.push({
-    //           x: lastValue.x + x1,
-    //           y: lastValue.y + y1
-    //         });
-    //       }
-
-    //       if ((westOfRight && d.x >= right) !== (!westOfRight && d.x < right)) {
-    //         x1 = right - lastValue.x;
-    //         x2 = d.x - lastValue.x;
-    //         y2 = d.y - lastValue.y;
-    //         y1 = x1 * y2 / x2;
-
-    //         filteredData.push({
-    //           x: lastValue.x + x1,
-    //           y: lastValue.y + y1
-    //         });
-    //       }
-    //     }
-
-    //     westOfLeft = d.x < left;
-    //     westOfRight = d.x < right;
-    //     lastValue = d;
-
-    //   });
-    // }
-
     var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
     var mappedData = filteredData.map(appliedAccessor);
 

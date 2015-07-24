@@ -27,7 +27,7 @@ export module Plots {
 
     protected _updateExtentsForProperty(property: string) {
       if (property === "y") {
-        this._addIntersectionPoints();
+        // this._addIntersectionPoints();
       }
       super._updateExtentsForProperty(property);
     }
@@ -48,6 +48,31 @@ export module Plots {
         this._yDomainChangeIncludedValues = () => includedValues;
         this.y().scale.addIncludedValuesProvider(this._yDomainChangeIncludedValues);
       }
+    }
+
+    protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+
+      var extent = super._computeExtent(dataset, accScaleBinding, filter);
+
+      if (this.x && this.x().scale && this.y && this.y().scale) {
+        var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+        var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
+
+        var maxIncludedValue = Math.max.apply(this, includedValues);
+        var minIncludedValue = Math.min.apply(this, includedValues);
+
+        if (minIncludedValue < extent[0]) {
+          extent[0] = minIncludedValue;
+        }
+
+        if (maxIncludedValue > extent[1]) {
+          extent[1] = maxIncludedValue;
+        }
+      }
+
+
+      return extent;
+
     }
 
     private _getEdgeIntersectionPoints(): Point[][] {
