@@ -1911,7 +1911,7 @@ declare module Plottable {
              *
              * @param {boolean} enable faster but less accurate computation of text widths.
              */
-            usesTextWidthApproximation(enable: boolean): any;
+            usesTextWidthApproximation(enable: boolean): void;
         }
     }
 }

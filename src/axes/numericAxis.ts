@@ -289,7 +289,7 @@ export module Axes {
      *
      * @param {boolean} enable faster but less accurate computation of text widths.
      */
-    public usesTextWidthApproximation(enable: boolean);
+    public usesTextWidthApproximation(enable: boolean): void;
     public usesTextWidthApproximation(enable?: boolean): boolean {
       if (enable == null) {
         return this._usesTextWidthApproximation;
