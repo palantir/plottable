@@ -10824,6 +10824,12 @@ var Plottable;
                     this.removeClass("x-resizable");
                 }
             };
+            XDragBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    return _super.prototype.yScale.call(this);
+                }
+                throw new Error("y scales cannot be set on an XDragBoxLayer");
+            };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
         Components.XDragBoxLayer = XDragBoxLayer;
@@ -10872,6 +10878,12 @@ var Plottable;
                 else {
                     this.removeClass("y-resizable");
                 }
+            };
+            YDragBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    return _super.prototype.xScale.call(this);
+                }
+                throw new Error("x scales cannot be set on an YDragBoxLayer");
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);

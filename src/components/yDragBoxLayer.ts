@@ -35,6 +35,15 @@ export module Components {
         this.removeClass("y-resizable");
       }
     }
+
+    public xScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
+    public xScale<D extends number | { valueOf(): number }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+    public xScale<D extends number | { valueOf(): number }>(xScale?: QuantitativeScale<D>): any {
+      if (xScale == null) {
+        return super.xScale();
+      }
+      throw new Error("x scales cannot be set on an YDragBoxLayer");
+    }
   }
 }
 }
