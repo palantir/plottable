@@ -281,13 +281,16 @@ export module Axes {
     /**
      * Gets the approximate text width setting.
      *
-     * @returns {boolean} The current approximate text width setting.
+     * @returns {boolean} The current text width approximation setting.
      */
     public usesTextWidthApproximation(): boolean;
     /**
-     * Sets the approximate text width setting.
+     * Sets the approximate text width setting. Approximating text width
+     * measurements can drastically speed up plot rendering, but the plot may
+     * have extra white space that would be eliminated by exact measurements.
+     * Additionally, very abnormal fonts may not approximate reasonably.
      *
-     * @param {boolean} enable faster but less accurate computation of text widths.
+     * @param {boolean} The new text width approximation setting.
      */
     public usesTextWidthApproximation(enable: boolean): void;
     public usesTextWidthApproximation(enable?: boolean): boolean {
