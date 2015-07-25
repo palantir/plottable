@@ -457,8 +457,10 @@ describe("NumericAxis", () => {
       svgApprox.remove();
       svgExact.remove();
 
-      assert.isTrue(widthApprox < (widthExact * 1.55), "an approximate scale of ["+domainBounds[0]+","+domainBounds[1]+"] is less than 55% larger than an exact scale");
-      assert.isTrue(widthApprox >= widthExact, "an approximate scale of ["+domainBounds[0]+","+domainBounds[1]+"] is smaller than an exact scale");
+      assert.isTrue(widthApprox < (widthExact * 1.55),
+        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is less than 55% larger than an exact scale");
+      assert.isTrue(widthApprox >= widthExact,
+        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is smaller than an exact scale");
     });
   });
 });
