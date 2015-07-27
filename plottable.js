@@ -1269,45 +1269,43 @@ var Plottable;
          *
          * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
          * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
-         * formatter are primarily expected to be
+         * formatter are primarily expected to be ranges of common currency values.
          *
          * @param {number} [precision] the number of decimal places to show (default 3)
          *
          * @returns {Formatter} A formatter for large numbers.
-         *
-         *
          */
         function shortScale(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
             var suffixes = "KMBTQ";
-            var efmt = d3.format("." + precision + "e");
-            var ffmt = d3.format("." + precision + "f");
+            var eFormatter = d3.format("." + precision + "e");
+            var fFormatter = d3.format("." + precision + "f");
             var max = Math.pow(10, (3 * suffixes.length) + precision + 1);
             var min = Math.pow(10, -precision - 1);
-            return function (d) {
-                var ad = Math.abs(d);
-                if (ad < min || ad >= max) {
-                    return efmt(d);
+            return function (num) {
+                var absNum = Math.abs(num);
+                if (absNum < min || absNum >= max) {
+                    return eFormatter(num);
                 }
                 var factor = 1;
                 var idx = -1;
-                while (ad >= (1000 * factor) && idx < (suffixes.length - 1)) {
+                while (absNum >= (1000 * factor) && idx < (suffixes.length - 1)) {
                     idx += 1;
                     factor *= 1000;
                 }
                 var output = "";
                 if (idx === -1) {
-                    output = ffmt(d);
+                    output = fFormatter(num);
                 }
                 else {
-                    output = ffmt(d / factor) + suffixes[idx];
+                    output = fFormatter(num / factor) + suffixes[idx];
                 }
                 // catch rounding by the underlying d3 formatter
-                if (idx < suffixes.length - 1 && ((d > 0 && output.substr(0, 5) === "1000.") || (d < 0 && output.substr(0, 6) === "-1000."))) {
+                if (idx < suffixes.length - 1 && ((num > 0 && output.substr(0, 5) === "1000.") || (num < 0 && output.substr(0, 6) === "-1000."))) {
                     factor *= 1000;
                     idx += 1;
-                    output = ffmt(d / factor) + suffixes[idx];
+                    output = fFormatter(num / factor) + suffixes[idx];
                 }
                 return output;
             };
