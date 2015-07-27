@@ -183,7 +183,7 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public boxXExtent() {
+    public xExtent() {
       return [this._boxLeftDataValue, this._boxRightDataValue];
     }
 
@@ -192,7 +192,7 @@ export module Components {
      *
      * Returns an undefined array if the edges are not backed by a scale.
      */
-    public boxYExtent() {
+    public yExtent() {
       return [this._boxTopDataValue, this._boxBottomDataValue];
     }
 

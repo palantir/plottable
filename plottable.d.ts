@@ -2364,7 +2364,7 @@ declare module Plottable {
              *
              * Returns an undefined array if the edges are not backed by a scale.
              */
-            boxXExtent(): {
+            xExtent(): {
                 valueOf(): number;
             }[];
             /**
@@ -2372,7 +2372,7 @@ declare module Plottable {
              *
              * Returns an undefined array if the edges are not backed by a scale.
              */
-            boxYExtent(): {
+            yExtent(): {
                 valueOf(): number;
             }[];
             destroy(): void;

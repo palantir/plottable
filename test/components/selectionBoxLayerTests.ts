@@ -178,7 +178,7 @@ describe("SelectionBoxLayer", () => {
       bottomRight: bottomRight
     });
 
-    assert.strictEqual(sbl.boxXExtent()[0], 400, "data value maps correctly");
+    assert.strictEqual(sbl.xExtent()[0], 400, "data value maps correctly");
 
     svg.remove();
   });
