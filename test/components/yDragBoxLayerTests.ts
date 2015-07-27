@@ -105,5 +105,10 @@ describe("Interactive Components", () => {
       assert.strictEqual(boundsAfter.bottomRight.y, boundsBefore.bottomRight.y, "box keeps same bottom edge");
       svg.remove();
     });
+
+    it("throws error on setting x scale", () => {
+      var dbl = new Plottable.Components.YDragBoxLayer();
+      assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "x scales cannot be set");
+    });
   });
 });
