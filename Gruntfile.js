@@ -362,11 +362,17 @@ module.exports = function(grunt) {
   grunt.registerTask("dist-compile", ["test", "uglify", "compress"]);
 
   grunt.registerTask("commitjs", ["dist-compile", "gitcommit:built"]);
-  grunt.registerTask("default", ["connect", "dev-compile", "watch"]);
+  grunt.registerTask("default", ["connect", "dev-compile", "watch-silent"]);
 
   grunt.registerTask("test", ["dev-compile", "test-local"]);
   grunt.registerTask("test-local", ["blanket_mocha", "ts:verifyDefinitionFiles", "lint"]);
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
+
+  grunt.registerTask("watch-silent", function() {
+    // Surpresses the "Running 'foo' task" messages
+    grunt.log.header = function() {};
+    grunt.task.run(["watch"]);
+  });
 
   grunt.registerTask("lint", ["parallelize:tslint", "jscs", "eslint"]);
 
