@@ -25,17 +25,17 @@ export module Plots {
     /**
      * Gets the interpolation function associated with the plot.
      *
-     * @return string
+     * @return string | (points: Array<[number, number]>) => string)
      */
-    public interpolate(): string | ((points: number[][]) => string);
+    public interpolate(): string | ((points: Array<[number, number]>) => string);
     /**
      * Sets the interpolation function associated with the plot.
      *
      * @param interpolate Interpolation function
      * @return Plots.Line
      */
-    public interpolate(interpolate: string | ((points: number[][]) => string)): Plots.Line<X>;
-    public interpolate(interpolate?: string | ((points: number[][]) => string)): any {
+    public interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+    public interpolate(interpolate?: string | ((points: Array<[number, number]>) => string)): any {
       if (interpolate == null) {
         return this._interpolationFunction;
       }
