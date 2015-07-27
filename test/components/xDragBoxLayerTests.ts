@@ -106,41 +106,6 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
-    it("stays full height after resizing", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var dbl = new Plottable.Components.XDragBoxLayer();
-      dbl.boxVisible(true);
-      dbl.resizable(true);
-      dbl.renderTo(svg);
-
-      var topLeft = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      var bottomRight = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      dbl.bounds({
-        topLeft: topLeft,
-        bottomRight: bottomRight
-      });
-
-      var heightBefore = dbl.height();
-      var boundsBefore = dbl.bounds();
-      svg.attr("height", 2 * SVG_HEIGHT);
-      dbl.redraw();
-      assert.notStrictEqual(dbl.height(), heightBefore, "component changed size");
-
-      var boundsAfter = dbl.bounds();
-      assert.strictEqual(boundsAfter.topLeft.x, boundsBefore.topLeft.x, "box keeps same left edge");
-      assert.strictEqual(boundsAfter.topLeft.y, 0, "box still starts at top");
-      assert.strictEqual(boundsAfter.bottomRight.x, boundsBefore.bottomRight.x, "box keeps same right edge");
-      assert.strictEqual(boundsAfter.bottomRight.y, dbl.height(), "box still ends at bottom");
-      svg.remove();
-    });
-
     it("throws error on setting y scale", () => {
       var dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "y scales cannot be set");
