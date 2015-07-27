@@ -45,22 +45,22 @@ describe("Plots", () => {
       it("interpolate() behavior for the step function", () => {
         var svg = TestMethods.generateSVG(400, 400);
         var data = [
-          {"x":0.0, "y":0},
-          {"x":0.8, "y":0.717},
-          {"x":1.6, "y":0.999},
-          {"x":2.4, "y":0.675},
-          {"x":3.2, "y":-0.058},
-          {"x":4.0, "y":-0.756},
-          {"x":4.8, "y":-0.996},
-          {"x":5.6, "y":-0.631},
+          {"x": 0.0, "y": 0},
+          {"x": 0.8, "y": 0.717},
+          {"x": 1.6, "y": 0.999},
+          {"x": 2.4, "y": 0.675},
+          {"x": 3.2, "y": -0.058},
+          {"x": 4.0, "y": -0.756},
+          {"x": 4.8, "y": -0.996},
+          {"x": 5.6, "y": -0.631},
         ];
 
         var xScale = new Plottable.Scales.Linear();
         var yScale = new Plottable.Scales.Linear();
         var linePlot = new Plottable.Plots.Line();
         linePlot.addDataset(new Plottable.Dataset(data));
-        linePlot.x((d) => d.x);
-        linePlot.y((d) => d.y);
+        linePlot.x((d) => d.x, xScale);
+        linePlot.y((d) => d.y, yScale);
 
         linePlot.renderTo(svg);
 
@@ -81,8 +81,6 @@ describe("Plots", () => {
         svg.remove();
       });
     });
-
-
   });
 
   describe("LinePlot", () => {
@@ -380,5 +378,4 @@ describe("Plots", () => {
       svg.remove();
     });
   });
-
 });
