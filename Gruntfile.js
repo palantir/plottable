@@ -369,7 +369,7 @@ module.exports = function(grunt) {
   grunt.registerTask("test-sauce", ["connect", "saucelabs-mocha"]);
 
   grunt.registerTask("watch-silent", function() {
-    // Surpresses the "Running 'foo' task" messages
+    // Surpresses the "Running 'foo' task" messages. More info at #2507.
     grunt.log.header = function() {};
     grunt.task.run(["watch"]);
   });
