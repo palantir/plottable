@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
-    private _interpolationFunction: string | ((points: number[][]) => string) = "linear";
+    private _interpolationFunction: string | ((points: Array<[number, number]>) => string) = "linear";
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
