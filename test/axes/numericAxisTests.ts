@@ -435,32 +435,36 @@ describe("NumericAxis", () => {
     var SVG_WIDTH = 500;
     var SVG_HEIGHT = 100;
 
-    [[-1, 1],
-     [0, 10],
-     [0, 999999999]
-    ].forEach((domainBounds) => {
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+    var testCases = [[-1, 1],
+                     [0, 10],
+                     [0, 999999999]];
+
+    var maxErrorFactor = 1.4;
+
+    testCases.forEach((domainBounds) => {
       var scale = new Plottable.Scales.Linear();
       scale.domain(domainBounds);
+      var numericAxis = new Plottable.Axes.Numeric(scale, "left");
 
-      var svgApprox = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var numericAxisApprox = new Plottable.Axes.Numeric(scale, "left");
-      numericAxisApprox.usesTextWidthApproximation(true);
-      numericAxisApprox.renderTo(svgApprox);
-      var widthApprox = (<any> numericAxisApprox)._computeWidth();
+      numericAxis.usesTextWidthApproximation(true);
+      numericAxis.renderTo(svg);
+      var widthApprox = numericAxis.width();
 
-      var svgExact = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var numericAxisExact = new Plottable.Axes.Numeric(scale, "left");
-      numericAxisExact.usesTextWidthApproximation(false);
-      numericAxisExact.renderTo(svgExact);
-      var widthExact = (<any> numericAxisExact)._computeWidth();
+      numericAxis.usesTextWidthApproximation(false);
+      numericAxis.redraw();
+      var widthExact = numericAxis.width();
 
-      svgApprox.remove();
-      svgExact.remove();
-
-      assert.isTrue(widthApprox < (widthExact * 1.55),
-        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is less than 55% larger than an exact scale");
-      assert.isTrue(widthApprox >= widthExact,
+      assert.operator(widthApprox, "<", (widthExact * maxErrorFactor),
+        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is less than "
+        + maxErrorFactor + "x larger than an exact scale");
+      assert.operator(widthApprox, ">=", widthExact,
         "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is smaller than an exact scale");
+
+      numericAxis.destroy();
     });
+
+    svg.remove();
   });
 });
