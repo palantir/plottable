@@ -24,17 +24,17 @@ export module Plots {
 
     /**
      * Gets the interpolation function associated with the plot.
-     * 
+     *
      * @return string
      */
-    public interpolate(): string;
+    public interpolate(): string | ((points: number[][]) => string);
     /**
      * Sets the interpolation function associated with the plot.
-     * 
+     *
      * @param interpolate Interpolation function
      * @return Plots.Line
      */
-    public interpolate(interpolate: string): Plots.Line<X>;
+    public interpolate(interpolate: string | ((points: number[][]) => string)): Plots.Line<X>;
     public interpolate(interpolate?: string | ((points: number[][]) => string)): any {
       if (interpolate == null) {
         return this._interpolationFunction;
@@ -128,7 +128,8 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .interpolate(this.interpolate())
+                     // HACKHACK https://github.com/Microsoft/TypeScript/issues/1805
+                     .interpolate(<any>this.interpolate())
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };
     }
