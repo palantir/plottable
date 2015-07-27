@@ -355,9 +355,8 @@ export module Plots {
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
         var showLabel = corners.every((corner) => {
-          return Math.abs(corner.x) <= absoluteCenter.x && Math.abs(corner.y) <= absoluteCenter.y;
+          return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
         });
 
         if (showLabel) {

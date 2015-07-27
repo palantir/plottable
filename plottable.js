@@ -6742,9 +6742,8 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var absoluteCenter = { x: this.width() / 2, y: this.height() / 2 };
                     var showLabel = corners.every(function (corner) {
-                        return Math.abs(corner.x) <= absoluteCenter.x && Math.abs(corner.y) <= absoluteCenter.y;
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
                     });
                     if (showLabel) {
                         var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
@@ -7737,8 +7736,8 @@ var Plottable;
                                 labelPosition.x = x;
                             }
                         }
-                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > +_this._boundingBox.attr("width") ||
-                            labelPosition.y < 0 || labelPosition.y + measurement.height > +_this._boundingBox.attr("height")) {
+                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
                             showLabel = false;
                         }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");

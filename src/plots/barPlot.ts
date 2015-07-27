@@ -456,8 +456,8 @@ export module Plots {
             }
           }
 
-          if (labelPosition.x < 0 || labelPosition.x + measurement.width > +this._boundingBox.attr("width") ||
-              labelPosition.y < 0 || labelPosition.y + measurement.height > +this._boundingBox.attr("height")) {
+          if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
+              labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
             showLabel = false;
           }
 
