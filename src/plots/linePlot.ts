@@ -128,7 +128,7 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     // HACKHACK https://github.com/Microsoft/TypeScript/issues/1805
+                     // HACKHACK https://github.com/borisyankov/DefinitelyTyped/pull/5095
                      .interpolate(<any>this.interpolate())
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };

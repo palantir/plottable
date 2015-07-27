@@ -191,7 +191,7 @@ export module Plots {
                                   .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
-                                  // HACKHACK https://github.com/Microsoft/TypeScript/issues/1805
+                                  // HACKHACK https://github.com/borisyankov/DefinitelyTyped/pull/5095
                                   .interpolate(<any>this.interpolate())
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
         return areaGenerator(datum);
