@@ -213,7 +213,7 @@ export module Plots {
       var center = { x: this.width() / 2, y: this.height() / 2 };
       var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
       var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
-      var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
+      var angle = Math.acos(-adjustedQueryPoint.y / radius);
       if (adjustedQueryPoint.x < 0) {
         angle = Math.PI * 2 - angle;
       }
