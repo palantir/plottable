@@ -238,9 +238,8 @@ export module Plots {
      * @returns {PlotEntity[]} The PlotEntities at the particular point
      */
     public entitiesAt(point: Point) {
-      var results: PlotEntity[] = [];
       var attrToProjector = this._generateAttrToProjector();
-      this.entities().forEach((entity) => {
+      return this.entities().filter((entity) => {
         var datum = entity.datum;
         var index = entity.index;
         var dataset = entity.dataset;
@@ -248,11 +247,8 @@ export module Plots {
         var y = attrToProjector["y"](datum, index, dataset);
         var width = attrToProjector["width"](datum, index, dataset);
         var height = attrToProjector["height"](datum, index, dataset);
-        if (x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height) {
-          results.push(entity);
-        }
+        return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
       });
-      return results;
     }
 
     protected _propertyProjectors(): AttributeToProjector {

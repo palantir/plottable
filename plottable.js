@@ -7217,9 +7217,8 @@ var Plottable;
              * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
             Rectangle.prototype.entitiesAt = function (point) {
-                var results = [];
                 var attrToProjector = this._generateAttrToProjector();
-                this.entities().forEach(function (entity) {
+                return this.entities().filter(function (entity) {
                     var datum = entity.datum;
                     var index = entity.index;
                     var dataset = entity.dataset;
@@ -7227,11 +7226,8 @@ var Plottable;
                     var y = attrToProjector["y"](datum, index, dataset);
                     var width = attrToProjector["width"](datum, index, dataset);
                     var height = attrToProjector["height"](datum, index, dataset);
-                    if (x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height) {
-                        results.push(entity);
-                    }
+                    return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
                 });
-                return results;
             };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
