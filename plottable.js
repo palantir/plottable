@@ -6069,6 +6069,7 @@ var Plottable;
              * Returns an undefined array if the edges are not backed by a scale.
              */
             SelectionBoxLayer.prototype.xExtent = function () {
+                // Explicit typing since the number portion gets hidden by the compiler
                 return [this._boxLeftDataValue, this._boxRightDataValue];
             };
             /**
@@ -6077,6 +6078,7 @@ var Plottable;
              * Returns an undefined array if the edges are not backed by a scale.
              */
             SelectionBoxLayer.prototype.yExtent = function () {
+                // Explicit typing since the number portion gets hidden by the compiler
                 return [this._boxTopDataValue, this._boxBottomDataValue];
             };
             SelectionBoxLayer.prototype._bindBoxDataValues = function () {

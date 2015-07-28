@@ -184,6 +184,7 @@ export module Components {
      * Returns an undefined array if the edges are not backed by a scale.
      */
     public xExtent(): (number | { valueOf(): number })[] {
+      // Explicit typing since the number portion gets hidden by the compiler
       return [this._boxLeftDataValue, this._boxRightDataValue];
     }
 
@@ -193,6 +194,7 @@ export module Components {
      * Returns an undefined array if the edges are not backed by a scale.
      */
     public yExtent(): (number | { valueOf(): number })[] {
+      // Explicit typing since the number portion gets hidden by the compiler
       return [this._boxTopDataValue, this._boxBottomDataValue];
     }
 
