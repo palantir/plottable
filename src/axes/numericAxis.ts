@@ -291,7 +291,7 @@ export module Axes {
      * Additionally, very abnormal fonts may not approximate reasonably.
      *
      * @param {boolean} The new text width approximation setting.
-     * @returns {Plottable.Axes.Numeric} The calling Plottable.Axes.Numeric.
+     * @returns {Axes.Numeric} The calling Axes.Numeric.
      */
     public usesTextWidthApproximation(enable: boolean): Axes.Numeric;
     public usesTextWidthApproximation(enable?: boolean): any {
