@@ -7218,36 +7218,19 @@ var Plottable;
              */
             Rectangle.prototype.entitiesAt = function (p) {
                 var results = [];
-                var entities = this.entities();
-                var xScale = this.x().scale;
-                var yScale = this.y().scale;
-                for (var i = 0; i < entities.length; i++) {
-                    var entity = entities[i];
-                    var x = xScale.scale(this.x().accessor(entity.datum, entity.index, entity.dataset));
-                    var y = yScale.scale(this.y().accessor(entity.datum, entity.index, entity.dataset));
-                    var x2 = x;
-                    if (this.x2()) {
-                        x2 = xScale.scale(this.x2().accessor(entity.datum, entity.index, entity.dataset));
-                    }
-                    else {
-                        var xRangeBand = xScale.rangeBand();
-                        x -= xRangeBand / 2;
-                        x2 += xRangeBand / 2;
-                    }
-                    var y2 = y;
-                    if (this.y2()) {
-                        y2 = yScale.scale(this.y2().accessor(entity.datum, entity.index, entity.dataset));
-                    }
-                    else {
-                        var yRangeBand = yScale.rangeBand();
-                        y -= yRangeBand / 2;
-                        y2 += yRangeBand / 2;
-                    }
-                    if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) &&
-                        ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {
+                var attrToProjector = this._generateAttrToProjector();
+                this.entities().forEach(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = attrToProjector["x"](datum, index, dataset);
+                    var y = attrToProjector["y"](datum, index, dataset);
+                    var width = attrToProjector["width"](datum, index, dataset);
+                    var height = attrToProjector["height"](datum, index, dataset);
+                    if (x <= p.x && p.x <= x + width && y <= p.y && p.y <= y + height) {
                         results.push(entity);
                     }
-                }
+                });
                 return results;
             };
             Rectangle.prototype._propertyProjectors = function () {
