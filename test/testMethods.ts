@@ -157,6 +157,21 @@ module TestMethods {
 
   export function triggerFakeDragSequence(target: d3.Selection<void>, start: Plottable.Point, end: Plottable.Point) {
     triggerFakeMouseEvent("mousedown", target, start.x, start.y);
+    var numSteps = 10;
+    // var steps: Plottable.Point[] = [];
+    for (var i = 0; i < numSteps; i++) {
+      // steps.push({
+      //   x: start.x + (end.x - start.x) * i / numSteps,
+      //   y: start.y + (end.y - start.y) * i / numSteps
+      // });
+      triggerFakeMouseEvent(
+        "mousemove",
+        target,
+        start.x + (end.x - start.x) * i / numSteps,
+        start.y + (end.y - start.y) * i / numSteps
+      );
+    }
+    // triggerFakeMouseEvent("mousemove", target, (end.x + start.x) / 2, (end.y + start.y) / 2);
     triggerFakeMouseEvent("mousemove", target, end.x, end.y);
     triggerFakeMouseEvent("mouseup", target, end.x, end.y);
   }
