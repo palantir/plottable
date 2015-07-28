@@ -7213,10 +7213,10 @@ var Plottable;
             /**
              * Gets the Entities at a particular Point.
              *
-             * @param {Point} p
-             * @param {PlotEntity[]}
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
-            Rectangle.prototype.entitiesAt = function (p) {
+            Rectangle.prototype.entitiesAt = function (point) {
                 var results = [];
                 var attrToProjector = this._generateAttrToProjector();
                 this.entities().forEach(function (entity) {
@@ -7227,7 +7227,7 @@ var Plottable;
                     var y = attrToProjector["y"](datum, index, dataset);
                     var width = attrToProjector["width"](datum, index, dataset);
                     var height = attrToProjector["height"](datum, index, dataset);
-                    if (x <= p.x && p.x <= x + width && y <= p.y && p.y <= y + height) {
+                    if (x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height) {
                         results.push(entity);
                     }
                 });

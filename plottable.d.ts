@@ -2787,10 +2787,10 @@ declare module Plottable {
             /**
              * Gets the Entities at a particular Point.
              *
-             * @param {Point} p
-             * @param {PlotEntity[]}
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
              */
-            entitiesAt(p: Point): PlotEntity[];
+            entitiesAt(point: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;

@@ -234,10 +234,10 @@ export module Plots {
     /**
      * Gets the Entities at a particular Point.
      *
-     * @param {Point} p
-     * @param {PlotEntity[]} 
+     * @param {Point} point The point to query.
+     * @returns {PlotEntity[]} The PlotEntities at the particular point
      */
-    public entitiesAt(p: Point) {
+    public entitiesAt(point: Point) {
       var results: PlotEntity[] = [];
       var attrToProjector = this._generateAttrToProjector();
       this.entities().forEach((entity) => {
@@ -248,7 +248,7 @@ export module Plots {
         var y = attrToProjector["y"](datum, index, dataset);
         var width = attrToProjector["width"](datum, index, dataset);
         var height = attrToProjector["height"](datum, index, dataset);
-        if (x <= p.x && p.x <= x + width && y <= p.y && p.y <= y + height) {
+        if (x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height) {
           results.push(entity);
         }
       });
