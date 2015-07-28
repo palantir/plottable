@@ -135,14 +135,14 @@ export module Components {
     /**
      * Gets the x scale for this SelectionBoxLayer.
      */
-    public xScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
+    public xScale(): QuantitativeScale<number | { valueOf(): number }>;
     /**
      * Sets the x scale for this SelectionBoxLayer.
      * 
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public xScale<D extends number | { valueOf(): number }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
-    public xScale<D extends number | { valueOf(): number }>(xScale?: QuantitativeScale<D>): any {
+    public xScale(xScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public xScale(xScale?: QuantitativeScale<number | { valueOf(): number }>): any {
       if (xScale == null) {
         return this._xScale;
       }
@@ -158,14 +158,14 @@ export module Components {
     /**
      * Gets the y scale for this SelectionBoxLayer.
      */
-    public yScale<D extends number | { valueOf(): number }>(): QuantitativeScale<D>;
+    public yScale(): QuantitativeScale<number | { valueOf(): number }>;
     /**
      * Sets the y scale for this SelectionBoxLayer.
      * 
      * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
      */
-    public yScale<D extends number | { valueOf(): number }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
-    public yScale<D extends number | { valueOf(): number }>(yScale?: QuantitativeScale<D>): any {
+    public yScale(yScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public yScale(yScale?: QuantitativeScale<number | { valueOf(): number }>): any {
       if (yScale == null) {
         return this._yScale;
       }

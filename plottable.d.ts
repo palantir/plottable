@@ -2334,31 +2334,31 @@ declare module Plottable {
             /**
              * Gets the x scale for this SelectionBoxLayer.
              */
-            xScale<D extends number | {
+            xScale(): QuantitativeScale<number | {
                 valueOf(): number;
-            }>(): QuantitativeScale<D>;
+            }>;
             /**
              * Sets the x scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            xScale<D extends number | {
+            xScale(xScale: QuantitativeScale<number | {
                 valueOf(): number;
-            }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            }>): SelectionBoxLayer;
             /**
              * Gets the y scale for this SelectionBoxLayer.
              */
-            yScale<D extends number | {
+            yScale(): QuantitativeScale<number | {
                 valueOf(): number;
-            }>(): QuantitativeScale<D>;
+            }>;
             /**
              * Sets the y scale for this SelectionBoxLayer.
              *
              * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
              */
-            yScale<D extends number | {
+            yScale(yScale: QuantitativeScale<number | {
                 valueOf(): number;
-            }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            }>): SelectionBoxLayer;
             /**
              * Gets the data values backing the left and right edges of the box.
              *
