@@ -30,6 +30,7 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
+      this.autorangeMode(this.autorangeMode());
       return this;
     }
 
@@ -41,26 +42,28 @@ export module Plots {
 
       var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
-      if (this._autorangeSmooth && this.x() && this.x().scale && this.y() && this.y().scale) {
-
-        var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
-        var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
-
-        var maxIncludedValue = Math.max.apply(this, includedValues);
-        var minIncludedValue = Math.min.apply(this, includedValues);
-
-        if (extent.length === 0) {
-          extent = [minIncludedValue, maxIncludedValue];
-        }
-
-        if (minIncludedValue < extent[0]) {
-          extent[0] = minIncludedValue;
-        }
-
-        if (maxIncludedValue > extent[1]) {
-          extent[1] = maxIncludedValue;
-        }
+      if (!(this._autorangeSmooth && this.x() && this.x().scale && this.y() && this.y().scale)) {
+        return extent;
       }
+
+      var edgeIntersectionPoints = this._getEdgeIntersectionPoints();
+      var includedValues = edgeIntersectionPoints[0].concat(edgeIntersectionPoints[1]).map((point) => point.y);
+
+      var maxIncludedValue = Math.max.apply(this, includedValues);
+      var minIncludedValue = Math.min.apply(this, includedValues);
+
+      if (extent.length === 0) {
+        extent = [minIncludedValue, maxIncludedValue];
+      }
+
+      if (minIncludedValue < extent[0]) {
+        extent[0] = minIncludedValue;
+      }
+
+      if (maxIncludedValue > extent[1]) {
+        extent[1] = maxIncludedValue;
+      }
+
       return extent;
     }
 
