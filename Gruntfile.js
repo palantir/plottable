@@ -29,9 +29,11 @@ module.exports = function(grunt) {
       }
     },
     verifyDefinitionFiles: {
-      src: ["typings/d3/d3.d.ts",
-            "plottable.d.ts",
-            "bower_components/svg-typewriter/svgtypewriter.d.ts"],
+      src: [
+        "typings/d3/d3.d.ts",
+        "plottable.d.ts",
+        "bower_components/svg-typewriter/svgtypewriter.d.ts"
+      ],
       options: {
         compiler: "./node_modules/typescript/bin/tsc"
       }
