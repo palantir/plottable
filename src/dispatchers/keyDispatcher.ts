@@ -1,9 +1,9 @@
 ///<reference path="../reference.ts" />
 
 module Plottable {
-export module Dispatchers {
-  export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
+export type KeyCallback = (keyCode?: number, event?: KeyboardEvent) => void;
 
+export module Dispatchers {
   export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
     private _keydownCallbacks: Utils.CallbackSet<KeyCallback>;
