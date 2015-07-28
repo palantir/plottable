@@ -197,14 +197,35 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(-1e17), "-100.000Q", "Last negative round short-scale representable number");
       assert.strictEqual(formatter(-1e18), "-1.000e+18", "First negative round short-scale non-representable number");
 
+      assert.strictEqual(formatter(0.001), "0.001", "Smallest positive short-scale representable number");
+      assert.strictEqual(formatter(0.0009), "9.000e-4", "Round up is not applied for very small positive numbers");
+
+      assert.strictEqual(formatter(-0.001), "-0.001", "Smallest negative short-scale representable number");
+      assert.strictEqual(formatter(-0.0009), "-9.000e-4", "Round up is not applied for very small negative numbers");
+
       assert.strictEqual(formatter(1e37), "1.000e+37", "large magnitute number use scientific notation");
       assert.strictEqual(formatter(1e-7), "1.000e-7", "small magnitude numbers use scientific notation");
     });
 
-    it("specified number of decimals", () => {
+    it("respects the precision provided", () => {
       var formatter = Plottable.Formatters.shortScale(1);
       assert.strictEqual(formatter(1), "1.0", "Just one decimal digit is added");
+      assert.strictEqual(formatter(999), "999.0", "Conversion to K happens in the same place (lower)");
+      assert.strictEqual(formatter(1000), "1.0K", "Conversion to K happens in the same place (upper)");
 
+      assert.strictEqual(formatter(999900000000000000), "999.9Q", "Largest positive short-scale representable number");
+      assert.strictEqual(formatter(999940000000000000), "999.9Q", "Largest positive short-scale representable number round-down");
+      assert.strictEqual(formatter(999950000000000000), "1.0e+18", "Largest positive short-scale representable number round-up");
+
+      assert.strictEqual(formatter(-999900000000000000), "-999.9Q", "Largest negative short-scale representable number");
+      assert.strictEqual(formatter(-999940000000000000), "-999.9Q", "Largest negative short-scale representable number round-down");
+      assert.strictEqual(formatter(-999950000000000000), "-1.0e+18", "Largest negative short-scale representable number round-up");
+
+      assert.strictEqual(formatter(0.1), "0.1", "Smallest positive short-scale representable number");
+      assert.strictEqual(formatter(0.09), "9.0e-2", "Round up is not applied for very small positive numbers");
+
+      assert.strictEqual(formatter(-0.1), "-0.1", "Smallest negative short-scale representable number");
+      assert.strictEqual(formatter(-0.09), "-9.0e-2", "Round up is not applied for very small negative numbers");
     });
   });
 

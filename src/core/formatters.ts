@@ -148,7 +148,7 @@ export module Formatters {
     var suffixes = "KMBTQ";
     var eFormatter = d3.format("." + precision + "e");
     var fFormatter = d3.format("." + precision + "f");
-    var max = Math.pow(10, (3 * suffixes.length) + precision);
+    var max = Math.pow(10, (3 * (suffixes.length + 1)));
     var min = Math.pow(10, -precision);
     return (num: number) => {
       var absNum = Math.abs(num);
