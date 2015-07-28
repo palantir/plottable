@@ -665,13 +665,11 @@ declare module Plottable {
          * and uses standard short scale suffixes (thousands, millions, billions, trillions,
          * quadrillions).
          *
-         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ (15 + precision)) are shown using
-         * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
-         * formatter are primarily expected to be ranges of common currency values.
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
          *
          * @param {number} [precision] the number of decimal places to show (default 3)
-         *
-         * @returns {Formatter} A formatter for large numbers.
+         * @returns {Formatter} A formatter with short scale formatting
          */
         function shortScale(precision?: number): (num: number) => string;
         /**
