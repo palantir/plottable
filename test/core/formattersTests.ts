@@ -203,6 +203,13 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(-0.001), "-0.001", "Smallest negative short-scale representable number");
       assert.strictEqual(formatter(-0.0009), "-9.000e-4", "Round up is not applied for very small negative numbers");
 
+      assert.strictEqual(formatter(0), "0.000", "0 gets formatted well");
+      assert.strictEqual(formatter(-0), "-0.000", "-0 gets formatted well");
+
+      assert.strictEqual(formatter(Infinity), "Infinity", "Infinity edge case");
+      assert.strictEqual(formatter(-Infinity), "-Infinity", "-Infinity edge case");
+      assert.strictEqual(formatter(NaN), "NaN", "NaN edge case");
+
       assert.strictEqual(formatter(1e37), "1.000e+37", "large magnitute number use scientific notation");
       assert.strictEqual(formatter(1e-7), "1.000e-7", "small magnitude numbers use scientific notation");
     });
@@ -226,6 +233,26 @@ describe("Formatters", () => {
 
       assert.strictEqual(formatter(-0.1), "-0.1", "Smallest negative short-scale representable number");
       assert.strictEqual(formatter(-0.09), "-9.0e-2", "Round up is not applied for very small negative numbers");
+
+      assert.strictEqual(formatter(0), "0.0", "0 gets formatted well");
+    });
+
+    it("0 as precision also works and uses integers only", () => {
+      var formatter = Plottable.Formatters.shortScale(0);
+      assert.strictEqual(formatter(1), "1", "Just one decimal digit is added");
+      assert.strictEqual(formatter(999), "999", "Conversion to K happens in the same place (lower)");
+      assert.strictEqual(formatter(1000), "1K", "Conversion to K happens in the same place (upper)");
+
+      assert.strictEqual(formatter(999000000000000000), "999Q", "Largest positive short-scale representable number");
+      assert.strictEqual(formatter(999400000000000000), "999Q", "Largest positive short-scale representable number round-down");
+      assert.strictEqual(formatter(999500000000000000), "1e+18", "Largest positive short-scale representable number round-up");
+
+      assert.strictEqual(formatter(-999900000000000000), "-999Q", "Largest negative short-scale representable number");
+      assert.strictEqual(formatter(-999400000000000000), "-999Q", "Largest negative short-scale representable number round-down");
+      assert.strictEqual(formatter(-999500000000000000), "-1e+18", "Largest negative short-scale representable number round-up");
+
+      assert.strictEqual(formatter(0.9), "9e-1", "Round up is not applied for very small positive numbers");
+      assert.strictEqual(formatter(0), "0", "0 gets formatted well");
     });
   });
 
