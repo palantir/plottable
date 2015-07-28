@@ -3,17 +3,16 @@
 var assert = chai.assert;
 
 describe("Plots", () => {
-  var SVG_WIDTH = 300;
-  var SVG_HEIGHT = 300;
-  var DATA = [
-    { x: 0, y: 0, x2: 1, y2: 1 },
-    { x: 1, y: 1, x2: 2, y2: 2 },
-    { x: 2, y: 2, x2: 3, y2: 3 },
-    { x: 3, y: 3, x2: 4, y2: 4 },
-    { x: 4, y: 4, x2: 5, y2: 5 }
-  ];
-
   describe("RectanglePlot", () => {
+    var SVG_WIDTH = 300;
+    var SVG_HEIGHT = 300;
+    var DATA = [
+      { x: 0, y: 0, x2: 1, y2: 1 },
+      { x: 1, y: 1, x2: 2, y2: 2 },
+      { x: 2, y: 2, x2: 3, y2: 3 },
+      { x: 3, y: 3, x2: 4, y2: 4 },
+      { x: 4, y: 4, x2: 5, y2: 5 }
+    ];
     var VERIFY_CELLS = (cells: d3.Selection<any>) => {
       assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: any, i: number) {
