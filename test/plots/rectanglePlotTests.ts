@@ -60,7 +60,7 @@ describe("Plots", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dataset = new Plottable.Dataset([
         { x: 1, y: 1, x2: 3, y2: 3 },
-        { x: 2, y: 2, x2: 4, y2: 4 }
+        { x: 4, y: 2, x2: 2, y2: 4 }
       ]);
       var plot = new Plottable.Plots.Rectangle()
         .x((d) => d.x, xScale).x2((d) => d.x2)
