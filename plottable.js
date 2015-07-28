@@ -4579,6 +4579,7 @@ var Plottable;
                 }
                 else {
                     this._usesTextWidthApproximation = enable;
+                    return this;
                 }
             };
             Numeric.prototype._hideEndTickLabels = function () {
