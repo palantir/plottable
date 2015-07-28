@@ -2364,17 +2364,17 @@ declare module Plottable {
              *
              * Returns an undefined array if the edges are not backed by a scale.
              */
-            xExtent(): {
+            xExtent(): (number | {
                 valueOf(): number;
-            }[];
+            })[];
             /**
              * Gets the data values backing the top and bottom edges of the box.
              *
              * Returns an undefined array if the edges are not backed by a scale.
              */
-            yExtent(): {
+            yExtent(): (number | {
                 valueOf(): number;
-            }[];
+            })[];
             destroy(): void;
         }
     }
