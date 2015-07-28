@@ -30,8 +30,6 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
-      this._updateExtentsForProperty("y");
-      this._updateExtentsForProperty("x");
       return this;
     }
 

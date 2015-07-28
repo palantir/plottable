@@ -7919,8 +7919,6 @@ var Plottable;
                     return this._autorangeSmooth;
                 }
                 this._autorangeSmooth = autorangeSmooth;
-                this._updateExtentsForProperty("y");
-                this._updateExtentsForProperty("x");
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {

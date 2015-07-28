@@ -331,78 +331,112 @@ describe("Plots", () => {
     });
   });
 
-  describe("smooth autoranging", () => {
-    it("smooth autoranging works", () => {
+  describe("Line Plot", () => {
+    describe("smooth autoranging", () => {
+      it("smooth autoranging works", () => {
 
-      var svg = TestMethods.generateSVG(500, 500);
+        var svg = TestMethods.generateSVG(500, 500);
 
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      xScale.domain([0.1, 1.1]);
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        xScale.domain([0.1, 1.1]);
 
-      var data = [
-        {"x": 0.0, "y": -1},
-        {"x": 1.8, "y": -2},
-      ];
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2},
+        ];
 
-      var line = new Plottable.Plots.Line();
-      line.x(function(d) { return d.x; }, xScale);
-      line.y(function(d) { return d.y; }, yScale);
-      line.addDataset(new Plottable.Dataset(data));
-      line.autorangeMode("y");
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
 
-      xScale.padProportion(0);
-      yScale.padProportion(0);
-      line.renderTo(svg);
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+        line.renderTo(svg);
 
-      assert.deepEqual(yScale.domain(), [0, 1],
-        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+        assert.deepEqual(yScale.domain(), [0, 1], "when there are no visible points in the view, the y-scale domain defaults to [0, 1]");
 
-      line.autorangeSmooth(true);
-      line.render();
-      // This is actually incorrect, but I don't know exact value to put in
-      assert.deepEqual(yScale.domain(), [0, 1],
-        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+        line.autorangeSmooth(true);
+        assert.closeTo(yScale.domain()[0], -1.61, 0.001, "smooth autoranging forces the domain to include the line (left)");
+        assert.closeTo(yScale.domain()[1], -1.05, 0.001, "Smooth autoranging forces the domain to include the line (right)");
 
-      line.autorangeSmooth(false);
-      assert.deepEqual(yScale.domain(), [0, 1],
-        "When there are no visible points in the view, the y-scale domain defaults to [0, 1]");
+        line.autorangeSmooth(false);
+        assert.deepEqual(yScale.domain(), [0, 1], "Resetting the smooth autorange works");
 
-      svg.remove();
+        xScale.domain([data[0].x, data[1].x]);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge poitns (no smooth)");
 
-    });
+        line.autorangeSmooth(true);
+        assert.deepEqual(yScale.domain(), [-2, -1], "no changes for autoranging smooth with same edge points (smooth)");
 
-    it("autoDomaining works", () => {
-      var svg = TestMethods.generateSVG(500, 500);
+        svg.remove();
 
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      });
 
-      xScale.domain([-0.1, 0.2]);
+      it("autoDomaining works with smooth autoranging (before rendering)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
 
-      var data = [
-        {"x": 0.0, "y": -1},
-        {"x": 1.8, "y": -2},
-      ];
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
 
-      var line = new Plottable.Plots.Line();
-      line.x(function(d) { return d.x; }, xScale);
-      line.y(function(d) { return d.y; }, yScale);
-      line.addDataset(new Plottable.Dataset(data));
-      line.autorangeMode("y");
+        xScale.domain([-0.1, 0.2]);
 
-      line.renderTo(svg);
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2},
+        ];
 
-      line.autorangeSmooth(true);
-      xScale.autoDomain();
-      assert.deepEqual(xScale.domain(), [-0.2, 2],
-        "autoDomain works even when autoranging is done smoothly");
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
 
-      line.autorangeSmooth(false);
-      assert.deepEqual(xScale.domain(), [-0.2, 2],
-        "autoDomain works when smooth autoranging is disabled back");
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+        line.renderTo(svg);
 
-      svg.remove();
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+
+        svg.remove();
+      });
+
+      it("autoDomaining works with smooth autoranging (after rendering)", () => {
+        var svg = TestMethods.generateSVG(500, 500);
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+
+        xScale.domain([-0.1, 0.2]);
+
+        var data = [
+          {"x": 0.0, "y": -1},
+          {"x": 1.8, "y": -2},
+        ];
+
+        var line = new Plottable.Plots.Line();
+        line.x(function(d) { return d.x; }, xScale);
+        line.y(function(d) { return d.y; }, yScale);
+        line.addDataset(new Plottable.Dataset(data));
+        line.autorangeMode("y");
+
+        line.renderTo(svg);
+
+        line.autorangeSmooth(true);
+        xScale.autoDomain();
+
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works even when autoranging is done smoothly");
+
+        line.autorangeSmooth(false);
+        assert.deepEqual(xScale.domain(), [-0.2, 2], "autoDomain works when smooth autoranging is disabled back");
+
+        svg.remove();
+      });
     });
   });
 });
