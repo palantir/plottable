@@ -7243,7 +7243,8 @@ var Plottable;
                         y -= yRangeBand / 2;
                         y2 += yRangeBand / 2;
                     }
-                    if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) && ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {
+                    if (((x < x2 && p.x > x && p.x < x2) || (x > x2 && p.x > x2 && p.x < x)) &&
+                        ((y < y2 && p.y > y && p.y < y2) || (y > y2 && p.y > y2 && p.y < y))) {
                         results.push(entity);
                     }
                 }
@@ -8879,10 +8880,12 @@ var Plottable;
                     var x = attrToProjector["x"](prevDatum, prevIndex, dataset);
                     var x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
                     var y = attrToProjector["y"](datum, datumIndex, dataset);
-                    if ((this._subtotals[datumIndex] > 0 && this._subtotals[datumIndex] > this._subtotals[prevIndex]) || (this._subtotals[datumIndex] < 0 && this._subtotals[datumIndex] >= this._subtotals[prevIndex])) {
+                    if ((this._subtotals[datumIndex] > 0 && this._subtotals[datumIndex] > this._subtotals[prevIndex]) ||
+                        (this._subtotals[datumIndex] < 0 && this._subtotals[datumIndex] >= this._subtotals[prevIndex])) {
                         y = attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
                     }
-                    this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true).attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
+                    this._connectorArea.append("line").classed(Waterfall._CONNECTOR_CLASS, true)
+                        .attr("x1", x).attr("x2", x2).attr("y1", y).attr("y2", y);
                 }
             };
             Waterfall.prototype._updateSubtotals = function () {
@@ -10815,7 +10818,7 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-var __extends = this.__extends || function (d, b) {
+var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
     __.prototype = b.prototype;
