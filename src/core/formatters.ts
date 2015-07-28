@@ -154,7 +154,7 @@ export module Formatters {
     var min = Math.pow(10, -precision);
     return (num: number) => {
       var absNum = Math.abs(num);
-      if (absNum < min || absNum >= max) {
+      if ((absNum < min || absNum >= max) && absNum !== 0) {
         return exponentFormatter(num);
       }
       var idx = -1;
@@ -168,7 +168,7 @@ export module Formatters {
         output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
       }
       // catch rounding by the underlying d3 formatter
-      if ((num > 0 && output.substr(0, 5) === "1000.") || (num < 0 && output.substr(0, 6) === "-1000.")) {
+      if ((num > 0 && output.substr(0, 4) === "1000") || (num < 0 && output.substr(0, 5) === "-1000")) {
         if (idx < suffixes.length - 1) {
           idx++;
           output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];

@@ -247,7 +247,7 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(999400000000000000), "999Q", "Largest positive short-scale representable number round-down");
       assert.strictEqual(formatter(999500000000000000), "1e+18", "Largest positive short-scale representable number round-up");
 
-      assert.strictEqual(formatter(-999900000000000000), "-999Q", "Largest negative short-scale representable number");
+      assert.strictEqual(formatter(-999000000000000000), "-999Q", "Largest negative short-scale representable number");
       assert.strictEqual(formatter(-999400000000000000), "-999Q", "Largest negative short-scale representable number round-down");
       assert.strictEqual(formatter(-999500000000000000), "-1e+18", "Largest negative short-scale representable number round-up");
 
