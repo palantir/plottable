@@ -4018,6 +4018,8 @@ declare module Plottable {
              */
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
+            movable(): boolean;
+            movable(movable: boolean): DragBoxLayer;
             /**
              * Sets the callback to be called when dragging starts.
              *

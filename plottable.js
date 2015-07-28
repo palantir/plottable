@@ -10649,6 +10649,8 @@ var Plottable;
                     this.removeClass("y-resizable");
                 }
             };
+            DragBoxLayer.prototype.movable = function (movable) {
+            };
             /**
              * Sets the callback to be called when dragging starts.
              *

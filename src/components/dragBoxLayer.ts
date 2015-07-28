@@ -272,6 +272,11 @@ export module Components {
       }
     }
 
+    public movable(): boolean;
+    public movable(movable: boolean): DragBoxLayer;
+    public movable(movable?: boolean): any {
+    }
+
     /**
      * Sets the callback to be called when dragging starts.
      *
