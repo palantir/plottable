@@ -9872,7 +9872,7 @@ var Plottable;
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is
-             * released and the user is moused over the Component.
+             * released if the key was pressed with the mouse inside of the Component.
              *
              * @param {number} keyCode
              * @param {KeyCallback} callback
@@ -9887,7 +9887,7 @@ var Plottable;
             };
             /**
              * Removes a callback that would be called when the key with the given keyCode is
-             * released and the user is moused over the Component.
+             * released if the key was pressed with the mouse inside of the Component.
              *
              * @param {number} keyCode
              * @param {KeyCallback} callback

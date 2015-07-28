@@ -217,6 +217,13 @@ module TestMethods {
     target.node().dispatchEvent( e );
   }
 
+  export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number) {
+    var event = <KeyboardEvent> document.createEvent("Events");
+    event.initEvent(type, true, true);
+    event.keyCode = keyCode;
+    target.node().dispatchEvent( event );
+  }
+
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {
     var actualAreaPathStrings = actualPath.split("Z");
     var expectedAreaPathStrings = expectedPath.split("Z");

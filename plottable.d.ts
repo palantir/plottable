@@ -3750,7 +3750,7 @@ declare module Plottable {
             offKeyPress(keyCode: number, callback: KeyCallback): Key;
             /**
              * Adds a callback to be called when the key with the given keyCode is
-             * released and the user is moused over the Component.
+             * released if the key was pressed with the mouse inside of the Component.
              *
              * @param {number} keyCode
              * @param {KeyCallback} callback
@@ -3759,7 +3759,7 @@ declare module Plottable {
             onKeyRelease(keyCode: number, callback: KeyCallback): Key;
             /**
              * Removes a callback that would be called when the key with the given keyCode is
-             * released and the user is moused over the Component.
+             * released if the key was pressed with the mouse inside of the Component.
              *
              * @param {number} keyCode
              * @param {KeyCallback} callback

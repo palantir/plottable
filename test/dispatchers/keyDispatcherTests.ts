@@ -21,7 +21,7 @@ describe("Dispatchers", () => {
       $("body").simulate("keydown", { keyCode: keyCodeToSend });
       assert.isTrue(keyDowned, "callback when a key was pressed");
 
-      ked.offKeyDown(callback); // clean up
+      ked.offKeyDown(callback);
 
       keyDowned = false;
       $("body").simulate("keydown", { keyCode: keyCodeToSend });
@@ -45,7 +45,7 @@ describe("Dispatchers", () => {
           $("body").simulate("keyup", { keyCode: keyCodeToSend });
           assert.isTrue(keyUped, "callback when a key was release");
 
-          ked.offKeyUp(callback); // clean up
+          ked.offKeyUp(callback);
 
           keyUped = false;
           $("body").simulate("keyup", { keyCode: keyCodeToSend });
