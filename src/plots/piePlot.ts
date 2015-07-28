@@ -355,8 +355,14 @@ export module Plots {
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-        var showLabel = sliceIndices.every((index) => index === datumIndex);
+        var showLabel = corners.every((corner) => {
+          return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
+        });
+
+        if (showLabel) {
+          var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+          showLabel = sliceIndices.every((index) => index === datumIndex);
+        }
 
         var color = attrToProjector["fill"](datum, datumIndex, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);

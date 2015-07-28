@@ -6742,8 +6742,13 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+                    });
+                    if (showLabel) {
+                        var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                        showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    }
                     var color = attrToProjector["fill"](datum, datumIndex, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
@@ -7715,9 +7720,30 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var showLabel = true;
+                        var labelPosition = {
+                            x: x,
+                            y: positive ? y : y + h - measurement.height
+                        };
+                        if (_this._isVertical) {
+                            labelPosition.x = x + w / 2 - measurement.width / 2;
+                        }
+                        else {
+                            if (!positive) {
+                                labelPosition.x = x + w - measurement.width;
+                            }
+                            else {
+                                labelPosition.x = x;
+                            }
+                        }
+                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
+                            showLabel = false;
+                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.style("visibility", showLabel ? "inherit" : "hidden");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {

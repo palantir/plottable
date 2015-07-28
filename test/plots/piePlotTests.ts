@@ -157,6 +157,54 @@ describe("Plots", () => {
         assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
         svg.remove();
       });
+
+      it("labels are shown and hidden appropriately", () => {
+        var data = [
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i % 2 === 0) {
+            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+          }
+        });
+
+        svg.remove();
+      });
+
+      it("labels outside of the render area are hidden", () => {
+        var data = [
+          { value: 5000 },
+          { value: 5000 },
+          { value: 5000 }];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset).outerRadius(500);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when cut off by the lower margin");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+          }
+        });
+        svg.remove();
+      });
     });
   });
 
