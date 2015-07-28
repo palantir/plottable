@@ -173,17 +173,30 @@ describe("Formatters", () => {
       var formatter = Plottable.Formatters.shortScale();
       assert.strictEqual(formatter(1), "1.000", "small numbers format simply");
       assert.strictEqual(formatter(-1), "-1.000", "negative small numbers format simply");
+
       assert.strictEqual(formatter(2e3), "2.000K", "thousands numbers format using short scale magnitudes");
       assert.strictEqual(formatter(2e6), "2.000M", "millions numbers format using short scale magnitudes");
       assert.strictEqual(formatter(2e9), "2.000B", "billions numbers format using short scale magnitudes");
-      assert.strictEqual(formatter(-2e9), "-2.000B", "negative numbers format using short scale magnitudes");
       assert.strictEqual(formatter(2e12), "2.000T", "trillions magnitude numbers format using short scale magnitudes");
       assert.strictEqual(formatter(2e15), "2.000Q", "quadrillions numbers format using short scale magnitudes");
-      assert.strictEqual(formatter(-2e15), "-2.000Q", "negative quadrillions numbers format using short scale magnitudes");
+
       assert.strictEqual(formatter(999.999), "999.999", "boundary cases are correct");
       assert.strictEqual(formatter(999.99999), "1.000K", "rounding cases are correct");
       assert.strictEqual(formatter(-999.99999), "-1.000K", "negative rounding cases are correct");
       assert.strictEqual(formatter(1000000), "1.000M", "boundary cases are correct");
+
+      assert.strictEqual(formatter(999999000000000000), "999.999Q", "Largest positive short-scale representable number");
+      assert.strictEqual(formatter(999999400000000000), "999.999Q", "Largest positive short-scale representable number round-down");
+      assert.strictEqual(formatter(999999500000000000), "1.000e+18", "Largest positive short-scale non-representable number round-up");
+      assert.strictEqual(formatter(1e17), "100.000Q", "Last positive round short-scale representable number");
+      assert.strictEqual(formatter(1e18), "1.000e+18", "First positive round short-scale non-representable number");
+
+      assert.strictEqual(formatter(-999999000000000000), "-999.999Q", "Largest negative short-scale representable number");
+      assert.strictEqual(formatter(999999400000000000), "999.999Q", "Largest negative short-scale representable number round-down");
+      assert.strictEqual(formatter(999999500000000000), "1.000e+18", "Largest negative short-scale non-representable number round-up");
+      assert.strictEqual(formatter(-1e17), "-100.000Q", "Last negative round short-scale representable number");
+      assert.strictEqual(formatter(-1e18), "-1.000e+18", "First negative round short-scale non-representable number");
+
       assert.strictEqual(formatter(1e37), "1.000e+37", "large magnitute number use scientific notation");
       assert.strictEqual(formatter(1e-7), "1.000e-7", "small magnitude numbers use scientific notation");
     });

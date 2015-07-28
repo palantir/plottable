@@ -665,7 +665,7 @@ declare module Plottable {
          * and uses standard short scale suffixes (thousands, millions, billions, trillions,
          * quadrillions).
          *
-         * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ (15 + precision)) are shown using
          * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
          * formatter are primarily expected to be ranges of common currency values.
          *

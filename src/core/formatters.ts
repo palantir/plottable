@@ -135,7 +135,7 @@ export module Formatters {
    * and uses standard short scale suffixes (thousands, millions, billions, trillions,
    * quadrillions).
    *
-   * Numbers with a magnitude outside of (10^-precision, 10^(15+precision)) are shown using
+   * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ (15 + precision)) are shown using
    * scientific notation to avoid creating extremely long decimal strings.  The inputs to the
    * formatter are primarily expected to be ranges of common currency values.
    *
@@ -148,8 +148,8 @@ export module Formatters {
     var suffixes = "KMBTQ";
     var eFormatter = d3.format("." + precision + "e");
     var fFormatter = d3.format("." + precision + "f");
-    var max = Math.pow(10, (3 * suffixes.length) + precision + 1);
-    var min = Math.pow(10, -precision - 1);
+    var max = Math.pow(10, (3 * suffixes.length) + precision);
+    var min = Math.pow(10, -precision);
     return (num: number) => {
       var absNum = Math.abs(num);
       if (absNum < min || absNum >= max) {
@@ -168,10 +168,14 @@ export module Formatters {
         output = fFormatter(num / factor) + suffixes[idx];
       }
       // catch rounding by the underlying d3 formatter
-      if (idx < suffixes.length - 1 && ((num > 0 && output.substr(0, 5) === "1000.") || (num < 0 && output.substr(0, 6) === "-1000."))) {
-        factor *= 1000;
-        idx += 1;
-        output = fFormatter(num / factor) + suffixes[idx];
+      if ((num > 0 && output.substr(0, 5) === "1000.") || (num < 0 && output.substr(0, 6) === "-1000.")) {
+        if (idx < suffixes.length - 1) {
+          factor *= 1000;
+          idx += 1;
+          output = fFormatter(num / factor) + suffixes[idx];
+        } else {
+          output = eFormatter(num);
+        }
       }
       return output;
     };
