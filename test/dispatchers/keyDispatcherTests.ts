@@ -29,27 +29,27 @@ describe("Dispatchers", () => {
     });
 
     it("triggers callback on keyup", () => {
-          var ked = Plottable.Dispatchers.Key.getDispatcher();
+      var ked = Plottable.Dispatchers.Key.getDispatcher();
 
-          var keyCodeToSend = 65;
+      var keyCodeToSend = 65;
 
-          var keyUped = false;
-          var callback = (code: number, e: KeyboardEvent) => {
-            keyUped = true;
-            assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
-            assert.isNotNull(e, "key event was passed to the callback");
-          };
+      var keyUped = false;
+      var callback = (code: number, e: KeyboardEvent) => {
+        keyUped = true;
+        assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
+        assert.isNotNull(e, "key event was passed to the callback");
+      };
 
-          ked.onKeyUp(callback);
+      ked.onKeyUp(callback);
 
-          $("body").simulate("keyup", { keyCode: keyCodeToSend });
-          assert.isTrue(keyUped, "callback when a key was release");
+      $("body").simulate("keyup", { keyCode: keyCodeToSend });
+      assert.isTrue(keyUped, "callback when a key was release");
 
-          ked.offKeyUp(callback);
+      ked.offKeyUp(callback);
 
-          keyUped = false;
-          $("body").simulate("keyup", { keyCode: keyCodeToSend });
-          assert.isFalse(keyUped, "nothing happens when a key was release");
-        });
+      keyUped = false;
+      $("body").simulate("keyup", { keyCode: keyCodeToSend });
+      assert.isFalse(keyUped, "nothing happens when a key was release");
+    });
   });
 });
