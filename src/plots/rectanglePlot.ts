@@ -231,9 +231,9 @@ export module Plots {
       return this;
     }
 
-    /*
+    /**
      * Gets the Entities at a particular Point.
-     * 
+     *
      * @param {Point} p
      * @param {PlotEntity[]} 
      */

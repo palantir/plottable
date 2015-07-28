@@ -7210,7 +7210,7 @@ var Plottable;
                 this.render();
                 return this;
             };
-            /*
+            /**
              * Gets the Entities at a particular Point.
              *
              * @param {Point} p
