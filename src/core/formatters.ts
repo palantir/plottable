@@ -155,7 +155,7 @@ export module Formatters {
       }
       var idx = -1;
       while (absNum >= Math.pow(1000, idx + 2) && idx < (suffixes.length - 1)) {
-        idx++;;
+        idx++;
       }
       var output = "";
       if (idx === -1) {
