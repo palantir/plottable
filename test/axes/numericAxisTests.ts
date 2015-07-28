@@ -431,4 +431,40 @@ describe("NumericAxis", () => {
     svg.remove();
   });
 
+  it("reasonably approximates tick label sizes with approximate measuring", () => {
+    var SVG_WIDTH = 500;
+    var SVG_HEIGHT = 100;
+
+    var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+
+    var testCases = [[-1, 1],
+                     [0, 10],
+                     [0, 999999999]];
+
+    var maxErrorFactor = 1.4;
+
+    testCases.forEach((domainBounds) => {
+      var scale = new Plottable.Scales.Linear();
+      scale.domain(domainBounds);
+      var numericAxis = new Plottable.Axes.Numeric(scale, "left");
+
+      numericAxis.usesTextWidthApproximation(true);
+      numericAxis.renderTo(svg);
+      var widthApprox = numericAxis.width();
+
+      numericAxis.usesTextWidthApproximation(false);
+      numericAxis.redraw();
+      var widthExact = numericAxis.width();
+
+      assert.operator(widthApprox, "<", (widthExact * maxErrorFactor),
+        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is less than "
+        + maxErrorFactor + "x larger than an exact scale");
+      assert.operator(widthApprox, ">=", widthExact,
+        "an approximate scale of [" + domainBounds[0] + "," + domainBounds[1] + "] is smaller than an exact scale");
+
+      numericAxis.destroy();
+    });
+
+    svg.remove();
+  });
 });
