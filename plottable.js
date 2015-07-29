@@ -10828,7 +10828,7 @@ var Plottable;
             };
             XDragBoxLayer.prototype.yScale = function (yScale) {
                 if (yScale == null) {
-                    return _super.prototype.yScale.call(this);
+                    throw new Error("XDragBoxLayer has no y scale");
                 }
                 throw new Error("y scales cannot be set on an XDragBoxLayer");
             };
@@ -10886,7 +10886,7 @@ var Plottable;
             };
             YDragBoxLayer.prototype.xScale = function (xScale) {
                 if (xScale == null) {
-                    return _super.prototype.xScale.call(this);
+                    throw new Error("YDragBoxLayer has no x scale");
                 }
                 throw new Error("x scales cannot be set on an YDragBoxLayer");
             };

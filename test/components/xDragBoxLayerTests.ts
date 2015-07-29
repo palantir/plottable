@@ -106,6 +106,11 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("throws error on getting y scale", () => {
+      var dbl = new Plottable.Components.XDragBoxLayer();
+      assert.throws(() => dbl.yScale(), "no y scale");
+    });
+
     it("throws error on setting y scale", () => {
       var dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "y scales cannot be set");

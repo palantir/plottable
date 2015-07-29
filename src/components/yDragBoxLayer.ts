@@ -40,7 +40,7 @@ export module Components {
     public xScale<D extends number | { valueOf(): number }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
     public xScale<D extends number | { valueOf(): number }>(xScale?: QuantitativeScale<D>): any {
       if (xScale == null) {
-        return super.xScale();
+        throw new Error("YDragBoxLayer has no x scale");
       }
       throw new Error("x scales cannot be set on an YDragBoxLayer");
     }
