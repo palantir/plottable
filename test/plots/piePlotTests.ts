@@ -14,6 +14,198 @@ describe("Plots", () => {
       assert.strictEqual(plot.height(), 400, "was allocated height");
       svg.remove();
     });
+
+    it("updates slices when data changes", () => {
+      var svg = TestMethods.generateSVG(500, 500);
+      var piePlot = new Plottable.Plots.Pie();
+      piePlot.sectorValue((d) => d.value);
+      var fourSliceData = [
+        { value: 1 },
+        { value: 1 },
+        { value: 1 },
+        { value: 1 }
+      ];
+      var dataset = new Plottable.Dataset(fourSliceData);
+      piePlot.addDataset(dataset);
+      piePlot.renderTo(svg);
+      var fourSlicePathStrings: String[] = [];
+      piePlot.content().selectAll("path").each(function() { fourSlicePathStrings.push(d3.select(this).attr("d")); });
+      assert.lengthOf(fourSlicePathStrings, fourSliceData.length, "one path per datum");
+
+      var twoSliceData = [
+        { value: 1 },
+        { value: 1 }
+      ];
+      dataset.data(twoSliceData);
+      var twoSlicePathStrings: String[] = [];
+      piePlot.content().selectAll("path").each(function() { twoSlicePathStrings.push(d3.select(this).attr("d")); });
+      assert.lengthOf(twoSlicePathStrings, twoSliceData.length, "one path per datum");
+
+      twoSlicePathStrings.forEach((pathString, index) => {
+        assert.notStrictEqual(pathString, fourSlicePathStrings[index], "slices were updated when data changed");
+      });
+      svg.remove();
+    });
+
+    describe("Labels", () => {
+      var svg: d3.Selection<void>;
+      var piePlot: Plottable.Plots.Pie;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(500, 500);
+        piePlot = new Plottable.Plots.Pie();
+        piePlot.sectorValue((d) => d.value);
+        piePlot.labelsEnabled(true);
+      });
+
+      it("rendering twice does not erase or add labels", () => {
+        var data = [
+          { value: 1 },
+          { value: 2 },
+          { value: 3 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per slice");
+        piePlot.render();
+        labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data.length, "one label per slice after re-render()ing");
+        svg.remove();
+      });
+
+      it("updates labels when data changes", () => {
+        var data1 = [
+          { value: 1 },
+          { value: 1 },
+          { value: 1 }
+        ];
+        var dataset = new Plottable.Dataset(data1);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data1.length, "one label per datum");
+        labels.each(function() {
+          var labelText = d3.select(this).text();
+          assert.strictEqual(labelText, "1", "label has correct text");
+        });
+        var data2 = [
+          { value: 2 },
+          { value: 2 }
+        ];
+        dataset.data(data2);
+        labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data2.length, "one label per datum");
+        labels.each(function() {
+          var labelText = d3.select(this).text();
+          assert.strictEqual(labelText, "2", "label text was updated");
+        });
+        svg.remove();
+      });
+
+      it("removes labels when they are disabled after rendering", () => {
+        var data1 = [
+          { value: 1 },
+          { value: 1 },
+          { value: 1 }
+        ];
+        var dataset = new Plottable.Dataset(data1);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), data1.length, "one label per datum");
+        piePlot.labelsEnabled(false);
+        labels = piePlot.content().selectAll("text");
+        assert.strictEqual(labels.size(), 0, "labels were removed");
+        svg.remove();
+      });
+
+      it("hides labels if slices are too small", () => {
+        var data = [
+          { key: "A", value: 1 }, { key: "B", value: 50 },
+          { key: "C", value: 1 }, { key: "D", value: 50 },
+          { key: "E", value: 1 }, { key: "F", value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+        var labelGs = piePlot.content().select(".label-area").selectAll(".label-area > g");
+        labelGs.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (data[i].value === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+          }
+        });
+        svg.remove();
+      });
+
+      it("formatters are used properly", () => {
+        var data = [
+          { value: 5 },
+          { value: 15 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.labelFormatter((n: number) => n + " m");
+        piePlot.renderTo(svg);
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "both labels are drawn");
+        assert.strictEqual(texts[0], "5 m", "The formatter was used to format the first label");
+        assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
+        svg.remove();
+      });
+
+      it("labels are shown and hidden appropriately", () => {
+        var data = [
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i % 2 === 0) {
+            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+          }
+        });
+
+        svg.remove();
+      });
+
+      it("labels outside of the render area are hidden", () => {
+        var data = [
+          { value: 5000 },
+          { value: 5000 },
+          { value: 5000 }];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset).outerRadius(500);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when cut off by the lower margin");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+          }
+        });
+        svg.remove();
+      });
+    });
   });
 
   describe("PiePlot", () => {
@@ -243,27 +435,6 @@ describe("Plots", () => {
       assert.strictEqual(message, "Negative values will not render correctly in a Pie Plot.");
       Plottable.Utils.Window.warn = oldWarn;
       svg.remove();
-    });
-
-    describe("Labels", () => {
-      it("labels are shown and hidden appropriately", () => {
-        piePlot.removeDataset(simpleDataset);
-        var data = [
-          { key: "A", value: 1 }, { key: "B", value: 50 },
-          { key: "C", value: 1 }, { key: "D", value: 50 },
-          { key: "E", value: 1 }, { key: "F", value: 50 }
-        ];
-        var dataset = new Plottable.Dataset(data);
-        piePlot.addDataset(dataset).labelsEnabled(true);
-        $(".label-area").children("g").each(function(i) {
-          if (i % 2 === 0) {
-            assert.strictEqual($(this).css("visibility"), "hidden", "label hidden when slice is too small");
-          } else {
-            assert.include(["visible", "inherit"], $(this).css("visibility"), "label shown when slice is appropriately sized");
-          }
-        });
-        svg.remove();
-      });
     });
   });
 

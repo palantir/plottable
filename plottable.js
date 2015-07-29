@@ -1,5 +1,5 @@
 /*!
-Plottable 1.3.0 (https://github.com/palantir/plottable)
+Plottable 1.4.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.3.0";
+    Plottable.version = "1.4.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -4356,6 +4356,7 @@ var Plottable;
             function Numeric(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
+                this._usesTextWidthApproximation = false;
                 this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
@@ -4364,20 +4365,33 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
+                var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+                if (this._tickLabelPositioning === "center") {
+                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+                }
+                else {
+                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+                }
+                return this._computedWidth;
+            };
+            Numeric.prototype._computeExactTextWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
                     return _this._measurer.measure(formattedValue).width;
                 });
-                var maxTextLength = Plottable.Utils.Math.max(textLengths, 0);
-                if (this._tickLabelPositioning === "center") {
-                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
-                }
-                else {
-                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
-                }
-                return this._computedWidth;
+                return Plottable.Utils.Math.max(textLengths, 0);
+            };
+            Numeric.prototype._computeApproximateTextWidth = function () {
+                var _this = this;
+                var tickValues = this._getTickValues();
+                var mWidth = this._measurer.measure("M").width;
+                var textLengths = tickValues.map(function (v) {
+                    var formattedValue = _this.formatter()(v);
+                    return formattedValue.length * mWidth;
+                });
+                return Plottable.Utils.Math.max(textLengths, 0);
             };
             Numeric.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
@@ -4556,6 +4570,15 @@ var Plottable;
                     }
                     this._tickLabelPositioning = positionLC;
                     this.redraw();
+                    return this;
+                }
+            };
+            Numeric.prototype.usesTextWidthApproximation = function (enable) {
+                if (enable == null) {
+                    return this._usesTextWidthApproximation;
+                }
+                else {
+                    this._usesTextWidthApproximation = enable;
                     return this;
                 }
             };
@@ -5196,7 +5219,7 @@ var Plottable;
                         return translateString;
                     });
                 });
-                entries.select("path").attr("d", function (d, i) { return _this.symbol()(d, i)(layout.textHeight * 0.6); })
+                entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                     .attr("fill", function (value) { return _this._colorScale.scale(value); })
                     .classed(Legend.LEGEND_SYMBOL_CLASS, true);
@@ -6500,6 +6523,7 @@ var Plottable;
             function Pie() {
                 var _this = this;
                 _super.call(this);
+                this._labelFormatter = Plottable.Formatters.identity();
                 this._labelsEnabled = false;
                 this.innerRadius(0);
                 this.outerRadius(function () { return Math.min(_this.width(), _this.height()) / 2; });
@@ -6534,8 +6558,8 @@ var Plottable;
                 return this;
             };
             Pie.prototype._onDatasetUpdate = function () {
-                _super.prototype._onDatasetUpdate.call(this);
                 this._updatePieAngles();
+                _super.prototype._onDatasetUpdate.call(this);
             };
             Pie.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Arc(dataset);
@@ -6581,6 +6605,16 @@ var Plottable;
                 }
                 else {
                     this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
+            Pie.prototype.labelFormatter = function (formatter) {
+                if (formatter == null) {
+                    return this._labelFormatter;
+                }
+                else {
+                    this._labelFormatter = formatter;
                     this.render();
                     return this;
                 }
@@ -6673,6 +6707,7 @@ var Plottable;
             };
             Pie.prototype._additionalPaint = function (time) {
                 var _this = this;
+                this._renderArea.select(".label-area").remove();
                 if (this._labelsEnabled) {
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
@@ -6710,7 +6745,7 @@ var Plottable;
                 var dataset = this.datasets()[0];
                 for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
                     var datum = dataset.data()[datumIndex];
-                    var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
+                    var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
                     var measurement = measurer.measure(value);
                     var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
                     var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
@@ -6730,8 +6765,13 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+                    });
+                    if (showLabel) {
+                        var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                        showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    }
                     var color = attrToProjector["fill"](datum, datumIndex, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
@@ -7703,9 +7743,30 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var showLabel = true;
+                        var labelPosition = {
+                            x: x,
+                            y: positive ? y : y + h - measurement.height
+                        };
+                        if (_this._isVertical) {
+                            labelPosition.x = x + w / 2 - measurement.width / 2;
+                        }
+                        else {
+                            if (!positive) {
+                                labelPosition.x = x + w - measurement.width;
+                            }
+                            else {
+                                labelPosition.x = x;
+                            }
+                        }
+                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
+                            showLabel = false;
+                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.style("visibility", showLabel ? "inherit" : "hidden");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
