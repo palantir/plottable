@@ -475,5 +475,145 @@ describe("Interactive Components", () => {
         svg.remove();
       });
     });
+
+    describe("moving", () => {
+      var svg: d3.Selection<void>;
+      var dbl: Plottable.Components.DragBoxLayer;
+      var target: d3.Selection<void>;
+      var midPoint = {
+        x: SVG_WIDTH / 2,
+        y: SVG_HEIGHT / 2
+      };
+      var dragDistance = 10;
+      var initialBounds: Plottable.Bounds;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        dbl = new Plottable.Components.DragBoxLayer();
+        dbl.renderTo(svg);
+
+        target = dbl.background();
+        dbl.bounds({
+          topLeft: { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4},
+          bottomRight: { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4}
+        });
+        dbl.boxVisible(true);
+        initialBounds = dbl.bounds();
+      });
+
+      it("get and set movable()", () => {
+        assert.isFalse(dbl.movable(), "defaults to false");
+        assert.isFalse(dbl.hasClass("movable"), "initially does not have \"movable\" CSS class");
+        assert.strictEqual(dbl.movable(true), dbl, "setter mode returns DragBoxLayer");
+        assert.isTrue(dbl.movable(), "set to true");
+        assert.isTrue(dbl.hasClass("movable"), "\"movable\" CSS class is applied");
+        svg.remove();
+      });
+
+      it("move left", () => {
+        dbl.movable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x - dragDistance, y: midPoint.y }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x - dragDistance, "left edge moved");
+        assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x - dragDistance, "right edge moved");
+        assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
+        assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
+        svg.remove();
+      });
+
+      it("move right", () => {
+        dbl.movable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x + dragDistance, y: midPoint.y }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x + dragDistance, "left edge moved");
+        assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x + dragDistance, "right edge moved");
+        assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge did not move");
+        assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge did not move");
+        svg.remove();
+      });
+
+      it("move up", () => {
+        dbl.movable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x, y: midPoint.y - dragDistance }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge did not move");
+        assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
+        assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y - dragDistance, "top edge moved");
+        assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y - dragDistance, "bottom edge moved");
+        svg.remove();
+      });
+
+      it("move down", () => {
+        dbl.movable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x, y: midPoint.y + dragDistance }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge did not move");
+        assert.strictEqual(bounds.bottomRight.x, initialBounds.bottomRight.x, "right edge did not move");
+        assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y + dragDistance, "top edge moved");
+        assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y + dragDistance, "bottom edge moved");
+        svg.remove();
+      });
+
+      it("does not move if grabbed within detectionRadius() while resizable()", () => {
+        dbl.movable(true);
+        dbl.resizable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: initialBounds.bottomRight.x, y: midPoint.y },
+          { x: SVG_WIDTH, y: midPoint.y }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.y, initialBounds.topLeft.y, "top edge was not moved");
+        assert.strictEqual(bounds.bottomRight.y, initialBounds.bottomRight.y, "bottom edge was not moved");
+        assert.strictEqual(bounds.topLeft.x, initialBounds.topLeft.x, "left edge was not moved");
+        assert.strictEqual(bounds.bottomRight.x, SVG_WIDTH, "right edge was repositioned");
+        svg.remove();
+      });
+
+      it("doesn't dismiss on no-op move", () => {
+        dbl.movable(true);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x, y: midPoint.y }
+        );
+        assert.isTrue(dbl.boxVisible(), "box remains visible");
+        var bounds = dbl.bounds();
+        assert.deepEqual(bounds, initialBounds, "bounds did not change");
+        svg.remove();
+      });
+
+      it("dismisses on click outside of box", () => {
+        dbl.movable(true);
+        var origin = { x: 0, y: 0 };
+        TestMethods.triggerFakeDragSequence(target, origin, origin);
+        assert.isFalse(dbl.boxVisible(), "box is no longer visible");
+        svg.remove();
+      });
+
+      it("starts new box if hidden instead of moving", () => {
+        dbl.movable(true);
+        dbl.boxVisible(false);
+        TestMethods.triggerFakeDragSequence(target,
+          { x: midPoint.x, y: midPoint.y },
+          { x: midPoint.x, y: midPoint.y + dragDistance }
+        );
+        var bounds = dbl.bounds();
+        assert.strictEqual(bounds.topLeft.x, midPoint.x, "new box was started at the drag start position (x)");
+        assert.strictEqual(bounds.topLeft.y, midPoint.y, "new box was started at the drag start position (y)");
+
+        svg.remove();
+      });
+    });
   });
 });

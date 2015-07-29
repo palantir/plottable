@@ -9,6 +9,7 @@ export module Plots {
     private static _SECTOR_VALUE_KEY = "sector-value";
     private _startAngles: number[];
     private _endAngles: number[];
+    private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
 
     /**
@@ -53,8 +54,8 @@ export module Plots {
     }
 
     protected _onDatasetUpdate() {
-      super._onDatasetUpdate();
       this._updatePieAngles();
+      super._onDatasetUpdate();
     }
 
     protected _createDrawer(dataset: Dataset) {
@@ -181,11 +182,32 @@ export module Plots {
       }
     }
 
+    /**
+     * Gets the Formatter for the labels.
+     */
+    public labelFormatter(): Formatter;
+    /**
+     * Sets the Formatter for the labels.
+     *
+     * @param {Formatter} formatter
+     * @returns {Pie} The calling Pie Plot.
+     */
+    public labelFormatter(formatter: Formatter): Pie;
+    public labelFormatter(formatter?: Formatter): any {
+      if (formatter == null) {
+        return this._labelFormatter;
+      } else {
+        this._labelFormatter = formatter;
+        this.render();
+        return this;
+      }
+    }
+
     /*
      * Gets the Entities at a particular Point.
-     * 
+     *
      * @param {Point} p
-     * @param {PlotEntity[]} 
+     * @param {PlotEntity[]}
      */
     public entitiesAt(queryPoint: Point) {
       var center = { x: this.width() / 2, y: this.height() / 2 };
@@ -269,6 +291,7 @@ export module Plots {
     }
 
     protected _additionalPaint(time: number) {
+      this._renderArea.select(".label-area").remove();
       if (this._labelsEnabled) {
         Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
@@ -308,7 +331,7 @@ export module Plots {
 
       for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
         var datum = dataset.data()[datumIndex];
-        var value = "" + this.sectorValue().accessor(datum, datumIndex, dataset);
+        var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
         var measurement = measurer.measure(value);
 
         var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
@@ -332,8 +355,14 @@ export module Plots {
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
-        var showLabel = sliceIndices.every((index) => index === datumIndex);
+        var showLabel = corners.every((corner) => {
+          return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
+        });
+
+        if (showLabel) {
+          var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+          showLabel = sliceIndices.every((index) => index === datumIndex);
+        }
 
         var color = attrToProjector["fill"](datum, datumIndex, dataset);
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);

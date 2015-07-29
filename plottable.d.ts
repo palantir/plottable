@@ -1900,6 +1900,22 @@ declare module Plottable {
              * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
+            /**
+             * Gets the approximate text width setting.
+             *
+             * @returns {boolean} The current text width approximation setting.
+             */
+            usesTextWidthApproximation(): boolean;
+            /**
+             * Sets the approximate text width setting. Approximating text width
+             * measurements can drastically speed up plot rendering, but the plot may
+             * have extra white space that would be eliminated by exact measurements.
+             * Additionally, very abnormal fonts may not approximate reasonably.
+             *
+             * @param {boolean} The new text width approximation setting.
+             * @returns {Axes.Numeric} The calling Axes.Numeric.
+             */
+            usesTextWidthApproximation(enable: boolean): Axes.Numeric;
         }
     }
 }
@@ -2618,6 +2634,17 @@ declare module Plottable {
              * @returns {Pie} The calling Pie Plot.
              */
             labelsEnabled(enabled: boolean): Pie;
+            /**
+             * Gets the Formatter for the labels.
+             */
+            labelFormatter(): Formatter;
+            /**
+             * Sets the Formatter for the labels.
+             *
+             * @param {Formatter} formatter
+             * @returns {Pie} The calling Pie Plot.
+             */
+            labelFormatter(formatter: Formatter): Pie;
             entitiesAt(queryPoint: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _getDataToDraw(): Utils.Map<Dataset, any[]>;
@@ -2818,6 +2845,13 @@ declare module Plottable {
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            entitiesAt(point: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -4052,6 +4086,17 @@ declare module Plottable {
              */
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
+            /**
+             * Gets whether or not the drag box is movable.
+             */
+            movable(): boolean;
+            /**
+             * Sets whether or not the drag box is movable.
+             *
+             * @param {boolean} movable
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            movable(movable: boolean): DragBoxLayer;
             /**
              * Sets the callback to be called when dragging starts.
              *

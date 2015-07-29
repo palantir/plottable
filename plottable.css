@@ -143,6 +143,19 @@ svg.plottable {
 .plottable .drag-box-layer.x-resizable.y-resizable .drag-corner-br {
   cursor: nwse-resize;
 }
+
+.plottable .drag-box-layer.movable .selection-area {
+  cursor: move; /* IE fallback */
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  cursor: grab;
+}
+
+.plottable .drag-box-layer.movable .selection-area:active {
+  cursor: -moz-grabbing;
+  cursor: -webkit-grabbing;
+  cursor: grabbing;
+}
 /* /DragBoxLayer */
 
 .plottable .legend text {

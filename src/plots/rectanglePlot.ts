@@ -231,6 +231,26 @@ export module Plots {
       return this;
     }
 
+    /**
+     * Gets the PlotEntities at a particular Point.
+     *
+     * @param {Point} point The point to query.
+     * @returns {PlotEntity[]} The PlotEntities at the particular point
+     */
+    public entitiesAt(point: Point) {
+      var attrToProjector = this._generateAttrToProjector();
+      return this.entities().filter((entity) => {
+        var datum = entity.datum;
+        var index = entity.index;
+        var dataset = entity.dataset;
+        var x = attrToProjector["x"](datum, index, dataset);
+        var y = attrToProjector["y"](datum, index, dataset);
+        var width = attrToProjector["width"](datum, index, dataset);
+        var height = attrToProjector["height"](datum, index, dataset);
+        return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+      });
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       var attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {
@@ -282,7 +302,6 @@ export module Plots {
       });
       return dataToDraw;
     }
-
   }
 }
 }

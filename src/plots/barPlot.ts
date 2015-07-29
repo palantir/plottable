@@ -428,7 +428,6 @@ export module Plots {
         var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
         var primary = this._isVertical ? h : w;
         var primarySpace = this._isVertical ? measurement.height : measurement.width;
-
         var secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         var secondaryAttrAvailableSpace = this._isVertical ? w : h;
         var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
@@ -441,9 +440,31 @@ export module Plots {
             x += offset;
           }
 
+          var showLabel = true;
+          var labelPosition = {
+            x: x,
+            y: positive ? y : y + h - measurement.height
+          };
+
+          if (this._isVertical) {
+            labelPosition.x = x + w / 2 - measurement.width / 2;
+          } else {
+            if (!positive) {
+              labelPosition.x = x + w - measurement.width;
+            } else {
+              labelPosition.x = x;
+            }
+          }
+
+          if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
+              labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
+            showLabel = false;
+          }
+
           var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
           var className = dark ? "dark-label" : "light-label";
           g.classed(className, true);
+          g.style("visibility", showLabel ? "inherit" : "hidden");
           var xAlign: string;
           var yAlign: string;
           if (this._isVertical) {
