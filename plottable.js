@@ -10511,6 +10511,7 @@ var Plottable;
                 _super.call(this);
                 this._detectionRadius = 3;
                 this._resizable = false;
+                this._movable = false;
                 this._hasCorners = true;
                 /*
                  * Enable clipPath to hide _detectionEdge s and _detectionCorner s
@@ -10532,46 +10533,68 @@ var Plottable;
                 var resizingEdges;
                 var topLeft;
                 var bottomRight;
-                var startedNewBox;
-                this._dragInteraction.onDragStart(function (s) {
-                    resizingEdges = _this._getResizingEdges(s);
-                    if (!_this.boxVisible() ||
-                        (!resizingEdges.top && !resizingEdges.bottom &&
-                            !resizingEdges.left && !resizingEdges.right)) {
-                        _this.bounds({
-                            topLeft: s,
-                            bottomRight: s
-                        });
-                        startedNewBox = true;
+                var lastEndPoint;
+                var DRAG_MODES = {
+                    newBox: 0,
+                    resize: 1,
+                    move: 2
+                };
+                var mode = DRAG_MODES.newBox;
+                this._dragInteraction.onDragStart(function (startPoint) {
+                    resizingEdges = _this._getResizingEdges(startPoint);
+                    var bounds = _this.bounds();
+                    var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+                        bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
+                    if (_this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
+                        mode = DRAG_MODES.resize;
+                    }
+                    else if (_this.boxVisible() && _this.movable() && isInsideBox) {
+                        mode = DRAG_MODES.move;
                     }
                     else {
-                        startedNewBox = false;
+                        mode = DRAG_MODES.newBox;
+                        _this.bounds({
+                            topLeft: startPoint,
+                            bottomRight: startPoint
+                        });
                     }
                     _this.boxVisible(true);
-                    var bounds = _this.bounds();
+                    bounds = _this.bounds();
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+                    lastEndPoint = startPoint;
                     _this._dragStartCallbacks.callCallbacks(bounds);
                 });
-                this._dragInteraction.onDrag(function (s, e) {
-                    if (startedNewBox) {
-                        bottomRight.x = e.x;
-                        bottomRight.y = e.y;
-                    }
-                    else {
-                        if (resizingEdges.bottom) {
-                            bottomRight.y = e.y;
-                        }
-                        else if (resizingEdges.top) {
-                            topLeft.y = e.y;
-                        }
-                        if (resizingEdges.right) {
-                            bottomRight.x = e.x;
-                        }
-                        else if (resizingEdges.left) {
-                            topLeft.x = e.x;
-                        }
+                this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                    switch (mode) {
+                        case DRAG_MODES.newBox:
+                            bottomRight.x = endPoint.x;
+                            bottomRight.y = endPoint.y;
+                            break;
+                        case DRAG_MODES.resize:
+                            if (resizingEdges.bottom) {
+                                bottomRight.y = endPoint.y;
+                            }
+                            else if (resizingEdges.top) {
+                                topLeft.y = endPoint.y;
+                            }
+                            if (resizingEdges.right) {
+                                bottomRight.x = endPoint.x;
+                            }
+                            else if (resizingEdges.left) {
+                                topLeft.x = endPoint.x;
+                            }
+                            break;
+                        case DRAG_MODES.move:
+                            var dx = endPoint.x - lastEndPoint.x;
+                            var dy = endPoint.y - lastEndPoint.y;
+                            topLeft.x += dx;
+                            topLeft.y += dy;
+                            bottomRight.x += dx;
+                            bottomRight.y += dy;
+                            lastEndPoint = endPoint;
+                            break;
                     }
                     _this.bounds({
                         topLeft: topLeft,
@@ -10579,8 +10602,8 @@ var Plottable;
                     });
                     _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
-                this._dragInteraction.onDragEnd(function (s, e) {
-                    if (startedNewBox && s.x === e.x && s.y === e.y) {
+                this._dragInteraction.onDragEnd(function (startPoint, endPoint) {
+                    if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
                         _this.boxVisible(false);
                     }
                     _this._dragEndCallbacks.callCallbacks(_this.bounds());
@@ -10697,6 +10720,19 @@ var Plottable;
                     this.removeClass("x-resizable");
                     this.removeClass("y-resizable");
                 }
+            };
+            DragBoxLayer.prototype.movable = function (movable) {
+                if (movable == null) {
+                    return this._movable;
+                }
+                this._movable = movable;
+                if (movable) {
+                    this.addClass("movable");
+                }
+                else {
+                    this.removeClass("movable");
+                }
+                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
