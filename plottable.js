@@ -7238,6 +7238,25 @@ var Plottable;
                 this.render();
                 return this;
             };
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            Rectangle.prototype.entitiesAt = function (point) {
+                var attrToProjector = this._generateAttrToProjector();
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = attrToProjector["x"](datum, index, dataset);
+                    var y = attrToProjector["y"](datum, index, dataset);
+                    var width = attrToProjector["width"](datum, index, dataset);
+                    var height = attrToProjector["height"](datum, index, dataset);
+                    return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+                });
+            };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 if (this.x2() != null) {

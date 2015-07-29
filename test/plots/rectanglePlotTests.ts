@@ -13,7 +13,6 @@ describe("Plots", () => {
       { x: 3, y: 3, x2: 4, y2: 4 },
       { x: 4, y: 4, x2: 5, y2: 5 }
     ];
-
     var VERIFY_CELLS = (cells: d3.Selection<any>) => {
       assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: any, i: number) {
@@ -37,6 +36,46 @@ describe("Plots", () => {
                    .y2((d) => d.y2)
                    .renderTo(svg);
       VERIFY_CELLS((<any> rectanglePlot)._renderArea.selectAll("rect"));
+      svg.remove();
+    });
+
+    it("retrieves the correct entity under a point", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dataset = new Plottable.Dataset(DATA);
+      var plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2);
+      plot.addDataset(dataset).renderTo(svg);
+      var entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
+      assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
+      svg.remove();
+    });
+
+    it("retrieves correct entities under a point", () => {
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dataset = new Plottable.Dataset([
+        { x: 1, y: 1, x2: 3, y2: 3 },
+        { x: 4, y: 2, x2: 2, y2: 4 }
+      ]);
+      var plot = new Plottable.Plots.Rectangle()
+        .x((d) => d.x, xScale).x2((d) => d.x2)
+        .y((d) => d.y, yScale).y2((d) => d.y2);
+      plot.addDataset(dataset).renderTo(svg);
+      var entities = plot.entitiesAt({ x: xScale.scale(2), y: xScale.scale(2) });
+      assert.lengthOf(entities, 2, "two entities when querying a point in both");
+      assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
+      assert.strictEqual(entities[1].index, 1, "entity retrieved is at index 1");
+      entities = plot.entitiesAt({ x: xScale.scale(4), y: yScale.scale(4) });
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the second rectangle");
+      assert.strictEqual(entities[0].index, 1, "entity retrieved is at index 1");
+      entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the first rectangle");
+      assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
       svg.remove();
     });
 
@@ -366,8 +405,6 @@ describe("Plots", () => {
 
         svg.remove();
       });
-
     });
-
   });
 });
