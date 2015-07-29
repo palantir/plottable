@@ -105,6 +105,21 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
+    it("throws error on getting y scale", () => {
+      var dbl = new Plottable.Components.XDragBoxLayer();
+      assert.throws(() => dbl.yScale(), "no yScale");
+    });
+
+    it("throws error on setting y scale", () => {
+      var dbl = new Plottable.Components.XDragBoxLayer();
+      assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "yScales cannot be set");
+    });
+
+    it("throws error on getting y extent", () => {
+      var dbl = new Plottable.Components.XDragBoxLayer();
+      assert.throws(() => dbl.yExtent(), "no yExtent");
+    });
+
     it("moves only in x", () => {
       var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var dbl = new Plottable.Components.XDragBoxLayer();

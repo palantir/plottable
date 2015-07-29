@@ -2347,6 +2347,51 @@ declare module Plottable {
             boxVisible(show: boolean): SelectionBoxLayer;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * Gets the x scale for this SelectionBoxLayer.
+             */
+            xScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the x scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            xScale(xScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the y scale for this SelectionBoxLayer.
+             */
+            yScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the y scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            yScale(yScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the data values backing the left and right edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
+            destroy(): void;
         }
     }
 }
@@ -4124,6 +4169,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }
@@ -4142,6 +4196,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }
