@@ -48,8 +48,8 @@ describe("Plots", () => {
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2);
       plot.addDataset(dataset).renderTo(svg);
-      var entities = plot.entitiesAt({ x: 140, y: 140 });
-      assert.lengthOf(entities, 1, "a single entity is retrieved at (140, 140)");
+      var entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
       assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
       svg.remove();
     });
@@ -71,10 +71,10 @@ describe("Plots", () => {
       assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
       assert.strictEqual(entities[1].index, 1, "entity retrieved is at index 1");
       entities = plot.entitiesAt({ x: xScale.scale(4), y: yScale.scale(4) });
-      assert.lengthOf(entities, 1, "one entity retrieved");
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the second rectangle");
       assert.strictEqual(entities[0].index, 1, "entity retrieved is at index 1");
       entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
-      assert.lengthOf(entities, 1, "one entity retrieved");
+      assert.lengthOf(entities, 1, "found only one entity when querying a point inside the first rectangle");
       assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
       svg.remove();
     });
