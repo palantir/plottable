@@ -66,13 +66,15 @@ describe("Plots", () => {
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2);
       plot.addDataset(dataset).renderTo(svg);
-      var entities = plot.entitiesAt({ x: 150, y: 150 });
-      assert.lengthOf(entities, 2, "two entities are retrieved at (150, 150)");
-      entities = plot.entitiesAt({ x: 200, y: 50 });
-      assert.lengthOf(entities, 1, "one entity is retrieved at (200, 50)");
+      var entities = plot.entitiesAt({ x: xScale.scale(2), y: xScale.scale(2) });
+      assert.lengthOf(entities, 2, "two entities when querying a point in both");
+      assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
+      assert.strictEqual(entities[1].index, 1, "entity retrieved is at index 1");
+      entities = plot.entitiesAt({ x: xScale.scale(4), y: yScale.scale(4) });
+      assert.lengthOf(entities, 1, "one entity retrieved");
       assert.strictEqual(entities[0].index, 1, "entity retrieved is at index 1");
-      entities = plot.entitiesAt({ x: 50, y: 200 });
-      assert.lengthOf(entities, 1, "one entity is retrieved at (50, 200)");
+      entities = plot.entitiesAt({ x: xScale.scale(1), y: yScale.scale(1) });
+      assert.lengthOf(entities, 1, "one entity retrieved");
       assert.strictEqual(entities[0].index, 0, "entity retrieved is at index 0");
       svg.remove();
     });
