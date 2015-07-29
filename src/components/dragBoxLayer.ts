@@ -74,12 +74,12 @@ export module Components {
       };
       var mode = DRAG_MODES.newBox;
 
-      this._dragInteraction.onDragStart((s: Point) => {
-        resizingEdges = this._getResizingEdges(s);
+      this._dragInteraction.onDragStart((startPoint: Point) => {
+        resizingEdges = this._getResizingEdges(startPoint);
 
         var bounds = this.bounds();
-        var isInsideBox = bounds.topLeft.x <= s.x && s.x <= bounds.bottomRight.x &&
-                          bounds.topLeft.y <= s.y && s.y <= bounds.bottomRight.y;
+        var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+                          bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
 
         if (this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
           mode = DRAG_MODES.resize;
@@ -88,8 +88,8 @@ export module Components {
         } else {
           mode = DRAG_MODES.newBox;
           this.bounds({
-            topLeft: s,
-            bottomRight: s
+            topLeft: startPoint,
+            bottomRight: startPoint
           });
         }
 
@@ -98,34 +98,38 @@ export module Components {
         // copy points so changes to topLeft and bottomRight don't mutate bounds
         topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
         bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
-        lastEndPoint = s;
+        lastEndPoint = startPoint;
         this._dragStartCallbacks.callCallbacks(bounds);
       });
 
-      this._dragInteraction.onDrag((s: Point, e: Point) => {
-        if (mode === DRAG_MODES.newBox) {
-          bottomRight.x = e.x;
-          bottomRight.y = e.y;
-        } else if (mode === DRAG_MODES.resize) {
-          if (resizingEdges.bottom) {
-            bottomRight.y = e.y;
-          } else if (resizingEdges.top) {
-            topLeft.y = e.y;
-          }
+      this._dragInteraction.onDrag((startPoint: Point, endPoint: Point) => {
+        switch (mode) {
+          case DRAG_MODES.newBox:
+            bottomRight.x = endPoint.x;
+            bottomRight.y = endPoint.y;
+            break;
+          case DRAG_MODES.resize:
+            if (resizingEdges.bottom) {
+              bottomRight.y = endPoint.y;
+            } else if (resizingEdges.top) {
+              topLeft.y = endPoint.y;
+            }
 
-          if (resizingEdges.right) {
-            bottomRight.x = e.x;
-          } else if (resizingEdges.left) {
-            topLeft.x = e.x;
-          }
-        } else {
-          var dx = e.x - lastEndPoint.x;
-          var dy = e.y - lastEndPoint.y;
-          topLeft.x += dx;
-          topLeft.y += dy;
-          bottomRight.x += dx;
-          bottomRight.y += dy;
-          lastEndPoint = e;
+            if (resizingEdges.right) {
+              bottomRight.x = endPoint.x;
+            } else if (resizingEdges.left) {
+              topLeft.x = endPoint.x;
+            }
+            break;
+          case DRAG_MODES.move:
+            var dx = endPoint.x - lastEndPoint.x;
+            var dy = endPoint.y - lastEndPoint.y;
+            topLeft.x += dx;
+            topLeft.y += dy;
+            bottomRight.x += dx;
+            bottomRight.y += dy;
+            lastEndPoint = endPoint;
+            break;
         }
 
         this.bounds({
@@ -136,8 +140,8 @@ export module Components {
         this._dragCallbacks.callCallbacks(this.bounds());
       });
 
-      this._dragInteraction.onDragEnd((s: Point, e: Point) => {
-        if (mode === DRAG_MODES.newBox && s.x === e.x && s.y === e.y) {
+      this._dragInteraction.onDragEnd((startPoint: Point, endPoint: Point) => {
+        if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
           this.boxVisible(false);
         }
 
