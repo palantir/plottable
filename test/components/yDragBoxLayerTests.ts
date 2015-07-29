@@ -108,17 +108,17 @@ describe("Interactive Components", () => {
 
     it("throws error on getting x scale", () => {
       var dbl = new Plottable.Components.YDragBoxLayer();
-      assert.throws(() => dbl.xScale(), "no x scale");
+      assert.throws(() => dbl.xScale(), "no xScale");
     });
 
     it("throws error on setting x scale", () => {
       var dbl = new Plottable.Components.YDragBoxLayer();
-      assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "x scales cannot be set");
+      assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "xScales cannot be set");
     });
 
     it("throws error on getting x extent", () => {
       var dbl = new Plottable.Components.YDragBoxLayer();
-      assert.throws(() => dbl.xExtent(), "no x extent");
+      assert.throws(() => dbl.xExtent(), "no xExtent");
     });
   });
 });
