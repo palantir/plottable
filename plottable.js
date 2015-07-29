@@ -7211,7 +7211,7 @@ var Plottable;
                 return this;
             };
             /**
-             * Gets the Entities at a particular Point.
+             * Gets the PlotEntities at a particular Point.
              *
              * @param {Point} point The point to query.
              * @returns {PlotEntity[]} The PlotEntities at the particular point
