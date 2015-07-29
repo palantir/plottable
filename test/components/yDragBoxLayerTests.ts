@@ -62,8 +62,7 @@ describe("Interactive Components", () => {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT * 3 / 4
       };
-      var target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+      TestMethods.triggerFakeDragSequence(dbl.background(), actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
       assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
@@ -129,8 +128,7 @@ describe("Interactive Components", () => {
 
       var boundsBefore = dbl.bounds();
       var dragDistance = 10;
-      var target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target,
+      TestMethods.triggerFakeDragSequence(dbl.background(),
         { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 },
         { x: SVG_WIDTH / 2 + dragDistance, y: SVG_HEIGHT / 2 + dragDistance }
       );

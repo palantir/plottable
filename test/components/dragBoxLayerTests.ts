@@ -506,8 +506,6 @@ describe("Interactive Components", () => {
         assert.strictEqual(dbl.movable(true), dbl, "setter mode returns DragBoxLayer");
         assert.isTrue(dbl.movable(), "set to true");
         assert.isTrue(dbl.hasClass("movable"), "\"movable\" CSS class is applied");
-        // assert.isTrue(dbl.hasClass("x-movable"), "\"x-movable\" CSS class is applied");
-        // assert.isTrue(dbl.hasClass("y-movable"), "\"y-movable\" CSS class is applied");
         svg.remove();
       });
 
