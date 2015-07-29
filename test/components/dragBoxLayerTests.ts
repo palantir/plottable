@@ -503,6 +503,7 @@ describe("Interactive Components", () => {
 
       it("get and set movable()", () => {
         assert.isFalse(dbl.movable(), "defaults to false");
+        assert.isFalse(dbl.hasClass("movable"), "initially does not have \"movable\" CSS class");
         assert.strictEqual(dbl.movable(true), dbl, "setter mode returns DragBoxLayer");
         assert.isTrue(dbl.movable(), "set to true");
         assert.isTrue(dbl.hasClass("movable"), "\"movable\" CSS class is applied");
@@ -589,6 +590,14 @@ describe("Interactive Components", () => {
         assert.isTrue(dbl.boxVisible(), "box remains visible");
         var bounds = dbl.bounds();
         assert.deepEqual(bounds, initialBounds, "bounds did not change");
+        svg.remove();
+      });
+
+      it("dismisses on click outside of box", () => {
+        dbl.movable(true);
+        var origin = { x: 0, y: 0 };
+        TestMethods.triggerFakeDragSequence(target, origin, origin);
+        assert.isFalse(dbl.boxVisible(), "box is no longer visible");
         svg.remove();
       });
 
