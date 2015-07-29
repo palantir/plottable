@@ -118,29 +118,6 @@ describe("Interactions", () => {
         keyInteraction.offKeyPress(aCode, aCallback2);
         svg.remove();
       });
-
-      it("passes correct keycode and event to callback", () => {
-        var callbackCalled = false;
-        var callbackKeyCode: number;
-        var callbackEvent: KeyboardEvent;
-        var callback = (keyCode: number, event: KeyboardEvent) => {
-          callbackKeyCode = keyCode;
-          callbackEvent = event;
-          callbackCalled = true;
-        };
-
-        keyInteraction.onKeyPress(aCode, callback);
-        keyInteraction.attachTo(component);
-
-        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
-        var fakeKeyboardEvent = TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
-        assert.isTrue(callbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
-        assert.strictEqual(callbackKeyCode, aCode, "keycode was passed to callback correctly");
-        assert.strictEqual(callbackEvent, fakeKeyboardEvent, "keyboardEvent was passed to callback correctly");
-
-        keyInteraction.offKeyPress(aCode, callback);
-        svg.remove();
-      });
     });
 
     describe("onKeyRelease", () => {
@@ -290,30 +267,6 @@ describe("Interactions", () => {
         assert.isTrue(aCallback2Called, "callback 2 for \"a\" is still connected to the interaction");
 
         keyInteraction.offKeyRelease(aCode, aCallback2);
-        svg.remove();
-      });
-
-      it("passes correct keycode and event to callback", () => {
-        var callbackCalled = false;
-        var callbackKeyCode: number;
-        var callbackEvent: KeyboardEvent;
-        var callback = (keyCode: number, event: KeyboardEvent) => {
-          callbackKeyCode = keyCode;
-          callbackEvent = event;
-          callbackCalled = true;
-        };
-
-        keyInteraction.onKeyRelease(aCode, callback);
-        keyInteraction.attachTo(component);
-
-        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
-        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
-        var fakeKeyboardEvent = TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
-        assert.isTrue(callbackCalled, "callback for \"a\" was called when \"a\" key was pressed");
-        assert.strictEqual(callbackKeyCode, aCode, "keycode was passed to callback correctly");
-        assert.strictEqual(callbackEvent, fakeKeyboardEvent, "keyboardEvent was passed to callback correctly");
-
-        keyInteraction.offKeyRelease(aCode, callback);
         svg.remove();
       });
     });
