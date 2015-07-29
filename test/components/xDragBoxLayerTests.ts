@@ -110,5 +110,10 @@ describe("Interactive Components", () => {
       var dbl = new Plottable.Components.XDragBoxLayer();
       assert.throws(() => dbl.yScale(new Plottable.Scales.Linear()), "y scales cannot be set");
     });
+
+    it("throws error on getting y extent", () => {
+      var dbl = new Plottable.Components.XDragBoxLayer();
+      assert.throws(() => dbl.yExtent(), "no y extent");
+    });
   });
 });

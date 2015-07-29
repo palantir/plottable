@@ -10832,6 +10832,9 @@ var Plottable;
                 }
                 throw new Error("y scales cannot be set on an XDragBoxLayer");
             };
+            XDragBoxLayer.prototype.yExtent = function () {
+                throw new Error("XDragBoxLayer has no y extent");
+            };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
         Components.XDragBoxLayer = XDragBoxLayer;
@@ -10886,6 +10889,9 @@ var Plottable;
                     return _super.prototype.xScale.call(this);
                 }
                 throw new Error("x scales cannot be set on an YDragBoxLayer");
+            };
+            YDragBoxLayer.prototype.xExtent = function () {
+                throw new Error("YDragBoxLayer has no x extent");
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);

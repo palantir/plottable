@@ -44,6 +44,11 @@ export module Components {
       }
       throw new Error("x scales cannot be set on an YDragBoxLayer");
     }
+
+    public xExtent(): (number | { valueOf(): number })[] {
+      throw new Error("YDragBoxLayer has no x extent");
+    }
+
   }
 }
 }
