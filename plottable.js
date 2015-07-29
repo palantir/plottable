@@ -1920,7 +1920,9 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-                var linearTicks = [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearMin = Math.max(min, -this._pivot);
+                var linearMax = Math.min(max, this._pivot);
+                var linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
