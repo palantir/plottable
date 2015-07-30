@@ -147,6 +147,7 @@ export module Formatters {
    */
   export function shortScale(precision = 3) {
     verifyPrecision(precision);
+    precision = Math.floor(precision);
     var suffixes = "KMBTQ";
     var exponentFormatter = d3.format("." + precision + "e");
     var fixedFormatter = d3.format("." + precision + "f");

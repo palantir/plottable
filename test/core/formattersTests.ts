@@ -254,6 +254,11 @@ describe("Formatters", () => {
       assert.strictEqual(formatter(0.9), "9e-1", "Round up is not applied for very small positive numbers");
       assert.strictEqual(formatter(0), "0", "0 gets formatted well");
     });
+
+    it("non-integer precision rounds down", () => {
+      assert.strictEqual(Plottable.Formatters.shortScale(1.1)(3), "3.0", "Precision of 1.1 should be same as precision of 1")
+      assert.strictEqual(Plottable.Formatters.shortScale(1.9)(3), "3.0", "Precision of 1.9 should be same as precision of 1")
+    });
   });
 
   describe("relativeDate", () => {
