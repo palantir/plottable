@@ -256,8 +256,8 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision rounds down", () => {
-      assert.strictEqual(Plottable.Formatters.shortScale(1.1)(3), "3.0", "Precision of 1.1 should be same as precision of 1")
-      assert.strictEqual(Plottable.Formatters.shortScale(1.9)(3), "3.0", "Precision of 1.9 should be same as precision of 1")
+      assert.strictEqual(Plottable.Formatters.shortScale(1.1)(3), "3.0", "Precision of 1.1 should be same as precision of 1");
+      assert.strictEqual(Plottable.Formatters.shortScale(1.9)(3), "3.0", "Precision of 1.9 should be same as precision of 1");
     });
   });
 
