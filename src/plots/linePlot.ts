@@ -40,6 +40,7 @@ export module Plots {
         return this._interpolationFunction;
       }
       this._interpolationFunction = interpolate;
+      this.render();
       return this;
     }
 

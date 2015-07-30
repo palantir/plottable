@@ -71,7 +71,6 @@ describe("Plots", () => {
         assert.isNull(svgPath.match(/H/g), "no horizontal lines");
 
         linePlot.interpolate("step");
-        linePlot.render();
 
         svgPath = linePlot.content().select("path").attr("d");
         assert.lengthOf(svgPath.match(/V/g), data.length - 1, "one vertical line for each pair of consecutive points");

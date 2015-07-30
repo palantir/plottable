@@ -7931,6 +7931,7 @@ var Plottable;
                     return this._interpolationFunction;
                 }
                 this._interpolationFunction = interpolate;
+                this.render();
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
