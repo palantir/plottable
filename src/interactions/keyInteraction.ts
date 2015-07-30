@@ -16,8 +16,8 @@ export module Interactions {
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
     private _downedKeys = new Plottable.Utils.Set();
-    private _keyDownCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyDownEvent(keyCode, event);
-    private _keyUpCallback = (keyCode: number, event: KeyboardEvent) => this._handleKeyUpEvent(keyCode, event);
+    private _keyDownCallback = (keyCode: number) => this._handleKeyDownEvent(keyCode);
+    private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
     protected _anchor(component: Component) {
       super._anchor(component);
@@ -41,19 +41,19 @@ export module Interactions {
       this._keyDispatcher = null;
     }
 
-    private _handleKeyDownEvent(keyCode: number, event: KeyboardEvent) {
+    private _handleKeyDownEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
       if (this._isInsideComponent(p)) {
         if (this._keyPressCallbacks[keyCode]) {
-          this._keyPressCallbacks[keyCode].callCallbacks(keyCode, event);
+          this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
         }
         this._downedKeys.add(keyCode);
       }
     }
 
-    private _handleKeyUpEvent(keyCode: number, event: KeyboardEvent) {
+    private _handleKeyUpEvent(keyCode: number) {
       if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
-        this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode, event);
+        this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
       }
       this._downedKeys.delete(keyCode);
     }

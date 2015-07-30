@@ -1,5 +1,5 @@
 /*!
-Plottable 1.4.0 (https://github.com/palantir/plottable)
+Plottable 1.3.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.4.0";
+    Plottable.version = "1.3.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -9806,8 +9806,8 @@ var Plottable;
                 this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._downedKeys = new Plottable.Utils.Set();
-                this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
-                this._keyUpCallback = function (keyCode, event) { return _this._handleKeyUpEvent(keyCode, event); };
+                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -9825,18 +9825,18 @@ var Plottable;
                 this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyDownEvent = function (keyCode, event) {
+            Key.prototype._handleKeyDownEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
                 if (this._isInsideComponent(p)) {
                     if (this._keyPressCallbacks[keyCode]) {
-                        this._keyPressCallbacks[keyCode].callCallbacks(keyCode, event);
+                        this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
                     }
                     this._downedKeys.add(keyCode);
                 }
             };
-            Key.prototype._handleKeyUpEvent = function (keyCode, event) {
+            Key.prototype._handleKeyUpEvent = function (keyCode) {
                 if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
-                    this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode, event);
+                    this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
                 }
                 this._downedKeys.delete(keyCode);
             };
