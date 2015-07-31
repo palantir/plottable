@@ -141,7 +141,7 @@ describe("Scales", () => {
         scale.niceDomain(true);
         assert.deepEqual(scale.domain(), [1, 3.2], "nice domain can be activated back");
       });
-    })
+    });
 
     it("custom tick generator", () => {
       var scale = new Plottable.Scales.Linear();
