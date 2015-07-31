@@ -120,6 +120,29 @@ describe("Scales", () => {
       assert.deepEqual(scale.domain(), [-1, 5], "Regular domains still accepted");
     });
 
+    describe("nice domain", () => {
+      it("nice domain setter and getter", () => {
+        var scale = new Plottable.Scales.Linear();
+
+        assert.strictEqual(scale.niceDomain(), true, "scales make their domain nice by default");
+        assert.strictEqual(scale.niceDomain(false), scale, "setting disabling nice domain returns the scale");
+        assert.strictEqual(scale.niceDomain(), false, "the domain is no longer nice");
+      });
+
+      it("nice domain works", () => {
+        var scale = new Plottable.Scales.Linear();
+        scale.addIncludedValuesProvider(function() {
+          return [1.123123123, 3.123123123];
+        });
+
+        assert.deepEqual(scale.domain(), [1, 3.2], "nice domain works");
+        scale.niceDomain(false);
+        assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "nice domain can be deactivated");
+        scale.niceDomain(true);
+        assert.deepEqual(scale.domain(), [1, 3.2], "nice domain can be activated back");
+      });
+    })
+
     it("custom tick generator", () => {
       var scale = new Plottable.Scales.Linear();
       scale.domain([0, 10]);

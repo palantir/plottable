@@ -159,7 +159,13 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     return ([newMin, newMax]);
   }
 
+  /**
+   * Gets whether or not the scale will have a nice domain.
+   */
   public niceDomain(): boolean;
+  /**
+   * Sets whether or not the scale will have a nice domain.
+   */
   public niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
   public niceDomain(niceDomainEnabled?: boolean): any {
     if (niceDomainEnabled == null) {

@@ -869,7 +869,13 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        /**
+         * Gets whether or not the scale will have a nice domain.
+         */
         niceDomain(): boolean;
+        /**
+         * Sets whether or not the scale will have a nice domain.
+         */
         niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
