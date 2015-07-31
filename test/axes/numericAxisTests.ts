@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("NumericAxis", () => {
   function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {
     if (inner.left < outer.left - epsilon) { return false; }

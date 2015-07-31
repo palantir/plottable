@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Interactions", () => {
   describe("KeyInteraction", () => {
     it("Triggers appropriate callback for the key pressed", () => {

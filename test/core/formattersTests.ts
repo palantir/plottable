@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Formatters", () => {
   describe("fixed", () => {
     it("shows exactly [precision] digits", () => {

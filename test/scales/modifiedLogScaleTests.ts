@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Scales", () => {
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scales.ModifiedLog;

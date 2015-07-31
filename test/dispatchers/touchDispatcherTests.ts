@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Dispatchers", () => {
   describe("Touch Dispatcher", () => {
     it("getDispatcher() creates only one Dispatcher.Touch per <svg>", () => {

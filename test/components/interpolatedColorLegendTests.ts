@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("InterpolatedColorLegend", () => {
   var svg: d3.Selection<void>;
   var colorScale: Plottable.Scales.InterpolatedColor;
