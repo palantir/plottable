@@ -173,6 +173,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     }
 
     this._niceDomainEnabled = niceDomainEnabled;
+    this._autoDomainIfAutomaticMode();
     return this;
   }
 

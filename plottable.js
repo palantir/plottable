@@ -1678,6 +1678,7 @@ var Plottable;
                 return this._niceDomainEnabled;
             }
             this._niceDomainEnabled = niceDomainEnabled;
+            this._autoDomainIfAutomaticMode();
             return this;
         };
         QuantitativeScale.prototype._expandSingleValueDomain = function (singleValueDomain) {
