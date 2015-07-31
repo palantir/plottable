@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Utils", () => {
   describe("CallbackSet", () => {
     it("callCallbacks()", () => {

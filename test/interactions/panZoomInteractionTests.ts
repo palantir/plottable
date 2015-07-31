@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
     var svg: d3.Selection<void>;

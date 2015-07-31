@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Formatters", () => {
   describe("fixed", () => {
     it("shows exactly [precision] digits", () => {

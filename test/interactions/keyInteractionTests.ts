@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Interactions", () => {
   describe("KeyInteraction", () => {
     it("Triggers appropriate callback for the key pressed", () => {

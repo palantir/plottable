@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Legend", () => {
   var svg: d3.Selection<void>;
   var color: Plottable.Scales.Color;

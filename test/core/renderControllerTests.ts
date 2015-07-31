@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("RenderController", () => {
   // HACKHACK: #2083
   it.skip("Components whose render() is triggered by another Component's render() will be drawn", () => {

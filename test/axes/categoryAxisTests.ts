@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Category Axes", () => {
   it("re-renders appropriately when data is changed", () => {
     var svg = TestMethods.generateSVG(400, 400);

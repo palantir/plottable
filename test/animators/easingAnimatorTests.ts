@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Animators", () => {
   describe("EasingAnimator", () => {
     describe("Time computations", () => {

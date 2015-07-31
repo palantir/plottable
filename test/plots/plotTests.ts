@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 

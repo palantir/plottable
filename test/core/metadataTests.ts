@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Metadata", () => {
   var xScale: Plottable.Scales.Linear;
   var yScale: Plottable.Scales.Linear;

@@ -1,5 +1,3 @@
-///<reference path="testReference.ts" />
-
 module Mocks {
   export class FixedSizeComponent extends Plottable.Component {
     public fsWidth: number;

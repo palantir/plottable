@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("SelectionBoxLayer", () => {
   it("boxVisible()", () => {
     var svg = TestMethods.generateSVG();

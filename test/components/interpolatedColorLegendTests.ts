@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("InterpolatedColorLegend", () => {
   var svg: d3.Selection<void>;
   var colorScale: Plottable.Scales.InterpolatedColor;

@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
     it("_connect() and _disconnect()", () => {

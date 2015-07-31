@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Scales", () => {
   describe("Modified Log Scale", () => {
     var scale: Plottable.Scales.ModifiedLog;
