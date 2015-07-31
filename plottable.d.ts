@@ -869,6 +869,8 @@ declare module Plottable {
          * @returns {QuantitativeScale} The calling QuantitativeScale.
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
+        niceDomain(): boolean;
+        niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.
@@ -3005,6 +3007,9 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            y(): Plots.AccessorScaleBinding<number, number>;
+            y(y: number | Accessor<number>): Plots.Line<X>;
+            y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
             autorangeSmooth(): boolean;
             autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;

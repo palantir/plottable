@@ -23,6 +23,16 @@ export module Plots {
       this.attr("stroke-width", "2px");
     }
 
+    public y(): Plots.AccessorScaleBinding<number, number>;
+    public y(y: number | Accessor<number>): Plots.Line<X>;
+    public y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
+    public y(y?: number | Accessor<number> | number | Accessor<number>, yScale?: Scale<number, number>): any {
+      if (yScale instanceof QuantitativeScale) {
+        (<QuantitativeScale<number>>yScale).niceDomain(!this._autorangeSmooth);
+      }
+      return super.y(y, yScale);
+    }
+
     public autorangeSmooth(): boolean;
     public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
     public autorangeSmooth(autorangeSmooth?: boolean): any {
@@ -30,6 +40,11 @@ export module Plots {
         return this._autorangeSmooth;
       }
       this._autorangeSmooth = autorangeSmooth;
+
+      if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
+        (<QuantitativeScale<number>>this.y().scale).niceDomain(!autorangeSmooth);
+      }
+
       this.autorangeMode(this.autorangeMode());
       return this;
     }
@@ -213,6 +228,7 @@ export module Plots {
       this.datasets().forEach((dataset) => dataToDraw.set(dataset, [dataset.data()]));
       return dataToDraw;
     }
+
   }
 }
 }

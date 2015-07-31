@@ -8,6 +8,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
+  private _niceDomainEnabled = true;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -152,7 +153,21 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     });
     var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    return this._niceDomain([newMin, newMax]);
+    if (this._niceDomainEnabled) {
+      return this._niceDomain([newMin, newMax]);
+    }
+    return ([newMin, newMax]);
+  }
+
+  public niceDomain(): boolean;
+  public niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
+  public niceDomain(niceDomainEnabled?: boolean): any {
+    if (niceDomainEnabled == null) {
+      return this._niceDomainEnabled;
+    }
+
+    this._niceDomainEnabled = niceDomainEnabled;
+    return this;
   }
 
   protected _expandSingleValueDomain(singleValueDomain: D[]): D[] {
