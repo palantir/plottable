@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Animators", () => {
   describe("EasingAnimator", () => {
     describe("Time computations", () => {

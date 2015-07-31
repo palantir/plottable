@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Metadata", () => {
   var xScale: Plottable.Scales.Linear;
   var yScale: Plottable.Scales.Linear;

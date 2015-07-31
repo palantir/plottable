@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Gridlines", () => {
   it("Gridlines and axis tick marks align", () => {
     var svg = TestMethods.generateSVG(640, 480);
