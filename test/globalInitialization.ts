@@ -5,6 +5,8 @@ interface Window {
   Pixel_CloseTo_Requirement: number;
 }
 
+var assert = chai.assert;
+
 before(() => {
   // Set the render policy to immediate to make sure ETE tests can check DOM change immediately
   Plottable.RenderController.renderPolicy("immediate");

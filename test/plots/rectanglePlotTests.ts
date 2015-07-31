@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Plots", () => {
   describe("RectanglePlot", () => {
     var SVG_WIDTH = 300;

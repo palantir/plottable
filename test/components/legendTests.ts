@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Legend", () => {
   var svg: d3.Selection<void>;
   var color: Plottable.Scales.Color;

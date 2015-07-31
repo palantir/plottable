@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     var svg = TestMethods.generateSVG();
