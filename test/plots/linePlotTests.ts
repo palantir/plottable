@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below

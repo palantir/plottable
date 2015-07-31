@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("InterpolatedColorLegend", () => {
   var svg: d3.Selection<void>;

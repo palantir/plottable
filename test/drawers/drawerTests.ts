@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 class MockAnimator implements Plottable.Animator {
   private _time: number;

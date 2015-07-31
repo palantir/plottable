@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;

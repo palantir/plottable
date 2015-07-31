@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
