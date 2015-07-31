@@ -2193,8 +2193,7 @@ declare module d3 {
             interpolate(interpolate: "cardinal-open"): Line<T>;
             interpolate(interpolate: "cardinal-closed"): Line<T>;
             interpolate(interpolate: "monotone"): Line<T>;
-            interpolate(interpolate: string): Line<T>;
-            interpolate(interpolate: (points: Array<[number, number]>) => string): Line<T>;
+            interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Line<T>;
 
             tension(): number;
             tension(tension: number): Line<T>;
@@ -2232,8 +2231,7 @@ declare module d3 {
                 interpolate(interpolate: "cardinal-open"): Radial<T>;
                 interpolate(interpolate: "cardinal-closed"): Radial<T>;
                 interpolate(interpolate: "monotone"): Radial<T>;
-                interpolate(interpolate: string): Radial<T>;
-                interpolate(interpolate: (points: Array<[number, number]>) => string): Radial<T>;
+                interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Radial<T>;
 
                 tension(): number;
                 tension(tension: number): Radial<T>;
@@ -2283,7 +2281,7 @@ declare module d3 {
             interpolate(interpolate: "cardinal"): Area<T>;
             interpolate(interpolate: "cardinal-open"): Area<T>;
             interpolate(interpolate: "monotone"): Area<T>;
-            interpolate(interpolate: string): Area<T>;
+            interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Area<T>;
 
             tension(): number;
             tension(tension: number): Area<T>;
@@ -2333,8 +2331,7 @@ declare module d3 {
                 interpolate(interpolate: "cardinal"): Radial<T>;
                 interpolate(interpolate: "cardinal-open"): Radial<T>;
                 interpolate(interpolate: "monotone"): Radial<T>;
-                interpolate(interpolate: string): Radial<T>;
-                interpolate(interpolate: (points: Array<[number, number]>) => string): Radial<T>;
+                interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Radial<T>;
 
                 tension(): number;
                 tension(tension: number): Radial<T>;
