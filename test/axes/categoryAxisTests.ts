@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("Category Axes", () => {
   it("re-renders appropriately when data is changed", () => {

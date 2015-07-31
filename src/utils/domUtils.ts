@@ -1,3 +1,4 @@
+/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export module Utils {
