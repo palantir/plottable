@@ -1,5 +1,5 @@
 /*!
-Plottable 1.4.0 (https://github.com/palantir/plottable)
+Plottable 1.5.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.4.0";
+    Plottable.version = "1.5.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1920,7 +1920,9 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-                var linearTicks = [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearMin = Math.max(min, -this._pivot);
+                var linearMax = Math.min(max, this._pivot);
+                var linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -4356,6 +4358,7 @@ var Plottable;
             function Numeric(scale, orientation) {
                 _super.call(this, scale, orientation);
                 this._tickLabelPositioning = "center";
+                this._usesTextWidthApproximation = false;
                 this.formatter(Plottable.Formatters.general());
             }
             Numeric.prototype._setup = function () {
@@ -4364,20 +4367,33 @@ var Plottable;
                 this._wrapper = new SVGTypewriter.Wrappers.Wrapper().maxLines(1);
             };
             Numeric.prototype._computeWidth = function () {
+                var maxTextWidth = this._usesTextWidthApproximation ? this._computeApproximateTextWidth() : this._computeExactTextWidth();
+                if (this._tickLabelPositioning === "center") {
+                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextWidth;
+                }
+                else {
+                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextWidth);
+                }
+                return this._computedWidth;
+            };
+            Numeric.prototype._computeExactTextWidth = function () {
                 var _this = this;
                 var tickValues = this._getTickValues();
                 var textLengths = tickValues.map(function (v) {
                     var formattedValue = _this.formatter()(v);
                     return _this._measurer.measure(formattedValue).width;
                 });
-                var maxTextLength = Plottable.Utils.Math.max(textLengths, 0);
-                if (this._tickLabelPositioning === "center") {
-                    this._computedWidth = this._maxLabelTickLength() + this.tickLabelPadding() + maxTextLength;
-                }
-                else {
-                    this._computedWidth = Math.max(this._maxLabelTickLength(), this.tickLabelPadding() + maxTextLength);
-                }
-                return this._computedWidth;
+                return Plottable.Utils.Math.max(textLengths, 0);
+            };
+            Numeric.prototype._computeApproximateTextWidth = function () {
+                var _this = this;
+                var tickValues = this._getTickValues();
+                var mWidth = this._measurer.measure("M").width;
+                var textLengths = tickValues.map(function (v) {
+                    var formattedValue = _this.formatter()(v);
+                    return formattedValue.length * mWidth;
+                });
+                return Plottable.Utils.Math.max(textLengths, 0);
             };
             Numeric.prototype._computeHeight = function () {
                 var textHeight = this._measurer.measure().height;
@@ -4556,6 +4572,15 @@ var Plottable;
                     }
                     this._tickLabelPositioning = positionLC;
                     this.redraw();
+                    return this;
+                }
+            };
+            Numeric.prototype.usesTextWidthApproximation = function (enable) {
+                if (enable == null) {
+                    return this._usesTextWidthApproximation;
+                }
+                else {
+                    this._usesTextWidthApproximation = enable;
                     return this;
                 }
             };
@@ -5954,6 +5979,7 @@ var Plottable;
         var SelectionBoxLayer = (function (_super) {
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
+                var _this = this;
                 _super.call(this);
                 this._boxVisible = false;
                 this._boxBounds = {
@@ -5961,6 +5987,18 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this.addClass("selection-box-layer");
+                this._adjustBoundsCallback = function () {
+                    _this.bounds({
+                        topLeft: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxLeftDataValue) : _this._boxBounds.topLeft.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxTopDataValue) : _this._boxBounds.topLeft.y
+                        },
+                        bottomRight: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxRightDataValue) : _this._boxBounds.bottomRight.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxBottomDataValue) : _this._boxBounds.bottomRight.y
+                        }
+                    });
+                };
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5994,6 +6032,7 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
+                this._bindBoxDataValues();
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
@@ -6024,6 +6063,59 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.fixedHeight = function () {
                 return true;
+            };
+            SelectionBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    return this._xScale;
+                }
+                if (this._xScale != null) {
+                    this._xScale.offUpdate(this._adjustBoundsCallback);
+                }
+                this._xScale = xScale;
+                this._xScale.onUpdate(this._adjustBoundsCallback);
+                this._bindBoxDataValues();
+                return this;
+            };
+            SelectionBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    return this._yScale;
+                }
+                if (this._yScale != null) {
+                    this._yScale.offUpdate(this._adjustBoundsCallback);
+                }
+                this._yScale = yScale;
+                this._yScale.onUpdate(this._adjustBoundsCallback);
+                this._bindBoxDataValues();
+                return this;
+            };
+            /**
+             * Gets the data values backing the left and right edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.xExtent = function () {
+                // Explicit typing for Typescript 1.4
+                return [this._boxLeftDataValue, this._boxRightDataValue];
+            };
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.yExtent = function () {
+                // Explicit typing for Typescript 1.4
+                return [this._boxTopDataValue, this._boxBottomDataValue];
+            };
+            SelectionBoxLayer.prototype._bindBoxDataValues = function () {
+                this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
+                this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
+                this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
+                this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+            };
+            SelectionBoxLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                this.xScale().offUpdate(this._adjustBoundsCallback);
+                this.yScale().offUpdate(this._adjustBoundsCallback);
             };
             return SelectionBoxLayer;
         })(Plottable.Component);
@@ -6605,27 +6697,8 @@ var Plottable;
             Pie.prototype.entitiesAt = function (queryPoint) {
                 var center = { x: this.width() / 2, y: this.height() / 2 };
                 var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
-                var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
-                var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
-                if (adjustedQueryPoint.x < 0) {
-                    angle = Math.PI * 2 - angle;
-                }
-                for (var i = 0; i < this.entities().length; i++) {
-                    var entity = this.entities()[i];
-                    var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (this.innerRadius().scale) {
-                        innerRadius = this.innerRadius().scale.scale(innerRadius);
-                    }
-                    var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (this.outerRadius().scale) {
-                        outerRadius = this.outerRadius().scale.scale(outerRadius);
-                    }
-                    if (this._startAngles[i] <= angle && this._endAngles[i] > angle &&
-                        innerRadius < radius && outerRadius > radius) {
-                        return [this.entities()[i]];
-                    }
-                }
-                return [];
+                var index = this._sliceIndexForPoint(adjustedQueryPoint);
+                return index == null ? [] : [this.entities()[index]];
             };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
@@ -6691,7 +6764,7 @@ var Plottable;
             };
             Pie.prototype._sliceIndexForPoint = function (p) {
                 var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
-                var pointAngle = Math.acos(-p.y / (1 + pointRadius));
+                var pointAngle = Math.acos(-p.y / pointRadius);
                 if (p.x < 0) {
                     pointAngle = Math.PI * 2 - pointAngle;
                 }
@@ -6742,8 +6815,13 @@ var Plottable;
                         { x: x + measurement.width, y: y },
                         { x: x + measurement.width, y: y + measurement.height }
                     ];
-                    var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
-                    var showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    var showLabel = corners.every(function (corner) {
+                        return Math.abs(corner.x) <= _this.width() / 2 && Math.abs(corner.y) <= _this.height() / 2;
+                    });
+                    if (showLabel) {
+                        var sliceIndices = corners.map(function (corner) { return _this._sliceIndexForPoint(corner); });
+                        showLabel = sliceIndices.every(function (index) { return index === datumIndex; });
+                    }
                     var color = attrToProjector["fill"](datum, datumIndex, dataset);
                     var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
                     var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
@@ -7209,6 +7287,25 @@ var Plottable;
                 this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
                 this.render();
                 return this;
+            };
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            Rectangle.prototype.entitiesAt = function (point) {
+                var attrToProjector = this._generateAttrToProjector();
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = attrToProjector["x"](datum, index, dataset);
+                    var y = attrToProjector["y"](datum, index, dataset);
+                    var width = attrToProjector["width"](datum, index, dataset);
+                    var height = attrToProjector["height"](datum, index, dataset);
+                    return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+                });
             };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
@@ -7715,9 +7812,30 @@ var Plottable;
                         else {
                             x += offset;
                         }
+                        var showLabel = true;
+                        var labelPosition = {
+                            x: x,
+                            y: positive ? y : y + h - measurement.height
+                        };
+                        if (_this._isVertical) {
+                            labelPosition.x = x + w / 2 - measurement.width / 2;
+                        }
+                        else {
+                            if (!positive) {
+                                labelPosition.x = x + w - measurement.width;
+                            }
+                            else {
+                                labelPosition.x = x;
+                            }
+                        }
+                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
+                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
+                            showLabel = false;
+                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
                         var className = dark ? "dark-label" : "light-label";
                         g.classed(className, true);
+                        g.style("visibility", showLabel ? "inherit" : "hidden");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
@@ -10462,6 +10580,7 @@ var Plottable;
                 _super.call(this);
                 this._detectionRadius = 3;
                 this._resizable = false;
+                this._movable = false;
                 this._hasCorners = true;
                 /*
                  * Enable clipPath to hide _detectionEdge s and _detectionCorner s
@@ -10483,46 +10602,68 @@ var Plottable;
                 var resizingEdges;
                 var topLeft;
                 var bottomRight;
-                var startedNewBox;
-                this._dragInteraction.onDragStart(function (s) {
-                    resizingEdges = _this._getResizingEdges(s);
-                    if (!_this.boxVisible() ||
-                        (!resizingEdges.top && !resizingEdges.bottom &&
-                            !resizingEdges.left && !resizingEdges.right)) {
-                        _this.bounds({
-                            topLeft: s,
-                            bottomRight: s
-                        });
-                        startedNewBox = true;
+                var lastEndPoint;
+                var DRAG_MODES = {
+                    newBox: 0,
+                    resize: 1,
+                    move: 2
+                };
+                var mode = DRAG_MODES.newBox;
+                this._dragInteraction.onDragStart(function (startPoint) {
+                    resizingEdges = _this._getResizingEdges(startPoint);
+                    var bounds = _this.bounds();
+                    var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+                        bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
+                    if (_this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
+                        mode = DRAG_MODES.resize;
+                    }
+                    else if (_this.boxVisible() && _this.movable() && isInsideBox) {
+                        mode = DRAG_MODES.move;
                     }
                     else {
-                        startedNewBox = false;
+                        mode = DRAG_MODES.newBox;
+                        _this.bounds({
+                            topLeft: startPoint,
+                            bottomRight: startPoint
+                        });
                     }
                     _this.boxVisible(true);
-                    var bounds = _this.bounds();
+                    bounds = _this.bounds();
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+                    lastEndPoint = startPoint;
                     _this._dragStartCallbacks.callCallbacks(bounds);
                 });
-                this._dragInteraction.onDrag(function (s, e) {
-                    if (startedNewBox) {
-                        bottomRight.x = e.x;
-                        bottomRight.y = e.y;
-                    }
-                    else {
-                        if (resizingEdges.bottom) {
-                            bottomRight.y = e.y;
-                        }
-                        else if (resizingEdges.top) {
-                            topLeft.y = e.y;
-                        }
-                        if (resizingEdges.right) {
-                            bottomRight.x = e.x;
-                        }
-                        else if (resizingEdges.left) {
-                            topLeft.x = e.x;
-                        }
+                this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                    switch (mode) {
+                        case DRAG_MODES.newBox:
+                            bottomRight.x = endPoint.x;
+                            bottomRight.y = endPoint.y;
+                            break;
+                        case DRAG_MODES.resize:
+                            if (resizingEdges.bottom) {
+                                bottomRight.y = endPoint.y;
+                            }
+                            else if (resizingEdges.top) {
+                                topLeft.y = endPoint.y;
+                            }
+                            if (resizingEdges.right) {
+                                bottomRight.x = endPoint.x;
+                            }
+                            else if (resizingEdges.left) {
+                                topLeft.x = endPoint.x;
+                            }
+                            break;
+                        case DRAG_MODES.move:
+                            var dx = endPoint.x - lastEndPoint.x;
+                            var dy = endPoint.y - lastEndPoint.y;
+                            topLeft.x += dx;
+                            topLeft.y += dy;
+                            bottomRight.x += dx;
+                            bottomRight.y += dy;
+                            lastEndPoint = endPoint;
+                            break;
                     }
                     _this.bounds({
                         topLeft: topLeft,
@@ -10530,8 +10671,8 @@ var Plottable;
                     });
                     _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
-                this._dragInteraction.onDragEnd(function (s, e) {
-                    if (startedNewBox && s.x === e.x && s.y === e.y) {
+                this._dragInteraction.onDragEnd(function (startPoint, endPoint) {
+                    if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
                         _this.boxVisible(false);
                     }
                     _this._dragEndCallbacks.callCallbacks(_this.bounds());
@@ -10648,6 +10789,19 @@ var Plottable;
                     this.removeClass("x-resizable");
                     this.removeClass("y-resizable");
                 }
+            };
+            DragBoxLayer.prototype.movable = function (movable) {
+                if (movable == null) {
+                    return this._movable;
+                }
+                this._movable = movable;
+                if (movable) {
+                    this.addClass("movable");
+                }
+                else {
+                    this.removeClass("movable");
+                }
+                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -10771,6 +10925,15 @@ var Plottable;
                     this.removeClass("x-resizable");
                 }
             };
+            XDragBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    throw new Error("XDragBoxLayer has no yScale");
+                }
+                throw new Error("yScales cannot be set on an XDragBoxLayer");
+            };
+            XDragBoxLayer.prototype.yExtent = function () {
+                throw new Error("XDragBoxLayer has no yExtent");
+            };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
         Components.XDragBoxLayer = XDragBoxLayer;
@@ -10819,6 +10982,15 @@ var Plottable;
                 else {
                     this.removeClass("y-resizable");
                 }
+            };
+            YDragBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    throw new Error("YDragBoxLayer has no xScale");
+                }
+                throw new Error("xScales cannot be set on an YDragBoxLayer");
+            };
+            YDragBoxLayer.prototype.xExtent = function () {
+                throw new Error("YDragBoxLayer has no xExtent");
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);

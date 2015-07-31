@@ -157,6 +157,54 @@ describe("Plots", () => {
         assert.strictEqual(texts[1], "15 m", "The formatter was used to format the second label");
         svg.remove();
       });
+
+      it("labels are shown and hidden appropriately", () => {
+        var data = [
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 },
+          { value: 1 }, { value: 50 }
+        ];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i % 2 === 0) {
+            assert.strictEqual(visibility, "hidden", "label hidden when slice is too small");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when slice is appropriately sized");
+          }
+        });
+
+        svg.remove();
+      });
+
+      it("labels outside of the render area are hidden", () => {
+        var data = [
+          { value: 5000 },
+          { value: 5000 },
+          { value: 5000 }];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset).outerRadius(500);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), data.length, "One label is rendered for each piece of data");
+
+        texts.each(function(d, i) {
+          var visibility = d3.select(this).style("visibility");
+          if (i === 1) {
+            assert.strictEqual(visibility, "hidden", "label hidden when cut off by the lower margin");
+          } else {
+            assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
+          }
+        });
+        svg.remove();
+      });
     });
   });
 
@@ -310,15 +358,32 @@ describe("Plots", () => {
       });
 
       it("retrieves entities under a point with entitiesAt()", () => {
-        var click1 = { x: 300, y: 200 };
-        var entity1 = piePlot.entitiesAt(click1);
-        TestMethods.assertPlotEntitiesEqual(entity1[0], piePlot.entities()[0], "entities are equal");
-        var click2 = { x: 200, y: 300 };
-        var entity2 = piePlot.entitiesAt(click2);
-        TestMethods.assertPlotEntitiesEqual(entity2[0], piePlot.entities()[1], "entities are equal");
-        var click3 = { x: 0, y: 0 };
-        var entity3 = piePlot.entitiesAt(click3);
-        assert.strictEqual(entity3.length, 0, "no entities returned");
+        var data = [
+          {value: 500},
+          {value: 5},
+          {value: 5},
+          {value: 5},
+          {value: 5}
+        ];
+
+        var clicks =  [
+          { x: 260, y: 25 },
+          { x: 200, y: 25 },
+          { x: 215, y: 25 },
+          { x: 230, y: 25 },
+          { x: 245, y: 25 }
+        ];
+        piePlot.removeDataset(simpleDataset);
+        piePlot.addDataset(new Plottable.Dataset(data));
+        clicks.forEach((point: Plottable.Point, i: number) => {
+          var entity = piePlot.entitiesAt(point);
+          assert.strictEqual(entity.length, 1, "exactly one entity is selected");
+          TestMethods.assertPlotEntitiesEqual(entity[0], piePlot.entities()[i], "the correct entity is selcted");
+        });
+
+        var entity = piePlot.entitiesAt( { x: 0, y: 0 } );
+        assert.strictEqual(entity.length, 0, "no entities returned");
+
         svg.remove();
       });
 

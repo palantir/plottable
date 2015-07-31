@@ -75,4 +75,112 @@ describe("SelectionBoxLayer", () => {
     assert.isTrue(sbl.fixedWidth(), "fixed width");
     assert.isTrue(sbl.fixedHeight(), "fixed height");
   });
+
+  it("xScale()", () => {
+    var svgWidth = 500;
+    var svgHeight = 500;
+    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+
+    var xScale = new Plottable.Scales.Linear();
+    xScale.domain([0, 2000]);
+    xScale.range([0, svgWidth]);
+
+    var sbl = new Plottable.Components.SelectionBoxLayer();
+    sbl.xScale(xScale);
+    sbl.renderTo(svg);
+
+    var topLeft: Plottable.Point = {
+      x: 0,
+      y: 0
+    };
+    var bottomRight: Plottable.Point = {
+      x: 250,
+      y: 300
+    };
+    sbl.bounds({
+      topLeft: topLeft,
+      bottomRight: bottomRight
+    });
+
+    sbl.boxVisible(true);
+    var selectionBox = svg.select(".selection-area");
+    assert.strictEqual(selectionBox.attr("x"), "0", "box starts at left edge");
+
+    xScale.domain([-1000, 1000]);
+
+    selectionBox = svg.select(".selection-area");
+    assert.strictEqual(selectionBox.attr("x"), "250", "domain change moves box");
+
+    svg.remove();
+  });
+
+  it("yScale()", () => {
+    var svgWidth = 500;
+    var svgHeight = 500;
+    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+
+    var yScale = new Plottable.Scales.Linear();
+    yScale.domain([0, 2000]);
+    yScale.range([0, svgHeight]);
+
+    var sbl = new Plottable.Components.SelectionBoxLayer();
+    sbl.yScale(yScale);
+    sbl.renderTo(svg);
+
+    var topLeft: Plottable.Point = {
+      x: 0,
+      y: 0
+    };
+    var bottomRight: Plottable.Point = {
+      x: 250,
+      y: 300
+    };
+    sbl.bounds({
+      topLeft: topLeft,
+      bottomRight: bottomRight
+    });
+
+    sbl.boxVisible(true);
+    var selectionBox = svg.select(".selection-area");
+    assert.strictEqual(selectionBox.attr("y"), "0", "box starts at top edge");
+
+    yScale.domain([-1000, 1000]);
+
+    selectionBox = svg.select(".selection-area");
+    assert.strictEqual(selectionBox.attr("y"), "250", "domain change moves box");
+
+    svg.remove();
+  });
+
+  it("boxDataValue endpoints", () => {
+    var svgWidth = 500;
+    var svgHeight = 500;
+    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+
+    var xScale = new Plottable.Scales.Linear();
+    xScale.domain([0, 2000]);
+    xScale.range([0, svgHeight]);
+
+    var sbl = new Plottable.Components.SelectionBoxLayer();
+    sbl.xScale(xScale);
+    sbl.renderTo(svg);
+
+    var topLeft: Plottable.Point = {
+      x: 100,
+      y: 0
+    };
+    var bottomRight: Plottable.Point = {
+      x: 250,
+      y: 300
+    };
+    sbl.bounds({
+      topLeft: topLeft,
+      bottomRight: bottomRight
+    });
+
+    assert.strictEqual(sbl.xExtent()[0], 400, "data value maps correctly");
+    assert.strictEqual(sbl.xExtent()[1], 1000, "data value maps correctly");
+
+    svg.remove();
+  });
 });

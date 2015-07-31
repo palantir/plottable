@@ -1900,6 +1900,22 @@ declare module Plottable {
              * @returns {Numeric} The calling Numeric Axis.
              */
             tickLabelPosition(position: string): Numeric;
+            /**
+             * Gets the approximate text width setting.
+             *
+             * @returns {boolean} The current text width approximation setting.
+             */
+            usesTextWidthApproximation(): boolean;
+            /**
+             * Sets the approximate text width setting. Approximating text width
+             * measurements can drastically speed up plot rendering, but the plot may
+             * have extra white space that would be eliminated by exact measurements.
+             * Additionally, very abnormal fonts may not approximate reasonably.
+             *
+             * @param {boolean} The new text width approximation setting.
+             * @returns {Axes.Numeric} The calling Axes.Numeric.
+             */
+            usesTextWidthApproximation(enable: boolean): Axes.Numeric;
         }
     }
 }
@@ -2331,6 +2347,51 @@ declare module Plottable {
             boxVisible(show: boolean): SelectionBoxLayer;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * Gets the x scale for this SelectionBoxLayer.
+             */
+            xScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the x scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            xScale(xScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the y scale for this SelectionBoxLayer.
+             */
+            yScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the y scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            yScale(yScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the data values backing the left and right edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
+            destroy(): void;
         }
     }
 }
@@ -2784,6 +2845,13 @@ declare module Plottable {
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            entitiesAt(point: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -4019,6 +4087,17 @@ declare module Plottable {
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
             /**
+             * Gets whether or not the drag box is movable.
+             */
+            movable(): boolean;
+            /**
+             * Sets whether or not the drag box is movable.
+             *
+             * @param {boolean} movable
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            movable(movable: boolean): DragBoxLayer;
+            /**
              * Sets the callback to be called when dragging starts.
              *
              * @param {DragBoxCallback} callback
@@ -4090,6 +4169,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }
@@ -4108,6 +4196,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }

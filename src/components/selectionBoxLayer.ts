@@ -10,10 +10,29 @@ export module Components {
       topLeft: { x: 0, y: 0 },
       bottomRight: { x: 0, y: 0 }
     };
+    private _boxLeftDataValue: number | { valueOf(): number };
+    private _boxRightDataValue: number | { valueOf(): number };
+    private _boxTopDataValue: number | { valueOf(): number };
+    private _boxBottomDataValue: number | { valueOf(): number };
+    private _xScale: QuantitativeScale<number | { valueOf(): number }>;
+    private _yScale: QuantitativeScale<number | { valueOf(): number }>;
+    private _adjustBoundsCallback: ScaleCallback<QuantitativeScale<number | { valueOf(): number }>>;
 
     constructor() {
       super();
       this.addClass("selection-box-layer");
+      this._adjustBoundsCallback = () => {
+        this.bounds({
+          topLeft: {
+            x: this._xScale ? this._xScale.scale(this._boxLeftDataValue) : this._boxBounds.topLeft.x,
+            y: this._yScale ? this._yScale.scale(this._boxTopDataValue) : this._boxBounds.topLeft.y
+          },
+          bottomRight: {
+            x: this._xScale ? this._xScale.scale(this._boxRightDataValue) : this._boxBounds.bottomRight.x,
+            y: this._yScale ? this._yScale.scale(this._boxBottomDataValue) : this._boxBounds.bottomRight.y
+          }
+        });
+      };
     }
 
     protected _setup() {
@@ -64,6 +83,7 @@ export module Components {
         topLeft: topLeft,
         bottomRight: bottomRight
       };
+      this._bindBoxDataValues();
     }
 
     public renderImmediately() {
@@ -110,6 +130,85 @@ export module Components {
 
     public fixedHeight() {
       return true;
+    }
+
+    /**
+     * Gets the x scale for this SelectionBoxLayer.
+     */
+    public xScale(): QuantitativeScale<number | { valueOf(): number }>;
+    /**
+     * Sets the x scale for this SelectionBoxLayer.
+     * 
+     * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
+    public xScale(xScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public xScale(xScale?: QuantitativeScale<number | { valueOf(): number }>): any {
+      if (xScale == null) {
+        return this._xScale;
+      }
+      if (this._xScale != null) {
+        this._xScale.offUpdate(this._adjustBoundsCallback);
+      }
+      this._xScale = xScale;
+      this._xScale.onUpdate(this._adjustBoundsCallback);
+      this._bindBoxDataValues();
+      return this;
+    }
+
+    /**
+     * Gets the y scale for this SelectionBoxLayer.
+     */
+    public yScale(): QuantitativeScale<number | { valueOf(): number }>;
+    /**
+     * Sets the y scale for this SelectionBoxLayer.
+     * 
+     * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+     */
+    public yScale(yScale: QuantitativeScale<number | { valueOf(): number }>): SelectionBoxLayer;
+    public yScale(yScale?: QuantitativeScale<number | { valueOf(): number }>): any {
+      if (yScale == null) {
+        return this._yScale;
+      }
+      if (this._yScale != null) {
+        this._yScale.offUpdate(this._adjustBoundsCallback);
+      }
+      this._yScale = yScale;
+      this._yScale.onUpdate(this._adjustBoundsCallback);
+      this._bindBoxDataValues();
+      return this;
+    }
+
+    /**
+     * Gets the data values backing the left and right edges of the box.
+     *
+     * Returns an undefined array if the edges are not backed by a scale.
+     */
+    public xExtent(): (number | { valueOf(): number })[] {
+      // Explicit typing for Typescript 1.4
+      return [this._boxLeftDataValue, this._boxRightDataValue];
+    }
+
+    /**
+     * Gets the data values backing the top and bottom edges of the box.
+     *
+     * Returns an undefined array if the edges are not backed by a scale.
+     */
+    public yExtent(): (number | { valueOf(): number })[] {
+      // Explicit typing for Typescript 1.4
+      return [this._boxTopDataValue, this._boxBottomDataValue];
+    }
+
+    private _bindBoxDataValues() {
+      this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
+      this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
+      this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
+      this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+    }
+
+    public destroy() {
+      super.destroy();
+      this.xScale().offUpdate(this._adjustBoundsCallback);
+      this.yScale().offUpdate(this._adjustBoundsCallback);
     }
   }
 }

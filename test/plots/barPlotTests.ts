@@ -610,7 +610,59 @@ describe("Plots", () => {
 
           svg.remove();
         });
+      });
+    });
 
+    describe("Horizontal Bar Plot label visibility", () => {
+      var svg: d3.Selection<void>;
+      var yScale: Plottable.Scales.Category;
+      var xScale: Plottable.Scales.Linear;
+      var barPlot: Plottable.Plots.Bar<number, string>;
+      beforeEach(() => {
+        svg = TestMethods.generateSVG(600, 400);
+        yScale = new Plottable.Scales.Category().domain(["A", "B"]);
+        xScale = new Plottable.Scales.Linear();
+
+        var data = [
+          {y: "A", x: -1.5},
+          {y: "B", x: 1},
+        ];
+
+        barPlot = new Plottable.Plots.Bar<number, string>(Plottable.Plots.Bar.ORIENTATION_HORIZONTAL);
+        barPlot.addDataset(new Plottable.Dataset(data));
+        barPlot.x((d) => d.x, xScale);
+        barPlot.y((d) => d.y, yScale);
+        barPlot.labelsEnabled(true);
+        barPlot.renderTo(svg);
+      });
+
+      it("hides labels properly on the right", () => {
+        xScale.domainMax(0.95);
+        var texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+
+        assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
+        assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
+
+        svg.remove();
+      });
+
+      it("hides labels properly on the left", () => {
+        xScale.domainMin(-1.4);
+        var texts = svg.selectAll("text");
+
+        assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+
+        assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
+        svg.remove();
       });
     });
 
@@ -691,6 +743,63 @@ describe("Plots", () => {
         dataset.data(data);
         texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "texts were immediately removed");
+      });
+    });
+
+    describe("Vertical Bar Plot label visibility", () => {
+      var svg: d3.Selection<void>;
+      var plot: Plottable.Plots.Bar<number, number>;
+      var xScale: Plottable.Scales.Linear;
+      var yScale: Plottable.Scales.Linear;
+
+      beforeEach(() => {
+        svg = TestMethods.generateSVG();
+        xScale = new Plottable.Scales.Linear();
+        yScale = new Plottable.Scales.Linear();
+        var data = [
+          { x: 1, y: 10.1 },
+          { x: 2, y: 5.3 },
+          { x: 3, y: 2.8 }
+        ];
+        plot = new Plottable.Plots.Bar<number, number>();
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+        plot.addDataset(new Plottable.Dataset(data));
+        plot.labelsEnabled(true);
+        plot.renderTo(svg);
+      });
+
+      it("hides labels outside of the visible render area (horizontal)", () => {
+        xScale.domain([1, 3]);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+        var label3 = d3.select(texts[0][2]);
+
+        assert.strictEqual(label1.style("visibility"), "hidden", "Left label is cut off by the margin");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
+        assert.strictEqual(label3.style("visibility"), "hidden", "Right label is cut off by the margin");
+
+        svg.remove();
+      });
+
+      it("hides labels outside of the visible render area (vertical)", () => {
+        yScale.domain([2.5, 11]);
+
+        var texts = svg.selectAll("text");
+        assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
+
+        var label1 = d3.select(texts[0][0]);
+        var label2 = d3.select(texts[0][1]);
+        var label3 = d3.select(texts[0][2]);
+
+        assert.include(["visible", "inherit"], label1.style("visibility"), "Left label should still show");
+        assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
+        assert.strictEqual(label3.style("visibility"), "hidden", "Right label is cut off. bar is too short");
+        svg.remove();
       });
     });
 

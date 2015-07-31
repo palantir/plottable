@@ -62,8 +62,7 @@ describe("Interactive Components", () => {
         x: SVG_WIDTH / 2,
         y: SVG_HEIGHT * 3 / 4
       };
-      var target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, actualBounds.bottomRight, dragTo);
+      TestMethods.triggerFakeDragSequence(dbl.background(), actualBounds.bottomRight, dragTo);
       actualBounds = dbl.bounds();
       assert.strictEqual(actualBounds.topLeft.x, 0, "box still starts at left");
       assert.strictEqual(actualBounds.bottomRight.x, dbl.width(), "box still ends at right");
@@ -103,6 +102,58 @@ describe("Interactive Components", () => {
       assert.strictEqual(boundsAfter.topLeft.y, boundsBefore.topLeft.y, "box keeps same top edge");
       assert.strictEqual(boundsAfter.bottomRight.x, dbl.width(), "box still ends at right");
       assert.strictEqual(boundsAfter.bottomRight.y, boundsBefore.bottomRight.y, "box keeps same bottom edge");
+      svg.remove();
+    });
+
+    it("throws error on getting x scale", () => {
+      var dbl = new Plottable.Components.YDragBoxLayer();
+      assert.throws(() => dbl.xScale(), "no xScale");
+    });
+
+    it("throws error on setting x scale", () => {
+      var dbl = new Plottable.Components.YDragBoxLayer();
+      assert.throws(() => dbl.xScale(new Plottable.Scales.Linear()), "xScales cannot be set");
+    });
+
+    it("throws error on getting x extent", () => {
+      var dbl = new Plottable.Components.YDragBoxLayer();
+      assert.throws(() => dbl.xExtent(), "no xExtent");
+    });
+
+    it("moves only in y", () => {
+      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var dbl = new Plottable.Components.YDragBoxLayer();
+      dbl.boxVisible(true);
+      dbl.movable(true);
+      dbl.renderTo(svg);
+
+      var topLeft = {
+        x: SVG_WIDTH / 4,
+        y: SVG_HEIGHT / 4
+      };
+      var bottomRight = {
+        x: SVG_WIDTH * 3 / 4,
+        y: SVG_HEIGHT * 3 / 4
+      };
+
+      dbl.bounds({
+        topLeft: topLeft,
+        bottomRight: bottomRight
+      });
+
+      var boundsBefore = dbl.bounds();
+      var dragDistance = 10;
+      TestMethods.triggerFakeDragSequence(dbl.background(),
+        { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 },
+        { x: SVG_WIDTH / 2 + dragDistance, y: SVG_HEIGHT / 2 + dragDistance }
+      );
+
+      var boundsAfter = dbl.bounds();
+      assert.strictEqual(boundsAfter.topLeft.x, 0, "box still starts at left");
+      assert.strictEqual(boundsAfter.topLeft.y, boundsBefore.topLeft.y + dragDistance, "top edge moved");
+      assert.strictEqual(boundsAfter.bottomRight.x, dbl.width(), "box still ends at right");
+      assert.strictEqual(boundsAfter.bottomRight.y, boundsBefore.bottomRight.y + dragDistance, "bottom edge moved");
+
       svg.remove();
     });
   });
