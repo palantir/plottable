@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {

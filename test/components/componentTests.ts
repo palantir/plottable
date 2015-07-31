@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables

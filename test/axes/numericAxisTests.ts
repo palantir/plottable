@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("NumericAxis", () => {
   function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {

@@ -1,4 +1,5 @@
 ///<reference path="../testReference.ts" />
+/* tslint:disable: no-var-keyword */
 
 describe("TimeAxis", () => {
   var scale: Plottable.Scales.Time;
