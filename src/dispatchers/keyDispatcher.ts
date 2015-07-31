@@ -2,7 +2,7 @@
 
 module Plottable {
 export module Dispatchers {
-  export type KeyCallback = (keyCode?: number, event?: KeyboardEvent) => void;
+  export type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
 
   export class Key extends Dispatcher {
     private static _DISPATCHER_KEY = "__Plottable_Dispatcher_Key";

@@ -3578,7 +3578,7 @@ declare module Plottable {
 
 declare module Plottable {
     module Dispatchers {
-        type KeyCallback = (keyCode?: number, event?: KeyboardEvent) => void;
+        type KeyCallback = (keyCode: number, event: KeyboardEvent) => void;
         class Key extends Dispatcher {
             /**
              * Gets a Key Dispatcher. If one already exists it will be returned;
@@ -3725,7 +3725,7 @@ declare module Plottable {
 
 
 declare module Plottable {
-    type KeyCallback = (keyCode?: number) => void;
+    type KeyCallback = (keyCode: number) => void;
     module Interactions {
         class Key extends Interaction {
             protected _anchor(component: Component): void;
