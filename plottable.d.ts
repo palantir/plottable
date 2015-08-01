@@ -1323,7 +1323,8 @@ declare module Plottable {
 declare module Plottable {
     module Drawers {
         class Arc extends Drawer {
-            constructor(dataset: Dataset);
+            constructor(dataset: Dataset, isOutline?: boolean);
+            protected _applyDefaultAttributes(selection: d3.Selection<any>): void;
         }
     }
 }
@@ -2648,9 +2649,12 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            protected _setup(): void;
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Pie;
             addDataset(dataset: Dataset): Pie;
+            protected _removeDatasetNodes(dataset: Dataset): void;
             removeDataset(dataset: Dataset): Pie;
+            selections(datasets?: Dataset[]): d3.Selection<any>;
             protected _onDatasetUpdate(): void;
             protected _createDrawer(dataset: Dataset): Drawers.Arc;
             entities(datasets?: Dataset[]): PlotEntity[];

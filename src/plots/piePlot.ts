@@ -11,6 +11,7 @@ export module Plots {
     private _endAngles: number[];
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
+    private _strokeDrawers: Utils.Map<Dataset, Drawers.Arc>;
 
     /**
      * @constructor
@@ -21,6 +22,13 @@ export module Plots {
       this.outerRadius(() => Math.min(this.width(), this.height()) / 2);
       this.addClass("pie-plot");
       this.attr("fill", (d, i) => String(i), new Scales.Color());
+
+      this._strokeDrawers = new Utils.Map<Dataset, Drawers.Arc>();
+    }
+
+    protected _setup() {
+      super._setup();
+      this._strokeDrawers.forEach((d) => d.renderArea(this._renderArea.append("g")));
     }
 
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
@@ -42,8 +50,18 @@ export module Plots {
         return this;
       }
       this._updatePieAngles();
+      var strokeDrawer = new Drawers.Arc(dataset, true);
+      if (this._isSetup) {
+       strokeDrawer.renderArea(this._renderArea.append("g"));
+      }
+      this._strokeDrawers.set(dataset, strokeDrawer);
       super.addDataset(dataset);
       return this;
+    }
+
+    protected _removeDatasetNodes(dataset: Dataset) {
+      super._removeDatasetNodes(dataset);
+      this._strokeDrawers.get(dataset).remove();
     }
 
     public removeDataset(dataset: Dataset) {
@@ -51,6 +69,18 @@ export module Plots {
       this._startAngles = [];
       this._endAngles = [];
       return this;
+    }
+
+    public selections(datasets = this.datasets()) {
+      var allSelections = super.selections(datasets)[0];
+      datasets.forEach((dataset) => {
+        var drawer = this._strokeDrawers.get(dataset);
+        if (drawer == null) { return; }
+        drawer.renderArea().selectAll(drawer.selector()).each(function() {
+          allSelections.push(this);
+        });
+      });
+      return d3.selectAll(allSelections);
     }
 
     protected _onDatasetUpdate() {
@@ -67,6 +97,8 @@ export module Plots {
       entities.forEach((entity) => {
         entity.position.x += this.width() / 2;
         entity.position.y += this.height() / 2;
+        var stroke = this._strokeDrawers.get(entity.dataset).selectionForIndex(entity.index);
+        entity.selection[0].push(stroke[0][0]);
       });
       return entities;
     }
@@ -274,6 +306,15 @@ export module Plots {
       if (this._labelsEnabled) {
         Utils.Window.setTimeout(() => this._drawLabels(), time);
       }
+
+      var drawSteps = this._generateStrokeDrawSteps();
+      var dataToDraw = this._getDataToDraw();
+      this.datasets().forEach((dataset) => this._strokeDrawers.get(dataset).draw(dataToDraw.get(dataset), drawSteps));
+    }
+
+    private _generateStrokeDrawSteps() {
+      var attrToProjector = this._generateAttrToProjector();
+      return [{attrToProjector: attrToProjector, animator: new Animators.Null()}];
     }
 
     private _sliceIndexForPoint(p: Point) {
