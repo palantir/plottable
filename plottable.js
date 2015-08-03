@@ -1263,6 +1263,60 @@ var Plottable;
         }
         Formatters.siSuffix = siSuffix;
         /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes
+         * - K - thousands - 10 ^ 3
+         * - M - millions - 10 ^ 6
+         * - B - billions - 10 ^ 9
+         * - T - trillions - 10 ^ 12
+         * - Q - quadrillions - 10 ^ 15
+         *
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         * @returns {Formatter} A formatter with short scale formatting
+         */
+        function shortScale(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            precision = Math.floor(precision);
+            var suffixes = "KMBTQ";
+            var exponentFormatter = d3.format("." + precision + "e");
+            var fixedFormatter = d3.format("." + precision + "f");
+            var max = Math.pow(10, (3 * (suffixes.length + 1)));
+            var min = Math.pow(10, -precision);
+            return function (num) {
+                var absNum = Math.abs(num);
+                if ((absNum < min || absNum >= max) && absNum !== 0) {
+                    return exponentFormatter(num);
+                }
+                var idx = -1;
+                while (absNum >= Math.pow(1000, idx + 2) && idx < (suffixes.length - 1)) {
+                    idx++;
+                }
+                var output = "";
+                if (idx === -1) {
+                    output = fixedFormatter(num);
+                }
+                else {
+                    output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                }
+                // catch rounding by the underlying d3 formatter
+                if ((num > 0 && output.substr(0, 4) === "1000") || (num < 0 && output.substr(0, 5) === "-1000")) {
+                    if (idx < suffixes.length - 1) {
+                        idx++;
+                        output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                    }
+                    else {
+                        output = exponentFormatter(num);
+                    }
+                }
+                return output;
+            };
+        }
+        Formatters.shortScale = shortScale;
+        /**
          * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
