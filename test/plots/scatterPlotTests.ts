@@ -140,6 +140,58 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("can retrieve entities in a certain range", () => {
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+
+      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      var plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      var entities = plot.entitiesIn({ min: xScale.scale(1), max: xScale.scale(1) },
+                                     { min: yScale.scale(1), max: yScale.scale(1) });
+
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
+    it("can retrieve entities in a certain bounds", () => {
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+
+      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      var plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      var entities = plot.entitiesIn({ topLeft: {
+                                         x: xScale.scale(1),
+                                         y: yScale.scale(1)
+                                       },
+                                       bottomRight: {
+                                         x: xScale.scale(1),
+                                         y: yScale.scale(1)
+                                       }});
+
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
     it("correctly handles NaN and undefined x and y values", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var data = [
