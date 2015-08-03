@@ -25,13 +25,13 @@ export module Plots {
     /**
      * Gets the interpolation function associated with the plot.
      *
-     * @return string | (points: Array<[number, number]>) => string)
+     * @return {string | (points: Array<[number, number]>) => string)}
      */
     public interpolator(): string | ((points: Array<[number, number]>) => string);
     /**
      * Sets the interpolation function associated with the plot.
      *
-     * @param interpolator Interpolation function
+     * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
      * @return Plots.Line
      */
     public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
