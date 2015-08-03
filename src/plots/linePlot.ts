@@ -28,6 +28,19 @@ export module Plots {
      * @return {string | (points: Array<[number, number]>) => string)}
      */
     public interpolator(): string | ((points: Array<[number, number]>) => string);
+    public interpolator(interpolator: "linear"): Line<X>;
+    public interpolator(interpolator: "linear-closed"): Line<X>;
+    public interpolator(interpolator: "step"): Line<X>;
+    public interpolator(interpolator: "step-before"): Line<X>;
+    public interpolator(interpolator: "step-after"): Line<X>;
+    public interpolator(interpolator: "basis"): Line<X>;
+    public interpolator(interpolator: "basis-open"): Line<X>;
+    public interpolator(interpolator: "basis-closed"): Line<X>;
+    public interpolator(interpolator: "bundle"): Line<X>;
+    public interpolator(interpolator: "cardinal"): Line<X>;
+    public interpolator(interpolator: "cardinal-open"): Line<X>;
+    public interpolator(interpolator: "cardinal-closed"): Line<X>;
+    public interpolator(interpolator: "monotone"): Line<X>;
     /**
      * Sets the interpolation function associated with the plot.
      *

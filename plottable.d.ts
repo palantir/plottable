@@ -3062,6 +3062,19 @@ declare module Plottable {
              * @return {string | (points: Array<[number, number]>) => string)}
              */
             interpolator(): string | ((points: Array<[number, number]>) => string);
+            interpolator(interpolator: "linear"): Line<X>;
+            interpolator(interpolator: "linear-closed"): Line<X>;
+            interpolator(interpolator: "step"): Line<X>;
+            interpolator(interpolator: "step-before"): Line<X>;
+            interpolator(interpolator: "step-after"): Line<X>;
+            interpolator(interpolator: "basis"): Line<X>;
+            interpolator(interpolator: "basis-open"): Line<X>;
+            interpolator(interpolator: "basis-closed"): Line<X>;
+            interpolator(interpolator: "bundle"): Line<X>;
+            interpolator(interpolator: "cardinal"): Line<X>;
+            interpolator(interpolator: "cardinal-open"): Line<X>;
+            interpolator(interpolator: "cardinal-closed"): Line<X>;
+            interpolator(interpolator: "monotone"): Line<X>;
             /**
              * Sets the interpolation function associated with the plot.
              *
