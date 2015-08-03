@@ -6894,6 +6894,8 @@ var Plottable;
                     _this._cachedDomainY = _lastSeenDomainY;
                     _deltaX = 0;
                     _deltaY = 0;
+                    _scalingX = 1;
+                    _scalingY = 1;
                     _this.render();
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                 }, _deferredRenderingTimeout);

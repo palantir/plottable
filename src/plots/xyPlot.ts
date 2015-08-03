@@ -49,6 +49,8 @@ export class XYPlot<X, Y> extends Plot {
         this._cachedDomainY = _lastSeenDomainY;
         _deltaX = 0;
         _deltaY = 0;
+        _scalingX = 1;
+        _scalingY = 1;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
       }, _deferredRenderingTimeout);
