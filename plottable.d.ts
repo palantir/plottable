@@ -2202,6 +2202,7 @@ declare module Plottable {
             destroy(): Gridlines;
             protected _setup(): void;
             renderImmediately(): Gridlines;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
         }
     }
 }

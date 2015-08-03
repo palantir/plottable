@@ -5619,6 +5619,16 @@ var Plottable;
                 this._redrawYLines();
                 return this;
             };
+            Gridlines.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this._xScale != null) {
+                    this._xScale.range([0, this.width()]);
+                }
+                if (this._yScale != null) {
+                    this._yScale.range([this.height(), 0]);
+                }
+                return this;
+            };
             Gridlines.prototype._redrawXLines = function () {
                 var _this = this;
                 if (this._xScale) {

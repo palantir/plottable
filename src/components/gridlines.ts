@@ -59,6 +59,17 @@ export module Components {
       return this;
     }
 
+    public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
+      super.computeLayout(origin, availableWidth, availableHeight);
+      if (this._xScale != null) {
+        this._xScale.range([0, this.width()]);
+      }
+      if (this._yScale != null) {
+        this._yScale.range([this.height(), 0]);
+      }
+      return this;
+    }
+
     private _redrawXLines() {
       if (this._xScale) {
         var xTicks = this._xScale.ticks();
