@@ -7519,6 +7519,29 @@ var Plottable;
                 };
                 return propertyToProjectors;
             };
+            Scatter.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                var attrToProjector = this._generateAttrToProjector();
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var translate = d3.transform(attrToProjector["transform"](datum, index, dataset)).translate;
+                    var x = translate[0];
+                    var y = translate[1];
+                    return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
+                });
+            };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
             return Scatter;
