@@ -3061,14 +3061,14 @@ declare module Plottable {
              *
              * @return string | (points: Array<[number, number]>) => string)
              */
-            interpolate(): string | ((points: Array<[number, number]>) => string);
+            interpolator(): string | ((points: Array<[number, number]>) => string);
             /**
              * Sets the interpolation function associated with the plot.
              *
-             * @param interpolate Interpolation function
+             * @param interpolator Interpolation function
              * @return Plots.Line
              */
-            interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];

@@ -3,7 +3,7 @@
 module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
-    private _interpolationFunction: string | ((points: Array<[number, number]>) => string) = "linear";
+    private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -27,19 +27,19 @@ export module Plots {
      *
      * @return string | (points: Array<[number, number]>) => string)
      */
-    public interpolate(): string | ((points: Array<[number, number]>) => string);
+    public interpolator(): string | ((points: Array<[number, number]>) => string);
     /**
      * Sets the interpolation function associated with the plot.
      *
-     * @param interpolate Interpolation function
+     * @param interpolator Interpolation function
      * @return Plots.Line
      */
-    public interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
-    public interpolate(interpolate?: string | ((points: Array<[number, number]>) => string)): any {
-      if (interpolate == null) {
-        return this._interpolationFunction;
+    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+    public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
+      if (interpolator == null) {
+        return this._interpolator;
       }
-      this._interpolationFunction = interpolate;
+      this._interpolator = interpolator;
       this.render();
       return this;
     }
@@ -129,7 +129,7 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
-                     .interpolate(this.interpolate())
+                     .interpolate(this.interpolator())
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };
     }

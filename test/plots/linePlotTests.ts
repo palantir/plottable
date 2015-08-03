@@ -33,14 +33,14 @@ describe("Plots", () => {
     });
 
     describe("interpolation", () => {
-      it("interpolate() get / set", () => {
+      it("interpolator() get / set", () => {
         var linePlot = new Plottable.Plots.Line();
-        assert.strictEqual(linePlot.interpolate(), "linear", "the default interpolation mode is linear");
-        assert.strictEqual(linePlot.interpolate("step"), linePlot, "setting an interpolation mode returns the plot");
-        assert.strictEqual(linePlot.interpolate(), "step", "setting an interpolation mode works");
+        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
+        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
+        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
       });
 
-      it("interpolate() behavior for the step function", () => {
+      it("interpolator() behavior for the step function", () => {
         var svg = TestMethods.generateSVG(400, 400);
         var data = [
           {"x": 0.0, "y": 0},
@@ -68,7 +68,7 @@ describe("Plots", () => {
         assert.isNull(svgPath.match(/V/g), "no vertical lines");
         assert.isNull(svgPath.match(/H/g), "no horizontal lines");
 
-        linePlot.interpolate("step");
+        linePlot.interpolator("step");
 
         svgPath = linePlot.content().select("path").attr("d");
         assert.lengthOf(svgPath.match(/V/g), data.length - 1, "one vertical line for each pair of consecutive points");

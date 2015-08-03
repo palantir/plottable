@@ -8034,7 +8034,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
-                this._interpolationFunction = "linear";
+                this._interpolator = "linear";
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -8044,11 +8044,11 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
-            Line.prototype.interpolate = function (interpolate) {
-                if (interpolate == null) {
-                    return this._interpolationFunction;
+            Line.prototype.interpolator = function (interpolator) {
+                if (interpolator == null) {
+                    return this._interpolator;
                 }
-                this._interpolationFunction = interpolate;
+                this._interpolator = interpolator;
                 this.render();
                 return this;
             };
@@ -8131,7 +8131,7 @@ var Plottable;
                     return d3.svg.line()
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
-                        .interpolate(_this.interpolate())
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
                 };
             };
@@ -8306,7 +8306,7 @@ var Plottable;
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
                         .y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); })
-                        .interpolate(_this.interpolate())
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
                     return areaGenerator(datum);
                 };
