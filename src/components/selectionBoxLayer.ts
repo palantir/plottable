@@ -207,8 +207,12 @@ export module Components {
 
     public destroy() {
       super.destroy();
-      this.xScale().offUpdate(this._adjustBoundsCallback);
-      this.yScale().offUpdate(this._adjustBoundsCallback);
+      if (this.xScale() != null) {
+        this.xScale().offUpdate(this._adjustBoundsCallback);
+      }
+      if (this.yScale() != null) {
+        this.yScale().offUpdate(this._adjustBoundsCallback);
+      }
     }
   }
 }
