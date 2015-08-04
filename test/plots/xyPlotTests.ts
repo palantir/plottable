@@ -1,5 +1,4 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Plots", () => {
   describe("XY Plot", () => {
