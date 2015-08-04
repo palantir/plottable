@@ -5279,7 +5279,7 @@ var Plottable;
                 entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                     .attr("fill", function (value) { return _this._colorScale.scale(value); })
-                    .attr("opacity", function (d, i) { return _this.symbolOpacity()(d, i); })
+                    .attr("opacity", function (d, i, j) { return _this.symbolOpacity()(d, j); })
                     .classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
@@ -5314,14 +5314,11 @@ var Plottable;
                 if (opacity == null) {
                     return this._symbolOpacityAccessor;
                 }
-                else if (typeof opacity === "number") {
-                    this._symbolOpacityAccessor = function () { return opacity; };
-                }
                 else {
-                    this._symbolOpacityAccessor = opacity;
+                    this._symbolOpacityAccessor = d3.functor(opacity);
+                    this.render();
+                    return this;
                 }
-                this.render();
-                return this;
             };
             Legend.prototype.fixedWidth = function () {
                 return true;

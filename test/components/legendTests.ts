@@ -397,4 +397,20 @@ describe("Legend", () => {
     legend.renderTo(svg);
     svg.remove();
   });
+
+  it("symbolOpacity() passes index correctly", () => {
+    var domain = ["AA", "BB", "CC"];
+    color.domain(domain);
+
+    var expectedIndex = 0;
+    var symbolOpacityChecker = (d: any, index: number) => {
+      assert.strictEqual(index, expectedIndex, "index passed in is correct");
+      expectedIndex++;
+      return 0.5;
+    };
+    legend.symbolOpacity(symbolOpacityChecker);
+
+    legend.renderTo(svg);
+    svg.remove();
+  });
 });

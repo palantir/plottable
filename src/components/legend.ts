@@ -282,7 +282,7 @@ export module Components {
       entries.select("path").attr("d", (d: any, i: number, j: number) => this.symbol()(d, j)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._colorScale.scale(value))
-                            .attr("opacity", (d: any, i: number) => this.symbolOpacity()(d, i))
+                            .attr("opacity", (d: any, i: number, j: number) => this.symbolOpacity()(d, j))
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
@@ -349,7 +349,7 @@ export module Components {
      * @returns {Legend} The calling Legend
      */
     public symbolOpacity(constantOpacity: number): Legend;
-    public symbolOpacity(opacity?: number|((datum: any, index: number) => number)): any {
+    public symbolOpacity(opacity?: number | ((datum: any, index: number) => number)): any {
       if (opacity == null) {
         return this._symbolOpacityAccessor;
       } else if (typeof opacity === "number") {
