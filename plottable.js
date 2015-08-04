@@ -10287,6 +10287,10 @@ var Plottable;
                     return;
                 }
                 var oldPoints = this._touchIds.values();
+                if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) ||
+                    !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
+                    return;
+                }
                 var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
                 if (oldCornerDistance === 0) {
                     return;
