@@ -6114,10 +6114,10 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.destroy = function () {
                 _super.prototype.destroy.call(this);
-                if (this.xScale() != null) {
+                if (this._xScale != null) {
                     this.xScale().offUpdate(this._adjustBoundsCallback);
                 }
-                if (this.yScale() != null) {
+                if (this._yScale != null) {
                     this.yScale().offUpdate(this._adjustBoundsCallback);
                 }
             };
