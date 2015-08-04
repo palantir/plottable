@@ -5310,15 +5310,18 @@ var Plottable;
                     return this;
                 }
             };
-            Legend.prototype.symbolOpacity = function (opacity) {
-                if (opacity == null) {
+            Legend.prototype.symbolOpacity = function (symbolOpacity) {
+                if (symbolOpacity == null) {
                     return this._symbolOpacityAccessor;
                 }
-                else {
-                    this._symbolOpacityAccessor = d3.functor(opacity);
-                    this.render();
-                    return this;
+                else if (typeof symbolOpacity === "number") {
+                    this._symbolOpacityAccessor = function () { return symbolOpacity; };
                 }
+                else {
+                    this._symbolOpacityAccessor = symbolOpacity;
+                }
+                this.render();
+                return this;
             };
             Legend.prototype.fixedWidth = function () {
                 return true;

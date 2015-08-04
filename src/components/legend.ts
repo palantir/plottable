@@ -336,26 +336,19 @@ export module Components {
      */
     public symbolOpacity(): (datum: any, index: number) => number;
     /**
-     * Sets the function determining the symbols of the Legend.
+     * Sets the function determining the opacity of the symbols of the Legend.
      *
      * @param {(datum: any, index: number) => number} opacityFunction
      * @returns {Legend} The calling Legend
      */
-    public symbolOpacity(opacityFunction: (datum: any, index: number) => number): Legend;
-    /**
-     * Sets the function determining the symbols of the Legend.
-     *
-     * @param {number} constantOpacity
-     * @returns {Legend} The calling Legend
-     */
-    public symbolOpacity(constantOpacity: number): Legend;
-    public symbolOpacity(opacity?: number | ((datum: any, index: number) => number)): any {
-      if (opacity == null) {
+    public symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
+    public symbolOpacity(symbolOpacity?: number | ((datum: any, index: number) => number)): any {
+      if (symbolOpacity == null) {
         return this._symbolOpacityAccessor;
-      } else if (typeof opacity === "number") {
-        this._symbolOpacityAccessor = () => opacity;
+      } else if (typeof symbolOpacity === "number") {
+        this._symbolOpacityAccessor = () => symbolOpacity;
       } else {
-        this._symbolOpacityAccessor = opacity;
+        this._symbolOpacityAccessor = symbolOpacity;
       }
       this.render();
       return this;
