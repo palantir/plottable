@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Plots {
   export class Area<X> extends Line<X> {

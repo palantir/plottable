@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("ComponentGroups", () => {
   it("append()", () => {
     var componentGroup = new Plottable.Components.Group();

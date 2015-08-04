@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("TimeScale tests", () => {
     it.skip("extentOfValues() filters out invalid Dates", () => {
       var scale = new Plottable.Scales.Time();

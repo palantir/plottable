@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Scales {
   type supportedScale = d3.scale.Linear<number, string> | d3.scale.Log<number, string> | d3.scale.Pow<number, string>;

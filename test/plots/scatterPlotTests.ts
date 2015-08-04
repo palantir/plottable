@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Plots", () => {
   describe("ScatterPlot", () => {
     it("renders correctly with no data", () => {

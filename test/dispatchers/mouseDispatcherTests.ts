@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Dispatchers", () => {
   describe("Mouse Dispatcher", () => {
 

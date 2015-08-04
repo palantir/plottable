@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Plots {
   export class ClusteredBar<X, Y> extends Bar<X, Y> {

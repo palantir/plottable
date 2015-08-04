@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Interactive Components", () => {
   describe("YDragBoxLayer", () => {
     var SVG_WIDTH = 400;

@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Plots", () => {
   describe("XY Plot", () => {
     var svg: d3.Selection<void>;

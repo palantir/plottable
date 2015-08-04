@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Drawers {
   export class Rectangle extends Drawer {

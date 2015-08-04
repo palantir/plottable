@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("TimeAxis", () => {
   var scale: Plottable.Scales.Time;
   var axis: Plottable.Axes.Time;

@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Components {
   export class XDragBoxLayer extends DragBoxLayer {

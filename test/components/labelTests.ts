@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Labels", () => {
 
   it("Standard text title label generates properly", () => {

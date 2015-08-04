@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 
 type LabelConfig = {

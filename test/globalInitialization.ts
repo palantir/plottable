@@ -1,3 +1,5 @@
+///<reference path="testReference.ts" />
+
 interface Window {
   PHANTOMJS: boolean;
   Pixel_CloseTo_Requirement: number;
