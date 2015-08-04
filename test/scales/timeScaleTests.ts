@@ -1,5 +1,4 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("TimeScale tests", () => {
     it.skip("extentOfValues() filters out invalid Dates", () => {
