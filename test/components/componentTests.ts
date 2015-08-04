@@ -124,6 +124,30 @@ describe("Component behavior", () => {
       assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
       svg.remove();
     });
+
+    it("callbacks on detach() not called unless the component is anchored", () => {
+      c = new Plottable.Component();
+
+      var callbackCalled = false;
+      var callback = (component: Plottable.Component) => callbackCalled = true;
+      c.onDetach(callback);
+
+      callbackCalled = false;
+      c.detach();
+      assert.isFalse(callbackCalled, "callback was not called because the Component is not rendered yet");
+
+      c.renderTo(svg);
+
+      callbackCalled = false;
+      c.detach();
+      assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
+
+      callbackCalled = false;
+      c.detach();
+      assert.isFalse(callbackCalled, "callback was not called because the Component was detached already");
+
+      svg.remove();
+    });
   });
 
   it("parent()", () => {
