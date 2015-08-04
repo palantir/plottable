@@ -3238,9 +3238,9 @@ var Plottable;
             this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
+                this._isAnchored = false;
+                this._onDetachCallbacks.callCallbacks(this);
             }
-            this._isAnchored = false;
-            this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
         /**
@@ -6936,7 +6936,7 @@ var Plottable;
             if (deferredRendering == null) {
                 return this._deferredRendering;
             }
-            if (deferredRendering) {
+            if (deferredRendering && this._isAnchored) {
                 if (this.x() && this.x().scale) {
                     this._cachedDomainX = this.x().scale.domain();
                 }

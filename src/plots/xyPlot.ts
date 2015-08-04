@@ -111,7 +111,7 @@ export class XYPlot<X, Y> extends Plot {
       return this._deferredRendering;
     }
 
-    if (deferredRendering) {
+    if (deferredRendering && this._isAnchored) {
       if (this.x() && this.x().scale) {
         this._cachedDomainX = this.x().scale.domain();
       }
