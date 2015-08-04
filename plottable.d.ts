@@ -3062,6 +3062,13 @@ declare module Plottable {
              * @return {string | (points: Array<[number, number]>) => string)}
              */
             interpolator(): string | ((points: Array<[number, number]>) => string);
+            /**
+             * Sets the interpolation function associated with the plot.
+             *
+             * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+             * @return Plots.Line
+             */
+            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
             interpolator(interpolator: "linear"): Line<X>;
             interpolator(interpolator: "linear-closed"): Line<X>;
             interpolator(interpolator: "step"): Line<X>;
@@ -3075,13 +3082,6 @@ declare module Plottable {
             interpolator(interpolator: "cardinal-open"): Line<X>;
             interpolator(interpolator: "cardinal-closed"): Line<X>;
             interpolator(interpolator: "monotone"): Line<X>;
-            /**
-             * Sets the interpolation function associated with the plot.
-             *
-             * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
-             * @return Plots.Line
-             */
-            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];

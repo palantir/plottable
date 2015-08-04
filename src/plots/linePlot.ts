@@ -28,6 +28,13 @@ export module Plots {
      * @return {string | (points: Array<[number, number]>) => string)}
      */
     public interpolator(): string | ((points: Array<[number, number]>) => string);
+    /**
+     * Sets the interpolation function associated with the plot.
+     *
+     * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+     * @return Plots.Line
+     */
+    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
     public interpolator(interpolator: "linear"): Line<X>;
     public interpolator(interpolator: "linear-closed"): Line<X>;
     public interpolator(interpolator: "step"): Line<X>;
@@ -41,13 +48,6 @@ export module Plots {
     public interpolator(interpolator: "cardinal-open"): Line<X>;
     public interpolator(interpolator: "cardinal-closed"): Line<X>;
     public interpolator(interpolator: "monotone"): Line<X>;
-    /**
-     * Sets the interpolation function associated with the plot.
-     *
-     * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
-     * @return Plots.Line
-     */
-    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
     public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
       if (interpolator == null) {
         return this._interpolator;
