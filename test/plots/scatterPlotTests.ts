@@ -163,7 +163,7 @@ describe("Plots", () => {
       svg.remove();
     });
 
-    it("cannot retrieve entities if range does not contain center", () => {
+    it("entities are not returned if their center lies outside the range", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
       var yScale = new Plottable.Scales.Linear();
