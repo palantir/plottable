@@ -330,15 +330,15 @@ export module Components {
     }
 
     /**
-     * Gets the function determining the opacity of the symbols of the Legend.
+     * Gets the opacity of the symbols of the Legend.
      *
      * @returns {(datum: any, index: number) => number}
      */
     public symbolOpacity(): (datum: any, index: number) => number;
     /**
-     * Sets the function determining the opacity of the symbols of the Legend.
+     * Sets the opacity of the symbols of the Legend.
      *
-     * @param {(datum: any, index: number) => number} opacityFunction
+     * @param {number | ((datum: any, index: number) => number)} symbolOpacity
      * @returns {Legend} The calling Legend
      */
     public symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;

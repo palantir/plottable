@@ -2133,15 +2133,15 @@ declare module Plottable {
              */
             symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
             /**
-             * Gets the function determining the opacity of the symbols of the Legend.
+             * Gets the opacity of the symbols of the Legend.
              *
              * @returns {(datum: any, index: number) => number}
              */
             symbolOpacity(): (datum: any, index: number) => number;
             /**
-             * Sets the function determining the opacity of the symbols of the Legend.
+             * Sets the opacity of the symbols of the Legend.
              *
-             * @param {(datum: any, index: number) => number} opacityFunction
+             * @param {number | ((datum: any, index: number) => number)} symbolOpacity
              * @returns {Legend} The calling Legend
              */
             symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
