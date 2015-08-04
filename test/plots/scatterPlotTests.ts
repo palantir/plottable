@@ -163,6 +163,28 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("cannot retrieve entities if range does not contain center", () => {
+      var svg = TestMethods.generateSVG(400, 400);
+      var xScale = new Plottable.Scales.Linear();
+      var yScale = new Plottable.Scales.Linear();
+
+      var dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      var dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      var plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      var entities = plot.entitiesIn({ min: xScale.scale(1.001), max: xScale.scale(1.001) },
+                                     { min: yScale.scale(1.001), max: yScale.scale(1.001) });
+
+      assert.lengthOf(entities, 0, "no entities retrieved");
+
+      svg.remove();
+    });
+
     it("can retrieve entities in a certain bounds", () => {
       var svg = TestMethods.generateSVG(400, 400);
       var xScale = new Plottable.Scales.Linear();
