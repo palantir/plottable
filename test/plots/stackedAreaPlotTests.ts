@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Plots", () => {
   describe("Stacked Area Plot", () => {
     var svg: d3.Selection<void>;

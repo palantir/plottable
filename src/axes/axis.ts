@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export class Axis<D> extends Component {
   /**

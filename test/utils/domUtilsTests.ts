@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Utils.DOM", () => {
 
   it("getBBox works properly", () => {

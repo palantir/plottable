@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Utils.Color", () => {
   it("lightenColor()", () => {
     var colorHex = "#12fced";

@@ -18,7 +18,6 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
         root['Plottable'] = factory(req, exp, mod);
     }
 }(this, function(require, exports, module) {
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -115,7 +114,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -201,7 +199,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -472,7 +469,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -553,7 +549,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -621,7 +616,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -659,7 +653,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -742,7 +735,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -812,7 +804,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -885,7 +876,6 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Configs;
@@ -897,13 +887,11 @@ var Plottable;
     })(Configs = Plottable.Configs || (Plottable.Configs = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     Plottable.version = "1.5.2";
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Dataset = (function () {
@@ -967,7 +955,6 @@ var Plottable;
     Plottable.Dataset = Dataset;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var RenderPolicies;
@@ -1016,7 +1003,6 @@ var Plottable;
     })(RenderPolicies = Plottable.RenderPolicies || (Plottable.RenderPolicies = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     /**
@@ -1133,7 +1119,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     /**
@@ -1408,7 +1393,6 @@ var Plottable;
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var SymbolFactories;
@@ -1440,7 +1424,6 @@ var Plottable;
     })(SymbolFactories = Plottable.SymbolFactories || (Plottable.SymbolFactories = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Scale = (function () {
@@ -1589,7 +1572,6 @@ var Plottable;
     Plottable.Scale = Scale;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1815,7 +1797,6 @@ var Plottable;
     Plottable.QuantitativeScale = QuantitativeScale;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -1874,7 +1855,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2066,7 +2046,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2181,7 +2160,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2300,7 +2278,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2416,7 +2393,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2570,7 +2546,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Scales;
@@ -2618,7 +2593,6 @@ var Plottable;
     })(Scales = Plottable.Scales || (Plottable.Scales = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Drawer = (function () {
@@ -2753,7 +2727,6 @@ var Plottable;
     Plottable.Drawer = Drawer;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2784,7 +2757,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2815,7 +2787,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2838,7 +2809,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2862,7 +2832,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2886,7 +2855,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -2909,7 +2877,6 @@ var Plottable;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Components;
@@ -3419,7 +3386,6 @@ var Plottable;
     Plottable.Component = Component;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -3501,7 +3467,6 @@ var Plottable;
     Plottable.ComponentContainer = ComponentContainer;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -3600,7 +3565,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -3928,7 +3892,6 @@ var Plottable;
     Plottable.Axis = Axis;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4387,7 +4350,6 @@ var Plottable;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4725,7 +4687,6 @@ var Plottable;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -4919,7 +4880,6 @@ var Plottable;
     })(Axes = Plottable.Axes || (Plottable.Axes = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5073,7 +5033,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5332,7 +5291,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5560,7 +5518,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5665,7 +5622,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6029,7 +5985,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6191,7 +6146,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6641,7 +6595,6 @@ var Plottable;
     Plottable.Plot = Plot;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -6913,7 +6866,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7204,7 +7156,6 @@ var Plottable;
     Plottable.XYPlot = XYPlot;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7432,7 +7383,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -7541,7 +7491,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8082,7 +8031,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8204,7 +8152,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8375,7 +8322,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8441,7 +8387,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8608,7 +8553,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8731,7 +8675,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -8849,7 +8792,6 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9054,9 +8996,7 @@ var Plottable;
     })(Plots = Plottable.Plots || (Plottable.Plots = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
@@ -9080,7 +9020,6 @@ var Plottable;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Animators;
@@ -9195,7 +9134,6 @@ var Plottable;
     })(Animators = Plottable.Animators || (Plottable.Animators = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Dispatcher = (function () {
@@ -9241,7 +9179,6 @@ var Plottable;
     Plottable.Dispatcher = Dispatcher;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9429,7 +9366,6 @@ var Plottable;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9587,7 +9523,6 @@ var Plottable;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9680,7 +9615,6 @@ var Plottable;
     })(Dispatchers = Plottable.Dispatchers || (Plottable.Dispatchers = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Interaction = (function () {
@@ -9775,7 +9709,6 @@ var Plottable;
     Plottable.Interaction = Interaction;
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9858,7 +9791,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9972,7 +9904,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -10092,7 +10023,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -10210,7 +10140,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -10531,7 +10460,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -10690,7 +10618,6 @@ var Plottable;
     })(Interactions = Plottable.Interactions || (Plottable.Interactions = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -11018,7 +10945,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -11076,7 +11002,6 @@ var Plottable;
     })(Components = Plottable.Components || (Plottable.Components = {}));
 })(Plottable || (Plottable = {}));
 
-///<reference path="../reference.ts" />
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }

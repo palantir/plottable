@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Plots", () => {
   describe("RectanglePlot", () => {
     var SVG_WIDTH = 300;

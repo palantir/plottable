@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Plots", () => {
 
   describe("StackedBar Plot Stacking", () => {

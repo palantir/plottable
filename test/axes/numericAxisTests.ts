@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("NumericAxis", () => {
   function boxIsInside(inner: ClientRect, outer: ClientRect, epsilon = 0) {
     if (inner.left < outer.left - epsilon) { return false; }

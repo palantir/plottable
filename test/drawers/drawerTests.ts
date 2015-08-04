@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 class MockAnimator implements Plottable.Animator {
   private _time: number;
   private _callback: Function;

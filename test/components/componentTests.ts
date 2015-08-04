@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform((<any> component)._element.attr("transform")).translate;

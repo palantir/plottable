@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Plots", () => {
   describe("Clustered Bar Plot", () => {
     var svg: d3.Selection<void>;

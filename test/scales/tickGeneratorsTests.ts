@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Tick generators", () => {
   describe("interval", () => {
     it("generate ticks within domain", () => {

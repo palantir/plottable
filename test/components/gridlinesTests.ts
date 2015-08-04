@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Gridlines", () => {
 
   it("Scale ranges are set to the Gridlines dimensions when layout is computed", () => {

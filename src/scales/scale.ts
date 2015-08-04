@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export interface ScaleCallback<S extends Scale<any, any>> {
   (scale: S): any;

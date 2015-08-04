@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Interactions", () => {
   describe("Pointer", () => {
     var SVG_WIDTH = 400;

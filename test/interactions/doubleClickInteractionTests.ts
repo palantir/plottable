@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Interactions", () => {
   describe("DoubleClick", () => {
     var SVG_WIDTH = 400;

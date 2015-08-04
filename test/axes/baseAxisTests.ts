@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("BaseAxis", () => {
   it("orientation", () => {
     var scale = new Plottable.Scales.Linear();

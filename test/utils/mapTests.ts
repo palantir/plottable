@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Map", () => {
   it("set() and get()", () => {
     var map = new Plottable.Utils.Map<string, string>();

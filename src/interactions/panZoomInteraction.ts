@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export module Interactions {
   export class PanZoom extends Interaction {

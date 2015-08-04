@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("Interactions", () => {
   describe("KeyInteraction", () => {
     var svg: d3.Selection<void>;

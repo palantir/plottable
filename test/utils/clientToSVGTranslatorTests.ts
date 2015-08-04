@@ -1,5 +1,3 @@
-///<reference path="../testReference.ts" />
-
 describe("ClientToSVGTranslator", () => {
   it("getTranslator() creates only one ClientToSVGTranslator per <svg>", () => {
     var svg = TestMethods.generateSVG();

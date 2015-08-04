@@ -1,5 +1,3 @@
-///<reference path="../reference.ts" />
-
 module Plottable {
 export class XYPlot<X, Y> extends Plot {
   protected static _X_KEY = "x";
