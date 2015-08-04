@@ -2866,6 +2866,20 @@ var Plottable;
             return Arc;
         })(Plottable.Drawer);
         Drawers.Arc = Arc;
+    })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
+    var Drawers;
+    (function (Drawers) {
         var ArcOutline = (function (_super) {
             __extends(ArcOutline, _super);
             function ArcOutline(dataset) {

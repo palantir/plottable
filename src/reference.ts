@@ -38,6 +38,7 @@
 /// <reference path="drawers/areaDrawer.ts" />
 /// <reference path="drawers/rectangleDrawer.ts" />
 /// <reference path="drawers/arcDrawer.ts" />
+/// <reference path="drawers/arcOutlineDrawer.ts" />
 /// <reference path="drawers/symbolDrawer.ts" />
 /// <reference path="drawers/segmentDrawer.ts" />
 
