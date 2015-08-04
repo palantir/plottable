@@ -207,10 +207,10 @@ export module Components {
 
     public destroy() {
       super.destroy();
-      if (this.xScale() != null) {
+      if (this._xScale != null) {
         this.xScale().offUpdate(this._adjustBoundsCallback);
       }
-      if (this.yScale() != null) {
+      if (this._yScale != null) {
         this.yScale().offUpdate(this._adjustBoundsCallback);
       }
     }
