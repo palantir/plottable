@@ -169,14 +169,12 @@ export module Plots {
         dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
-      var attrToProjector = this._generateAttrToProjector();
       return this.entities().filter((entity) => {
         var datum = entity.datum;
         var index = entity.index;
         var dataset = entity.dataset;
-        var translate = d3.transform(attrToProjector["transform"](datum, index, dataset)).translate;
-        var x = translate[0];
-        var y = translate[1];
+        var x = Plot._scaledAccessor(this.x())(datum, index, dataset);
+        var y = Plot._scaledAccessor(this.y())(datum, index, dataset);
         return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
       });
     }
