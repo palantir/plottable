@@ -1,17 +1,16 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Plots", () => {
   describe("Waterfall Plot", () => {
-    var svg: d3.Selection<void>;
-    var dataset: Plottable.Dataset;
-    var xScale: Plottable.Scales.Category;
-    var yScale: Plottable.Scales.Linear;
-    var plot: Plottable.Plots.Waterfall<string, number>;
-    var renderArea: d3.Selection<void>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var data = [
+    let svg: d3.Selection<void>;
+    let dataset: Plottable.Dataset;
+    let xScale: Plottable.Scales.Category;
+    let yScale: Plottable.Scales.Linear;
+    let plot: Plottable.Plots.Waterfall<string, number>;
+    let renderArea: d3.Selection<void>;
+    const SVG_WIDTH = 600;
+    const SVG_HEIGHT = 400;
+    const data = [
       { x: "A", y: 20, t: "total" },
       { x: "B", y: -5, t: "delta" },
       { x: "C", y: 10, t: "delta" },
@@ -36,18 +35,18 @@ describe("Plots", () => {
     });
 
     it("adjacent bars share correct edge", () => {
-      var bars = renderArea.selectAll("rect")[0];
-      var data = dataset.data();
-      var yAccessor = plot.y().accessor;
-      var totalAccessor = plot.total().accessor;
-      for (var currentIndex = 1; currentIndex < bars.length; currentIndex++) {
-        var currentBar = d3.select(bars[currentIndex]);
-        var currentTotal = totalAccessor(data[currentIndex], currentIndex, dataset);
-        var currentValue = yAccessor(data[currentIndex], currentIndex, dataset);
-        var previousIndex = currentIndex - 1;
-        var previousBar = d3.select(bars[previousIndex]);
-        var previousTotal = totalAccessor(data[previousIndex], previousIndex, dataset);
-        var previousValue = yAccessor(data[previousIndex], previousIndex, dataset);
+      const bars = renderArea.selectAll("rect")[0];
+      const data = dataset.data();
+      const yAccessor = plot.y().accessor;
+      const totalAccessor = plot.total().accessor;
+      for (let currentIndex = 1; currentIndex < bars.length; currentIndex++) {
+        const currentBar = d3.select(bars[currentIndex]);
+        const currentTotal = totalAccessor(data[currentIndex], currentIndex, dataset);
+        const currentValue = yAccessor(data[currentIndex], currentIndex, dataset);
+        const previousIndex = currentIndex - 1;
+        const previousBar = d3.select(bars[previousIndex]);
+        const previousTotal = totalAccessor(data[previousIndex], previousIndex, dataset);
+        const previousValue = yAccessor(data[previousIndex], previousIndex, dataset);
         if (previousTotal) {
           if (currentTotal || currentValue < 0) {
             assert.isTrue(+previousBar.attr("y") === +currentBar.attr("y"), "bars are top/top aligned");
@@ -78,16 +77,16 @@ describe("Plots", () => {
     });
 
     it("bars are classed correctly", () => {
-      var bars = renderArea.selectAll("rect")[0];
-      var data = dataset.data();
-      var totalAccessor = plot.total().accessor;
+      const bars = renderArea.selectAll("rect")[0];
+      const data = dataset.data();
+      const totalAccessor = plot.total().accessor;
       bars.forEach((bar, index) => {
-        var selection = d3.select(bar);
-        var isTotal = totalAccessor(data[index], index, dataset);
+        const selection = d3.select(bar);
+        const isTotal = totalAccessor(data[index], index, dataset);
         if (isTotal) {
           assert.isTrue(selection.classed("waterfall-total"));
         } else {
-          var yAccessor = plot.y().accessor;
+          const yAccessor = plot.y().accessor;
           if (yAccessor(data[index], index, dataset) > 0) {
             assert.isTrue(selection.classed("waterfall-growth"));
           } else {
@@ -101,17 +100,17 @@ describe("Plots", () => {
     it("renders connector lines correctly", () => {
       plot.connectorsEnabled(true);
       plot.renderTo(svg);
-      var bars = renderArea.selectAll("rect")[0];
-      var connectors = renderArea.selectAll("line.connector")[0];
+      const bars = renderArea.selectAll("rect")[0];
+      const connectors = renderArea.selectAll("line.connector")[0];
       assert.isTrue(bars.length - 1 === connectors.length, "there is one more bar than number of connectors");
       connectors.forEach((connector, index) => {
-        var selection = d3.select(connector);
-        var firstBar = d3.select(bars[index]);
-        var secondBar = d3.select(bars[index + 1]);
-        var firstY = +firstBar.attr("y");
-        var firstHeight = +firstBar.attr("height");
-        var secondY = +secondBar.attr("y");
-        var secondHeight = +secondBar.attr("height");
+        const selection = d3.select(connector);
+        const firstBar = d3.select(bars[index]);
+        const secondBar = d3.select(bars[index + 1]);
+        const firstY = +firstBar.attr("y");
+        const firstHeight = +firstBar.attr("height");
+        const secondY = +secondBar.attr("y");
+        const secondHeight = +secondBar.attr("height");
         if (firstY === secondY || Math.abs(secondY + secondHeight - firstY) < 1) {
           assert.isTrue(firstY === +selection.attr("y1"), "connector is aligned to bars");
         } else {

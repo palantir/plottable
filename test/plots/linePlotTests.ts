@@ -1,12 +1,11 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Plots", () => {
   // HACKHACK #1798: beforeEach being used below
   describe("LinePlot", () => {
     it("entities() with NaN in data", () => {
-      var svg = TestMethods.generateSVG(500, 500);
-      var dataWithNaN = [
+      const svg = TestMethods.generateSVG(500, 500);
+      const dataWithNaN = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
         { foo: 0.4, bar: NaN },
@@ -14,20 +13,20 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
 
-      var xScale = new Plottable.Scales.Linear();
+      const xScale = new Plottable.Scales.Linear();
       xScale.domain([0, 1]);
-      var yScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
       yScale.domain([0, 1]);
 
-      var linePlot = new Plottable.Plots.Line();
+      const linePlot = new Plottable.Plots.Line();
       linePlot.addDataset(new Plottable.Dataset(dataWithNaN));
       linePlot.x((d: any) => d.foo, xScale);
       linePlot.y((d: any) => d.bar, yScale);
       linePlot.renderTo(svg);
 
-      var entities = linePlot.entities();
+      const entities = linePlot.entities();
 
-      var expectedLength = dataWithNaN.length - 1;
+      const expectedLength = dataWithNaN.length - 1;
       assert.lengthOf(entities, expectedLength, "NaN data was not returned");
 
       svg.remove();
@@ -37,10 +36,10 @@ describe("Plots", () => {
   describe("LinePlot", () => {
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var plot = new Plottable.Plots.Line();
+      const svg = TestMethods.generateSVG(400, 400);
+      const xScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
+      const plot = new Plottable.Plots.Line();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -51,16 +50,16 @@ describe("Plots", () => {
   });
 
   describe("LinePlot", () => {
-    var svg: d3.Selection<void>;
-    var xScale: Plottable.Scales.Linear;
-    var yScale: Plottable.Scales.Linear;
-    var xAccessor: any;
-    var yAccessor: any;
-    var colorAccessor: any;
-    var twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
-    var simpleDataset: Plottable.Dataset;
-    var linePlot: Plottable.Plots.Line<number>;
-    var renderArea: d3.Selection<void>;
+    let svg: d3.Selection<void>;
+    let xScale: Plottable.Scales.Linear;
+    let yScale: Plottable.Scales.Linear;
+    let xAccessor: any;
+    let yAccessor: any;
+    let colorAccessor: any;
+    const twoPointData = [{foo: 0, bar: 0}, {foo: 1, bar: 1}];
+    let simpleDataset: Plottable.Dataset;
+    let linePlot: Plottable.Plots.Line<number>;
+    let renderArea: d3.Selection<void>;
 
     before(() => {
       xScale = new Plottable.Scales.Linear();
@@ -85,33 +84,33 @@ describe("Plots", () => {
     });
 
     it("draws a line correctly", () => {
-      var linePath = renderArea.select(".line");
+      const linePath = renderArea.select(".line");
       assert.strictEqual(TestMethods.normalizePath(linePath.attr("d")), "M0,500L500,0", "line d was set correctly");
       assert.strictEqual(linePath.style("fill"), "none", "line fill renders as \"none\"");
       svg.remove();
     });
 
     it("attributes set appropriately from accessor", () => {
-      var areaPath = renderArea.select(".line");
+      const areaPath = renderArea.select(".line");
       assert.strictEqual(areaPath.attr("stroke"), "#000000", "stroke set correctly");
       svg.remove();
     });
 
     it("attributes can be changed by projecting new accessor and re-render appropriately", () => {
-      var newColorAccessor = () => "pink";
+      const newColorAccessor = () => "pink";
       linePlot.attr("stroke", newColorAccessor);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      const linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke changed correctly");
       svg.remove();
     });
 
     it("attributes can be changed by projecting attribute accessor (sets to first datum attribute)", () => {
-      var data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
+      const data = JSON.parse(JSON.stringify(twoPointData)); // deep copy to not affect other tests
       data.forEach(function(d: any) { d.stroke = "pink"; });
       simpleDataset.data(data);
       linePlot.attr("stroke", (d) => d.stroke);
-      var linePath = renderArea.select(".line");
+      const linePath = renderArea.select(".line");
       assert.strictEqual(linePath.attr("stroke"), "pink", "stroke set to uniform stroke color");
 
       data[0].stroke = "green";
@@ -121,7 +120,7 @@ describe("Plots", () => {
     });
 
     it("correctly handles NaN and undefined x and y values", () => {
-      var lineData = [
+      const lineData = [
         { foo: 0.0, bar: 0.0 },
         { foo: 0.2, bar: 0.2 },
         { foo: 0.4, bar: 0.4 },
@@ -129,20 +128,20 @@ describe("Plots", () => {
         { foo: 0.8, bar: 0.8 }
       ];
       simpleDataset.data(lineData);
-      var linePath = renderArea.select(".line");
-      var dOriginal = TestMethods.normalizePath(linePath.attr("d"));
+      const linePath = renderArea.select(".line");
+      const dOriginal = TestMethods.normalizePath(linePath.attr("d"));
 
       function assertCorrectPathSplitting(msgPrefix: string) {
-        var d = TestMethods.normalizePath(linePath.attr("d"));
-        var pathSegements = d.split("M").filter((segment) => segment !== "");
+        const d = TestMethods.normalizePath(linePath.attr("d"));
+        const pathSegements = d.split("M").filter((segment) => segment !== "");
         assert.lengthOf(pathSegements, 2, msgPrefix + " split path into two segments");
-        var firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
+        const firstSegmentContained = dOriginal.indexOf(pathSegements[0]) >= 0;
         assert.isTrue(firstSegmentContained, "first path segment is a subpath of the original path");
-        var secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
+        const secondSegmentContained = dOriginal.indexOf(pathSegements[1]) >= 0;
         assert.isTrue(secondSegmentContained, "second path segment is a subpath of the original path");
       }
 
-      var dataWithNaN = lineData.slice();
+      const dataWithNaN = lineData.slice();
       dataWithNaN[2] = { foo: 0.4, bar: NaN };
       simpleDataset.data(dataWithNaN);
       assertCorrectPathSplitting("y=NaN");
@@ -150,7 +149,7 @@ describe("Plots", () => {
       simpleDataset.data(dataWithNaN);
       assertCorrectPathSplitting("x=NaN");
 
-      var dataWithUndefined = lineData.slice();
+      const dataWithUndefined = lineData.slice();
       dataWithUndefined[2] = { foo: 0.4, bar: undefined };
       simpleDataset.data(dataWithUndefined);
       assertCorrectPathSplitting("y=undefined");
@@ -163,44 +162,44 @@ describe("Plots", () => {
 
     describe("selections()", () => {
       it("retrieves all dataset selections with no args", () => {
-        var dataset3 = new Plottable.Dataset([
+        const dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.selections();
+        const allLines = linePlot.selections();
         assert.strictEqual(allLines.size(), 2, "all lines retrieved");
 
         svg.remove();
       });
 
       it("retrieves correct selections", () => {
-        var dataset3 = new Plottable.Dataset([
+        const dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var allLines = linePlot.selections([dataset3]);
+        const allLines = linePlot.selections([dataset3]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        var selectionData = allLines.data();
+        const selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
       });
 
       it("skips invalid Dataset", () => {
-        var dataset3 = new Plottable.Dataset([
+        const dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
-        var dummyDataset = new Plottable.Dataset([]);
+        const dummyDataset = new Plottable.Dataset([]);
 
-        var allLines = linePlot.selections([dataset3, dummyDataset]);
+        const allLines = linePlot.selections([dataset3, dummyDataset]);
         assert.strictEqual(allLines.size(), 1, "all lines retrieved");
-        var selectionData = allLines.data();
+        const selectionData = allLines.data();
         assert.include(selectionData, dataset3.data(), "third dataset data in selection data");
 
         svg.remove();
@@ -210,14 +209,14 @@ describe("Plots", () => {
 
     describe("entities()", () => {
       it("retrieves correct data", () => {
-        var dataset3 = new Plottable.Dataset([
+        const dataset3 = new Plottable.Dataset([
           { foo: 0, bar: 1 },
           { foo: 1, bar: 0.95 }
         ]);
         linePlot.addDataset(dataset3);
 
-        var nodes = linePlot.entities().map((entity) => entity.selection.node());
-        var uniqueNodes: EventTarget[] = [];
+        const nodes = linePlot.entities().map((entity) => entity.selection.node());
+        const uniqueNodes: EventTarget[] = [];
         nodes.forEach((node) => {
           if (uniqueNodes.indexOf(node) === -1) {
             uniqueNodes.push(node);
@@ -229,10 +228,10 @@ describe("Plots", () => {
     });
 
     describe("entityNearest()", () => {
-      var lines: d3.Selection<void>;
-      var d0: any, d1: any;
-      var d0Px: Plottable.Point, d1Px: Plottable.Point;
-      var dataset2: Plottable.Dataset;
+      let lines: d3.Selection<void>;
+      let d0: any, d1: any;
+      let d0Px: Plottable.Point, d1Px: Plottable.Point;
+      let dataset2: Plottable.Dataset;
 
       beforeEach(() => {
         dataset2 = new Plottable.Dataset([
@@ -257,7 +256,7 @@ describe("Plots", () => {
       });
 
       it("returns nearest Entity", () => {
-        var expected: Plottable.Plots.PlotEntity = {
+        let expected: Plottable.Plots.PlotEntity = {
           datum: d0,
           index: 0,
           dataset: dataset2,
@@ -266,7 +265,7 @@ describe("Plots", () => {
           component: linePlot
         };
 
-        var closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
+        let closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y - 1});
         TestMethods.assertPlotEntitiesEqual(closest, expected, "if above a point, it is closest");
 
         closest = linePlot.entityNearest({x: d0Px.x, y: d0Px.y + 1});
@@ -293,7 +292,7 @@ describe("Plots", () => {
       it("considers only in-view points", () => {
         xScale.domain([0.25, 1]);
 
-        var expected: Plottable.Plots.PlotEntity = {
+        const expected: Plottable.Plots.PlotEntity = {
           datum: d1,
           index: 1,
           dataset: dataset2,
@@ -305,7 +304,7 @@ describe("Plots", () => {
           component: linePlot
         };
 
-        var closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
+        const closest = linePlot.entityNearest({ x: xScale.scale(0.25), y: d1Px.y });
         TestMethods.assertPlotEntitiesEqual(closest, expected, "only in-view points are considered");
 
         svg.remove();
@@ -313,17 +312,17 @@ describe("Plots", () => {
 
       it("returns undefined if no Entities are visible", () => {
         linePlot = new Plottable.Plots.Line<number>();
-        var closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+        const closest = linePlot.entityNearest({ x: d0Px.x, y: d0Px.y });
         assert.isUndefined(closest, "returns undefined if no Entity can be found");
         svg.remove();
       });
     });
 
     it("retains original classes when class is projected", () => {
-      var newClassProjector = () => "pink";
+      const newClassProjector = () => "pink";
       linePlot.attr("class", newClassProjector);
       linePlot.renderTo(svg);
-      var linePath = renderArea.select(".line");
+      const linePath = renderArea.select(".line");
       assert.isTrue(linePath.classed("pink"), "'pink' class is applied");
       assert.isTrue(linePath.classed("line"), "'line' class is retained");
       svg.remove();
