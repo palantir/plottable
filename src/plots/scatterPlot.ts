@@ -169,12 +169,14 @@ export module Plots {
         dataXRange = (<Range> xRangeOrBounds);
         dataYRange = yRange;
       }
+      var xProjector = Plot._scaledAccessor(this.x());
+      var yProjector = Plot._scaledAccessor(this.y());
       return this.entities().filter((entity) => {
         var datum = entity.datum;
         var index = entity.index;
         var dataset = entity.dataset;
-        var x = Plot._scaledAccessor(this.x())(datum, index, dataset);
-        var y = Plot._scaledAccessor(this.y())(datum, index, dataset);
+        var x = xProjector(datum, index, dataset);
+        var y = yProjector(datum, index, dataset);
         return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
       });
     }

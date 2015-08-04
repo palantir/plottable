@@ -7520,7 +7520,6 @@ var Plottable;
                 return propertyToProjectors;
             };
             Scatter.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
-                var _this = this;
                 var dataXRange;
                 var dataYRange;
                 if (yRange == null) {
@@ -7532,12 +7531,14 @@ var Plottable;
                     dataXRange = xRangeOrBounds;
                     dataYRange = yRange;
                 }
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
                 return this.entities().filter(function (entity) {
                     var datum = entity.datum;
                     var index = entity.index;
                     var dataset = entity.dataset;
-                    var x = Plottable.Plot._scaledAccessor(_this.x())(datum, index, dataset);
-                    var y = Plottable.Plot._scaledAccessor(_this.y())(datum, index, dataset);
+                    var x = xProjector(datum, index, dataset);
+                    var y = yProjector(datum, index, dataset);
                     return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
                 });
             };
