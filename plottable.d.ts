@@ -3050,6 +3050,8 @@ declare module Plottable {
              * If the position scale of the plot is a CategoryScale and in points mode, then
              *   from https://github.com/mbostock/d3/wiki/Ordinal-Scales#ordinal_rangePoints, the max barPixelWidth is step * padding
              * If the position scale of the plot is a QuantitativeScale, then _getMinimumDataWidth is scaled to compute the barPixelWidth
+             *
+             * // TODO ^ is no loger true.
              */
             protected _getBarPixelWidth(): number;
             entities(datasets?: Dataset[]): PlotEntity[];
