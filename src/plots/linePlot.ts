@@ -28,7 +28,7 @@ export module Plots {
     public y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
     public y(y?: number | Accessor<number> | number | Accessor<number>, yScale?: Scale<number, number>): any {
       if (yScale instanceof QuantitativeScale) {
-        (<QuantitativeScale<number>>yScale).niceDomain(!this._autorangeSmooth);
+        (<QuantitativeScale<number>>yScale).snapsDomain(!this._autorangeSmooth);
       }
       return super.y(y, yScale);
     }
@@ -42,7 +42,7 @@ export module Plots {
       this._autorangeSmooth = autorangeSmooth;
 
       if (this.y() && this.y().scale && this.y().scale instanceof QuantitativeScale) {
-        (<QuantitativeScale<number>>this.y().scale).niceDomain(!autorangeSmooth);
+        (<QuantitativeScale<number>>this.y().scale).snapsDomain(!autorangeSmooth);
       }
 
       this.autorangeMode(this.autorangeMode());

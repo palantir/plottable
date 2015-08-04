@@ -870,13 +870,13 @@ declare module Plottable {
          */
         padProportion(padProportion: number): QuantitativeScale<D>;
         /**
-         * Gets whether or not the scale will have a nice domain.
+         * Gets whether or not the scale snaps its domain to nice values.
          */
-        niceDomain(): boolean;
+        snapsDomain(): boolean;
         /**
-         * Sets whether or not the scale will have a nice domain.
+         * Sets whether or not the scale snaps its domain to nice values.
          */
-        niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
+        snapsDomain(snapsDomain: boolean): QuantitativeScale<D>;
         protected _expandSingleValueDomain(singleValueDomain: D[]): D[];
         /**
          * Computes the domain value corresponding to a supplied range value.

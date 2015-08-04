@@ -124,9 +124,9 @@ describe("Scales", () => {
       it("nice domain setter and getter", () => {
         var scale = new Plottable.Scales.Linear();
 
-        assert.strictEqual(scale.niceDomain(), true, "scales make their domain nice by default");
-        assert.strictEqual(scale.niceDomain(false), scale, "setting disabling nice domain returns the scale");
-        assert.strictEqual(scale.niceDomain(), false, "the domain is no longer nice");
+        assert.strictEqual(scale.snapsDomain(), true, "scales make their domain nice by default");
+        assert.strictEqual(scale.snapsDomain(false), scale, "setting disabling nice domain returns the scale");
+        assert.strictEqual(scale.snapsDomain(), false, "the domain is no longer nice");
       });
 
       it("nice domain works", () => {
@@ -136,9 +136,9 @@ describe("Scales", () => {
         });
 
         assert.deepEqual(scale.domain(), [1, 3.2], "nice domain works");
-        scale.niceDomain(false);
+        scale.snapsDomain(false);
         assert.deepEqual(scale.domain(), [1.073123123, 3.173123123], "nice domain can be deactivated");
-        scale.niceDomain(true);
+        scale.snapsDomain(true);
         assert.deepEqual(scale.domain(), [1, 3.2], "nice domain can be activated back");
       });
     });

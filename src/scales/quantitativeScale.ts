@@ -8,7 +8,7 @@ export class QuantitativeScale<D> extends Scale<D, number> {
   private _paddingExceptionsProviders: Utils.Set<Scales.PaddingExceptionsProvider<D>>;
   private _domainMin: D;
   private _domainMax: D;
-  private _niceDomainEnabled = true;
+  private _snapsDomain = true;
 
   /**
    * A QuantitativeScale is a Scale that maps number-like values to numbers.
@@ -153,26 +153,26 @@ export class QuantitativeScale<D> extends Scale<D, number> {
     });
     var newMin = minExistsInExceptions ? min : this.invert(this.scale(min) - (this.scale(max) - this.scale(min)) * p);
     var newMax = maxExistsInExceptions ? max : this.invert(this.scale(max) + (this.scale(max) - this.scale(min)) * p);
-    if (this._niceDomainEnabled) {
+    if (this._snapsDomain) {
       return this._niceDomain([newMin, newMax]);
     }
     return ([newMin, newMax]);
   }
 
   /**
-   * Gets whether or not the scale will have a nice domain.
+   * Gets whether or not the scale snaps its domain to nice values.
    */
-  public niceDomain(): boolean;
+  public snapsDomain(): boolean;
   /**
-   * Sets whether or not the scale will have a nice domain.
+   * Sets whether or not the scale snaps its domain to nice values.
    */
-  public niceDomain(niceDomainEnabled: boolean): QuantitativeScale<D>;
-  public niceDomain(niceDomainEnabled?: boolean): any {
-    if (niceDomainEnabled == null) {
-      return this._niceDomainEnabled;
+  public snapsDomain(snapsDomain: boolean): QuantitativeScale<D>;
+  public snapsDomain(snapsDomain?: boolean): any {
+    if (snapsDomain == null) {
+      return this._snapsDomain;
     }
 
-    this._niceDomainEnabled = niceDomainEnabled;
+    this._snapsDomain = snapsDomain;
     this._autoDomainIfAutomaticMode();
     return this;
   }
