@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 
 export type DragCallback = (start: Point, end: Point) => void;

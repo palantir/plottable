@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 
 export type Formatter = (d: any) => string;

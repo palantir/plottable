@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Axes {
   export class Numeric extends Axis<number> {

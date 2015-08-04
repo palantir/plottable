@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Dispatchers", () => {
   describe("Touch Dispatcher", () => {
     it("getDispatcher() creates only one Dispatcher.Touch per <svg>", () => {

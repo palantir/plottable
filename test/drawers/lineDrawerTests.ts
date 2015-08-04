@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Drawers", () => {
   describe("Line Drawer", () => {
     it("selectionForIndex()", () => {

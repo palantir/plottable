@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export class Interaction {
   protected _componentAttachedTo: Component;

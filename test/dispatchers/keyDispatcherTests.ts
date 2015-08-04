@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on keydown", () => {

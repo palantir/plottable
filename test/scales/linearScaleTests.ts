@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Scales", () => {
   describe("Linear Scales", () => {
     it("extentOfValues() filters out invalid numbers", () => {

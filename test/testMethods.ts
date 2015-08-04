@@ -1,3 +1,5 @@
+///<reference path="testReference.ts" />
+
 module TestMethods {
 
   export function generateSVG(width = 400, height = 400): d3.Selection<void> {

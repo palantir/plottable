@@ -1,3 +1,5 @@
+///<reference path="../testReference.ts" />
+
 describe("Plots", () => {
   describe("AreaPlot", () => {
     // HACKHACK #1798: beforeEach being used below

@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Scales {
   export class Category extends Scale<string, number> {

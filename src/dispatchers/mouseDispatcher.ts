@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 export module Dispatchers {
   export type MouseCallback = (p: Point, event: MouseEvent) => void;

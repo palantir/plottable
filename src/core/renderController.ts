@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 /**
  * The RenderController is responsible for enqueueing and synchronizing

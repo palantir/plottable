@@ -1,3 +1,5 @@
+///<reference path="../reference.ts" />
+
 module Plottable {
 
 export type ComponentCallback = (component: Component) => void;
