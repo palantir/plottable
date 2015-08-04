@@ -33,7 +33,16 @@ export module Plots {
       return super.y(y, yScale);
     }
 
+    /**
+     * Gets whether or not the autoranging is done smoothly.
+     */
     public autorangeSmooth(): boolean;
+    /**
+     * Sets whether or not the autorange is done smoothly.
+     *
+     * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+     * and deactivating the nice domain feature on the scales
+     */
     public autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
     public autorangeSmooth(autorangeSmooth?: boolean): any {
       if (autorangeSmooth == null) {

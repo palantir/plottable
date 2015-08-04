@@ -3016,7 +3016,16 @@ declare module Plottable {
             y(): Plots.AccessorScaleBinding<number, number>;
             y(y: number | Accessor<number>): Plots.Line<X>;
             y(y: number | Accessor<number>, yScale: Scale<number, number>): Plots.Line<X>;
+            /**
+             * Gets whether or not the autoranging is done smoothly.
+             */
             autorangeSmooth(): boolean;
+            /**
+             * Sets whether or not the autorange is done smoothly.
+             *
+             * Smooth autoranging is done by making sure lines always exit on the left / right side of the plot
+             * and deactivating the nice domain feature on the scales
+             */
             autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
