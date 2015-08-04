@@ -2854,20 +2854,32 @@ var Plottable;
     (function (Drawers) {
         var Arc = (function (_super) {
             __extends(Arc, _super);
-            function Arc(dataset, isOutline) {
-                if (isOutline === void 0) { isOutline = false; }
+            function Arc(dataset) {
                 _super.call(this, dataset);
-                this._className = "arc " + (isOutline ? "outline" : "fill");
+                this._className = "arc fill";
                 this._svgElementName = "path";
-                this._isOutline = isOutline;
             }
             Arc.prototype._applyDefaultAttributes = function (selection) {
                 _super.prototype._applyDefaultAttributes.call(this, selection);
-                selection.style(this._isOutline ? "fill" : "stroke", "none");
+                selection.style("stroke", "none");
             };
             return Arc;
         })(Plottable.Drawer);
         Drawers.Arc = Arc;
+        var ArcOutline = (function (_super) {
+            __extends(ArcOutline, _super);
+            function ArcOutline(dataset) {
+                _super.call(this, dataset);
+                this._className = "arc outline";
+                this._svgElementName = "path";
+            }
+            ArcOutline.prototype._applyDefaultAttributes = function (selection) {
+                _super.prototype._applyDefaultAttributes.call(this, selection);
+                selection.style("fill", "none");
+            };
+            return ArcOutline;
+        })(Plottable.Drawer);
+        Drawers.ArcOutline = ArcOutline;
     })(Drawers = Plottable.Drawers || (Plottable.Drawers = {}));
 })(Plottable || (Plottable = {}));
 
@@ -6858,7 +6870,7 @@ var Plottable;
                     return this;
                 }
                 this._updatePieAngles();
-                var strokeDrawer = new Plottable.Drawers.Arc(dataset, true);
+                var strokeDrawer = new Plottable.Drawers.ArcOutline(dataset);
                 if (this._isSetup) {
                     strokeDrawer.renderArea(this._renderArea.append("g"));
                 }

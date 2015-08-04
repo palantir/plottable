@@ -3,18 +3,30 @@
 module Plottable {
 export module Drawers {
   export class Arc extends Drawer {
-    private _isOutline: boolean;
 
-    constructor(dataset: Dataset, isOutline = false) {
+    constructor(dataset: Dataset) {
       super(dataset);
-      this._className = "arc " + (isOutline ? "outline" : "fill");
+      this._className = "arc fill";
       this._svgElementName = "path";
-      this._isOutline = isOutline;
     }
 
     protected _applyDefaultAttributes(selection: d3.Selection<any>) {
       super._applyDefaultAttributes(selection);
-      selection.style(this._isOutline ? "fill" : "stroke", "none");
+      selection.style("stroke", "none");
+    }
+  }
+
+  export class ArcOutline extends Drawer {
+
+    constructor(dataset: Dataset) {
+      super(dataset);
+      this._className = "arc outline";
+      this._svgElementName = "path";
+    }
+
+    protected _applyDefaultAttributes(selection: d3.Selection<any>) {
+      super._applyDefaultAttributes(selection);
+      selection.style("fill", "none");
     }
   }
 }

@@ -11,7 +11,7 @@ export module Plots {
     private _endAngles: number[];
     private _labelFormatter: Formatter = Formatters.identity();
     private _labelsEnabled = false;
-    private _strokeDrawers: Utils.Map<Dataset, Drawers.Arc>;
+    private _strokeDrawers: Utils.Map<Dataset, Drawers.ArcOutline>;
 
     /**
      * @constructor
@@ -23,7 +23,7 @@ export module Plots {
       this.addClass("pie-plot");
       this.attr("fill", (d, i) => String(i), new Scales.Color());
 
-      this._strokeDrawers = new Utils.Map<Dataset, Drawers.Arc>();
+      this._strokeDrawers = new Utils.Map<Dataset, Drawers.ArcOutline>();
     }
 
     protected _setup() {
@@ -50,7 +50,7 @@ export module Plots {
         return this;
       }
       this._updatePieAngles();
-      var strokeDrawer = new Drawers.Arc(dataset, true);
+      var strokeDrawer = new Drawers.ArcOutline(dataset);
       if (this._isSetup) {
        strokeDrawer.renderArea(this._renderArea.append("g"));
       }
