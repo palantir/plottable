@@ -1,84 +1,83 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Plots", () => {
 
   describe("StackedBar Plot Stacking", () => {
-    var stackedPlot: Plottable.Plots.StackedBar<number, number>;
+    let stackedPlot: Plottable.Plots.StackedBar<number, number>;
 
     beforeEach(() => {
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      const xScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
       stackedPlot = new Plottable.Plots.StackedBar<number, number>();
       stackedPlot.x((d) => d.x, xScale);
       stackedPlot.y((d) => d.y, yScale);
     });
 
     it("uses positive offset on stacking the 0 value", () => {
-      var data0 = [
+      const data0 = [
         {x: 1, y: 1},
         {x: 3, y: 1}
       ];
-      var data1 = [
+      const data1 = [
         {x: 1, y: 0},
         {x: 3, y: 1}
       ];
-      var data2 = [
+      const data2 = [
         {x: 1, y: -1},
         {x: 3, y: 1}
       ];
-      var data3 = [
+      const data3 = [
         {x: 1, y: 1},
         {x: 3, y: 1}
       ];
-      var data4 = [
+      const data4 = [
         {x: 1, y: 0},
         {x: 3, y: 1}
       ];
 
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      var ds4 = new Plottable.Dataset(data4);
+      const ds0 = new Plottable.Dataset(data0);
+      const ds1 = new Plottable.Dataset(data1);
+      const ds2 = new Plottable.Dataset(data2);
+      const ds3 = new Plottable.Dataset(data3);
+      const ds4 = new Plottable.Dataset(data4);
       stackedPlot.addDataset(ds0);
       stackedPlot.addDataset(ds1);
       stackedPlot.addDataset(ds2);
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      var stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
-      var stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
 
     it("strings are coerced to numbers for stacking", () => {
-      var data0 = [
+      const data0 = [
         { x: 1, y: "-2" }
       ];
-      var data1 = [
+      const data1 = [
         { x: 1, y: "3" }
       ];
-      var data2 = [
+      const data2 = [
         { x: 1, y: "-1" }
       ];
-      var data3 = [
+      const data3 = [
         { x: 1, y: "5" }
       ];
-      var data4 = [
+      const data4 = [
         { x: 1, y: "1" }
       ];
-      var data5 = [
+      const data5 = [
         { x: 1, y: "-1" }
       ];
 
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      var ds4 = new Plottable.Dataset(data4);
-      var ds5 = new Plottable.Dataset(data5);
+      const ds0 = new Plottable.Dataset(data0);
+      const ds1 = new Plottable.Dataset(data1);
+      const ds2 = new Plottable.Dataset(data2);
+      const ds3 = new Plottable.Dataset(data3);
+      const ds4 = new Plottable.Dataset(data4);
+      const ds5 = new Plottable.Dataset(data5);
       stackedPlot.addDataset(ds0);
       stackedPlot.addDataset(ds1);
       stackedPlot.addDataset(ds2);
@@ -86,10 +85,10 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      var stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
-      var stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
-      var stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
-      var stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
+      const stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
+      const stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
@@ -100,15 +99,15 @@ describe("Plots", () => {
     });
 
     it("stacks correctly on empty data", () => {
-      var dataset1 = new Plottable.Dataset([]);
-      var dataset2 = new Plottable.Dataset([]);
+      const dataset1 = new Plottable.Dataset([]);
+      const dataset2 = new Plottable.Dataset([]);
 
       assert.doesNotThrow(() => stackedPlot.addDataset(dataset1), Error);
       assert.doesNotThrow(() => stackedPlot.addDataset(dataset2), Error);
     });
 
     it("does not crash on stacking no datasets", () => {
-      var dataset1 = new Plottable.Dataset([
+      const dataset1 = new Plottable.Dataset([
         {x: 1, y: -2}
       ]);
 
@@ -118,81 +117,81 @@ describe("Plots", () => {
   });
 
   describe("StackedArea Plot Stacking", () => {
-    var stackedPlot: Plottable.Plots.StackedArea<number>;
+    let stackedPlot: Plottable.Plots.StackedArea<number>;
 
     beforeEach(() => {
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
+      const xScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
       stackedPlot = new Plottable.Plots.StackedArea<number>();
       stackedPlot.x((d: any) => d.x, xScale);
       stackedPlot.y((d: any) => d.y, yScale);
     });
 
     it("uses positive offset on stacking the 0 value", () => {
-      var data0 = [
+      const data0 = [
         { x: 1, y: 1 },
         { x: 3, y: 1 }
       ];
-      var data1 = [
+      const data1 = [
         { x: 1, y: 0 },
         { x: 3, y: 1 }
       ];
-      var data2 = [
+      const data2 = [
         { x: 1, y: -1 },
         { x: 3, y: 1 }
       ];
-      var data3 = [
+      const data3 = [
         { x: 1, y: 1 },
         { x: 3, y: 1 }
       ];
-      var data4 = [
+      const data4 = [
         { x: 1, y: 0 },
         { x: 3, y: 1 }
       ];
 
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      var ds4 = new Plottable.Dataset(data4);
+      const ds0 = new Plottable.Dataset(data0);
+      const ds1 = new Plottable.Dataset(data1);
+      const ds2 = new Plottable.Dataset(data2);
+      const ds3 = new Plottable.Dataset(data3);
+      const ds4 = new Plottable.Dataset(data4);
       stackedPlot.addDataset(ds0);
       stackedPlot.addDataset(ds1);
       stackedPlot.addDataset(ds2);
       stackedPlot.addDataset(ds3);
       stackedPlot.addDataset(ds4);
 
-      var stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
-      var stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset1 = (<any> stackedPlot)._stackingResult.get(ds1);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
       assert.strictEqual(stackOffset1.get("1").offset, 1, "positive offset was used");
       assert.strictEqual(stackOffset4.get("1").offset, 2, "positive offset was used");
     });
 
     it("strings are coerced to numbers for stacking", () => {
-      var data0 = [
+      const data0 = [
         { x: 1, y: "-2" }
       ];
-      var data1 = [
+      const data1 = [
         { x: 1, y: "3" }
       ];
-      var data2 = [
+      const data2 = [
         { x: 1, y: "-1" }
       ];
-      var data3 = [
+      const data3 = [
         { x: 1, y: "5" }
       ];
-      var data4 = [
+      const data4 = [
         { x: 1, y: "1" }
       ];
-      var data5 = [
+      const data5 = [
         { x: 1, y: "-1" }
       ];
 
-      var ds0 = new Plottable.Dataset(data0);
-      var ds1 = new Plottable.Dataset(data1);
-      var ds2 = new Plottable.Dataset(data2);
-      var ds3 = new Plottable.Dataset(data3);
-      var ds4 = new Plottable.Dataset(data4);
-      var ds5 = new Plottable.Dataset(data5);
+      const ds0 = new Plottable.Dataset(data0);
+      const ds1 = new Plottable.Dataset(data1);
+      const ds2 = new Plottable.Dataset(data2);
+      const ds3 = new Plottable.Dataset(data3);
+      const ds4 = new Plottable.Dataset(data4);
+      const ds5 = new Plottable.Dataset(data5);
       stackedPlot.addDataset(ds0);
       stackedPlot.addDataset(ds1);
       stackedPlot.addDataset(ds2);
@@ -200,10 +199,10 @@ describe("Plots", () => {
       stackedPlot.addDataset(ds4);
       stackedPlot.addDataset(ds5);
 
-      var stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
-      var stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
-      var stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
-      var stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
+      const stackOffset2 = (<any> stackedPlot)._stackingResult.get(ds2);
+      const stackOffset3 = (<any> stackedPlot)._stackingResult.get(ds3);
+      const stackOffset4 = (<any> stackedPlot)._stackingResult.get(ds4);
+      const stackOffset5 = (<any> stackedPlot)._stackingResult.get(ds5);
 
       assert.strictEqual(stackOffset2.get("1").offset, -2, "stacking on data1 numerical y value");
       assert.strictEqual(stackOffset3.get("1").offset, 3, "stacking on data2 numerical y value");
@@ -214,15 +213,15 @@ describe("Plots", () => {
     });
 
     it("stacks correctly on empty data", () => {
-      var dataset1 = new Plottable.Dataset([]);
-      var dataset2 = new Plottable.Dataset([]);
+      const dataset1 = new Plottable.Dataset([]);
+      const dataset2 = new Plottable.Dataset([]);
 
       assert.doesNotThrow(() => stackedPlot.addDataset(dataset1), Error);
       assert.doesNotThrow(() => stackedPlot.addDataset(dataset2), Error);
     });
 
     it("does not crash on stacking no datasets", () => {
-      var dataset1 = new Plottable.Dataset([
+      const dataset1 = new Plottable.Dataset([
         { x: 1, y: -2 }
       ]);
 
@@ -232,13 +231,13 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on numeric", () => {
-    var svg: d3.Selection<void>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var yScale: Plottable.Scales.Linear;
-    var xScale: Plottable.Scales.Linear;
-    var dataset1: Plottable.Dataset;
-    var dataset2: Plottable.Dataset;
+    let svg: d3.Selection<void>;
+    const SVG_WIDTH = 600;
+    const SVG_HEIGHT = 400;
+    let yScale: Plottable.Scales.Linear;
+    let xScale: Plottable.Scales.Linear;
+    let dataset1: Plottable.Dataset;
+    let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -260,7 +259,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plots.StackedArea();
+      const plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -272,7 +271,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plots.StackedBar();
+      const plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -285,13 +284,13 @@ describe("Plots", () => {
   });
 
   describe("auto scale domain on Category", () => {
-    var svg: d3.Selection<void>;
-    var SVG_WIDTH = 600;
-    var SVG_HEIGHT = 400;
-    var yScale: Plottable.Scales.Linear;
-    var xScale: Plottable.Scales.Category;
-    var dataset1: Plottable.Dataset;
-    var dataset2: Plottable.Dataset;
+    let svg: d3.Selection<void>;
+    const SVG_WIDTH = 600;
+    const SVG_HEIGHT = 400;
+    let yScale: Plottable.Scales.Linear;
+    let xScale: Plottable.Scales.Category;
+    let dataset1: Plottable.Dataset;
+    let dataset2: Plottable.Dataset;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -312,7 +311,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked bar", () => {
-      var plot = new Plottable.Plots.StackedBar();
+      const plot = new Plottable.Plots.StackedBar();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -324,7 +323,7 @@ describe("Plots", () => {
     });
 
     it("auto scales correctly on stacked area", () => {
-      var plot = new Plottable.Plots.StackedArea();
+      const plot = new Plottable.Plots.StackedArea();
       plot.addDataset(dataset1)
           .addDataset(dataset2);
       plot.x((d: any) => d.x, xScale)
@@ -337,10 +336,10 @@ describe("Plots", () => {
   });
 
   describe("scale extent updates", () => {
-    var svg: d3.Selection<void>;
-    var xScale: Plottable.Scales.Category;
-    var yScale: Plottable.Scales.Linear;
-    var stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
+    let svg: d3.Selection<void>;
+    let xScale: Plottable.Scales.Category;
+    let yScale: Plottable.Scales.Linear;
+    let stackedBarPlot: Plottable.Plots.StackedBar<string, number>;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(600, 400);
@@ -360,21 +359,21 @@ describe("Plots", () => {
     });
 
     it("extents are updated as datasets are updated", () => {
-      var data1 = [
+      const data1 = [
         { key: "a", value: 1 },
         { key: "b", value: -2 }
       ];
-      var data2 = [
+      const data2 = [
         { key: "a", value: 3 },
         { key: "b", value: -4 }
       ];
-      var data2B = [
+      const data2B = [
         { key: "a", value: 1 },
         { key: "b", value: -2 }
       ];
 
-      var dataset1 = new Plottable.Dataset(data1);
-      var dataset2 = new Plottable.Dataset(data2);
+      const dataset1 = new Plottable.Dataset(data1);
+      const dataset2 = new Plottable.Dataset(data2);
       stackedBarPlot.addDataset(dataset1);
       stackedBarPlot.addDataset(dataset2);
 
