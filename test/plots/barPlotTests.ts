@@ -289,7 +289,11 @@ describe("Plots", () => {
       });
 
       it("barPixelWidth calculated appropriately", () => {
-        assert.strictEqual((<any> barPlot)._barPixelWidth, xScale.scale(2) * 2 * 0.95);
+        assert.strictEqual(
+          (<any>barPlot)._barPixelWidth,
+          (xScale.scale(10) - xScale.scale(2)) * (<any>Plottable.Plots.Bar)._BAR_WIDTH_RATIO,
+          "the bar width is equal to the minimum distance between two bars minus the padding between bars"
+        );
         svg.remove();
       });
 
