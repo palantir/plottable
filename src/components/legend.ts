@@ -24,6 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
+    private _symbolOpacityAccessor: (datum: any, index: number) => number;
     private _redrawCallback: ScaleCallback<Scales.Color>;
 
     /**
@@ -48,6 +49,7 @@ export module Components {
       this.xAlignment("right").yAlignment("top");
       this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
+      this._symbolOpacityAccessor = () => 1;
     }
 
     protected _setup() {
@@ -280,6 +282,7 @@ export module Components {
       entries.select("path").attr("d", (d: any, i: number, j: number) => this.symbol()(d, j)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._colorScale.scale(value))
+                            .attr("opacity", (d: any, i: number) => this.symbolOpacity()(d, i))
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
@@ -324,6 +327,38 @@ export module Components {
         this.render();
         return this;
       }
+    }
+
+    /**
+     * Gets the function determining the opacity of the symbols of the Legend.
+     *
+     * @returns {(datum: any, index: number) => number}
+     */
+    public symbolOpacity(): (datum: any, index: number) => number;
+    /**
+     * Sets the function determining the symbols of the Legend.
+     *
+     * @param {(datum: any, index: number) => number} opacityFunction
+     * @returns {Legend} The calling Legend
+     */
+    public symbolOpacity(opacityFunction: (datum: any, index: number) => number): Legend;
+    /**
+     * Sets the function determining the symbols of the Legend.
+     *
+     * @param {number} constantOpacity
+     * @returns {Legend} The calling Legend
+     */
+    public symbolOpacity(constantOpacity: number): Legend;
+    public symbolOpacity(opacity?: number|((datum: any, index: number) => number)): any {
+      if (opacity == null) {
+        return this._symbolOpacityAccessor;
+      } else if (typeof opacity === "number") {
+        this._symbolOpacityAccessor = () => opacity;
+      } else {
+        this._symbolOpacityAccessor = opacity;
+      }
+      this.render();
+      return this;
     }
 
     public fixedWidth() {

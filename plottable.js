@@ -5107,6 +5107,7 @@ var Plottable;
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
+                this._symbolOpacityAccessor = function () { return 1; };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5278,6 +5279,7 @@ var Plottable;
                 entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                     .attr("fill", function (value) { return _this._colorScale.scale(value); })
+                    .attr("opacity", function (d, i) { return _this.symbolOpacity()(d, i); })
                     .classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
@@ -5307,6 +5309,19 @@ var Plottable;
                     this.render();
                     return this;
                 }
+            };
+            Legend.prototype.symbolOpacity = function (opacity) {
+                if (opacity == null) {
+                    return this._symbolOpacityAccessor;
+                }
+                else if (typeof opacity === "number") {
+                    this._symbolOpacityAccessor = function () { return opacity; };
+                }
+                else {
+                    this._symbolOpacityAccessor = opacity;
+                }
+                this.render();
+                return this;
             };
             Legend.prototype.fixedWidth = function () {
                 return true;
