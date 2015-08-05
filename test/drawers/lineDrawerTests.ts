@@ -1,17 +1,16 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Drawers", () => {
   describe("Line Drawer", () => {
     it("selectionForIndex()", () => {
-      var svg = TestMethods.generateSVG(300, 300);
-      var data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
-      var dataset = new Plottable.Dataset(data);
-      var xScale = new Plottable.Scales.Linear();
-      var yScale = new Plottable.Scales.Linear();
-      var linePlot = new Plottable.Plots.Line();
+      const svg = TestMethods.generateSVG(300, 300);
+      const data = [{a: 12, b: 10}, {a: 13, b: 24}, {a: 14, b: 21}, {a: 15, b: 14}];
+      const dataset = new Plottable.Dataset(data);
+      const xScale = new Plottable.Scales.Linear();
+      const yScale = new Plottable.Scales.Linear();
+      const linePlot = new Plottable.Plots.Line();
 
-      var drawer = new Plottable.Drawers.Line(dataset);
+      const drawer = new Plottable.Drawers.Line(dataset);
       (<any> linePlot)._createDrawer = () => drawer;
 
       linePlot.addDataset(dataset);
@@ -19,9 +18,9 @@ describe("Drawers", () => {
       linePlot.y((d: any) => d.b, yScale);
       linePlot.renderTo(svg);
 
-      var lineSelection = linePlot.selections();
+      const lineSelection = linePlot.selections();
       data.forEach((datum: any, index: number) => {
-        var selection = drawer.selectionForIndex(index);
+        const selection = drawer.selectionForIndex(index);
         assert.strictEqual(selection.node(), lineSelection.node(), "line selection retrieved");
       });
 
