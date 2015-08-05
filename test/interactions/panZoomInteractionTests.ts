@@ -181,6 +181,29 @@ describe("Interactions", () => {
       svg.remove();
     });
 
+    it("pinching inside one component does not affect another component", () => {
+      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      var component2 = new Plottable.Component();
+      component2.renderTo(svg2);
+      var xScale2 = new Plottable.Scales.Linear();
+      xScale2.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+      var panZoomInteraction2 = new Plottable.Interactions.PanZoom();
+      panZoomInteraction2.addXScale(xScale2);
+      panZoomInteraction2.attachTo(component2);
+
+      var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
+      var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+
+      var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT / 2 };
+      TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+      TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+      assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale inside target component transforms via pinch");
+      assert.deepEqual(xScale2.domain(), [0, SVG_WIDTH / 2], "xScale outside of target component does not transform via pinch");
+      svg.remove();
+      svg2.remove();
+    });
+
     it("Setting the xScales in batch is the same as adding one at a time", () => {
       var xScale2 = new Plottable.Scales.Linear();
       panZoomInteraction.addXScale(xScale2);
