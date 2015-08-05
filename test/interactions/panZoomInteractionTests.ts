@@ -6,6 +6,7 @@ describe("Interactions", () => {
     var SVG_WIDTH = 400;
     var SVG_HEIGHT = 500;
 
+    var component: Plottable.Component;
     var eventTarget: d3.Selection<void>;
 
     var xScale: Plottable.QuantitativeScale<number>;
@@ -15,7 +16,7 @@ describe("Interactions", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-      var component = new Plottable.Component();
+      component = new Plottable.Component();
       component.renderTo(svg);
 
       xScale = new Plottable.Scales.Linear();
@@ -182,11 +183,12 @@ describe("Interactions", () => {
     });
 
     it("pinching inside one component does not affect another component", () => {
-      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       var component2 = new Plottable.Component();
-      component2.renderTo(svg2);
+      var table = new Plottable.Components.Table([[component], [component2]]);
+      table.renderTo(svg);
       var xScale2 = new Plottable.Scales.Linear();
-      xScale2.domain([0, SVG_WIDTH / 2]).range([0, SVG_WIDTH]);
+      const initialDomain = [0, SVG_WIDTH / 2];
+      xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
       var panZoomInteraction2 = new Plottable.Interactions.PanZoom();
       panZoomInteraction2.addXScale(xScale2);
       panZoomInteraction2.attachTo(component2);
@@ -199,9 +201,8 @@ describe("Interactions", () => {
       TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
       TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
       assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale inside target component transforms via pinch");
-      assert.deepEqual(xScale2.domain(), [0, SVG_WIDTH / 2], "xScale outside of target component does not transform via pinch");
+      assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
       svg.remove();
-      svg2.remove();
     });
 
     it("Setting the xScales in batch is the same as adding one at a time", () => {
