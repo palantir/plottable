@@ -152,7 +152,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("deferredRendering() caches domains properly", function() {
+      it("deferredRendering() caches domains properly", () => {
         xScale.domain([5, 6]);
         yScale.domain([6, 7]);
         plot.x((d) => d.x, xScale);
@@ -168,7 +168,7 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      it("deferredRendering() caches domains properly when setup before rendering", function() {
+      it("deferredRendering() caches domains properly when setup before rendering", () => {
         xScale.domain([5, 6]);
         yScale.domain([6, 7]);
         plot.x((d) => d.x, xScale);
