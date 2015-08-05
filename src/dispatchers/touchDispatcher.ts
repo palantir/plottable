@@ -146,6 +146,9 @@ export module Dispatchers {
      * calls all the callbacks in the provided callbackSet.
      */
     private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
+      if (!this._translator.insideSVG(event)) {
+        return;
+      }
       var touches = event.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];

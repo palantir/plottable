@@ -9621,6 +9621,9 @@ var Plottable;
              * calls all the callbacks in the provided callbackSet.
              */
             Touch.prototype._measureAndDispatch = function (event, callbackSet) {
+                if (!this._translator.insideSVG(event)) {
+                    return;
+                }
                 var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
