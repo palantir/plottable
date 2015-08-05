@@ -450,6 +450,13 @@ export module Interactions {
       if (minDomainValue == null) {
         return this._minDomainValues.get(quantitativeScale);
       }
+      const maxDomainValue = this.maxDomainValue(quantitativeScale);
+      if (maxDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
+      }
       this._minDomainValues.set(quantitativeScale, minDomainValue);
       return this;
     }
@@ -476,6 +483,13 @@ export module Interactions {
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): any {
       if (maxDomainValue == null) {
         return this._maxDomainValues.get(quantitativeScale);
+      }
+      const minDomainValue = this.minDomainValue(quantitativeScale);
+      if (minDomainValue != null && maxDomainValue.valueOf() < minDomainValue.valueOf()) {
+        throw new Error("maxDomainValue must be larger than minDomainValue for the same Scale");
+      }
+      if (this._nonLinearScaleWithExtents(quantitativeScale)) {
+        Utils.Window.warn("Panning and zooming with extents on a nonlinear scale may have unintended behavior.");
       }
       this._maxDomainValues.set(quantitativeScale, maxDomainValue);
       return this;
