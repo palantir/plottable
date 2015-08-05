@@ -1,5 +1,5 @@
 /*!
-Plottable 1.4.0 (https://github.com/palantir/plottable)
+Plottable 1.5.2 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.4.0";
+    Plottable.version = "1.5.2";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1262,6 +1262,60 @@ var Plottable;
             return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
+        /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes
+         * - K - thousands - 10 ^ 3
+         * - M - millions - 10 ^ 6
+         * - B - billions - 10 ^ 9
+         * - T - trillions - 10 ^ 12
+         * - Q - quadrillions - 10 ^ 15
+         *
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         * @returns {Formatter} A formatter with short scale formatting
+         */
+        function shortScale(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            precision = Math.floor(precision);
+            var suffixes = "KMBTQ";
+            var exponentFormatter = d3.format("." + precision + "e");
+            var fixedFormatter = d3.format("." + precision + "f");
+            var max = Math.pow(10, (3 * (suffixes.length + 1)));
+            var min = Math.pow(10, -precision);
+            return function (num) {
+                var absNum = Math.abs(num);
+                if ((absNum < min || absNum >= max) && absNum !== 0) {
+                    return exponentFormatter(num);
+                }
+                var idx = -1;
+                while (absNum >= Math.pow(1000, idx + 2) && idx < (suffixes.length - 1)) {
+                    idx++;
+                }
+                var output = "";
+                if (idx === -1) {
+                    output = fixedFormatter(num);
+                }
+                else {
+                    output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                }
+                // catch rounding by the underlying d3 formatter
+                if ((num > 0 && output.substr(0, 4) === "1000") || (num < 0 && output.substr(0, 5) === "-1000")) {
+                    if (idx < suffixes.length - 1) {
+                        idx++;
+                        output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                    }
+                    else {
+                        output = exponentFormatter(num);
+                    }
+                }
+                return output;
+            };
+        }
+        Formatters.shortScale = shortScale;
         /**
          * Creates a multi time formatter that displays dates.
          *
@@ -1932,7 +1986,9 @@ var Plottable;
                 var positiveUpper = max;
                 var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map(function (x) { return -x; }).reverse();
                 var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
-                var linearTicks = [-this._pivot, 0, this._pivot].filter(function (x) { return min <= x && x <= max; });
+                var linearMin = Math.max(min, -this._pivot);
+                var linearMax = Math.min(max, this._pivot);
+                var linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
                 var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
                 // If you only have 1 tick, you can't tell how big the scale is.
                 if (ticks.length <= 1) {
@@ -5063,6 +5119,7 @@ var Plottable;
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
+                this._symbolOpacityAccessor = function () { return 1; };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5234,6 +5291,7 @@ var Plottable;
                 entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                     .attr("fill", function (value) { return _this._colorScale.scale(value); })
+                    .attr("opacity", function (d, i, j) { return _this.symbolOpacity()(d, j); })
                     .classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
@@ -5263,6 +5321,19 @@ var Plottable;
                     this.render();
                     return this;
                 }
+            };
+            Legend.prototype.symbolOpacity = function (symbolOpacity) {
+                if (symbolOpacity == null) {
+                    return this._symbolOpacityAccessor;
+                }
+                else if (typeof symbolOpacity === "number") {
+                    this._symbolOpacityAccessor = function () { return symbolOpacity; };
+                }
+                else {
+                    this._symbolOpacityAccessor = symbolOpacity;
+                }
+                this.render();
+                return this;
             };
             Legend.prototype.fixedWidth = function () {
                 return true;
@@ -5573,6 +5644,16 @@ var Plottable;
                 _super.prototype.renderImmediately.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
+                return this;
+            };
+            Gridlines.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this._xScale != null) {
+                    this._xScale.range([0, this.width()]);
+                }
+                if (this._yScale != null) {
+                    this._yScale.range([this.height(), 0]);
+                }
                 return this;
             };
             Gridlines.prototype._redrawXLines = function () {
@@ -5989,6 +6070,7 @@ var Plottable;
         var SelectionBoxLayer = (function (_super) {
             __extends(SelectionBoxLayer, _super);
             function SelectionBoxLayer() {
+                var _this = this;
                 _super.call(this);
                 this._boxVisible = false;
                 this._boxBounds = {
@@ -5996,6 +6078,18 @@ var Plottable;
                     bottomRight: { x: 0, y: 0 }
                 };
                 this.addClass("selection-box-layer");
+                this._adjustBoundsCallback = function () {
+                    _this.bounds({
+                        topLeft: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxLeftDataValue) : _this._boxBounds.topLeft.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxTopDataValue) : _this._boxBounds.topLeft.y
+                        },
+                        bottomRight: {
+                            x: _this._xScale ? _this._xScale.scale(_this._boxRightDataValue) : _this._boxBounds.bottomRight.x,
+                            y: _this._yScale ? _this._yScale.scale(_this._boxBottomDataValue) : _this._boxBounds.bottomRight.y
+                        }
+                    });
+                };
             }
             SelectionBoxLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -6029,6 +6123,7 @@ var Plottable;
                     topLeft: topLeft,
                     bottomRight: bottomRight
                 };
+                this._bindBoxDataValues();
             };
             SelectionBoxLayer.prototype.renderImmediately = function () {
                 if (this._boxVisible) {
@@ -6059,6 +6154,63 @@ var Plottable;
             };
             SelectionBoxLayer.prototype.fixedHeight = function () {
                 return true;
+            };
+            SelectionBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    return this._xScale;
+                }
+                if (this._xScale != null) {
+                    this._xScale.offUpdate(this._adjustBoundsCallback);
+                }
+                this._xScale = xScale;
+                this._xScale.onUpdate(this._adjustBoundsCallback);
+                this._bindBoxDataValues();
+                return this;
+            };
+            SelectionBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    return this._yScale;
+                }
+                if (this._yScale != null) {
+                    this._yScale.offUpdate(this._adjustBoundsCallback);
+                }
+                this._yScale = yScale;
+                this._yScale.onUpdate(this._adjustBoundsCallback);
+                this._bindBoxDataValues();
+                return this;
+            };
+            /**
+             * Gets the data values backing the left and right edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.xExtent = function () {
+                // Explicit typing for Typescript 1.4
+                return [this._boxLeftDataValue, this._boxRightDataValue];
+            };
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            SelectionBoxLayer.prototype.yExtent = function () {
+                // Explicit typing for Typescript 1.4
+                return [this._boxTopDataValue, this._boxBottomDataValue];
+            };
+            SelectionBoxLayer.prototype._bindBoxDataValues = function () {
+                this._boxLeftDataValue = this._xScale ? this._xScale.invert(this._boxBounds.topLeft.x) : null;
+                this._boxTopDataValue = this._yScale ? this._yScale.invert(this._boxBounds.topLeft.y) : null;
+                this._boxRightDataValue = this._xScale ? this._xScale.invert(this._boxBounds.bottomRight.x) : null;
+                this._boxBottomDataValue = this._yScale ? this._yScale.invert(this._boxBounds.bottomRight.y) : null;
+            };
+            SelectionBoxLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                if (this._xScale != null) {
+                    this.xScale().offUpdate(this._adjustBoundsCallback);
+                }
+                if (this._yScale != null) {
+                    this.yScale().offUpdate(this._adjustBoundsCallback);
+                }
             };
             return SelectionBoxLayer;
         })(Plottable.Component);
@@ -6640,27 +6792,8 @@ var Plottable;
             Pie.prototype.entitiesAt = function (queryPoint) {
                 var center = { x: this.width() / 2, y: this.height() / 2 };
                 var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
-                var radius = Math.sqrt(Math.pow(adjustedQueryPoint.x, 2) + Math.pow(adjustedQueryPoint.y, 2));
-                var angle = Math.acos(-adjustedQueryPoint.y / (1 + radius));
-                if (adjustedQueryPoint.x < 0) {
-                    angle = Math.PI * 2 - angle;
-                }
-                for (var i = 0; i < this.entities().length; i++) {
-                    var entity = this.entities()[i];
-                    var innerRadius = this.innerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (this.innerRadius().scale) {
-                        innerRadius = this.innerRadius().scale.scale(innerRadius);
-                    }
-                    var outerRadius = this.outerRadius().accessor(entity.datum, entity.index, entity.dataset);
-                    if (this.outerRadius().scale) {
-                        outerRadius = this.outerRadius().scale.scale(outerRadius);
-                    }
-                    if (this._startAngles[i] <= angle && this._endAngles[i] > angle &&
-                        innerRadius < radius && outerRadius > radius) {
-                        return [this.entities()[i]];
-                    }
-                }
-                return [];
+                var index = this._sliceIndexForPoint(adjustedQueryPoint);
+                return index == null ? [] : [this.entities()[index]];
             };
             Pie.prototype._propertyProjectors = function () {
                 var _this = this;
@@ -6726,7 +6859,7 @@ var Plottable;
             };
             Pie.prototype._sliceIndexForPoint = function (p) {
                 var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
-                var pointAngle = Math.acos(-p.y / (1 + pointRadius));
+                var pointAngle = Math.acos(-p.y / pointRadius);
                 if (p.x < 0) {
                     pointAngle = Math.PI * 2 - pointAngle;
                 }
@@ -7249,6 +7382,25 @@ var Plottable;
                 this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
                 this.render();
                 return this;
+            };
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            Rectangle.prototype.entitiesAt = function (point) {
+                var attrToProjector = this._generateAttrToProjector();
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = attrToProjector["x"](datum, index, dataset);
+                    var y = attrToProjector["y"](datum, index, dataset);
+                    var width = attrToProjector["width"](datum, index, dataset);
+                    var height = attrToProjector["height"](datum, index, dataset);
+                    return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
+                });
             };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
@@ -7977,6 +8129,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
+                this._interpolator = "linear";
                 this._autorangeSmooth = false;
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
@@ -8002,6 +8155,14 @@ var Plottable;
                     this.y().scale.snapsDomain(!autorangeSmooth);
                 }
                 this.autorangeMode(this.autorangeMode());
+                return this;
+            };
+            Line.prototype.interpolator = function (interpolator) {
+                if (interpolator == null) {
+                    return this._interpolator;
+                }
+                this._interpolator = interpolator;
+                this.render();
                 return this;
             };
             Line.prototype._createDrawer = function (dataset) {
@@ -8149,6 +8310,7 @@ var Plottable;
                     return d3.svg.line()
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
                 };
             };
@@ -8323,6 +8485,7 @@ var Plottable;
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
                         .y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); })
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
                     return areaGenerator(datum);
                 };
@@ -9568,8 +9731,10 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._eventToCallback["keydown"] = function (e) { return _this._processKeydown(e); };
+                this._eventToCallback["keyup"] = function (e) { return _this._processKeyup(e); };
                 this._keydownCallbacks = new Plottable.Utils.CallbackSet();
-                this._callbacks = [this._keydownCallbacks];
+                this._keyupCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._keydownCallbacks, this._keyupCallbacks];
             }
             /**
              * Gets a Key Dispatcher. If one already exists it will be returned;
@@ -9605,8 +9770,30 @@ var Plottable;
                 this._unsetCallback(this._keydownCallbacks, callback);
                 return this;
             };
+            /** Registers a callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            Key.prototype.onKeyUp = function (callback) {
+                this._setCallback(this._keyupCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            Key.prototype.offKeyUp = function (callback) {
+                this._unsetCallback(this._keyupCallbacks, callback);
+                return this;
+            };
             Key.prototype._processKeydown = function (event) {
                 this._keydownCallbacks.callCallbacks(event.keyCode, event);
+            };
+            Key.prototype._processKeyup = function (event) {
+                this._keyupCallbacks.callCallbacks(event.keyCode, event);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
@@ -9923,9 +10110,12 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.apply(this, arguments);
-                this._keyCodeCallbacks = {};
+                this._keyPressCallbacks = {};
+                this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
-                this._keyDownCallback = function (keyCode) { return _this._handleKeyEvent(keyCode); };
+                this._downedKeys = new Plottable.Utils.Set();
+                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -9933,19 +10123,30 @@ var Plottable;
                 this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
                 this._keyDispatcher.onKeyDown(this._keyDownCallback);
+                this._keyDispatcher.onKeyUp(this._keyUpCallback);
             };
             Key.prototype._unanchor = function () {
                 _super.prototype._unanchor.call(this);
                 this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
                 this._positionDispatcher = null;
                 this._keyDispatcher.offKeyDown(this._keyDownCallback);
+                this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyEvent = function (keyCode) {
+            Key.prototype._handleKeyDownEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
-                    this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
+                if (this._isInsideComponent(p)) {
+                    if (this._keyPressCallbacks[keyCode]) {
+                        this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
+                    }
+                    this._downedKeys.add(keyCode);
                 }
+            };
+            Key.prototype._handleKeyUpEvent = function (keyCode) {
+                if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+                    this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
+                }
+                this._downedKeys.delete(keyCode);
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is
@@ -9956,10 +10157,10 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.onKeyPress = function (keyCode, callback) {
-                if (!this._keyCodeCallbacks[keyCode]) {
-                    this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                if (!this._keyPressCallbacks[keyCode]) {
+                    this._keyPressCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
-                this._keyCodeCallbacks[keyCode].add(callback);
+                this._keyPressCallbacks[keyCode].add(callback);
                 return this;
             };
             /**
@@ -9971,9 +10172,39 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.offKeyPress = function (keyCode, callback) {
-                this._keyCodeCallbacks[keyCode].delete(callback);
-                if (this._keyCodeCallbacks[keyCode].size === 0) {
-                    delete this._keyCodeCallbacks[keyCode];
+                this._keyPressCallbacks[keyCode].delete(callback);
+                if (this._keyPressCallbacks[keyCode].size === 0) {
+                    delete this._keyPressCallbacks[keyCode];
+                }
+                return this;
+            };
+            /**
+             * Adds a callback to be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            Key.prototype.onKeyRelease = function (keyCode, callback) {
+                if (!this._keyReleaseCallbacks[keyCode]) {
+                    this._keyReleaseCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                }
+                this._keyReleaseCallbacks[keyCode].add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback that would be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            Key.prototype.offKeyRelease = function (keyCode, callback) {
+                this._keyReleaseCallbacks[keyCode].delete(callback);
+                if (this._keyReleaseCallbacks[keyCode].size === 0) {
+                    delete this._keyReleaseCallbacks[keyCode];
                 }
                 return this;
             };
@@ -10607,6 +10838,7 @@ var Plottable;
                 _super.call(this);
                 this._detectionRadius = 3;
                 this._resizable = false;
+                this._movable = false;
                 this._hasCorners = true;
                 /*
                  * Enable clipPath to hide _detectionEdge s and _detectionCorner s
@@ -10628,46 +10860,68 @@ var Plottable;
                 var resizingEdges;
                 var topLeft;
                 var bottomRight;
-                var startedNewBox;
-                this._dragInteraction.onDragStart(function (s) {
-                    resizingEdges = _this._getResizingEdges(s);
-                    if (!_this.boxVisible() ||
-                        (!resizingEdges.top && !resizingEdges.bottom &&
-                            !resizingEdges.left && !resizingEdges.right)) {
-                        _this.bounds({
-                            topLeft: s,
-                            bottomRight: s
-                        });
-                        startedNewBox = true;
+                var lastEndPoint;
+                var DRAG_MODES = {
+                    newBox: 0,
+                    resize: 1,
+                    move: 2
+                };
+                var mode = DRAG_MODES.newBox;
+                this._dragInteraction.onDragStart(function (startPoint) {
+                    resizingEdges = _this._getResizingEdges(startPoint);
+                    var bounds = _this.bounds();
+                    var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+                        bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
+                    if (_this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
+                        mode = DRAG_MODES.resize;
+                    }
+                    else if (_this.boxVisible() && _this.movable() && isInsideBox) {
+                        mode = DRAG_MODES.move;
                     }
                     else {
-                        startedNewBox = false;
+                        mode = DRAG_MODES.newBox;
+                        _this.bounds({
+                            topLeft: startPoint,
+                            bottomRight: startPoint
+                        });
                     }
                     _this.boxVisible(true);
-                    var bounds = _this.bounds();
+                    bounds = _this.bounds();
                     // copy points so changes to topLeft and bottomRight don't mutate bounds
                     topLeft = { x: bounds.topLeft.x, y: bounds.topLeft.y };
                     bottomRight = { x: bounds.bottomRight.x, y: bounds.bottomRight.y };
+                    lastEndPoint = startPoint;
                     _this._dragStartCallbacks.callCallbacks(bounds);
                 });
-                this._dragInteraction.onDrag(function (s, e) {
-                    if (startedNewBox) {
-                        bottomRight.x = e.x;
-                        bottomRight.y = e.y;
-                    }
-                    else {
-                        if (resizingEdges.bottom) {
-                            bottomRight.y = e.y;
-                        }
-                        else if (resizingEdges.top) {
-                            topLeft.y = e.y;
-                        }
-                        if (resizingEdges.right) {
-                            bottomRight.x = e.x;
-                        }
-                        else if (resizingEdges.left) {
-                            topLeft.x = e.x;
-                        }
+                this._dragInteraction.onDrag(function (startPoint, endPoint) {
+                    switch (mode) {
+                        case DRAG_MODES.newBox:
+                            bottomRight.x = endPoint.x;
+                            bottomRight.y = endPoint.y;
+                            break;
+                        case DRAG_MODES.resize:
+                            if (resizingEdges.bottom) {
+                                bottomRight.y = endPoint.y;
+                            }
+                            else if (resizingEdges.top) {
+                                topLeft.y = endPoint.y;
+                            }
+                            if (resizingEdges.right) {
+                                bottomRight.x = endPoint.x;
+                            }
+                            else if (resizingEdges.left) {
+                                topLeft.x = endPoint.x;
+                            }
+                            break;
+                        case DRAG_MODES.move:
+                            var dx = endPoint.x - lastEndPoint.x;
+                            var dy = endPoint.y - lastEndPoint.y;
+                            topLeft.x += dx;
+                            topLeft.y += dy;
+                            bottomRight.x += dx;
+                            bottomRight.y += dy;
+                            lastEndPoint = endPoint;
+                            break;
                     }
                     _this.bounds({
                         topLeft: topLeft,
@@ -10675,8 +10929,8 @@ var Plottable;
                     });
                     _this._dragCallbacks.callCallbacks(_this.bounds());
                 });
-                this._dragInteraction.onDragEnd(function (s, e) {
-                    if (startedNewBox && s.x === e.x && s.y === e.y) {
+                this._dragInteraction.onDragEnd(function (startPoint, endPoint) {
+                    if (mode === DRAG_MODES.newBox && startPoint.x === endPoint.x && startPoint.y === endPoint.y) {
                         _this.boxVisible(false);
                     }
                     _this._dragEndCallbacks.callCallbacks(_this.bounds());
@@ -10793,6 +11047,19 @@ var Plottable;
                     this.removeClass("x-resizable");
                     this.removeClass("y-resizable");
                 }
+            };
+            DragBoxLayer.prototype.movable = function (movable) {
+                if (movable == null) {
+                    return this._movable;
+                }
+                this._movable = movable;
+                if (movable) {
+                    this.addClass("movable");
+                }
+                else {
+                    this.removeClass("movable");
+                }
+                return this;
             };
             /**
              * Sets the callback to be called when dragging starts.
@@ -10916,6 +11183,15 @@ var Plottable;
                     this.removeClass("x-resizable");
                 }
             };
+            XDragBoxLayer.prototype.yScale = function (yScale) {
+                if (yScale == null) {
+                    throw new Error("XDragBoxLayer has no yScale");
+                }
+                throw new Error("yScales cannot be set on an XDragBoxLayer");
+            };
+            XDragBoxLayer.prototype.yExtent = function () {
+                throw new Error("XDragBoxLayer has no yExtent");
+            };
             return XDragBoxLayer;
         })(Components.DragBoxLayer);
         Components.XDragBoxLayer = XDragBoxLayer;
@@ -10964,6 +11240,15 @@ var Plottable;
                 else {
                     this.removeClass("y-resizable");
                 }
+            };
+            YDragBoxLayer.prototype.xScale = function (xScale) {
+                if (xScale == null) {
+                    throw new Error("YDragBoxLayer has no xScale");
+                }
+                throw new Error("xScales cannot be set on an YDragBoxLayer");
+            };
+            YDragBoxLayer.prototype.xExtent = function () {
+                throw new Error("YDragBoxLayer has no xExtent");
             };
             return YDragBoxLayer;
         })(Components.DragBoxLayer);

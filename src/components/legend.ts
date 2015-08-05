@@ -24,6 +24,7 @@ export module Components {
     private _wrapper: SVGTypewriter.Wrappers.Wrapper;
     private _writer: SVGTypewriter.Writers.Writer;
     private _symbolFactoryAccessor: (datum: any, index: number) => SymbolFactory;
+    private _symbolOpacityAccessor: (datum: any, index: number) => number;
     private _redrawCallback: ScaleCallback<Scales.Color>;
 
     /**
@@ -48,6 +49,7 @@ export module Components {
       this.xAlignment("right").yAlignment("top");
       this.comparator((a: string, b: string) => this._colorScale.domain().indexOf(a) - this._colorScale.domain().indexOf(b));
       this._symbolFactoryAccessor = () => SymbolFactories.circle();
+      this._symbolOpacityAccessor = () => 1;
     }
 
     protected _setup() {
@@ -280,6 +282,7 @@ export module Components {
       entries.select("path").attr("d", (d: any, i: number, j: number) => this.symbol()(d, j)(layout.textHeight * 0.6))
                             .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                             .attr("fill", (value: string) => this._colorScale.scale(value))
+                            .attr("opacity", (d: any, i: number, j: number) => this.symbolOpacity()(d, j))
                             .classed(Legend.LEGEND_SYMBOL_CLASS, true);
 
       var padding = this._padding;
@@ -324,6 +327,31 @@ export module Components {
         this.render();
         return this;
       }
+    }
+
+    /**
+     * Gets the opacity of the symbols of the Legend.
+     *
+     * @returns {(datum: any, index: number) => number}
+     */
+    public symbolOpacity(): (datum: any, index: number) => number;
+    /**
+     * Sets the opacity of the symbols of the Legend.
+     *
+     * @param {number | ((datum: any, index: number) => number)} symbolOpacity
+     * @returns {Legend} The calling Legend
+     */
+    public symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
+    public symbolOpacity(symbolOpacity?: number | ((datum: any, index: number) => number)): any {
+      if (symbolOpacity == null) {
+        return this._symbolOpacityAccessor;
+      } else if (typeof symbolOpacity === "number") {
+        this._symbolOpacityAccessor = () => symbolOpacity;
+      } else {
+        this._symbolOpacityAccessor = symbolOpacity;
+      }
+      this.render();
+      return this;
     }
 
     public fixedWidth() {

@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Plots", () => {
   describe("SegmentPlot", () => {
     var svg: d3.Selection<void>;

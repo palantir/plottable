@@ -661,6 +661,22 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes
+         * - K - thousands - 10 ^ 3
+         * - M - millions - 10 ^ 6
+         * - B - billions - 10 ^ 9
+         * - T - trillions - 10 ^ 12
+         * - Q - quadrillions - 10 ^ 15
+         *
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         * @returns {Formatter} A formatter with short scale formatting
+         */
+        function shortScale(precision?: number): (num: number) => string;
+        /**
          * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
@@ -2124,6 +2140,19 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+            /**
+             * Gets the opacity of the symbols of the Legend.
+             *
+             * @returns {(datum: any, index: number) => number}
+             */
+            symbolOpacity(): (datum: any, index: number) => number;
+            /**
+             * Sets the opacity of the symbols of the Legend.
+             *
+             * @param {number | ((datum: any, index: number) => number)} symbolOpacity
+             * @returns {Legend} The calling Legend
+             */
+            symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
@@ -2194,6 +2223,7 @@ declare module Plottable {
             destroy(): Gridlines;
             protected _setup(): void;
             renderImmediately(): Gridlines;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
         }
     }
 }
@@ -2355,6 +2385,51 @@ declare module Plottable {
             boxVisible(show: boolean): SelectionBoxLayer;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
+            /**
+             * Gets the x scale for this SelectionBoxLayer.
+             */
+            xScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the x scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            xScale(xScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the y scale for this SelectionBoxLayer.
+             */
+            yScale(): QuantitativeScale<number | {
+                valueOf(): number;
+            }>;
+            /**
+             * Sets the y scale for this SelectionBoxLayer.
+             *
+             * @returns {SelectionBoxLayer} The calling SelectionBoxLayer.
+             */
+            yScale(yScale: QuantitativeScale<number | {
+                valueOf(): number;
+            }>): SelectionBoxLayer;
+            /**
+             * Gets the data values backing the left and right edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
+            /**
+             * Gets the data values backing the top and bottom edges of the box.
+             *
+             * Returns an undefined array if the edges are not backed by a scale.
+             */
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
+            destroy(): void;
         }
     }
 }
@@ -2809,6 +2884,13 @@ declare module Plottable {
              * @returns {Plots.Rectangle} The calling Rectangle Plot.
              */
             y2(y2: number | Accessor<number> | Y | Accessor<Y>): Plots.Rectangle<X, Y>;
+            /**
+             * Gets the PlotEntities at a particular Point.
+             *
+             * @param {Point} point The point to query.
+             * @returns {PlotEntity[]} The PlotEntities at the particular point
+             */
+            entitiesAt(point: Point): PlotEntity[];
             protected _propertyProjectors(): AttributeToProjector;
             protected _pixelPoint(datum: any, index: number, dataset: Dataset): {
                 x: any;
@@ -3027,6 +3109,32 @@ declare module Plottable {
              * and deactivating the nice domain feature on the scales
              */
             autorangeSmooth(autorangeSmooth: boolean): Plots.Line<X>;
+            /**
+             * Gets the interpolation function associated with the plot.
+             *
+             * @return {string | (points: Array<[number, number]>) => string)}
+             */
+            interpolator(): string | ((points: Array<[number, number]>) => string);
+            /**
+             * Sets the interpolation function associated with the plot.
+             *
+             * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+             * @return Plots.Line
+             */
+            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+            interpolator(interpolator: "linear"): Line<X>;
+            interpolator(interpolator: "linear-closed"): Line<X>;
+            interpolator(interpolator: "step"): Line<X>;
+            interpolator(interpolator: "step-before"): Line<X>;
+            interpolator(interpolator: "step-after"): Line<X>;
+            interpolator(interpolator: "basis"): Line<X>;
+            interpolator(interpolator: "basis-open"): Line<X>;
+            interpolator(interpolator: "basis-closed"): Line<X>;
+            interpolator(interpolator: "bundle"): Line<X>;
+            interpolator(interpolator: "cardinal"): Line<X>;
+            interpolator(interpolator: "cardinal-open"): Line<X>;
+            interpolator(interpolator: "cardinal-closed"): Line<X>;
+            interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
@@ -3647,6 +3755,19 @@ declare module Plottable {
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyDown(callback: KeyCallback): Key;
+            /** Registers a callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            onKeyUp(callback: KeyCallback): Key;
+            /**
+             * Removes the callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            offKeyUp(callback: KeyCallback): Key;
         }
     }
 }
@@ -3775,6 +3896,24 @@ declare module Plottable {
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             offKeyPress(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Adds a callback to be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            onKeyRelease(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Removes a callback that would be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            offKeyRelease(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }
@@ -4059,6 +4198,17 @@ declare module Plottable {
             resizable(canResize: boolean): DragBoxLayer;
             protected _setResizableClasses(canResize: boolean): void;
             /**
+             * Gets whether or not the drag box is movable.
+             */
+            movable(): boolean;
+            /**
+             * Sets whether or not the drag box is movable.
+             *
+             * @param {boolean} movable
+             * @return {DragBoxLayer} The calling DragBoxLayer.
+             */
+            movable(movable: boolean): DragBoxLayer;
+            /**
              * Sets the callback to be called when dragging starts.
              *
              * @param {DragBoxCallback} callback
@@ -4130,6 +4280,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): XDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            yScale<D extends number | {
+                valueOf(): number;
+            }>(yScale: QuantitativeScale<D>): SelectionBoxLayer;
+            yExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }
@@ -4148,6 +4307,15 @@ declare module Plottable {
             computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): YDragBoxLayer;
             protected _setBounds(newBounds: Bounds): void;
             protected _setResizableClasses(canResize: boolean): void;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(): QuantitativeScale<D>;
+            xScale<D extends number | {
+                valueOf(): number;
+            }>(xScale: QuantitativeScale<D>): SelectionBoxLayer;
+            xExtent(): (number | {
+                valueOf(): number;
+            })[];
         }
     }
 }

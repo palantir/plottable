@@ -1,6 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
 class CountingPlot extends Plottable.Plot {
   public renders: number = 0;
 

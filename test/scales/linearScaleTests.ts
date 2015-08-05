@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Scales", () => {
   describe("Linear Scales", () => {
     it("extentOfValues() filters out invalid numbers", () => {

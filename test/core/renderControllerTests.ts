@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("RenderController", () => {
   // HACKHACK: #2083
   it.skip("Components whose render() is triggered by another Component's render() will be drawn", () => {

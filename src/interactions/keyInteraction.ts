@@ -11,10 +11,13 @@ export module Interactions {
      */
     private _positionDispatcher: Plottable.Dispatchers.Mouse;
     private _keyDispatcher: Plottable.Dispatchers.Key;
-    private _keyCodeCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyPressCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
+    private _keyReleaseCallbacks: { [keyCode: string]: Utils.CallbackSet<KeyCallback> } = {};
 
     private _mouseMoveCallback = (point: Point) => false; // HACKHACK: registering a listener
-    private _keyDownCallback = (keyCode: number) => this._handleKeyEvent(keyCode);
+    private _downedKeys = new Plottable.Utils.Set();
+    private _keyDownCallback = (keyCode: number) => this._handleKeyDownEvent(keyCode);
+    private _keyUpCallback = (keyCode: number) => this._handleKeyUpEvent(keyCode);
 
     protected _anchor(component: Component) {
       super._anchor(component);
@@ -25,6 +28,7 @@ export module Interactions {
 
       this._keyDispatcher = Dispatchers.Key.getDispatcher();
       this._keyDispatcher.onKeyDown(this._keyDownCallback);
+      this._keyDispatcher.onKeyUp(this._keyUpCallback);
     }
 
     protected _unanchor() {
@@ -33,14 +37,25 @@ export module Interactions {
       this._positionDispatcher = null;
 
       this._keyDispatcher.offKeyDown(this._keyDownCallback);
+      this._keyDispatcher.offKeyUp(this._keyUpCallback);
       this._keyDispatcher = null;
     }
 
-    private _handleKeyEvent(keyCode: number) {
+    private _handleKeyDownEvent(keyCode: number) {
       var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-      if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
-        this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
+      if (this._isInsideComponent(p)) {
+        if (this._keyPressCallbacks[keyCode]) {
+          this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
+        }
+        this._downedKeys.add(keyCode);
       }
+    }
+
+    private _handleKeyUpEvent(keyCode: number) {
+      if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+        this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
+      }
+      this._downedKeys.delete(keyCode);
     }
 
     /**
@@ -52,10 +67,10 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public onKeyPress(keyCode: number, callback: KeyCallback) {
-      if (!this._keyCodeCallbacks[keyCode]) {
-        this._keyCodeCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      if (!this._keyPressCallbacks[keyCode]) {
+        this._keyPressCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
       }
-      this._keyCodeCallbacks[keyCode].add(callback);
+      this._keyPressCallbacks[keyCode].add(callback);
       return this;
     }
 
@@ -68,9 +83,41 @@ export module Interactions {
      * @returns {Interactions.Key} The calling Key Interaction.
      */
     public offKeyPress(keyCode: number, callback: KeyCallback) {
-      this._keyCodeCallbacks[keyCode].delete(callback);
-      if (this._keyCodeCallbacks[keyCode].size === 0) {
-        delete this._keyCodeCallbacks[keyCode];
+      this._keyPressCallbacks[keyCode].delete(callback);
+      if (this._keyPressCallbacks[keyCode].size === 0) {
+        delete this._keyPressCallbacks[keyCode];
+      }
+      return this;
+    }
+
+    /**
+     * Adds a callback to be called when the key with the given keyCode is
+     * released if the key was pressed with the mouse inside of the Component.
+     *
+     * @param {number} keyCode
+     * @param {KeyCallback} callback
+     * @returns {Interactions.Key} The calling Key Interaction.
+     */
+    public onKeyRelease(keyCode: number, callback: KeyCallback) {
+      if (!this._keyReleaseCallbacks[keyCode]) {
+        this._keyReleaseCallbacks[keyCode] = new Utils.CallbackSet<KeyCallback>();
+      }
+      this._keyReleaseCallbacks[keyCode].add(callback);
+      return this;
+    }
+
+    /**
+     * Removes a callback that would be called when the key with the given keyCode is
+     * released if the key was pressed with the mouse inside of the Component.
+     *
+     * @param {number} keyCode
+     * @param {KeyCallback} callback
+     * @returns {Interactions.Key} The calling Key Interaction.
+     */
+    public offKeyRelease(keyCode: number, callback: KeyCallback) {
+      this._keyReleaseCallbacks[keyCode].delete(callback);
+      if (this._keyReleaseCallbacks[keyCode].size === 0) {
+        delete this._keyReleaseCallbacks[keyCode];
       }
       return this;
     }

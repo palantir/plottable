@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("TimeAxis", () => {
   var scale: Plottable.Scales.Time;
   var axis: Plottable.Axes.Time;

@@ -1,8 +1,24 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Gridlines", () => {
+
+  it("Scale ranges are set to the Gridlines dimensions when layout is computed", () => {
+    var svg = TestMethods.generateSVG(640, 480);
+    var xScale = new Plottable.Scales.Linear();
+    xScale.domain([0, 10]);
+
+    var yScale = new Plottable.Scales.Linear();
+    yScale.domain([0, 10]);
+
+    var gridlines = new Plottable.Components.Gridlines(xScale, yScale);
+    gridlines.renderTo(svg);
+
+    assert.deepEqual(xScale.range(), [0, 640], "x scale range extends to the width of the svg");
+    assert.deepEqual(yScale.range(), [480, 0], "y scale range extends to the height of the svg");
+
+    svg.remove();
+  });
+
   it("Gridlines and axis tick marks align", () => {
     var svg = TestMethods.generateSVG(640, 480);
     var xScale = new Plottable.Scales.Linear();

@@ -152,7 +152,7 @@ module.exports = function(grunt) {
 
   var tslintConfig = {
     options: {
-      configuration: grunt.file.readJSON("tslint.json")
+      configuration: grunt.file.readJSON(".tslintrc")
     },
     all: {
       src: ["src/**/*.ts", "test/**/*.ts"]
@@ -292,6 +292,12 @@ module.exports = function(grunt) {
           browserName: "internet explorer",
           version: "9",
           platform: "WIN7"
+        }, {
+          browserName: "iphone",
+          platform: "OS X 10.10",
+          version: "8.0",
+          deviceName: "iPad Simulator",
+          deviceOrientation: "portrait"
         }],
         build: process.env.TRAVIS_JOB_ID,
         "tunnel-identifier": process.env.TRAVIS_JOB_NUMBER
