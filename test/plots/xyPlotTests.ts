@@ -134,47 +134,52 @@ describe("Plots", () => {
       var yScale: Plottable.Scales.Linear;
       var plot: Plottable.XYPlot<number, number>;
 
+      var oldTimeout: any;
+
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
         plot = new Plottable.XYPlot<number, number>();
         (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      });
 
-      // it("deferredRendering() setter/getter", () => {
-      //   assert.strictEqual(plot.deferredRendering(), false, "deferred rendering is false by default");
-      //   assert.strictEqual(plot.deferredRendering(true), plot, "setting the deferred rendering option returns the plot");
-      //   assert.strictEqual(plot.deferredRendering(), true, "deferred rendering can be turned on");
-      //   plot.deferredRendering(false);
-      //   assert.strictEqual(plot.deferredRendering(), false, "deferred rendering can be turned off");
-
-      //   svg.remove();
-      // });
-
-      // it("deferredRendering() caches domains properly", () => {
-      //   xScale.domain([5, 6]);
-      //   yScale.domain([6, 7]);
-      //   plot.x((d) => d.x, xScale);
-      //   plot.y((d) => d.y, yScale);
-      //   plot.renderTo(svg);
-      //   assert.deepEqual((<any>plot)._cachedDomainX, [null, null], "the x domain is not cached when deferredRendering is disabled");
-      //   assert.deepEqual((<any>plot)._cachedDomainY, [null, null], "the y domain is not cached when deferredRendering is disabled");
-      //   plot.deferredRendering(true);
-
-      //   assert.deepEqual((<any>plot)._cachedDomainX, [5, 6], "The correct x domain is cached");
-      //   assert.deepEqual((<any>plot)._cachedDomainY, [6, 7], "The correct y domain is cached");
-
-      //   svg.remove();
-      // });
-
-      it("deferredRendering() caches domains properly when setup before rendering", () => {
-
-
-        var oldTimeout = (<any>window).setTimeout;
+        oldTimeout = (<any>window).setTimeout;
         (<any>window).setTimeout = function (fn, time) {
           fn.call(this);
         }
+      });
+
+      afterEach(() => {
+        (<any>window).setTimeout = oldTimeout;
+      });
+
+      it("deferredRendering() setter/getter", () => {
+        assert.strictEqual(plot.deferredRendering(), false, "deferred rendering is false by default");
+        assert.strictEqual(plot.deferredRendering(true), plot, "setting the deferred rendering option returns the plot");
+        assert.strictEqual(plot.deferredRendering(), true, "deferred rendering can be turned on");
+        plot.deferredRendering(false);
+        assert.strictEqual(plot.deferredRendering(), false, "deferred rendering can be turned off");
+
+        svg.remove();
+      });
+
+      it("deferredRendering() caches domains properly", () => {
+        xScale.domain([5, 6]);
+        yScale.domain([6, 7]);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+        plot.renderTo(svg);
+        assert.deepEqual((<any>plot)._cachedDomainX, [null, null], "the x domain is not cached when deferredRendering is disabled");
+        assert.deepEqual((<any>plot)._cachedDomainY, [null, null], "the y domain is not cached when deferredRendering is disabled");
+        plot.deferredRendering(true);
+
+        assert.deepEqual((<any>plot)._cachedDomainX, [5, 6], "The correct x domain is cached");
+        assert.deepEqual((<any>plot)._cachedDomainY, [6, 7], "The correct y domain is cached");
+
+        svg.remove();
+      });
+
+      it("deferredRendering() caches domains properly when setup before rendering", () => {
 
         xScale.domain([5, 6]);
         yScale.domain([6, 7]);
@@ -192,19 +197,21 @@ describe("Plots", () => {
         svg.remove();
       });
 
-      // it("deferredRendering() caches domains properly setup before scales", () => {
-      //   xScale.domain([5, 6]);
-      //   yScale.domain([6, 7]);
-      //   plot.deferredRendering(true);
-      //   plot.x((d) => d.x, xScale);
-      //   plot.y((d) => d.y, yScale);
-      //   plot.renderTo(svg);
+      it("deferredRendering() caches domains properly setup before scales", () => {
+        xScale.domain([5, 6]);
+        yScale.domain([6, 7]);
+        plot.deferredRendering(true);
+        plot.x((d) => d.x, xScale);
+        plot.y((d) => d.y, yScale);
+        assert.deepEqual((<any>plot)._cachedDomainX, [null, null], "The x domain is still not cached until the timeout expires");
+        assert.deepEqual((<any>plot)._cachedDomainY, [null, null], "The y domain is still not cached until the timeout expires");
+        plot.renderTo(svg);
 
-      //   assert.deepEqual((<any>plot)._cachedDomainX, [null, null], "The x domain is still not cached until the timeout expires");
-      //   assert.deepEqual((<any>plot)._cachedDomainY, [null, null], "The y domain is still not cached until the timeout expires");
+        assert.deepEqual((<any>plot)._cachedDomainX, [5, 6], "The x domain is still not cached until the timeout expires");
+        assert.deepEqual((<any>plot)._cachedDomainY, [6, 7], "The y domain is still not cached until the timeout expires");
 
-      //   svg.remove();
-      // });
+        svg.remove();
+      });
 
     });
 
