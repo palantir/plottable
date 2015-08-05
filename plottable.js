@@ -6200,6 +6200,37 @@ var __extends = (this && this.__extends) || function (d, b) {
 };
 var Plottable;
 (function (Plottable) {
+    var Components;
+    (function (Components) {
+        var GuideLineLayer = (function (_super) {
+            __extends(GuideLineLayer, _super);
+            function GuideLineLayer(orientation) {
+                _super.call(this);
+            }
+            GuideLineLayer.prototype.scale = function (scale) {
+                return;
+            };
+            GuideLineLayer.prototype.value = function (value) {
+                return;
+            };
+            GuideLineLayer.prototype.pixelPosition = function (pixelPosition) {
+                return;
+            };
+            return GuideLineLayer;
+        })(Plottable.Component);
+        Components.GuideLineLayer = GuideLineLayer;
+    })(Components = Plottable.Components || (Plottable.Components = {}));
+})(Plottable || (Plottable = {}));
+
+///<reference path="../reference.ts" />
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    __.prototype = b.prototype;
+    d.prototype = new __();
+};
+var Plottable;
+(function (Plottable) {
     var Plots;
     (function (Plots) {
         var Animator;

@@ -2415,6 +2415,21 @@ declare module Plottable {
 
 
 declare module Plottable {
+    module Components {
+        class GuideLineLayer<D> extends Component {
+            constructor(orientation: string);
+            scale(): QuantitativeScale<D>;
+            scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+            value(): D;
+            value(value: D): GuideLineLayer<D>;
+            pixelPosition(): number;
+            pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+        }
+    }
+}
+
+
+declare module Plottable {
     module Plots {
         interface PlotEntity extends Entity<Plot> {
             dataset: Dataset;

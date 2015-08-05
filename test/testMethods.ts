@@ -91,6 +91,16 @@ module TestMethods {
     assert.strictEqual(height, String(heightExpected), "height: " + message);
   }
 
+  export function assertLineAttrs(
+    line: d3.Selection<void>,
+    expectedAttrs: { x1: number, y1: number, x2: number, y2: number },
+    message: string) {
+    assert.strictEqual(TestMethods.numAttr(line, "x1"), expectedAttrs.x1, message + " (x1)");
+    assert.strictEqual(TestMethods.numAttr(line, "y1"), expectedAttrs.y1, message + " (y1)");
+    assert.strictEqual(TestMethods.numAttr(line, "x2"), expectedAttrs.x2, message + " (x2)");
+    assert.strictEqual(TestMethods.numAttr(line, "y2"), expectedAttrs.y2, message + " (y2)");
+  }
+
   export function assertEntitiesEqual(
       actual: Plottable.Entity<Plottable.Component>,
       expected: Plottable.Entity<Plottable.Component>,
