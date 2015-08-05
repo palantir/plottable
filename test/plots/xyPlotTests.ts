@@ -133,14 +133,6 @@ describe("Plots", () => {
       var xScale: Plottable.Scales.Linear;
       var yScale: Plottable.Scales.Linear;
       var plot: Plottable.XYPlot<number, number>;
-      var simpleDataset = new Plottable.Dataset([
-        { a: -6, b: 6 },
-        { a: -2, b: 2 },
-        { a: 2, b: -2 },
-        { a: 6, b: -6 }
-      ]);
-      var xAccessor = (d: any) => d.a;
-      var yAccessor = (d: any) => d.b;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(500, 500);
