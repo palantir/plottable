@@ -3,6 +3,7 @@
 module Plottable {
 export module Plots {
   export class Line<X> extends XYPlot<X, number> {
+    private _interpolator: string | ((points: Array<[number, number]>) => string) = "linear";
 
     /**
      * A Line Plot draws line segments starting from the first data point to the next.
@@ -19,6 +20,41 @@ export module Plots {
       this.animator(Plots.Animator.MAIN, animator);
       this.attr("stroke", new Scales.Color().range()[0]);
       this.attr("stroke-width", "2px");
+    }
+
+    /**
+     * Gets the interpolation function associated with the plot.
+     *
+     * @return {string | (points: Array<[number, number]>) => string)}
+     */
+    public interpolator(): string | ((points: Array<[number, number]>) => string);
+    /**
+     * Sets the interpolation function associated with the plot.
+     *
+     * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+     * @return Plots.Line
+     */
+    public interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+    public interpolator(interpolator: "linear"): Line<X>;
+    public interpolator(interpolator: "linear-closed"): Line<X>;
+    public interpolator(interpolator: "step"): Line<X>;
+    public interpolator(interpolator: "step-before"): Line<X>;
+    public interpolator(interpolator: "step-after"): Line<X>;
+    public interpolator(interpolator: "basis"): Line<X>;
+    public interpolator(interpolator: "basis-open"): Line<X>;
+    public interpolator(interpolator: "basis-closed"): Line<X>;
+    public interpolator(interpolator: "bundle"): Line<X>;
+    public interpolator(interpolator: "cardinal"): Line<X>;
+    public interpolator(interpolator: "cardinal-open"): Line<X>;
+    public interpolator(interpolator: "cardinal-closed"): Line<X>;
+    public interpolator(interpolator: "monotone"): Line<X>;
+    public interpolator(interpolator?: string | ((points: Array<[number, number]>) => string)): any {
+      if (interpolator == null) {
+        return this._interpolator;
+      }
+      this._interpolator = interpolator;
+      this.render();
+      return this;
     }
 
     protected _createDrawer(dataset: Dataset): Drawer {
@@ -106,6 +142,7 @@ export module Plots {
         return d3.svg.line()
                      .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                      .y((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
+                     .interpolate(this.interpolator())
                      .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset))(datum);
       };
     }

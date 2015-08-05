@@ -31,6 +31,53 @@ describe("Plots", () => {
 
       svg.remove();
     });
+
+    describe("interpolation", () => {
+      it("interpolator() get / set", () => {
+        var linePlot = new Plottable.Plots.Line();
+        assert.strictEqual(linePlot.interpolator(), "linear", "the default interpolation mode is linear");
+        assert.strictEqual(linePlot.interpolator("step"), linePlot, "setting an interpolation mode returns the plot");
+        assert.strictEqual(linePlot.interpolator(), "step", "setting an interpolation mode works");
+      });
+
+      it("interpolator() behavior for the step function", () => {
+        var svg = TestMethods.generateSVG(400, 400);
+        var data = [
+          {"x": 0.0, "y": 0},
+          {"x": 0.8, "y": 0.717},
+          {"x": 1.6, "y": 0.999},
+          {"x": 2.4, "y": 0.675},
+          {"x": 3.2, "y": -0.058},
+          {"x": 4.0, "y": -0.756},
+          {"x": 4.8, "y": -0.996},
+          {"x": 5.6, "y": -0.631},
+        ];
+
+        var xScale = new Plottable.Scales.Linear();
+        var yScale = new Plottable.Scales.Linear();
+        var linePlot = new Plottable.Plots.Line();
+        linePlot.addDataset(new Plottable.Dataset(data));
+        linePlot.x((d) => d.x, xScale);
+        linePlot.y((d) => d.y, yScale);
+
+        linePlot.renderTo(svg);
+
+        var svgPath: string;
+        svgPath = linePlot.content().select("path").attr("d");
+        assert.lengthOf(svgPath.match(/L/g), data.length - 1, "one line for each pair of consecutive points");
+        assert.isNull(svgPath.match(/V/g), "no vertical lines");
+        assert.isNull(svgPath.match(/H/g), "no horizontal lines");
+
+        linePlot.interpolator("step");
+
+        svgPath = linePlot.content().select("path").attr("d");
+        assert.lengthOf(svgPath.match(/V/g), data.length - 1, "one vertical line for each pair of consecutive points");
+        assert.lengthOf(svgPath.match(/H/g), data.length, "one horizontal line for each point");
+        assert.isNull(svgPath.match(/L/g), "no other lines");
+
+        svg.remove();
+      });
+    });
   });
 
   describe("LinePlot", () => {
