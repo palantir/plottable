@@ -31,8 +31,8 @@ export class XYPlot<X, Y> extends Plot {
     var _deltaY = 0;
     var _scalingX = 1;
     var _scalingY = 1;
-    var _lastSeenDomainX: X[] = null;
-    var _lastSeenDomainY: Y[] = null;
+    var _lastSeenDomainX: X[] = [null, null];
+    var _lastSeenDomainY: Y[] = [null, null];
     var _timeoutReference = 0;
     var _deferredRenderingTimeout = 500;
 
@@ -69,6 +69,9 @@ export class XYPlot<X, Y> extends Plot {
     };
 
     var _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
+      console.log("cached domain Y", this._cachedDomainY);
+
+
       if (!this._isAnchored) {
         return;
       }

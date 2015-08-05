@@ -6878,8 +6878,8 @@ var Plottable;
             var _deltaY = 0;
             var _scalingX = 1;
             var _scalingY = 1;
-            var _lastSeenDomainX = null;
-            var _lastSeenDomainY = null;
+            var _lastSeenDomainX = [null, null];
+            var _lastSeenDomainY = [null, null];
             var _timeoutReference = 0;
             var _deferredRenderingTimeout = 500;
             var _registerDeferredRendering = function () {
@@ -6911,6 +6911,7 @@ var Plottable;
                 _registerDeferredRendering();
             };
             var _lazyDomainChangeCallbackY = function (scale) {
+                console.log("cached domain Y", _this._cachedDomainY);
                 if (!_this._isAnchored) {
                     return;
                 }
