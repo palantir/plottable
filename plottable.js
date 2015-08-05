@@ -10532,6 +10532,12 @@ var Plottable;
                 this._maxDomainExtents.set(quantitativeScale, maxDomainExtent);
                 return this;
             };
+            PanZoom.prototype.minDomainValue = function (quantitativeScale, minDomainValue) {
+                throw new Error("not implemented yet");
+            };
+            PanZoom.prototype.maxDomainValue = function (quantitativeScale, maxDomainValue) {
+                throw new Error("not implemented yet");
+            };
             /**
              * The number of pixels occupied in a line.
              */
