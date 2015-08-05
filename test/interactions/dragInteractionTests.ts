@@ -1,53 +1,52 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Interactions", () => {
   describe("Drag", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    const SVG_WIDTH = 400;
+    const SVG_HEIGHT = 400;
 
-    var startPoint = {
+    const startPoint = {
       x: SVG_WIDTH / 4,
       y: SVG_HEIGHT / 4
     };
-    var endPoint = {
+    const endPoint = {
       x: SVG_WIDTH / 2,
       y: SVG_HEIGHT / 2
     };
 
-    var outsidePointPos = {
+    const outsidePointPos = {
       x: SVG_WIDTH * 1.5,
       y: SVG_HEIGHT * 1.5
     };
-    var constrainedPos = {
+    const constrainedPos = {
       x: SVG_WIDTH,
       y: SVG_HEIGHT
     };
-    var outsidePointNeg = {
+    const outsidePointNeg = {
       x: -SVG_WIDTH / 2,
       y: -SVG_HEIGHT / 2
     };
-    var constrainedNeg = {
+    const constrainedNeg = {
       x: 0,
       y: 0
     };
 
     it("onDragStart()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
-      var startCallbackCalled = false;
-      var receivedStart: Plottable.Point;
-      var startCallback = (p: Plottable.Point) => {
+      const drag = new Plottable.Interactions.Drag();
+      let startCallbackCalled = false;
+      let receivedStart: Plottable.Point;
+      const startCallback = (p: Plottable.Point) => {
         startCallbackCalled = true;
         receivedStart = p;
       };
       drag.onDragStart(startCallback);
       drag.attachTo(c);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       assert.isTrue(startCallbackCalled, "callback was called on beginning drag (mousedown)");
       assert.deepEqual(receivedStart, startPoint, "was passed the correct point");
@@ -87,15 +86,15 @@ describe("Interactions", () => {
     });
 
     it("onDrag()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
-      var moveCallbackCalled = false;
-      var receivedStart: Plottable.Point;
-      var receivedEnd: Plottable.Point;
-      var moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
+      const drag = new Plottable.Interactions.Drag();
+      let moveCallbackCalled = false;
+      let receivedStart: Plottable.Point;
+      let receivedEnd: Plottable.Point;
+      const moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
         moveCallbackCalled = true;
         receivedStart = start;
         receivedEnd = end;
@@ -103,7 +102,7 @@ describe("Interactions", () => {
       drag.onDrag(moveCallback);
       drag.attachTo(c);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       TestMethods.triggerFakeMouseEvent("mousemove", target, endPoint.x, endPoint.y);
       assert.isTrue(moveCallbackCalled, "callback was called on dragging (mousemove)");
@@ -133,15 +132,15 @@ describe("Interactions", () => {
     });
 
     it("onDragEnd()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
-      var endCallbackCalled = false;
-      var receivedStart: Plottable.Point;
-      var receivedEnd: Plottable.Point;
-      var endCallback = (start: Plottable.Point, end: Plottable.Point) => {
+      const drag = new Plottable.Interactions.Drag();
+      let endCallbackCalled = false;
+      let receivedStart: Plottable.Point;
+      let receivedEnd: Plottable.Point;
+      const endCallback = (start: Plottable.Point, end: Plottable.Point) => {
         endCallbackCalled = true;
         receivedStart = start;
         receivedEnd = end;
@@ -149,7 +148,7 @@ describe("Interactions", () => {
       drag.onDragEnd(endCallback);
       drag.attachTo(c);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       TestMethods.triggerFakeMouseEvent("mouseup", target, endPoint.x, endPoint.y);
       assert.isTrue(endCallbackCalled, "callback was called on drag ending (mouseup)");
@@ -186,24 +185,24 @@ describe("Interactions", () => {
     });
 
     it("multiple interactions on drag", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
-      var startCallback1Called = false;
-      var startCallback2Called = false;
-      var moveCallback1Called = false;
-      var moveCallback2Called = false;
-      var endCallback1Called = false;
-      var endCallback2Called = false;
+      const drag = new Plottable.Interactions.Drag();
+      let startCallback1Called = false;
+      let startCallback2Called = false;
+      let moveCallback1Called = false;
+      let moveCallback2Called = false;
+      let endCallback1Called = false;
+      let endCallback2Called = false;
 
-      var startCallback1 = () => startCallback1Called = true;
-      var startCallback2 = () => startCallback2Called = true;
-      var moveCallback1 = () => moveCallback1Called = true;
-      var moveCallback2 = () => moveCallback2Called = true;
-      var endCallback1 = () => endCallback1Called = true;
-      var endCallback2 = () => endCallback2Called = true;
+      const startCallback1 = () => startCallback1Called = true;
+      const startCallback2 = () => startCallback2Called = true;
+      const moveCallback1 = () => moveCallback1Called = true;
+      const moveCallback2 = () => moveCallback2Called = true;
+      const endCallback1 = () => endCallback1Called = true;
+      const endCallback2 = () => endCallback2Called = true;
 
       drag.onDragStart(startCallback1);
       drag.onDragStart(startCallback2);
@@ -214,7 +213,7 @@ describe("Interactions", () => {
 
       drag.attachTo(component);
 
-      var target = component.background();
+      const target = component.background();
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       assert.isTrue(startCallback1Called, "callback 1 was called on beginning drag (mousedown)");
       assert.isTrue(startCallback2Called, "callback 2 was called on beginning drag (mousedown)");
@@ -254,28 +253,28 @@ describe("Interactions", () => {
     });
 
     it("constrainToComponent()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
+      const drag = new Plottable.Interactions.Drag();
       assert.isTrue(drag.constrainedToComponent(), "constrains by default");
 
-      var receivedStart: Plottable.Point;
-      var receivedEnd: Plottable.Point;
-      var moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
+      let receivedStart: Plottable.Point;
+      let receivedEnd: Plottable.Point;
+      const moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
         receivedStart = start;
         receivedEnd = end;
       };
       drag.onDrag(moveCallback);
-      var endCallback = (start: Plottable.Point, end: Plottable.Point) => {
+      const endCallback = (start: Plottable.Point, end: Plottable.Point) => {
         receivedStart = start;
         receivedEnd = end;
       };
       drag.onDragEnd(endCallback);
 
       drag.attachTo(c);
-      var target = c.content();
+      const target = c.content();
 
       TestMethods.triggerFakeMouseEvent("mousedown", target, startPoint.x, startPoint.y);
       TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePointPos.x, outsidePointPos.y);
@@ -346,15 +345,15 @@ describe("Interactions", () => {
     });
 
     it("touchcancel cancels the current drag", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var drag = new Plottable.Interactions.Drag();
-      var moveCallbackCalled = false;
-      var receivedStart: Plottable.Point;
-      var receivedEnd: Plottable.Point;
-      var moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
+      const drag = new Plottable.Interactions.Drag();
+      let moveCallbackCalled = false;
+      let receivedStart: Plottable.Point;
+      let receivedEnd: Plottable.Point;
+      const moveCallback = (start: Plottable.Point, end: Plottable.Point) => {
         moveCallbackCalled = true;
         receivedStart = start;
         receivedEnd = end;
@@ -362,7 +361,7 @@ describe("Interactions", () => {
       drag.onDrag(moveCallback);
       drag.attachTo(c);
 
-      var target = c.background();
+      const target = c.background();
       receivedStart = null;
       receivedEnd = null;
       TestMethods.triggerFakeTouchEvent("touchstart", target, [{x: startPoint.x, y: startPoint.y}]);
