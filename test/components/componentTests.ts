@@ -24,6 +24,8 @@ describe("Component behavior", () => {
       c.anchor(svg);
       assert.strictEqual((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
+      const computedStyle = window.getComputedStyle(<Element>svg.node());
+      assert.strictEqual(computedStyle.pointerEvents, "visible", "\"pointer-events\" style set to \"visible\"");
       svg.remove();
     });
 
@@ -34,6 +36,8 @@ describe("Component behavior", () => {
       c.anchor(svg2);
       assert.strictEqual((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
+      const computedStyle = window.getComputedStyle(<Element>svg2.node());
+      assert.strictEqual(computedStyle.pointerEvents, "visible", "second <svg>'s \"pointer-events\" style set to \"visible\"");
 
       svg.remove();
       svg2.remove();

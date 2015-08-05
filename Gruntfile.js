@@ -284,7 +284,7 @@ module.exports = function(grunt) {
         testname: "Plottable Sauce Unit Tests",
         browsers: [{
           browserName: "firefox",
-          platform: "linux"
+          platform: "WIN7"
         }, {
           browserName: "chrome",
           platform: "linux"
