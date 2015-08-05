@@ -1,28 +1,27 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Interactions", () => {
   describe("Pointer", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    const SVG_WIDTH = 400;
+    const SVG_HEIGHT = 400;
 
     it("onPointerEnter", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interactions.Pointer();
+      const pointerInteraction = new Plottable.Interactions.Pointer();
       pointerInteraction.attachTo(c);
 
-      var callbackCalled = false;
-      var lastPoint: Plottable.Point;
-      var callback = function(p: Plottable.Point) {
+      let callbackCalled = false;
+      let lastPoint: Plottable.Point;
+      const callback = function(p: Plottable.Point) {
         callbackCalled = true;
         lastPoint = p;
       };
       pointerInteraction.onPointerEnter(callback);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
@@ -55,22 +54,22 @@ describe("Interactions", () => {
     });
 
     it("onPointerMove", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interactions.Pointer();
+      const pointerInteraction = new Plottable.Interactions.Pointer();
       pointerInteraction.attachTo(c);
 
-      var callbackCalled = false;
-      var lastPoint: Plottable.Point;
-      var callback = function(p: Plottable.Point) {
+      let callbackCalled = false;
+      let lastPoint: Plottable.Point;
+      const callback = function(p: Plottable.Point) {
         callbackCalled = true;
         lastPoint = p;
       };
       pointerInteraction.onPointerMove(callback);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousemove", target, SVG_WIDTH / 2, SVG_HEIGHT / 2);
       assert.isTrue(callbackCalled, "callback called on entering Component (mouse)");
       assert.deepEqual(lastPoint, { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 }, "was passed correct point (mouse)");
@@ -106,22 +105,22 @@ describe("Interactions", () => {
     });
 
     it("onPointerExit", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const c = new Plottable.Component();
       c.renderTo(svg);
 
-      var pointerInteraction = new Plottable.Interactions.Pointer();
+      const pointerInteraction = new Plottable.Interactions.Pointer();
       pointerInteraction.attachTo(c);
 
-      var callbackCalled = false;
-      var lastPoint: Plottable.Point;
-      var callback = function(p: Plottable.Point) {
+      let callbackCalled = false;
+      let lastPoint: Plottable.Point;
+      const callback = function(p: Plottable.Point) {
         callbackCalled = true;
         lastPoint = p;
       };
       pointerInteraction.onPointerExit(callback);
 
-      var target = c.background();
+      const target = c.background();
       TestMethods.triggerFakeMouseEvent("mousemove", target, 2 * SVG_WIDTH, 2 * SVG_HEIGHT);
       assert.isFalse(callbackCalled, "not called when moving outside of the Component (mouse)");
 
@@ -157,24 +156,24 @@ describe("Interactions", () => {
     });
 
     it("multiple callbacks can be added to pointer interaction", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var pointer = new Plottable.Interactions.Pointer();
-      var enterCallback1Called = false;
-      var enterCallback2Called = false;
-      var moveCallback1Called = false;
-      var moveCallback2Called = false;
-      var exitCallback1Called = false;
-      var exitCallback2Called = false;
+      const pointer = new Plottable.Interactions.Pointer();
+      let enterCallback1Called = false;
+      let enterCallback2Called = false;
+      let moveCallback1Called = false;
+      let moveCallback2Called = false;
+      let exitCallback1Called = false;
+      let exitCallback2Called = false;
 
-      var enterCallback1 = () => enterCallback1Called = true;
-      var enterCallback2 = () => enterCallback2Called = true;
-      var moveCallback1 = () => moveCallback1Called = true;
-      var moveCallback2 = () => moveCallback2Called = true;
-      var exitCallback1 = () => exitCallback1Called = true;
-      var exitCallback2 = () => exitCallback2Called = true;
+      const enterCallback1 = () => enterCallback1Called = true;
+      const enterCallback2 = () => enterCallback2Called = true;
+      const moveCallback1 = () => moveCallback1Called = true;
+      const moveCallback2 = () => moveCallback2Called = true;
+      const exitCallback1 = () => exitCallback1Called = true;
+      const exitCallback2 = () => exitCallback2Called = true;
 
       pointer.onPointerEnter(enterCallback1);
       pointer.onPointerEnter(enterCallback2);
@@ -185,9 +184,9 @@ describe("Interactions", () => {
 
       pointer.attachTo(component);
 
-      var target = component.background();
-      var insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-      var outsidePoint = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
+      const target = component.background();
+      const insidePoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const outsidePoint = { x: SVG_WIDTH * 2, y: SVG_HEIGHT * 2 };
       TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);
       TestMethods.triggerFakeMouseEvent("mousemove", target, insidePoint.x, insidePoint.y);
       TestMethods.triggerFakeMouseEvent("mousemove", target, outsidePoint.x, outsidePoint.y);

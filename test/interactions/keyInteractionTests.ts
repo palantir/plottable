@@ -1,28 +1,27 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Interactions", () => {
   describe("KeyInteraction", () => {
     it("Triggers appropriate callback for the key pressed", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(400, 400);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var keyInteraction = new Plottable.Interactions.Key();
+      const keyInteraction = new Plottable.Interactions.Key();
 
-      var aCode = 65; // "a" key
-      var bCode = 66; // "b" key
+      const aCode = 65; // "a" key
+      const bCode = 66; // "b" key
 
-      var aCallbackCalled = false;
-      var aCallback = () => aCallbackCalled = true;
-      var bCallbackCalled = false;
-      var bCallback = () => bCallbackCalled = true;
+      let aCallbackCalled = false;
+      const aCallback = () => aCallbackCalled = true;
+      let bCallbackCalled = false;
+      const bCallback = () => bCallbackCalled = true;
 
       keyInteraction.onKeyPress(aCode, aCallback);
       keyInteraction.onKeyPress(bCode, bCallback);
       keyInteraction.attachTo(component);
 
-      var $target = $(component.background().node());
+      const $target = $(component.background().node());
 
       TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
       $target.simulate("keydown", { keyCode: aCode });
@@ -43,16 +42,16 @@ describe("Interactions", () => {
     });
 
     it("appropriate keyCode is sent to the callback", () => {
-      var svg = TestMethods.generateSVG(400, 400);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(400, 400);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var keyInteraction = new Plottable.Interactions.Key();
+      const keyInteraction = new Plottable.Interactions.Key();
 
-      var bCode = 66; // "b" key
+      const bCode = 66; // "b" key
 
-      var bCallbackCalled = false;
-      var bCallback = (keyCode: number) => {
+      let bCallbackCalled = false;
+      const bCallback = (keyCode: number) => {
         bCallbackCalled = true;
         assert.strictEqual(keyCode, bCode, "keyCode 65(a) was sent to the callback");
       };
@@ -61,7 +60,7 @@ describe("Interactions", () => {
 
       keyInteraction.attachTo(component);
 
-      var $target = $(component.background().node());
+      const $target = $(component.background().node());
 
       TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
       $target.simulate("keydown", { keyCode: bCode });
@@ -71,22 +70,22 @@ describe("Interactions", () => {
     });
 
     it("canceling callbacks is possible", () => {
-        var svg = TestMethods.generateSVG(400, 400);
-        var component = new Plottable.Component();
+        const svg = TestMethods.generateSVG(400, 400);
+        const component = new Plottable.Component();
         component.renderTo(svg);
 
-        var keyInteraction = new Plottable.Interactions.Key();
+        const keyInteraction = new Plottable.Interactions.Key();
 
-        var aCode = 65; // "a" key
+        const aCode = 65; // "a" key
 
-        var aCallbackCalled = false;
-        var aCallback = () => aCallbackCalled = true;
+        let aCallbackCalled = false;
+        const aCallback = () => aCallbackCalled = true;
 
         keyInteraction.onKeyPress(aCode, aCallback);
 
         keyInteraction.attachTo(component);
 
-        var $target = $(component.background().node());
+        const $target = $(component.background().node());
 
         TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
         $target.simulate("keydown", { keyCode: aCode });
@@ -105,24 +104,24 @@ describe("Interactions", () => {
     });
 
     it("multiple callbacks are possible", () => {
-        var svg = TestMethods.generateSVG(400, 400);
-        var component = new Plottable.Component();
+        const svg = TestMethods.generateSVG(400, 400);
+        const component = new Plottable.Component();
         component.renderTo(svg);
 
-        var keyInteraction = new Plottable.Interactions.Key();
+        const keyInteraction = new Plottable.Interactions.Key();
 
-        var aCode = 65; // "a" key
+        const aCode = 65; // "a" key
 
-        var aCallback1Called = false;
-        var aCallback1 = () => aCallback1Called = true;
-        var aCallback2Called = false;
-        var aCallback2 = () => aCallback2Called = true;
+        let aCallback1Called = false;
+        const aCallback1 = () => aCallback1Called = true;
+        let aCallback2Called = false;
+        const aCallback2 = () => aCallback2Called = true;
 
         keyInteraction.onKeyPress(aCode, aCallback1);
         keyInteraction.onKeyPress(aCode, aCallback2);
         keyInteraction.attachTo(component);
 
-        var $target = $(component.background().node());
+        const $target = $(component.background().node());
 
         TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
         $target.simulate("keydown", { keyCode: aCode });
