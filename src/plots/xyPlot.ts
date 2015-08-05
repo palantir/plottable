@@ -31,8 +31,8 @@ export class XYPlot<X, Y> extends Plot {
     var _deltaY = 0;
     var _scalingX = 1;
     var _scalingY = 1;
-    var _lastSeenDomainX: X[] = null;
-    var _lastSeenDomainY: Y[] = null;
+    var _lastSeenDomainX: X[] = [null, null];
+    var _lastSeenDomainY: Y[] = [null, null];
     var _timeoutReference = 0;
     var _deferredRenderingTimeout = 500;
 
@@ -49,6 +49,8 @@ export class XYPlot<X, Y> extends Plot {
         this._cachedDomainY = _lastSeenDomainY;
         _deltaX = 0;
         _deltaY = 0;
+        _scalingX = 1;
+        _scalingY = 1;
         this.render();
         this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
       }, _deferredRenderingTimeout);
@@ -109,7 +111,7 @@ export class XYPlot<X, Y> extends Plot {
       return this._deferredRendering;
     }
 
-    if (deferredRendering) {
+    if (deferredRendering && this._isAnchored) {
       if (this.x() && this.x().scale) {
         this._cachedDomainX = this.x().scale.domain();
       }
