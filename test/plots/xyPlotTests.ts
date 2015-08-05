@@ -178,7 +178,6 @@ describe("Plots", () => {
       });
 
       it("deferredRendering() caches domains properly when setup before rendering", () => {
-
         xScale.domain([5, 6]);
         yScale.domain([6, 7]);
         plot.x((d) => d.x, xScale);
