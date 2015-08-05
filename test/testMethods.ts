@@ -144,8 +144,8 @@ module TestMethods {
 
   export function triggerFakeMouseEvent(type: string, target: d3.Selection<void>, relativeX: number, relativeY: number, button = 0) {
     var clientRect = (<Element> target.node()).getBoundingClientRect();
-    var xPos = clientRect.left + relativeX;
-    var yPos = clientRect.top + relativeY;
+    var xPos = Math.round(clientRect.left + relativeX);
+    var yPos = Math.round(clientRect.top + relativeY);
     var e = <MouseEvent> document.createEvent("MouseEvents");
     e.initMouseEvent(type, true, true, window, 1,
       xPos, yPos,
@@ -199,8 +199,8 @@ module TestMethods {
     var fakeTouchList: any = [];
 
     touchPoints.forEach(( touchPoint, i ) => {
-      var xPos = clientRect.left + touchPoint.x;
-      var yPos = clientRect.top + touchPoint.y;
+      var xPos = Math.round(clientRect.left + touchPoint.x);
+      var yPos = Math.round(clientRect.top + touchPoint.y);
       var identifier = ids[i] == null ? 0 : ids[i];
       fakeTouchList.push( {
         identifier: identifier,
