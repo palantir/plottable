@@ -1,11 +1,10 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Formatters", () => {
   describe("fixed", () => {
     it("shows exactly [precision] digits", () => {
-      var fixed3 = Plottable.Formatters.fixed();
-      var result = fixed3(1);
+      const fixed3 = Plottable.Formatters.fixed();
+      let result = fixed3(1);
       assert.strictEqual(result, "1.000", "defaults to three decimal places");
       result = fixed3(1.234);
       assert.strictEqual(result, "1.234", "shows three decimal places");
@@ -14,22 +13,22 @@ describe("Formatters", () => {
     });
 
     it("precision can be changed", () => {
-      var fixed2 = Plottable.Formatters.fixed(2);
-      var result = fixed2(1);
+      const fixed2 = Plottable.Formatters.fixed(2);
+      const result = fixed2(1);
       assert.strictEqual(result, "1.00", "formatter was changed to show only two decimal places");
     });
 
     it("can be set to show rounded values", () => {
-      var fixed3 = Plottable.Formatters.fixed(3);
-      var result = fixed3(1.2349);
+      const fixed3 = Plottable.Formatters.fixed(3);
+      const result = fixed3(1.2349);
       assert.strictEqual(result, "1.235", "long values are rounded correctly");
     });
   });
 
   describe("general", () => {
     it("formats number to show at most [precision] digits", () => {
-      var general = Plottable.Formatters.general();
-      var result = general(1);
+      const general = Plottable.Formatters.general();
+      let result = general(1);
       assert.strictEqual(result, "1", "shows no decimals if formatting an integer");
       result = general(1.234);
       assert.strictEqual(result, "1.234", "shows up to three decimal places");
@@ -38,8 +37,8 @@ describe("Formatters", () => {
     });
 
     it("stringifies non-number values", () => {
-      var general = Plottable.Formatters.general();
-      var result = general("blargh");
+      const general = Plottable.Formatters.general();
+      let result = general("blargh");
       assert.strictEqual(result, "blargh", "string values are passed through unchanged");
       result = general(null);
       assert.strictEqual(result, "null", "non-number inputs are stringified");
@@ -57,8 +56,8 @@ describe("Formatters", () => {
 
   describe("identity", () => {
     it("stringifies inputs", () => {
-      var identity = Plottable.Formatters.identity();
-      var result = identity(1);
+      const identity = Plottable.Formatters.identity();
+      let result = identity(1);
       assert.strictEqual(result, "1", "numbers are stringified");
       result = identity(0.999999);
       assert.strictEqual(result, "0.999999", "long numbers are stringified");
@@ -71,10 +70,10 @@ describe("Formatters", () => {
 
   describe("currency", () => {
     it("uses reasonable defaults", () => {
-      var currencyFormatter = Plottable.Formatters.currency();
-      var result = currencyFormatter(1);
+      const currencyFormatter = Plottable.Formatters.currency();
+      let result = currencyFormatter(1);
       assert.strictEqual(result.charAt(0), "$", "defaults to $ for currency symbol");
-      var decimals = result.substring(result.indexOf(".") + 1, result.length);
+      const decimals = result.substring(result.indexOf(".") + 1, result.length);
       assert.strictEqual(decimals.length, 2, "defaults to 2 decimal places");
 
       result = currencyFormatter(-1);
@@ -83,17 +82,17 @@ describe("Formatters", () => {
     });
 
     it("can change the type and position of the currency symbol", () => {
-      var centsFormatter = Plottable.Formatters.currency(0, "c", false);
-      var result = centsFormatter(1);
+      const centsFormatter = Plottable.Formatters.currency(0, "c", false);
+      const result = centsFormatter(1);
       assert.strictEqual(result.charAt(result.length - 1), "c", "The specified currency symbol was appended");
     });
   });
 
   describe("multiTime", () => {
     it("uses reasonable defaults", () => {
-      var timeFormatter = Plottable.Formatters.multiTime();
+      const timeFormatter = Plottable.Formatters.multiTime();
       // year, month, day, hours, minutes, seconds, milliseconds
-      var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
+      let result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
       assert.strictEqual(result, "2000", "only the year was displayed");
       result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
       assert.strictEqual(result, "Mar", "only the month was displayed");
@@ -112,33 +111,33 @@ describe("Formatters", () => {
 
   describe("percentage", () => {
     it("uses reasonable defaults", () => {
-      var percentFormatter = Plottable.Formatters.percentage();
-      var result = percentFormatter(1);
+      const percentFormatter = Plottable.Formatters.percentage();
+      const result = percentFormatter(1);
       assert.strictEqual(result, "100%",
         "the value was multiplied by 100, a percent sign was appended, and no decimal places are shown by default");
     });
 
     it("can handle float imprecision", () => {
-      var percentFormatter = Plottable.Formatters.percentage();
-      var result = percentFormatter(0.07);
+      const percentFormatter = Plottable.Formatters.percentage();
+      const result = percentFormatter(0.07);
       assert.strictEqual(result, "7%", "does not have trailing zeros and is not empty string");
-      percentFormatter = Plottable.Formatters.percentage(2);
-      var result2 = percentFormatter(0.0035);
+      const twoPercentFormatter = Plottable.Formatters.percentage(2);
+      const result2 = twoPercentFormatter(0.0035);
       assert.strictEqual(result2, "0.35%", "works even if multiplying by 100 does not make it an integer");
     });
 
     it("onlyShowUnchanged set to false", () => {
-      var percentFormatter = Plottable.Formatters.percentage(0);
-      var result = percentFormatter(0.075);
+      const percentFormatter = Plottable.Formatters.percentage(0);
+      const result = percentFormatter(0.075);
       assert.strictEqual(result, "8%", "shows formatter changed value");
     });
   });
 
   describe("multiTime", () => {
     it("uses reasonable defaults", () => {
-      var timeFormatter = Plottable.Formatters.multiTime();
+      const timeFormatter = Plottable.Formatters.multiTime();
       // year, month, day, hours, minutes, seconds, milliseconds
-      var result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
+      let result = timeFormatter(new Date(2000, 0, 1, 0, 0, 0, 0));
       assert.strictEqual(result, "2000", "only the year was displayed");
       result = timeFormatter(new Date(2000, 2, 1, 0, 0, 0, 0));
       assert.strictEqual(result, "Mar", "only the month was displayed");
@@ -157,8 +156,8 @@ describe("Formatters", () => {
 
   describe("SISuffix", () => {
     it("shortens long numbers", () => {
-      var lnFormatter = Plottable.Formatters.siSuffix();
-      var result = lnFormatter(1);
+      const lnFormatter = Plottable.Formatters.siSuffix();
+      let result = lnFormatter(1);
       assert.strictEqual(result, "1.00", "shows 3 signifigicant figures by default");
       result = lnFormatter(Math.pow(10, 12));
       assert.operator(result.length, "<=", 5, "large number was formatted to a short string");
@@ -169,32 +168,32 @@ describe("Formatters", () => {
 
   describe("relativeDate", () => {
     it("uses reasonable defaults", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate();
-      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      const relativeDateFormatter = Plottable.Formatters.relativeDate();
+      const result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "7", "7 day difference from epoch, incremented by days, no suffix");
     });
 
     it("resulting value is difference from base value", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
-      var result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      const relativeDateFormatter = Plottable.Formatters.relativeDate(5 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      let result = relativeDateFormatter(9 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4", "4 days greater from base value");
       result = relativeDateFormatter(Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "-4", "4 days less from base value");
     });
 
     it("can increment by different time types (hours, minutes)", () => {
-      var hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
-      var result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      const hoursRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / 24);
+      let result = hoursRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "72", "72 hour difference from epoch");
 
-      var minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
+      const minutesRelativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY / (24 * 60));
       result = minutesRelativeDateFormatter(3 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "4320", "4320 minute difference from epoch");
     });
 
     it("can append a suffix", () => {
-      var relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
-      var result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
+      const relativeDateFormatter = Plottable.Formatters.relativeDate(0, Plottable.MILLISECONDS_IN_ONE_DAY, "days");
+      const result = relativeDateFormatter(7 * Plottable.MILLISECONDS_IN_ONE_DAY);
       assert.strictEqual(result, "7days", "days appended to the end");
     });
   });
