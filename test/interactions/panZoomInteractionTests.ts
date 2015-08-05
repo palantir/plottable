@@ -1,22 +1,21 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Interactions", () => {
   describe("PanZoomInteraction", () => {
-    var svg: d3.Selection<void>;
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 500;
+    let svg: d3.Selection<void>;
+    const SVG_WIDTH = 400;
+    const SVG_HEIGHT = 500;
 
-    var eventTarget: d3.Selection<void>;
+    let eventTarget: d3.Selection<void>;
 
-    var xScale: Plottable.QuantitativeScale<number>;
-    var yScale: Plottable.QuantitativeScale<number>;
-    var panZoomInteraction: Plottable.Interactions.PanZoom;
+    let xScale: Plottable.QuantitativeScale<number>;
+    let yScale: Plottable.QuantitativeScale<number>;
+    let panZoomInteraction: Plottable.Interactions.PanZoom;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-      var component = new Plottable.Component();
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
       xScale = new Plottable.Scales.Linear();
@@ -34,8 +33,8 @@ describe("Interactions", () => {
     describe("Panning", () => {
 
       it("dragging a certain amount will translate the scale correctly (mouse)", () => {
-        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+        const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -45,8 +44,8 @@ describe("Interactions", () => {
       });
 
       it("dragging to outside the component will translate the scale correctly (mouse)", () => {
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -56,11 +55,11 @@ describe("Interactions", () => {
       });
 
       it("dragging a certain amount will translate multiple scales correctly (mouse)", () => {
-        var xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeMouseEvent("mousedown", eventTarget, startPoint.x, startPoint.y);
         TestMethods.triggerFakeMouseEvent("mousemove", eventTarget, endPoint.x, endPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseend", eventTarget, endPoint.x, endPoint.y);
@@ -77,8 +76,8 @@ describe("Interactions", () => {
           return;
         }
 
-        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
+        const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const endPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT * 3 / 4 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -88,8 +87,8 @@ describe("Interactions", () => {
       });
 
       it("dragging to outside the component will translate the scale correctly (touch)", () => {
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -99,11 +98,11 @@ describe("Interactions", () => {
       });
 
       it("dragging a certain amount will translate multiple scales correctly (touch)", () => {
-        var xScale2 = new Plottable.Scales.Linear();
+        const xScale2 = new Plottable.Scales.Linear();
         xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
         panZoomInteraction.addXScale(xScale2);
-        var startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
-        var endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const endPoint = { x: -SVG_WIDTH / 2, y: -SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent("touchstart", eventTarget, [startPoint]);
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint]);
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint]);
@@ -122,8 +121,8 @@ describe("Interactions", () => {
         return;
       }
 
-      var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      var deltaY = 500;
+      const scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      const deltaY = 500;
 
       TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
 
@@ -139,12 +138,12 @@ describe("Interactions", () => {
         svg.remove();
         return;
       }
-      var xScale2 = new Plottable.Scales.Linear();
+      const xScale2 = new Plottable.Scales.Linear();
       xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
       panZoomInteraction.addXScale(xScale2);
 
-      var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      var deltaY = 500;
+      const scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      const deltaY = 500;
 
       TestMethods.triggerFakeWheelEvent( "wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
 
@@ -154,11 +153,11 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify the scale correctly", () => {
-      var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      const startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
 
-      var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+      const endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
       TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
       TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
       assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
@@ -167,14 +166,14 @@ describe("Interactions", () => {
     });
 
     it("pinching a certain amount will magnify multiple scales correctly", () => {
-      var xScale2 = new Plottable.Scales.Linear();
+      const xScale2 = new Plottable.Scales.Linear();
       xScale2.domain([0, 2 * SVG_WIDTH]).range([0, SVG_WIDTH]);
       panZoomInteraction.addXScale(xScale2);
-      var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-      var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+      const startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
       TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
 
-      var endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
+      const endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT * 3 / 4 };
       TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
       TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
       assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
@@ -183,32 +182,32 @@ describe("Interactions", () => {
     });
 
     it("Setting the xScales in batch is the same as adding one at a time", () => {
-      var xScale2 = new Plottable.Scales.Linear();
+      const xScale2 = new Plottable.Scales.Linear();
       panZoomInteraction.addXScale(xScale2);
-      var xScales = panZoomInteraction.xScales();
+      const xScales = panZoomInteraction.xScales();
       panZoomInteraction.xScales([xScale, xScale2]);
       assert.deepEqual(xScales, panZoomInteraction.xScales(), "Setting and adding x scales result in the same behavior");
       svg.remove();
     });
 
     it("Setting the yScales in batch is the same as adding one at a time", () => {
-      var yScale2 = new Plottable.Scales.Linear();
+      const yScale2 = new Plottable.Scales.Linear();
       panZoomInteraction.addYScale(yScale2);
-      var yScales = panZoomInteraction.yScales();
+      const yScales = panZoomInteraction.yScales();
       panZoomInteraction.yScales([yScale, yScale2]);
       assert.deepEqual(yScales, panZoomInteraction.yScales(), "Setting and adding y scales result in the same behavior");
       svg.remove();
     });
 
     it("Adding an already existent xScale does nothing", () => {
-      var oldXScaleNumber = panZoomInteraction.xScales().length;
+      const oldXScaleNumber = panZoomInteraction.xScales().length;
       panZoomInteraction.addXScale(panZoomInteraction.xScales()[0]);
       assert.lengthOf(panZoomInteraction.xScales(), oldXScaleNumber, "Number of x scales is maintained");
       svg.remove();
     });
 
     it("Adding an already existent yScale does nothing", () => {
-      var oldYScaleNumber = panZoomInteraction.yScales().length;
+      const oldYScaleNumber = panZoomInteraction.yScales().length;
       panZoomInteraction.addYScale(panZoomInteraction.yScales()[0]);
       assert.lengthOf(panZoomInteraction.yScales(), oldYScaleNumber, "Number of y scales is maintained");
       svg.remove();
@@ -216,7 +215,7 @@ describe("Interactions", () => {
 
     describe("minDomainExtent", () => {
 
-      var minimumDomainExtent: number;
+      let minimumDomainExtent: number;
 
       beforeEach(() => {
         minimumDomainExtent = SVG_WIDTH / 4;
@@ -229,9 +228,9 @@ describe("Interactions", () => {
       });
 
       it("can't be larger than maxDomainExtent() for the same Scale", () => {
-        var maximumDomainExtent = minimumDomainExtent * 2;
+        const maximumDomainExtent = minimumDomainExtent * 2;
         panZoomInteraction.maxDomainExtent(xScale, maximumDomainExtent);
-        var tooBigMinimumDomainExtent = maximumDomainExtent * 2;
+        const tooBigMinimumDomainExtent = maximumDomainExtent * 2;
         assert.throws(() => panZoomInteraction.minDomainExtent(xScale, tooBigMinimumDomainExtent), Error);
         svg.remove();
       });
@@ -244,24 +243,24 @@ describe("Interactions", () => {
           return;
         }
 
-        var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var deltaY = -3000;
+        const scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const deltaY = -3000;
 
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
-        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        const domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
-        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
 
-        var endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT};
+        const endPoint = { x: SVG_WIDTH, y: SVG_HEIGHT};
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
-        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        const domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, minimumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
       });
@@ -269,7 +268,7 @@ describe("Interactions", () => {
     });
 
     describe("maxDomainExtent", () => {
-      var maximumDomainExtent: number;
+      let maximumDomainExtent: number;
 
       beforeEach(() => {
         maximumDomainExtent = SVG_WIDTH;
@@ -283,9 +282,9 @@ describe("Interactions", () => {
       });
 
       it("can't be smaller than minDomainExtent() for the same Scale", () => {
-        var minimumDomainExtent = maximumDomainExtent / 2;
+        const minimumDomainExtent = maximumDomainExtent / 2;
         panZoomInteraction.minDomainExtent(xScale, minimumDomainExtent);
-        var tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
+        const tooSmallMaximumDomainExtent = minimumDomainExtent / 2;
         assert.throws(() => panZoomInteraction.maxDomainExtent(xScale, tooSmallMaximumDomainExtent), Error);
         svg.remove();
       });
@@ -298,24 +297,24 @@ describe("Interactions", () => {
           return;
         }
 
-        var scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var deltaY = 3000;
+        const scrollPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const deltaY = 3000;
 
         TestMethods.triggerFakeWheelEvent("wheel", svg, scrollPoint.x, scrollPoint.y, deltaY );
-        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        const domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via scroll");
         svg.remove();
       });
 
       it("Pinching in cannot go beyond the specified domainExtent", () => {
-        var startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
-        var startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+        const startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 4 };
+        const startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
         TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
 
-        var endPoint = { x: 5 * SVG_WIDTH / 16, y: 5 * SVG_HEIGHT / 16 };
+        const endPoint = { x: 5 * SVG_WIDTH / 16, y: 5 * SVG_HEIGHT / 16 };
         TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
         TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
-        var domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
+        const domainExtent = Math.abs(xScale.domain()[1] - xScale.domain()[0]);
         assert.strictEqual(domainExtent, maximumDomainExtent, "xScale zooms to the correct domain via pinch");
         svg.remove();
       });
