@@ -6911,7 +6911,6 @@ var Plottable;
                 _registerDeferredRendering();
             };
             var _lazyDomainChangeCallbackY = function (scale) {
-                console.log("cached domain Y", _this._cachedDomainY);
                 if (!_this._isAnchored) {
                     return;
                 }

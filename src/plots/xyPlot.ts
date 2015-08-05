@@ -69,9 +69,6 @@ export class XYPlot<X, Y> extends Plot {
     };
 
     var _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
-      console.log("cached domain Y", this._cachedDomainY);
-
-
       if (!this._isAnchored) {
         return;
       }
