@@ -10257,6 +10257,8 @@ var Plottable;
                 this._touchIds = d3.map();
                 this._minDomainExtents = new Plottable.Utils.Map();
                 this._maxDomainExtents = new Plottable.Utils.Map();
+                this._minDomainValues = new Plottable.Utils.Map();
+                this._maxDomainValues = new Plottable.Utils.Map();
                 if (xScale != null) {
                     this.addXScale(xScale);
                 }
@@ -10533,10 +10535,18 @@ var Plottable;
                 return this;
             };
             PanZoom.prototype.minDomainValue = function (quantitativeScale, minDomainValue) {
-                throw new Error("not implemented yet");
+                if (minDomainValue == null) {
+                    return this._minDomainValues.get(quantitativeScale);
+                }
+                this._minDomainValues.set(quantitativeScale, minDomainValue);
+                return this;
             };
             PanZoom.prototype.maxDomainValue = function (quantitativeScale, maxDomainValue) {
-                throw new Error("not implemented yet");
+                if (maxDomainValue == null) {
+                    return this._maxDomainValues.get(quantitativeScale);
+                }
+                this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+                return this;
             };
             /**
              * The number of pixels occupied in a line.

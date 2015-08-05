@@ -25,6 +25,9 @@ export module Interactions {
     private _minDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
     private _maxDomainExtents: Utils.Map<QuantitativeScale<any>, any>;
 
+    private _minDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+    private _maxDomainValues: Utils.Map<QuantitativeScale<any>, any>;
+
     /**
      * A PanZoom Interaction updates the domains of an x-scale and/or a y-scale
      * in response to the user panning or zooming.
@@ -42,6 +45,8 @@ export module Interactions {
       this._touchIds = d3.map<Point>();
       this._minDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
       this._maxDomainExtents = new Utils.Map<QuantitativeScale<any>, number>();
+      this._minDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
+      this._maxDomainValues = new Utils.Map<QuantitativeScale<any>, number>();
       if (xScale != null) {
         this.addXScale(xScale);
       }
@@ -442,7 +447,11 @@ export module Interactions {
      */
     public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue: D): Interactions.PanZoom;
     public minDomainValue<D>(quantitativeScale: QuantitativeScale<D>, minDomainValue?: D): any {
-      throw new Error("not implemented yet");
+      if (minDomainValue == null) {
+        return this._minDomainValues.get(quantitativeScale);
+      }
+      this._minDomainValues.set(quantitativeScale, minDomainValue);
+      return this;
     }
 
     /**
@@ -465,7 +474,11 @@ export module Interactions {
      */
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue: D): Interactions.PanZoom;
     public maxDomainValue<D>(quantitativeScale: QuantitativeScale<D>, maxDomainValue?: D): any {
-      throw new Error("not implemented yet");
+      if (maxDomainValue == null) {
+        return this._maxDomainValues.get(quantitativeScale);
+      }
+      this._maxDomainValues.set(quantitativeScale, maxDomainValue);
+      return this;
     }
   }
 }
