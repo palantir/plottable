@@ -1,15 +1,14 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
     it("_connect() and _disconnect()", () => {
-      var dispatcher = new Plottable.Dispatcher();
+      const dispatcher = new Plottable.Dispatcher();
 
-      var callbackCalls = 0;
+      let callbackCalls = 0;
       (<any> dispatcher)._eventToCallback["click"] = () => callbackCalls++;
 
-      var d3document = d3.select(document);
+      const d3document = d3.select(document);
       (<any> dispatcher)._connect();
       TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
@@ -26,17 +25,17 @@ describe("Dispatchers", () => {
     });
 
     it("won't _disconnect() if dispatcher still have listeners", () => {
-      var dispatcher = new Plottable.Dispatcher();
+      const dispatcher = new Plottable.Dispatcher();
 
-      var callbackWasCalled = false;
+      let callbackWasCalled = false;
       (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
 
-      var callback = () => { return; };
-      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      const callback = () => { return; };
+      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
       callbackSet.add(callback);
       (<any> dispatcher)._callbacks = [callbackSet];
 
-      var d3document = d3.select(document);
+      const d3document = d3.select(document);
       (<any> dispatcher)._connect();
 
       TestMethods.triggerFakeUIEvent("click", d3document);
@@ -55,11 +54,11 @@ describe("Dispatchers", () => {
     });
 
     it("_setCallback()", () => {
-      var dispatcher = new Plottable.Dispatcher();
-      var callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      const dispatcher = new Plottable.Dispatcher();
+      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
-      var callbackWasCalled = false;
-      var callback = () => callbackWasCalled = true;
+      let callbackWasCalled = false;
+      const callback = () => callbackWasCalled = true;
 
       (<any> dispatcher)._setCallback(callbackSet, callback);
       callbackSet.callCallbacks();
