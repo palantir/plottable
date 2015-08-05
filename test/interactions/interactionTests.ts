@@ -1,15 +1,14 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Interactions", () => {
   describe("Interaction", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    const SVG_WIDTH = 400;
+    const SVG_HEIGHT = 400;
 
     it("attaching/detaching a component modifies the state of the interaction", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
-      var interaction = new Plottable.Interaction();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
+      const interaction = new Plottable.Interaction();
       component.renderTo(svg);
 
       interaction.attachTo(component);
@@ -24,14 +23,14 @@ describe("Interactions", () => {
     });
 
     it("can attach interaction to component", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      const clickInteraction = new Plottable.Interactions.Click();
 
-      var callbackCalled = false;
-      var callback = () => callbackCalled = true;
+      let callbackCalled = false;
+      const callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
       clickInteraction.attachTo(component);
@@ -44,14 +43,14 @@ describe("Interactions", () => {
     });
 
     it("can detach interaction from component", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
       component.renderTo(svg);
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      const clickInteraction = new Plottable.Interactions.Click();
 
-      var callbackCalled = false;
-      var callback = () => callbackCalled = true;
+      let callbackCalled = false;
+      const callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
       clickInteraction.attachTo(component);
@@ -71,10 +70,10 @@ describe("Interactions", () => {
     });
 
     it("calling detachFrom() on a detached Interaction has no effect", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component = new Plottable.Component();
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      const clickInteraction = new Plottable.Interactions.Click();
 
       assert.doesNotThrow(() => {
         clickInteraction.detachFrom(component);
@@ -99,18 +98,18 @@ describe("Interactions", () => {
     });
 
     it("can move interaction from one component to another", () => {
-      var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component1 = new Plottable.Component();
-      var component2 = new Plottable.Component();
+      const svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      const component1 = new Plottable.Component();
+      const component2 = new Plottable.Component();
 
       component1.renderTo(svg1);
       component2.renderTo(svg2);
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      const clickInteraction = new Plottable.Interactions.Click();
 
-      var callbackCalled = false;
-      var callback = () => callbackCalled = true;
+      let callbackCalled = false;
+      const callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
       clickInteraction.attachTo(component1);
@@ -156,7 +155,7 @@ describe("Interactions", () => {
 
     describe("enabled()", () => {
       it("setting and querying status", () => {
-        var interaction = new Plottable.Interaction();
+        const interaction = new Plottable.Interaction();
         assert.isTrue(interaction.enabled(), "defaults to enabled");
         interaction.enabled(false);
         assert.isFalse(interaction.enabled(), "enabled status set to false");
@@ -165,13 +164,13 @@ describe("Interactions", () => {
       });
 
       it("no longer responds when disabled", () => {
-        var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var component = new Plottable.Component();
+        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const component = new Plottable.Component();
         component.renderTo(svg);
 
-        var clickInteraction = new Plottable.Interactions.Click();
-        var callbackCalled = false;
-        var callback = () => callbackCalled = true;
+        const clickInteraction = new Plottable.Interactions.Click();
+        let callbackCalled = false;
+        const callback = () => callbackCalled = true;
         clickInteraction.onClick(callback);
         clickInteraction.attachTo(component);
 
@@ -189,16 +188,16 @@ describe("Interactions", () => {
       });
 
       it("can be attached to new Component while disabled", () => {
-        var svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        var component1 = new Plottable.Component();
-        var component2 = new Plottable.Component();
+        const svg1 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const svg2 = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        const component1 = new Plottable.Component();
+        const component2 = new Plottable.Component();
         component1.renderTo(svg1);
         component2.renderTo(svg2);
 
-        var clickInteraction = new Plottable.Interactions.Click();
-        var callbackCalled = false;
-        var callback = () => callbackCalled = true;
+        const clickInteraction = new Plottable.Interactions.Click();
+        let callbackCalled = false;
+        const callback = () => callbackCalled = true;
         clickInteraction.onClick(callback);
         clickInteraction.attachTo(component1);
 
