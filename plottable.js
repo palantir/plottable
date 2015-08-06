@@ -4971,6 +4971,9 @@ var Plottable;
                     return this._text;
                 }
                 else {
+                    if (typeof displayText !== "string") {
+                        throw new Error("Label.text() only takes strings as input");
+                    }
                     this._text = displayText;
                     this.redraw();
                     return this;
