@@ -4967,7 +4967,7 @@ var Plottable;
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
-                if (displayText === undefined) {
+                if (displayText === undefined || displayText == null) {
                     return this._text;
                 }
                 else {
