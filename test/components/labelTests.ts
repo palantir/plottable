@@ -3,9 +3,10 @@
 describe("Labels", () => {
 
   it("text() only accepts strings", () => {
-    assert.throws(() => new Plottable.Components.Label(<any> 23), Error);
-    assert.throws(() => new Plottable.Components.Label(<any> new Date()), Error);
-    assert.doesNotThrow(() => new Plottable.Components.Label("string"), Error, "accepts strings");
+    var label = new Plottable.Components.Label();
+    assert.throws(() => label.text(<any> 23), Error);
+    assert.throws(() => label.text(<any> new Date()), Error);
+    assert.doesNotThrow(() => label.text("string"), Error, "text() accepts strings");
   });
 
   it("Standard text title label generates properly", () => {
