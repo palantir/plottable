@@ -59,7 +59,7 @@ export module Components {
      */
     public text(displayText: string): Label;
     public text(displayText?: string): any {
-      if (displayText === undefined || displayText == null) {
+      if (displayText == null) {
         return this._text;
       } else {
         if (typeof displayText !== "string") {
