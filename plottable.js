@@ -6876,18 +6876,22 @@ var Plottable;
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 var dataset = this.datasets()[0];
-                for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
-                    var datum = dataset.data()[datumIndex];
-                    var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
-                    var measurement = measurer.measure(value);
-                    var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
-                    var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
-                    if (this.outerRadius().scale) {
-                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                var data = this._getDataToDraw().get(dataset);
+                data.forEach(function (datum, datumIndex) {
+                    var value = _this.sectorValue().accessor(datum, datumIndex, dataset);
+                    if (!Plottable.Utils.Math.isValidNumber(value)) {
+                        return;
                     }
-                    var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
-                    if (this.innerRadius().scale) {
-                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    value = _this._labelFormatter(value);
+                    var measurement = measurer.measure(value);
+                    var theta = (_this._endAngles[datumIndex] + _this._startAngles[datumIndex]) / 2;
+                    var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset);
+                    if (_this.outerRadius().scale) {
+                        outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset);
+                    if (_this.innerRadius().scale) {
+                        innerRadius = _this.innerRadius().scale.scale(innerRadius);
                     }
                     var labelRadius = (outerRadius + innerRadius) / 2;
                     var x = Math.sin(theta) * labelRadius - measurement.width / 2;
@@ -6917,7 +6921,7 @@ var Plottable;
                         yAlign: "center",
                         textRotation: 0
                     });
-                }
+                });
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";

@@ -307,10 +307,13 @@ export module Plots {
       var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
       var writer = new SVGTypewriter.Writers.Writer(measurer);
       var dataset = this.datasets()[0];
-
-      for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
-        var datum = dataset.data()[datumIndex];
-        var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
+      var data = this._getDataToDraw().get(dataset);
+      data.forEach((datum, datumIndex) => {
+        var value = this.sectorValue().accessor(datum, datumIndex, dataset);
+        if (!Plottable.Utils.Math.isValidNumber(value)) {
+          return;
+        }
+        value = this._labelFormatter(value);
         var measurement = measurer.measure(value);
 
         var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
@@ -356,7 +359,7 @@ export module Plots {
           yAlign: "center",
           textRotation: 0
         });
-      }
+      });
     }
   }
 }
