@@ -62,9 +62,12 @@ export module Components {
       if (displayText === undefined) {
         return this._text;
       } else {
-        this._text = displayText;
-        this.redraw();
-        return this;
+        if (typeof displayText === "string") {
+          this._text = displayText;
+          this.redraw();
+          return this;
+        }
+        throw new Error("Label.text() only takes strings as input");
       }
     }
 
