@@ -142,6 +142,44 @@ export module Plots {
         symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
       return propertyToProjectors;
     }
+
+    /**
+     * Gets the Entities that intersect the Bounds.
+     *
+     * @param {Bounds} bounds
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(bounds: Bounds): PlotEntity[];
+    /**
+     * Gets the Entities that intersect the area defined by the ranges.
+     *
+     * @param {Range} xRange
+     * @param {Range} yRange
+     * @returns {PlotEntity[]}
+     */
+    public entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
+    public entitiesIn(xRangeOrBounds: Range | Bounds, yRange?: Range): PlotEntity[] {
+      let dataXRange: Range;
+      let dataYRange: Range;
+      if (yRange == null) {
+        let bounds = (<Bounds> xRangeOrBounds);
+        dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+        dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+      } else {
+        dataXRange = (<Range> xRangeOrBounds);
+        dataYRange = yRange;
+      }
+      let xProjector = Plot._scaledAccessor(this.x());
+      let yProjector = Plot._scaledAccessor(this.y());
+      return this.entities().filter((entity) => {
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = xProjector(datum, index, dataset);
+        let y = yProjector(datum, index, dataset);
+        return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
+      });
+    }
   }
 }
 }

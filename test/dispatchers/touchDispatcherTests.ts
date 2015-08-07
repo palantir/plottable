@@ -192,5 +192,59 @@ describe("Dispatchers", () => {
 
       td.offTouchMove(callback);
     });
+
+    it("doesn't call callbacks if obscured by overlay", () => {
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
+      // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
+      target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
+
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
+        return {
+          x: targetX,
+          y: targetYs[i]
+        };
+      });
+      let ids = targetXs.map((targetX, i) => i);
+
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+
+      let callbackWasCalled = false;
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+        callbackWasCalled = true;
+        assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
+      };
+
+      td.onTouchStart(callback);
+      TestMethods.triggerFakeTouchEvent("touchstart", target, expectedPoints, ids);
+      assert.isTrue(callbackWasCalled, "callback was called on touchstart");
+
+      let element = <HTMLElement> target[0][0];
+      let position = { x: 0, y: 0 };
+      while (element != null) {
+        position.x += (element.offsetLeft || element.clientLeft || 0);
+        position.y += (element.offsetTop || element.clientTop || 0);
+        element = <HTMLElement> (element.offsetParent || element.parentNode);
+      }
+
+      let overlay = TestMethods.getSVGParent().append("div")
+            .style({
+              height: "400px",
+              width: "400px",
+              position: "absolute",
+              top: position.y + "px",
+              left: position.x + "px"
+            });
+
+      callbackWasCalled = false;
+      TestMethods.triggerFakeTouchEvent("touchmove", target, expectedPoints, ids);
+      assert.isFalse(callbackWasCalled, "callback was not called on touchstart on overlay");
+
+      td.offTouchStart(callback);
+      target.remove();
+      overlay.remove();
+    });
   });
 });

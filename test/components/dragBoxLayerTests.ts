@@ -612,6 +612,14 @@ describe("Interactive Components", () => {
 
         svg.remove();
       });
+
+      it("destroy() does not error if scales are not inputted", () => {
+        let sbl = new Plottable.Components.DragBoxLayer();
+        sbl.renderTo(svg);
+        assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
+
+        svg.remove();
+      });
     });
   });
 });

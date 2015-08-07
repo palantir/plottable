@@ -154,5 +154,14 @@ describe("Interactive Components", () => {
 
       svg.remove();
     });
+
+    it("destroy() does not error if scales are not inputted", () => {
+      let svg = TestMethods.generateSVG();
+      let sbl = new Plottable.Components.YDragBoxLayer();
+      sbl.renderTo(svg);
+      assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy");
+
+      svg.remove();
+    });
   });
 });

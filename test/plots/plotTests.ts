@@ -9,7 +9,7 @@ class CountingPlot extends Plottable.Plot {
   }
 
   protected _createDrawer(dataset: Plottable.Dataset) {
-    const drawer = new Plottable.Drawer(dataset);
+    let drawer = new Plottable.Drawer(dataset);
     (<any> drawer)._svgElement = "g";
     return drawer;
   }
@@ -18,8 +18,8 @@ class CountingPlot extends Plottable.Plot {
 describe("Plots", () => {
   describe("Plot", () => {
     it("Plots default correctly", () => {
-      const svg = TestMethods.generateSVG(400, 300);
-      const r = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 300);
+      let r = new Plottable.Plot();
       (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.renderTo(svg);
       TestMethods.verifyClipPath(r);
@@ -27,20 +27,20 @@ describe("Plots", () => {
     });
 
     it("Base Plot functionality works", () => {
-      const svg = TestMethods.generateSVG(400, 300);
-      const r = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 300);
+      let r = new Plottable.Plot();
       (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.anchor(svg);
       r.computeLayout();
-      const renderArea = (<any> r)._content.select(".render-area");
+      let renderArea = (<any> r)._content.select(".render-area");
       assert.isNotNull(renderArea.node(), "there is a render-area");
       svg.remove();
     });
 
     it("Changes Dataset listeners when the Dataset is changed", () => {
-      const dFoo = new Plottable.Dataset(["foo"], {cssClass: "bar"});
-      const dBar = new Plottable.Dataset(["bar"], {cssClass: "boo"});
-      const r = new CountingPlot();
+      let dFoo = new Plottable.Dataset(["foo"], {cssClass: "bar"});
+      let dBar = new Plottable.Dataset(["bar"], {cssClass: "boo"});
+      let r = new CountingPlot();
       r.addDataset(dFoo);
 
       assert.strictEqual(1, r.renders, "initial render due to addDataset");
@@ -64,10 +64,10 @@ describe("Plots", () => {
     });
 
     it("datasets()", () => {
-      const dataset1 = new Plottable.Dataset([]);
-      const dataset2 = new Plottable.Dataset([]);
+      let dataset1 = new Plottable.Dataset([]);
+      let dataset2 = new Plottable.Dataset([]);
 
-      const plot = new Plottable.Plot();
+      let plot = new Plottable.Plot();
       (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(dataset1);
       plot.addDataset(dataset2);
@@ -76,7 +76,7 @@ describe("Plots", () => {
       plot.datasets([dataset2, dataset1]);
       assert.deepEqual(plot.datasets(), [dataset2, dataset1], "order of Datasets was changed");
 
-      const dataset3 = new Plottable.Dataset([]);
+      let dataset3 = new Plottable.Dataset([]);
       plot.addDataset(dataset3);
       assert.deepEqual(plot.datasets(), [dataset2, dataset1, dataset3], "adding further Datasets respects the order");
 
@@ -85,16 +85,16 @@ describe("Plots", () => {
     });
 
     it("Updates its projectors when the Dataset is changed", () => {
-      const d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
-      const r = new Plottable.Plot();
+      let d1 = new Plottable.Dataset([{x: 5, y: 6}], {cssClass: "bar"});
+      let r = new Plottable.Plot();
       (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       r.addDataset(d1);
 
       let xScaleCalls: number = 0;
       let yScaleCalls: number = 0;
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Linear();
-      const metadataProjector = (d: any, i: number, m: any) => m.cssClass;
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let metadataProjector = (d: any, i: number, m: any) => m.cssClass;
       r.attr("x", (d) => d.x, xScale);
       r.attr("y", (d) => d.y, yScale);
       r.attr("meta", metadataProjector);
@@ -114,7 +114,7 @@ describe("Plots", () => {
       assert.strictEqual(1, xScaleCalls, "X scale was wired up to datasource correctly");
       assert.strictEqual(1, yScaleCalls, "Y scale was wired up to datasource correctly");
 
-      const d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
+      let d2 = new Plottable.Dataset([{x: 7, y: 8}], {cssClass: "boo"});
       r.removeDataset(d1);
       r.addDataset(d2);
       assert.strictEqual(3, xScaleCalls, "Changing datasource fires X scale listeners (but doesn't coalesce callbacks)");
@@ -131,27 +131,27 @@ describe("Plots", () => {
     });
 
     it("Plot.project works as intended", () => {
-      const r = new Plottable.Plot();
+      let r = new Plottable.Plot();
       (<any> r)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
-      const s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
+      let s = new Plottable.Scales.Linear().domain([0, 1]).range([0, 10]);
       r.attr("attr", (d) => d.a, s);
-      const attrToProjector = (<any> r)._generateAttrToProjector();
-      const projector = attrToProjector["attr"];
+      let attrToProjector = (<any> r)._generateAttrToProjector();
+      let projector = attrToProjector["attr"];
       assert.strictEqual(projector({"a": 0.5}, 0, null, null), 5, "projector works as intended");
     });
 
     it("Changing Plot.dataset().data to [] causes scale to contract", () => {
-      const ds1 = new Plottable.Dataset([0, 1, 2]);
-      const ds2 = new Plottable.Dataset([1, 2, 3]);
-      const s = new Plottable.Scales.Linear().padProportion(0);
-      const svg1 = TestMethods.generateSVG(100, 100);
-      const svg2 = TestMethods.generateSVG(100, 100);
-      const plot1 = new Plottable.Plot();
+      let ds1 = new Plottable.Dataset([0, 1, 2]);
+      let ds2 = new Plottable.Dataset([1, 2, 3]);
+      let s = new Plottable.Scales.Linear().padProportion(0);
+      let svg1 = TestMethods.generateSVG(100, 100);
+      let svg2 = TestMethods.generateSVG(100, 100);
+      let plot1 = new Plottable.Plot();
       (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot1.addDataset(ds1)
            .attr("x", (x: number) => x, s)
            .renderTo(svg1);
-      const plot2 = new Plottable.Plot();
+      let plot2 = new Plottable.Plot();
       (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot2.addDataset(ds2)
            .attr("x", (x: number) => x, s)
@@ -164,18 +164,18 @@ describe("Plots", () => {
     });
 
     it("selections() with dataset retrieval", () => {
-      const svg = TestMethods.generateSVG(400, 400);
-      const plot = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 400);
+      let plot = new Plottable.Plot();
 
-      const dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
-      const dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
+      let dataset1 = new Plottable.Dataset([{value: 0}, {value: 1}, {value: 2}]);
+      let dataset2 = new Plottable.Dataset([{value: 1}, {value: 2}, {value: 3}]);
 
       // Create mock drawers with functioning selector()
-      const mockDrawer1 = new Plottable.Drawer(dataset1);
+      let mockDrawer1 = new Plottable.Drawer(dataset1);
       (<any> mockDrawer1)._svgElementName = "circle";
       mockDrawer1.selector = () => "circle";
 
-      const mockDrawer2 = new Plottable.Drawer(dataset2);
+      let mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
 
@@ -193,46 +193,46 @@ describe("Plots", () => {
       plot.renderTo(svg);
 
       // mock drawn items and replace the renderArea on the mock Drawers
-      const renderArea1 = svg.append("g");
+      let renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       mockDrawer1.renderArea(renderArea1);
-      const renderArea2 = svg.append("g");
+      let renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       mockDrawer2.renderArea(renderArea2);
 
-      const selections = plot.selections();
+      let selections = plot.selections();
       assert.strictEqual(selections.size(), 2, "all circle selections gotten");
 
-      const oneSelection = plot.selections([dataset1]);
+      let oneSelection = plot.selections([dataset1]);
       assert.strictEqual(oneSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneSelection, "cx"), 100, "retrieved selection in renderArea1");
 
-      const oneElementSelection = plot.selections([dataset2]);
+      let oneElementSelection = plot.selections([dataset2]);
       assert.strictEqual(oneElementSelection.size(), 1);
       assert.strictEqual(TestMethods.numAttr(oneElementSelection, "cy"), 10, "retreived selection in renderArea2");
       svg.remove();
     });
 
     it("entities() with dataset retrieval", () => {
-      const svg = TestMethods.generateSVG(400, 400);
-      const plot = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 400);
+      let plot = new Plottable.Plot();
 
-      const data1 = [{value: 0}, {value: 1}, {value: 2}];
-      const data2 = [{value: 0}, {value: 1}, {value: 2}];
-      const dataset1 = new Plottable.Dataset(data1);
-      const dataset2 = new Plottable.Dataset(data2);
+      let data1 = [{value: 0}, {value: 1}, {value: 2}];
+      let data2 = [{value: 0}, {value: 1}, {value: 2}];
+      let dataset1 = new Plottable.Dataset(data1);
+      let dataset2 = new Plottable.Dataset(data2);
 
-      const data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
-      const data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
+      let data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
+      let data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
 
-      const data1PointConverter = (datum: any, index: number) => data1Points[index];
-      const data2PointConverter = (datum: any, index: number) => data2Points[index];
+      let data1PointConverter = (datum: any, index: number) => data1Points[index];
+      let data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with functioning selector()
-      const mockDrawer1 = new Plottable.Drawer(dataset1);
+      let mockDrawer1 = new Plottable.Drawer(dataset1);
       (<any> mockDrawer1)._svgElementName = "circle";
       mockDrawer1.selector = () => "circle";
-      const mockDrawer2 = new Plottable.Drawer(dataset2);
+      let mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
 
@@ -259,19 +259,19 @@ describe("Plots", () => {
       plot.renderTo(svg);
 
       // mock drawn items and replace the renderArea on the mock Drawers
-      const renderArea1 = svg.append("g");
-      const renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
+      let renderArea1 = svg.append("g");
+      let renderArea1Selection = renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       mockDrawer1.renderArea(renderArea1);
-      const renderArea2 = svg.append("g");
-      const renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
+      let renderArea2 = svg.append("g");
+      let renderArea2Selection = renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
       mockDrawer2.renderArea(renderArea2);
 
       let entities = plot.entities();
       assert.lengthOf(entities, data1.length + data2.length, "retrieved one Entity for each value on the Plot");
-      const entityData = entities.map((entity) => entity.datum);
+      let entityData = entities.map((entity) => entity.datum);
       assert.includeMembers(entityData, data1, "includes data1 members");
       assert.includeMembers(entityData, data2, "includes data2 members");
-      const entityPositions = entities.map((entity) => entity.position);
+      let entityPositions = entities.map((entity) => entity.position);
       assert.includeMembers(entityPositions, data1.map(data1PointConverter), "includes data1 points");
       assert.includeMembers(entityPositions, data2.map(data2PointConverter), "includes data2 points");
 
@@ -290,18 +290,18 @@ describe("Plots", () => {
     });
 
     it("entities() with NaN values", () => {
-      const svg = TestMethods.generateSVG(400, 400);
-      const plot = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 400);
+      let plot = new Plottable.Plot();
 
-      const data = [{value: NaN}, {value: 1}, {value: 2}];
-      const dataset = new Plottable.Dataset(data);
+      let data = [{value: NaN}, {value: 1}, {value: 2}];
+      let dataset = new Plottable.Dataset(data);
 
-      const dataPoints = data.map((datum: any) => { return {x: datum.value, y: 10}; });
+      let dataPoints = data.map((datum: any) => { return {x: datum.value, y: 10}; });
 
-      const dataPointConverter = (datum: any, index: number) => dataPoints[index];
+      let dataPointConverter = (datum: any, index: number) => dataPoints[index];
 
       // Create mock drawer with already drawn items
-      const mockDrawer = new Plottable.Drawer(dataset);
+      let mockDrawer = new Plottable.Drawer(dataset);
       (<any> mockDrawer)._svgElementName = "circle";
       mockDrawer.selector = () => "circle";
 
@@ -316,14 +316,14 @@ describe("Plots", () => {
       plot.renderTo(svg);
 
       // replace the renderArea with our own
-      const renderArea = svg.append("g");
-      const dataToPlot = data.filter((datum) => Plottable.Utils.Math.isValidNumber(datum.value));
-      const circles = renderArea.selectAll("circles").data(dataToPlot);
+      let renderArea = svg.append("g");
+      let dataToPlot = data.filter((datum) => Plottable.Utils.Math.isValidNumber(datum.value));
+      let circles = renderArea.selectAll("circles").data(dataToPlot);
       circles.enter().append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       circles.exit().remove();
       mockDrawer.renderArea(renderArea);
 
-      const entities = plot.entities();
+      let entities = plot.entities();
       assert.lengthOf(entities, 2, "returns Entities for all valid data values");
 
       entities.forEach((entity, loopIndex) => {
@@ -337,31 +337,31 @@ describe("Plots", () => {
     });
 
     it("entityNearest()", () => {
-      const svg = TestMethods.generateSVG(400, 400);
-      const plot = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 400);
+      let plot = new Plottable.Plot();
 
-      const data1 = [{value: 0}, {value: 1}, {value: 2}];
-      const data2 = [{value: 0}, {value: 1}, {value: 2}];
-      const dataset1 = new Plottable.Dataset(data1);
-      const dataset2 = new Plottable.Dataset(data2);
+      let data1 = [{value: 0}, {value: 1}, {value: 2}];
+      let data2 = [{value: 0}, {value: 1}, {value: 2}];
+      let dataset1 = new Plottable.Dataset(data1);
+      let dataset2 = new Plottable.Dataset(data2);
 
-      const data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
-      const data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
+      let data1Points = data1.map((datum: any) => { return {x: datum.value, y: 100}; });
+      let data2Points = data2.map((datum: any) => { return {x: datum.value, y: 10}; });
 
-      const data1PointConverter = (datum: any, index: number) => data1Points[index];
-      const data2PointConverter = (datum: any, index: number) => data2Points[index];
+      let data1PointConverter = (datum: any, index: number) => data1Points[index];
+      let data2PointConverter = (datum: any, index: number) => data2Points[index];
 
       // Create mock drawers with already drawn items
-      const mockDrawer1 = new Plottable.Drawer(dataset1);
-      const renderArea1 = svg.append("g");
+      let mockDrawer1 = new Plottable.Drawer(dataset1);
+      let renderArea1 = svg.append("g");
       renderArea1.append("circle").attr("cx", 100).attr("cy", 100).attr("r", 10);
       (<any> mockDrawer1).setup = () => (<any> mockDrawer1)._renderArea = renderArea1;
       (<any> mockDrawer1)._svgElementName = "circle";
      mockDrawer1.selector = () => "circle";
 
-      const renderArea2 = svg.append("g");
+      let renderArea2 = svg.append("g");
       renderArea2.append("circle").attr("cx", 10).attr("cy", 10).attr("r", 10);
-      const mockDrawer2 = new Plottable.Drawer(dataset2);
+      let mockDrawer2 = new Plottable.Drawer(dataset2);
       (<any> mockDrawer2).setup = () => (<any> mockDrawer2)._renderArea = renderArea2;
       (<any> mockDrawer2)._svgElementName = "circle";
       mockDrawer2.selector = () => "circle";
@@ -387,8 +387,8 @@ describe("Plots", () => {
       };
       plot.renderTo(svg);
 
-      const queryPoint = {x: 1, y: 11};
-      const nearestEntity = plot.entityNearest(queryPoint);
+      let queryPoint = {x: 1, y: 11};
+      let nearestEntity = plot.entityNearest(queryPoint);
       assert.deepEqual(nearestEntity.position, {x: 1, y: 10}, "retrieves the closest point across datasets");
 
       svg.remove();
@@ -416,32 +416,32 @@ describe("Plots", () => {
       });
 
       it("removeDataset ignores Datasets not in the Plot", () => {
-        const d3 = new Plottable.Dataset();
+        let d3 = new Plottable.Dataset();
         plot.removeDataset(d3);
         assert.deepEqual(plot.datasets(), [d1, d2], "datasets as expected");
       });
     });
 
     it("destroy() disconnects plots from its scales", () => {
-      const plot2 = new Plottable.Plot();
-      const scale = new Plottable.Scales.Linear();
+      let plot2 = new Plottable.Plot();
+      let scale = new Plottable.Scales.Linear();
       plot2.attr("attr", (d) => d.a, scale);
       plot2.destroy();
       assert.strictEqual((<any> scale)._callbacks.size, 0, "the plot is no longer attached to the scale");
     });
 
     it("extent registration works as intended", () => {
-      const scale1 = new Plottable.Scales.Linear().padProportion(0);
-      const scale2 = new Plottable.Scales.Linear().padProportion(0);
+      let scale1 = new Plottable.Scales.Linear().padProportion(0);
+      let scale2 = new Plottable.Scales.Linear().padProportion(0);
 
-      const d1 = new Plottable.Dataset([1, 2, 3]);
-      const d2 = new Plottable.Dataset([4, 99, 999]);
-      const d3 = new Plottable.Dataset([-1, -2, -3]);
+      let d1 = new Plottable.Dataset([1, 2, 3]);
+      let d2 = new Plottable.Dataset([4, 99, 999]);
+      let d3 = new Plottable.Dataset([-1, -2, -3]);
 
-      const id = (d: number) => d;
-      const plot1 = new Plottable.Plot();
-      const plot2 = new Plottable.Plot();
-      const svg = TestMethods.generateSVG(400, 400);
+      let id = (d: number) => d;
+      let plot1 = new Plottable.Plot();
+      let plot2 = new Plottable.Plot();
+      let svg = TestMethods.generateSVG(400, 400);
       (<any> plot1)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       (<any> plot2)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot1.attr("null", id, scale1);
@@ -474,21 +474,21 @@ describe("Plots", () => {
     });
 
     it("additionalPaint timing works properly", () => {
-      const animator = new Plottable.Animators.Easing()
+      let animator = new Plottable.Animators.Easing()
         .startDelay(10)
         .stepDuration(10)
         .stepDelay(0);
-      const x = new Plottable.Scales.Linear();
-      const y = new Plottable.Scales.Linear();
-      const plot = new Plottable.Plots.Bar();
+      let x = new Plottable.Scales.Linear();
+      let y = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Bar();
       plot.addDataset(new Plottable.Dataset([])).animated(true);
       let recordedTime = -1;
-      const additionalPaint = (x: number) => {
+      let additionalPaint = (x: number) => {
         recordedTime = Math.max(x, recordedTime);
       };
       (<any> plot)._additionalPaint = additionalPaint;
       plot.animator(Plottable.Plots.Animator.MAIN, animator);
-      const svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG();
       plot.x((d: any) => d.x, x);
       plot.y((d: any) => d.y, y);
       plot.renderTo(svg);
@@ -497,16 +497,16 @@ describe("Plots", () => {
     });
 
     it("extent calculation done in correct dataset order", () => {
-      const categoryScale = new Plottable.Scales.Category();
-      const dataset1 = new Plottable.Dataset([{key: "A"}]);
-      const dataset2 = new Plottable.Dataset([{key: "B"}]);
-      const plot = new Plottable.Plot();
+      let categoryScale = new Plottable.Scales.Category();
+      let dataset1 = new Plottable.Dataset([{key: "A"}]);
+      let dataset2 = new Plottable.Dataset([{key: "B"}]);
+      let plot = new Plottable.Plot();
       (<any> plot)._createDrawer = (dataset: Plottable.Dataset) => createMockDrawer(dataset);
       plot.addDataset(dataset2);
       plot.addDataset(dataset1);
       plot.attr("key", (d) => d.key, categoryScale);
 
-      const svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG();
       plot.renderTo(svg);
 
       assert.deepEqual(categoryScale.domain(), ["B", "A"], "extent is in the right order");
@@ -514,7 +514,7 @@ describe("Plots", () => {
     });
 
     it("animated() getter", () => {
-      const plot = new Plottable.Plot();
+      let plot = new Plottable.Plot();
       assert.strictEqual(plot.animated(), false, "by default the plot is not animated");
       assert.strictEqual(plot.animated(true), plot, "toggling animation returns the plot");
       assert.strictEqual(plot.animated(), true, "animated toggled on");

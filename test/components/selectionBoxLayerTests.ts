@@ -20,6 +20,15 @@ describe("SelectionBoxLayer", () => {
     svg.remove();
   });
 
+  it("destroy() does not error if scales are not inputted", () => {
+    let svg = TestMethods.generateSVG();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
+    sbl.renderTo(svg);
+    assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy even with no scales");
+
+    svg.remove();
+  });
+
   it("bounds()", () => {
     let svg = TestMethods.generateSVG();
     let sbl = new Plottable.Components.SelectionBoxLayer();
