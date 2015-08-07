@@ -337,8 +337,7 @@ describe("Plots", () => {
       });
 
       it("calculating width does not crash if handed invalid values", () => {
-        var errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
-        assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
+        assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), Error, "barPixelWidth does not crash on invalid values");
         svg.remove();
       });
 
