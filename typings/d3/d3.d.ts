@@ -805,6 +805,9 @@ declare module d3 {
     }
 
     interface Transition<Datum> {
+
+        transition(): Transition<Datum>;
+        
         delay(): number;
         delay(delay: number): Transition<Datum>;
         delay(delay: (datum: Datum, index: number, outerIndex: number) => number): Transition<Datum>;
@@ -821,7 +824,7 @@ declare module d3 {
         attr(name: string, value: (datum: Datum, index: number, outerIndex: number) => Primitive): Transition<Datum>;
         attr(obj: { [key: string]: Primitive | ((datum: Datum, index: number, outerIndex: number) => Primitive) }): Transition<Datum>;
 
-        attrTween(name: string, tween: (datum: Datum, index: number, attr: string) => Primitive): Transition<Datum>;
+        attrTween(name: string, tween: (datum: Datum, index: number, attr: string) => (t: number) => Primitive): Transition<Datum>;
 
         style(name: string, value: Primitive, priority?: string): Transition<Datum>;
         style(name: string, value: (datum: Datum, index: number, outerIndex: number) => Primitive, priority?: string): Transition<Datum>;
@@ -2193,8 +2196,7 @@ declare module d3 {
             interpolate(interpolate: "cardinal-open"): Line<T>;
             interpolate(interpolate: "cardinal-closed"): Line<T>;
             interpolate(interpolate: "monotone"): Line<T>;
-            interpolate(interpolate: string): Line<T>;
-            interpolate(interpolate: (points: Array<[number, number]>) => string): Line<T>;
+            interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Line<T>;
 
             tension(): number;
             tension(tension: number): Line<T>;
@@ -2232,8 +2234,7 @@ declare module d3 {
                 interpolate(interpolate: "cardinal-open"): Radial<T>;
                 interpolate(interpolate: "cardinal-closed"): Radial<T>;
                 interpolate(interpolate: "monotone"): Radial<T>;
-                interpolate(interpolate: string): Radial<T>;
-                interpolate(interpolate: (points: Array<[number, number]>) => string): Radial<T>;
+                interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Radial<T>;
 
                 tension(): number;
                 tension(tension: number): Radial<T>;
@@ -2283,7 +2284,7 @@ declare module d3 {
             interpolate(interpolate: "cardinal"): Area<T>;
             interpolate(interpolate: "cardinal-open"): Area<T>;
             interpolate(interpolate: "monotone"): Area<T>;
-            interpolate(interpolate: string): Area<T>;
+            interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Area<T>;
 
             tension(): number;
             tension(tension: number): Area<T>;
@@ -2333,8 +2334,7 @@ declare module d3 {
                 interpolate(interpolate: "cardinal"): Radial<T>;
                 interpolate(interpolate: "cardinal-open"): Radial<T>;
                 interpolate(interpolate: "monotone"): Radial<T>;
-                interpolate(interpolate: string): Radial<T>;
-                interpolate(interpolate: (points: Array<[number, number]>) => string): Radial<T>;
+                interpolate(interpolate: string | ((points: Array<[number, number]>) => string)): Radial<T>;
 
                 tension(): number;
                 tension(tension: number): Radial<T>;
@@ -2358,7 +2358,7 @@ declare module d3 {
         }
 
         interface Arc<T> {
-            (d: T, i: number): string;
+            (d: T, i?: number): string;
 
             innerRadius(): (d: T, i: number) => number;
             innerRadius(radius: number): Arc<T>;

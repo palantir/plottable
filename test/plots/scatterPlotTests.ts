@@ -140,6 +140,80 @@ describe("Plots", () => {
       svg.remove();
     });
 
+    it("can retrieve entities in a certain range", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesIn({ min: xScale.scale(1), max: xScale.scale(1) },
+                                     { min: yScale.scale(1), max: yScale.scale(1) });
+
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
+    it("entities are not returned if their center lies outside the range", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesIn({ min: xScale.scale(1.001), max: xScale.scale(1.001) },
+                                     { min: yScale.scale(1.001), max: yScale.scale(1.001) });
+
+      assert.lengthOf(entities, 0, "no entities retrieved");
+
+      svg.remove();
+    });
+
+    it("can retrieve entities in a certain bounds", () => {
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+
+      let dataset = new Plottable.Dataset([{x: 0, y: 0}, {x: 1, y: 1}]);
+      let dataset2 = new Plottable.Dataset([{x: 1, y: 2}, {x: 3, y: 4}]);
+      let plot = new Plottable.Plots.Scatter();
+      plot.x((d: any) => d.x, xScale)
+          .y((d: any) => d.y, yScale)
+          .addDataset(dataset)
+          .addDataset(dataset2);
+      plot.renderTo(svg);
+
+      let entities = plot.entitiesIn({ topLeft: {
+                                         x: xScale.scale(1),
+                                         y: yScale.scale(1)
+                                       },
+                                       bottomRight: {
+                                         x: xScale.scale(1),
+                                         y: yScale.scale(1)
+                                       }});
+
+      assert.lengthOf(entities, 1, "only one entity has been retrieved");
+      assert.deepEqual(entities[0].datum, {x: 1, y: 1}, "correct datum has been retrieved");
+
+      svg.remove();
+    });
+
     it("correctly handles NaN and undefined x and y values", () => {
       const svg = TestMethods.generateSVG(400, 400);
       const data = [

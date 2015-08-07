@@ -6,6 +6,7 @@ describe("Interactions", () => {
     const SVG_WIDTH = 400;
     const SVG_HEIGHT = 500;
 
+    let component: Plottable.Component;
     let eventTarget: d3.Selection<void>;
 
     let xScale: Plottable.QuantitativeScale<number>;
@@ -15,7 +16,7 @@ describe("Interactions", () => {
     beforeEach(() => {
       svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
 
-      const component = new Plottable.Component();
+      component = new Plottable.Component();
       component.renderTo(svg);
 
       xScale = new Plottable.Scales.Linear();
@@ -178,6 +179,29 @@ describe("Interactions", () => {
       TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
       assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale transforms to the correct domain via pinch");
       assert.deepEqual(xScale2.domain(), [SVG_WIDTH / 4, SVG_WIDTH * 5 / 4], "xScale2 transforms to the correct domain via pinch");
+      svg.remove();
+    });
+
+    it("pinching inside one component does not affect another component", () => {
+      let component2 = new Plottable.Component();
+      let table = new Plottable.Components.Table([[component], [component2]]);
+      table.renderTo(svg);
+      let xScale2 = new Plottable.Scales.Linear();
+      const initialDomain = [0, SVG_WIDTH / 2];
+      xScale2.domain(initialDomain).range([0, SVG_WIDTH]);
+      let panZoomInteraction2 = new Plottable.Interactions.PanZoom();
+      panZoomInteraction2.addXScale(xScale2);
+      panZoomInteraction2.attachTo(component2);
+
+      let startPoint = { x: SVG_WIDTH / 4, y: SVG_HEIGHT / 2 };
+      let startPoint2 = { x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2 };
+      TestMethods.triggerFakeTouchEvent( "touchstart", eventTarget, [startPoint, startPoint2], [0, 1] );
+
+      let endPoint = { x: SVG_WIDTH * 3 / 4, y: SVG_HEIGHT / 2 };
+      TestMethods.triggerFakeTouchEvent("touchmove", eventTarget, [endPoint], [1] );
+      TestMethods.triggerFakeTouchEvent("touchend", eventTarget, [endPoint], [1] );
+      assert.deepEqual(xScale.domain(), [SVG_WIDTH / 16, SVG_WIDTH * 5 / 16], "xScale inside target component transforms via pinch");
+      assert.deepEqual(xScale2.domain(), initialDomain, "xScale outside of target component does not transform via pinch");
       svg.remove();
     });
 
