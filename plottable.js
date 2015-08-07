@@ -9025,7 +9025,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Animators;
