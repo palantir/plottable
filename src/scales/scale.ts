@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export interface ScaleCallback<S extends Scale<any, any>> {
