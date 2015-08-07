@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export module Components {
@@ -62,9 +61,9 @@ export module Components {
 
     private _redrawXLines() {
       if (this._xScale) {
-        var xTicks = this._xScale.ticks();
-        var getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
-        var xLines = this._xLinesContainer.selectAll("line").data(xTicks);
+        let xTicks = this._xScale.ticks();
+        let getScaledXValue = (tickVal: number) => this._xScale.scale(tickVal);
+        let xLines = this._xLinesContainer.selectAll("line").data(xTicks);
         xLines.enter().append("line");
         xLines.attr("x1", getScaledXValue)
               .attr("y1", 0)
@@ -77,9 +76,9 @@ export module Components {
 
     private _redrawYLines() {
       if (this._yScale) {
-        var yTicks = this._yScale.ticks();
-        var getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
-        var yLines = this._yLinesContainer.selectAll("line").data(yTicks);
+        let yTicks = this._yScale.ticks();
+        let getScaledYValue = (tickVal: number) => this._yScale.scale(tickVal);
+        let yLines = this._yLinesContainer.selectAll("line").data(yTicks);
         yLines.enter().append("line");
         yLines.attr("x1", 0)
               .attr("y1", getScaledYValue)
