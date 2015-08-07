@@ -397,6 +397,29 @@ export module Plots {
       }
     }
 
+    private _oldProvider: any = () => [0, 0];
+    protected _updateExtents() {
+      super._updateExtents();
+
+      if (!this.x() || !this.x().scale) {
+        console.log("WHAT?");
+        return;
+      }
+
+      var xScale = this.x().scale;
+      xScale.removeIncludedValuesProvider(this._oldProvider);
+      var extent = (<any>xScale)._getExtent();
+
+      var amendedExtent = [
+        (<any>xScale).invert(xScale.scale(extent[0]) - this._barPixelWidth / 2),
+        (<any>xScale).invert(xScale.scale(extent[1]) + this._barPixelWidth / 2),
+      ];
+
+      this._oldProvider = () => amendedExtent;
+
+      xScale.addIncludedValuesProvider(this._oldProvider);
+    }
+
     private _drawLabels() {
       var dataToDraw = this._getDataToDraw();
       var labelsTooWide = false;

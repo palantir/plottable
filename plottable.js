@@ -7568,6 +7568,7 @@ var Plottable;
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
+                this._oldProvider = function () { return [0, 0]; };
                 this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -7833,6 +7834,22 @@ var Plottable;
                 if (this._labelsEnabled) {
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
+            };
+            Bar.prototype._updateExtents = function () {
+                _super.prototype._updateExtents.call(this);
+                if (!this.x() || !this.x().scale) {
+                    console.log("WHAT?");
+                    return;
+                }
+                var xScale = this.x().scale;
+                xScale.removeIncludedValuesProvider(this._oldProvider);
+                var extent = xScale._getExtent();
+                var amendedExtent = [
+                    xScale.invert(xScale.scale(extent[0]) - this._barPixelWidth / 2),
+                    xScale.invert(xScale.scale(extent[1]) + this._barPixelWidth / 2),
+                ];
+                this._oldProvider = function () { return amendedExtent; };
+                xScale.addIncludedValuesProvider(this._oldProvider);
             };
             Bar.prototype._drawLabels = function () {
                 var _this = this;
