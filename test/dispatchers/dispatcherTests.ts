@@ -3,12 +3,12 @@
 describe("Dispatchers", () => {
   describe("Dispatcher", () => {
     it("_connect() and _disconnect()", () => {
-      const dispatcher = new Plottable.Dispatcher();
+      let dispatcher = new Plottable.Dispatcher();
 
       let callbackCalls = 0;
       (<any> dispatcher)._eventToCallback["click"] = () => callbackCalls++;
 
-      const d3document = d3.select(document);
+      let d3document = d3.select(document);
       (<any> dispatcher)._connect();
       TestMethods.triggerFakeUIEvent("click", d3document);
       assert.strictEqual(callbackCalls, 1, "connected correctly (callback was called)");
@@ -25,17 +25,17 @@ describe("Dispatchers", () => {
     });
 
     it("won't _disconnect() if dispatcher still have listeners", () => {
-      const dispatcher = new Plottable.Dispatcher();
+      let dispatcher = new Plottable.Dispatcher();
 
       let callbackWasCalled = false;
       (<any> dispatcher)._eventToCallback["click"] = () => callbackWasCalled = true;
 
-      const callback = () => { return; };
-      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      let callback = () => { return; };
+      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
       callbackSet.add(callback);
       (<any> dispatcher)._callbacks = [callbackSet];
 
-      const d3document = d3.select(document);
+      let d3document = d3.select(document);
       (<any> dispatcher)._connect();
 
       TestMethods.triggerFakeUIEvent("click", d3document);
@@ -54,11 +54,11 @@ describe("Dispatchers", () => {
     });
 
     it("_setCallback()", () => {
-      const dispatcher = new Plottable.Dispatcher();
-      const callbackSet = new Plottable.Utils.CallbackSet<Function>();
+      let dispatcher = new Plottable.Dispatcher();
+      let callbackSet = new Plottable.Utils.CallbackSet<Function>();
 
       let callbackWasCalled = false;
-      const callback = () => callbackWasCalled = true;
+      let callback = () => callbackWasCalled = true;
 
       (<any> dispatcher)._setCallback(callbackSet, callback);
       callbackSet.callCallbacks();

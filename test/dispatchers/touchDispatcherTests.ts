@@ -3,36 +3,36 @@
 describe("Dispatchers", () => {
   describe("Touch Dispatcher", () => {
     it("getDispatcher() creates only one Dispatcher.Touch per <svg>", () => {
-      const svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG();
 
-      const td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+      let td1 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
       assert.isNotNull(td1, "created a new Dispatcher on an SVG");
-      const td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
+      let td2 = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> svg.node());
       assert.strictEqual(td1, td2, "returned the existing Dispatcher if called again with same <svg>");
 
       svg.remove();
     });
 
     it("onTouchStart()", () => {
-      const targetWidth = 400, targetHeight = 400;
-      const target = TestMethods.generateSVG(targetWidth, targetHeight);
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
-      const targetXs = [17, 18, 12, 23, 44];
-      const targetYs = [77, 78, 52, 43, 14];
-      const expectedPoints = targetXs.map((targetX, i) => {
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
           y: targetYs[i]
         };
       });
-      const ids = targetXs.map((targetX, i) => i);
+      let ids = targetXs.map((targetX, i) => i);
 
-      const td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       let callbackWasCalled = false;
-      const callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         ids.forEach((id) => {
           TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
@@ -50,25 +50,25 @@ describe("Dispatchers", () => {
     });
 
     it("onTouchMove()", () => {
-      const targetWidth = 400, targetHeight = 400;
-      const target = TestMethods.generateSVG(targetWidth, targetHeight);
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
-      const targetXs = [17, 18, 12, 23, 44];
-      const targetYs = [77, 78, 52, 43, 14];
-      const expectedPoints = targetXs.map((targetX, i) => {
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
           y: targetYs[i]
         };
       });
-      const ids = targetXs.map((targetX, i) => i);
+      let ids = targetXs.map((targetX, i) => i);
 
-      const td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       let callbackWasCalled = false;
-      const callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         ids.forEach((id) => {
           TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
@@ -86,25 +86,25 @@ describe("Dispatchers", () => {
     });
 
     it("onTouchEnd()", () => {
-      const targetWidth = 400, targetHeight = 400;
-      const target = TestMethods.generateSVG(targetWidth, targetHeight);
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
-      const targetXs = [17, 18, 12, 23, 44];
-      const targetYs = [77, 78, 52, 43, 14];
-      const expectedPoints = targetXs.map((targetX, i) => {
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
           y: targetYs[i]
         };
       });
-      const ids = targetXs.map((targetX, i) => i);
+      let ids = targetXs.map((targetX, i) => i);
 
-      const td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       let callbackWasCalled = false;
-      const callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         ids.forEach((id) => {
           TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
@@ -122,25 +122,25 @@ describe("Dispatchers", () => {
     });
 
     it("onTouchCancel()", () => {
-      const targetWidth = 400, targetHeight = 400;
-      const target = TestMethods.generateSVG(targetWidth, targetHeight);
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
-      const targetXs = [17, 18, 12, 23, 44];
-      const targetYs = [77, 78, 52, 43, 14];
-      const expectedPoints = targetXs.map((targetX, i) => {
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
           y: targetYs[i]
         };
       });
-      const ids = targetXs.map((targetX, i) => i);
+      let ids = targetXs.map((targetX, i) => i);
 
-      const td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       let callbackWasCalled = false;
-      const callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         ids.forEach((id) => {
           TestMethods.assertPointsClose(points[id], expectedPoints[id], 0.5, "touch position is correct");
@@ -158,25 +158,25 @@ describe("Dispatchers", () => {
     });
 
     it("doesn't call callbacks if not in the DOM", () => {
-      const targetWidth = 400, targetHeight = 400;
-      const target = TestMethods.generateSVG(targetWidth, targetHeight);
+      let targetWidth = 400, targetHeight = 400;
+      let target = TestMethods.generateSVG(targetWidth, targetHeight);
       // HACKHACK: PhantomJS can't measure SVGs unless they have something in them occupying space
       target.append("rect").attr("width", targetWidth).attr("height", targetHeight);
 
-      const targetXs = [17, 18, 12, 23, 44];
-      const targetYs = [77, 78, 52, 43, 14];
-      const expectedPoints = targetXs.map((targetX, i) => {
+      let targetXs = [17, 18, 12, 23, 44];
+      let targetYs = [77, 78, 52, 43, 14];
+      let expectedPoints = targetXs.map((targetX, i) => {
         return {
           x: targetX,
           y: targetYs[i]
         };
       });
-      const ids = targetXs.map((targetX, i) => i);
+      let ids = targetXs.map((targetX, i) => i);
 
-      const td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
+      let td = Plottable.Dispatchers.Touch.getDispatcher(<SVGElement> target.node());
 
       let callbackWasCalled = false;
-      const callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
+      let callback = function(ids: number[], points: { [id: number]: Plottable.Point; }, e: TouchEvent) {
         callbackWasCalled = true;
         assert.isNotNull(e, "TouchEvent was passed to the Dispatcher");
       };

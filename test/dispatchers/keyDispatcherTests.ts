@@ -3,12 +3,12 @@
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on mousedown", () => {
-      const ked = Plottable.Dispatchers.Key.getDispatcher();
+      let ked = Plottable.Dispatchers.Key.getDispatcher();
 
-      const keyCodeToSend = 65;
+      let keyCodeToSend = 65;
 
       let keyDowned = false;
-      const callback = (code: number, e: KeyboardEvent) => {
+      let callback = (code: number, e: KeyboardEvent) => {
         keyDowned = true;
         assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
         assert.isNotNull(e, "key event was passed to the callback");
