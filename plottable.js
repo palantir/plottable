@@ -8910,7 +8910,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -9042,7 +9041,7 @@ var Plottable;
                 var min = Number.MAX_VALUE;
                 var max = Number.MIN_VALUE;
                 var total = 0;
-                var startValue = -Infinity;
+                var hasStarted = false;
                 dataset.data().forEach(function (datum, index) {
                     var currentValue = _this.y().accessor(datum, index, dataset);
                     var isTotal = _this.total().accessor(datum, index, dataset);
@@ -9064,12 +9063,12 @@ var Plottable;
                             max = currentValue;
                         }
                     }
-                    if (startValue === -Infinity && isTotal) {
+                    if (!hasStarted && isTotal) {
                         var startTotal = currentValue - total;
                         for (var i = 0; i < _this._subtotals.length; i++) {
                             _this._subtotals[i] += startTotal;
                         }
-                        startValue = _this._subtotals[i];
+                        hasStarted = true;
                         total += startTotal;
                         min += startTotal;
                         max += startTotal;
