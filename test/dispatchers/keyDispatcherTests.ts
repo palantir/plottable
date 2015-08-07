@@ -1,15 +1,14 @@
 ///<reference path="../testReference.ts" />
-/* tslint:disable: no-var-keyword */
 
 describe("Dispatchers", () => {
   describe("Key Dispatcher", () => {
     it("triggers callback on mousedown", () => {
-      var ked = Plottable.Dispatchers.Key.getDispatcher();
+      let ked = Plottable.Dispatchers.Key.getDispatcher();
 
-      var keyCodeToSend = 65;
+      let keyCodeToSend = 65;
 
-      var keyDowned = false;
-      var callback = (code: number, e: KeyboardEvent) => {
+      let keyDowned = false;
+      let callback = (code: number, e: KeyboardEvent) => {
         keyDowned = true;
         assert.strictEqual(code, keyCodeToSend, "correct keycode was passed");
         assert.isNotNull(e, "key event was passed to the callback");
