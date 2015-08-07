@@ -5685,7 +5685,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var __extends = (this && this.__extends) || function (d, b) {
     for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
     function __() { this.constructor = d; }
@@ -5758,12 +5757,10 @@ var Plottable;
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
-             * ```typescript
-             * var table = new Table();
+             * var table = new Plottable.Components.Table();
              * table.add(a, 0, 0);
              * table.add(b, 0, 1);
              * table.add(c, 1, 1);
-             * ```
              *
              * @param {Component} component The Component to be added.
              * @param {number} row
@@ -5840,19 +5837,22 @@ var Plottable;
                 var freeWidth;
                 var freeHeight;
                 var nIterations = 0;
+                var guarantees;
+                var wantsWidth;
+                var wantsHeight;
                 while (true) {
                     var offeredHeights = Plottable.Utils.Array.add(guaranteedHeights, rowProportionalSpace);
                     var offeredWidths = Plottable.Utils.Array.add(guaranteedWidths, colProportionalSpace);
-                    var guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
+                    guarantees = this._determineGuarantees(offeredWidths, offeredHeights, isFinalOffer);
                     guaranteedWidths = guarantees.guaranteedWidths;
                     guaranteedHeights = guarantees.guaranteedHeights;
-                    var wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
-                    var wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
+                    wantsWidth = guarantees.wantsWidthArr.some(function (x) { return x; });
+                    wantsHeight = guarantees.wantsHeightArr.some(function (x) { return x; });
                     var lastFreeWidth = freeWidth;
                     var lastFreeHeight = freeHeight;
                     freeWidth = availableWidthAfterPadding - d3.sum(guarantees.guaranteedWidths);
                     freeHeight = availableHeightAfterPadding - d3.sum(guarantees.guaranteedHeights);
-                    var xWeights;
+                    var xWeights = void 0;
                     if (wantsWidth) {
                         xWeights = guarantees.wantsWidthArr.map(function (x) { return x ? 0.1 : 0; });
                         xWeights = Plottable.Utils.Array.add(xWeights, colWeights);
@@ -5860,7 +5860,7 @@ var Plottable;
                     else {
                         xWeights = colWeights;
                     }
-                    var yWeights;
+                    var yWeights = void 0;
                     if (wantsHeight) {
                         yWeights = guarantees.wantsHeightArr.map(function (x) { return x ? 0.1 : 0; });
                         yWeights = Plottable.Utils.Array.add(yWeights, rowWeights);
@@ -6010,7 +6010,7 @@ var Plottable;
                         }
                     }
                 }
-                for (j = 0; j < nCols; j++) {
+                for (var j = 0; j < nCols; j++) {
                     if (this._columnWeights[j] === undefined) {
                         this._columnWeights[j] = null;
                     }
