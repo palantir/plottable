@@ -19,7 +19,6 @@ Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
     }
 }(this, function(require, exports, module) {
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -117,7 +116,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -204,7 +202,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -272,7 +269,7 @@ var Plottable;
     })(Utils = Plottable.Utils || (Plottable.Utils = {}));
 })(Plottable || (Plottable = {}));
 
-/* tslint:disable: no-var-keyword */
+///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -477,7 +474,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -559,7 +555,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -666,7 +661,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
@@ -820,7 +814,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Utils;
