@@ -48,9 +48,9 @@ export module Dispatchers {
       this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
 
       this._eventToCallback["touchstart"] = (e: TouchEvent) => this._measureAndDispatch(e, this._startCallbacks);
-      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks);
-      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks);
-      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks);
+      this._eventToCallback["touchmove"] = (e: TouchEvent) => this._measureAndDispatch(e, this._moveCallbacks, "page");
+      this._eventToCallback["touchend"] = (e: TouchEvent) => this._measureAndDispatch(e, this._endCallbacks, "page");
+      this._eventToCallback["touchcancel"] = (e: TouchEvent) => this._measureAndDispatch(e, this._cancelCallbacks, "page");
     }
 
     /**
@@ -145,7 +145,13 @@ export module Dispatchers {
      * Computes the Touch position from the given event, and if successful
      * calls all the callbacks in the provided callbackSet.
      */
-    private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>) {
+    private _measureAndDispatch(event: TouchEvent, callbackSet: Utils.CallbackSet<TouchCallback>, scope = "element") {
+      if (scope !== "page" && scope !== "element") {
+        throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+      }
+      if (scope === "element" && !this._translator.insideSVG(event)) {
+        return;
+      }
       var touches = event.changedTouches;
       var touchPositions: { [id: number]: Point; } = {};
       var touchIdentifiers: number[] = [];
