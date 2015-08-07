@@ -1,5 +1,5 @@
 /*!
-Plottable 1.5.2 (https://github.com/palantir/plottable)
+Plottable 1.5.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -901,7 +901,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.5.2";
+    Plottable.version = "1.5.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -2576,7 +2576,6 @@ var Plottable;
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 var Plottable;
 (function (Plottable) {
     var Drawer = (function () {
