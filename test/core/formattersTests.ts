@@ -54,8 +54,8 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision rounds down", () => {
-      assert.strictEqual(Plottable.Formatters.general(2.1)(123.3), "123.30", "Precision of 2.1 should be same as precision of 2");
-      assert.strictEqual(Plottable.Formatters.general(2.9)(123.3), "123.30", "Precision of 2.9 should be same as precision of 2");
+      assert.strictEqual(Plottable.Formatters.general(2.1)(123.313), "123.31", "Precision of 2.1 should be same as precision of 2");
+      assert.strictEqual(Plottable.Formatters.general(2.9)(123.313), "123.31", "Precision of 2.9 should be same as precision of 2");
     });
   });
 
@@ -171,8 +171,8 @@ describe("Formatters", () => {
     });
 
     it("non-integer precision rounds down", () => {
-      assert.strictEqual(Plottable.Formatters.siSuffix(2.1)(123.3), "123.30", "Precision of 2.1 should be same as precision of 2");
-      assert.strictEqual(Plottable.Formatters.siSuffix(2.9)(123.3), "123.30", "Precision of 2.9 should be same as precision of 2");
+      assert.strictEqual(Plottable.Formatters.siSuffix(2.1)(1.31), "1.3", "Precision of 2.1 should be same as precision of 2");
+      assert.strictEqual(Plottable.Formatters.siSuffix(2.9)(1.31), "1.3", "Precision of 2.9 should be same as precision of 2");
 
       assert.strictEqual(Plottable.Formatters.siSuffix(2.1)(1000000000), "1.0G", "Correct precision should work on truncating as well");
     });

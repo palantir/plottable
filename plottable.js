@@ -1190,7 +1190,7 @@ var Plottable;
          */
         function fixed(precision) {
             if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
+            precision = verifyAndAdjustPrecision(precision);
             return function (d) { return d.toFixed(precision); };
         }
         Formatters.fixed = fixed;
@@ -1205,7 +1205,7 @@ var Plottable;
          */
         function general(precision) {
             if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
+            precision = verifyAndAdjustPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
@@ -1258,7 +1258,7 @@ var Plottable;
          */
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
+            precision = verifyAndAdjustPrecision(precision);
             return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
@@ -1279,8 +1279,7 @@ var Plottable;
          */
         function shortScale(precision) {
             if (precision === void 0) { precision = 3; }
-            verifyPrecision(precision);
-            precision = Math.floor(precision);
+            precision = verifyAndAdjustPrecision(precision);
             var suffixes = "KMBTQ";
             var exponentFormatter = d3.format("." + precision + "e");
             var fixedFormatter = d3.format("." + precision + "f");
@@ -1400,10 +1399,11 @@ var Plottable;
             };
         }
         Formatters.relativeDate = relativeDate;
-        function verifyPrecision(precision) {
+        function verifyAndAdjustPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
+            return Math.floor(precision);
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
