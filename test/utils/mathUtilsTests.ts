@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Utils.Methods", () => {
   it("inRange()", () => {
     assert.isTrue(Plottable.Utils.Math.inRange(0, -1, 1), "basic functionality works");

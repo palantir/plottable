@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 function generateBasicTable(nRows: number, nCols: number) {
   // makes a table with exactly nRows * nCols children in a regular grid, with each
   // child being a basic component

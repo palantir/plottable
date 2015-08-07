@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Tick generators", () => {
   describe("interval", () => {
     it("generate ticks within domain", () => {

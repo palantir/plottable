@@ -1,5 +1,4 @@
 ///<reference path="../testReference.ts" />
-var assert = chai.assert;
 
 describe("BaseAxis", () => {
   it("orientation", () => {

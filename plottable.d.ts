@@ -661,6 +661,22 @@ declare module Plottable {
          */
         function siSuffix(precision?: number): (d: any) => string;
         /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes
+         * - K - thousands - 10 ^ 3
+         * - M - millions - 10 ^ 6
+         * - B - billions - 10 ^ 9
+         * - T - trillions - 10 ^ 12
+         * - Q - quadrillions - 10 ^ 15
+         *
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         * @returns {Formatter} A formatter with short scale formatting
+         */
+        function shortScale(precision?: number): (num: number) => string;
+        /**
          * Creates a multi time formatter that displays dates.
          *
          * @returns {Formatter} A formatter for time/date values.
@@ -2116,6 +2132,19 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+            /**
+             * Gets the opacity of the symbols of the Legend.
+             *
+             * @returns {(datum: any, index: number) => number}
+             */
+            symbolOpacity(): (datum: any, index: number) => number;
+            /**
+             * Sets the opacity of the symbols of the Legend.
+             *
+             * @param {number | ((datum: any, index: number) => number)} symbolOpacity
+             * @returns {Legend} The calling Legend
+             */
+            symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
@@ -2186,6 +2215,7 @@ declare module Plottable {
             destroy(): Gridlines;
             protected _setup(): void;
             renderImmediately(): Gridlines;
+            computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number): Gridlines;
         }
     }
 }
@@ -2910,6 +2940,21 @@ declare module Plottable {
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
         }
     }
 }
@@ -3056,6 +3101,32 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            /**
+             * Gets the interpolation function associated with the plot.
+             *
+             * @return {string | (points: Array<[number, number]>) => string)}
+             */
+            interpolator(): string | ((points: Array<[number, number]>) => string);
+            /**
+             * Sets the interpolation function associated with the plot.
+             *
+             * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+             * @return Plots.Line
+             */
+            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+            interpolator(interpolator: "linear"): Line<X>;
+            interpolator(interpolator: "linear-closed"): Line<X>;
+            interpolator(interpolator: "step"): Line<X>;
+            interpolator(interpolator: "step-before"): Line<X>;
+            interpolator(interpolator: "step-after"): Line<X>;
+            interpolator(interpolator: "basis"): Line<X>;
+            interpolator(interpolator: "basis-open"): Line<X>;
+            interpolator(interpolator: "basis-closed"): Line<X>;
+            interpolator(interpolator: "bundle"): Line<X>;
+            interpolator(interpolator: "cardinal"): Line<X>;
+            interpolator(interpolator: "cardinal-open"): Line<X>;
+            interpolator(interpolator: "cardinal-closed"): Line<X>;
+            interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];
@@ -3675,6 +3746,19 @@ declare module Plottable {
              * @return {Dispatchers.Key} The calling Key Dispatcher.
              */
             offKeyDown(callback: KeyCallback): Key;
+            /** Registers a callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            onKeyUp(callback: KeyCallback): Key;
+            /**
+             * Removes the callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            offKeyUp(callback: KeyCallback): Key;
         }
     }
 }
@@ -3803,6 +3887,24 @@ declare module Plottable {
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             offKeyPress(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Adds a callback to be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            onKeyRelease(keyCode: number, callback: KeyCallback): Key;
+            /**
+             * Removes a callback that would be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            offKeyRelease(keyCode: number, callback: KeyCallback): Key;
         }
     }
 }

@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Interactive Components", () => {
   describe("DragBoxLayer", () => {
     var SVG_WIDTH = 400;

@@ -1,5 +1,5 @@
 /*!
-Plottable 1.5.2 (https://github.com/palantir/plottable)
+Plottable 1.6.0 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -900,7 +900,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.5.2";
+    Plottable.version = "1.6.0";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -1262,6 +1262,60 @@ var Plottable;
             return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
+        /**
+         * Creates a formatter for values that displays abbreviated values
+         * and uses standard short scale suffixes
+         * - K - thousands - 10 ^ 3
+         * - M - millions - 10 ^ 6
+         * - B - billions - 10 ^ 9
+         * - T - trillions - 10 ^ 12
+         * - Q - quadrillions - 10 ^ 15
+         *
+         * Numbers with a magnitude outside of (10 ^ (-precision), 10 ^ 15) are shown using
+         * scientific notation to avoid creating extremely long decimal strings.
+         *
+         * @param {number} [precision] the number of decimal places to show (default 3)
+         * @returns {Formatter} A formatter with short scale formatting
+         */
+        function shortScale(precision) {
+            if (precision === void 0) { precision = 3; }
+            verifyPrecision(precision);
+            precision = Math.floor(precision);
+            var suffixes = "KMBTQ";
+            var exponentFormatter = d3.format("." + precision + "e");
+            var fixedFormatter = d3.format("." + precision + "f");
+            var max = Math.pow(10, (3 * (suffixes.length + 1)));
+            var min = Math.pow(10, -precision);
+            return function (num) {
+                var absNum = Math.abs(num);
+                if ((absNum < min || absNum >= max) && absNum !== 0) {
+                    return exponentFormatter(num);
+                }
+                var idx = -1;
+                while (absNum >= Math.pow(1000, idx + 2) && idx < (suffixes.length - 1)) {
+                    idx++;
+                }
+                var output = "";
+                if (idx === -1) {
+                    output = fixedFormatter(num);
+                }
+                else {
+                    output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                }
+                // catch rounding by the underlying d3 formatter
+                if ((num > 0 && output.substr(0, 4) === "1000") || (num < 0 && output.substr(0, 5) === "-1000")) {
+                    if (idx < suffixes.length - 1) {
+                        idx++;
+                        output = fixedFormatter(num / Math.pow(1000, idx + 1)) + suffixes[idx];
+                    }
+                    else {
+                        output = exponentFormatter(num);
+                    }
+                }
+                return output;
+            };
+        }
+        Formatters.shortScale = shortScale;
         /**
          * Creates a multi time formatter that displays dates.
          *
@@ -3238,9 +3292,9 @@ var Plottable;
             this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
+                this._isAnchored = false;
+                this._onDetachCallbacks.callCallbacks(this);
             }
-            this._isAnchored = false;
-            this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
         /**
@@ -4913,10 +4967,13 @@ var Plottable;
                 this.text(this._text);
             };
             Label.prototype.text = function (displayText) {
-                if (displayText === undefined) {
+                if (displayText == null) {
                     return this._text;
                 }
                 else {
+                    if (typeof displayText !== "string") {
+                        throw new Error("Label.text() only takes strings as input");
+                    }
                     this._text = displayText;
                     this.redraw();
                     return this;
@@ -5053,6 +5110,7 @@ var Plottable;
                 this.xAlignment("right").yAlignment("top");
                 this.comparator(function (a, b) { return _this._colorScale.domain().indexOf(a) - _this._colorScale.domain().indexOf(b); });
                 this._symbolFactoryAccessor = function () { return Plottable.SymbolFactories.circle(); };
+                this._symbolOpacityAccessor = function () { return 1; };
             }
             Legend.prototype._setup = function () {
                 _super.prototype._setup.call(this);
@@ -5224,6 +5282,7 @@ var Plottable;
                 entries.select("path").attr("d", function (d, i, j) { return _this.symbol()(d, j)(layout.textHeight * 0.6); })
                     .attr("transform", "translate(" + (layout.textHeight / 2) + "," + layout.textHeight / 2 + ")")
                     .attr("fill", function (value) { return _this._colorScale.scale(value); })
+                    .attr("opacity", function (d, i, j) { return _this.symbolOpacity()(d, j); })
                     .classed(Legend.LEGEND_SYMBOL_CLASS, true);
                 var padding = this._padding;
                 var textContainers = entries.select("g.text-container");
@@ -5253,6 +5312,19 @@ var Plottable;
                     this.render();
                     return this;
                 }
+            };
+            Legend.prototype.symbolOpacity = function (symbolOpacity) {
+                if (symbolOpacity == null) {
+                    return this._symbolOpacityAccessor;
+                }
+                else if (typeof symbolOpacity === "number") {
+                    this._symbolOpacityAccessor = function () { return symbolOpacity; };
+                }
+                else {
+                    this._symbolOpacityAccessor = symbolOpacity;
+                }
+                this.render();
+                return this;
             };
             Legend.prototype.fixedWidth = function () {
                 return true;
@@ -5563,6 +5635,16 @@ var Plottable;
                 _super.prototype.renderImmediately.call(this);
                 this._redrawXLines();
                 this._redrawYLines();
+                return this;
+            };
+            Gridlines.prototype.computeLayout = function (origin, availableWidth, availableHeight) {
+                _super.prototype.computeLayout.call(this, origin, availableWidth, availableHeight);
+                if (this._xScale != null) {
+                    this._xScale.range([0, this.width()]);
+                }
+                if (this._yScale != null) {
+                    this._yScale.range([this.height(), 0]);
+                }
                 return this;
             };
             Gridlines.prototype._redrawXLines = function () {
@@ -6797,18 +6879,22 @@ var Plottable;
                 var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
                 var writer = new SVGTypewriter.Writers.Writer(measurer);
                 var dataset = this.datasets()[0];
-                for (var datumIndex = 0; datumIndex < dataset.data().length; datumIndex++) {
-                    var datum = dataset.data()[datumIndex];
-                    var value = this._labelFormatter(this.sectorValue().accessor(datum, datumIndex, dataset));
-                    var measurement = measurer.measure(value);
-                    var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
-                    var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
-                    if (this.outerRadius().scale) {
-                        outerRadius = this.outerRadius().scale.scale(outerRadius);
+                var data = this._getDataToDraw().get(dataset);
+                data.forEach(function (datum, datumIndex) {
+                    var value = _this.sectorValue().accessor(datum, datumIndex, dataset);
+                    if (!Plottable.Utils.Math.isValidNumber(value)) {
+                        return;
                     }
-                    var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
-                    if (this.innerRadius().scale) {
-                        innerRadius = this.innerRadius().scale.scale(innerRadius);
+                    value = _this._labelFormatter(value);
+                    var measurement = measurer.measure(value);
+                    var theta = (_this._endAngles[datumIndex] + _this._startAngles[datumIndex]) / 2;
+                    var outerRadius = _this.outerRadius().accessor(datum, datumIndex, dataset);
+                    if (_this.outerRadius().scale) {
+                        outerRadius = _this.outerRadius().scale.scale(outerRadius);
+                    }
+                    var innerRadius = _this.innerRadius().accessor(datum, datumIndex, dataset);
+                    if (_this.innerRadius().scale) {
+                        innerRadius = _this.innerRadius().scale.scale(innerRadius);
                     }
                     var labelRadius = (outerRadius + innerRadius) / 2;
                     var x = Math.sin(theta) * labelRadius - measurement.width / 2;
@@ -6838,7 +6924,7 @@ var Plottable;
                         yAlign: "center",
                         textRotation: 0
                     });
-                }
+                });
             };
             Pie._INNER_RADIUS_KEY = "inner-radius";
             Pie._OUTER_RADIUS_KEY = "outer-radius";
@@ -6882,8 +6968,8 @@ var Plottable;
             var _deltaY = 0;
             var _scalingX = 1;
             var _scalingY = 1;
-            var _lastSeenDomainX = null;
-            var _lastSeenDomainY = null;
+            var _lastSeenDomainX = [null, null];
+            var _lastSeenDomainY = [null, null];
             var _timeoutReference = 0;
             var _deferredRenderingTimeout = 500;
             var _registerDeferredRendering = function () {
@@ -6898,6 +6984,8 @@ var Plottable;
                     _this._cachedDomainY = _lastSeenDomainY;
                     _deltaX = 0;
                     _deltaY = 0;
+                    _scalingX = 1;
+                    _scalingY = 1;
                     _this.render();
                     _this._renderArea.attr("transform", "translate(0, 0) scale(1, 1)");
                 }, _deferredRenderingTimeout);
@@ -6938,7 +7026,7 @@ var Plottable;
             if (deferredRendering == null) {
                 return this._deferredRendering;
             }
-            if (deferredRendering) {
+            if (deferredRendering && this._isAnchored) {
                 if (this.x() && this.x().scale) {
                     this._cachedDomainX = this.x().scale.domain();
                 }
@@ -7468,6 +7556,29 @@ var Plottable;
                     return symbolProjector(datum, index, dataset)(sizeProjector(datum, index, dataset));
                 };
                 return propertyToProjectors;
+            };
+            Scatter.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                var xProjector = Plottable.Plot._scaledAccessor(this.x());
+                var yProjector = Plottable.Plot._scaledAccessor(this.y());
+                return this.entities().filter(function (entity) {
+                    var datum = entity.datum;
+                    var index = entity.index;
+                    var dataset = entity.dataset;
+                    var x = xProjector(datum, index, dataset);
+                    var y = yProjector(datum, index, dataset);
+                    return dataXRange.min <= x && x <= dataXRange.max && dataYRange.min <= y && y <= dataYRange.max;
+                });
             };
             Scatter._SIZE_KEY = "size";
             Scatter._SYMBOL_KEY = "symbol";
@@ -8038,6 +8149,7 @@ var Plottable;
              */
             function Line() {
                 _super.call(this);
+                this._interpolator = "linear";
                 this.addClass("line-plot");
                 var animator = new Plottable.Animators.Easing();
                 animator.stepDuration(Plottable.Plot._ANIMATION_MAX_DURATION);
@@ -8047,6 +8159,14 @@ var Plottable;
                 this.attr("stroke", new Plottable.Scales.Color().range()[0]);
                 this.attr("stroke-width", "2px");
             }
+            Line.prototype.interpolator = function (interpolator) {
+                if (interpolator == null) {
+                    return this._interpolator;
+                }
+                this._interpolator = interpolator;
+                this.render();
+                return this;
+            };
             Line.prototype._createDrawer = function (dataset) {
                 return new Plottable.Drawers.Line(dataset);
             };
@@ -8126,6 +8246,7 @@ var Plottable;
                     return d3.svg.line()
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); })(datum);
                 };
             };
@@ -8300,6 +8421,7 @@ var Plottable;
                         .x(function (innerDatum, innerIndex) { return xProjector(innerDatum, innerIndex, dataset); })
                         .y1(function (innerDatum, innerIndex) { return yProjector(innerDatum, innerIndex, dataset); })
                         .y0(function (innerDatum, innerIndex) { return y0Projector(innerDatum, innerIndex, dataset); })
+                        .interpolate(_this.interpolator())
                         .defined(function (innerDatum, innerIndex) { return definedProjector(innerDatum, innerIndex, dataset); });
                     return areaGenerator(datum);
                 };
@@ -9394,9 +9516,9 @@ var Plottable;
                 this._cancelCallbacks = new Plottable.Utils.CallbackSet();
                 this._callbacks = [this._moveCallbacks, this._startCallbacks, this._endCallbacks, this._cancelCallbacks];
                 this._eventToCallback["touchstart"] = function (e) { return _this._measureAndDispatch(e, _this._startCallbacks); };
-                this._eventToCallback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks); };
-                this._eventToCallback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks); };
-                this._eventToCallback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks); };
+                this._eventToCallback["touchmove"] = function (e) { return _this._measureAndDispatch(e, _this._moveCallbacks, "page"); };
+                this._eventToCallback["touchend"] = function (e) { return _this._measureAndDispatch(e, _this._endCallbacks, "page"); };
+                this._eventToCallback["touchcancel"] = function (e) { return _this._measureAndDispatch(e, _this._cancelCallbacks, "page"); };
             }
             /**
              * Gets a Touch Dispatcher for the <svg> containing elem.
@@ -9498,7 +9620,14 @@ var Plottable;
              * Computes the Touch position from the given event, and if successful
              * calls all the callbacks in the provided callbackSet.
              */
-            Touch.prototype._measureAndDispatch = function (event, callbackSet) {
+            Touch.prototype._measureAndDispatch = function (event, callbackSet, scope) {
+                if (scope === void 0) { scope = "element"; }
+                if (scope !== "page" && scope !== "element") {
+                    throw new Error("Invalid scope '" + scope + "', must be 'element' or 'page'");
+                }
+                if (scope === "element" && !this._translator.insideSVG(event)) {
+                    return;
+                }
                 var touches = event.changedTouches;
                 var touchPositions = {};
                 var touchIdentifiers = [];
@@ -9545,8 +9674,10 @@ var Plottable;
                 var _this = this;
                 _super.call(this);
                 this._eventToCallback["keydown"] = function (e) { return _this._processKeydown(e); };
+                this._eventToCallback["keyup"] = function (e) { return _this._processKeyup(e); };
                 this._keydownCallbacks = new Plottable.Utils.CallbackSet();
-                this._callbacks = [this._keydownCallbacks];
+                this._keyupCallbacks = new Plottable.Utils.CallbackSet();
+                this._callbacks = [this._keydownCallbacks, this._keyupCallbacks];
             }
             /**
              * Gets a Key Dispatcher. If one already exists it will be returned;
@@ -9582,8 +9713,30 @@ var Plottable;
                 this._unsetCallback(this._keydownCallbacks, callback);
                 return this;
             };
+            /** Registers a callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            Key.prototype.onKeyUp = function (callback) {
+                this._setCallback(this._keyupCallbacks, callback);
+                return this;
+            };
+            /**
+             * Removes the callback to be called whenever a key is released.
+             *
+             * @param {KeyCallback} callback
+             * @return {Dispatchers.Key} The calling Key Dispatcher.
+             */
+            Key.prototype.offKeyUp = function (callback) {
+                this._unsetCallback(this._keyupCallbacks, callback);
+                return this;
+            };
             Key.prototype._processKeydown = function (event) {
                 this._keydownCallbacks.callCallbacks(event.keyCode, event);
+            };
+            Key.prototype._processKeyup = function (event) {
+                this._keyupCallbacks.callCallbacks(event.keyCode, event);
             };
             Key._DISPATCHER_KEY = "__Plottable_Dispatcher_Key";
             return Key;
@@ -9900,9 +10053,12 @@ var Plottable;
             function Key() {
                 var _this = this;
                 _super.apply(this, arguments);
-                this._keyCodeCallbacks = {};
+                this._keyPressCallbacks = {};
+                this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
-                this._keyDownCallback = function (keyCode) { return _this._handleKeyEvent(keyCode); };
+                this._downedKeys = new Plottable.Utils.Set();
+                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
                 _super.prototype._anchor.call(this, component);
@@ -9910,19 +10066,30 @@ var Plottable;
                 this._positionDispatcher.onMouseMove(this._mouseMoveCallback);
                 this._keyDispatcher = Plottable.Dispatchers.Key.getDispatcher();
                 this._keyDispatcher.onKeyDown(this._keyDownCallback);
+                this._keyDispatcher.onKeyUp(this._keyUpCallback);
             };
             Key.prototype._unanchor = function () {
                 _super.prototype._unanchor.call(this);
                 this._positionDispatcher.offMouseMove(this._mouseMoveCallback);
                 this._positionDispatcher = null;
                 this._keyDispatcher.offKeyDown(this._keyDownCallback);
+                this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyEvent = function (keyCode) {
+            Key.prototype._handleKeyDownEvent = function (keyCode) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p) && this._keyCodeCallbacks[keyCode]) {
-                    this._keyCodeCallbacks[keyCode].callCallbacks(keyCode);
+                if (this._isInsideComponent(p)) {
+                    if (this._keyPressCallbacks[keyCode]) {
+                        this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
+                    }
+                    this._downedKeys.add(keyCode);
                 }
+            };
+            Key.prototype._handleKeyUpEvent = function (keyCode) {
+                if (this._downedKeys.has(keyCode) && this._keyReleaseCallbacks[keyCode]) {
+                    this._keyReleaseCallbacks[keyCode].callCallbacks(keyCode);
+                }
+                this._downedKeys.delete(keyCode);
             };
             /**
              * Adds a callback to be called when the key with the given keyCode is
@@ -9933,10 +10100,10 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.onKeyPress = function (keyCode, callback) {
-                if (!this._keyCodeCallbacks[keyCode]) {
-                    this._keyCodeCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                if (!this._keyPressCallbacks[keyCode]) {
+                    this._keyPressCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
                 }
-                this._keyCodeCallbacks[keyCode].add(callback);
+                this._keyPressCallbacks[keyCode].add(callback);
                 return this;
             };
             /**
@@ -9948,9 +10115,39 @@ var Plottable;
              * @returns {Interactions.Key} The calling Key Interaction.
              */
             Key.prototype.offKeyPress = function (keyCode, callback) {
-                this._keyCodeCallbacks[keyCode].delete(callback);
-                if (this._keyCodeCallbacks[keyCode].size === 0) {
-                    delete this._keyCodeCallbacks[keyCode];
+                this._keyPressCallbacks[keyCode].delete(callback);
+                if (this._keyPressCallbacks[keyCode].size === 0) {
+                    delete this._keyPressCallbacks[keyCode];
+                }
+                return this;
+            };
+            /**
+             * Adds a callback to be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            Key.prototype.onKeyRelease = function (keyCode, callback) {
+                if (!this._keyReleaseCallbacks[keyCode]) {
+                    this._keyReleaseCallbacks[keyCode] = new Plottable.Utils.CallbackSet();
+                }
+                this._keyReleaseCallbacks[keyCode].add(callback);
+                return this;
+            };
+            /**
+             * Removes a callback that would be called when the key with the given keyCode is
+             * released if the key was pressed with the mouse inside of the Component.
+             *
+             * @param {number} keyCode
+             * @param {KeyCallback} callback
+             * @returns {Interactions.Key} The calling Key Interaction.
+             */
+            Key.prototype.offKeyRelease = function (keyCode, callback) {
+                this._keyReleaseCallbacks[keyCode].delete(callback);
+                if (this._keyReleaseCallbacks[keyCode].size === 0) {
+                    delete this._keyReleaseCallbacks[keyCode];
                 }
                 return this;
             };
@@ -10155,6 +10352,10 @@ var Plottable;
                     return;
                 }
                 var oldPoints = this._touchIds.values();
+                if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) ||
+                    !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
+                    return;
+                }
                 var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
                 if (oldCornerDistance === 0) {
                     return;

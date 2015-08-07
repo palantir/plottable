@@ -222,7 +222,15 @@ module TestMethods {
     e.metaKey = false;
     e.ctrlKey = false;
     e.shiftKey = false;
-    target.node().dispatchEvent( e );
+    target.node().dispatchEvent(e);
+  }
+
+  export function triggerFakeKeyboardEvent(type: string, target: d3.Selection<void>, keyCode: number) {
+    var event = <KeyboardEvent> document.createEvent("Events");
+    event.initEvent(type, true, true);
+    event.keyCode = keyCode;
+    target.node().dispatchEvent(event);
+    return event;
   }
 
   export function assertAreaPathCloseTo(actualPath: string, expectedPath: string, precision: number, msg: string) {

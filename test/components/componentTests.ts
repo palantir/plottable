@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 function assertComponentXY(component: Plottable.Component, x: number, y: number, message: string) {
   // use <any> to examine the private variables
   var translate = d3.transform((<any> component)._element.attr("transform")).translate;
@@ -26,6 +24,9 @@ describe("Component behavior", () => {
       c.anchor(svg);
       assert.strictEqual((<any> c)._element.node(), svg.select("g").node(), "the component anchored to a <g> beneath the <svg>");
       assert.isTrue(svg.classed("plottable"), "<svg> was given \"plottable\" CSS class");
+      const computedStyle = window.getComputedStyle(<Element>svg.node());
+      assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill",
+        "\"pointer-events\" style set to \"visiblefill\"");
       svg.remove();
     });
 
@@ -36,6 +37,9 @@ describe("Component behavior", () => {
       c.anchor(svg2);
       assert.strictEqual((<any> c)._element.node(), svg2.select("g").node(), "the component re-achored under the second <svg>");
       assert.isTrue(svg2.classed("plottable"), "second <svg> was given \"plottable\" CSS class");
+      const computedStyle = window.getComputedStyle(<Element>svg2.node());
+      assert.strictEqual(computedStyle.pointerEvents.toLowerCase(), "visiblefill",
+        "second <svg>'s \"pointer-events\" style set to \"visiblefill\"");
 
       svg.remove();
       svg2.remove();
@@ -124,6 +128,30 @@ describe("Component behavior", () => {
       c.detach();
       assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
       assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
+      svg.remove();
+    });
+
+    it("callbacks on detach() not called unless the component is anchored", () => {
+      c = new Plottable.Component();
+
+      var callbackCalled = false;
+      var callback = (component: Plottable.Component) => callbackCalled = true;
+      c.onDetach(callback);
+
+      callbackCalled = false;
+      c.detach();
+      assert.isFalse(callbackCalled, "callback was not called because the Component is not rendered yet");
+
+      c.renderTo(svg);
+
+      callbackCalled = false;
+      c.detach();
+      assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
+
+      callbackCalled = false;
+      c.detach();
+      assert.isFalse(callbackCalled, "callback was not called because the Component was detached already");
+
       svg.remove();
     });
   });

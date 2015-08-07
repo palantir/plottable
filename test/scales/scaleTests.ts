@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Scales", () => {
   it("Scale alerts listeners when its domain is updated", () => {
     var scale = new Plottable.Scale();

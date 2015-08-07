@@ -191,6 +191,7 @@ export module Plots {
                                   .x((innerDatum, innerIndex) => xProjector(innerDatum, innerIndex, dataset))
                                   .y1((innerDatum, innerIndex) => yProjector(innerDatum, innerIndex, dataset))
                                   .y0((innerDatum, innerIndex) => y0Projector(innerDatum, innerIndex, dataset))
+                                  .interpolate(this.interpolator())
                                   .defined((innerDatum, innerIndex) => definedProjector(innerDatum, innerIndex, dataset));
         return areaGenerator(datum);
       };

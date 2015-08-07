@@ -91,6 +91,12 @@ export module Interactions {
       }
 
       var oldPoints = this._touchIds.values();
+
+      if (!this._isInsideComponent(this._translateToComponentSpace(oldPoints[0])) ||
+         !this._isInsideComponent(this._translateToComponentSpace(oldPoints[1]))) {
+        return;
+      }
+
       var oldCornerDistance = PanZoom._pointDistance(oldPoints[0], oldPoints[1]);
 
       if (oldCornerDistance === 0) {
@@ -252,7 +258,7 @@ export module Interactions {
     public xScales(): QuantitativeScale<any>[];
     /**
      * Sets the x scales for this PanZoom Interaction.
-     * 
+     *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public xScales(xScales: QuantitativeScale<any>[]): Interactions.PanZoom;
@@ -277,7 +283,7 @@ export module Interactions {
     public yScales(): QuantitativeScale<any>[];
     /**
      * Sets the y scales for this PanZoom Interaction.
-     * 
+     *
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
     public yScales(yScales: QuantitativeScale<any>[]): Interactions.PanZoom;
@@ -298,7 +304,7 @@ export module Interactions {
 
     /**
      * Adds an x scale to this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} An x scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -309,7 +315,7 @@ export module Interactions {
 
     /**
      * Removes an x scale from this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} An x scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -322,7 +328,7 @@ export module Interactions {
 
     /**
      * Adds a y scale to this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} A y scale to add
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */
@@ -333,7 +339,7 @@ export module Interactions {
 
     /**
      * Removes a y scale from this PanZoom Interaction
-     * 
+     *
      * @param {QuantitativeScale<any>} A y scale to remove
      * @returns {Interactions.PanZoom} The calling PanZoom Interaction.
      */

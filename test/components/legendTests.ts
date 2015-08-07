@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Legend", () => {
   var svg: d3.Selection<void>;
   var color: Plottable.Scales.Color;
@@ -30,6 +28,7 @@ describe("Legend", () => {
       assert.strictEqual(text, d, "the text node has correct text");
       var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
+      assert.strictEqual(symbol.attr("opacity"), "1", "the symbol's opacity is set by default to 1");
     });
     svg.remove();
   });
@@ -122,6 +121,33 @@ describe("Legend", () => {
       assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
     });
 
+    svg.remove();
+  });
+
+  it("renders with correct opacity for each symbol when specified", () => {
+    color.domain(["foo", "bar", "baz"]);
+    legend.symbolOpacity(0.5);
+    legend.renderTo(svg);
+
+    var rows = (<any> legend)._content.selectAll(entrySelector);
+
+    rows.each(function(d: any, i: number) {
+      var d3this = d3.select(this);
+      var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      assert.strictEqual(symbol.attr("opacity"), "0.5", "the symbol's opacity is set to a constant");
+    });
+
+    var opacityFunction = (d: any, i: number) => {
+      return (d === "foo") ? 0.2 : 0.8;
+    };
+    legend.symbolOpacity(opacityFunction).redraw();
+    rows = (<any> legend)._content.selectAll(entrySelector);
+
+    rows.each(function(d: any, i: number) {
+      var d3this = d3.select(this);
+      var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(d, i)), "the symbol's opacity follows the provided function.");
+    });
     svg.remove();
   });
 
@@ -367,6 +393,22 @@ describe("Legend", () => {
       return (size: number) => "";
     };
     legend.symbol(symbolChecker);
+
+    legend.renderTo(svg);
+    svg.remove();
+  });
+
+  it("symbolOpacity() passes index correctly", () => {
+    var domain = ["AA", "BB", "CC"];
+    color.domain(domain);
+
+    var expectedIndex = 0;
+    var symbolOpacityChecker = (d: any, index: number) => {
+      assert.strictEqual(index, expectedIndex, "index passed in is correct");
+      expectedIndex++;
+      return 0.5;
+    };
+    legend.symbolOpacity(symbolOpacityChecker);
 
     legend.renderTo(svg);
     svg.remove();

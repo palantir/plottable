@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Interactions", () => {
   describe("Pointer", () => {
     var SVG_WIDTH = 400;

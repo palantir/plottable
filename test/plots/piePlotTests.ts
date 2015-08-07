@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Plots", () => {
   describe("PiePlot", () => {
     // HACKHACK #1798: beforeEach being used below
@@ -203,6 +201,22 @@ describe("Plots", () => {
             assert.include(["visible", "inherit"], visibility, "label shown when in the renderArea");
           }
         });
+        svg.remove();
+      });
+
+      it("does not show label for invalid data", () => {
+        var data = [
+          { value: 1 },
+          { value: "value" },
+          { value: 2 }];
+        var dataset = new Plottable.Dataset(data);
+        piePlot.addDataset(dataset);
+        piePlot.renderTo(svg);
+
+        var texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        assert.lengthOf(texts, 2, "One label is rendered for each valid of data");
+        assert.strictEqual(texts[0], "1", "Label for the first valid data is shown");
+        assert.strictEqual(texts[1], "2", "Label for the second valid data is shown");
         svg.remove();
       });
     });

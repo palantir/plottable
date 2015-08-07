@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Map", () => {
   it("set() and get()", () => {
     var map = new Plottable.Utils.Map<string, string>();

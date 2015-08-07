@@ -1,8 +1,14 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Labels", () => {
+
+  it("text() only accepts strings", () => {
+    var label = new Plottable.Components.Label();
+    assert.throws(() => label.text(<any> 23), Error);
+    assert.throws(() => label.text(<any> new Date()), Error);
+    assert.doesNotThrow(() => label.text("string"), Error, "text() accepts strings");
+    assert.strictEqual(label.text(null), "string", "text(null) returns a string");
+  });
 
   it("Standard text title label generates properly", () => {
     var svg = TestMethods.generateSVG(400, 80);

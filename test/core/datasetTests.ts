@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Dataset", () => {
   it("Updates listeners when the data is changed", () => {
     var ds = new Plottable.Dataset();

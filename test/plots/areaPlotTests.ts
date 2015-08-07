@@ -1,7 +1,5 @@
 ///<reference path="../testReference.ts" />
 
-var assert = chai.assert;
-
 describe("Plots", () => {
   describe("AreaPlot", () => {
     // HACKHACK #1798: beforeEach being used below
