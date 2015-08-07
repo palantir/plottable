@@ -3,43 +3,43 @@
 describe("Utils", () => {
   describe("Set", () => {
     it("add()", () => {
-      const set = new Plottable.Utils.Set();
+      let set = new Plottable.Utils.Set();
 
-      const value1 = { value: "one" };
+      let value1 = { value: "one" };
       set.add(value1);
       assert.strictEqual(set.size, 1, "set contains one value");
 
       set.add(value1);
       assert.strictEqual(set.size, 1, "same value is not added twice");
 
-      const value2 = { value: "two" };
+      let value2 = { value: "two" };
       set.add(value2);
       assert.strictEqual(set.size, 2, "set now contains two values");
     });
 
     it("delete()", () => {
-      const set = new Plottable.Utils.Set();
+      let set = new Plottable.Utils.Set();
 
-      const value1 = { value: "one" };
+      let value1 = { value: "one" };
       set.add(value1);
       assert.strictEqual(set.size, 1, "set contains one value after adding");
       set.delete(value1);
       assert.strictEqual(set.size, 0, "value was delete");
 
       set.add(value1);
-      const value2 = { value: "two" };
+      let value2 = { value: "two" };
       set.delete(value2);
       assert.strictEqual(set.size, 1, "removing a non-existent value does nothing");
     });
 
     it("has()", () => {
-      const set = new Plottable.Utils.Set();
+      let set = new Plottable.Utils.Set();
 
-      const value1 = { value: "one" };
+      let value1 = { value: "one" };
       set.add(value1);
       assert.isTrue(set.has(value1), "correctly checks that value is in the set");
 
-      const similarValue1 = { value: "one" };
+      let similarValue1 = { value: "one" };
       assert.isFalse(set.has(similarValue1), "correctly determines that similar object is not in the set");
 
       set.delete(value1);
@@ -47,8 +47,8 @@ describe("Utils", () => {
     });
 
     it("forEach()", () => {
-      const set = new Plottable.Utils.Set<any>();
-      const values = [1, "2"];
+      let set = new Plottable.Utils.Set<any>();
+      let values = [1, "2"];
       set.add(values[0]);
       set.add(values[1]);
      let index = 0;
@@ -65,16 +65,16 @@ describe("Utils", () => {
     });
 
     it("forEach() not called on empty set", () => {
-      const set = new Plottable.Utils.Set<any>();
+      let set = new Plottable.Utils.Set<any>();
       set.forEach((value: any, value2: any, mp: Plottable.Utils.Set<any>) => {
         assert.notOk(true, "forEach should not be called because the set is empty");
       });
     });
 
     it("forEach() can force the this context", () => {
-      const set = new Plottable.Utils.Set<number>();
+      let set = new Plottable.Utils.Set<number>();
       set.add(1);
-      const thisArg = {"foo": "bar"};
+      let thisArg = {"foo": "bar"};
       set.forEach(function(value: number, value2: number, mp: Plottable.Utils.Set<number>) {
         assert.strictEqual(this, thisArg, "The correct this context is forced");
         assert.strictEqual(this.foo, "bar", "The forced context object behaves correctly");

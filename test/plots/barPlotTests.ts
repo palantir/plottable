@@ -5,10 +5,10 @@ describe("Plots", () => {
 
     // HACKHACK #1798: beforeEach being used below
     it("renders correctly with no data", () => {
-      const svg = TestMethods.generateSVG(400, 400);
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Linear();
-      const plot = new Plottable.Plots.Bar<number, number>();
+      let svg = TestMethods.generateSVG(400, 400);
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Bar<number, number>();
       plot.x((d: any) => d.x, xScale);
       plot.y((d: any) => d.y, yScale);
       assert.doesNotThrow(() => plot.renderTo(svg), Error);
@@ -22,13 +22,13 @@ describe("Plots", () => {
     });
 
     it("orientation() works as expected", () => {
-      const defaultPlot = new Plottable.Plots.Bar<number, number>();
+      let defaultPlot = new Plottable.Plots.Bar<number, number>();
       assert.strictEqual(defaultPlot.orientation(), "vertical", "default Plots.Bar() are vertical");
 
-      const verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
+      let verticalPlot = new Plottable.Plots.Bar<number, number>("vertical");
       assert.strictEqual(verticalPlot.orientation(), "vertical", "vertical Plots.Bar()");
 
-      const horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
+      let horizontalPlot = new Plottable.Plots.Bar<number, number>("horizontal");
       assert.strictEqual(horizontalPlot.orientation(), "horizontal", "horizontal Plots.Bar()");
     });
 
@@ -38,14 +38,14 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Category;
       let yScale: Plottable.Scales.Linear;
       let barPlot: Plottable.Plots.Bar<string, number>;
-      const SVG_WIDTH = 600;
-      const SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scales.Category().domain(["A", "B"]);
         yScale = new Plottable.Scales.Linear();
-        const data = [
+        let data = [
           {x: "A", y: 1},
           {x: "B", y: -1.5},
           {x: "B", y: 1} // duplicate X-value
@@ -62,11 +62,11 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
         assert.closeTo(TestMethods.numAttr(bar0, "width"), xScale.rangeBand(), 1, "bar0 width is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "width"), xScale.rangeBand(), 1, "bar1 width is correct");
         assert.strictEqual(bar0.attr("height"), "100", "bar0 height is correct");
@@ -76,7 +76,7 @@ describe("Plots", () => {
         assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
         assert.strictEqual(bar1.attr("y"), "200", "bar1 y is correct");
 
-        const baseline = renderArea.select(".baseline");
+        let baseline = renderArea.select(".baseline");
         assert.strictEqual(baseline.attr("y1"), "200", "the baseline is in the correct vertical position");
         assert.strictEqual(baseline.attr("y2"), "200", "the baseline is in the correct vertical position");
         assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
@@ -87,16 +87,16 @@ describe("Plots", () => {
       it("baseline value can be changed; barPlot updates appropriately", () => {
         barPlot.baselineValue(-1);
 
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
         assert.strictEqual(bar0.attr("height"), "200", "bar0 height is correct");
         assert.strictEqual(bar1.attr("height"), "50", "bar1 height is correct");
         assert.strictEqual(bar0.attr("y"), "100", "bar0 y is correct");
         assert.strictEqual(bar1.attr("y"), "300", "bar1 y is correct");
 
-        const baseline = renderArea.select(".baseline");
+        let baseline = renderArea.select(".baseline");
         assert.strictEqual(baseline.attr("y1"), "300", "the baseline is in the correct vertical position");
         assert.strictEqual(baseline.attr("y2"), "300", "the baseline is in the correct vertical position");
         assert.strictEqual(baseline.attr("x1"), "0", "the baseline starts at the edge of the chart");
@@ -106,7 +106,7 @@ describe("Plots", () => {
 
       it("don't show points from outside of domain", () => {
         xScale.domain(["C"]);
-        const bars = (<any> barPlot)._renderArea.selectAll("rect");
+        let bars = (<any> barPlot)._renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 0, "no bars have been rendered");
         svg.remove();
       });
@@ -149,10 +149,10 @@ describe("Plots", () => {
       describe("entities()", () => {
         describe("position", () => {
           it("entities() pixel points corrected for negative-valued bars", () => {
-            const entities = barPlot.entities();
+            let entities = barPlot.entities();
             entities.forEach((entity) => {
-              const barSelection = entity.selection;
-              const pixelPointY = entity.position.y;
+              let barSelection = entity.selection;
+              let pixelPointY = entity.position.y;
               if (entity.datum.y < 0) {
                 assert.strictEqual(pixelPointY, +barSelection.attr("y") + +barSelection.attr("height"), "negative on bottom");
               } else {
@@ -235,7 +235,7 @@ describe("Plots", () => {
             y: yScale.scale(d1.y)
           };
 
-          const expected: Plottable.Plots.PlotEntity = {
+          let expected: Plottable.Plots.PlotEntity = {
             datum: d1,
             index: 1,
             dataset: dataset,
@@ -244,7 +244,7 @@ describe("Plots", () => {
             component: barPlot
           };
 
-          const closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
+          let closest = barPlot.entityNearest({ x: d0Px.x, y: zeroY + 1 });
           TestMethods.assertPlotEntitiesEqual(closest, expected, "nearest Entity is the visible one");
 
           svg.remove();
@@ -252,7 +252,7 @@ describe("Plots", () => {
 
         it("returns undefined if no Entities are visible", () => {
           barPlot = new Plottable.Plots.Bar<string, number>();
-          const closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y });
+          let closest = barPlot.entityNearest({ x: d0Px.x, y: d0Px.y });
           assert.isUndefined(closest, "returns undefined if no Entity can be found");
           svg.remove();
         });
@@ -265,14 +265,14 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.ModifiedLog;
       let yScale: Plottable.Scales.Linear;
       let barPlot: Plottable.Plots.Bar<number, number>;
-      const SVG_WIDTH = 600;
-      const SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scales.ModifiedLog();
         yScale = new Plottable.Scales.Linear();
-        const data = [
+        let data = [
           {x: 2, y: 1},
           {x: 10, y: -1.5},
           {x: 100, y: 1}
@@ -294,14 +294,14 @@ describe("Plots", () => {
       });
 
       it("bar widths are equal to barPixelWidth", () => {
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
-        const barPixelWidth = (<any> barPlot)._barPixelWidth;
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
-        const bar2 = d3.select(bars[0][2]);
+        let barPixelWidth = (<any> barPlot)._barPixelWidth;
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
+        let bar2 = d3.select(bars[0][2]);
         assert.closeTo(TestMethods.numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
         assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
@@ -315,14 +315,14 @@ describe("Plots", () => {
       let xScale: Plottable.Scales.Linear;
       let yScale: Plottable.Scales.Linear;
       let barPlot: Plottable.Plots.Bar<number, number>;
-      const SVG_WIDTH = 600;
-      const SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        const data = [
+        let data = [
           {x: 2, y: 1},
           {x: 10, y: -1.5},
           {x: 100, y: 1}
@@ -337,7 +337,7 @@ describe("Plots", () => {
       });
 
       it("calculating width does not crash if handed invalid values", () => {
-        const errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
+        let errMsg = /TypeError: Cannot read property \'valueOf\' of undefined/;
         assert.doesNotThrow(() => barPlot.x((d) => d.a, xScale), errMsg, "barPixelWidth does not crash on invalid values");
         svg.remove();
       });
@@ -348,14 +348,14 @@ describe("Plots", () => {
       });
 
       it("bar widths are equal to barPixelWidth", () => {
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
 
-        const barPixelWidth = (<any> barPlot)._barPixelWidth;
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
-        const bar2 = d3.select(bars[0][2]);
+        let barPixelWidth = (<any> barPlot)._barPixelWidth;
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
+        let bar2 = d3.select(bars[0][2]);
         assert.closeTo(TestMethods.numAttr(bar0, "width"), barPixelWidth, 0.1, "bar0 width is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "width"), barPixelWidth, 0.1, "bar1 width is correct");
         assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
@@ -379,7 +379,7 @@ describe("Plots", () => {
       it("sensible bar width unsorted data", () => {
         barPlot.removeDataset(dataset);
         barPlot.addDataset(new Plottable.Dataset([{x: 2, y: 2}, {x: 20, y: 2}, {x: 5, y: 2}]));
-        const expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
+        let expectedBarPixelWidth = (xScale.scale(5) - xScale.scale(2)) * 0.95;
         assert.closeTo((<any> barPlot)._barPixelWidth, expectedBarPixelWidth, 0.1, "bar width uses closest sorted x values");
         svg.remove();
       });
@@ -392,14 +392,14 @@ describe("Plots", () => {
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(600, 400);
-        const data = [{ x: "12/01/92", y: 0, type: "a" },
+        let data = [{ x: "12/01/92", y: 0, type: "a" },
           { x: "12/01/93", y: 1, type: "a" },
           { x: "12/01/94", y: 1, type: "a" },
           { x: "12/01/95", y: 2, type: "a" },
           { x: "12/01/96", y: 2, type: "a" },
           { x: "12/01/97", y: 2, type: "a" }];
         xScale = new Plottable.Scales.Time();
-        const yScale = new Plottable.Scales.Linear();
+        let yScale = new Plottable.Scales.Linear();
         barPlot = new Plottable.Plots.Bar<Date, number>();
         barPlot.addDataset(new Plottable.Dataset(data));
         barPlot.x((d: any) => d3.time.format("%m/%d/%y").parse(d.x), xScale)
@@ -408,8 +408,8 @@ describe("Plots", () => {
       });
 
       it("bar width takes an appropriate value", () => {
-        const timeFormatter = d3.time.format("%m/%d/%y");
-        const expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
+        let timeFormatter = d3.time.format("%m/%d/%y");
+        let expectedBarWidth = (xScale.scale(timeFormatter.parse("12/01/94")) - xScale.scale(timeFormatter.parse("12/01/93"))) * 0.95;
         assert.closeTo((<any> barPlot)._barPixelWidth, expectedBarWidth, 0.1, "width is difference between two dates");
         svg.remove();
       });
@@ -422,15 +422,15 @@ describe("Plots", () => {
       let yScale: Plottable.Scales.Category;
       let xScale: Plottable.Scales.Linear;
       let barPlot: Plottable.Plots.Bar<number, string>;
-      const SVG_WIDTH = 600;
-      const SVG_HEIGHT = 400;
+      let SVG_WIDTH = 600;
+      let SVG_HEIGHT = 400;
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
         yScale = new Plottable.Scales.Category().domain(["A", "B"]);
         xScale = new Plottable.Scales.Linear();
         xScale.domain([-3, 3]);
 
-        const data = [
+        let data = [
           {y: "A", x: 1},
           {y: "B", x: -1.5},
           {y: "B", x: 1} // duplicate Y-value
@@ -446,11 +446,11 @@ describe("Plots", () => {
       });
 
       it("renders correctly", () => {
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
         assert.lengthOf(bars[0], 3, "One bar was created per data point");
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
         assert.closeTo(TestMethods.numAttr(bar0, "height"), yScale.rangeBand(), 1, "bar0 height is correct");
         assert.closeTo(TestMethods.numAttr(bar1, "height"), yScale.rangeBand(), 1, "bar1 height is correct");
         assert.strictEqual(bar0.attr("width"), "100", "bar0 width is correct");
@@ -460,7 +460,7 @@ describe("Plots", () => {
         assert.strictEqual(bar0.attr("x"), "300", "bar0 x is correct");
         assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
-        const baseline = renderArea.select(".baseline");
+        let baseline = renderArea.select(".baseline");
         assert.strictEqual(baseline.attr("x1"), "300", "the baseline is in the correct horizontal position");
         assert.strictEqual(baseline.attr("x2"), "300", "the baseline is in the correct horizontal position");
         assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
@@ -471,16 +471,16 @@ describe("Plots", () => {
       it("baseline value can be changed; barPlot updates appropriately", () => {
         barPlot.baselineValue(-1);
 
-        const renderArea = (<any> barPlot)._renderArea;
-        const bars = renderArea.selectAll("rect");
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
+        let renderArea = (<any> barPlot)._renderArea;
+        let bars = renderArea.selectAll("rect");
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
         assert.strictEqual(bar0.attr("width"), "200", "bar0 width is correct");
         assert.strictEqual(bar1.attr("width"), "50", "bar1 width is correct");
         assert.strictEqual(bar0.attr("x"), "200", "bar0 x is correct");
         assert.strictEqual(bar1.attr("x"), "150", "bar1 x is correct");
 
-        const baseline = renderArea.select(".baseline");
+        let baseline = renderArea.select(".baseline");
         assert.strictEqual(baseline.attr("x1"), "200", "the baseline is in the correct horizontal position");
         assert.strictEqual(baseline.attr("x2"), "200", "the baseline is in the correct horizontal position");
         assert.strictEqual(baseline.attr("y1"), "0", "the baseline starts at the top of the chart");
@@ -489,11 +489,11 @@ describe("Plots", () => {
       });
 
       it("width projector may be overwritten, and calling project queues rerender", () => {
-        const bars = (<any> barPlot)._renderArea.selectAll("rect");
-        const bar0 = d3.select(bars[0][0]);
-        const bar1 = d3.select(bars[0][1]);
-        const bar0y = bar0.data()[0].y;
-        const bar1y = bar1.data()[0].y;
+        let bars = (<any> barPlot)._renderArea.selectAll("rect");
+        let bar0 = d3.select(bars[0][0]);
+        let bar1 = d3.select(bars[0][1]);
+        let bar0y = bar0.data()[0].y;
+        let bar1y = bar1.data()[0].y;
         barPlot.attr("width", 10);
         assert.closeTo(TestMethods.numAttr(bar0, "height"), 10, 0.01, "bar0 height");
         assert.closeTo(TestMethods.numAttr(bar1, "height"), 10, 0.01, "bar1 height");
@@ -507,10 +507,10 @@ describe("Plots", () => {
       describe("entities()", () => {
         describe("position", () => {
           it("entities() pixel points corrected for negative-valued bars", () => {
-            const entities = barPlot.entities();
+            let entities = barPlot.entities();
             entities.forEach((entity) => {
-              const barSelection = entity.selection;
-              const pixelPointX = entity.position.x;
+              let barSelection = entity.selection;
+              let pixelPointX = entity.position.x;
               if (entity.datum.x < 0) {
                 assert.strictEqual(pixelPointX, +barSelection.attr("x"), "negative on left");
               } else {
@@ -594,7 +594,7 @@ describe("Plots", () => {
             x: xScale.scale(d1.x),
             y: yScale.scale(d1.y)
           };
-          const expected: Plottable.Plots.PlotEntity = {
+          let expected: Plottable.Plots.PlotEntity = {
             datum: d1,
             index: 1,
             dataset: dataset,
@@ -603,7 +603,7 @@ describe("Plots", () => {
             component: barPlot
           };
 
-          const closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
+          let closest = barPlot.entityNearest({ x: zeroX - 1, y: d0Px.y });
           TestMethods.assertPlotEntitiesEqual(expected, closest, "closest plot data is on-plot data");
 
           svg.remove();
@@ -621,7 +621,7 @@ describe("Plots", () => {
         yScale = new Plottable.Scales.Category().domain(["A", "B"]);
         xScale = new Plottable.Scales.Linear();
 
-        const data = [
+        let data = [
           {y: "A", x: -1.5},
           {y: "B", x: 1},
         ];
@@ -636,12 +636,12 @@ describe("Plots", () => {
 
       it("hides labels properly on the right", () => {
         xScale.domainMax(0.95);
-        const texts = svg.selectAll("text");
+        let texts = svg.selectAll("text");
 
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
 
-        const label1 = d3.select(texts[0][0]);
-        const label2 = d3.select(texts[0][1]);
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
 
         assert.include(["visible", "inherit"], label1.style("visibility"), "label 1 is visible");
         assert.strictEqual(label2.style("visibility"), "hidden", "label 2 is not visible");
@@ -651,12 +651,12 @@ describe("Plots", () => {
 
       it("hides labels properly on the left", () => {
         xScale.domainMin(-1.4);
-        const texts = svg.selectAll("text");
+        let texts = svg.selectAll("text");
 
         assert.strictEqual(texts.size(), 2, "There should be two labels rendered");
 
-        const label1 = d3.select(texts[0][0]);
-        const label2 = d3.select(texts[0][1]);
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
 
         assert.strictEqual(label1.style("visibility"), "hidden", "label 2 is not visible");
         assert.include(["visible", "inherit"], label2.style("visibility"), "label 1 is visible");
@@ -686,7 +686,7 @@ describe("Plots", () => {
 
       it("bar labels disabled by default", () => {
         plot.renderTo(svg);
-        const texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "by default, no texts are drawn");
         svg.remove();
       });
@@ -694,7 +694,7 @@ describe("Plots", () => {
       it("bar labels render properly", () => {
         plot.renderTo(svg);
         plot.labelsEnabled(true);
-        const texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
         assert.strictEqual(texts[0], "640", "first label is 640");
         assert.strictEqual(texts[1], "12345", "first label is 12345");
@@ -705,7 +705,7 @@ describe("Plots", () => {
         plot.labelsEnabled(true);
         plot.renderTo(svg);
         plot.labelFormatter((n: number) => n.toString() + (n === 12345 ? "looong" : ""));
-        const texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 0, "no text drawn");
         svg.remove();
       });
@@ -714,7 +714,7 @@ describe("Plots", () => {
         plot.labelsEnabled(true);
         plot.labelFormatter((n: number) => n.toString() + "%");
         plot.renderTo(svg);
-        const texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
+        let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
         assert.strictEqual(texts[0], "640%", "first label is 640%");
         assert.strictEqual(texts[1], "12345%", "first label is 12345%");
@@ -726,7 +726,7 @@ describe("Plots", () => {
         plot.renderTo(svg);
         let texts = svg.selectAll("text")[0].map((n: any) => d3.select(n).text());
         assert.lengthOf(texts, 2, "both texts drawn");
-        const originalDrawLabels = (<any> plot)._drawLabels;
+        let originalDrawLabels = (<any> plot)._drawLabels;
         let called = false;
         (<any> plot)._drawLabels = () => {
           if (!called) {
@@ -754,7 +754,7 @@ describe("Plots", () => {
         svg = TestMethods.generateSVG();
         xScale = new Plottable.Scales.Linear();
         yScale = new Plottable.Scales.Linear();
-        const data = [
+        let data = [
           { x: 1, y: 10.1 },
           { x: 2, y: 5.3 },
           { x: 3, y: 2.8 }
@@ -770,12 +770,12 @@ describe("Plots", () => {
       it("hides labels outside of the visible render area (horizontal)", () => {
         xScale.domain([1, 3]);
 
-        const texts = svg.selectAll("text");
+        let texts = svg.selectAll("text");
         assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
 
-        const label1 = d3.select(texts[0][0]);
-        const label2 = d3.select(texts[0][1]);
-        const label3 = d3.select(texts[0][2]);
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
+        let label3 = d3.select(texts[0][2]);
 
         assert.strictEqual(label1.style("visibility"), "hidden", "Left label is cut off by the margin");
         assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
@@ -787,12 +787,12 @@ describe("Plots", () => {
       it("hides labels outside of the visible render area (vertical)", () => {
         yScale.domain([2.5, 11]);
 
-        const texts = svg.selectAll("text");
+        let texts = svg.selectAll("text");
         assert.strictEqual(texts.size(), plot.datasets()[0].data().length, "One label rendered for each piece of data");
 
-        const label1 = d3.select(texts[0][0]);
-        const label2 = d3.select(texts[0][1]);
-        const label3 = d3.select(texts[0][2]);
+        let label1 = d3.select(texts[0][0]);
+        let label2 = d3.select(texts[0][1]);
+        let label3 = d3.select(texts[0][2]);
 
         assert.include(["visible", "inherit"], label1.style("visibility"), "Left label should still show");
         assert.include(["visible", "inherit"], label2.style("visibility"), "Middle label should still show");
@@ -809,48 +809,48 @@ describe("Plots", () => {
       beforeEach(() => {
         svg = TestMethods.generateSVG();
         dataset = new Plottable.Dataset();
-        const xScale = new Plottable.Scales.Category();
-        const yScale = new Plottable.Scales.Linear();
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Linear();
         verticalBarPlot = new Plottable.Plots.Bar<string, number>();
         verticalBarPlot.x((d) => d.x, xScale);
         verticalBarPlot.y((d) => d.y, yScale);
       });
 
       it("retrieves all dataset selections with no args", () => {
-        const barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
+        let barData = [{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }];
         verticalBarPlot.addDataset(new Plottable.Dataset(barData));
         verticalBarPlot.renderTo(svg);
 
-        const allBars = verticalBarPlot.selections();
+        let allBars = verticalBarPlot.selections();
         assert.strictEqual(allBars.size(), 3, "retrieved all bars");
 
         svg.remove();
       });
 
       it("retrieves correct selections for supplied Datasets", () => {
-        const dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
-        const dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        let dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        let dataset2 = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
         verticalBarPlot.addDataset(dataset1);
         verticalBarPlot.addDataset(dataset2);
         verticalBarPlot.renderTo(svg);
 
-        const allBars = verticalBarPlot.selections([dataset1]);
+        let allBars = verticalBarPlot.selections([dataset1]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
-        const selectionData = allBars.data();
+        let selectionData = allBars.data();
         assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
       });
 
       it("skips invalid Datasets", () => {
-        const dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
-        const notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
+        let dataset1 = new Plottable.Dataset([{ x: "foo", y: 5 }, { x: "bar", y: 640 }, { x: "zoo", y: 12345 }]);
+        let notAddedDataset = new Plottable.Dataset([{ x: "one", y: 5 }, { x: "two", y: 640 }, { x: "three", y: 12345 }]);
         verticalBarPlot.addDataset(dataset1);
         verticalBarPlot.renderTo(svg);
 
-        const allBars = verticalBarPlot.selections([dataset1, notAddedDataset]);
+        let allBars = verticalBarPlot.selections([dataset1, notAddedDataset]);
         assert.strictEqual(allBars.size(), 3, "all bars retrieved");
-        const selectionData = allBars.data();
+        let selectionData = allBars.data();
         assert.includeMembers(selectionData, dataset1.data(), "first dataset data in selection data");
 
         svg.remove();
@@ -859,13 +859,13 @@ describe("Plots", () => {
     });
 
     it("plot auto domain scale to visible points on Category scale", () => {
-      const svg = TestMethods.generateSVG(500, 500);
-      const xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a;
-      const yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
-      const simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Linear();
-      const plot = new Plottable.Plots.Bar<string, number>();
+      let svg = TestMethods.generateSVG(500, 500);
+      let xAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.a;
+      let yAccessor = (d: any, i: number, dataset: Plottable.Dataset) => d.b + dataset.metadata().foo;
+      let simpleDataset = new Plottable.Dataset([{a: "a", b: 6}, {a: "b", b: 2}, {a: "c", b: -2}, {a: "d", b: -6}], {foo: 0});
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
+      let plot = new Plottable.Plots.Bar<string, number>();
       plot.addDataset(simpleDataset);
       plot.x(xAccessor, xScale)
           .y(yAccessor, yScale)
