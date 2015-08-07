@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export module Plots {
@@ -73,8 +72,8 @@ export module Plots {
         super.x(<number | Accessor<number>>x);
       } else {
         super.x(<X | Accessor<X>>x, xScale);
-        var x2Binding = this.x2();
-        var x2 = x2Binding && x2Binding.accessor;
+        let x2Binding = this.x2();
+        let x2 = x2Binding && x2Binding.accessor;
         if (x2 != null) {
           this._bindProperty(Segment._X2_KEY, x2, xScale);
         }
@@ -98,8 +97,8 @@ export module Plots {
       if (x2 == null) {
         return this._propertyBindings.get(Segment._X2_KEY);
       }
-      var xBinding = this.x();
-      var xScale = xBinding && xBinding.scale;
+      let xBinding = this.x();
+      let xScale = xBinding && xBinding.scale;
       this._bindProperty(Segment._X2_KEY, x2, xScale);
       this.render();
       return this;
@@ -133,8 +132,8 @@ export module Plots {
         super.y(<number | Accessor<number>>y);
       } else {
         super.y(<Y | Accessor<Y>>y, yScale);
-        var y2Binding = this.y2();
-        var y2 = y2Binding && y2Binding.accessor;
+        let y2Binding = this.y2();
+        let y2 = y2Binding && y2Binding.accessor;
         if (y2 != null) {
           this._bindProperty(Segment._Y2_KEY, y2, yScale);
         }
@@ -158,15 +157,15 @@ export module Plots {
       if (y2 == null) {
         return this._propertyBindings.get(Segment._Y2_KEY);
       }
-      var yBinding = this.y();
-      var yScale = yBinding && yBinding.scale;
+      let yBinding = this.y();
+      let yScale = yBinding && yBinding.scale;
       this._bindProperty(Segment._Y2_KEY, y2, yScale);
       this.render();
       return this;
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
+      let attrToProjector = super._propertyProjectors();
       attrToProjector["x1"] = Plot._scaledAccessor(this.x());
       attrToProjector["x2"] = this.x2() == null ? Plot._scaledAccessor(this.x()) : Plot._scaledAccessor(this.x2());
       attrToProjector["y1"] = Plot._scaledAccessor(this.y());
