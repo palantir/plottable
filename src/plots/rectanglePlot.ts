@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export module Plots {
@@ -30,16 +29,16 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
 
       // Copy each of the different projectors.
-      var xAttr = Plot._scaledAccessor(this.x());
-      var x2Attr = attrToProjector[Rectangle._X2_KEY];
-      var yAttr = Plot._scaledAccessor(this.y());
-      var y2Attr = attrToProjector[Rectangle._Y2_KEY];
+      let xAttr = Plot._scaledAccessor(this.x());
+      let x2Attr = attrToProjector[Rectangle._X2_KEY];
+      let yAttr = Plot._scaledAccessor(this.y());
+      let y2Attr = attrToProjector[Rectangle._Y2_KEY];
 
-      var xScale = this.x().scale;
-      var yScale = this.y().scale;
+      let xScale = this.x().scale;
+      let yScale = this.y().scale;
 
       if (x2Attr != null) {
         attrToProjector["width"] = (d, i, dataset) => Math.abs(x2Attr(d, i, dataset) - xAttr(d, i, dataset));
@@ -120,8 +119,8 @@ export module Plots {
       }
 
       if (xScale != null) {
-        var x2Binding = this.x2();
-        var x2 = x2Binding && x2Binding.accessor;
+        let x2Binding = this.x2();
+        let x2 = x2Binding && x2Binding.accessor;
         if (x2 != null) {
           this._bindProperty(Rectangle._X2_KEY, x2, xScale);
         }
@@ -152,8 +151,8 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._X2_KEY);
       }
 
-      var xBinding = this.x();
-      var xScale = xBinding && xBinding.scale;
+      let xBinding = this.x();
+      let xScale = xBinding && xBinding.scale;
       this._bindProperty(Rectangle._X2_KEY, x2, xScale);
 
       this.render();
@@ -192,8 +191,8 @@ export module Plots {
       }
 
       if (yScale != null) {
-        var y2Binding = this.y2();
-        var y2 = y2Binding && y2Binding.accessor;
+        let y2Binding = this.y2();
+        let y2 = y2Binding && y2Binding.accessor;
         if (y2 != null) {
           this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
         }
@@ -224,8 +223,8 @@ export module Plots {
         return this._propertyBindings.get(Rectangle._Y2_KEY);
       }
 
-      var yBinding = this.y();
-      var yScale = yBinding && yBinding.scale;
+      let yBinding = this.y();
+      let yScale = yBinding && yBinding.scale;
       this._bindProperty(Rectangle._Y2_KEY, y2, yScale);
 
       this.render();
@@ -239,21 +238,21 @@ export module Plots {
      * @returns {PlotEntity[]} The PlotEntities at the particular point
      */
     public entitiesAt(point: Point) {
-      var attrToProjector = this._generateAttrToProjector();
+      let attrToProjector = this._generateAttrToProjector();
       return this.entities().filter((entity) => {
-        var datum = entity.datum;
-        var index = entity.index;
-        var dataset = entity.dataset;
-        var x = attrToProjector["x"](datum, index, dataset);
-        var y = attrToProjector["y"](datum, index, dataset);
-        var width = attrToProjector["width"](datum, index, dataset);
-        var height = attrToProjector["height"](datum, index, dataset);
+        let datum = entity.datum;
+        let index = entity.index;
+        let dataset = entity.dataset;
+        let x = attrToProjector["x"](datum, index, dataset);
+        let y = attrToProjector["y"](datum, index, dataset);
+        let width = attrToProjector["width"](datum, index, dataset);
+        let height = attrToProjector["height"](datum, index, dataset);
         return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
       });
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
+      let attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {
         attrToProjector["x2"] = Plot._scaledAccessor(this.x2());
       }
@@ -264,13 +263,13 @@ export module Plots {
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-      var attrToProjector = this._generateAttrToProjector();
-      var rectX = attrToProjector["x"](datum, index, dataset);
-      var rectY = attrToProjector["y"](datum, index, dataset);
-      var rectWidth = attrToProjector["width"](datum, index, dataset);
-      var rectHeight = attrToProjector["height"](datum, index, dataset);
-      var x = rectX + rectWidth / 2;
-      var y = rectY + rectHeight / 2;
+      let attrToProjector = this._generateAttrToProjector();
+      let rectX = attrToProjector["x"](datum, index, dataset);
+      let rectY = attrToProjector["y"](datum, index, dataset);
+      let rectWidth = attrToProjector["width"](datum, index, dataset);
+      let rectHeight = attrToProjector["height"](datum, index, dataset);
+      let x = rectX + rectWidth / 2;
+      let y = rectY + rectHeight / 2;
       return { x: x, y: y };
     }
 
@@ -278,24 +277,24 @@ export module Plots {
       if (scale instanceof Plottable.Scales.Category) {
         return (<Plottable.Scales.Category> scale).rangeBand();
       } else {
-        var accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
-        var accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
+        let accessor = scale === this.x().scale ? this.x().accessor : this.y().accessor;
+        let accessorData = d3.set(Utils.Array.flatten(this.datasets().map((dataset) => {
           return dataset.data().map((d, i) => accessor(d, i, dataset).valueOf());
         }))).values().map((value) => +value);
         // Get the absolute difference between min and max
-        var min = Plottable.Utils.Math.min(accessorData, 0);
-        var max = Plottable.Utils.Math.max(accessorData, 0);
-        var scaledMin = scale.scale(min);
-        var scaledMax = scale.scale(max);
+        let min = Plottable.Utils.Math.min(accessorData, 0);
+        let max = Plottable.Utils.Math.max(accessorData, 0);
+        let scaledMin = scale.scale(min);
+        let scaledMax = scale.scale(max);
         return (scaledMax - scaledMin) / Math.abs(max - min);
       }
     }
 
     protected _getDataToDraw() {
-      var dataToDraw = new Utils.Map<Dataset, any[]>();
-      var attrToProjector = this._generateAttrToProjector();
+      let dataToDraw = new Utils.Map<Dataset, any[]>();
+      let attrToProjector = this._generateAttrToProjector();
       this.datasets().forEach((dataset) => {
-        var data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
+        let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));

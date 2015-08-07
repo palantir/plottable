@@ -94,6 +94,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Utils {
         module DOM {
