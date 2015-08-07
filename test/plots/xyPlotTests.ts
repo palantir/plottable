@@ -6,14 +6,14 @@ describe("Plots", () => {
     let xScale: Plottable.Scales.Linear;
     let yScale: Plottable.Scales.Linear;
     let plot: Plottable.XYPlot<number, number>;
-    const simpleDataset = new Plottable.Dataset([
+    let simpleDataset = new Plottable.Dataset([
       { a: -6, b: 6 },
       { a: -2, b: 2 },
       { a: 2, b: -2 },
       { a: 6, b: -6 }
     ]);
-    const xAccessor = (d: any) => d.a;
-    const yAccessor = (d: any) => d.b;
+    let xAccessor = (d: any) => d.a;
+    let yAccessor = (d: any) => d.b;
 
     beforeEach(() => {
       svg = TestMethods.generateSVG(500, 500);
@@ -63,7 +63,7 @@ describe("Plots", () => {
 
     it("automatically adjusting Y domain when X scale is replaced", () => {
       plot.autorangeMode("y");
-      const newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
+      let newXScale = new Plottable.Scales.Linear().domain([-3, 3]);
       plot.x(xAccessor, newXScale);
       assert.deepEqual(yScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new X scale domain");
       xScale.domain([-2, 2]);
@@ -89,7 +89,7 @@ describe("Plots", () => {
 
     it("automatically adjusting X domain when Y scale is replaced", () => {
       plot.autorangeMode("x");
-      const newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
+      let newYScale = new Plottable.Scales.Linear().domain([-3, 3]);
       plot.y(yAccessor, newYScale);
       assert.deepEqual(xScale.domain(), [-2.5, 2.5], "domain has been adjusted to visible points on new Y scale domain");
       yScale.domain([-2, 2]);

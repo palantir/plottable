@@ -2,19 +2,19 @@
 
 describe("Plots", () => {
   describe("RectanglePlot", () => {
-    const SVG_WIDTH = 300;
-    const SVG_HEIGHT = 300;
-    const DATA = [
+    let SVG_WIDTH = 300;
+    let SVG_HEIGHT = 300;
+    let DATA = [
       { x: 0, y: 0, x2: 1, y2: 1 },
       { x: 1, y: 1, x2: 2, y2: 2 },
       { x: 2, y: 2, x2: 3, y2: 3 },
       { x: 3, y: 3, x2: 4, y2: 4 },
       { x: 4, y: 4, x2: 5, y2: 5 }
     ];
-    const VERIFY_CELLS = (cells: d3.Selection<any>) => {
+    let VERIFY_CELLS = (cells: d3.Selection<any>) => {
       assert.strictEqual(cells[0].length, 5);
       cells.each(function(d: any, i: number) {
-        const cell = d3.select(this);
+        let cell = d3.select(this);
         assert.closeTo(+cell.attr("height"), 50, 0.5, "Cell height is correct");
         assert.closeTo(+cell.attr("width"), 50, 0.5, "Cell width is correct");
         assert.closeTo(+cell.attr("x"), 25 + 50 * i, 0.5, "Cell x coordinate is correct");
@@ -23,10 +23,10 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Linear();
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const rectanglePlot = new Plottable.Plots.Rectangle();
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let rectanglePlot = new Plottable.Plots.Rectangle();
       rectanglePlot.addDataset(new Plottable.Dataset(DATA));
       rectanglePlot.x((d) => d.x, xScale)
                    .y((d) => d.y, yScale)
@@ -38,29 +38,29 @@ describe("Plots", () => {
     });
 
     it("retrieves the correct entity under a point", () => {
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Linear();
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const dataset = new Plottable.Dataset(DATA);
-      const plot = new Plottable.Plots.Rectangle()
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset(DATA);
+      let plot = new Plottable.Plots.Rectangle()
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2);
       plot.addDataset(dataset).renderTo(svg);
-      const entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
+      let entities = plot.entitiesAt({ x: xScale.scale(2.5), y: yScale.scale(2.5) });
       assert.lengthOf(entities, 1, "found only one entity when querying a point inside the third rectangle");
       assert.strictEqual(entities[0].index, 2, "entity retrieved is at index 2");
       svg.remove();
     });
 
     it("retrieves correct entities under a point", () => {
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Linear();
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const dataset = new Plottable.Dataset([
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Linear();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset([
         { x: 1, y: 1, x2: 3, y2: 3 },
         { x: 4, y: 2, x2: 2, y2: 4 }
       ]);
-      const plot = new Plottable.Plots.Rectangle()
+      let plot = new Plottable.Plots.Rectangle()
         .x((d) => d.x, xScale).x2((d) => d.x2)
         .y((d) => d.y, yScale).y2((d) => d.y2);
       plot.addDataset(dataset).renderTo(svg);
@@ -78,22 +78,22 @@ describe("Plots", () => {
     });
 
     it("autorangeMode(\"x\")", () => {
-      const staggeredData = [
+      let staggeredData = [
         { y: "A", x: 0, x2: 1 },
         { y: "B", x: 1, x2: 2 }
       ];
 
-      const xScale = new Plottable.Scales.Linear();
-      const yScale = new Plottable.Scales.Category();
+      let xScale = new Plottable.Scales.Linear();
+      let yScale = new Plottable.Scales.Category();
       xScale.padProportion(0);
 
-      const plot = new Plottable.Plots.Rectangle();
+      let plot = new Plottable.Plots.Rectangle();
       plot.x(function(d) { return d.x; }, xScale);
       plot.x2(function(d) { return d.x2; });
       plot.y(function(d) { return d.y; }, yScale);
       plot.addDataset(new Plottable.Dataset(staggeredData));
       plot.autorangeMode("x");
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       plot.renderTo(svg);
 
       assert.deepEqual(xScale.domain(), [0, 2], "y domain includes both visible segments");
@@ -108,22 +108,22 @@ describe("Plots", () => {
     });
 
     it("autorangeMode(\"y\")", () => {
-      const staggeredData = [
+      let staggeredData = [
         { x: "A", y: 0, y2: 1 },
         { x: "B", y: 1, y2: 2 }
       ];
 
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
       yScale.padProportion(0);
 
-      const plot = new Plottable.Plots.Rectangle();
+      let plot = new Plottable.Plots.Rectangle();
       plot.x(function(d) { return d.x; }, xScale);
       plot.y(function(d) { return d.y; }, yScale);
       plot.y2(function(d) { return d.y2; });
       plot.addDataset(new Plottable.Dataset(staggeredData));
       plot.autorangeMode("y");
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       plot.renderTo(svg);
 
       assert.deepEqual(yScale.domain(), [0, 2], "y domain includes both visible segments");
@@ -141,9 +141,9 @@ describe("Plots", () => {
 
   describe("fail safe tests", () => {
     it("illegal rectangles don't get displayed", () => {
-      const svg = TestMethods.generateSVG();
+      let svg = TestMethods.generateSVG();
 
-      const data1 = [
+      let data1 = [
         { x: "A", y: 1, y2: 2, v: 1 },
         { x: "B", y: 2, y2: 3, v: 2 },
         { x: "C", y: 3, y2: NaN, v: 3 },
@@ -152,10 +152,10 @@ describe("Plots", () => {
         { x: "F", y: 6, y2: 7, v: 6 }
       ];
 
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Linear();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Linear();
 
-      const plot = new Plottable.Plots.Rectangle();
+      let plot = new Plottable.Plots.Rectangle();
       plot
         .x((d: any) => d.x, xScale)
         .y((d: any) => d.y, yScale)
@@ -164,13 +164,13 @@ describe("Plots", () => {
 
       plot.renderTo(svg);
 
-      const rectanglesSelection = plot.selections();
+      let rectanglesSelection = plot.selections();
 
       assert.strictEqual(rectanglesSelection.size(), 5,
         "only 5 rectangles should be displayed");
 
       rectanglesSelection.each(function(d: any, i: number) {
-        const sel = d3.select(this);
+        let sel = d3.select(this);
         assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("x")),
           "x attribute should be valid for rectangle # " + i + ". Currently " + sel.attr("x"));
         assert.isFalse(Plottable.Utils.Math.isNaN(+sel.attr("y")),
@@ -186,22 +186,22 @@ describe("Plots", () => {
   });
 
   describe("RectanglePlot - Grids", () => {
-    const SVG_WIDTH = 400;
-    const SVG_HEIGHT = 200;
-    const DATA = [
+    let SVG_WIDTH = 400;
+    let SVG_HEIGHT = 200;
+    let DATA = [
       {x: "A", y: "U", magnitude: 0},
       {x: "B", y: "U", magnitude: 2},
       {x: "A", y: "V", magnitude: 16},
       {x: "B", y: "V", magnitude: 8},
     ];
 
-    const VERIFY_CELLS = (cells: any[]) => {
+    let VERIFY_CELLS = (cells: any[]) => {
       assert.strictEqual(cells.length, 4);
 
-      const cellAU = d3.select(cells[0]);
-      const cellBU = d3.select(cells[1]);
-      const cellAV = d3.select(cells[2]);
-      const cellBV = d3.select(cells[3]);
+      let cellAU = d3.select(cells[0]);
+      let cellBU = d3.select(cells[1]);
+      let cellAV = d3.select(cells[2]);
+      let cellBV = d3.select(cells[3]);
 
       assert.strictEqual(cellAU.attr("height"), "100", "cell 'AU' height is correct");
       assert.strictEqual(cellAU.attr("width"), "200", "cell 'AU' width is correct");
@@ -229,12 +229,12 @@ describe("Plots", () => {
     };
 
     it("renders correctly", () => {
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Category();
-      const colorScale = new Plottable.Scales.InterpolatedColor();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Category();
+      let colorScale = new Plottable.Scales.InterpolatedColor();
       colorScale.range(["black", "white"]);
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const gridPlot = new Plottable.Plots.Rectangle();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -245,13 +245,13 @@ describe("Plots", () => {
     });
 
     it("renders correctly when data is set after construction", () => {
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Category();
-      const colorScale = new Plottable.Scales.InterpolatedColor();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Category();
+      let colorScale = new Plottable.Scales.InterpolatedColor();
       colorScale.range(["black", "white"]);
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const dataset = new Plottable.Dataset();
-      const gridPlot = new Plottable.Plots.Rectangle();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset();
+      let gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -263,31 +263,31 @@ describe("Plots", () => {
     });
 
     it("renders correctly when there isn't data for every spot", () => {
-      const CELL_HEIGHT = 50;
-      const CELL_WIDTH = 100;
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Category();
-      const colorScale = new Plottable.Scales.InterpolatedColor();
+      let CELL_HEIGHT = 50;
+      let CELL_WIDTH = 100;
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Category();
+      let colorScale = new Plottable.Scales.InterpolatedColor();
       colorScale.range(["black", "white"]);
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const dataset = new Plottable.Dataset();
-      const gridPlot = new Plottable.Plots.Rectangle();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let dataset = new Plottable.Dataset();
+      let gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(dataset)
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
               .y((d: any) => d.y, yScale)
               .renderTo(svg);
-      const data = [
+      let data = [
         {x: "A", y: "W", magnitude: 0},
         {x: "B", y: "X", magnitude: 8},
         {x: "C", y: "Y", magnitude: 16},
         {x: "D", y: "Z", magnitude: 24}
       ];
       dataset.data(data);
-      const cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
+      let cells = (<any> gridPlot)._renderArea.selectAll("rect")[0];
       assert.strictEqual(cells.length, data.length);
       for (let i = 0; i < cells.length; i++) {
-        const cell = d3.select(cells[i]);
+        let cell = d3.select(cells[i]);
         assert.strictEqual(cell.attr("x"), String(i * CELL_WIDTH), "Cell x coord is correct");
         assert.strictEqual(cell.attr("y"), String(i * CELL_HEIGHT), "Cell y coord is correct");
         assert.strictEqual(cell.attr("width"), String(CELL_WIDTH), "Cell width is correct");
@@ -297,12 +297,12 @@ describe("Plots", () => {
     });
 
     it("can invert y axis correctly", () => {
-      const xScale = new Plottable.Scales.Category();
-      const yScale = new Plottable.Scales.Category();
-      const colorScale = new Plottable.Scales.InterpolatedColor();
+      let xScale = new Plottable.Scales.Category();
+      let yScale = new Plottable.Scales.Category();
+      let colorScale = new Plottable.Scales.InterpolatedColor();
       colorScale.range(["black", "white"]);
-      const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      const gridPlot = new Plottable.Plots.Rectangle();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gridPlot = new Plottable.Plots.Rectangle();
       gridPlot.addDataset(new Plottable.Dataset(DATA))
               .attr("fill", (d) => d.magnitude, colorScale);
       gridPlot.x((d: any) => d.x, xScale)
@@ -340,65 +340,65 @@ describe("Plots", () => {
     describe("selections()", () => {
 
       it("retrieves all selections with no args", () => {
-        const xScale = new Plottable.Scales.Category();
-        const yScale = new Plottable.Scales.Category();
-        const colorScale = new Plottable.Scales.InterpolatedColor();
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        const gridPlot = new Plottable.Plots.Rectangle();
-        const dataset = new Plottable.Dataset(DATA);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
         gridPlot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
-        const allCells = gridPlot.selections();
+        let allCells = gridPlot.selections();
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
 
         svg.remove();
       });
 
       it("retrieves correct selections", () => {
-        const xScale = new Plottable.Scales.Category();
-        const yScale = new Plottable.Scales.Category();
-        const colorScale = new Plottable.Scales.InterpolatedColor();
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        const gridPlot = new Plottable.Plots.Rectangle();
-        const dataset = new Plottable.Dataset(DATA);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
                 .attr("fill", (d) => d.magnitude, colorScale);
         gridPlot.x((d: any) => d.x, xScale)
                 .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
-        const allCells = gridPlot.selections([dataset]);
+        let allCells = gridPlot.selections([dataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-        const selectionData = allCells.data();
+        let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
 
         svg.remove();
       });
 
       it("skips invalid Datasets", () => {
-        const xScale = new Plottable.Scales.Category();
-        const yScale = new Plottable.Scales.Category();
-        const colorScale = new Plottable.Scales.InterpolatedColor();
+        let xScale = new Plottable.Scales.Category();
+        let yScale = new Plottable.Scales.Category();
+        let colorScale = new Plottable.Scales.InterpolatedColor();
         colorScale.range(["black", "white"]);
-        const svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-        const gridPlot = new Plottable.Plots.Rectangle();
-        const dataset = new Plottable.Dataset(DATA);
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let gridPlot = new Plottable.Plots.Rectangle();
+        let dataset = new Plottable.Dataset(DATA);
         gridPlot.addDataset(dataset)
           .attr("fill", (d) => d.magnitude, colorScale);
          gridPlot.x((d: any) => d.x, xScale)
           .y((d: any) => d.y, yScale);
         gridPlot.renderTo(svg);
 
-        const dummyDataset = new Plottable.Dataset([]);
-        const allCells = gridPlot.selections([dataset, dummyDataset]);
+        let dummyDataset = new Plottable.Dataset([]);
+        let allCells = gridPlot.selections([dataset, dummyDataset]);
         assert.strictEqual(allCells.size(), 4, "all cells retrieved");
-        const selectionData = allCells.data();
+        let selectionData = allCells.data();
         assert.includeMembers(selectionData, DATA, "data in selection data");
 
         svg.remove();

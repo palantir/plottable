@@ -24,9 +24,9 @@ describe("Utils.Window", () => {
     });
 
     it("deprecated() calling method name, version and message are correct", () => {
-      const callingMethod = "reallyOutdatedCallerMethod";
-      const version = "v0.77.2";
-      const message = "hadoop is doopey";
+      let callingMethod = "reallyOutdatedCallerMethod";
+      let version = "v0.77.2";
+      let message = "hadoop is doopey";
 
       let warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
@@ -34,7 +34,7 @@ describe("Utils.Window", () => {
         assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
         assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
         assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
-        const regEx = new RegExp(message + "$");
+        let regEx = new RegExp(message + "$");
         assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
         warningTriggered = true;
       };

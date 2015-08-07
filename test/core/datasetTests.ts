@@ -2,12 +2,12 @@
 
 describe("Dataset", () => {
   it("Updates listeners when the data is changed", () => {
-    const ds = new Plottable.Dataset();
+    let ds = new Plottable.Dataset();
 
-    const newData = [1, 2, 3];
+    let newData = [1, 2, 3];
 
     let callbackCalled = false;
-    const callback = (listenable: Plottable.Dataset) => {
+    let callback = (listenable: Plottable.Dataset) => {
       assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
       assert.deepEqual(ds.data(), newData, "Dataset arrives with correct data");
       callbackCalled = true;
@@ -19,12 +19,12 @@ describe("Dataset", () => {
   });
 
   it("Updates listeners when the metadata is changed", () => {
-    const ds = new Plottable.Dataset();
+    let ds = new Plottable.Dataset();
 
-    const newMetadata = "blargh";
+    let newMetadata = "blargh";
 
     let callbackCalled = false;
-    const callback = (listenable: Plottable.Dataset) => {
+    let callback = (listenable: Plottable.Dataset) => {
       assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
       assert.deepEqual(ds.metadata(), newMetadata, "Dataset arrives with correct metadata");
       callbackCalled = true;
@@ -36,13 +36,13 @@ describe("Dataset", () => {
   });
 
   it("Removing listener from dataset should be possible", () => {
-    const ds = new Plottable.Dataset();
+    let ds = new Plottable.Dataset();
 
-    const newData1 = [1, 2, 3];
-    const newData2 = [4, 5, 6];
+    let newData1 = [1, 2, 3];
+    let newData2 = [4, 5, 6];
 
     let callbackCalled = false;
-    const callback = (listenable: Plottable.Dataset) => {
+    let callback = (listenable: Plottable.Dataset) => {
       assert.strictEqual(listenable, ds, "Callback received the Dataset as the first argument");
       callbackCalled = true;
     };
