@@ -264,7 +264,7 @@ export module Formatters {
     };
   }
 
-    function verifyPrecision(precision: number) {
+  function verifyPrecision(precision: number) {
     if (precision < 0 || precision > 20) {
       throw new RangeError("Formatter precision must be between 0 and 20");
     }
