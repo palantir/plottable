@@ -2498,6 +2498,7 @@ declare module Plottable {
         protected _updateExtents(): void;
         protected _updateExtentsForProperty(property: string): void;
         protected _filterForProperty(property: string): Accessor<boolean>;
+        protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
         /**
          * Override in subclass to add special extents, such as included values
          */
@@ -3041,9 +3042,9 @@ declare module Plottable {
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
             /**
-             * Extends the extent to account for the width of the bars.
+             * Makes sure the extent takes into account the widths of the bars
              */
-            protected _includedValuesForScale<D>(scale: Scale<D, any>): D[];
+            protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;

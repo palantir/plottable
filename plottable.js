@@ -7835,17 +7835,18 @@ var Plottable;
                 }
             };
             /**
-             * Extends the extent to account for the width of the bars.
+             * Makes sure the extent takes into account the widths of the bars
              */
-            Bar.prototype._includedValuesForScale = function (scale) {
-                var includedValues = _super.prototype._includedValuesForScale.call(this, scale);
-                if (!(scale instanceof Plottable.QuantitativeScale)) {
-                    return includedValues;
+            Bar.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
+                var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
+                var barAccScaleBinding = this._isVertical ? this.x() : this.y();
+                if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
+                    return extent;
                 }
-                var qScale = scale;
+                var qScale = accScaleBinding.scale;
                 return [
-                    qScale.invert(qScale.scale(includedValues[0]) - this._barPixelWidth / 2),
-                    qScale.invert(qScale.scale(includedValues[1]) + this._barPixelWidth / 2),
+                    qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
+                    qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
                 ];
             };
             Bar.prototype._drawLabels = function () {

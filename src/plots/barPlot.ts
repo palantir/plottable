@@ -398,19 +398,20 @@ export module Plots {
     }
 
     /**
-     * Extends the extent to account for the width of the bars.
+     * Makes sure the extent takes into account the widths of the bars
      */
-    protected _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
-      var includedValues = super._includedValuesForScale(scale);
+    protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+      var extent = super._computeExtent(dataset, accScaleBinding, filter);
 
-      if (!(scale instanceof QuantitativeScale)) {
-        return includedValues;
+      var barAccScaleBinding = this._isVertical ? this.x() : this.y();
+      if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof QuantitativeScale)) {
+        return extent;
       }
 
-      var qScale = <QuantitativeScale<D>>scale;
+      var qScale = <QuantitativeScale<any>>accScaleBinding.scale;
       return [
-        qScale.invert(qScale.scale(includedValues[0]) - this._barPixelWidth / 2),
-        qScale.invert(qScale.scale(includedValues[1]) + this._barPixelWidth / 2),
+        qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
+        qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
       ];
     }
 
