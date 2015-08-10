@@ -311,6 +311,23 @@ describe("Plots", () => {
         assert.closeTo(TestMethods.numAttr(bar2, "width"), barPixelWidth, 0.1, "bar2 width is correct");
         svg.remove();
       });
+
+      it("autodomaining takes into account the barPixelWidth", () => {
+        xScale.autoDomain();
+        yScale.autoDomain();
+        xScale.padProportion(0);
+        yScale.padProportion(0);
+
+        var barPixelWidth = (<any>barPlot)._barPixelWidth;
+
+        var left = xScale.invert(xScale.scale(2) - barPixelWidth / 2);
+        var right = xScale.invert(xScale.scale(100) + barPixelWidth / 2);
+
+        assert.closeTo(xScale.domain()[0], left, 0.0001, "Left side domain includes the first bar");
+        assert.closeTo(xScale.domain()[1], right, 0.0001, "Right side includes the entire third bar");
+
+        svg.remove();
+      });
     });
 
     describe("Vertical Bar Plot linear scale", () => {
