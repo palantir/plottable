@@ -1,6 +1,6 @@
 {
   "name": "plottable.js",
-  "description": "A library for creating charts out of D3",
+  "description": "A modular charting library built on D3",
   "version": "1.6.0",
   "license": "MIT",
   "repository": {
