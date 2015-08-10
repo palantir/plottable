@@ -139,6 +139,12 @@ describe("Component behavior", () => {
       c.detach();
       assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
       assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
+
+      callbackCalled = false;
+      c.detach();
+      assert.isTrue(callbackCalled, "callback called even if already detach()-ed");
+      assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
+
       svg.remove();
     });
   });
