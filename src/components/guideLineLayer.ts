@@ -10,7 +10,10 @@ export module Components {
     private _value: D;
     private _scale: QuantitativeScale<D>;
     private _pixelPosition: number;
-    private _scaleUpdateCallback = () => this._updatePixelPosition();
+    private _scaleUpdateCallback = () => {
+      this._updatePixelPosition();
+      this.render();
+    };
     private _line: d3.Selection<void>;
 
     constructor(orientation: string) {

@@ -6207,7 +6207,10 @@ var Plottable;
             function GuideLineLayer(orientation) {
                 var _this = this;
                 _super.call(this);
-                this._scaleUpdateCallback = function () { return _this._updatePixelPosition(); };
+                this._scaleUpdateCallback = function () {
+                    _this._updatePixelPosition();
+                    _this.render();
+                };
                 if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
                 }
