@@ -94,11 +94,38 @@ describe("GuideLineLayer", () => {
     assert.throws(() => new Plottable.Components.GuideLineLayer<number>("blargh"), Error);
   });
 
-  it("has fixed height if vertical, fixed width if horizontal", () => {
-    let verticalGLL = new Plottable.Components.GuideLineLayer<number>("vertical");
-    assert.strictEqual(verticalGLL.fixedHeight(), true, "fixed height if vertical");
-    let horizontalGLL = new Plottable.Components.GuideLineLayer<number>("horizontal");
-    assert.strictEqual(horizontalGLL.fixedWidth(), true, "fixed width if horizontal");
+  it("has an effective size of 0, but will occupy all offered space (vertical)", () => {
+    let SVG_WIDTH = 400;
+    let SVG_HEIGHT = 300;
+    let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+    let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+    TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
+    assert.isTrue(gll.fixedWidth(), "fixed width");
+    assert.isTrue(gll.fixedHeight(), "fixed height");
+
+    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    gll.anchor(svg);
+    gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
+    assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
+    assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
+    svg.remove();
+  });
+
+  it("has an effective size of 0, but will occupy all offered space (horizontal)", () => {
+    let SVG_WIDTH = 300;
+    let SVG_HEIGHT = 400;
+    let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
+    let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+    TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
+    assert.isTrue(gll.fixedWidth(), "fixed width");
+    assert.isTrue(gll.fixedHeight(), "fixed height");
+
+    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+    gll.anchor(svg);
+    gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
+    assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
+    assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
+    svg.remove();
   });
 
   describe("rendering (vertical)", () => {
