@@ -2503,7 +2503,6 @@ declare module Plottable {
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForProperty(property: string): any[];
-        protected _includedValuesForScale<D>(scale: Scale<D, any>): D[];
         /**
          * Get the Animator associated with the specified Animator key.
          *
