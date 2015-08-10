@@ -26,7 +26,7 @@ export module Plots {
     public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
       super.computeLayout(origin, availableWidth, availableHeight);
       this._renderArea.attr("transform", "translate(" + this.width() / 2 + "," + this.height() / 2 + ")");
-      var radiusLimit = Math.min(this.width(), this.height()) / 2;
+      let radiusLimit = Math.min(this.width(), this.height()) / 2;
       if (this.innerRadius().scale != null) {
         this.innerRadius().scale.range([0, radiusLimit]);
       }
@@ -63,7 +63,7 @@ export module Plots {
     }
 
     public entities(datasets = this.datasets()): PlotEntity[] {
-      var entities = super.entities(datasets);
+      let entities = super.entities(datasets);
       entities.forEach((entity) => {
         entity.position.x += this.width() / 2;
         entity.position.y += this.height() / 2;
@@ -210,16 +210,16 @@ export module Plots {
      * @param {PlotEntity[]}
      */
     public entitiesAt(queryPoint: Point) {
-      var center = { x: this.width() / 2, y: this.height() / 2 };
-      var adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
-      var index = this._sliceIndexForPoint(adjustedQueryPoint);
+      let center = { x: this.width() / 2, y: this.height() / 2 };
+      let adjustedQueryPoint = { x: queryPoint.x - center.x, y: queryPoint.y - center.y };
+      let index = this._sliceIndexForPoint(adjustedQueryPoint);
       return index == null ? [] : [this.entities()[index]];
     }
 
     protected _propertyProjectors(): AttributeToProjector {
-      var attrToProjector = super._propertyProjectors();
-      var innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
-      var outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
+      let attrToProjector = super._propertyProjectors();
+      let innerRadiusAccessor = Plot._scaledAccessor(this.innerRadius());
+      let outerRadiusAccessor = Plot._scaledAccessor(this.outerRadius());
       attrToProjector["d"] = (datum: any, index: number, ds: Dataset) => {
         return d3.svg.arc().innerRadius(innerRadiusAccessor(datum, index, ds))
                            .outerRadius(outerRadiusAccessor(datum, index, ds))
@@ -232,10 +232,10 @@ export module Plots {
     private _updatePieAngles() {
       if (this.sectorValue() == null) { return; }
       if (this.datasets().length === 0) { return; }
-      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      var dataset = this.datasets()[0];
-      var data = dataset.data().filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)));
-      var pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
+      let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      let dataset = this.datasets()[0];
+      let data = dataset.data().filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, dataset)));
+      let pie = d3.layout.pie().sort(null).value((d, i) => sectorValueAccessor(d, i, dataset))(data);
       if (pie.some((slice) => slice.value < 0)) {
         Utils.Window.warn("Negative values will not render correctly in a Pie Plot.");
       }
@@ -244,28 +244,28 @@ export module Plots {
     }
 
     protected _getDataToDraw() {
-      var dataToDraw = super._getDataToDraw();
+      let dataToDraw = super._getDataToDraw();
       if (this.datasets().length === 0) { return dataToDraw; }
-      var sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      var ds = this.datasets()[0];
-      var data = dataToDraw.get(ds);
-      var filteredData = data.filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)));
+      let sectorValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      let ds = this.datasets()[0];
+      let data = dataToDraw.get(ds);
+      let filteredData = data.filter((d, i) => Plottable.Utils.Math.isValidNumber(sectorValueAccessor(d, i, ds)));
       dataToDraw.set(ds, filteredData);
       return dataToDraw;
     }
 
     protected _pixelPoint(datum: any, index: number, dataset: Dataset) {
-      var innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
-      var outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
-      var avgRadius = (innerRadius + outerRadius) / 2;
+      let innerRadius = Plot._scaledAccessor(this.innerRadius())(datum, index, dataset);
+      let outerRadius = Plot._scaledAccessor(this.outerRadius())(datum, index, dataset);
+      let avgRadius = (innerRadius + outerRadius) / 2;
 
-      var scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
-      var pie = d3.layout.pie()
+      let scaledValueAccessor = Plot._scaledAccessor(this.sectorValue());
+      let pie = d3.layout.pie()
                          .sort(null)
                          .value((d: any, i: number) => scaledValueAccessor(d, i, dataset))(dataset.data());
-      var startAngle = pie[index].startAngle;
-      var endAngle = pie[index].endAngle;
-      var avgAngle = (startAngle + endAngle) / 2;
+      let startAngle = pie[index].startAngle;
+      let endAngle = pie[index].endAngle;
+      let avgAngle = (startAngle + endAngle) / 2;
       return { x: avgRadius * Math.sin(avgAngle), y: -avgRadius * Math.cos(avgAngle) };
     }
 
@@ -277,23 +277,23 @@ export module Plots {
     }
 
     private _sliceIndexForPoint(p: Point) {
-      var pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
-      var pointAngle = Math.acos(-p.y / pointRadius);
+      let pointRadius = Math.sqrt(Math.pow(p.x, 2) + Math.pow(p.y, 2));
+      let pointAngle = Math.acos(-p.y / pointRadius);
       if (p.x < 0) {
         pointAngle = Math.PI * 2 - pointAngle;
       }
-      var index: number;
-      for (var i = 0; i < this._startAngles.length; i++) {
+      let index: number;
+      for (let i = 0; i < this._startAngles.length; i++) {
         if (this._startAngles[i] < pointAngle && this._endAngles[i] > pointAngle) {
           index = i;
           break;
         }
       }
       if (index !== undefined) {
-        var dataset = this.datasets()[0];
-        var datum = dataset.data()[index];
-        var innerRadius = this.innerRadius().accessor(datum, index, dataset);
-        var outerRadius = this.outerRadius().accessor(datum, index, dataset);
+        let dataset = this.datasets()[0];
+        let datum = dataset.data()[index];
+        let innerRadius = this.innerRadius().accessor(datum, index, dataset);
+        let outerRadius = this.outerRadius().accessor(datum, index, dataset);
         if (pointRadius > innerRadius && pointRadius < outerRadius) {
           return index;
         }
@@ -302,54 +302,54 @@ export module Plots {
     }
 
     private _drawLabels() {
-      var attrToProjector = this._generateAttrToProjector();
-      var labelArea = this._renderArea.append("g").classed("label-area", true);
-      var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
-      var writer = new SVGTypewriter.Writers.Writer(measurer);
-      var dataset = this.datasets()[0];
-      var data = this._getDataToDraw().get(dataset);
+      let attrToProjector = this._generateAttrToProjector();
+      let labelArea = this._renderArea.append("g").classed("label-area", true);
+      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      let dataset = this.datasets()[0];
+      let data = this._getDataToDraw().get(dataset);
       data.forEach((datum, datumIndex) => {
-        var value = this.sectorValue().accessor(datum, datumIndex, dataset);
+        let value = this.sectorValue().accessor(datum, datumIndex, dataset);
         if (!Plottable.Utils.Math.isValidNumber(value)) {
           return;
         }
         value = this._labelFormatter(value);
-        var measurement = measurer.measure(value);
+        let measurement = measurer.measure(value);
 
-        var theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
-        var outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
+        let theta = (this._endAngles[datumIndex] + this._startAngles[datumIndex]) / 2;
+        let outerRadius = this.outerRadius().accessor(datum, datumIndex, dataset);
         if (this.outerRadius().scale) {
           outerRadius = this.outerRadius().scale.scale(outerRadius);
         }
-        var innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
+        let innerRadius = this.innerRadius().accessor(datum, datumIndex, dataset);
         if (this.innerRadius().scale) {
           innerRadius = this.innerRadius().scale.scale(innerRadius);
         }
-        var labelRadius = (outerRadius + innerRadius) / 2;
+        let labelRadius = (outerRadius + innerRadius) / 2;
 
-        var x = Math.sin(theta) * labelRadius - measurement.width / 2;
-        var y = -Math.cos(theta) * labelRadius - measurement.height / 2;
+        let x = Math.sin(theta) * labelRadius - measurement.width / 2;
+        let y = -Math.cos(theta) * labelRadius - measurement.height / 2;
 
-        var corners = [
+        let corners = [
           { x: x, y: y },
           { x: x, y: y + measurement.height},
           { x: x + measurement.width, y: y },
           { x: x + measurement.width, y: y + measurement.height }
         ];
 
-        var showLabel = corners.every((corner) => {
+        let showLabel = corners.every((corner) => {
           return Math.abs(corner.x) <= this.width() / 2 && Math.abs(corner.y) <= this.height() / 2;
         });
 
         if (showLabel) {
-          var sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
+          let sliceIndices = corners.map((corner) => this._sliceIndexForPoint(corner));
           showLabel = sliceIndices.every((index) => index === datumIndex);
         }
 
-        var color = attrToProjector["fill"](datum, datumIndex, dataset);
-        var dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
-        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-        var className = dark ? "dark-label" : "light-label";
+        let color = attrToProjector["fill"](datum, datumIndex, dataset);
+        let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+        let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+        let className = dark ? "dark-label" : "light-label";
         g.classed(className, true);
         g.style("visibility", showLabel ? "inherit" : "hidden");
 

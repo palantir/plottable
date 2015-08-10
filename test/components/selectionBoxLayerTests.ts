@@ -2,11 +2,11 @@
 
 describe("SelectionBoxLayer", () => {
   it("boxVisible()", () => {
-    var svg = TestMethods.generateSVG();
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let svg = TestMethods.generateSVG();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.renderTo(svg);
 
-    var selectionBox = svg.select(".selection-box");
+    let selectionBox = svg.select(".selection-box");
     assert.isTrue(selectionBox.empty(), "initilizes without box in DOM");
 
     sbl.boxVisible(true);
@@ -21,8 +21,8 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("destroy() does not error if scales are not inputted", () => {
-    var svg = TestMethods.generateSVG();
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let svg = TestMethods.generateSVG();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.renderTo(svg);
     assert.doesNotThrow(() => sbl.destroy(), Error, "can destroy even with no scales");
 
@@ -30,14 +30,14 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("bounds()", () => {
-    var svg = TestMethods.generateSVG();
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let svg = TestMethods.generateSVG();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
 
-    var topLeft: Plottable.Point = {
+    let topLeft: Plottable.Point = {
       x: 100,
       y: 100
     };
-    var bottomRight: Plottable.Point = {
+    let bottomRight: Plottable.Point = {
       x: 300,
       y: 300
     };
@@ -50,8 +50,8 @@ describe("SelectionBoxLayer", () => {
     sbl.renderTo(svg);
 
     function assertCorrectRendering(expectedTL: Plottable.Point, expectedBR: Plottable.Point, msg: string) {
-      var selectionBox = svg.select(".selection-box");
-      var bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
+      let selectionBox = svg.select(".selection-box");
+      let bbox = Plottable.Utils.DOM.elementBBox(selectionBox);
       assert.strictEqual(bbox.x, expectedTL.x, msg + " (x-origin)");
       assert.strictEqual(bbox.x, expectedTL.y, msg + " (y-origin)");
       assert.strictEqual(bbox.width, expectedBR.x - expectedTL.x, msg + " (width)");
@@ -59,7 +59,7 @@ describe("SelectionBoxLayer", () => {
     }
 
     assertCorrectRendering(topLeft, bottomRight, "rendered correctly");
-    var queriedBounds = sbl.bounds();
+    let queriedBounds = sbl.bounds();
     assert.deepEqual(queriedBounds.topLeft, topLeft, "returns correct top-left position");
     assert.deepEqual(queriedBounds.bottomRight, bottomRight, "returns correct bottom-right position");
 
@@ -76,31 +76,31 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("has an effective size of 0, but will occupy all offered space", () => {
-    var sbl = new Plottable.Components.SelectionBoxLayer();
-    var request = sbl.requestedSpace(400, 400);
+    let sbl = new Plottable.Components.SelectionBoxLayer();
+    let request = sbl.requestedSpace(400, 400);
     TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
     assert.isTrue(sbl.fixedWidth(), "fixed width");
     assert.isTrue(sbl.fixedHeight(), "fixed height");
   });
 
   it("xScale()", () => {
-    var svgWidth = 500;
-    var svgHeight = 500;
-    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+    let svgWidth = 500;
+    let svgHeight = 500;
+    let svg = TestMethods.generateSVG(svgWidth, svgHeight);
 
-    var xScale = new Plottable.Scales.Linear();
+    let xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 2000]);
     xScale.range([0, svgWidth]);
 
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.xScale(xScale);
     sbl.renderTo(svg);
 
-    var topLeft: Plottable.Point = {
+    let topLeft: Plottable.Point = {
       x: 0,
       y: 0
     };
-    var bottomRight: Plottable.Point = {
+    let bottomRight: Plottable.Point = {
       x: 250,
       y: 300
     };
@@ -110,7 +110,7 @@ describe("SelectionBoxLayer", () => {
     });
 
     sbl.boxVisible(true);
-    var selectionBox = svg.select(".selection-area");
+    let selectionBox = svg.select(".selection-area");
     assert.strictEqual(selectionBox.attr("x"), "0", "box starts at left edge");
 
     xScale.domain([-1000, 1000]);
@@ -122,23 +122,23 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("yScale()", () => {
-    var svgWidth = 500;
-    var svgHeight = 500;
-    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+    let svgWidth = 500;
+    let svgHeight = 500;
+    let svg = TestMethods.generateSVG(svgWidth, svgHeight);
 
-    var yScale = new Plottable.Scales.Linear();
+    let yScale = new Plottable.Scales.Linear();
     yScale.domain([0, 2000]);
     yScale.range([0, svgHeight]);
 
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.yScale(yScale);
     sbl.renderTo(svg);
 
-    var topLeft: Plottable.Point = {
+    let topLeft: Plottable.Point = {
       x: 0,
       y: 0
     };
-    var bottomRight: Plottable.Point = {
+    let bottomRight: Plottable.Point = {
       x: 250,
       y: 300
     };
@@ -148,7 +148,7 @@ describe("SelectionBoxLayer", () => {
     });
 
     sbl.boxVisible(true);
-    var selectionBox = svg.select(".selection-area");
+    let selectionBox = svg.select(".selection-area");
     assert.strictEqual(selectionBox.attr("y"), "0", "box starts at top edge");
 
     yScale.domain([-1000, 1000]);
@@ -160,23 +160,23 @@ describe("SelectionBoxLayer", () => {
   });
 
   it("boxDataValue endpoints", () => {
-    var svgWidth = 500;
-    var svgHeight = 500;
-    var svg = TestMethods.generateSVG(svgWidth, svgHeight);
+    let svgWidth = 500;
+    let svgHeight = 500;
+    let svg = TestMethods.generateSVG(svgWidth, svgHeight);
 
-    var xScale = new Plottable.Scales.Linear();
+    let xScale = new Plottable.Scales.Linear();
     xScale.domain([0, 2000]);
     xScale.range([0, svgHeight]);
 
-    var sbl = new Plottable.Components.SelectionBoxLayer();
+    let sbl = new Plottable.Components.SelectionBoxLayer();
     sbl.xScale(xScale);
     sbl.renderTo(svg);
 
-    var topLeft: Plottable.Point = {
+    let topLeft: Plottable.Point = {
       x: 100,
       y: 0
     };
-    var bottomRight: Plottable.Point = {
+    let bottomRight: Plottable.Point = {
       x: 250,
       y: 300
     };

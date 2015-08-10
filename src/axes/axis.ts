@@ -78,8 +78,8 @@ export class Axis<D> extends Component {
   }
 
   public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-    var requestedWidth = 0;
-    var requestedHeight = 0;
+    let requestedWidth = 0;
+    let requestedHeight = 0;
 
     if (this._isHorizontal()) {
       if (this._computedHeight == null) {
@@ -140,8 +140,8 @@ export class Axis<D> extends Component {
   }
 
   public renderImmediately() {
-    var tickMarkValues = this._getTickValues();
-    var tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
+    let tickMarkValues = this._getTickValues();
+    let tickMarks = this._tickMarkContainer.selectAll("." + Axis.TICK_MARK_CLASS).data(tickMarkValues);
     tickMarks.enter().append("line").classed(Axis.TICK_MARK_CLASS, true);
     tickMarks.attr(this._generateTickMarkAttrHash());
     d3.select(tickMarks[0][0]).classed(Axis.END_TICK_MARK_CLASS, true)
@@ -154,7 +154,7 @@ export class Axis<D> extends Component {
   }
 
   protected _generateBaselineAttrHash() {
-    var baselineAttrHash: { [key: string]: number } = {
+    let baselineAttrHash: { [key: string]: number } = {
       x1: 0,
       y1: 0,
       x2: 0,
@@ -187,14 +187,14 @@ export class Axis<D> extends Component {
   }
 
   protected _generateTickMarkAttrHash(isEndTickMark = false) {
-    var tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
+    let tickMarkAttrHash: { [key: string]: number | ((d: any) => number) } = {
       x1: 0,
       y1: 0,
       x2: 0,
       y2: 0
     };
 
-    var scalingFunction = (d: any) => this._scale.scale(d);
+    let scalingFunction = (d: any) => this._scale.scale(d);
     if (this._isHorizontal()) {
       tickMarkAttrHash["x1"] = scalingFunction;
       tickMarkAttrHash["x2"] = scalingFunction;
@@ -203,7 +203,7 @@ export class Axis<D> extends Component {
       tickMarkAttrHash["y2"] = scalingFunction;
     }
 
-    var tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
+    let tickLength = isEndTickMark ? this._endTickLength : this._innerTickLength;
 
     switch (this._orientation) {
       case "bottom":
@@ -415,7 +415,7 @@ export class Axis<D> extends Component {
     if (orientation == null) {
       return this._orientation;
     } else {
-      var newOrientationLC = orientation.toLowerCase();
+      let newOrientationLC = orientation.toLowerCase();
       if (newOrientationLC !== "top" &&
           newOrientationLC !== "bottom" &&
           newOrientationLC !== "left" &&

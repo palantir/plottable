@@ -94,6 +94,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Utils {
         module DOM {
@@ -2247,12 +2248,10 @@ declare module Plottable {
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
-             * ```typescript
-             * var table = new Table();
+             * var table = new Plottable.Components.Table();
              * table.add(a, 0, 0);
              * table.add(b, 0, 1);
              * table.add(c, 1, 1);
-             * ```
              *
              * @param {Component} component The Component to be added.
              * @param {number} row

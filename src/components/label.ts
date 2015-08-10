@@ -28,9 +28,9 @@ export module Components {
     }
 
     public requestedSpace(offeredWidth: number, offeredHeight: number): SpaceRequest {
-      var desiredWH = this._measurer.measure(this._text);
-      var desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
-      var desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
+      let desiredWH = this._measurer.measure(this._text);
+      let desiredWidth = (this.angle() === 0 ? desiredWH.width : desiredWH.height) + 2 * this.padding();
+      let desiredHeight = (this.angle() === 0 ? desiredWH.height : desiredWH.width) + 2 * this.padding();
 
       return {
         minWidth: desiredWidth,
@@ -139,13 +139,13 @@ export module Components {
       super.renderImmediately();
       // HACKHACK SVGTypewriter should remove existing content - #21 on SVGTypewriter.
       this._textContainer.selectAll("g").remove();
-      var textMeasurement = this._measurer.measure(this._text);
-      var heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
-      var widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
+      let textMeasurement = this._measurer.measure(this._text);
+      let heightPadding = Math.max(Math.min((this.height() - textMeasurement.height) / 2, this.padding()), 0);
+      let widthPadding = Math.max(Math.min((this.width() - textMeasurement.width) / 2, this.padding()), 0);
       this._textContainer.attr("transform", "translate(" + widthPadding + "," + heightPadding + ")");
-      var writeWidth = this.width() - 2 * widthPadding;
-      var writeHeight = this.height() - 2 * heightPadding;
-      var writeOptions = {
+      let writeWidth = this.width() - 2 * widthPadding;
+      let writeHeight = this.height() - 2 * heightPadding;
+      let writeOptions = {
                         selection: this._textContainer,
                         xAlign: this.xAlignment(),
                         yAlign: this.yAlignment(),

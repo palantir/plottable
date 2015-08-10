@@ -12,9 +12,9 @@ export module Utils {
      * If one already exists on that <svg>, it will be returned; otherwise, a new one will be created.
      */
     public static getTranslator(elem: SVGElement): ClientToSVGTranslator {
-      var svg = Utils.DOM.boundingSVG(elem);
+      let svg = Utils.DOM.boundingSVG(elem);
 
-      var translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
+      let translator: ClientToSVGTranslator = (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY];
       if (translator == null) {
         translator = new ClientToSVGTranslator(svg);
         (<any> svg)[ClientToSVGTranslator._TRANSLATOR_KEY] = translator;
@@ -39,31 +39,31 @@ export module Utils {
       // get the origin
       this._measureRect.setAttribute("x", "0");
       this._measureRect.setAttribute("y", "0");
-      var mrBCR = this._measureRect.getBoundingClientRect();
-      var origin = { x: mrBCR.left, y: mrBCR.top };
+      let mrBCR = this._measureRect.getBoundingClientRect();
+      let origin = { x: mrBCR.left, y: mrBCR.top };
 
       // calculate the scale
-      var sampleDistance = 100;
+      let sampleDistance = 100;
       this._measureRect.setAttribute("x", String(sampleDistance));
       this._measureRect.setAttribute("y", String(sampleDistance));
       mrBCR = this._measureRect.getBoundingClientRect();
-      var testPoint = { x: mrBCR.left, y: mrBCR.top };
+      let testPoint = { x: mrBCR.left, y: mrBCR.top };
 
       // invalid measurements -- SVG might not be in the DOM
       if (origin.x === testPoint.x || origin.y === testPoint.y) {
         return null;
       }
 
-      var scaleX = (testPoint.x - origin.x) / sampleDistance;
-      var scaleY = (testPoint.y - origin.y) / sampleDistance;
+      let scaleX = (testPoint.x - origin.x) / sampleDistance;
+      let scaleY = (testPoint.y - origin.y) / sampleDistance;
 
       // get the true cursor position
       this._measureRect.setAttribute("x", String((clientX - origin.x) / scaleX));
       this._measureRect.setAttribute("y", String((clientY - origin.y) / scaleY));
       mrBCR = this._measureRect.getBoundingClientRect();
-      var trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
+      let trueCursorPosition = { x: mrBCR.left, y: mrBCR.top };
 
-      var scaledPosition = {
+      let scaledPosition = {
         x: (trueCursorPosition.x - origin.x) / scaleX,
         y: (trueCursorPosition.y - origin.y) / scaleY
       };

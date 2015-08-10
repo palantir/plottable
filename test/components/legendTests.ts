@@ -1,13 +1,13 @@
 ///<reference path="../testReference.ts" />
 
 describe("Legend", () => {
-  var svg: d3.Selection<void>;
-  var color: Plottable.Scales.Color;
-  var legend: Plottable.Components.Legend;
+  let svg: d3.Selection<void>;
+  let color: Plottable.Scales.Color;
+  let legend: Plottable.Components.Legend;
 
-  var entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
-  var symbolSelector = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
-  var rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
+  let entrySelector = "." + Plottable.Components.Legend.LEGEND_ENTRY_CLASS;
+  let symbolSelector = "." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS;
+  let rowSelector = "." + Plottable.Components.Legend.LEGEND_ROW_CLASS;
 
   beforeEach(() => {
     svg = TestMethods.generateSVG(400, 400);
@@ -18,15 +18,15 @@ describe("Legend", () => {
   it("a basic legend renders", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var rows = (<any> legend)._content.selectAll(entrySelector);
+    let rows = (<any> legend)._content.selectAll(entrySelector);
     assert.lengthOf(rows[0], color.domain().length, "one entry is created for each item in the domain");
 
     rows.each(function(d: any, i: number) {
       assert.strictEqual(d, color.domain()[i], "the data is set properly");
-      var d3this = d3.select(this);
-      var text = d3this.select("text").text();
+      let d3this = d3.select(this);
+      let text = d3this.select("text").text();
       assert.strictEqual(text, d, "the text node has correct text");
-      var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      let symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("fill"), color.scale(d), "the symbol's fill is set properly");
       assert.strictEqual(symbol.attr("opacity"), "1", "the symbol's opacity is set by default to 1");
     });
@@ -38,14 +38,14 @@ describe("Legend", () => {
     legend.colorScale(color);
     assert.strictEqual(legend.requestedSpace(200, 200).minHeight, 10, "there is a padding requested height when domain is empty");
     color.domain(["foo", "bar"]);
-    var height1 = legend.requestedSpace(400, 400).minHeight;
-    var actualHeight1 = legend.height();
+    let height1 = legend.requestedSpace(400, 400).minHeight;
+    let actualHeight1 = legend.height();
     assert.operator(height1, ">", 0, "changing the domain gives a positive height");
     color.domain(["foo", "bar", "baz"]);
     assert.operator(legend.requestedSpace(400, 400).minHeight, ">", height1, "adding to the domain increases the height requested");
-    var actualHeight2 = legend.height();
+    let actualHeight2 = legend.height();
     assert.operator(actualHeight1, "<", actualHeight2, "Changing the domain caused the legend to re-layout with more height");
-    var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
+    let numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.strictEqual(numRows, 3, "there are 3 rows");
     svg.remove();
   });
@@ -54,10 +54,10 @@ describe("Legend", () => {
     color.domain(["alpha", "beta", "gamma", "delta", "omega", "omicron", "persei", "eight"]);
     legend.renderTo(svg);
 
-    var contentBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._content);
-    var contentBottomEdge = contentBBox.y + contentBBox.height;
-    var bboxBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._element.select(".bounding-box"));
-    var bboxBottomEdge = bboxBBox.y + bboxBBox.height;
+    let contentBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._content);
+    let contentBottomEdge = contentBBox.y + contentBBox.height;
+    let bboxBBox = Plottable.Utils.DOM.elementBBox((<any> legend)._element.select(".bounding-box"));
+    let bboxBottomEdge = bboxBBox.y + bboxBBox.height;
 
     assert.operator(contentBottomEdge, "<=", bboxBottomEdge, "content does not extend past bounding box");
     svg.remove();
@@ -67,11 +67,11 @@ describe("Legend", () => {
     color.domain(["foooboooloonoogoorooboopoo"]);
     svg.attr("width", 100);
     legend.renderTo(svg);
-    var text = (<any> legend)._content.select("text").text();
+    let text = (<any> legend)._content.select("text").text();
     assert.notEqual(text, "foooboooloonoogoorooboopoo", "the text was truncated");
-    var rightEdge = (<any> legend)._content.select("text").node().getBoundingClientRect().right;
-    var bbox = (<any> legend)._element.select(".bounding-box");
-    var rightEdgeBBox = bbox.node().getBoundingClientRect().right;
+    let rightEdge = (<any> legend)._content.select("text").node().getBoundingClientRect().right;
+    let bbox = (<any> legend)._element.select(".bounding-box");
+    let rightEdgeBBox = bbox.node().getBoundingClientRect().right;
     assert.operator(rightEdge, "<=", rightEdgeBBox, "the long text did not overflow the legend");
     svg.remove();
   });
@@ -79,7 +79,7 @@ describe("Legend", () => {
   it("calling legend.render multiple times does not add more elements", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
+    let numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
     assert.strictEqual(numRows, 3, "there are 3 legend rows initially");
     legend.render();
     numRows = (<any> legend)._content.selectAll(rowSelector)[0].length;
@@ -90,14 +90,14 @@ describe("Legend", () => {
   it("re-rendering the legend with a new domain will do the right thing", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
-    var newDomain = ["mushu", "foo", "persei", "baz", "eight"];
+    let newDomain = ["mushu", "foo", "persei", "baz", "eight"];
     color.domain(newDomain);
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
       assert.strictEqual(d, newDomain[i], "the data is set correctly");
-      var text = d3.select(this).select("text").text();
+      let text = d3.select(this).select("text").text();
       assert.strictEqual(text, d, "the text was set properly");
-      var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+      let fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.strictEqual(fill, color.scale(d), "the fill was set properly");
     });
     assert.lengthOf((<any> legend)._content.selectAll(rowSelector)[0], 5, "there are the right number of legend elements");
@@ -108,16 +108,16 @@ describe("Legend", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
 
-    var newDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.Scales.Color("20");
+    let newDomain = ["a", "b", "c"];
+    let newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(newDomain);
     legend.colorScale(newColorScale);
 
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
       assert.strictEqual(d, newDomain[i], "the data is set correctly");
-      var text = d3.select(this).select("text").text();
+      let text = d3.select(this).select("text").text();
       assert.strictEqual(text, d, "the text was set properly");
-      var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+      let fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
     });
 
@@ -129,23 +129,23 @@ describe("Legend", () => {
     legend.symbolOpacity(0.5);
     legend.renderTo(svg);
 
-    var rows = (<any> legend)._content.selectAll(entrySelector);
+    let rows = (<any> legend)._content.selectAll(entrySelector);
 
     rows.each(function(d: any, i: number) {
-      var d3this = d3.select(this);
-      var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      let d3this = d3.select(this);
+      let symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("opacity"), "0.5", "the symbol's opacity is set to a constant");
     });
 
-    var opacityFunction = (d: any, i: number) => {
+    let opacityFunction = (d: any, i: number) => {
       return (d === "foo") ? 0.2 : 0.8;
     };
     legend.symbolOpacity(opacityFunction).redraw();
     rows = (<any> legend)._content.selectAll(entrySelector);
 
     rows.each(function(d: any, i: number) {
-      var d3this = d3.select(this);
-      var symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      let d3this = d3.select(this);
+      let symbol = d3this.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
       assert.strictEqual(symbol.attr("opacity"), String(opacityFunction(d, i)), "the symbol's opacity follows the provided function.");
     });
     svg.remove();
@@ -155,18 +155,18 @@ describe("Legend", () => {
     color.domain(["foo", "bar", "baz"]);
     legend.renderTo(svg);
 
-    var tempDomain = ["a", "b", "c"];
-    var newColorScale = new Plottable.Scales.Color("20");
+    let tempDomain = ["a", "b", "c"];
+    let newColorScale = new Plottable.Scales.Color("20");
     newColorScale.domain(tempDomain);
     legend.colorScale(newColorScale);
 
-    var newDomain = ["a", "foo", "d"];
+    let newDomain = ["a", "foo", "d"];
     newColorScale.domain(newDomain);
     (<any> legend)._content.selectAll(entrySelector).each(function(d: any, i: number) {
       assert.strictEqual(d, newDomain[i], "the data is set correctly");
-      var text = d3.select(this).select("text").text();
+      let text = d3.select(this).select("text").text();
       assert.strictEqual(text, d, "the text was set properly");
-      var fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
+      let fill = d3.select(this).select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS).attr("fill");
       assert.strictEqual(fill, newColorScale.scale(d), "the fill was set properly");
     });
     svg.remove();
@@ -175,14 +175,14 @@ describe("Legend", () => {
   it("scales icon sizes properly with font size (textHeight / 2 < symbolHeight < textHeight)", () => {
     color.domain(["foo"]);
     legend.renderTo(svg);
-    var style = (<any> legend)._element.append("style");
+    let style = (<any> legend)._element.append("style");
     style.attr("type", "text/css");
 
     function verifySymbolHeight() {
-      var text = (<any> legend)._content.select("text");
-      var icon = (<any> legend)._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
-      var textHeight = Plottable.Utils.DOM.elementBBox(text).height;
-      var symbolHeight = icon.node().getBoundingClientRect().height;
+      let text = (<any> legend)._content.select("text");
+      let icon = (<any> legend)._content.select("." + Plottable.Components.Legend.LEGEND_SYMBOL_CLASS);
+      let textHeight = Plottable.Utils.DOM.elementBBox(text).height;
+      let symbolHeight = icon.node().getBoundingClientRect().height;
       assert.operator(symbolHeight, "<", textHeight, "icons too small: symbolHeight < textHeight");
       assert.operator(symbolHeight, ">", textHeight / 2, "icons too big: textHeight / 2 > symbolHeight");
     }
@@ -206,12 +206,12 @@ describe("Legend", () => {
     color.domain(["AA", "BB", "CC", "DD", "EE", "FF"]);
     legend.renderTo(svg);
 
-    var verifyMaxEntriesInRow = (n: number) => {
+    let verifyMaxEntriesInRow = (n: number) => {
       legend.maxEntriesPerRow(n);
-      var rows = (<any> legend)._element.selectAll(rowSelector);
+      let rows = (<any> legend)._element.selectAll(rowSelector);
       assert.lengthOf(rows[0], (6 / n), "number of rows is correct");
       rows.each(function(d: any) {
-        var entries = d3.select(this).selectAll(entrySelector);
+        let entries = d3.select(this).selectAll(entrySelector);
         assert.lengthOf(entries[0], n, "number of entries in row is correct");
       });
     };
@@ -229,7 +229,7 @@ describe("Legend", () => {
     legend.maxEntriesPerRow(Infinity);
 
     legend.renderTo(svg);
-    var rows = (<any> legend)._element.selectAll(rowSelector);
+    let rows = (<any> legend)._element.selectAll(rowSelector);
     assert.lengthOf(rows[0], 2, "Wrapped text on to two rows when space is constrained");
     legend.detach();
     svg.remove();
@@ -246,8 +246,8 @@ describe("Legend", () => {
 
     legend.renderTo(svg); // have to be in DOM to measure
 
-    var idealSpaceRequest = legend.requestedSpace(Infinity, Infinity);
-    var constrainedRequest = legend.requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
+    let idealSpaceRequest = legend.requestedSpace(Infinity, Infinity);
+    let constrainedRequest = legend.requestedSpace(idealSpaceRequest.minWidth * 0.9, Infinity);
 
     assert.strictEqual(idealSpaceRequest.minWidth, constrainedRequest.minWidth,
       "won't settle for less width if entries would be truncated");
@@ -256,12 +256,12 @@ describe("Legend", () => {
 
   describe("entitiesAt()", () => {
     function computeExpectedSymbolPosition(legend: Plottable.Components.Legend, rowIndex: number, entryIndexWithinRow: number) {
-      var row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
-      var entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
-      var symbol = entry.select(symbolSelector);
-      var rowTranslate = d3.transform(row.attr("transform")).translate;
-      var entryTranslate = d3.transform(entry.attr("transform")).translate;
-      var symbolTranslate = d3.transform(symbol.attr("transform")).translate;
+      let row = d3.select(legend.content().selectAll(rowSelector)[0][rowIndex]);
+      let entry = d3.select(row.selectAll(entrySelector)[0][entryIndexWithinRow]);
+      let symbol = entry.select(symbolSelector);
+      let rowTranslate = d3.transform(row.attr("transform")).translate;
+      let entryTranslate = d3.transform(entry.attr("transform")).translate;
+      let symbolTranslate = d3.transform(symbol.attr("transform")).translate;
       return {
         x: rowTranslate[0] + entryTranslate[0] + symbolTranslate[0],
         y: rowTranslate[1] + entryTranslate[1] + symbolTranslate[1]
@@ -269,13 +269,13 @@ describe("Legend", () => {
     }
 
     it("gets Entities representing the entry at a particular point", () => {
-      var domain = ["AA", "BB", "CC"];
+      let domain = ["AA", "BB", "CC"];
       color.domain(domain);
       legend.renderTo(svg);
-      var entities = legend.entitiesAt({x: 10, y: 10});
-      var entries = legend.content().selectAll(entrySelector);
+      let entities = legend.entitiesAt({x: 10, y: 10});
+      let entries = legend.content().selectAll(entrySelector);
 
-      var expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
@@ -301,13 +301,13 @@ describe("Legend", () => {
     });
 
     it("gets Entities representing the entry at a particular point (maxEntriesPerRow > 1)", () => {
-      var domain = ["AA", "BB", "CC"];
+      let domain = ["AA", "BB", "CC"];
       color.domain(domain);
       legend.maxEntriesPerRow(Infinity);
       legend.renderTo(svg);
-      var entities = legend.entitiesAt({x: 10, y: 10});
-      var entries = legend.content().selectAll(entrySelector);
-      var expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
+      let entities = legend.entitiesAt({x: 10, y: 10});
+      let entries = legend.content().selectAll(entrySelector);
+      let expectedEntity: Plottable.Entity<Plottable.Components.Legend> = {
         datum: "AA",
         index: 0,
         position: computeExpectedSymbolPosition(legend, 0, 0),
@@ -330,24 +330,24 @@ describe("Legend", () => {
     });
 
     it("returns an empty array if no Entitites are present at that point", () => {
-      var domain = ["AA", "BB", "CC"];
+      let domain = ["AA", "BB", "CC"];
       color.domain(domain);
       legend.renderTo(svg);
-      var entities = legend.entitiesAt({x: -100, y: -100});
+      let entities = legend.entitiesAt({x: -100, y: -100});
       assert.lengthOf(entities, 0, "no Entities returned if there are no entries at that point");
       svg.remove();
     });
   });
 
   it("comparator() works as expected", () => {
-    var newDomain = ["F", "E", "D", "C", "B", "A"];
+    let newDomain = ["F", "E", "D", "C", "B", "A"];
     color.domain(newDomain);
     legend.renderTo(svg);
-    var entries = (<any> legend)._element.selectAll(entrySelector);
-    var elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
+    let entries = (<any> legend)._element.selectAll(entrySelector);
+    let elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
     assert.deepEqual(elementTexts, newDomain, "entry has not been sorted");
 
-    var compareFunction = (a: string, b: string) => a.localeCompare(b);
+    let compareFunction = (a: string, b: string) => a.localeCompare(b);
     legend.comparator(compareFunction);
     entries = (<any> legend)._element.selectAll(entrySelector);
     elementTexts = entries.select("text")[0].map((node: Element) => d3.select(node).text());
@@ -363,9 +363,9 @@ describe("Legend", () => {
     legend.maxEntriesPerRow(Infinity);
     legend.renderTo(svg);
 
-    var textEls = (<any> legend)._element.selectAll("text");
+    let textEls = (<any> legend)._element.selectAll("text");
     textEls.each(function(d: any) {
-      var textEl = d3.select(this);
+      let textEl = d3.select(this);
       TestMethods.assertBBoxInclusion((<any> legend)._element, textEl);
     });
 
@@ -375,7 +375,7 @@ describe("Legend", () => {
     legend.renderTo(svg);
     textEls = (<any> legend)._element.selectAll("text");
     textEls.each(function(d: any) {
-      var textEl = d3.select(this);
+      let textEl = d3.select(this);
       TestMethods.assertBBoxInclusion((<any> legend)._element, textEl);
     });
 
@@ -383,11 +383,11 @@ describe("Legend", () => {
   });
 
   it("symbol() passes index correctly", () => {
-    var domain = ["AA", "BB", "CC"];
+    let domain = ["AA", "BB", "CC"];
     color.domain(domain);
 
-    var expectedIndex = 0;
-    var symbolChecker = (d: any, index: number) => {
+    let expectedIndex = 0;
+    let symbolChecker = (d: any, index: number) => {
       assert.strictEqual(index, expectedIndex, "index passed in is correct");
       expectedIndex++;
       return (size: number) => "";
@@ -399,11 +399,11 @@ describe("Legend", () => {
   });
 
   it("symbolOpacity() passes index correctly", () => {
-    var domain = ["AA", "BB", "CC"];
+    let domain = ["AA", "BB", "CC"];
     color.domain(domain);
 
-    var expectedIndex = 0;
-    var symbolOpacityChecker = (d: any, index: number) => {
+    let expectedIndex = 0;
+    let symbolOpacityChecker = (d: any, index: number) => {
       assert.strictEqual(index, expectedIndex, "index passed in is correct");
       expectedIndex++;
       return 0.5;

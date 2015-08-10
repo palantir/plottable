@@ -23,8 +23,8 @@ export module Scales {
      */
     public tickInterval(interval: string, step?: number): Date[] {
       // temporarily creats a time scale from our linear scale into a time scale so we can get access to its api
-      var tempScale = d3.time.scale();
-      var d3Interval = Time.timeIntervalToD3Time(interval);
+      let tempScale = d3.time.scale();
+      let d3Interval = Time.timeIntervalToD3Time(interval);
       tempScale.domain(this.domain());
       tempScale.range(this.range());
       return tempScale.ticks(d3Interval, step);
@@ -38,20 +38,20 @@ export module Scales {
     }
 
     protected _defaultExtent(): Date[] {
-      var now = new Date();
-      var endTimeValue = now.valueOf();
+      let now = new Date();
+      let endTimeValue = now.valueOf();
       now.setDate(now.getDate() - 1);
-      var startTimeValue = now.valueOf();
+      let startTimeValue = now.valueOf();
       return [new Date(startTimeValue), new Date(endTimeValue)];
     }
 
     protected _expandSingleValueDomain(singleValueDomain: Date[]): Date[] {
-      var startTime = singleValueDomain[0].getTime();
-      var endTime = singleValueDomain[1].getTime();
+      let startTime = singleValueDomain[0].getTime();
+      let endTime = singleValueDomain[1].getTime();
       if (startTime === endTime) {
-        var startDate = new Date(startTime);
+        let startDate = new Date(startTime);
         startDate.setDate(startDate.getDate() - 1);
-        var endDate = new Date(endTime);
+        let endDate = new Date(endTime);
         endDate.setDate(endDate.getDate() + 1);
         return [startDate, endDate];
       }

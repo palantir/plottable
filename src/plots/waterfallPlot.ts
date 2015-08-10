@@ -67,13 +67,13 @@ export module Plots {
     }
 
     protected _createNodesForDataset(dataset: Dataset) {
-      var drawer = super._createNodesForDataset(dataset);
+      let drawer = super._createNodesForDataset(dataset);
       this._connectorArea = this._renderArea.append("g").classed(Waterfall._CONNECTOR_AREA_CLASS, true);
       return drawer;
     }
 
     protected _extentsForProperty(attr: string) {
-      var primaryAttr = "y";
+      let primaryAttr = "y";
       if (attr === primaryAttr) {
         return [this._extent];
       } else {
@@ -82,20 +82,20 @@ export module Plots {
     }
 
     protected _generateAttrToProjector() {
-      var attrToProjector = super._generateAttrToProjector();
+      let attrToProjector = super._generateAttrToProjector();
 
-      var yScale = this.y().scale;
-      var totalAccessor = Plot._scaledAccessor(this.total());
+      let yScale = this.y().scale;
+      let totalAccessor = Plot._scaledAccessor(this.total());
 
-      var yAttr = this.attr("y");
+      let yAttr = this.attr("y");
       if (yAttr == null) {
         attrToProjector["y"] = (d, i, dataset) => {
-          var currentValue = this.y().accessor(d, i, dataset);
-          var isTotal = totalAccessor(d, i, dataset);
+          let currentValue = this.y().accessor(d, i, dataset);
+          let isTotal = totalAccessor(d, i, dataset);
           if (isTotal) {
             return Math.min(yScale.scale(currentValue), yScale.scale(0));
           } else {
-            var currentSubtotal = this._subtotals[i];
+            let currentSubtotal = this._subtotals[i];
             if (i === 0) {
               if (currentValue < 0) {
                 return yScale.scale(currentSubtotal - currentValue);
@@ -103,7 +103,7 @@ export module Plots {
                 return yScale.scale(currentSubtotal);
               }
             }
-            var priorSubtotal = this._subtotals[i - 1];
+            let priorSubtotal = this._subtotals[i - 1];
             if (currentSubtotal > priorSubtotal) {
               return yScale.scale(currentSubtotal);
             } else {
@@ -113,19 +113,19 @@ export module Plots {
         };
       }
 
-      var heightAttr = this.attr("height");
+      let heightAttr = this.attr("height");
       if (heightAttr == null) {
         attrToProjector["height"] = (d, i, dataset) => {
-          var isTotal = totalAccessor(d, i, dataset);
-          var currentValue = this.y().accessor(d, i, dataset);
+          let isTotal = totalAccessor(d, i, dataset);
+          let currentValue = this.y().accessor(d, i, dataset);
           if (isTotal) {
             return Math.abs(yScale.scale(currentValue) - yScale.scale(0));
           } else {
-            var currentSubtotal = this._subtotals[i];
+            let currentSubtotal = this._subtotals[i];
             if (i === 0) {
               return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(currentSubtotal - currentValue));
             } else {
-              var priorSubtotal = this._subtotals[i - 1];
+              let priorSubtotal = this._subtotals[i - 1];
               return Math.abs(yScale.scale(currentSubtotal) - yScale.scale(priorSubtotal));
             }
           }
@@ -133,15 +133,15 @@ export module Plots {
       }
 
       attrToProjector["class"] = (d, i, dataset) => {
-        var baseClass = "";
+        let baseClass = "";
         if (this.attr("class") != null) {
           baseClass = this.attr("class").accessor(d, i, dataset) + " ";
         }
-        var isTotal = totalAccessor(d, i, dataset);
+        let isTotal = totalAccessor(d, i, dataset);
         if (isTotal) {
           return baseClass + Waterfall._BAR_TOTAL_CLASS;
         } else {
-          var delta  = this.y().accessor(d, i, dataset);
+          let delta  = this.y().accessor(d, i, dataset);
           return baseClass + (delta > 0 ? Waterfall._BAR_GROWTH_CLASS : Waterfall._BAR_DECLINE_CLASS);
         }
       };
@@ -156,13 +156,13 @@ export module Plots {
     }
 
     private _calculateSubtotalsAndExtent(dataset: Dataset) {
-      var min = Number.MAX_VALUE;
-      var max = Number.MIN_VALUE;
-      var total = 0;
-      var startValue = -Infinity;
+      let min = Number.MAX_VALUE;
+      let max = Number.MIN_VALUE;
+      let total = 0;
+      let hasStarted = false;
       dataset.data().forEach((datum, index) => {
-        var currentValue = this.y().accessor(datum, index, dataset);
-        var isTotal = this.total().accessor(datum, index, dataset);
+        let currentValue = this.y().accessor(datum, index, dataset);
+        let isTotal = this.total().accessor(datum, index, dataset);
         if (!isTotal || index === 0) {
           total += currentValue;
         }
@@ -181,12 +181,12 @@ export module Plots {
             max = currentValue;
           }
         }
-        if (startValue === -Infinity && isTotal) {
-          var startTotal = currentValue - total;
-          for (var i = 0; i < this._subtotals.length; i++) {
+        if (!hasStarted && isTotal) {
+          let startTotal = currentValue - total;
+          for (let i = 0; i < this._subtotals.length; i++) {
             this._subtotals[i] += startTotal;
           }
-          startValue = this._subtotals[i];
+          hasStarted = true;
           total += startTotal;
           min += startTotal;
           max += startTotal;
@@ -196,15 +196,15 @@ export module Plots {
     }
 
     private _drawConnectors() {
-      var attrToProjector = this._generateAttrToProjector();
-      var dataset = this.datasets()[0];
-      for (var datumIndex = 1; datumIndex < dataset.data().length; datumIndex++) {
-        var prevIndex = datumIndex - 1;
-        var datum = dataset.data()[datumIndex];
-        var prevDatum = dataset.data()[prevIndex];
-        var x = attrToProjector["x"](prevDatum, prevIndex, dataset);
-        var x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
-        var y = attrToProjector["y"](datum, datumIndex, dataset);
+      let attrToProjector = this._generateAttrToProjector();
+      let dataset = this.datasets()[0];
+      for (let datumIndex = 1; datumIndex < dataset.data().length; datumIndex++) {
+        let prevIndex = datumIndex - 1;
+        let datum = dataset.data()[datumIndex];
+        let prevDatum = dataset.data()[prevIndex];
+        let x = attrToProjector["x"](prevDatum, prevIndex, dataset);
+        let x2 = attrToProjector["x"](datum, datumIndex, dataset) + attrToProjector["width"](datum, datumIndex, dataset);
+        let y = attrToProjector["y"](datum, datumIndex, dataset);
         if ((this._subtotals[datumIndex] > 0 && this._subtotals[datumIndex] > this._subtotals[prevIndex]) ||
             (this._subtotals[datumIndex] < 0 && this._subtotals[datumIndex] >= this._subtotals[prevIndex])) {
           y = attrToProjector["y"](datum, datumIndex, dataset) + attrToProjector["height"](datum, datumIndex, dataset);
@@ -215,9 +215,9 @@ export module Plots {
     }
 
     private _updateSubtotals() {
-      var datasets = this.datasets();
+      let datasets = this.datasets();
       if (datasets.length > 0) {
-        var dataset = datasets[datasets.length - 1];
+        let dataset = datasets[datasets.length - 1];
         this._subtotals = new Array();
         this._calculateSubtotalsAndExtent(dataset);
       }
