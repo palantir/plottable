@@ -1,5 +1,5 @@
 /*!
-Plottable 1.6.0 (https://github.com/palantir/plottable)
+Plottable 1.6.1 (https://github.com/palantir/plottable)
 Copyright 2014-2015 Palantir Technologies
 Licensed under MIT (https://github.com/palantir/plottable/blob/master/LICENSE)
 */
@@ -908,7 +908,7 @@ var Plottable;
 ///<reference path="../reference.ts" />
 var Plottable;
 (function (Plottable) {
-    Plottable.version = "1.6.0";
+    Plottable.version = "1.6.1";
 })(Plottable || (Plottable = {}));
 
 ///<reference path="../reference.ts" />
@@ -3312,9 +3312,9 @@ var Plottable;
             this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
-                this._isAnchored = false;
-                this._onDetachCallbacks.callCallbacks(this);
             }
+            this._isAnchored = false;
+            this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
         /**
