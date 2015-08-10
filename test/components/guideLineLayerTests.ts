@@ -210,6 +210,15 @@ describe("GuideLineLayer", () => {
       };
       TestMethods.assertLineAttrs(line, expectedAttrs1, "the line was drawn at the correct position");
 
+      scale1.domain([0, 20]);
+      let expectedAttrs1b = {
+        x1: scale1.scale(value),
+        x2: scale1.scale(value),
+        y1: 0,
+        y2: SVG_HEIGHT
+      };
+      TestMethods.assertLineAttrs(line, expectedAttrs1b, "the line was redrawn at the correct position on domain change");
+
       let scale2 = new Plottable.Scales.Linear();
       scale2.domain([0, 100]);
       gll.scale(scale2);
@@ -341,6 +350,15 @@ describe("GuideLineLayer", () => {
         y2: scale1.scale(value)
       };
       TestMethods.assertLineAttrs(line, expectedAttrs1, "the line was drawn at the correct position");
+
+      scale1.domain([0, 20]);
+      let expectedAttrs1b = {
+        x1: 0,
+        x2: SVG_WIDTH,
+        y1: scale1.scale(value),
+        y2: scale1.scale(value)
+      };
+      TestMethods.assertLineAttrs(line, expectedAttrs1b, "the line was redrawn at the correct position on domain change");
 
       let scale2 = new Plottable.Scales.Linear();
       scale2.domain([0, 100]);
