@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 
@@ -50,7 +49,7 @@ export module Interactions {
     }
 
     private _translateAndConstrain(p: Point) {
-      var translatedP = this._translateToComponentSpace(p);
+      let translatedP = this._translateToComponentSpace(p);
       if (!this._constrainedToComponent) {
         return translatedP;
       }
@@ -65,7 +64,7 @@ export module Interactions {
       if (event instanceof MouseEvent && (<MouseEvent> event).button !== 0) {
         return;
       }
-      var translatedP = this._translateToComponentSpace(point);
+      let translatedP = this._translateToComponentSpace(point);
       if (this._isInsideComponent(translatedP)) {
         event.preventDefault();
         this._dragging = true;

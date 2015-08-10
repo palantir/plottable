@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export interface ScaleCallback<S extends Scale<any, any>> {
@@ -58,9 +57,9 @@ export class Scale<D, R> {
   }
 
   protected _getAllIncludedValues(): D[] {
-    var providerArray: D[] = [];
+    let providerArray: D[] = [];
     this._includedValuesProviders.forEach((provider: Scales.IncludedValuesProvider<D>) => {
-      var extents = provider(this);
+      let extents = provider(this);
       providerArray = providerArray.concat(extents);
     });
     return providerArray;

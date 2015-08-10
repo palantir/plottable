@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 
@@ -63,23 +62,23 @@ export module Components {
     }
 
     private _setUpCallbacks() {
-      var resizingEdges: _EdgeIndicator;
-      var topLeft: Point;
-      var bottomRight: Point;
-      var lastEndPoint: Point;
+      let resizingEdges: _EdgeIndicator;
+      let topLeft: Point;
+      let bottomRight: Point;
+      let lastEndPoint: Point;
 
-      var DRAG_MODES = {
+      let DRAG_MODES = {
         newBox: 0,
         resize: 1,
         move: 2
       };
-      var mode = DRAG_MODES.newBox;
+      let mode = DRAG_MODES.newBox;
 
       this._dragInteraction.onDragStart((startPoint: Point) => {
         resizingEdges = this._getResizingEdges(startPoint);
 
-        var bounds = this.bounds();
-        var isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
+        let bounds = this.bounds();
+        let isInsideBox = bounds.topLeft.x <= startPoint.x && startPoint.x <= bounds.bottomRight.x &&
                           bounds.topLeft.y <= startPoint.y && startPoint.y <= bounds.bottomRight.y;
 
         if (this.boxVisible() && (resizingEdges.top || resizingEdges.bottom || resizingEdges.left || resizingEdges.right)) {
@@ -123,8 +122,8 @@ export module Components {
             }
             break;
           case DRAG_MODES.move:
-            var dx = endPoint.x - lastEndPoint.x;
-            var dy = endPoint.y - lastEndPoint.y;
+            let dx = endPoint.x - lastEndPoint.x;
+            let dy = endPoint.y - lastEndPoint.y;
             topLeft.x += dx;
             topLeft.y += dy;
             bottomRight.x += dx;
@@ -153,7 +152,7 @@ export module Components {
     protected _setup() {
       super._setup();
 
-      var createLine = () => this._box.append("line").style({
+      let createLine = () => this._box.append("line").style({
                                "opacity": 0,
                                "stroke": "pink"
                              });
@@ -163,7 +162,7 @@ export module Components {
       this._detectionEdgeR = createLine().classed("drag-edge-lr", true);
 
       if (this._hasCorners) {
-        var createCorner = () => this._box.append("circle")
+        let createCorner = () => this._box.append("circle")
                                      .style({
                                        "opacity": 0,
                                        "fill": "pink"
@@ -176,7 +175,7 @@ export module Components {
     }
 
     private _getResizingEdges(p: Point) {
-      var edges = {
+      let edges = {
         top: false,
         bottom: false,
         left: false,
@@ -187,12 +186,12 @@ export module Components {
         return edges;
       }
 
-      var bounds = this.bounds();
-      var t = bounds.topLeft.y;
-      var b = bounds.bottomRight.y;
-      var l = bounds.topLeft.x;
-      var r = bounds.bottomRight.x;
-      var rad = this._detectionRadius;
+      let bounds = this.bounds();
+      let t = bounds.topLeft.y;
+      let b = bounds.bottomRight.y;
+      let l = bounds.topLeft.x;
+      let r = bounds.bottomRight.x;
+      let rad = this._detectionRadius;
 
       if (l - rad <= p.x && p.x <= r + rad) {
         edges.top = (t - rad <= p.y && p.y <= t + rad);
@@ -210,11 +209,11 @@ export module Components {
     public renderImmediately() {
       super.renderImmediately();
       if (this.boxVisible()) {
-        var bounds = this.bounds();
-        var t = bounds.topLeft.y;
-        var b = bounds.bottomRight.y;
-        var l = bounds.topLeft.x;
-        var r = bounds.bottomRight.x;
+        let bounds = this.bounds();
+        let t = bounds.topLeft.y;
+        let b = bounds.bottomRight.y;
+        let l = bounds.topLeft.x;
+        let r = bounds.bottomRight.x;
 
         this._detectionEdgeT.attr({
           x1: l, y1: t, x2: r, y2: t,

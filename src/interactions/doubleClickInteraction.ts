@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export module Interactions {
@@ -49,7 +48,7 @@ export module Interactions {
     }
 
     private _handleClickDown(p: Point) {
-      var translatedP = this._translateToComponentSpace(p);
+      let translatedP = this._translateToComponentSpace(p);
       if (this._isInsideComponent(translatedP)) {
         if (!(this._clickState === ClickState.SingleClicked) || !DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
           this._clickState = ClickState.NotClicked;
@@ -60,7 +59,7 @@ export module Interactions {
     }
 
     private _handleClickUp(p: Point) {
-      var translatedP = this._translateToComponentSpace(p);
+      let translatedP = this._translateToComponentSpace(p);
       if (this._clickedDown && DoubleClick._pointsEqual(translatedP, this._clickedPoint)) {
         this._clickState = this._clickState === ClickState.NotClicked ? ClickState.SingleClicked : ClickState.DoubleClicked;
       } else {

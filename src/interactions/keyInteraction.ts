@@ -1,5 +1,4 @@
 ///<reference path="../reference.ts" />
-/* tslint:disable: no-var-keyword */
 
 module Plottable {
 export type KeyCallback = (keyCode: number) => void;
@@ -43,7 +42,7 @@ export module Interactions {
     }
 
     private _handleKeyDownEvent(keyCode: number) {
-      var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
+      let p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
       if (this._isInsideComponent(p)) {
         if (this._keyPressCallbacks[keyCode]) {
           this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
