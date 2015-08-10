@@ -110,7 +110,18 @@ describe("Component behavior", () => {
 
     it("components can be detach()-ed even if not anchor()-ed", () => {
       var c = new Plottable.Component();
-      c.detach(); // no error thrown
+
+      var callbackCalled = false;
+      var passedComponent: Plottable.Component;
+      var callback = (component: Plottable.Component) => {
+        callbackCalled = true;
+        passedComponent = component;
+      };
+      c.onDetach(callback);
+
+      assert.doesNotThrow(() => c.detach(), Error, "does not throw error if detach() called before anchor()");
+      assert.isTrue(callbackCalled, "detach() callback was still called");
+      assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
       svg.remove();
     });
 
@@ -128,30 +139,6 @@ describe("Component behavior", () => {
       c.detach();
       assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
       assert.strictEqual(passedComponent, c, "callback was passed the Component that detach()-ed");
-      svg.remove();
-    });
-
-    it("callbacks on detach() not called unless the component is anchored", () => {
-      c = new Plottable.Component();
-
-      var callbackCalled = false;
-      var callback = (component: Plottable.Component) => callbackCalled = true;
-      c.onDetach(callback);
-
-      callbackCalled = false;
-      c.detach();
-      assert.isFalse(callbackCalled, "callback was not called because the Component is not rendered yet");
-
-      c.renderTo(svg);
-
-      callbackCalled = false;
-      c.detach();
-      assert.isTrue(callbackCalled, "callback was called when the Component was detach()-ed");
-
-      callbackCalled = false;
-      c.detach();
-      assert.isFalse(callbackCalled, "callback was not called because the Component was detached already");
-
       svg.remove();
     });
   });

@@ -71,12 +71,9 @@ describe("ComponentGroups", () => {
   it("detach()-ing a Component that is in the Group removes it from the Group", () => {
     var c0 = new Plottable.Component();
     var componentGroup = new Plottable.Components.Group([c0]);
-    var svg = TestMethods.generateSVG();
-    componentGroup.renderTo(svg);
     c0.detach();
     assert.lengthOf(componentGroup.components(), 0, "Component is no longer in the Group");
     assert.isNull(c0.parent(), "Component disconnected from Group");
-    svg.remove();
   });
 
   it("can move components to other groups after anchoring", () => {

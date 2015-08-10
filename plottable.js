@@ -3292,9 +3292,9 @@ var Plottable;
             this.parent(null);
             if (this._isAnchored) {
                 this._element.remove();
-                this._isAnchored = false;
-                this._onDetachCallbacks.callCallbacks(this);
             }
+            this._isAnchored = false;
+            this._onDetachCallbacks.callCallbacks(this);
             return this;
         };
         /**
