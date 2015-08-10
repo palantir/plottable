@@ -94,43 +94,35 @@ describe("GuideLineLayer", () => {
     assert.throws(() => new Plottable.Components.GuideLineLayer<number>("blargh"), Error);
   });
 
-  it("has an effective size of 0, but will occupy all offered space (vertical)", () => {
-    let SVG_WIDTH = 400;
-    let SVG_HEIGHT = 300;
-    let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
-    let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-    TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
-    assert.isTrue(gll.fixedWidth(), "fixed width");
-    assert.isTrue(gll.fixedHeight(), "fixed height");
-
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    gll.anchor(svg);
-    gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
-    assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
-    assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
-    svg.remove();
-  });
-
-  it("has an effective size of 0, but will occupy all offered space (horizontal)", () => {
-    let SVG_WIDTH = 300;
-    let SVG_HEIGHT = 400;
-    let gll = new Plottable.Components.GuideLineLayer<number>("horizontal");
-    let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
-    TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
-    assert.isTrue(gll.fixedWidth(), "fixed width");
-    assert.isTrue(gll.fixedHeight(), "fixed height");
-
-    let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-    gll.anchor(svg);
-    gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
-    assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
-    assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
-    svg.remove();
-  });
-
   describe("rendering (vertical)", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
+
+    it("has an effective size of 0, but will occupy all offered space", () => {
+      let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
+      let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
+      assert.isTrue(gll.fixedWidth(), "fixed width");
+      assert.isTrue(gll.fixedHeight(), "fixed height");
+
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      gll.anchor(svg);
+      gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
+      assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
+      assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
+      svg.remove();
+    });
+
+    it("clipPath enabled", () => {
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
+      gll.renderTo(svg);
+      TestMethods.verifyClipPath(gll);
+      let clipRect = (<any> gll)._boxContainer.select(".clip-rect");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+      svg.remove();
+    });
 
     it("renders correctly given a pixel position", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -237,6 +229,32 @@ describe("GuideLineLayer", () => {
   describe("rendering (horizontal)", () => {
     let SVG_WIDTH = 400;
     let SVG_HEIGHT = 400;
+
+    it("has an effective size of 0, but will occupy all offered space", () => {
+      let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
+      let request = gll.requestedSpace(SVG_WIDTH, SVG_HEIGHT);
+      TestMethods.verifySpaceRequest(request, 0, 0, "does not request any space");
+      assert.isTrue(gll.fixedWidth(), "fixed width");
+      assert.isTrue(gll.fixedHeight(), "fixed height");
+
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      gll.anchor(svg);
+      gll.computeLayout({x: 0, y: 0}, SVG_WIDTH, SVG_HEIGHT);
+      assert.strictEqual(gll.width(), SVG_WIDTH, "accepted all offered width");
+      assert.strictEqual(gll.height(), SVG_HEIGHT, "accepted all offered height");
+      svg.remove();
+    });
+
+    it("clipPath enabled", () => {
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let gll = new Plottable.Components.GuideLineLayer<void>("horizontal");
+      gll.renderTo(svg);
+      TestMethods.verifyClipPath(gll);
+      let clipRect = (<any> gll)._boxContainer.select(".clip-rect");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "width"), SVG_WIDTH, "the clipRect has an appropriate width");
+      assert.strictEqual(TestMethods.numAttr(clipRect, "height"), SVG_HEIGHT, "the clipRect has an appropriate height");
+      svg.remove();
+    });
 
     it("renders correctly given a pixel position", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
