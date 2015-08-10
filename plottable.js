@@ -7568,7 +7568,6 @@ var Plottable;
                 this._labelsEnabled = false;
                 this._hideBarsIfAnyAreTooWide = true;
                 this._barPixelWidth = 0;
-                this._barWidthValue = function () { return [0, 0]; };
                 this.addClass("bar-plot");
                 if (orientation !== Bar.ORIENTATION_VERTICAL && orientation !== Bar.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for Plots.Bar");
@@ -7835,21 +7834,19 @@ var Plottable;
                     Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
                 }
             };
-            Bar.prototype._updateExtents = function () {
-                _super.prototype._updateExtents.call(this);
-                var barScaleAccessorBinding = this._isVertical ? this.x() : this.y();
-                if (!(barScaleAccessorBinding && barScaleAccessorBinding.scale && barScaleAccessorBinding.scale instanceof Plottable.QuantitativeScale)) {
-                    return;
+            /**
+             * Extends the extent to account for the width of the bars.
+             */
+            Bar.prototype._includedValuesForScale = function (scale) {
+                var includedValues = _super.prototype._includedValuesForScale.call(this, scale);
+                if (!(scale instanceof Plottable.QuantitativeScale)) {
+                    return includedValues;
                 }
-                var xScale = barScaleAccessorBinding.scale;
-                xScale.removeIncludedValuesProvider(this._barWidthValue);
-                var extent = xScale.domain();
-                var amendedExtent = [
-                    xScale.invert(xScale.scale(extent[0]) - this._barPixelWidth / 2),
-                    xScale.invert(xScale.scale(extent[1]) + this._barPixelWidth / 2),
+                var qScale = scale;
+                return [
+                    qScale.invert(qScale.scale(includedValues[0]) - this._barPixelWidth / 2),
+                    qScale.invert(qScale.scale(includedValues[1]) + this._barPixelWidth / 2),
                 ];
-                this._barWidthValue = function () { return amendedExtent; };
-                xScale.addIncludedValuesProvider(this._barWidthValue);
             };
             Bar.prototype._drawLabels = function () {
                 var _this = this;

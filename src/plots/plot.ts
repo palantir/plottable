@@ -324,7 +324,7 @@ export class Plot extends Component {
     return this._propertyExtents.get(property);
   }
 
-  private _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
+  protected _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
     if (!this._isAnchored) {
       return [];
     }

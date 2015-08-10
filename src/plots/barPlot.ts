@@ -397,28 +397,21 @@ export module Plots {
       }
     }
 
-    private _barWidthValue: any = () => [0, 0];
-    protected _updateExtents() {
-      super._updateExtents();
+    /**
+     * Extends the extent to account for the width of the bars.
+     */
+    protected _includedValuesForScale<D>(scale: Scale<D, any>): D[] {
+      var includedValues = super._includedValuesForScale(scale);
 
-      var barScaleAccessorBinding = this._isVertical ? this.x() : this.y();
-
-      if (!(barScaleAccessorBinding && barScaleAccessorBinding.scale && barScaleAccessorBinding.scale instanceof QuantitativeScale)) {
-        return;
+      if (!(scale instanceof QuantitativeScale)) {
+        return includedValues;
       }
 
-      var xScale = <QuantitativeScale<any>>barScaleAccessorBinding.scale;
-      xScale.removeIncludedValuesProvider(this._barWidthValue);
-      var extent = xScale.domain();
-
-      var amendedExtent = [
-        xScale.invert(xScale.scale(extent[0]) - this._barPixelWidth / 2),
-        xScale.invert(xScale.scale(extent[1]) + this._barPixelWidth / 2),
+      var qScale = <QuantitativeScale<D>>scale;
+      return [
+        qScale.invert(qScale.scale(includedValues[0]) - this._barPixelWidth / 2),
+        qScale.invert(qScale.scale(includedValues[1]) + this._barPixelWidth / 2),
       ];
-
-      this._barWidthValue = () => amendedExtent;
-
-      xScale.addIncludedValuesProvider(this._barWidthValue);
     }
 
     private _drawLabels() {

@@ -2502,6 +2502,7 @@ declare module Plottable {
          * Override in subclass to add special extents, such as included values
          */
         protected _extentsForProperty(property: string): any[];
+        protected _includedValuesForScale<D>(scale: Scale<D, any>): D[];
         /**
          * Get the Animator associated with the specified Animator key.
          *
@@ -3039,7 +3040,10 @@ declare module Plottable {
              */
             entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
             protected _additionalPaint(time: number): void;
-            protected _updateExtents(): void;
+            /**
+             * Extends the extent to account for the width of the bars.
+             */
+            protected _includedValuesForScale<D>(scale: Scale<D, any>): D[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
