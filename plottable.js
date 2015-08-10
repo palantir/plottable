@@ -1191,7 +1191,7 @@ var Plottable;
          */
         function fixed(precision) {
             if (precision === void 0) { precision = 3; }
-            precision = sanitizePrecision(precision);
+            verifyPrecision(precision);
             return function (d) { return d.toFixed(precision); };
         }
         Formatters.fixed = fixed;
@@ -1206,7 +1206,7 @@ var Plottable;
          */
         function general(precision) {
             if (precision === void 0) { precision = 3; }
-            precision = sanitizePrecision(precision);
+            verifyPrecision(precision);
             return function (d) {
                 if (typeof d === "number") {
                     var multiplier = Math.pow(10, precision);
@@ -1259,7 +1259,7 @@ var Plottable;
          */
         function siSuffix(precision) {
             if (precision === void 0) { precision = 3; }
-            precision = sanitizePrecision(precision);
+            verifyPrecision(precision);
             return function (d) { return d3.format("." + precision + "s")(d); };
         }
         Formatters.siSuffix = siSuffix;
@@ -1280,7 +1280,7 @@ var Plottable;
          */
         function shortScale(precision) {
             if (precision === void 0) { precision = 3; }
-            precision = sanitizePrecision(precision);
+            verifyPrecision(precision);
             var suffixes = "KMBTQ";
             var exponentFormatter = d3.format("." + precision + "e");
             var fixedFormatter = d3.format("." + precision + "f");
@@ -1400,11 +1400,13 @@ var Plottable;
             };
         }
         Formatters.relativeDate = relativeDate;
-        function sanitizePrecision(precision) {
+        function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
             }
-            return Math.floor(precision);
+            if (precision !== Math.floor(precision)) {
+                throw new RangeError("Formatter precision must be an integer number");
+            }
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
 })(Plottable || (Plottable = {}));
