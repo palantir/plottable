@@ -27,16 +27,16 @@ export class XYPlot<X, Y> extends Plot {
     this._adjustYDomainOnChangeFromXCallback = (scale) => this._adjustYDomainOnChangeFromX();
     this._adjustXDomainOnChangeFromYCallback = (scale) => this._adjustXDomainOnChangeFromY();
 
-    var _deltaX = 0;
-    var _deltaY = 0;
-    var _scalingX = 1;
-    var _scalingY = 1;
-    var _lastSeenDomainX: X[] = [null, null];
-    var _lastSeenDomainY: Y[] = [null, null];
-    var _timeoutReference = 0;
-    var _deferredRenderingTimeout = 500;
+    let _deltaX = 0;
+    let _deltaY = 0;
+    let _scalingX = 1;
+    let _scalingY = 1;
+    let _lastSeenDomainX: X[] = [null, null];
+    let _lastSeenDomainY: Y[] = [null, null];
+    let _timeoutReference = 0;
+    let _deferredRenderingTimeout = 500;
 
-    var _registerDeferredRendering = () => {
+    let _registerDeferredRendering = () => {
       if (this._renderArea == null) {
         return;
       }
@@ -56,7 +56,7 @@ export class XYPlot<X, Y> extends Plot {
       }, _deferredRenderingTimeout);
     };
 
-    var _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
+    let _lazyDomainChangeCallbackX = (scale: Scale<X, any>) => {
       if (!this._isAnchored) {
         return;
       }
@@ -68,7 +68,7 @@ export class XYPlot<X, Y> extends Plot {
       _registerDeferredRendering();
     };
 
-    var _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
+    let _lazyDomainChangeCallbackY = (scale: Scale<Y, any>) => {
       if (!this._isAnchored) {
         return;
       }
@@ -201,13 +201,13 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   private _makeFilterByProperty(property: string) {
-    var binding = this._propertyBindings.get(property);
+    let binding = this._propertyBindings.get(property);
     if (binding != null) {
-      var accessor = binding.accessor;
-      var scale = binding.scale;
+      let accessor = binding.accessor;
+      let scale = binding.scale;
       if (scale != null) {
         return (datum: any, index: number, dataset: Dataset) => {
-          var range = scale.range();
+          let range = scale.range();
           return Utils.Math.inRange(scale.scale(accessor(datum, index, dataset)), range[0], range[1]);
         };
       }
@@ -217,14 +217,14 @@ export class XYPlot<X, Y> extends Plot {
 
   protected _uninstallScaleForKey(scale: Scale<any, any>, key: string) {
     super._uninstallScaleForKey(scale, key);
-    var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+    let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.offUpdate(adjustCallback);
   }
 
   protected _installScaleForKey(scale: Scale<any, any>, key: string) {
     super._installScaleForKey(scale, key);
-    var adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
+    let adjustCallback = key === XYPlot._X_KEY ? this._adjustYDomainOnChangeFromXCallback
                                                : this._adjustXDomainOnChangeFromYCallback;
     scale.onUpdate(adjustCallback);
   }
@@ -288,13 +288,13 @@ export class XYPlot<X, Y> extends Plot {
 
   public computeLayout(origin?: Point, availableWidth?: number, availableHeight?: number) {
     super.computeLayout(origin, availableWidth, availableHeight);
-    var xBinding = this.x();
-    var xScale = xBinding && xBinding.scale;
+    let xBinding = this.x();
+    let xScale = xBinding && xBinding.scale;
     if (xScale != null) {
       xScale.range([0, this.width()]);
     }
-    var yBinding = this.y();
-    var yScale = yBinding && yBinding.scale;
+    let yBinding = this.y();
+    let yScale = yBinding && yBinding.scale;
     if (yScale != null) {
       if (this.y().scale instanceof Scales.Category) {
         this.y().scale.range([0, this.height()]);
@@ -307,7 +307,7 @@ export class XYPlot<X, Y> extends Plot {
 
   private _updateXExtentsAndAutodomain() {
     this._updateExtentsForProperty("x");
-    var xScale = this.x().scale;
+    let xScale = this.x().scale;
     if (xScale != null) {
       xScale.autoDomain();
     }
@@ -315,7 +315,7 @@ export class XYPlot<X, Y> extends Plot {
 
   private _updateYExtentsAndAutodomain() {
     this._updateExtentsForProperty("y");
-    var yScale = this.y().scale;
+    let yScale = this.y().scale;
     if (yScale != null) {
       yScale.autoDomain();
     }
@@ -347,8 +347,8 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   protected _projectorsReady() {
-    var xBinding = this.x();
-    var yBinding = this.y();
+    let xBinding = this.x();
+    let yBinding = this.y();
     return xBinding != null &&
         xBinding.accessor != null &&
         yBinding != null &&
@@ -356,17 +356,17 @@ export class XYPlot<X, Y> extends Plot {
   }
 
   protected _pixelPoint(datum: any, index: number, dataset: Dataset): Point {
-    var xProjector = Plot._scaledAccessor(this.x());
-    var yProjector = Plot._scaledAccessor(this.y());
+    let xProjector = Plot._scaledAccessor(this.x());
+    let yProjector = Plot._scaledAccessor(this.y());
     return { x: xProjector(datum, index, dataset), y: yProjector(datum, index, dataset) };
   }
 
   protected _getDataToDraw() {
-    var dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
+    let dataToDraw: Utils.Map<Dataset, any[]> = super._getDataToDraw();
 
-    var definedFunction = (d: any, i: number, dataset: Dataset) => {
-      var positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
-      var positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
+    let definedFunction = (d: any, i: number, dataset: Dataset) => {
+      let positionX = Plot._scaledAccessor(this.x())(d, i, dataset);
+      let positionY = Plot._scaledAccessor(this.y())(d, i, dataset);
       return Utils.Math.isValidNumber(positionX) &&
              Utils.Math.isValidNumber(positionY);
     };

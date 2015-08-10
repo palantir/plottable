@@ -3,7 +3,7 @@
 module Plottable {
 export module Utils {
   export module Array {
-    var nativeArray = (<any>window).Array;
+    let nativeArray = (<any>window).Array;
 
     /**
      * Takes two arrays of numbers and adds them together
@@ -27,8 +27,8 @@ export module Utils {
      * @return {T[]} The unique values
      */
     export function uniq<T>(arr: T[]): T[] {
-      var seen: d3.Set = d3.set();
-      var result: T[] = [];
+      let seen: d3.Set = d3.set();
+      let result: T[] = [];
       arr.forEach((x) => {
         if (!seen.has(String(x))) {
           seen.add(String(x));
@@ -54,8 +54,8 @@ export module Utils {
      * @return {any[]}
      */
     export function createFilledArray<T>(value: T | ((index?: number) => T), count: number) {
-      var out: T[] = [];
-      for (var i = 0; i < count; i++) {
+      let out: T[] = [];
+      for (let i = 0; i < count; i++) {
         out[i] = typeof(value) === "function" ? (<(index?: number) => T> value)(i) : <T> value;
       }
       return out;
