@@ -2428,11 +2428,50 @@ declare module Plottable {
             fixedWidth(): boolean;
             fixedHeight(): boolean;
             renderImmediately(): GuideLineLayer<D>;
+            /**
+             * Gets the QuantitativeScale on the GuideLineLayer.
+             *
+             * @return {QuantitativeScale<D>}
+             */
             scale(): QuantitativeScale<D>;
+            /**
+             * Sets the QuantitativeScale on the GuideLineLayer.
+             * If the value of the guide line in data-space has been set,
+             * the position of the guide line in pixel-space will be updated.
+             *
+             * @param {QuantitativeScale<D>} scale
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
             scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
+            /**
+             * Gets the position of the guide line in data-space.
+             *
+             * @return {D}
+             */
             value(): D;
+            /**
+             * Sets the position of the guide line in data-space.
+             * If the GuideLineLayer has a scale, the position of the line
+             * in pixel-space will be updated accordingly.
+             *
+             * @param {D} value
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
             value(value: D): GuideLineLayer<D>;
+            /**
+             * Gets the position of the guide line in pixel-space.
+             *
+             * @return {number}
+             */
             pixelPosition(): number;
+            /**
+             * Sets the position of the guide line in pixel-space.
+             * If the GuideLineLayer has a scale, the position of the line
+             * in data-space will be updated accordingly.
+             *
+             * @param {number} pixelPosition
+             * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+             */
             pixelPosition(pixelPosition: number): GuideLineLayer<D>;
         }
     }

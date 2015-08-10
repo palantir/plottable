@@ -65,7 +65,20 @@ export module Components {
       }
     }
 
+    /**
+     * Gets the QuantitativeScale on the GuideLineLayer.
+     *
+     * @return {QuantitativeScale<D>}
+     */
     public scale(): QuantitativeScale<D>;
+    /**
+     * Sets the QuantitativeScale on the GuideLineLayer.
+     * If the value of the guide line in data-space has been set,
+     * the position of the guide line in pixel-space will be updated.
+     *
+     * @param {QuantitativeScale<D>} scale
+     * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+     */
     public scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
     public scale(scale?: QuantitativeScale<D>): any {
       if (scale == null) {
@@ -82,7 +95,20 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the position of the guide line in data-space.
+     *
+     * @return {D}
+     */
     public value(): D;
+    /**
+     * Sets the position of the guide line in data-space.
+     * If the GuideLineLayer has a scale, the position of the line
+     * in pixel-space will be updated accordingly.
+     *
+     * @param {D} value
+     * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+     */
     public value(value: D): GuideLineLayer<D>;
     public value(value?: D): any {
       if (value == null) {
@@ -94,7 +120,20 @@ export module Components {
       return this;
     }
 
+    /**
+     * Gets the position of the guide line in pixel-space.
+     *
+     * @return {number}
+     */
     public pixelPosition(): number;
+    /**
+     * Sets the position of the guide line in pixel-space.
+     * If the GuideLineLayer has a scale, the position of the line
+     * in data-space will be updated accordingly.
+     *
+     * @param {number} pixelPosition
+     * @return {GuideLineLayer<D>} The calling GuideLineLayer.
+     */
     public pixelPosition(pixelPosition: number): GuideLineLayer<D>;
     public pixelPosition(pixelPosition?: number): any {
       if (pixelPosition == null) {
