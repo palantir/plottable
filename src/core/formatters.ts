@@ -60,7 +60,7 @@ export module Formatters {
    * @returns {Formatter} A formatter that displays exactly [precision] decimal places.
    */
   export function fixed(precision = 3) {
-    precision = verifyAndAdjustPrecision(precision);
+    precision = sanitizePrecision(precision);
     return (d: any) => (<number> d).toFixed(precision);
   }
 
@@ -74,7 +74,7 @@ export module Formatters {
    * @returns {Formatter} A formatter for general values.
    */
   export function general(precision = 3) {
-    precision = verifyAndAdjustPrecision(precision);
+    precision = sanitizePrecision(precision);
     return (d: any) => {
       if (typeof d === "number") {
         var multiplier = Math.pow(10, precision);
@@ -126,7 +126,7 @@ export module Formatters {
    * @returns {Formatter} A formatter for SI values.
    */
   export function siSuffix(precision = 3) {
-    precision = verifyAndAdjustPrecision(precision);
+    precision = sanitizePrecision(precision);
     return (d: any) => d3.format("." + precision + "s")(d);
   }
 
@@ -146,7 +146,7 @@ export module Formatters {
    * @returns {Formatter} A formatter with short scale formatting
    */
   export function shortScale(precision = 3) {
-    precision = verifyAndAdjustPrecision(precision);
+    precision = sanitizePrecision(precision);
     var suffixes = "KMBTQ";
     var exponentFormatter = d3.format("." + precision + "e");
     var fixedFormatter = d3.format("." + precision + "f");
@@ -264,7 +264,7 @@ export module Formatters {
     };
   }
 
-  function verifyAndAdjustPrecision(precision: number) {
+  function sanitizePrecision(precision: number) {
     if (precision < 0 || precision > 20) {
       throw new RangeError("Formatter precision must be between 0 and 20");
     }
