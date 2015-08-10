@@ -6205,17 +6205,87 @@ var Plottable;
         var GuideLineLayer = (function (_super) {
             __extends(GuideLineLayer, _super);
             function GuideLineLayer(orientation) {
+                var _this = this;
                 _super.call(this);
+                this._scaleUpdateCallback = function () { return _this._updatePixelPosition(); };
+                if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
+                    throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
+                }
+                this._orientation = orientation;
+                this._clipPathEnabled = true;
+                this.addClass("guide-line-layer");
             }
+            GuideLineLayer.prototype._setup = function () {
+                _super.prototype._setup.call(this);
+                this._line = this.content().append("line").classed("guide-line", true);
+            };
+            GuideLineLayer.prototype._sizeFromOffer = function (availableWidth, availableHeight) {
+                return {
+                    width: availableWidth,
+                    height: availableHeight
+                };
+            };
+            GuideLineLayer.prototype._isVertical = function () {
+                return this._orientation === GuideLineLayer.ORIENTATION_VERTICAL;
+            };
+            GuideLineLayer.prototype.fixedWidth = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.fixedHeight = function () {
+                return true;
+            };
+            GuideLineLayer.prototype.renderImmediately = function () {
+                _super.prototype.renderImmediately.call(this);
+                this._updatePixelPosition();
+                this._line.attr({
+                    x1: this._isVertical() ? this.pixelPosition() : 0,
+                    y1: this._isVertical() ? 0 : this.pixelPosition(),
+                    x2: this._isVertical() ? this.pixelPosition() : this.width(),
+                    y2: this._isVertical() ? this.height() : this.pixelPosition()
+                });
+                return this;
+            };
+            GuideLineLayer.prototype._updatePixelPosition = function () {
+                if (this.scale() != null && this.value() != null) {
+                    this._pixelPosition = this.scale().scale(this.value());
+                }
+            };
             GuideLineLayer.prototype.scale = function (scale) {
-                return;
+                if (scale == null) {
+                    return this._scale;
+                }
+                var previousScale = this._scale;
+                if (previousScale != null) {
+                    previousScale.offUpdate(this._scaleUpdateCallback);
+                }
+                this._scale = scale;
+                this._scale.onUpdate(this._scaleUpdateCallback);
+                this._updatePixelPosition();
+                this.render();
+                return this;
             };
             GuideLineLayer.prototype.value = function (value) {
-                return;
+                if (value == null) {
+                    return this._value;
+                }
+                this._value = value;
+                this._updatePixelPosition();
+                this.render();
+                return this;
             };
             GuideLineLayer.prototype.pixelPosition = function (pixelPosition) {
-                return;
+                if (pixelPosition == null) {
+                    return this._pixelPosition;
+                }
+                this._pixelPosition = pixelPosition;
+                if (this.scale() != null) {
+                    this._value = this.scale().invert(pixelPosition);
+                }
+                this.render();
+                return this;
             };
+            GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
+            GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
             return GuideLineLayer;
         })(Plottable.Component);
         Components.GuideLineLayer = GuideLineLayer;

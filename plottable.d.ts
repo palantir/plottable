@@ -2417,7 +2417,17 @@ declare module Plottable {
 declare module Plottable {
     module Components {
         class GuideLineLayer<D> extends Component {
+            static ORIENTATION_VERTICAL: string;
+            static ORIENTATION_HORIZONTAL: string;
             constructor(orientation: string);
+            protected _setup(): void;
+            protected _sizeFromOffer(availableWidth: number, availableHeight: number): {
+                width: number;
+                height: number;
+            };
+            fixedWidth(): boolean;
+            fixedHeight(): boolean;
+            renderImmediately(): GuideLineLayer<D>;
             scale(): QuantitativeScale<D>;
             scale(scale: QuantitativeScale<D>): GuideLineLayer<D>;
             value(): D;
