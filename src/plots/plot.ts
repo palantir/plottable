@@ -72,7 +72,7 @@ export class Plot extends Component {
     this._onDatasetUpdateCallback = () => this._onDatasetUpdate();
     this._propertyBindings = d3.map<Plots.AccessorScaleBinding<any, any>>();
     this._propertyExtents = d3.map<any[]>();
-    var mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
+    let mainAnimator = new Animators.Easing().maxTotalDuration(Plot._ANIMATION_MAX_DURATION);
     this.animator(Plots.Animator.MAIN, mainAnimator);
     this.animator(Plots.Animator.RESET, new Animators.Null());
   }
@@ -106,7 +106,7 @@ export class Plot extends Component {
     if (this.datasets().indexOf(dataset) > -1) {
       this.removeDataset(dataset);
     };
-    var drawer = this._createDrawer(dataset);
+    let drawer = this._createDrawer(dataset);
     this._datasetToDrawer.set(dataset, drawer);
 
     if (this._isSetup) {
@@ -119,7 +119,7 @@ export class Plot extends Component {
   }
 
   protected _createNodesForDataset(dataset: Dataset) {
-    var drawer = this._datasetToDrawer.get(dataset);
+    let drawer = this._datasetToDrawer.get(dataset);
     drawer.renderArea(this._renderArea.append("g"));
     return drawer;
   }
@@ -188,8 +188,8 @@ export class Plot extends Component {
 
   private _bind(key: string, value: any, scale: Scale<any, any>,
                     bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>, extents: d3.Map<any[]>) {
-    var binding = bindings.get(key);
-    var oldScale = binding != null ? binding.scale : null;
+    let binding = bindings.get(key);
+    let oldScale = binding != null ? binding.scale : null;
 
     if (oldScale != null) {
       this._uninstallScaleForKey(oldScale, key);
@@ -202,14 +202,14 @@ export class Plot extends Component {
   }
 
   protected _generateAttrToProjector(): AttributeToProjector {
-    var h: AttributeToProjector = {};
+    let h: AttributeToProjector = {};
     this._attrBindings.forEach((attr, binding) => {
-      var accessor = binding.accessor;
-      var scale = binding.scale;
-      var fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
+      let accessor = binding.accessor;
+      let scale = binding.scale;
+      let fn = scale ? (d: any, i: number, dataset: Dataset) => scale.scale(accessor(d, i, dataset)) : accessor;
       h[attr] = fn;
     });
-    var propertyProjectors = this._propertyProjectors();
+    let propertyProjectors = this._propertyProjectors();
     Object.keys(propertyProjectors).forEach((key) => {
       if (h[key] == null) {
         h[key] = propertyProjectors[key];
@@ -254,15 +254,15 @@ export class Plot extends Component {
    * @returns {Scale[]} A unique array of all scales currently used by the Plot.
    */
   private _scales() {
-    var scales: Scale<any, any>[] = [];
+    let scales: Scale<any, any>[] = [];
     this._attrBindings.forEach((attr, binding) => {
-      var scale = binding.scale;
+      let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
       }
     });
     this._propertyBindings.forEach((property, binding) => {
-      var scale = binding.scale;
+      let scale = binding.scale;
       if (scale != null && scales.indexOf(scale) === -1) {
         scales.push(scale);
       }
@@ -294,25 +294,25 @@ export class Plot extends Component {
 
   private _updateExtentsForKey(key: string, bindings: d3.Map<Plots.AccessorScaleBinding<any, any>>,
       extents: d3.Map<any[]>, filter: Accessor<boolean>) {
-    var accScaleBinding = bindings.get(key);
+    let accScaleBinding = bindings.get(key);
     if (accScaleBinding == null || accScaleBinding.accessor == null) { return; }
     extents.set(key, this.datasets().map((dataset) => this._computeExtent(dataset, accScaleBinding, filter)));
   }
 
   protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
-    var accessor = accScaleBinding.accessor;
-    var scale = accScaleBinding.scale;
+    let accessor = accScaleBinding.accessor;
+    let scale = accScaleBinding.scale;
 
     if (scale == null) {
       return [];
     }
 
-    var data = dataset.data();
+    let data = dataset.data();
     if (filter != null) {
       data = data.filter((d, i) => filter(d, i, dataset));
     }
-    var appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
-    var mappedData = data.map(appliedAccessor);
+    let appliedAccessor = (d: any, i: number) => accessor(d, i, dataset);
+    let mappedData = data.map(appliedAccessor);
 
     return scale.extentOfValues(mappedData);
   }
@@ -328,10 +328,10 @@ export class Plot extends Component {
     if (!this._isAnchored) {
       return [];
     }
-    var includedValues: D[] = [];
+    let includedValues: D[] = [];
     this._attrBindings.forEach((attr, binding) => {
       if (binding.scale === scale) {
-        var extents = this._attrExtents.get(attr);
+        let extents = this._attrExtents.get(attr);
         if (extents != null) {
           includedValues = includedValues.concat(<D[]> d3.merge(extents));
         }
@@ -340,7 +340,7 @@ export class Plot extends Component {
 
     this._propertyBindings.forEach((property, binding) => {
       if (binding.scale === scale) {
-        var extents = this._extentsForProperty(property);
+        let extents = this._extentsForProperty(property);
         if (extents != null) {
           includedValues = includedValues.concat(<D[]> d3.merge(extents));
         }
@@ -390,14 +390,14 @@ export class Plot extends Component {
   }
 
   protected _removeDatasetNodes(dataset: Dataset) {
-    var drawer = this._datasetToDrawer.get(dataset);
+    let drawer = this._datasetToDrawer.get(dataset);
     drawer.remove();
   }
 
   public datasets(): Dataset[];
   public datasets(datasets: Dataset[]): Plot;
   public datasets(datasets?: Dataset[]): any {
-    var currentDatasets: Dataset[] = [];
+    let currentDatasets: Dataset[] = [];
     this._datasetToDrawer.forEach((drawer, dataset) => currentDatasets.push(dataset));
     if (datasets == null) {
       return currentDatasets;
@@ -420,20 +420,20 @@ export class Plot extends Component {
   }
 
   protected _getDataToDraw() {
-    var dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
+    let dataToDraw: Utils.Map<Dataset, any[]> = new Utils.Map<Dataset, any[]>();
     this.datasets().forEach((dataset) => dataToDraw.set(dataset, dataset.data()));
     return dataToDraw;
   }
 
   private _paint() {
-    var drawSteps = this._generateDrawSteps();
-    var dataToDraw = this._getDataToDraw();
-    var drawers = this._getDrawersInOrder();
+    let drawSteps = this._generateDrawSteps();
+    let dataToDraw = this._getDataToDraw();
+    let drawers = this._getDrawersInOrder();
 
     this.datasets().forEach((ds, i) => drawers[i].draw(dataToDraw.get(ds), drawSteps));
 
-    var times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
-    var maxTime = Utils.Math.max(times, 0);
+    let times = this.datasets().map((ds, i) => drawers[i].totalDrawTime(dataToDraw.get(ds), drawSteps));
+    let maxTime = Utils.Math.max(times, 0);
     this._additionalPaint(maxTime);
   }
 
@@ -445,10 +445,10 @@ export class Plot extends Component {
    * @returns {d3.Selection}
    */
   public selections(datasets = this.datasets()): d3.Selection<any> {
-    var selections: Element[] = [];
+    let selections: Element[] = [];
 
     datasets.forEach((dataset) => {
-      var drawer = this._datasetToDrawer.get(dataset);
+      let drawer = this._datasetToDrawer.get(dataset);
       if (drawer == null) { return; }
       drawer.renderArea().selectAll(drawer.selector()).each(function() {
         selections.push(this);
@@ -470,13 +470,13 @@ export class Plot extends Component {
   }
 
   private _lightweightEntities(datasets = this.datasets()) {
-    var lightweightEntities: LightweightPlotEntity[] = [];
+    let lightweightEntities: LightweightPlotEntity[] = [];
     datasets.forEach((dataset) => {
-      var drawer = this._datasetToDrawer.get(dataset);
-      var validDatumIndex = 0;
+      let drawer = this._datasetToDrawer.get(dataset);
+      let validDatumIndex = 0;
 
       dataset.data().forEach((datum: any, datasetIndex: number) => {
-        var position = this._pixelPoint(datum, datasetIndex, dataset);
+        let position = this._pixelPoint(datum, datasetIndex, dataset);
         if (Utils.Math.isNaN(position.x) || Utils.Math.isNaN(position.y)) {
           return;
         }
@@ -496,7 +496,7 @@ export class Plot extends Component {
   }
 
   private _lightweightPlotEntityToPlotEntity(entity: LightweightPlotEntity) {
-    var plotEntity: Plots.PlotEntity = {
+    let plotEntity: Plots.PlotEntity = {
       datum: entity.datum,
       position: entity.position,
       dataset: entity.dataset,
@@ -514,15 +514,15 @@ export class Plot extends Component {
    * @returns {Plots.PlotEntity} The nearest PlotEntity, or undefined if no PlotEntity can be found.
    */
   public entityNearest(queryPoint: Point): Plots.PlotEntity {
-    var closestDistanceSquared = Infinity;
-    var closestPointEntity: LightweightPlotEntity;
-    var entities = this._lightweightEntities();
+    let closestDistanceSquared = Infinity;
+    let closestPointEntity: LightweightPlotEntity;
+    let entities = this._lightweightEntities();
     entities.forEach((entity) => {
       if (!this._entityVisibleOnPlot(entity.position, entity.datum, entity.index, entity.dataset)) {
         return;
       }
 
-      var distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
+      let distanceSquared = Utils.Math.distanceSquared(entity.position, queryPoint);
       if (distanceSquared < closestDistanceSquared) {
         closestDistanceSquared = distanceSquared;
         closestPointEntity = entity;

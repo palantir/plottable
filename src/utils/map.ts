@@ -28,7 +28,7 @@ export module Utils {
         return this;
       }
 
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
+      for (let i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i].key === key) {
           this._keyValuePairs[i].value = value;
           return this;
@@ -43,7 +43,7 @@ export module Utils {
         return <V>this._es6Map.get(key);
       }
 
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
+      for (let i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i].key === key) {
           return this._keyValuePairs[i].value;
         }
@@ -56,7 +56,7 @@ export module Utils {
         return <boolean>this._es6Map.has(key);
       }
 
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
+      for (let i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i].key === key) {
           return true;
         }
@@ -66,7 +66,7 @@ export module Utils {
 
     public forEach(callbackFn: (value: V, key: K, map: Map<K, V>) => void, thisArg?: any) {
       if (this._es6Map != null) {
-        var callbackWrapper = (value: V, key: K) => callbackFn.call(thisArg, value, key, this);
+        let callbackWrapper = (value: V, key: K) => callbackFn.call(thisArg, value, key, this);
         this._es6Map.forEach(callbackWrapper, thisArg);
         return;
       }
@@ -81,7 +81,7 @@ export module Utils {
         return <boolean>this._es6Map.delete(key);
       }
 
-      for (var i = 0; i < this._keyValuePairs.length; i++) {
+      for (let i = 0; i < this._keyValuePairs.length; i++) {
         if (this._keyValuePairs[i].key === key) {
           this._keyValuePairs.splice(i, 1);
           return true;

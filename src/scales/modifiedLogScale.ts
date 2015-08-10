@@ -46,7 +46,7 @@ export module Scales {
      * adjusted to 1, resulting in a returned result of 0.
      */
     private _adjustedLog(x: number): number {
-      var negationFactor = x < 0 ? -1 : 1;
+      let negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
       if (x < this._pivot) {
@@ -60,7 +60,7 @@ export module Scales {
     }
 
     private _invertedAdjustedLog(x: number): number {
-      var negationFactor = x < 0 ? -1 : 1;
+      let negationFactor = x < 0 ? -1 : 1;
       x *= negationFactor;
 
       x = Math.pow(this._base, x);
@@ -87,7 +87,7 @@ export module Scales {
 
     protected _setDomain(values: number[]) {
       this._untransformedDomain = values;
-      var transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
+      let transformedDomain = [this._adjustedLog(values[0]), this._adjustedLog(values[1])];
       super._setDomain(transformedDomain);
     }
 
@@ -99,21 +99,21 @@ export module Scales {
       // Say your domain is [-100, 100] and your pivot is 10.
       // then we're going to draw negative log ticks from -100 to -10,
       // linear ticks from -10 to 10, and positive log ticks from 10 to 100.
-      var middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
-      var min = Utils.Math.min(this._untransformedDomain, 0);
-      var max = Utils.Math.max(this._untransformedDomain, 0);
-      var negativeLower = min;
-      var negativeUpper = middle(min, max, -this._pivot);
-      var positiveLower = middle(min, max, this._pivot);
-      var positiveUpper = max;
+      let middle = (x: number, y: number, z: number) => [x, y, z].sort((a, b) => a - b)[1];
+      let min = Utils.Math.min(this._untransformedDomain, 0);
+      let max = Utils.Math.max(this._untransformedDomain, 0);
+      let negativeLower = min;
+      let negativeUpper = middle(min, max, -this._pivot);
+      let positiveLower = middle(min, max, this._pivot);
+      let positiveUpper = max;
 
-      var negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
-      var positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
+      let negativeLogTicks = this._logTicks(-negativeUpper, -negativeLower).map((x) => -x).reverse();
+      let positiveLogTicks = this._logTicks(positiveLower, positiveUpper);
 
-      var linearMin = Math.max(min, -this._pivot);
-      var linearMax = Math.min(max, this._pivot);
-      var linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
-      var ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
+      let linearMin = Math.max(min, -this._pivot);
+      let linearMax = Math.min(max, this._pivot);
+      let linearTicks = d3.scale.linear().domain([linearMin, linearMax]).ticks(this._howManyTicks(linearMin, linearMax));
+      let ticks = negativeLogTicks.concat(linearTicks).concat(positiveLogTicks);
 
       // If you only have 1 tick, you can't tell how big the scale is.
       if (ticks.length <= 1) {
@@ -136,19 +136,19 @@ export module Scales {
      * drastically exceeding its number of ticks.
      */
     private _logTicks(lower: number, upper: number): number[] {
-      var nTicks = this._howManyTicks(lower, upper);
+      let nTicks = this._howManyTicks(lower, upper);
       if (nTicks === 0) {
         return [];
       }
-      var startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
-      var endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
-      var bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
-      var multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
-      var uniqMultiples = Utils.Array.uniq(multiples);
-      var clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
-      var flattened = Utils.Array.flatten(clusters);
-      var filtered = flattened.filter((x) => lower <= x && x <= upper);
-      var sorted = filtered.sort((x, y) => x - y);
+      let startLogged = Math.floor(Math.log(lower) / Math.log(this._base));
+      let endLogged = Math.ceil(Math.log(upper) / Math.log(this._base));
+      let bases = d3.range(endLogged, startLogged, -Math.ceil((endLogged - startLogged) / nTicks));
+      let multiples = d3.range(this._base, 1, -(this._base - 1)).map(Math.floor);
+      let uniqMultiples = Utils.Array.uniq(multiples);
+      let clusters = bases.map((b) => uniqMultiples.map((x) => Math.pow(this._base, b - 1) * x));
+      let flattened = Utils.Array.flatten(clusters);
+      let filtered = flattened.filter((x) => lower <= x && x <= upper);
+      let sorted = filtered.sort((x, y) => x - y);
       return sorted;
     }
 
@@ -160,12 +160,12 @@ export module Scales {
      * distance when plotted.
      */
     private _howManyTicks(lower: number, upper: number): number {
-      var adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
-      var adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
-      var adjustedLower = this._adjustedLog(lower);
-      var adjustedUpper = this._adjustedLog(upper);
-      var proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
-      var ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
+      let adjustedMin = this._adjustedLog(Utils.Math.min(this._untransformedDomain, 0));
+      let adjustedMax = this._adjustedLog(Utils.Math.max(this._untransformedDomain, 0));
+      let adjustedLower = this._adjustedLog(lower);
+      let adjustedUpper = this._adjustedLog(upper);
+      let proportion = (adjustedUpper - adjustedLower) / (adjustedMax - adjustedMin);
+      let ticks = Math.ceil(proportion * Scales.ModifiedLog._DEFAULT_NUM_TICKS);
       return ticks;
     }
 
@@ -179,7 +179,7 @@ export module Scales {
 
     protected _expandSingleValueDomain(singleValueDomain: number[]): number[] {
       if (singleValueDomain[0] === singleValueDomain[1]) {
-        var singleValue = singleValueDomain[0];
+        let singleValue = singleValueDomain[0];
         if (singleValue > 0) {
           return [singleValue / this._base, singleValue * this._base];
         } else if (singleValue === 0) {

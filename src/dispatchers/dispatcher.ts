@@ -15,7 +15,7 @@ export class Dispatcher {
       return;
     }
     Object.keys(this._eventToCallback).forEach((event: string) => {
-      var callback = this._eventToCallback[event];
+      let callback = this._eventToCallback[event];
       document.addEventListener(event, callback);
     });
     this._connected = true;
@@ -24,7 +24,7 @@ export class Dispatcher {
   private _disconnect() {
     if (this._connected && this._hasNoListeners()) {
       Object.keys(this._eventToCallback).forEach((event: string) => {
-        var callback = this._eventToCallback[event];
+        let callback = this._eventToCallback[event];
         document.removeEventListener(event, callback);
       });
       this._connected = false;

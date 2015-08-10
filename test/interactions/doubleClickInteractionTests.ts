@@ -2,15 +2,15 @@
 
 describe("Interactions", () => {
   describe("DoubleClick", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    let SVG_WIDTH = 400;
+    let SVG_HEIGHT = 400;
 
     describe("onDblClick generic callback", () => {
-      var svg: d3.Selection<void>;
-      var dblClickInteraction: Plottable.Interactions.DoubleClick;
-      var component: Plottable.Component;
-      var doubleClickedPoint: Plottable.Point = null;
-      var dblClickCallback = (p: Plottable.Point) => doubleClickedPoint = p;
+      let svg: d3.Selection<void>;
+      let dblClickInteraction: Plottable.Interactions.DoubleClick;
+      let component: Plottable.Component;
+      let doubleClickedPoint: Plottable.Point = null;
+      let dblClickCallback = (p: Plottable.Point) => doubleClickedPoint = p;
 
       beforeEach(() => {
         svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
@@ -28,13 +28,13 @@ describe("Interactions", () => {
       });
 
       it("double click interaction accepts multiple callbacks", () => {
-        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        let userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
 
-        var newCallback1WasCalled = false;
-        var newCallback1 = () => newCallback1WasCalled = true;
+        let newCallback1WasCalled = false;
+        let newCallback1 = () => newCallback1WasCalled = true;
 
-        var newCallback2WasCalled = false;
-        var newCallback2 = () => newCallback2WasCalled = true;
+        let newCallback2WasCalled = false;
+        let newCallback2 = () => newCallback2WasCalled = true;
 
         dblClickInteraction.onDoubleClick(newCallback1);
         dblClickInteraction.onDoubleClick(newCallback2);
@@ -66,7 +66,7 @@ describe("Interactions", () => {
       });
 
       it("callback sets correct point on normal case", () => {
-        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        let userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
 
         TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
@@ -79,7 +79,7 @@ describe("Interactions", () => {
       });
 
       it("callback not called if clicked in different locations", () => {
-        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        let userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
 
         TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
@@ -92,7 +92,7 @@ describe("Interactions", () => {
       });
 
       it("callback not called does not receive dblclick confirmation", () => {
-        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        let userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
 
         TestMethods.triggerFakeMouseEvent("mousedown", component.content(), userClickPoint.x, userClickPoint.y);
         TestMethods.triggerFakeMouseEvent("mouseup", component.content(), userClickPoint.x, userClickPoint.y);
@@ -104,7 +104,7 @@ describe("Interactions", () => {
       });
 
       it("callback not called does not receive dblclick confirmation", () => {
-        var userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
+        let userClickPoint = {x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2};
 
         TestMethods.triggerFakeTouchEvent("touchstart", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);
         TestMethods.triggerFakeTouchEvent("touchend", component.content(), [{x: userClickPoint.x, y: userClickPoint.y}]);

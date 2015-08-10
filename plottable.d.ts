@@ -94,6 +94,7 @@ declare module Plottable {
     }
 }
 
+
 declare module Plottable {
     module Utils {
         module DOM {
@@ -2132,6 +2133,19 @@ declare module Plottable {
              * @returns {Legend} The calling Legend
              */
             symbol(symbol: (datum: any, index: number) => SymbolFactory): Legend;
+            /**
+             * Gets the opacity of the symbols of the Legend.
+             *
+             * @returns {(datum: any, index: number) => number}
+             */
+            symbolOpacity(): (datum: any, index: number) => number;
+            /**
+             * Sets the opacity of the symbols of the Legend.
+             *
+             * @param {number | ((datum: any, index: number) => number)} symbolOpacity
+             * @returns {Legend} The calling Legend
+             */
+            symbolOpacity(symbolOpacity: number | ((datum: any, index: number) => number)): Legend;
             fixedWidth(): boolean;
             fixedHeight(): boolean;
         }
@@ -2234,12 +2248,10 @@ declare module Plottable {
              *
              * For example, instead of calling `new Table([[a, b], [null, c]])`, you
              * could call
-             * ```typescript
-             * var table = new Table();
+             * var table = new Plottable.Components.Table();
              * table.add(a, 0, 0);
              * table.add(b, 0, 1);
              * table.add(c, 1, 1);
-             * ```
              *
              * @param {Component} component The Component to be added.
              * @param {number} row
@@ -2928,6 +2940,21 @@ declare module Plottable {
             protected _visibleOnPlot(datum: any, pixelPoint: Point, selection: d3.Selection<void>): boolean;
             protected _entityVisibleOnPlot(pixelPoint: Point, datum: any, index: number, dataset: Dataset): boolean;
             protected _propertyProjectors(): AttributeToProjector;
+            /**
+             * Gets the Entities that intersect the Bounds.
+             *
+             * @param {Bounds} bounds
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(bounds: Bounds): PlotEntity[];
+            /**
+             * Gets the Entities that intersect the area defined by the ranges.
+             *
+             * @param {Range} xRange
+             * @param {Range} yRange
+             * @returns {PlotEntity[]}
+             */
+            entitiesIn(xRange: Range, yRange: Range): PlotEntity[];
         }
     }
 }
@@ -3077,6 +3104,32 @@ declare module Plottable {
              * @constructor
              */
             constructor();
+            /**
+             * Gets the interpolation function associated with the plot.
+             *
+             * @return {string | (points: Array<[number, number]>) => string)}
+             */
+            interpolator(): string | ((points: Array<[number, number]>) => string);
+            /**
+             * Sets the interpolation function associated with the plot.
+             *
+             * @param {string | points: Array<[number, number]>) => string} interpolator Interpolation function
+             * @return Plots.Line
+             */
+            interpolator(interpolator: string | ((points: Array<[number, number]>) => string)): Plots.Line<X>;
+            interpolator(interpolator: "linear"): Line<X>;
+            interpolator(interpolator: "linear-closed"): Line<X>;
+            interpolator(interpolator: "step"): Line<X>;
+            interpolator(interpolator: "step-before"): Line<X>;
+            interpolator(interpolator: "step-after"): Line<X>;
+            interpolator(interpolator: "basis"): Line<X>;
+            interpolator(interpolator: "basis-open"): Line<X>;
+            interpolator(interpolator: "basis-closed"): Line<X>;
+            interpolator(interpolator: "bundle"): Line<X>;
+            interpolator(interpolator: "cardinal"): Line<X>;
+            interpolator(interpolator: "cardinal-open"): Line<X>;
+            interpolator(interpolator: "cardinal-closed"): Line<X>;
+            interpolator(interpolator: "monotone"): Line<X>;
             protected _createDrawer(dataset: Dataset): Drawer;
             protected _getResetYFunction(): (d: any, i: number, dataset: Dataset) => number;
             protected _generateDrawSteps(): Drawers.DrawStep[];

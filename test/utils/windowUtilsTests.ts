@@ -3,7 +3,7 @@
 describe("Utils.Window", () => {
   describe("deprecated()", () => {
 
-    var oldWarn: (warning: string) => void;
+    let oldWarn: (warning: string) => void;
 
     before(() => {
       oldWarn = Plottable.Utils.Window.warn;
@@ -14,7 +14,7 @@ describe("Utils.Window", () => {
     });
 
     it("deprecated() issues a warning", () => {
-      var warningTriggered = false;
+      let warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         warningTriggered = true;
       };
@@ -24,17 +24,17 @@ describe("Utils.Window", () => {
     });
 
     it("deprecated() calling method name, version and message are correct", () => {
-      var callingMethod = "reallyOutdatedCallerMethod";
-      var version = "v0.77.2";
-      var message = "hadoop is doopey";
+      let callingMethod = "reallyOutdatedCallerMethod";
+      let version = "v0.77.2";
+      let message = "hadoop is doopey";
 
-      var warningTriggered = false;
+      let warningTriggered = false;
       Plottable.Utils.Window.warn = (msg: string) => {
         assert.isNotNull(msg.match(new RegExp(callingMethod)), "The method name exists in the message " + msg);
         assert.isNotNull(msg.match(/v\d\.\d\d\.\d/), "There exists a version number " + msg);
         assert.strictEqual(msg.match(/v\d\.\d\d\.\d/)[0], version, "The version number has been correctly passed in " + msg);
         assert.isNotNull(msg.match(message)[0], "The message exists in the warning message " + msg);
-        var regEx = new RegExp(message + "$");
+        let regEx = new RegExp(message + "$");
         assert.strictEqual(msg.match(regEx)[0], message, "The message appears at the end of the warning message " + msg);
         warningTriggered = true;
       };

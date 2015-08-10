@@ -2,20 +2,20 @@
 
 describe("Interactions", () => {
   describe("Click", () => {
-    var SVG_WIDTH = 400;
-    var SVG_HEIGHT = 400;
+    let SVG_WIDTH = 400;
+    let SVG_HEIGHT = 400;
 
     it("onClick", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let c = new Plottable.Component();
       c.renderTo(svg);
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      let clickInteraction = new Plottable.Interactions.Click();
       clickInteraction.attachTo(c);
 
-      var callbackCalled = false;
-      var lastPoint: Plottable.Point;
-      var callback = function(p: Plottable.Point) {
+      let callbackCalled = false;
+      let lastPoint: Plottable.Point;
+      let callback = function(p: Plottable.Point) {
         callbackCalled = true;
         lastPoint = p;
       };
@@ -80,15 +80,15 @@ describe("Interactions", () => {
     });
 
     it("offClick()", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let component = new Plottable.Component();
       component.renderTo(svg);
-      var clickInteraction = new Plottable.Interactions.Click();
+      let clickInteraction = new Plottable.Interactions.Click();
 
       clickInteraction.attachTo(component);
 
-      var callbackWasCalled = false;
-      var callback = () => callbackWasCalled = true;
+      let callbackWasCalled = false;
+      let callback = () => callbackWasCalled = true;
 
       clickInteraction.onClick(callback);
       TestMethods.triggerFakeMouseEvent("mousedown", component.content(), 0, 0);
@@ -105,18 +105,18 @@ describe("Interactions", () => {
     });
 
     it("multiple click listeners", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var component = new Plottable.Component();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let component = new Plottable.Component();
       component.renderTo(svg);
-      var clickInteraction = new Plottable.Interactions.Click();
+      let clickInteraction = new Plottable.Interactions.Click();
 
       clickInteraction.attachTo(component);
 
-      var callback1WasCalled = false;
-      var callback1 = () => callback1WasCalled = true;
+      let callback1WasCalled = false;
+      let callback1 = () => callback1WasCalled = true;
 
-      var callback2WasCalled = false;
-      var callback2 = () => callback2WasCalled = true;
+      let callback2WasCalled = false;
+      let callback2 = () => callback2WasCalled = true;
 
       clickInteraction.onClick(callback1);
       clickInteraction.onClick(callback2);
@@ -138,15 +138,15 @@ describe("Interactions", () => {
     });
 
     it("cancelling touches cancels any ongoing clicks", () => {
-      var svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      var c = new Plottable.Component();
+      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+      let c = new Plottable.Component();
       c.renderTo(svg);
 
-      var clickInteraction = new Plottable.Interactions.Click();
+      let clickInteraction = new Plottable.Interactions.Click();
       clickInteraction.attachTo(c);
 
-      var callbackCalled = false;
-      var callback = () => callbackCalled = true;
+      let callbackCalled = false;
+      let callback = () => callbackCalled = true;
       clickInteraction.onClick(callback);
 
       TestMethods.triggerFakeTouchEvent("touchstart", c.content(), [{x: SVG_WIDTH / 2, y: SVG_HEIGHT / 2}]);
