@@ -100,9 +100,11 @@ export class Plot extends Component {
    * Adds a Dataset to the Plot.
    *
    * @param {Dataset} dataset
+   * @param {boolean} callUpdateHandler Whether the typical on-dataset-update handler should be called.
+   *   If not provided, defaults to true.
    * @returns {Plot} The calling Plot.
    */
-  public addDataset(dataset: Dataset) {
+  public addDataset(dataset: Dataset, callUpdateHandler: boolean = true) {
     if (this.datasets().indexOf(dataset) > -1) {
       this.removeDataset(dataset);
     };
@@ -114,7 +116,9 @@ export class Plot extends Component {
     }
 
     dataset.onUpdate(this._onDatasetUpdateCallback);
-    this._onDatasetUpdate();
+    if (callUpdateHandler) {
+      this._onDatasetUpdate();
+    }
     return this;
   }
 
@@ -403,7 +407,8 @@ export class Plot extends Component {
       return currentDatasets;
     }
     currentDatasets.forEach((dataset) => this.removeDataset(dataset));
-    datasets.forEach((dataset) => this.addDataset(dataset));
+    datasets.forEach((dataset) => this.addDataset(dataset, false));
+    this._onDatasetUpdate();
     return this;
   }
 
