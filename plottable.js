@@ -6207,16 +6207,16 @@ var Plottable;
             function GuideLineLayer(orientation) {
                 var _this = this;
                 _super.call(this);
-                this._scaleUpdateCallback = function () {
-                    _this._updatePixelPosition();
-                    _this.render();
-                };
                 if (orientation !== GuideLineLayer.ORIENTATION_VERTICAL && orientation !== GuideLineLayer.ORIENTATION_HORIZONTAL) {
                     throw new Error(orientation + " is not a valid orientation for GuideLineLayer");
                 }
                 this._orientation = orientation;
                 this._clipPathEnabled = true;
                 this.addClass("guide-line-layer");
+                this._scaleUpdateCallback = function () {
+                    _this._updatePixelPosition();
+                    _this.render();
+                };
             }
             GuideLineLayer.prototype._setup = function () {
                 _super.prototype._setup.call(this);

@@ -10,10 +10,7 @@ export module Components {
     private _value: D;
     private _scale: QuantitativeScale<D>;
     private _pixelPosition: number;
-    private _scaleUpdateCallback = () => {
-      this._updatePixelPosition();
-      this.render();
-    };
+    private _scaleUpdateCallback: ScaleCallback<QuantitativeScale<D>>;
     private _line: d3.Selection<void>;
 
     constructor(orientation: string) {
@@ -24,6 +21,10 @@ export module Components {
       this._orientation = orientation;
       this._clipPathEnabled = true;
       this.addClass("guide-line-layer");
+      this._scaleUpdateCallback = () => {
+        this._updatePixelPosition();
+        this.render();
+      };
     }
 
     protected _setup() {
