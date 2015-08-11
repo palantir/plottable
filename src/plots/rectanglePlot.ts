@@ -285,9 +285,9 @@ export module Plots {
       let index = entity.index;
       let dataset = entity.dataset;
       return {
-        x : attrToProjector["x"](datum, index, dataset),
-        y : attrToProjector["y"](datum, index, dataset),
-        width:  attrToProjector["width"](datum, index, dataset),
+        x: attrToProjector["x"](datum, index, dataset),
+        y: attrToProjector["y"](datum, index, dataset),
+        width: attrToProjector["width"](datum, index, dataset),
         height: attrToProjector["height"](datum, index, dataset)
       };
     }
