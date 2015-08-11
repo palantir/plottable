@@ -30,40 +30,6 @@ describe("Interactive Components", () => {
       svg.remove();
     });
 
-    it("enabled(boolean) properly modifies the state", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
-      assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
-      assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
-      svg.remove();
-    });
-
-    it("disables box when enabled(false)", () => {
-      let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
-      let dbl = new Plottable.Components.DragBoxLayer();
-      dbl.enabled(false);
-      dbl.renderTo(svg);
-      assert.isFalse(dbl.boxVisible(), "box is hidden initially");
-
-      let startPoint = {
-        x: SVG_WIDTH / 4,
-        y: SVG_HEIGHT / 4
-      };
-      let endPoint = {
-        x: SVG_WIDTH / 2,
-        y: SVG_HEIGHT / 2
-      };
-
-      let target = dbl.background();
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isFalse(dbl.boxVisible(), "box is not shown when disabled");
-      dbl.enabled(true);
-      TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
-      assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
-      svg.remove();
-    });
-
     it("dismisses on click", () => {
       let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
       let dbl = new Plottable.Components.DragBoxLayer();
@@ -299,6 +265,42 @@ describe("Interactive Components", () => {
       assert.isTrue(callbackDragEnd2Called, "the callback 2 for drag end is still connected");
 
       svg.remove();
+    });
+
+    describe("enabling/disabling", () => {
+      it("enabled(boolean) properly modifies the state", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        assert.isTrue(dbl.enabled(), "drag box layer is enabled by default");
+        assert.strictEqual(dbl.enabled(false), dbl, "enabled(boolean) returns itself");
+        assert.isFalse(dbl.enabled(), "drag box layer reports when it is disabled");
+        svg.remove();
+      });
+
+      it("disables box when enabled(false)", () => {
+        let svg = TestMethods.generateSVG(SVG_WIDTH, SVG_HEIGHT);
+        let dbl = new Plottable.Components.DragBoxLayer();
+        dbl.enabled(false);
+        dbl.renderTo(svg);
+        assert.isFalse(dbl.boxVisible(), "box is hidden initially");
+
+        let startPoint = {
+          x: SVG_WIDTH / 4,
+          y: SVG_HEIGHT / 4
+        };
+        let endPoint = {
+          x: SVG_WIDTH / 2,
+          y: SVG_HEIGHT / 2
+        };
+
+        let target = dbl.background();
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isFalse(dbl.boxVisible(), "box is not shown when disabled");
+        dbl.enabled(true);
+        TestMethods.triggerFakeDragSequence(target, startPoint, endPoint);
+        assert.isTrue(dbl.boxVisible(), "box is shown when enabled");
+        svg.remove();
+      });
     });
 
     describe("resizing", () => {
