@@ -431,6 +431,7 @@ export module Plots {
         let secondaryAttrTextSpace = this._isVertical ? measurement.width : measurement.height;
         let secondaryAttrAvailableSpace = this._isVertical ? w : h;
         let tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+        let showLabelAboveBar = (measurement.height > h);
         if (measurement.width <= w) {
           let offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
           if (!positive) { offset = offset * -1; }
@@ -440,10 +441,16 @@ export module Plots {
             x += offset;
           }
 
-          let showLabel = true;
           let labelPosition = {
             x: x,
-            y: positive ? y : y + h - measurement.height
+            y: y
+          };
+
+          if(showLabelAboveBar) {
+            y = y - h + offset;
+            labelPosition.y = y;
+          } else {
+            labelPosition.y = positive ? y : y + h - measurement.height;
           };
 
           if (this._isVertical) {
@@ -456,15 +463,11 @@ export module Plots {
             }
           }
 
-          if (labelPosition.x < 0 || labelPosition.x + measurement.width > this.width() ||
-              labelPosition.y < 0 || labelPosition.y + measurement.height > this.height()) {
-            showLabel = false;
-          }
-
           let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-          let className = dark ? "dark-label" : "light-label";
-          g.classed(className, true);
-          g.style("visibility", showLabel ? "inherit" : "hidden");
+          let labelPositioningClassName = showLabelAboveBar ? "above-bar-label" : "in-bar-label";
+          g.classed(labelPositioningClassName, true);
+
+          g.style("visibility", "inherit");
           let xAlign: string;
           let yAlign: string;
           if (this._isVertical) {

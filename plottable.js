@@ -7918,6 +7918,7 @@ var Plottable;
                     var secondaryAttrTextSpace = _this._isVertical ? measurement.width : measurement.height;
                     var secondaryAttrAvailableSpace = _this._isVertical ? w : h;
                     var tooWide = secondaryAttrTextSpace + 2 * Bar._LABEL_HORIZONTAL_PADDING > secondaryAttrAvailableSpace;
+                    var showLabelAboveBar = (measurement.height > h);
                     if (measurement.width <= w) {
                         var offset = Math.min((primary - primarySpace) / 2, Bar._LABEL_VERTICAL_PADDING);
                         if (!positive) {
@@ -7929,11 +7930,18 @@ var Plottable;
                         else {
                             x += offset;
                         }
-                        var showLabel = true;
                         var labelPosition = {
                             x: x,
-                            y: positive ? y : y + h - measurement.height
+                            y: y
                         };
+                        if (showLabelAboveBar) {
+                            y = y - h + offset;
+                            labelPosition.y = y;
+                        }
+                        else {
+                            labelPosition.y = positive ? y : y + h - measurement.height;
+                        }
+                        ;
                         if (_this._isVertical) {
                             labelPosition.x = x + w / 2 - measurement.width / 2;
                         }
@@ -7945,14 +7953,10 @@ var Plottable;
                                 labelPosition.x = x;
                             }
                         }
-                        if (labelPosition.x < 0 || labelPosition.x + measurement.width > _this.width() ||
-                            labelPosition.y < 0 || labelPosition.y + measurement.height > _this.height()) {
-                            showLabel = false;
-                        }
                         var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
-                        var className = dark ? "dark-label" : "light-label";
-                        g.classed(className, true);
-                        g.style("visibility", showLabel ? "inherit" : "hidden");
+                        var labelPositioningClassName = showLabelAboveBar ? "above-bar-label" : "in-bar-label";
+                        g.classed(labelPositioningClassName, true);
+                        g.style("visibility", "inherit");
                         var xAlign;
                         var yAlign;
                         if (_this._isVertical) {
