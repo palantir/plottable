@@ -7890,10 +7890,10 @@ var Plottable;
                 var _this = this;
                 var extents = _super.prototype._extentsForProperty.call(this, property);
                 var accScaleBinding;
-                if (property === "x") {
+                if (property === "x" && this._isVertical) {
                     accScaleBinding = this.x();
                 }
-                else if (property === "y") {
+                else if (property === "y" && !this._isVertical) {
                     accScaleBinding = this.y();
                 }
                 else {
@@ -7909,18 +7909,6 @@ var Plottable;
                 ]; });
                 return extents;
             };
-            // protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
-            //   let extent = super._computeExtent(dataset, accScaleBinding, filter);
-            //   let barAccScaleBinding = this._isVertical ? this.x() : this.y();
-            //   if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof QuantitativeScale)) {
-            //     return extent;
-            //   }
-            //   let qScale = <QuantitativeScale<any>>accScaleBinding.scale;
-            //   return [
-            //     qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
-            //     qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
-            //   ];
-            // }
             Bar.prototype._drawLabels = function () {
                 var _this = this;
                 var dataToDraw = this._getDataToDraw();
