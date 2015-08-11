@@ -7886,18 +7886,41 @@ var Plottable;
             /**
              * Makes sure the extent takes into account the widths of the bars
              */
-            Bar.prototype._computeExtent = function (dataset, accScaleBinding, filter) {
-                var extent = _super.prototype._computeExtent.call(this, dataset, accScaleBinding, filter);
-                var barAccScaleBinding = this._isVertical ? this.x() : this.y();
-                if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
-                    return extent;
+            Bar.prototype._extentsForProperty = function (property) {
+                var _this = this;
+                var extents = _super.prototype._extentsForProperty.call(this, property);
+                var accScaleBinding;
+                if (property === "x") {
+                    accScaleBinding = this.x();
                 }
-                var qScale = accScaleBinding.scale;
-                return [
-                    qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
-                    qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
-                ];
+                else if (property === "y") {
+                    accScaleBinding = this.y();
+                }
+                else {
+                    return extents;
+                }
+                if (!(accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
+                    return extents;
+                }
+                var scale = accScaleBinding.scale;
+                extents = extents.map(function (extent) { return [
+                    scale.invert(scale.scale(extent[0]) - _this._barPixelWidth / 2),
+                    scale.invert(scale.scale(extent[1]) + _this._barPixelWidth / 2),
+                ]; });
+                return extents;
             };
+            // protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+            //   let extent = super._computeExtent(dataset, accScaleBinding, filter);
+            //   let barAccScaleBinding = this._isVertical ? this.x() : this.y();
+            //   if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof QuantitativeScale)) {
+            //     return extent;
+            //   }
+            //   let qScale = <QuantitativeScale<any>>accScaleBinding.scale;
+            //   return [
+            //     qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
+            //     qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
+            //   ];
+            // }
             Bar.prototype._drawLabels = function () {
                 var _this = this;
                 var dataToDraw = this._getDataToDraw();

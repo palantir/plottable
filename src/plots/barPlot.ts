@@ -400,20 +400,46 @@ export module Plots {
     /**
      * Makes sure the extent takes into account the widths of the bars
      */
-    protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
-      let extent = super._computeExtent(dataset, accScaleBinding, filter);
+    protected _extentsForProperty(property: string) {
+      var extents = super._extentsForProperty(property)
 
-      let barAccScaleBinding = this._isVertical ? this.x() : this.y();
-      if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof QuantitativeScale)) {
-        return extent;
+      var accScaleBinding: Plots.AccessorScaleBinding<any, any>;
+      if (property === "x") {
+        accScaleBinding = this.x();
+      } else if (property === "y") {
+        accScaleBinding = this.y();
+      } else {
+        return extents;
       }
 
-      let qScale = <QuantitativeScale<any>>accScaleBinding.scale;
-      return [
-        qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
-        qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
-      ];
+      if (!(accScaleBinding.scale instanceof QuantitativeScale)) {
+        return extents;
+      }
+
+      var scale = <QuantitativeScale<any>>accScaleBinding.scale;
+
+      extents = extents.map((extent) => [
+        scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
+        scale.invert(scale.scale(extent[1]) + this._barPixelWidth / 2),
+      ]);
+
+      return extents;
     }
+
+    // protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[] {
+    //   let extent = super._computeExtent(dataset, accScaleBinding, filter);
+
+    //   let barAccScaleBinding = this._isVertical ? this.x() : this.y();
+    //   if (accScaleBinding !== barAccScaleBinding || !(accScaleBinding.scale instanceof QuantitativeScale)) {
+    //     return extent;
+    //   }
+
+    //   let qScale = <QuantitativeScale<any>>accScaleBinding.scale;
+    //   return [
+    //     qScale.invert(qScale.scale(extent[0]) - this._barPixelWidth / 2),
+    //     qScale.invert(qScale.scale(extent[1]) + this._barPixelWidth / 2),
+    //   ];
+    // }
 
     private _drawLabels() {
       let dataToDraw = this._getDataToDraw();

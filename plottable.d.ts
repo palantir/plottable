@@ -3070,7 +3070,7 @@ declare module Plottable {
             /**
              * Makes sure the extent takes into account the widths of the bars
              */
-            protected _computeExtent(dataset: Dataset, accScaleBinding: Plots.AccessorScaleBinding<any, any>, filter: Accessor<boolean>): any[];
+            protected _extentsForProperty(property: string): any[];
             protected _generateDrawSteps(): Drawers.DrawStep[];
             protected _generateAttrToProjector(): {
                 [attr: string]: (datum: any, index: number, dataset: Dataset) => any;
