@@ -634,11 +634,13 @@ export module Plots {
     protected _getDataToDraw() {
       let dataToDraw = new Utils.Map<Dataset, any[]>();
       let attrToProjector = this._generateAttrToProjector();
+      let primaryAccessor = this._isVertical ? this.y().accessor : this.x().accessor;
       this.datasets().forEach((dataset: Dataset) => {
         let data = dataset.data().filter((d, i) => Utils.Math.isValidNumber(attrToProjector["x"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["y"](d, i, dataset)) &&
                                                    Utils.Math.isValidNumber(attrToProjector["width"](d, i, dataset)) &&
-                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)));
+                                                   Utils.Math.isValidNumber(attrToProjector["height"](d, i, dataset)) &&
+                                                   (primaryAccessor(d, i, dataset) != 0));
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;
