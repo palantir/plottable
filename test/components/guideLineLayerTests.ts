@@ -25,7 +25,7 @@ describe("GuideLineLayer", () => {
   });
 
   describe("coordination between scale(), value(), and pixelPosition()", () => {
-    it("changing value() updates pixelPosition()", () => {
+    it("changing value() updates pixelPosition() if scale() is set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
@@ -37,7 +37,7 @@ describe("GuideLineLayer", () => {
       assert.strictEqual(gll.pixelPosition(), expectedPosition, "pixel position was updated to match the set value");
     });
 
-    it("changing pixelPosition() updates value()", () => {
+    it("changing pixelPosition() updates value() if scale() is set", () => {
       let linearScale = new Plottable.Scales.Linear();
       linearScale.domain([0, 1]);
       linearScale.range([0, 100]);
@@ -71,7 +71,7 @@ describe("GuideLineLayer", () => {
       let value = 0.5;
       gll.value(value);
       var setPosition = -999;
-      gll.position(setPosition);
+      gll.pixelPosition(setPosition);
       let expectedPosition = linearScale.scale(value);
       gll.scale(linearScale);
       assert.strictEqual(gll.pixelPosition(), expectedPosition, "setting the scale updates the pixel position");
