@@ -5,6 +5,8 @@ export module Plots {
   export class Rectangle<X, Y> extends XYPlot<X, Y> {
     private static _X2_KEY = "x2";
     private static _Y2_KEY = "y2";
+    private static _LABEL_KEY = "label";
+    private _labelsEnabled = false;
 
     /**
      * A Rectangle Plot displays rectangles based on the data.
@@ -303,6 +305,50 @@ export module Plots {
       return intersected;
     }
 
+    /**
+     * Gets the Accessor for label.
+     */
+    public label(): AccessorScaleBinding<any, string>;
+    /**
+     * Sets label to the result of an Accessor.
+     *
+     * @param {Accessor<string>} label
+     * @returns {Plots.Rectangle} The calling Rectangle Plot.
+     */
+    public label(label: Accessor<string>): Plots.Rectangle<X, Y>;
+    public label(label?: Accessor<string>): any {
+      if (label === undefined) {
+        return this._propertyBindings.get(Rectangle._LABEL_KEY);
+      }
+
+      this._bindProperty(Rectangle._LABEL_KEY, label, null);
+      this.render();
+      return this;
+    }
+
+    /**
+     * Get whether rectangle labels are enabled.
+     *
+     * @returns {boolean} Whether rectangles should display labels or not.
+     */
+    public labelsEnabled(): boolean;
+    /**
+     * Sets whether labels are enabled.
+     *
+     * @param {boolean} labelsEnabled
+     * @returns {Rectangle} The calling Rectangle Plot.
+     */
+    public labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
+    public labelsEnabled(enabled?: boolean): any {
+      if (enabled === undefined) {
+        return this._labelsEnabled;
+      } else {
+        this._labelsEnabled = enabled;
+        this.render();
+        return this;
+      }
+    }
+
     protected _propertyProjectors(): AttributeToProjector {
       let attrToProjector = super._propertyProjectors();
       if (this.x2() != null) {
@@ -353,6 +399,54 @@ export module Plots {
         dataToDraw.set(dataset, data);
       });
       return dataToDraw;
+    }
+
+    protected _additionalPaint(time: number) {
+      this._renderArea.select(".label-area").remove();
+      if (this._labelsEnabled && this.label() != null) {
+        Utils.Window.setTimeout(() => this._drawLabels(), time);
+      }
+    }
+
+    private _drawLabels() {
+      let dataToDraw = this._getDataToDraw();
+      this.datasets().forEach((dataset) => this._drawLabel(dataToDraw.get(dataset), dataset));
+    }
+
+    private _drawLabel(data: any[], dataset: Dataset) {
+      let attrToProjector = this._generateAttrToProjector();
+      let labelArea = this._renderArea.append("g").classed("label-area", true);
+      let measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+      let writer = new SVGTypewriter.Writers.Writer(measurer);
+      data.forEach((datum, datumIndex) => {
+        let label = "" + this.label().accessor(datum, datumIndex, dataset);
+        let measurement = measurer.measure(label);
+
+        let x = attrToProjector["x"](datum, datumIndex, dataset);
+        let y = attrToProjector["y"](datum, datumIndex, dataset);
+        let width = attrToProjector["width"](datum, datumIndex, dataset);
+        let height = attrToProjector["height"](datum, datumIndex, dataset);
+
+        if (measurement.height <= height && measurement.width <= width) {
+          let horizontalOffset = (width - measurement.width) / 2;
+          let verticalOffset = (height - measurement.height) / 2;
+          x += horizontalOffset;
+          y += verticalOffset;
+
+          let color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+          let dark = Utils.Color.contrast("white", color) * 1.6 < Utils.Color.contrast("black", color);
+          let g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+          let className = dark ? "dark-label" : "light-label";
+          g.classed(className, true);
+
+          writer.write(label, measurement.width, measurement.height, {
+            selection: g,
+            xAlign: "center",
+            yAlign: "center",
+            textRotation: 0
+          });
+        }
+      });
     }
   }
 }

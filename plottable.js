@@ -7258,6 +7258,7 @@ var Plottable;
              */
             function Rectangle() {
                 _super.call(this);
+                this._labelsEnabled = false;
                 this.animator("rectangles", new Plottable.Animators.Null());
                 this.addClass("rectangle-plot");
             }
@@ -7439,6 +7440,24 @@ var Plottable;
                 });
                 return intersected;
             };
+            Rectangle.prototype.label = function (label) {
+                if (label === undefined) {
+                    return this._propertyBindings.get(Rectangle._LABEL_KEY);
+                }
+                this._bindProperty(Rectangle._LABEL_KEY, label, null);
+                this.render();
+                return this;
+            };
+            Rectangle.prototype.labelsEnabled = function (enabled) {
+                if (enabled === undefined) {
+                    return this._labelsEnabled;
+                }
+                else {
+                    this._labelsEnabled = enabled;
+                    this.render();
+                    return this;
+                }
+            };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 if (this.x2() != null) {
@@ -7488,8 +7507,53 @@ var Plottable;
                 });
                 return dataToDraw;
             };
+            Rectangle.prototype._additionalPaint = function (time) {
+                var _this = this;
+                this._renderArea.select(".label-area").remove();
+                if (this._labelsEnabled && this.label() != null) {
+                    Plottable.Utils.Window.setTimeout(function () { return _this._drawLabels(); }, time);
+                }
+            };
+            Rectangle.prototype._drawLabels = function () {
+                var _this = this;
+                var dataToDraw = this._getDataToDraw();
+                this.datasets().forEach(function (dataset) { return _this._drawLabel(dataToDraw.get(dataset), dataset); });
+            };
+            Rectangle.prototype._drawLabel = function (data, dataset) {
+                var _this = this;
+                var attrToProjector = this._generateAttrToProjector();
+                var labelArea = this._renderArea.append("g").classed("label-area", true);
+                var measurer = new SVGTypewriter.Measurers.Measurer(labelArea);
+                var writer = new SVGTypewriter.Writers.Writer(measurer);
+                data.forEach(function (datum, datumIndex) {
+                    var label = "" + _this.label().accessor(datum, datumIndex, dataset);
+                    var measurement = measurer.measure(label);
+                    var x = attrToProjector["x"](datum, datumIndex, dataset);
+                    var y = attrToProjector["y"](datum, datumIndex, dataset);
+                    var width = attrToProjector["width"](datum, datumIndex, dataset);
+                    var height = attrToProjector["height"](datum, datumIndex, dataset);
+                    if (measurement.height <= height && measurement.width <= width) {
+                        var horizontalOffset = (width - measurement.width) / 2;
+                        var verticalOffset = (height - measurement.height) / 2;
+                        x += horizontalOffset;
+                        y += verticalOffset;
+                        var color = attrToProjector["fill"] == null ? "black" : attrToProjector["fill"](datum, datumIndex, dataset);
+                        var dark = Plottable.Utils.Color.contrast("white", color) * 1.6 < Plottable.Utils.Color.contrast("black", color);
+                        var g = labelArea.append("g").attr("transform", "translate(" + x + "," + y + ")");
+                        var className = dark ? "dark-label" : "light-label";
+                        g.classed(className, true);
+                        writer.write(label, measurement.width, measurement.height, {
+                            selection: g,
+                            xAlign: "center",
+                            yAlign: "center",
+                            textRotation: 0
+                        });
+                    }
+                });
+            };
             Rectangle._X2_KEY = "x2";
             Rectangle._Y2_KEY = "y2";
+            Rectangle._LABEL_KEY = "label";
             return Rectangle;
         })(Plottable.XYPlot);
         Plots.Rectangle = Rectangle;
