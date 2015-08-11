@@ -70,7 +70,7 @@ describe("GuideLineLayer", () => {
       let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
       let value = 0.5;
       gll.value(value);
-      var setPosition = -999;
+      let setPosition = -999;
       gll.pixelPosition(setPosition);
       let expectedPosition = linearScale.scale(value);
       gll.scale(linearScale);
