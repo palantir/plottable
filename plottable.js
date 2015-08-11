@@ -7415,10 +7415,23 @@ var Plottable;
                 }
                 return this._entitiesIntersecting(dataXRange, dataYRange);
             };
+            Rectangle.prototype._entityBBox = function (entity, attrToProjector) {
+                var datum = entity.datum;
+                var index = entity.index;
+                var dataset = entity.dataset;
+                return {
+                    x: attrToProjector["x"](datum, index, dataset),
+                    y: attrToProjector["y"](datum, index, dataset),
+                    width: attrToProjector["width"](datum, index, dataset),
+                    height: attrToProjector["height"](datum, index, dataset)
+                };
+            };
             Rectangle.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+                var _this = this;
                 var intersected = [];
+                var attrToProjector = this._generateAttrToProjector();
                 this.entities().forEach(function (entity) {
-                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.elementBBox(entity.selection))) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, _this._entityBBox(entity, attrToProjector))) {
                         intersected.push(entity);
                     }
                 });

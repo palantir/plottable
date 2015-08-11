@@ -280,10 +280,23 @@ export module Plots {
       return this._entitiesIntersecting(dataXRange, dataYRange);
     }
 
+    private _entityBBox(entity: PlotEntity, attrToProjector: AttributeToProjector): SVGRect {
+      let datum = entity.datum;
+      let index = entity.index;
+      let dataset = entity.dataset;
+      return {
+        x : attrToProjector["x"](datum, index, dataset),
+        y : attrToProjector["y"](datum, index, dataset),
+        width:  attrToProjector["width"](datum, index, dataset),
+        height: attrToProjector["height"](datum, index, dataset)
+      };
+    }
+
     private _entitiesIntersecting(xValOrRange: number | Range, yValOrRange: number | Range): PlotEntity[] {
       let intersected: PlotEntity[] = [];
+      let attrToProjector = this._generateAttrToProjector();
       this.entities().forEach((entity) => {
-        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Utils.DOM.elementBBox(entity.selection))) {
+        if (Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, this._entityBBox(entity, attrToProjector))) {
           intersected.push(entity);
         }
       });
