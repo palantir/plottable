@@ -7899,7 +7899,7 @@ var Plottable;
                 else {
                     return extents;
                 }
-                if (!(accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
+                if (!(accScaleBinding && accScaleBinding.scale && accScaleBinding.scale instanceof Plottable.QuantitativeScale)) {
                     return extents;
                 }
                 var scale = accScaleBinding.scale;

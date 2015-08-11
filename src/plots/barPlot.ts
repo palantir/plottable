@@ -412,7 +412,7 @@ export module Plots {
         return extents;
       }
 
-      if (!(accScaleBinding.scale instanceof QuantitativeScale)) {
+      if (!(accScaleBinding && accScaleBinding.scale && accScaleBinding.scale instanceof QuantitativeScale)) {
         return extents;
       }
 
