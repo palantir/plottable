@@ -147,7 +147,6 @@ export module Formatters {
    */
   export function shortScale(precision = 3) {
     verifyPrecision(precision);
-    precision = Math.floor(precision);
     let suffixes = "KMBTQ";
     let exponentFormatter = d3.format("." + precision + "e");
     let fixedFormatter = d3.format("." + precision + "f");
@@ -268,6 +267,10 @@ export module Formatters {
   function verifyPrecision(precision: number) {
     if (precision < 0 || precision > 20) {
       throw new RangeError("Formatter precision must be between 0 and 20");
+    }
+
+    if (precision !== Math.floor(precision)) {
+      throw new RangeError("Formatter precision must be an integer");
     }
   }
 

@@ -1281,7 +1281,6 @@ var Plottable;
         function shortScale(precision) {
             if (precision === void 0) { precision = 3; }
             verifyPrecision(precision);
-            precision = Math.floor(precision);
             var suffixes = "KMBTQ";
             var exponentFormatter = d3.format("." + precision + "e");
             var fixedFormatter = d3.format("." + precision + "f");
@@ -1404,6 +1403,9 @@ var Plottable;
         function verifyPrecision(precision) {
             if (precision < 0 || precision > 20) {
                 throw new RangeError("Formatter precision must be between 0 and 20");
+            }
+            if (precision !== Math.floor(precision)) {
+                throw new RangeError("Formatter precision must be an integer");
             }
         }
     })(Formatters = Plottable.Formatters || (Plottable.Formatters = {}));
