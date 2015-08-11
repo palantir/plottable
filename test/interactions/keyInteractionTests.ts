@@ -196,6 +196,12 @@ describe("Interactions", () => {
         TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
         assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
 
+        TestMethods.triggerFakeMouseEvent("mouseout", component.background(), -100, -100);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode);
+        TestMethods.triggerFakeMouseEvent("mouseover", component.background(), 100, 100);
+        TestMethods.triggerFakeKeyboardEvent("keyup", component.background(), aCode);
+        TestMethods.triggerFakeKeyboardEvent("keydown", component.background(), aCode, { repeat : true });
+        assert.isFalse(aCallbackCalled, "callback for \"a\" was not called when \"a\" key was released");
         keyInteraction.offKeyRelease(aCode, aCallback);
         svg.remove();
       });

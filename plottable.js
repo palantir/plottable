@@ -10061,7 +10061,7 @@ var Plottable;
                 this._keyReleaseCallbacks = {};
                 this._mouseMoveCallback = function (point) { return false; }; // HACKHACK: registering a listener
                 this._downedKeys = new Plottable.Utils.Set();
-                this._keyDownCallback = function (keyCode) { return _this._handleKeyDownEvent(keyCode); };
+                this._keyDownCallback = function (keyCode, event) { return _this._handleKeyDownEvent(keyCode, event); };
                 this._keyUpCallback = function (keyCode) { return _this._handleKeyUpEvent(keyCode); };
             }
             Key.prototype._anchor = function (component) {
@@ -10080,9 +10080,9 @@ var Plottable;
                 this._keyDispatcher.offKeyUp(this._keyUpCallback);
                 this._keyDispatcher = null;
             };
-            Key.prototype._handleKeyDownEvent = function (keyCode) {
+            Key.prototype._handleKeyDownEvent = function (keyCode, event) {
                 var p = this._translateToComponentSpace(this._positionDispatcher.lastMousePosition());
-                if (this._isInsideComponent(p)) {
+                if (this._isInsideComponent(p) && !event.repeat) {
                     if (this._keyPressCallbacks[keyCode]) {
                         this._keyPressCallbacks[keyCode].callCallbacks(keyCode);
                     }
