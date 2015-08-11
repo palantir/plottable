@@ -401,9 +401,9 @@ export module Plots {
      * Makes sure the extent takes into account the widths of the bars
      */
     protected _extentsForProperty(property: string) {
-      var extents = super._extentsForProperty(property)
+      let extents = super._extentsForProperty(property);
 
-      var accScaleBinding: Plots.AccessorScaleBinding<any, any>;
+      let accScaleBinding: Plots.AccessorScaleBinding<any, any>;
       if (property === "x" && this._isVertical) {
         accScaleBinding = this.x();
       } else if (property === "y" && !this._isVertical) {
@@ -416,7 +416,7 @@ export module Plots {
         return extents;
       }
 
-      var scale = <QuantitativeScale<any>>accScaleBinding.scale;
+      let scale = <QuantitativeScale<any>>accScaleBinding.scale;
 
       extents = extents.map((extent) => [
         scale.invert(scale.scale(extent[0]) - this._barPixelWidth / 2),
