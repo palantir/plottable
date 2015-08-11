@@ -17,11 +17,21 @@ describe("GuideLineLayer", () => {
   });
 
   it("pixelPosition()", () => {
-    let gll = new Plottable.Components.GuideLineLayer<number>("vertical");
+    let gll = new Plottable.Components.GuideLineLayer<void>("vertical");
     let expectedPosition = 5;
     assert.isUndefined(gll.pixelPosition(), "returns undefined before any pixel position is set");
     assert.strictEqual(gll.pixelPosition(expectedPosition), gll, "setter returns the calling GuideLineLayer");
     assert.strictEqual(gll.pixelPosition(), expectedPosition, "getter returns the set pixel position");
+  });
+
+  it("destroy() disconnects from scale safely", () => {
+    let scaleLessGLL = new Plottable.Components.GuideLineLayer<void>("vertical");
+    assert.doesNotThrow(() => scaleLessGLL.destroy(), Error, "destroy() does not error if no scale was set");
+    let timeScaleGLL = new Plottable.Components.GuideLineLayer<Date>("vertical");
+    let timeScale = new Plottable.Scales.Time();
+    timeScaleGLL.scale(timeScale);
+    assert.doesNotThrow(() => timeScaleGLL.destroy(), Error, "destroy() does not error if a scale was set");
+    assert.strictEqual((<any>timeScale)._callbacks.size, 0, "callback was removed from Scale");
   });
 
   describe("coordination between scale(), value(), and pixelPosition()", () => {
@@ -83,11 +93,7 @@ describe("GuideLineLayer", () => {
       let expectedPositionB = linearScaleB.scale(value);
       gll.scale(linearScaleB);
       assert.strictEqual(gll.pixelPosition(), expectedPositionB, "changing the scale updates the pixel position");
-
-      linearScaleB.range([0, 400]); // range changes are non-updating
-      assert.strictEqual(gll.pixelPosition(), expectedPositionB, "range() updates don't normally affect GuideLineLayer");
-      linearScale.domain([0, 2]);
-      assert.strictEqual(gll.pixelPosition(), expectedPositionB, "changing the old scale does not trigger updates");
+      assert.strictEqual((<any>linearScale)._callbacks.size, 0, "callback was removed from the previous Scale");
     });
 
     it("changing the scale updates value() if pixelPosition() is set but value() is not", () => {

@@ -2470,6 +2470,7 @@ declare module Plottable {
              * @return {GuideLineLayer<D>} The calling GuideLineLayer.
              */
             pixelPosition(pixelPosition: number): GuideLineLayer<D>;
+            destroy(): void;
         }
     }
 }

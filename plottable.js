@@ -6290,6 +6290,12 @@ var Plottable;
                 this.render();
                 return this;
             };
+            GuideLineLayer.prototype.destroy = function () {
+                _super.prototype.destroy.call(this);
+                if (this.scale() != null) {
+                    this.scale().offUpdate(this._scaleUpdateCallback);
+                }
+            };
             GuideLineLayer.ORIENTATION_VERTICAL = "vertical";
             GuideLineLayer.ORIENTATION_HORIZONTAL = "horizontal";
             return GuideLineLayer;

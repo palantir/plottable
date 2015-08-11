@@ -149,6 +149,13 @@ export module Components {
       this.render();
       return this;
     }
+
+    public destroy() {
+      super.destroy();
+      if (this.scale() != null) {
+        this.scale().offUpdate(this._scaleUpdateCallback);
+      }
+    }
   }
 }
 }
