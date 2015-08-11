@@ -445,15 +445,15 @@ describe("Plots", () => {
     });
 
     describe("Rectangle Plot With Labels", () => {
-      let svg: d3.Selection<any>;
-      let rectanglePlot: Plottable.Plots.Rectangle<any, any>;
+      let svg: d3.Selection<void>;
+      let rectanglePlot: Plottable.Plots.Rectangle<number, number>;
       let DATA: [any];
       let dataset: Plottable.Dataset;
       beforeEach(() => {
         let xScale = new Plottable.Scales.Linear();
         let yScale = new Plottable.Scales.Linear();
         svg = TestMethods.generateSVG(SVG_WIDTH / 2, SVG_HEIGHT);
-        rectanglePlot = new Plottable.Plots.Rectangle();
+        rectanglePlot = new Plottable.Plots.Rectangle<number, number>();
         DATA = [
           { x: 0, y: 0, x2: 1, y2: 1, val: 1 },
           { x: 0, y: 1, x2: 1, y2: 2, val: 2 }

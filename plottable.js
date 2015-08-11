@@ -6759,7 +6759,7 @@ var Plottable;
                 return this;
             };
             Pie.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7441,7 +7441,7 @@ var Plottable;
                 return intersected;
             };
             Rectangle.prototype.label = function (label) {
-                if (label === undefined) {
+                if (label == null) {
                     return this._propertyBindings.get(Rectangle._LABEL_KEY);
                 }
                 this._bindProperty(Rectangle._LABEL_KEY, label, null);
@@ -7449,7 +7449,7 @@ var Plottable;
                 return this;
             };
             Rectangle.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {
@@ -7814,7 +7814,7 @@ var Plottable;
                 return this;
             };
             Bar.prototype.labelsEnabled = function (enabled) {
-                if (enabled === undefined) {
+                if (enabled == null) {
                     return this._labelsEnabled;
                 }
                 else {

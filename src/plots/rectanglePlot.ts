@@ -317,7 +317,7 @@ export module Plots {
      */
     public label(label: Accessor<string>): Plots.Rectangle<X, Y>;
     public label(label?: Accessor<string>): any {
-      if (label === undefined) {
+      if (label == null) {
         return this._propertyBindings.get(Rectangle._LABEL_KEY);
       }
 
@@ -340,7 +340,7 @@ export module Plots {
      */
     public labelsEnabled(enabled: boolean): Plots.Rectangle<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
-      if (enabled === undefined) {
+      if (enabled == null) {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;

@@ -181,7 +181,7 @@ export module Plots {
      */
     public labelsEnabled(enabled: boolean): Bar<X, Y>;
     public labelsEnabled(enabled?: boolean): any {
-      if (enabled === undefined) {
+      if (enabled == null) {
         return this._labelsEnabled;
       } else {
         this._labelsEnabled = enabled;
