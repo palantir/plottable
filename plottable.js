@@ -10413,9 +10413,33 @@ var Plottable;
                     }
                     var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
                     _this.xScales().forEach(function (xScale) {
+                        var domainIncreasing = xScale.domain()[1] > xScale.domain()[0];
+                        var positiveTranslate = translateAmountX > 0;
+                        var positiveDataTranslate = domainIncreasing === positiveTranslate;
+                        var limitingDomainValue = positiveDataTranslate ? _this.maxDomainValue(xScale) : _this.minDomainValue(xScale);
+                        if (limitingDomainValue == null) {
+                            return;
+                        }
+                        var relevantRangeValue = positiveTranslate ? xScale.range()[1] : xScale.range()[0];
+                        var limiter = positiveTranslate ? Math.min : Math.max;
+                        translateAmountX = limiter(translateAmountX, xScale.scale(limitingDomainValue) - relevantRangeValue);
+                    });
+                    _this.xScales().forEach(function (xScale) {
                         _this._translateScale(xScale, translateAmountX);
                     });
                     var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+                    _this.yScales().forEach(function (yScale) {
+                        var domainIncreasing = yScale.domain()[1] > yScale.domain()[0];
+                        var positiveTranslate = translateAmountY < 0;
+                        var positiveDataTranslate = domainIncreasing === positiveTranslate;
+                        var limitingDomainValue = positiveDataTranslate ? _this.maxDomainValue(yScale) : _this.minDomainValue(yScale);
+                        if (limitingDomainValue == null) {
+                            return;
+                        }
+                        var relevantRangeValue = positiveTranslate ? yScale.range()[1] : yScale.range()[0];
+                        var limiter = positiveTranslate ? Math.min : Math.max;
+                        translateAmountY = limiter(translateAmountY, yScale.scale(limitingDomainValue) - relevantRangeValue);
+                    });
                     _this.yScales().forEach(function (yScale) {
                         _this._translateScale(yScale, translateAmountY);
                     });

@@ -234,10 +234,36 @@ export module Interactions {
         var translateAmountX = (lastDragPoint == null ? startPoint.x : lastDragPoint.x) - endPoint.x;
 
         this.xScales().forEach((xScale) => {
+          let domainIncreasing = xScale.domain()[1] > xScale.domain()[0];
+          let positiveTranslate = translateAmountX > 0;
+          let positiveDataTranslate = domainIncreasing === positiveTranslate;
+          let limitingDomainValue = positiveDataTranslate ? this.maxDomainValue(xScale) : this.minDomainValue(xScale);
+          if (limitingDomainValue == null) {
+            return;
+          }
+          let relevantRangeValue = positiveTranslate ? xScale.range()[1] : xScale.range()[0];
+          let limiter = positiveTranslate ? Math.min : Math.max;
+          translateAmountX = limiter(translateAmountX, xScale.scale(limitingDomainValue) - relevantRangeValue);
+        });
+
+        this.xScales().forEach((xScale) => {
           this._translateScale(xScale, translateAmountX);
         });
 
         var translateAmountY = (lastDragPoint == null ? startPoint.y : lastDragPoint.y) - endPoint.y;
+
+        this.yScales().forEach((yScale) => {
+          let domainIncreasing = yScale.domain()[1] > yScale.domain()[0];
+          let positiveTranslate = translateAmountY < 0;
+          let positiveDataTranslate = domainIncreasing === positiveTranslate;
+          let limitingDomainValue = positiveDataTranslate ? this.maxDomainValue(yScale) : this.minDomainValue(yScale);
+          if (limitingDomainValue == null) {
+            return;
+          }
+          let relevantRangeValue = positiveTranslate ? yScale.range()[1] : yScale.range()[0];
+          let limiter = positiveTranslate ? Math.min : Math.max;
+          translateAmountY = limiter(translateAmountY, yScale.scale(limitingDomainValue) - relevantRangeValue);
+        });
 
         this.yScales().forEach((yScale) => {
           this._translateScale(yScale, translateAmountY);
