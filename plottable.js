@@ -7401,6 +7401,29 @@ var Plottable;
                     return x <= point.x && point.x <= x + width && y <= point.y && point.y <= y + height;
                 });
             };
+            Rectangle.prototype.entitiesIn = function (xRangeOrBounds, yRange) {
+                var dataXRange;
+                var dataYRange;
+                if (yRange == null) {
+                    var bounds = xRangeOrBounds;
+                    dataXRange = { min: bounds.topLeft.x, max: bounds.bottomRight.x };
+                    dataYRange = { min: bounds.topLeft.y, max: bounds.bottomRight.y };
+                }
+                else {
+                    dataXRange = xRangeOrBounds;
+                    dataYRange = yRange;
+                }
+                return this._entitiesIntersecting(dataXRange, dataYRange);
+            };
+            Rectangle.prototype._entitiesIntersecting = function (xValOrRange, yValOrRange) {
+                var intersected = [];
+                this.entities().forEach(function (entity) {
+                    if (Plottable.Utils.DOM.intersectsBBox(xValOrRange, yValOrRange, Plottable.Utils.DOM.elementBBox(entity.selection))) {
+                        intersected.push(entity);
+                    }
+                });
+                return intersected;
+            };
             Rectangle.prototype._propertyProjectors = function () {
                 var attrToProjector = _super.prototype._propertyProjectors.call(this);
                 if (this.x2() != null) {
